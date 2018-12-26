@@ -21,6 +21,12 @@
 #define hv_sfence() _mm_sfence()
 #elif __arm__ || HV_SIMD_NEON
   #if __ARM_ACLE
+    #ifdef __clang__
+      // this is defined by Xenomai's compiler.h and it causes
+      // troubles when including the below, where it is defined as a function
+      #undef  __clz
+    #endif /* __clang_ */
+
     #include <arm_acle.h>
     // https://msdn.microsoft.com/en-us/library/hh875058.aspx#BarrierRestrictions
     // http://doxygen.reactos.org/d8/d47/armintr_8h_a02be7ec76ca51842bc90d9b466b54752.html
