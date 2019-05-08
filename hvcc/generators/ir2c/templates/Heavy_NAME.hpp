@@ -3,6 +3,7 @@
 #ifndef _HEAVY_CONTEXT_{{name|upper}}_HPP_
 #define _HEAVY_CONTEXT_{{name|upper}}_HPP_
 
+#include <new> // for std::bad_alloc
 // object includes
 #include "HeavyContext.hpp"
 {%- for i in include_set %}
@@ -15,6 +16,16 @@ class Heavy_{{name}} : public HeavyContext {
   Heavy_{{name}}(double sampleRate, int poolKb=10, int inQueueKb=2, int outQueueKb=0);
   ~Heavy_{{name}}();
 
+  // ensure desired alignment is achieved even for heap allocation
+  void* operator new(size_t sz) {
+    auto ptr = aligned_alloc(alignof(Heavy_{{name}}), sz);
+    if(!ptr)
+    {
+      std::bad_alloc e;
+      throw(e);
+    }
+    return ptr;
+  }
   const char *getName() override { return "{{name}}"; }
   int getNumInputChannels() override { return {{signal.numInputBuffers}}; }
   int getNumOutputChannels() override { return {{signal.numOutputBuffers}}; }
