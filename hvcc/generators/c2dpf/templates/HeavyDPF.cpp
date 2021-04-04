@@ -36,6 +36,7 @@ void {{class_name}}::initParameter(uint32_t index, Parameter& parameter)
       case param{{v.display}}:
         parameter.name = "{{v.display.replace('_', ' ')}}";
         parameter.symbol = "{{v.display|lower}}";
+        parameter.hints = kParameterIsAutomable;
         _parameters[{{loop.index-1}}] = {{(v.attributes.default-v.attributes.min)/(v.attributes.max-v.attributes.min)}}f; // {{v.display}}
         break;
     {%- endfor %}
@@ -66,7 +67,6 @@ void {{class_name}}::setParameterValue(uint32_t index, float value)
       _context->sendFloatToReceiver(
           Heavy_{{name}}::Parameter::In::{{k|upper}},
           scaleParameterForIndex(index, value));
-          // value);
       break;
     }
     {%- endfor %}
