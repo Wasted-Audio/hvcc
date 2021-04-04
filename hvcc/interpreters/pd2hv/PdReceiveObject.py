@@ -55,11 +55,13 @@ class PdReceiveObject(PdObject):
                 self.__attributes = {
                     "min": 0.0,
                     "max": 1.0,
-                    "default": 0.5
+                    "default": 0.5,
+                    "type": "float"
                 }
                 self.__attributes["min"] = float(self.obj_args[2])
                 self.__attributes["max"] = float(self.obj_args[3])
                 self.__attributes["default"] = float(self.obj_args[4])
+                self.__attributes["type"] = str(self.obj_args[5])
             except ValueError:
                 self.add_warning(
                     f"Minimum, maximum, and default values for Parameter {self.__receiver_name}  must be numbers.")

@@ -36,7 +36,10 @@ void {{class_name}}::initParameter(uint32_t index, Parameter& parameter)
       case param{{v.display}}:
         parameter.name = "{{v.display.replace('_', ' ')}}";
         parameter.symbol = "{{v.display|lower}}";
-        parameter.hints = kParameterIsAutomable;
+        parameter.hints = kParameterIsAutomable
+      {%- if v.attributes.type == 'bool': -%}
+        | kParameterIsBoolean
+      {%- endif -%};
         _parameters[{{loop.index-1}}] = {{(v.attributes.default-v.attributes.min)/(v.attributes.max-v.attributes.min)}}f; // {{v.display}}
         break;
     {%- endfor %}
