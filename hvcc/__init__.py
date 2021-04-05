@@ -353,7 +353,7 @@ def main():
         "--gen",
         nargs="+",
         default=["c"],
-        help="List of generator outputs: c, unity, wwise, js, vst2, dpf, fabric")
+        help="List of generator outputs: c, unity, wwise, js, pdext, dpf, fabric")
     parser.add_argument(
         "--results_path",
         help="Write results dictionary to the given path as a JSON-formatted string."

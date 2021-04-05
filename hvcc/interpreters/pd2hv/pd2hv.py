@@ -45,6 +45,10 @@ class pd2hv:
         tick = time.time()
 
         parser = PdParser()  # create parser state
+        if search_paths is not None:
+            for p in search_paths:
+                parser.add_absolute_search_directory(p)
+
         pd_graph = parser.graph_from_file(pd_path)
         notices = pd_graph.get_notices()
 

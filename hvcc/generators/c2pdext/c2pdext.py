@@ -35,13 +35,19 @@ class c2pdext:
     def filter_xcode_build(clazz, s):
         """Return a build hash suitable for use in an Xcode project file.
         """
-        return hashlib.md5(s + "_build").hexdigest().upper()[0:24]
+        s = f"{s}_build"
+        s = hashlib.md5(s.encode('utf-8'))
+        s = s.hexdigest().upper()[0:24]
+        return s
 
     @classmethod
     def filter_xcode_fileref(clazz, s):
         """Return a fileref hash suitable for use in an Xcode project file.
         """
-        return hashlib.md5(s + "_fileref").hexdigest().upper()[0:24]
+        s = f"{s}_fileref"
+        s = hashlib.md5(s.encode('utf-8'))
+        s = s.hexdigest().upper()[0:24]
+        return s
 
     @classmethod
     def compile(clazz, c_src_dir, out_dir, externs,
