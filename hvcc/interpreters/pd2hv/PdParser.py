@@ -110,15 +110,18 @@ class PdParser:
                 else:
                     concat = (concat + " " + li) if len(concat) > 0 else li
 
-    def add_relative_search_directory(self, search_dir):
-        search_dir = os.path.abspath(os.path.join(
-            self.__search_paths[0],
-            search_dir))
+    def add_absolute_search_directory(self, search_dir):
         if os.path.isdir(search_dir):
             self.__search_paths.append(search_dir)
             return True
         else:
             return False
+
+    def add_relative_search_directory(self, search_dir):
+        search_dir = os.path.abspath(os.path.join(
+            self.__search_paths[0],
+            search_dir))
+        return self.add_absolute_search_directory(search_dir)
 
     def find_abstraction_path(self, local_dir, abs_name):
         """ Finds the full path for an abstraction.
