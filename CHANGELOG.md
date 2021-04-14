@@ -8,7 +8,8 @@ Next
 * pep8 checks
 * update docs
 * bundle utils into executable package
-
+* add bool attribute type
+* improve pd search paths
 
 0.0.1
 -----
