@@ -13,23 +13,31 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import sys
 import argparse
 import json
 
+import hvcc.core.hv2ir.HeavyLangObject as HeavyLangObject
 import hvcc.interpreters.pd2hv.PdParser as PdParser
 
 
 def main():
     parser = argparse.ArgumentParser(
-        description="")
-    parser.add_argument(
-        "cmd",
-        help="command")
-    args = parser.parse_args()
+        description="Some separate heavy utilities, wrapped into a single app")
+    subparsers = parser.add_subparsers(dest="command")
+    subparsers.add_parser("pdobjects", help="list supported Pure Data objects")
+    subparser_hvhash = subparsers.add_parser("hvhash", help="print the heavy hash of the input string")
+    subparser_hvhash.add_argument("string")
 
-    if args.cmd == "pdobjects":
+    parsed_args = parser.parse_args(args=None if sys.argv[1:] else ['--help'])
+    args = vars(parsed_args)
+
+    command = args.pop("command")
+    if command == "pdobjects":
         obj_list = PdParser.PdParser.get_supported_objects()
-        print(json.dumps(obj_list))
+        print(json.dumps(obj_list, indent=4))
+    elif command == "hvhash":
+        print("0x{0:X}".format(HeavyLangObject.HeavyLangObject.get_hash(args.get('string'))))
     else:
         pass
 

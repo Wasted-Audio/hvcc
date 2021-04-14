@@ -14,4 +14,4 @@ setup(name='hvcc',
       install_requires=[
           'Jinja2==2.11.3'
       ],
-      scripts=['bin/hvcc'])
+      scripts=['bin/hvcc', 'bin/hvutil'])
