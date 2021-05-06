@@ -158,4 +158,4 @@ class TestUploader(unittest.TestCase):
         self.check_file_for_generator("fabric", "android", "armv7a")
 
 if __name__ == "__main__":
-    print "Usage: $ nose2 test_uploader.TestUploader"
+    print("Usage: $ nose2 test_uploader.TestUploader")

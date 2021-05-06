@@ -46,7 +46,7 @@ class MaxParser:
                         if len(g.obj_args) > x:
                             obj_args[i] = g.obj_args[x]
                         else:
-                            print "WARNING: Can't resolve object argument {0} against graph arguments: {1}".format(
+                            print("WARNING: Can't resolve object argument {0} against graph arguments: {1}".format(
                                 a,
                                 g.obj_args)
 
@@ -93,7 +93,7 @@ class MaxParser:
                     pos_x=patching_rect[0], pos_y=patching_rect[1])
 
             else:
-                print "WARNING: Ignoring maxclass \"{0}\".".format(o["maxclass"])
+                print("WARNING: Ignoring maxclass \"{0}\".".format(o["maxclass"])
                 continue # ignore comments, etc.
 
             g.add_object(x)

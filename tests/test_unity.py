@@ -105,7 +105,7 @@ class TestUnityPlugins(unittest.TestCase):
                     should_print = True
 
                 if should_print:
-                    print line,
+                    print(line, end='')
 
                 if line.startswith("-----EndCompilerOutput"):
                     break
@@ -151,4 +151,4 @@ class TestUnityPlugins(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    print "Usage: $ nose2 test_unity.TestUnityPlugins"
+    print("Usage: $ nose2 test_unity.TestUnityPlugins")

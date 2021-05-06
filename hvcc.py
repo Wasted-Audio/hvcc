@@ -147,7 +147,7 @@ def compile_dataflow(in_path, out_dir, patch_name=None,
 
     if in_path.endswith((".pd", ".maxpat")):
         if verbose:
-            print "--> Generating C"
+            print("--> Generating C")
         if in_path.endswith(".pd"):
             results["pd2hv"] = pd2hv.pd2hv.compile(
                 pd_path=in_path,
@@ -230,7 +230,7 @@ def compile_dataflow(in_path, out_dir, patch_name=None,
 
     if "bela" in generators:
         if verbose:
-            print "--> Generating Bela plugin"
+            print("--> Generating Bela plugin")
         results["c2fabric"] = c2bela.c2bela.compile(
             c_src_dir=c_src_dir,
             out_dir=os.path.join(out_dir, "bela"),
@@ -242,7 +242,7 @@ def compile_dataflow(in_path, out_dir, patch_name=None,
 
     if "fabric" in generators:
         if verbose:
-            print "--> Generating Fabric plugin"
+            print("--> Generating Fabric plugin")
         results["c2fabric"] = c2fabric.c2fabric.compile(
             c_src_dir=c_src_dir,
             out_dir=os.path.join(out_dir, "fabric"),
@@ -255,7 +255,7 @@ def compile_dataflow(in_path, out_dir, patch_name=None,
 
     if "js" in generators:
         if verbose:
-            print "--> Generating Javascript"
+            print("--> Generating Javascript")
         results["c2js"] = c2js.c2js.compile(
             c_src_dir=c_src_dir,
             out_dir=os.path.join(out_dir, "js"),
@@ -268,7 +268,7 @@ def compile_dataflow(in_path, out_dir, patch_name=None,
 
     if "pdext" in generators:
         if verbose:
-            print "--> Generating Pd external"
+            print("--> Generating Pd external")
         results["c2pdext"] = c2pdext.c2pdext.compile(
             c_src_dir=c_src_dir,
             out_dir=os.path.join(out_dir, "pdext"),
@@ -282,7 +282,7 @@ def compile_dataflow(in_path, out_dir, patch_name=None,
 
     if "unity" in generators:
         if verbose:
-            print "--> Generating Unity plugin"
+            print("--> Generating Unity plugin")
         results["c2unity"] = c2unity.c2unity.compile(
             c_src_dir=c_src_dir,
             out_dir=os.path.join(out_dir, "unity"),
@@ -295,7 +295,7 @@ def compile_dataflow(in_path, out_dir, patch_name=None,
 
     if "vst2" in generators:
         if verbose:
-            print "--> Generating VST2 plugin"
+            print("--> Generating VST2 plugin")
         results["c2vst2"] = c2vst2.c2vst2.compile(
             c_src_dir=c_src_dir,
             out_dir=os.path.join(out_dir, "vst2.4"),
@@ -308,7 +308,7 @@ def compile_dataflow(in_path, out_dir, patch_name=None,
 
     if "wwise" in generators:
         if verbose:
-            print "--> Generating Wwise plugin"
+            print("--> Generating Wwise plugin")
         results["c2wwise"] = c2wwise.c2wwise.compile(
             c_src_dir=c_src_dir,
             out_dir=os.path.join(out_dir, "wwise"),
@@ -375,22 +375,22 @@ def main():
         # print any errors
         if r["notifs"].get("has_error", False):
             for i,error in enumerate(r["notifs"].get("errors", [])):
-                print "{4:3d}) {2}Error{3} {0}: {1}".format(
-                    r["stage"], error["message"], Colours.red, Colours.end, i+1)
+                print("{4:3d}) {2}Error{3} {0}: {1}".format(
+                    r["stage"], error["message"], Colours.red, Colours.end, i+1))
 
             # only print exception if no errors are indicated
             if len(r["notifs"].get("errors", [])) == 0 and \
             r["notifs"].get("exception",None) is not None:
-                print "{2}Error{3} {0} exception: {1}".format(
-                    r["stage"], r["notifs"]["exception"], Colours.red, Colours.end)
+                print("{2}Error{3} {0} exception: {1}".format(
+                    r["stage"], r["notifs"]["exception"], Colours.red, Colours.end))
 
             # clear any exceptions such that results can be JSONified if necessary
             r["notifs"]["exception"] = []
 
         # print any warnings
         for i,warning in enumerate(r["notifs"].get("warnings", [])):
-            print "{4:3d}) {2}Warning{3} {0}: {1}".format(
-                r["stage"], warning["message"], Colours.yellow, Colours.end, i+1)
+            print("{4:3d}) {2}Warning{3} {0}: {1}".format(
+                r["stage"], warning["message"], Colours.yellow, Colours.end, i+1))
 
     if args.results_path:
         results_path = os.path.realpath(os.path.abspath(args.results_path))
@@ -403,7 +403,7 @@ def main():
             json.dump(results, f)
 
     if args.verbose:
-        print "Total compile time: {0:.2f}ms".format(1000*(time.time()-tick))
+        print("Total compile time: {0:.2f}ms".format(1000*(time.time()-tick)))
 
 if __name__ == "__main__":
     main()

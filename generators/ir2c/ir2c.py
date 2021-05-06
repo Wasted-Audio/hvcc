@@ -327,7 +327,7 @@ def main():
         args.copyright)
 
     if args.verbose:
-        print "Total ir2c time: {0:.2f}ms".format(results["compile_time"]*1000)
+        print("Total ir2c time: {0:.2f}ms".format(results["compile_time"]*1000))
 
 if __name__ == "__main__":
     main()

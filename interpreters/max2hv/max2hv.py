@@ -70,11 +70,11 @@ def main():
         verbose=args.verbose)
 
     if result["notifs"].get("has_error", False):
-        print result["notifs"]["errors"]
+        print(result["notifs"]["errors"])
 
     if args.verbose:
-        print "Heavy file written to", os.path.join(result["output_dir"], result["output_file"])
-        print "Total max2hv compile time: {0:.2f}ms".format(result["compile_time"]*1000)
+        print("Heavy file written to", os.path.join(result["output_dir"], result["output_file"]))
+        print("Total max2hv compile time: {0:.2f}ms".format(result["compile_time"]*1000))
 
 if __name__ == "__main__":
     main()
