@@ -20,10 +20,10 @@ import os
 import re
 import time
 
-import interpreters.pd2hv.pd2hv as pd2hv
-import interpreters.max2hv.max2hv as max2hv
-import core.hv2ir.hv2ir as hv2ir
-import generators.ir2c.ir2c as ir2c
+import pd2hv
+import max2hv
+import hv2ir
+import ir2c
 import generators.ir2c.ir2c_perf as ir2c_perf
 import generators.c2bela.c2bela as c2bela
 import generators.c2fabric.c2fabric as c2fabric
@@ -80,12 +80,12 @@ def generate_extern_info(hvir, results):
         externed with @hv_param, @hv_event or @hv_table
     """
     # Exposed input parameters
-    in_parameter_list = [(k, v) for k, v in hvir["control"]["receivers"].iteritems() if v.get("extern", None) == "param"]
+    in_parameter_list = [(k, v) for k, v in list(hvir["control"]["receivers"].items()) if v.get("extern", None) == "param"]
     in_parameter_list.sort(key=lambda x: x[0])
     check_extern_name_conflicts("input parameter", in_parameter_list, results)
 
     # Exposed input events
-    in_event_list = [(k, v) for k, v in hvir["control"]["receivers"].iteritems() if v.get("extern", None) == "event"]
+    in_event_list = [(k, v) for k, v in list(hvir["control"]["receivers"].items()) if v.get("extern", None) == "event"]
     in_event_list.sort(key=lambda x: x[0])
     check_extern_name_conflicts("input event", in_event_list, results)
 
@@ -93,18 +93,18 @@ def generate_extern_info(hvir, results):
     out_parameter_list = [(v["name"], v) for v in hvir["control"]["sendMessage"] if v.get("extern", None) == "param"]
     # remove duplicate output parameters/events
     # NOTE(joe): is the id argument important here? We'll only take the first one in this case.
-    out_parameter_list = list(dict(out_parameter_list).iteritems())
+    out_parameter_list = list(dict(out_parameter_list).items())
     out_parameter_list.sort(key=lambda x: x[0])
     check_extern_name_conflicts("output parameter", out_parameter_list, results)
 
     # Exposed output events
     out_event_list = [(v["name"], v) for v in hvir["control"]["sendMessage"] if v.get("extern", None) == "event"]
-    out_event_list = list(dict(out_event_list).iteritems())
+    out_event_list = list(dict(out_event_list).items())
     out_event_list.sort(key=lambda x: x[0])
     check_extern_name_conflicts("output event", out_event_list, results)
 
     # Exposed tables
-    table_list = [(k, v) for k, v in hvir["tables"].iteritems() if v.get("extern", None) == True]
+    table_list = [(k, v) for k, v in list(hvir["tables"].items()) if v.get("extern", None) == True]
     table_list.sort(key=lambda x: x[0])
     check_extern_name_conflicts("table", table_list, results)
 
@@ -162,11 +162,12 @@ def compile_dataflow(in_path, out_dir, patch_name=None,
                 verbose=verbose)
 
         # check for errors
-        if results.values()[0]["notifs"].get("has_error", False):
+        rv = list(results.values())[0]
+        if rv["notifs"].get("has_error", False):
             return results
 
         results["hv2ir"] = hv2ir.hv2ir.compile(
-            hv_file=os.path.join(results.values()[0]["out_dir"], results.values()[0]["out_file"]),
+            hv_file=os.path.join(rv["out_dir"], rv["out_file"]),
             # ensure that the ir filename has no funky characters in it
             ir_file=os.path.join(out_dir, "ir", re.sub("\W", "_", patch_name)+".heavy.ir.json"),
             patch_name=patch_name,
@@ -371,26 +372,26 @@ def main():
         verbose=args.verbose,
         copyright=args.copyright)
 
-    for r in results.values():
+    for r in list(results.values()):
         # print any errors
         if r["notifs"].get("has_error", False):
             for i,error in enumerate(r["notifs"].get("errors", [])):
-                print("{4:3d}) {2}Error{3} {0}: {1}".format(
-                    r["stage"], error["message"], Colours.red, Colours.end, i+1))
+                print(("{4:3d}) {2}Error{3} {0}: {1}".format(
+                    r["stage"], error["message"], Colours.red, Colours.end, i+1)))
 
             # only print exception if no errors are indicated
             if len(r["notifs"].get("errors", [])) == 0 and \
             r["notifs"].get("exception",None) is not None:
-                print("{2}Error{3} {0} exception: {1}".format(
-                    r["stage"], r["notifs"]["exception"], Colours.red, Colours.end))
+                print(("{2}Error{3} {0} exception: {1}".format(
+                    r["stage"], r["notifs"]["exception"], Colours.red, Colours.end)))
 
             # clear any exceptions such that results can be JSONified if necessary
             r["notifs"]["exception"] = []
 
         # print any warnings
         for i,warning in enumerate(r["notifs"].get("warnings", [])):
-            print("{4:3d}) {2}Warning{3} {0}: {1}".format(
-                r["stage"], warning["message"], Colours.yellow, Colours.end, i+1))
+            print(("{4:3d}) {2}Warning{3} {0}: {1}".format(
+                r["stage"], warning["message"], Colours.yellow, Colours.end, i+1)))
 
     if args.results_path:
         results_path = os.path.realpath(os.path.abspath(args.results_path))
@@ -403,7 +404,7 @@ def main():
             json.dump(results, f)
 
     if args.verbose:
-        print("Total compile time: {0:.2f}ms".format(1000*(time.time()-tick)))
+        print(("Total compile time: {0:.2f}ms".format(1000*(time.time()-tick))))
 
 if __name__ == "__main__":
     main()

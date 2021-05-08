@@ -15,9 +15,9 @@
 
 import re
 
-from HeavyException import HeavyException
-from HeavyIrObject import HeavyIrObject
-from HeavyLangObject import HeavyLangObject
+from .HeavyException import HeavyException
+from .HeavyIrObject import HeavyIrObject
+from .HeavyLangObject import HeavyLangObject
 
 
 class HLangBiquad(HeavyLangObject):

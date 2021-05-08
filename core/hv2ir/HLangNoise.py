@@ -16,7 +16,7 @@
 import os
 import random
 
-from HeavyLangObject import HeavyLangObject
+from .HeavyLangObject import HeavyLangObject
 
 class HLangNoise(HeavyLangObject):
     """ Handles the HeavyLang "noise" object.
@@ -38,4 +38,4 @@ class HLangNoise(HeavyLangObject):
         # TODO(mhroth): deal with control input
         return ({x}, self.get_connection_move_list(x))
 
-from HeavyParser import HeavyParser
+from core.hv2ir.HeavyParser import HeavyParser

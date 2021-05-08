@@ -38,7 +38,7 @@ class HeavyLangObject:
         self.type = obj_type
 
         # generate a unique id for this object
-        self.id = "".join(HeavyLangObject.__RANDOM.choice(HeavyLangObject.__ID_CHARS) for _ in xrange(8))
+        self.id = "".join(HeavyLangObject.__RANDOM.choice(HeavyLangObject.__ID_CHARS) for _ in range(8))
 
         # assign the parent graph
         self.graph = graph
@@ -58,11 +58,11 @@ class HeavyLangObject:
 
         # the list of connections at each inlet
         num_inlets = num_inlets if num_inlets >= 0 else len(self._obj_desc["inlets"])
-        self.inlet_connections = [[] for _ in xrange(num_inlets)]
+        self.inlet_connections = [[] for _ in range(num_inlets)]
 
         # the list of connections at each outlet
         num_outlets = num_outlets if num_outlets >= 0 else len(self._obj_desc["outlets"])
-        self.outlet_connections = [[] for _ in xrange(num_outlets)]
+        self.outlet_connections = [[] for _ in range(num_outlets)]
 
     @property
     def scope(self):
@@ -140,28 +140,28 @@ class HeavyLangObject:
         elif value_type == "string":
             return str(value) if value is not None else None
         elif value_type == "boolean":
-            if isinstance(value, str) or isinstance(value, unicode):
+            if isinstance(value, str) :
                 return value.strip().lower() not in ["false", "f", "0"]
             else:
                 return bool(value)
         elif value_type == "floatarray":
             if isinstance(value, list):
                 return [float(v) for v in value]
-            if isinstance(value, str) or isinstance(value, unicode):
+            if isinstance(value, str) :
                 return [float(v) for v in value.split()]
             else:
                 raise HeavyException("Cannot convert value to type floatarray: {0}".format(value))
         elif value_type == "intarray":
             if isinstance(value, list):
                 return [int(v) for v in value]
-            if isinstance(value, str) or isinstance(value, unicode):
+            if isinstance(value, str) :
                 return [int(v) for v in value.split()]
             else:
                 raise HeavyException("Cannot convert value to type intarray: {0}".format(value))
         elif value_type == "stringarray":
              if isinstance(value, list):
                  return [str(v) for v in value]
-             if isinstance(value, str) or isinstance(value, unicode):
+             if isinstance(value, str) :
                  return [str(v) for v in value.split()]
              else:
                  raise HeavyException("Cannot convert value to type stringarray: {0}".format(value))
@@ -357,7 +357,7 @@ class HeavyLangObject:
             return unpack("@I", pack("@f", float(x)))[0]
         elif x == "bang":
             return 0xFFFFFFFF
-        elif isinstance(x, str) or isinstance(x, unicode):
+        elif isinstance(x, str) :
             # this hash is based MurmurHash2
             # http://en.wikipedia.org/wiki/MurmurHash
             # https://sites.google.com/site/murmurhash/
@@ -393,5 +393,5 @@ class HeavyLangObject:
             raise Exception("Message element hashes can only be computed for float and string types.")
 
     def __repr__(self):
-        arg_str = " ".join(["{0}:{1}".format(k, o) for (k,o) in self.args.iteritems()])
+        arg_str = " ".join(["{0}:{1}".format(k, o) for (k,o) in list(self.args.items())])
         return "{0} {{{1}}}".format(self.type, arg_str) if len(arg_str) > 0 else self.type

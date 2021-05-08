@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from HeavyObject import HeavyObject
+from .HeavyObject import HeavyObject
 
 class SignalDel1(HeavyObject):
     """Handles the __del1~f object.

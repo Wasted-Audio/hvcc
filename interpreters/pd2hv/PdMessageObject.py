@@ -1,7 +1,7 @@
 # Copyright 2015 Enzien Audio, Ltd. All Rights Reserved.
 
-from NotificationEnum import NotificationEnum
-from PdObject import PdObject
+from .NotificationEnum import NotificationEnum
+from .PdObject import PdObject
 
 import re
 

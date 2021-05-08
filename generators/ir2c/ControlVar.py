@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from HeavyObject import HeavyObject
+from .HeavyObject import HeavyObject
 
 class ControlVar(HeavyObject):
     """An object which holds a variable. In this case only a float.
@@ -34,7 +34,7 @@ class ControlVar(HeavyObject):
 
     @classmethod
     def get_C_init(clazz, obj_type, obj_id, args):
-        if isinstance(args["k"], str) or isinstance(args["k"], unicode):
+        if isinstance(args["k"], str) :
             return [
                 "cVar_init_s(&cVar_{0}, \"{1}\");".format(
                     obj_id,

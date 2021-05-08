@@ -56,7 +56,7 @@ class c2vst2:
         patch_name = patch_name or "heavy"
 
         copyright_c = copyright_manager.get_copyright_for_c(copyright)
-        copyright_plist = copyright or u"Copyright {0} Enzien Audio, Ltd. All Rights Reserved.".format(datetime.datetime.now().year)
+        copyright_plist = copyright or "Copyright {0} Enzien Audio, Ltd. All Rights Reserved.".format(datetime.datetime.now().year)
 
         try:
             # ensure that the output directory does not exist

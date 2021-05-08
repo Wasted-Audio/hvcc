@@ -18,8 +18,8 @@ import json
 import os
 import time
 
-from HeavyException import HeavyException
-from HeavyParser import HeavyParser
+from core.hv2ir.HeavyException import HeavyException
+from core.hv2ir.HeavyParser import HeavyParser
 
 class hv2ir:
 
@@ -105,11 +105,11 @@ class hv2ir:
                 for so in ir["signal"]["processOrder"]:
                     o = ir["objects"][so["id"]]
                     if len(o["args"]) > 0:
-                        print("{0} {{{1}}}".format(
+                        print(("{0} {{{1}}}".format(
                             o["type"],
-                            " ".join(["{0}:{1}".format(k,v) for k,v in o["args"].iteritems()])))
+                            " ".join(["{0}:{1}".format(k,v) for k,v in list(o["args"].items())]))))
                     else:
-                        print(o["type"])
+                        print((o["type"]))
 
         return {
             "stage": "hv2ir",
@@ -147,7 +147,7 @@ def main():
         verbose=args.verbose)
 
     if args.verbose:
-        print("Total hv2ir time: {0:.2f}ms".format(d["compile_time"]*1000))
+        print(("Total hv2ir time: {0:.2f}ms".format(d["compile_time"]*1000)))
 
 if __name__ == "__main__":
     main()

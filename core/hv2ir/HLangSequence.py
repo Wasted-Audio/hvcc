@@ -13,10 +13,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from Connection import Connection
-from HeavyException import HeavyException
-from HeavyIrObject import HeavyIrObject
-from HeavyLangObject import HeavyLangObject
+from .Connection import Connection
+from .HeavyException import HeavyException
+from .HeavyIrObject import HeavyIrObject
+from .HeavyLangObject import HeavyLangObject
 
 class HLangSequence(HeavyLangObject):
     def __init__(self, obj_type, args, graph, annotations=None):
@@ -46,7 +46,7 @@ class HLangSequence(HeavyLangObject):
         # establish connections from inlet objects to the cast objects
         for ci in self.inlet_connections[0]:
             c_list = []
-            for i in xrange(self.num_outlets-1, -1, -1):
+            for i in range(self.num_outlets-1, -1, -1):
                 if cast_objs[i] is not None:
                     c_list.append(Connection.copy(ci, to_object=cast_objs[i], inlet_index=0))
                 else:
@@ -56,7 +56,7 @@ class HLangSequence(HeavyLangObject):
             connections.append((ci, c_list))
 
         # establish connections from the cast objects
-        for i in xrange(self.num_outlets-1,-1,-1):
+        for i in range(self.num_outlets-1,-1,-1):
             if cast_objs[i] is not None:
                 for c in self.outlet_connections[i]:
                     connections.append((c, [c.copy(from_object=cast_objs[i], outlet_index=0)]))

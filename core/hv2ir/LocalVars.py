@@ -16,7 +16,7 @@
 from collections import defaultdict
 import os
 
-from HeavyException import HeavyException
+from .HeavyException import HeavyException
 
 class LocalVars:
     """ A set of scoped objects.
@@ -81,7 +81,7 @@ class LocalVars:
         """
 
         d = defaultdict(list)
-        for k, v in self.__REGISTERED_OBJ_DICT.iteritems():
+        for k, v in list(self.__REGISTERED_OBJ_DICT.items()):
             x = [o for o in v if o.type == obj_type]
             if len(x) > 0: # only return names that actually have associated objects
                 d[k].extend(x)

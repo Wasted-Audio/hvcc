@@ -15,9 +15,9 @@
 
 import os
 
-from Connection import Connection
-from NotificationEnum import NotificationEnum
-from PdObject import PdObject
+from .Connection import Connection
+from .NotificationEnum import NotificationEnum
+from .PdObject import PdObject
 
 class PdGraph(PdObject):
 

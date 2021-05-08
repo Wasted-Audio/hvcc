@@ -16,41 +16,41 @@
 import json
 import os
 
-from HIrConvolution import HIrConvolution
-from HIrInlet import HIrInlet
-from HIrLorenz import HIrLorenz
-from HIrOutlet import HIrOutlet
-from HIrPack import HIrPack
-from HIrSwitchcase import HIrSwitchcase
-from HIrTabhead import HIrTabhead
-from HIrTabread import HIrTabread
-from HIrTabwrite import HIrTabwrite
+from .HIrConvolution import HIrConvolution
+from .HIrInlet import HIrInlet
+from .HIrLorenz import HIrLorenz
+from .HIrOutlet import HIrOutlet
+from .HIrPack import HIrPack
+from .HIrSwitchcase import HIrSwitchcase
+from .HIrTabhead import HIrTabhead
+from .HIrTabread import HIrTabread
+from .HIrTabwrite import HIrTabwrite
 
-from HLangAdc import HLangAdc
-from HLangBinop import HLangBinop
-from HLangBiquad import HLangBiquad
-from HLangDelay import HLangDelay
-from HLangIf import HLangIf
-from HeavyException import HeavyException
-from HeavyIrObject import HeavyIrObject
-from HeavyLangObject import HeavyLangObject
-from HLangLine import HLangLine
-from HLangMessage import HLangMessage
-from HLangPhasor import HLangPhasor
-from HLangPrint import HLangPrint
-from HLangReceive import HLangReceive
-from HLangRandom import HLangRandom
-from HLangSend import HLangSend
-from HLangSequence import HLangSequence
-from HLangSlice import HLangSlice
-from HLangSystem import HLangSystem
-from HLangTable import HLangTable
-from HLangUnop import HLangUnop
-from HLangVar import HLangVar
-from HLangVario import HLangVario
+from .HLangAdc import HLangAdc
+from .HLangBinop import HLangBinop
+from .HLangBiquad import HLangBiquad
+from .HLangDelay import HLangDelay
+from .HLangIf import HLangIf
+from .HeavyException import HeavyException
+from .HeavyIrObject import HeavyIrObject
+from .HeavyLangObject import HeavyLangObject
+from .HLangLine import HLangLine
+from .HLangMessage import HLangMessage
+from .HLangPhasor import HLangPhasor
+from .HLangPrint import HLangPrint
+from .HLangReceive import HLangReceive
+from .HLangRandom import HLangRandom
+from .HLangSend import HLangSend
+from .HLangSequence import HLangSequence
+from .HLangSlice import HLangSlice
+from .HLangSystem import HLangSystem
+from .HLangTable import HLangTable
+from .HLangUnop import HLangUnop
+from .HLangVar import HLangVar
+from .HLangVario import HLangVario
 
-from HeavyGraph import HeavyGraph
-from Connection import Connection
+from core.hv2ir.HeavyGraph import HeavyGraph
+from .Connection import Connection
 
 class HeavyParser:
 
@@ -116,7 +116,7 @@ class HeavyParser:
 
         # instantiate all objects
         try:
-            for obj_id, o in json_heavy["objects"].iteritems():
+            for obj_id, o in list(json_heavy["objects"].items()):
                 if o["type"] == "comment":
                     continue # first and foremost, ignore comment objects
 
@@ -199,8 +199,8 @@ class HeavyParser:
 
 # NOTE(mhroth): these imports are at the end of the file in order to prevent
 # circular import errors
-from HLangDac import HLangDac
-from HLangNoise import HLangNoise
+from .HLangDac import HLangDac
+from .HLangNoise import HLangNoise
 
 # A list of all of the HeavyLang objects and the classes
 # that will translate them into HeavyIR objects.

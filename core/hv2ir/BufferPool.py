@@ -15,7 +15,7 @@
 
 from collections import defaultdict
 
-from HeavyException import HeavyException
+from .HeavyException import HeavyException
 
 class BufferPool:
 
@@ -36,7 +36,7 @@ class BufferPool:
         if connection_type is None:
             return self.num_buffers("~f>") + self.num_buffers("~i>")
         elif connection_type in self.pool:
-            return sum(len(v) for v in self.pool[connection_type].values())
+            return sum(len(v) for v in list(self.pool[connection_type].values()))
         else:
             raise HeavyException("Unknown connection type: \"{0}\"".format(connection_type))
 
@@ -66,7 +66,7 @@ class BufferPool:
             return 0
         else:
             pool = self.pool[b[0]]
-            for k, v in pool.iteritems():
+            for k, v in list(pool.items()):
                 if b in v:
                     v.remove(b)
                     pool[k+count].append(b)
@@ -83,7 +83,7 @@ class BufferPool:
             return 0
         else:
             pool = self.pool[b[0]]
-            for k, v in pool.iteritems():
+            for k, v in list(pool.items()):
                 if b in v:
                     v.remove(b)
                     pool[k-count].append(b)

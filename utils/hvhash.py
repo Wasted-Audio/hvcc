@@ -26,7 +26,7 @@ def main():
         help="String to convert to hash.")
     args = parser.parse_args()
 
-    print("0x{0:X}".format(HeavyLangObject.HeavyLangObject.get_hash(args.string)))
+    print(("0x{0:X}".format(HeavyLangObject.HeavyLangObject.get_hash(args.string))))
 
 if __name__ == "__main__":
     main()

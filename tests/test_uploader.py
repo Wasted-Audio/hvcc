@@ -19,7 +19,7 @@ import shutil
 import sys
 import tempfile
 import unittest
-import urlparse
+import urllib.parse
 
 sys.path.append("../../../hv-uploader")
 import hv_uploader
@@ -49,7 +49,7 @@ class TestUploader(unittest.TestCase):
         assert exit_code == 0, "Uploader returned with non-zero exit code: {0}".format(exit_code)
         assert len(reply_json.get("errors",[])) == 0, reply_json["errors"][0]["detail"]
 
-        TestUploader.__JOB_URL = urlparse.urljoin(domain, reply_json["data"]["links"]["html"])
+        TestUploader.__JOB_URL = urllib.parse.urljoin(domain, reply_json["data"]["links"]["html"])
 
     # called once when all tests are done
     @classmethod

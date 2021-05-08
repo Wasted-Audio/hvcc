@@ -1,6 +1,6 @@
 # Copyright 2015 Enzien Audio, Ltd. All Rights Reserved.
 
-from MaxObject import MaxObject
+from .MaxObject import MaxObject
 
 class MaxBinopObject(MaxObject):
     # a translation dictionary from max object to corresponding heavy object
@@ -23,7 +23,7 @@ class MaxBinopObject(MaxObject):
 
     @classmethod
     def get_supported_objects(clazz):
-        return MaxBinopObject.__MAX_HEAVY_DICT.keys()
+        return list(MaxBinopObject.__MAX_HEAVY_DICT.keys())
 
     def to_hv(self):
         return {

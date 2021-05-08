@@ -13,9 +13,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from Connection import Connection
-from PdObject import PdObject
-from HeavyObject import HeavyObject
+from .Connection import Connection
+from .PdObject import PdObject
+from .HeavyObject import HeavyObject
 
 class PdBinopObject(PdObject):
     # a translation dictionary from a Pd object to corresponding heavy object

@@ -72,7 +72,7 @@ class HeavyObject:
                 HeavyObject._get_on_message_list(on_message_list[0], get_obj_class, objects))
         else:
             send_message_list.append("switch (letIn) {")
-            for i in xrange(len(on_message_list)):
+            for i in range(len(on_message_list)):
                 send_message_list.append("case {0}: {{".format(i))
                 send_message_list.extend(
                     HeavyObject._get_on_message_list(on_message_list[i], get_obj_class, objects))
@@ -116,7 +116,7 @@ class HeavyObject:
             return unpack("@I", pack("@f", float(x)))[0]
         elif x == "bang":
             return 0xFFFFFFFF
-        elif isinstance(x, str) or isinstance(x, unicode):
+        elif isinstance(x, str) :
             # this hash is based MurmurHash2
             # http://en.wikipedia.org/wiki/MurmurHash
             # https://sites.google.com/site/murmurhash/

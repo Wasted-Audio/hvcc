@@ -7,7 +7,7 @@ class MaxObject:
     def __init__(self, obj_type, obj_args=None, obj_id=None, pos_x=0, pos_y=0):
         self.obj_type = obj_type
         self.obj_args = obj_args or []
-        self.obj_id = obj_id or "".join(random.choice(string.ascii_letters + string.digits) for _ in xrange(5))
+        self.obj_id = obj_id or "".join(random.choice(string.ascii_letters + string.digits) for _ in range(5))
         self.pos_x = int(pos_x)
         self.pos_y = int(pos_y)
 

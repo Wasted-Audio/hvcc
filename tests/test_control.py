@@ -357,7 +357,7 @@ class TestPdControlPatches(unittest.TestCase):
             shutil.rmtree(out_dir)
 
         hvcc_results = hvcc.compile_dataflow(pd_path, out_dir, verbose=False)
-        for r in hvcc_results.values():
+        for r in list(hvcc_results.values()):
             if r["notifs"].get("has_error", False):
                 if r["stage"] == "pd2hv":
                     self.assertTrue(expected_enum in \
@@ -378,7 +378,7 @@ class TestPdControlPatches(unittest.TestCase):
             shutil.rmtree(out_dir)
 
         hvcc_results = hvcc.compile_dataflow(pd_path, out_dir, verbose=False)
-        for r in hvcc_results.values():
+        for r in list(hvcc_results.values()):
             if r["stage"] == "pd2hv":
                 self.assertTrue(expected_enum in \
                     [w["enum"] for w in hvcc_results["pd2hv"]["notifs"]["warnings"]])
@@ -403,7 +403,7 @@ class TestPdControlPatches(unittest.TestCase):
             shutil.rmtree(out_dir)
 
         hvcc_results = hvcc.compile_dataflow(pd_path, out_dir, verbose=False)
-        for r in hvcc_results.values():
+        for r in list(hvcc_results.values()):
             # if there are any errors from hvcc, fail immediately
             # TODO(mhroth): standardise how errors and warnings are returned
             # between stages
@@ -476,7 +476,7 @@ def main():
         result = TestPdControlPatches._test_control_patch(args.pd_path)
         print(result)
     else:
-        print("Pd file path '{0}' doesn't exist".format(args.pd_path))
+        print(("Pd file path '{0}' doesn't exist".format(args.pd_path)))
 
 if __name__ == "__main__":
     main()

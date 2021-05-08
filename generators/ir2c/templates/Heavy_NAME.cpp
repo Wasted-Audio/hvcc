@@ -62,7 +62,7 @@ Heavy_{{name}}::~Heavy_{{name}}() {
 HvTable *Heavy_{{name}}::getTableForHash(hv_uint32_t tableHash) {
   {%- if send_table|length > 0 -%}
   switch (tableHash) {
-    {%- for k,v in send_table.iteritems() %}
+    {%- for k,v in send_table.items() %}
     case {{v.hash}}: return &hTable_{{v.id}}; // {{v.display}}
     {%- endfor %}
     default: return nullptr;
@@ -74,7 +74,7 @@ HvTable *Heavy_{{name}}::getTableForHash(hv_uint32_t tableHash) {
 
 void Heavy_{{name}}::scheduleMessageForReceiver(hv_uint32_t receiverHash, HvMessage *m) {
   switch (receiverHash) {
-    {%- for k,v in send_receive.iteritems() %}
+    {%- for k,v in send_receive.items() %}
     case {{v.hash}}: { // {{v.display}}
       {%- for obj_id in v.ids %}
       mq_addMessageByTimestamp(&mq, m, 0, &cReceive_{{obj_id}}_sendMessage);

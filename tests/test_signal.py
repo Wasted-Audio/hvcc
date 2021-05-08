@@ -105,7 +105,7 @@ class TestPdSignalPatches(unittest.TestCase):
             shutil.rmtree(out_dir)
 
         hvcc_results = hvcc.compile_dataflow(pd_path, out_dir)
-        for r in hvcc_results.values():
+        for r in list(hvcc_results.values()):
             # if there are any errors from hvcc, fail immediately
             # TODO(mhroth): standardise how errors and warnings are returned between stages
             if r["notifs"].get("has_error", False):
@@ -200,7 +200,7 @@ def main():
         flag=args.simd)
 
     if args.verbose:
-        print os.path.abspath(wav_path)
+        print(os.path.abspath(wav_path))
 
 if __name__ == "__main__":
     main()

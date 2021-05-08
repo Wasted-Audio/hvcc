@@ -4,7 +4,7 @@ import json
 import os
 import re
 
-from MaxObject import MaxObject
+from .MaxObject import MaxObject
 
 class HeavyObject(MaxObject):
 

@@ -14,8 +14,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import re
-from HeavyLangObject import HeavyLangObject
-from HeavyIrObject import HeavyIrObject
+from .HeavyLangObject import HeavyLangObject
+from .HeavyIrObject import HeavyIrObject
 
 class HLangTable(HeavyLangObject):
     """ Handles the HeavyLang "table" object.

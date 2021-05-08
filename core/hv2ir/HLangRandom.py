@@ -15,8 +15,8 @@
 
 import random
 
-from HeavyLangObject import HeavyLangObject
-from HeavyIrObject import HeavyIrObject
+from .HeavyLangObject import HeavyLangObject
+from .HeavyIrObject import HeavyIrObject
 
 class HLangRandom(HeavyLangObject):
     """ Handles the HeavyLang "print" object.

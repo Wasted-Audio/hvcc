@@ -16,8 +16,8 @@
 import json
 import os
 
-from PdObject import PdObject
-from HeavyObject import HeavyObject
+from .PdObject import PdObject
+from interpreters.pd2hv.HeavyObject import HeavyObject
 
 class HeavyGraph(PdObject):
     def __init__(self, hv_path, obj_args=None, pos_x=0, pos_y=0):
@@ -32,7 +32,7 @@ class HeavyGraph(PdObject):
             self.hv_json = json.load(f)
 
         # parse the heavy data structure to determine the outlet connection type
-        outlets = [o for o in self.hv_json["objects"].values() if o["type"] == "outlet"]
+        outlets = [o for o in list(self.hv_json["objects"].values()) if o["type"] == "outlet"]
         sorted(outlets, key=lambda o:o["args"]["index"])
         self.__outlet_connection_types = [o["args"]["type"] for o in outlets]
 
@@ -57,8 +57,8 @@ class HeavyGraph(PdObject):
                         str(e)))
 
             # resolve all arguments for each object in the graph
-            for o in self.hv_json["objects"].values():
-                for k,v in o["args"].items():
+            for o in list(self.hv_json["objects"].values()):
+                for k,v in list(o["args"].items()):
                     # TODO(mhroth): make resolution more robust
                     if v == "$"+a["name"]:
                         o["args"][k] = arg_value

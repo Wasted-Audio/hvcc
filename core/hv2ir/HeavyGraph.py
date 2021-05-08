@@ -17,13 +17,13 @@ from collections import Counter
 import os
 import re
 
-from BufferPool import BufferPool
-from Connection import Connection
-from LocalVars import LocalVars
-from HeavyException import HeavyException
-from HeavyIrObject import HeavyIrObject
-from HIrReceive import HIrReceive
-from HeavyLangObject import HeavyLangObject
+from .BufferPool import BufferPool
+from .Connection import Connection
+from .LocalVars import LocalVars
+from .HeavyException import HeavyException
+from .HeavyIrObject import HeavyIrObject
+from .HIrReceive import HIrReceive
+from .HeavyLangObject import HeavyLangObject
 
 class HeavyGraph(HeavyIrObject):
     """ Represents a graph. Subclasses HeavyIrObject for functionality.
@@ -69,9 +69,9 @@ class HeavyGraph(HeavyIrObject):
         """ Resolves the object arguments based on values from the local graph.
         """
         args = dict(obj_args) # make a copy of the input arguments
-        for key,value in args.items():
+        for key,value in list(args.items()):
             # do any of them reference a variable input?
-            if (isinstance(value, str) or isinstance(value, unicode)):
+            if (isinstance(value, str) ):
                 if value.find("$") > -1:
                     # is there a value provided for that key in the graph arguments?
                     for k in self.args:
@@ -84,10 +84,10 @@ class HeavyGraph(HeavyIrObject):
                                 break # break because all dollar arguments have by definition been replaced
                             else:
                                 # otherwise assume a string value
-                                value = value.replace(dollar_key, unicode(self.args[k]))
+                                value = value.replace(dollar_key, str(self.args[k]))
                                 # continue around the loop in case value has multiple dollar args
 
-                    if (isinstance(value, str) or isinstance(value, unicode)) and value.find("$") > -1:
+                    if (isinstance(value, str) ) and value.find("$") > -1:
                         # if the variable cannot be resolved, leave it alone.
                         # When the arguments are passed to the object, they will be
                         # set to the default value. These unset variables are simply
@@ -285,7 +285,7 @@ class HeavyGraph(HeavyIrObject):
             for c in list(connections): # make copy
                 self.disconnect_objects(c)
 
-        for k,v in self.objs.items():
+        for k,v in list(self.objs.items()):
             if o is v:
                 del self.objs[k]
                 break
@@ -309,7 +309,7 @@ class HeavyGraph(HeavyIrObject):
         """
         if recursive:
             channels = set(self.input_channel_set) # copy the output channel set
-            for o in [o for o in self.objs.values() if o.type == "__graph"]:
+            for o in [o for o in list(self.objs.values()) if o.type == "__graph"]:
                 channels.update(o.get_input_channel_set(recursive=True))
             return channels
         else:
@@ -321,7 +321,7 @@ class HeavyGraph(HeavyIrObject):
         """
         if recursive:
             channels = set(self.output_channel_set) # copy the output channel set
-            for o in [o for o in self.objs.values() if o.type == "__graph"]:
+            for o in [o for o in list(self.objs.values()) if o.type == "__graph"]:
                 channels.update(o.get_output_channel_set(recursive=True))
             return channels
         else:
@@ -329,7 +329,7 @@ class HeavyGraph(HeavyIrObject):
 
     def get_notices(self):
         notices = HeavyLangObject.get_notices(self)
-        for o in self.objs.values():
+        for o in list(self.objs.values()):
             n = o.get_notices()
             notices["warnings"].extend(n["warnings"])
             notices["errors"].extend(n["errors"])
@@ -340,7 +340,7 @@ class HeavyGraph(HeavyIrObject):
             The optional parameter "recursive" also includes all objects from subgraphs.
         """
         obj_list = []
-        for o in self.objs.values():
+        for o in list(self.objs.values()):
             if o.type == "__graph" and recursive:
                 obj_list.extend(o.get_objects_for_type(obj_type, recursive))
             elif o.type == obj_type:
@@ -354,7 +354,7 @@ class HeavyGraph(HeavyIrObject):
             An optional recursive argument includes all subgraphs.
         """
         c = Counter()
-        for o in self.objs.values():
+        for o in list(self.objs.values()):
             if o.type == "__graph" and recursive:
                 c += o.get_object_counter(recursive=True)
             elif o.type in ["__inlet", "__outlet"]:
@@ -427,7 +427,7 @@ class HeavyGraph(HeavyIrObject):
                     self.disconnect_objects(c)
 
         # the recursive bit
-        for o in [o for o in self.objs.values() if (o.type == "__graph")]:
+        for o in [o for o in list(self.objs.values()) if (o.type == "__graph")]:
             o._remove_unused_inlet_connections()
 
     def _resolved_outlet_type(self, outlet_index=0):
@@ -454,7 +454,7 @@ class HeavyGraph(HeavyIrObject):
             obj_stack.add(self)
 
         # start from all roots and resolve all connections downwards
-        for o in [o for o in self.objs.values() if o.is_root()]:
+        for o in [o for o in list(self.objs.values()) if o.is_root()]:
             o._resolve_connection_types(obj_stack)
 
         # when all internal connections have been resolved,
@@ -477,7 +477,7 @@ class HeavyGraph(HeavyIrObject):
         sends_dict = self.local_vars.get_registered_objects_for_type("send")
         receives_dict = self.local_vars.get_registered_objects_for_type("receive")
 
-        for (name, send_objs) in sends_dict.items():
+        for (name, send_objs) in list(sends_dict.items()):
 
             # unconnected send/receives will be removed in the reduce step,
             # if necessary (depending on control or signal functionality).
@@ -552,7 +552,7 @@ class HeavyGraph(HeavyIrObject):
             graphs contains no sub-graphs. Thus this method does not process subgraphs.
         """
         # refactor all constituent objects
-        for (obj_id, o) in self.objs.items():
+        for (obj_id, o) in list(self.objs.items()):
             # use items and not iteritems so that object dictionary remains mutable
 
             # break the object into atomic (i.e. low-level) objects and
@@ -588,8 +588,8 @@ class HeavyGraph(HeavyIrObject):
         """ Turns implicit +~ into explicit cascading +~ trees.
             It is assumed that this simplification operation is run on a reduced graph.
         """
-        for o in self.objs.values(): # all items in the graph
-            for i in xrange(len(o.inlet_connections)): # for each inlet
+        for o in list(self.objs.values()): # all items in the graph
+            for i in range(len(o.inlet_connections)): # for each inlet
                 # if there is more than one signal connection
                 # get all of the signal connections to an object at this inlet
                 cc = [c for c in o.inlet_connections[i] if c.is_signal]
@@ -604,7 +604,7 @@ class HeavyGraph(HeavyIrObject):
                         cc[1],
                         [Connection.copy(cc[1], to_object=oL, inlet_index=1)])
 
-                    for j in xrange(2,len(cc)):
+                    for j in range(2,len(cc)):
                         x = HeavyIrObject("__add~f")
                         self.add_object(x)
 
@@ -637,7 +637,7 @@ class HeavyGraph(HeavyIrObject):
             [__mul~f] ~f> [__sub~f] with [__fms~f]
         """
         # for all __mul~f objects
-        for o in self.objs.values():
+        for o in list(self.objs.values()):
             if o.type == "__mul~f" and \
             len(o.inlet_connections[0]) == 1 and \
             len(o.inlet_connections[1]) == 1 and \
@@ -686,7 +686,7 @@ class HeavyGraph(HeavyIrObject):
             all receivers.
         """
 
-        for name,receivers in self.local_vars.get_registered_objects_for_type("__receive").iteritems():
+        for name,receivers in list(self.local_vars.get_registered_objects_for_type("__receive").items()):
 
             # ensure that all receiver arguments are consistent
             extern = list(set([r.args["extern"] for r in receivers]) - set([None]))
@@ -730,7 +730,7 @@ class HeavyGraph(HeavyIrObject):
     def does_process_signal(self):
         # this graph processes a signal if it contains any adc~ (__inlet
         # objects with index > 127)
-        return any(o.does_process_signal for o in self.objs.values()) or \
+        return any(o.does_process_signal for o in list(self.objs.values())) or \
             any(o.args["index"] > 127 for o in self.inlet_objs)
 
     def order_signal_objects(self):
@@ -739,7 +739,7 @@ class HeavyGraph(HeavyIrObject):
         """
         # for all leaves of graph, get the parent objects and combine the lists
         self.signal_order = [] # ordered objects
-        for o in [o for o in self.objs.values() if o.is_leaf()]:
+        for o in [o for o in list(self.objs.values()) if o.is_leaf()]:
             self.signal_order.extend(o.get_parent_order())
 
         # retain only objects that process a signal
@@ -847,7 +847,7 @@ class HeavyGraph(HeavyIrObject):
     def get_object_dict(self):
         # d = {o.id: o.get_object_dict() for o in self.objs.values() if o.type not in ["inlet", "__inlet", "outlet", "__outlet"]}
         d = {}
-        for o in self.objs.values():
+        for o in list(self.objs.values()):
             # NOTE(mhroth): a bit of a hack to remove unnecessary inlet and outlet ir objects
             if o.type not in ["inlet", "__inlet", "outlet", "__outlet"]:
                 d.update(o.get_object_dict())
@@ -858,7 +858,7 @@ class HeavyGraph(HeavyIrObject):
             in the order that they are processed. This is to reduce cache misses
             on the signal object state as the process function is executed.
         """
-        init_list = [x for o in self.objs.values() for x in o.get_ir_init_list()]
+        init_list = [x for o in list(self.objs.values()) for x in o.get_ir_init_list()]
         signal_list = self.get_ir_signal_list()
         s_init_list = [x["id"] for x in signal_list if x["id"] in init_list]
         i_init_list = [o_id for o_id in init_list if o_id not in s_init_list]
@@ -885,7 +885,7 @@ class HeavyGraph(HeavyIrObject):
         d.update(self.local_vars.get_registered_objects_for_type("table"))
 
         e = {}
-        for k, v in d.iteritems():
+        for k, v in list(d.items()):
             # escape table key to be used as the value for code stubs
             key = ("_"+k) if re.match("\d", k) else k
             if key not in e:
@@ -898,7 +898,7 @@ class HeavyGraph(HeavyIrObject):
         return e
 
     def get_ir_control_list(self):
-        return [x for o in self.objs.values() for x in o.get_ir_control_list()]
+        return [x for o in list(self.objs.values()) for x in o.get_ir_control_list()]
 
     def get_ir_receiver_dict(self):
         # NOTE(mhroth): this code assumes that v is always an array of length 1,
@@ -911,7 +911,7 @@ class HeavyGraph(HeavyIrObject):
             "extern": v[0].args["extern"],
             "attributes": v[0].args["attributes"],
             "ids": [v[0].id]
-        } for k,v in self.local_vars.get_registered_objects_for_type("__receive").iteritems()}
+        } for k,v in list(self.local_vars.get_registered_objects_for_type("__receive").items())}
 
     def get_ir_signal_list(self):
         return [x for o in self.signal_order for x in o.get_ir_signal_list()]

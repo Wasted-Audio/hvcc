@@ -107,8 +107,8 @@ class TestPdPatches(unittest.TestCase):
                 percent_difference < TestPdPatches.__PERCENT_THRESHOLD,
                 "{0} has become {1:g}% slower @ {2}us/block.".format(os.path.basename(pd_path), percent_difference, tick))
             if (percent_difference < -TestPdPatches.__PERCENT_THRESHOLD):
-                print("{0} has become significantly faster: {1:g}%".format(
+                print(("{0} has become significantly faster: {1:g}%".format(
                     os.path.basename(pd_path),
-                    percent_difference))
+                    percent_difference)))
         else:
             print(tick)

@@ -13,8 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from HeavyLangObject import HeavyLangObject
-from HIrReceive import HIrReceive
+from .HeavyLangObject import HeavyLangObject
+from .HIrReceive import HIrReceive
 
 class HLangReceive(HeavyLangObject):
     """ Translates HeavyLang object [receive] to HeavyIR [__receive if control,

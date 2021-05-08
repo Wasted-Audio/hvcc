@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from PdObject import PdObject
+from .PdObject import PdObject
 
 class PdUnpackObject(PdObject):
     def __init__(self, obj_type, obj_args=None, pos_x=0, pos_y=0):
@@ -55,7 +55,7 @@ class PdUnpackObject(PdObject):
 
         # NOTE(mhroth): reverse the iteration such that connections are
         # added in the correct order
-        for i in reversed(range(len(self.obj_args))):
+        for i in reversed(list(range(len(self.obj_args)))):
             # add slices to graph
             hv_graph["objects"]["slice_{0}".format(i)] = {
                 "type": "slice",

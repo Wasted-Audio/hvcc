@@ -14,7 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import re
-from HeavyIrObject import HeavyIrObject
+from .HeavyIrObject import HeavyIrObject
 
 class HIrReceive(HeavyIrObject):
     """ A specific implementation of the __receive object.

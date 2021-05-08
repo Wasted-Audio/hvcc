@@ -1,6 +1,6 @@
 # Copyright 2015 Enzien Audio, Ltd. All Rights Reserved.
 
-from MaxObject import MaxObject
+from .MaxObject import MaxObject
 
 class MaxAdcObject(MaxObject):
     def __init__(self, obj_type, obj_args=None, obj_id=None, pos_x=0, pos_y=0):

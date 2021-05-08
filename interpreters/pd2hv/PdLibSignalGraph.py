@@ -2,9 +2,9 @@
 
 import os
 
-from Connection import Connection
-from PdGraph import PdGraph
-from HeavyObject import HeavyObject
+from .Connection import Connection
+from .PdGraph import PdGraph
+from .HeavyObject import HeavyObject
 
 class PdLibSignalGraph(PdGraph):
 

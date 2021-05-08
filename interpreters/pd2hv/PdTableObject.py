@@ -13,8 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from NotificationEnum import NotificationEnum
-from PdObject import PdObject
+from .NotificationEnum import NotificationEnum
+from .PdObject import PdObject
 
 class PdTableObject(PdObject):
 

@@ -42,7 +42,7 @@ def compile_and_run_patch(pd_file):
     cmd = (["python", py_script, pd_file,
             "-o", out_dir,
             "-v"])
-    print(subprocess.check_output(cmd))
+    print((subprocess.check_output(cmd)))
 
     # hv2ir
     py_script = os.path.join(SCRIPT_DIR, "../core/hv2ir/hv2ir.py")
@@ -50,7 +50,7 @@ def compile_and_run_patch(pd_file):
     ir_file = os.path.join(out_dir, patch_name + ".ir.hv.json")
     cmd = (["python", py_script, hv_file,
             "--hv_ir_path", ir_file])
-    print(subprocess.check_output(cmd))
+    print((subprocess.check_output(cmd)))
 
     # ir2c
     ir2c_dir = os.path.join(SCRIPT_DIR, "../generators/ir2c")
@@ -59,11 +59,11 @@ def compile_and_run_patch(pd_file):
             "--template_path", os.path.join(ir2c_dir, "template"),
             "--output_path", c_src_dir,
             "--verbose"])
-    print(subprocess.check_output(cmd))
+    print((subprocess.check_output(cmd)))
 
     # ir2c-perf
     cmd = (["python", os.path.join(ir2c_dir, "ir2c_perf.py"), ir_file])
-    print(subprocess.check_output(cmd))
+    print((subprocess.check_output(cmd)))
 
     c_sources = [os.path.join(c_src_dir, c) for c in os.listdir(c_src_dir) if c.endswith(".c")]
     flags = [
@@ -75,7 +75,7 @@ def compile_and_run_patch(pd_file):
     ]
 
     # generate assembly
-    print("Assembly output directory: ", asm_dir + "/")
+    print(("Assembly output directory: ", asm_dir + "/"))
     for c_src in c_sources:
         asm_out = os.path.join(asm_dir, os.path.splitext(os.path.basename(c_src))[0] + ".s")
         cmd = ["clang"] + flags + ["-S", "-O3", "-mllvm", "--x86-asm-syntax=intel", c_src, "-o", asm_out]
@@ -88,7 +88,7 @@ def compile_and_run_patch(pd_file):
     start_time = time.time()
     subprocess.check_output(cmd)
     compile_time_s = (time.time() - start_time) * 1000.0
-    print("Total compile time: {0:2f}ms\n".format(compile_time_s))
+    print(("Total compile time: {0:2f}ms\n".format(compile_time_s)))
 
     # run executable (returns stdout)
     result = subprocess.check_output([exe_file]).split("\n")
@@ -118,8 +118,8 @@ class TestPdPatches(unittest.TestCase):
             print()
             print("##################################################")
             print("#")
-            print("# Testing patch " + pd_file)
+            print(("# Testing patch " + pd_file))
             print("#")
             print("##################################################")
             result = compile_and_run_patch(pd_file)
-            print("\n".join(result))
+            print(("\n".join(result)))

@@ -17,8 +17,8 @@ import decimal
 import json
 import os
 
-from NotificationEnum import NotificationEnum
-from PdObject import PdObject
+from .NotificationEnum import NotificationEnum
+from .PdObject import PdObject
 
 class HeavyObject(PdObject):
 
@@ -95,28 +95,28 @@ class HeavyObject(PdObject):
         elif value_type == "string":
             return str(value)
         elif value_type == "boolean":
-            if isinstance(value, str) or isinstance(value, unicode):
+            if isinstance(value, str) :
                 return value.strip().lower() not in ["false", "f", "0"]
             else:
                 return bool(value)
         elif value_type == "floatarray":
             if isinstance(value, list):
                 return [float(v) for v in value]
-            if isinstance(value, str) or isinstance(value, unicode):
+            if isinstance(value, str) :
                 return [float(v) for v in value.split()]
             else:
                 raise Exception("Cannot convert value to type floatarray: {0}".format(value))
         elif value_type == "intarray":
             if isinstance(value, list):
                 return [int(v) for v in value]
-            if isinstance(value, str) or isinstance(value, unicode):
+            if isinstance(value, str) :
                 return [int(v) for v in value.split()]
             else:
                 raise Exception("Cannot convert value to type intarray: {0}".format(value))
         elif value_type == "stringarray":
              if isinstance(value, list):
                  return [str(v) for v in value]
-             if isinstance(value, str) or isinstance(value, unicode):
+             if isinstance(value, str) :
                  return [str(v) for v in value.split()]
              else:
                  raise Exception("Cannot convert value to type stringarray: {0}".format(value))

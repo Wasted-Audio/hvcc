@@ -19,25 +19,25 @@ import decimal
 import os
 import re
 
-from HeavyObject import HeavyObject
-from HeavyGraph import HeavyGraph             # pre-converted Heavy graphs
-from HvSwitchcase import HvSwitchcase         # __switchcase
-from PdAudioIoObject import PdAudioIoObject   # adc~/dac~
-from PdBinopObject import PdBinopObject       # binary arithmatic operators
-from PdGraph import PdGraph                   # canvas
-from PdLetObject import PdLetObject           # inlet/inlet~/outlet/outlet~
-from PdMessageObject import PdMessageObject   # msg
-from PdPackObject import PdPackObject         # pack
-from PdReceiveObject import PdReceiveObject   # r/r~/receive/receive~/catch~
-from PdRouteObject import PdRouteObject       # route
-from PdSelectObject import PdSelectObject     # select/sel
-from PdSendObject import PdSendObject         # s/s~/send/send~/throw~
-from PdTriggerObject import PdTriggerObject   # trigger/t
-from PdTableObject import PdTableObject       # table
-from PdUnpackObject import PdUnpackObject     # unpack
-from PdLibSignalGraph import PdLibSignalGraph # pd/lib abstraction connection checks
+from .HeavyObject import HeavyObject
+from interpreters.pd2hv.HeavyGraph import HeavyGraph  # pre-converted Heavy graphs
+from .HvSwitchcase import HvSwitchcase         # __switchcase
+from .PdAudioIoObject import PdAudioIoObject   # adc~/dac~
+from .PdBinopObject import PdBinopObject       # binary arithmatic operators
+from .PdGraph import PdGraph                   # canvas
+from .PdLetObject import PdLetObject           # inlet/inlet~/outlet/outlet~
+from .PdMessageObject import PdMessageObject   # msg
+from .PdPackObject import PdPackObject         # pack
+from .PdReceiveObject import PdReceiveObject   # r/r~/receive/receive~/catch~
+from .PdRouteObject import PdRouteObject       # route
+from .PdSelectObject import PdSelectObject     # select/sel
+from .PdSendObject import PdSendObject         # s/s~/send/send~/throw~
+from .PdTriggerObject import PdTriggerObject   # trigger/t
+from .PdTableObject import PdTableObject       # table
+from .PdUnpackObject import PdUnpackObject     # unpack
+from .PdLibSignalGraph import PdLibSignalGraph # pd/lib abstraction connection checks
 
-from NotificationEnum import NotificationEnum
+from .NotificationEnum import NotificationEnum
 
 class PdParser:
 
@@ -69,7 +69,7 @@ class PdParser:
         """ Returns a set of all pd objects names supported by the parser.
         """
         pd_objects = [os.path.splitext(f)[0] for f in os.listdir(clazz.__PDLIB_DIR) if f.endswith(".pd")]
-        pd_objects.extend(PdParser.__PD_CLASSES.keys())
+        pd_objects.extend(list(PdParser.__PD_CLASSES.keys()))
         return pd_objects
 
     @classmethod
@@ -90,7 +90,7 @@ class PdParser:
                     hv_arg_list.append(l.rstrip(";\r\n"))
                 elif l.startswith("#X restore"):
                     num_canvas -= 1
-                    hv_arg_list = hv_arg_dict.values()[num_canvas]
+                    hv_arg_list = list(hv_arg_dict.values())[num_canvas]
         return hv_arg_dict
 
     @classmethod
@@ -152,7 +152,7 @@ class PdParser:
 
         file_hv_arg_dict = PdParser.__get_hv_args(file_path)
         file_iterator = PdParser.__get_pd_line(file_path)
-        canvas_line = file_iterator.next()
+        canvas_line = next(file_iterator)
 
         self.__DOLLAR_ZERO += 1 # increment $0
         graph_args = [self.__DOLLAR_ZERO] + (obj_args or [])

@@ -13,8 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from HeavyLangObject import HeavyLangObject
-from HIrSend import HIrSend
+from .HeavyLangObject import HeavyLangObject
+from .HIrSend import HIrSend
 
 class HLangSend(HeavyLangObject):
     """ Translates HeavyLang object [send] to HeavyIR [__send] if control,

@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from HeavyObject import HeavyObject
+from .HeavyObject import HeavyObject
 
 class ControlBinop(HeavyObject):
     # a dictionary translating from the operation argument to the C case
@@ -94,7 +94,7 @@ class ControlBinop(HeavyObject):
             return [
                 "cBinop_init(&cBinop_{0}, {1}f); // {2}".format(
                     obj_id,
-                    float(args.values()[0]),
+                    float(list(args.values())[0]),
                     obj_type)
             ]
 

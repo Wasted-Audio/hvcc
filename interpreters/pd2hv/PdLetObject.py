@@ -1,6 +1,6 @@
 # Copyright 2015,2016 Enzien Audio, Ltd. All Rights Reserved.
 
-from PdObject import PdObject
+from .PdObject import PdObject
 
 class PdLetObject(PdObject):
     def __init__(self, obj_type, obj_args=None, pos_x=0, pos_y=0):

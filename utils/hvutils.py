@@ -28,7 +28,7 @@ def main():
 
     if args.cmd == "pdobjects":
         obj_list = PdParser.PdParser.get_supported_objects()
-        print json.dumps(obj_list)
+        print(json.dumps(obj_list))
     else:
         pass
 

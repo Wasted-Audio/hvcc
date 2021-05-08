@@ -15,7 +15,7 @@
 
 import re
 
-from HeavyObject import HeavyObject
+from .HeavyObject import HeavyObject
 
 class ControlMessage(HeavyObject):
 
@@ -40,7 +40,7 @@ class ControlMessage(HeavyObject):
             # construct the message
             send_message_list.append("m = HV_MESSAGE_ON_STACK({0});".format(len(m)))
             send_message_list.append("msg_init(m, {0}, msg_getTimestamp(n));".format(len(m)))
-            for i in xrange(len(m)):
+            for i in range(len(m)):
                 e = m[i] # get the message element
                 try:
                     # is the message a float?

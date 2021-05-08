@@ -16,9 +16,9 @@
 import json
 import os
 
-from Connection import Connection
-from HeavyException import HeavyException
-from HeavyLangObject import HeavyLangObject
+from .Connection import Connection
+from .HeavyException import HeavyException
+from .HeavyLangObject import HeavyLangObject
 
 class HeavyIrObject(HeavyLangObject):
     """ Intermediate Representation (IR) objects are atomic and have
@@ -146,7 +146,7 @@ class HeavyIrObject(HeavyLangObject):
         # assign the output buffers
         exclude_set = set()
 
-        for i in xrange(self.num_outlets):
+        for i in range(self.num_outlets):
             # buffers are assigned even if the outlet has no connections.
             # The buffer will still be filled. However, if the buffer has already
             # been set (i.e. non-zero) (e.g. in the case of dac~),

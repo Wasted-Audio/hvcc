@@ -21,6 +21,9 @@ profile
 DerivedData
 .idea/
 
+### Visual Studio Code ###
+.vscode
+
 ### Binaries ###
 *.mp3
 *.key
@@ -31,3 +34,4 @@ generators/c2vst2/VST_SDK
 generators/vs2015/Heavy/generated
 generators/c2js/emsdk_portable/
 generators/c2js/emsdk/
+

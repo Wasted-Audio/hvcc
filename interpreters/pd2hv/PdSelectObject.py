@@ -14,8 +14,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from collections import Counter
-from NotificationEnum import NotificationEnum
-from PdObject import PdObject
+from .NotificationEnum import NotificationEnum
+from .PdObject import PdObject
 
 class PdSelectObject(PdObject):
     def __init__(self, obj_type, obj_args=None, pos_x=0, pos_y=0):

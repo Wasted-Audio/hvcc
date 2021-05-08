@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from PdObject import PdObject
+from .PdObject import PdObject
 
 class HvSwitchcase(PdObject):
     def __init__(self, obj_type, obj_args=None, pos_x=0, pos_y=0):

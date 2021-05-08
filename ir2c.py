@@ -22,45 +22,45 @@ import os
 import shutil
 import time
 
-from PrettyfyC import PrettyfyC
-from ..copyright import copyright_manager
+from generators.ir2c.PrettyfyC import PrettyfyC
+from generators.copyright import copyright_manager
 
-from ControlBinop import ControlBinop
-from ControlCast import ControlCast
-from ControlDelay import ControlDelay
-from ControlIf import ControlIf
-from ControlMessage import ControlMessage
-from ControlPack import ControlPack
-from ControlPrint import ControlPrint
-from ControlReceive import ControlReceive
-from ControlRandom import ControlRandom
-from ControlSend import ControlSend
-from ControlSlice import ControlSlice
-from ControlSwitchcase import ControlSwitchcase
-from ControlSystem import ControlSystem
-from ControlTabhead import ControlTabhead
-from ControlTabread import ControlTabread
-from ControlTabwrite import ControlTabwrite
-from ControlUnop import ControlUnop
-from ControlVar import ControlVar
-from HeavyObject import HeavyObject
-from HeavyTable import HeavyTable
-from SignalConvolution import SignalConvolution
-from SignalBiquad import SignalBiquad
-from SignalCPole import SignalCPole
-from SignalDel1 import SignalDel1
-from SignalEnvelope import SignalEnvelope
-from SignalLine import SignalLine
-from SignalLorenz import SignalLorenz
-from SignalMath import SignalMath
-from SignalPhasor import SignalPhasor
-from SignalRPole import SignalRPole
-from SignalSample import SignalSample
-from SignalSamphold import SignalSamphold
-from SignalTabhead import SignalTabhead
-from SignalTabread import SignalTabread
-from SignalTabwrite import SignalTabwrite
-from SignalVar import SignalVar
+from generators.ir2c.ControlBinop import ControlBinop
+from generators.ir2c.ControlCast import ControlCast
+from generators.ir2c.ControlDelay import ControlDelay
+from generators.ir2c.ControlIf import ControlIf
+from generators.ir2c.ControlMessage import ControlMessage
+from generators.ir2c.ControlPack import ControlPack
+from generators.ir2c.ControlPrint import ControlPrint
+from generators.ir2c.ControlReceive import ControlReceive
+from generators.ir2c.ControlRandom import ControlRandom
+from generators.ir2c.ControlSend import ControlSend
+from generators.ir2c.ControlSlice import ControlSlice
+from generators.ir2c.ControlSwitchcase import ControlSwitchcase
+from generators.ir2c.ControlSystem import ControlSystem
+from generators.ir2c.ControlTabhead import ControlTabhead
+from generators.ir2c.ControlTabread import ControlTabread
+from generators.ir2c.ControlTabwrite import ControlTabwrite
+from generators.ir2c.ControlUnop import ControlUnop
+from generators.ir2c.ControlVar import ControlVar
+from generators.ir2c.HeavyObject import HeavyObject
+from generators.ir2c.HeavyTable import HeavyTable
+from generators.ir2c.SignalConvolution import SignalConvolution
+from generators.ir2c.SignalBiquad import SignalBiquad
+from generators.ir2c.SignalCPole import SignalCPole
+from generators.ir2c.SignalDel1 import SignalDel1
+from generators.ir2c.SignalEnvelope import SignalEnvelope
+from generators.ir2c.SignalLine import SignalLine
+from generators.ir2c.SignalLorenz import SignalLorenz
+from generators.ir2c.SignalMath import SignalMath
+from generators.ir2c.SignalPhasor import SignalPhasor
+from generators.ir2c.SignalRPole import SignalRPole
+from generators.ir2c.SignalSample import SignalSample
+from generators.ir2c.SignalSamphold import SignalSamphold
+from generators.ir2c.SignalTabhead import SignalTabhead
+from generators.ir2c.SignalTabread import SignalTabread
+from generators.ir2c.SignalTabwrite import SignalTabwrite
+from generators.ir2c.SignalVar import SignalVar
 
 class ir2c:
 
@@ -128,7 +128,7 @@ class ir2c:
     def filter_extern(clazz, d):
         """ Return a dictionary of objects that are externed.
         """
-        return {k:v for k,v in d.iteritems() if v["extern"]}
+        return {k:v for k,v in list(d.items()) if v["extern"]}
 
     @classmethod
     def get_class(clazz, obj_type):
@@ -160,7 +160,7 @@ class ir2c:
         env.filters["hvhash"] = ir2c.filter_hvhash
         env.filters["extern"] = ir2c.filter_extern
         env.loader = jinja2.FileSystemLoader(
-            os.path.join(os.path.dirname(__file__), "templates"))
+            os.path.join(os.path.dirname(__file__), "generators/ir2c/templates"))
 
         # read the hv.ir.json file
         with open(hv_ir_path, "r") as f:
@@ -175,10 +175,10 @@ class ir2c:
         #
 
         # generate set of header files to include
-        include_set = set([x for o in ir["objects"].values() for x in ir2c.get_class(o["type"]).get_C_header_set()])
+        include_set = set([x for o in list(ir["objects"].values()) for x in ir2c.get_class(o["type"]).get_C_header_set()])
 
         # generate set of files to add to project
-        file_set = set([x for o in ir["objects"].values() for x in ir2c.get_class(o["type"]).get_C_file_set()])
+        file_set = set([x for o in list(ir["objects"].values()) for x in ir2c.get_class(o["type"]).get_C_file_set()])
         file_set.update(ir2c.__BASE_FILE_SET)
 
         # generate object definition and initialisation list
@@ -209,7 +209,7 @@ class ir2c:
 
         # generate static table data initialisers
         table_data_list = []
-        for k, v in ir["tables"].iteritems():
+        for k, v in list(ir["tables"].items()):
             o = ir["objects"][v["id"]]
             obj_class = ir2c.get_class(o["type"])
             table_data_list.extend(obj_class.get_table_data_decl(
@@ -241,7 +241,7 @@ class ir2c:
         name = ir["name"]["escaped"]
 
         # ensure that send_receive dictionary is alphabetised by the receiver key
-        send_receive = OrderedDict(sorted([(k,v) for k,v in ir["control"]["receivers"].iteritems()], key=lambda x: x[0]))
+        send_receive = OrderedDict(sorted([(k,v) for k,v in list(ir["control"]["receivers"].items())], key=lambda x: x[0]))
 
         # write HeavyContext.h
         with open(os.path.join(output_dir, "Heavy_{0}.hpp".format(name)), "w") as f:
@@ -282,7 +282,7 @@ class ir2c:
                 dst=os.path.join(output_dir, f))
 
         # generate HeavyIR object counter
-        ir_counter = Counter([obj["type"] for obj in ir["objects"].values()])
+        ir_counter = Counter([obj["type"] for obj in list(ir["objects"].values())])
 
         return {
             "stage": "ir2c",
@@ -327,7 +327,7 @@ def main():
         args.copyright)
 
     if args.verbose:
-        print("Total ir2c time: {0:.2f}ms".format(results["compile_time"]*1000))
+        print(("Total ir2c time: {0:.2f}ms".format(results["compile_time"]*1000)))
 
 if __name__ == "__main__":
     main()
