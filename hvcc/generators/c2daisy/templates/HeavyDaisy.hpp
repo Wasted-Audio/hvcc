@@ -1,4 +1,4 @@
 {{copyright}}
 
-#include "daisy_boards.hpp"
+#include "daisy_boards.h"
 #include "Heavy_{{name}}.hpp"

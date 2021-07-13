@@ -53,6 +53,7 @@ class c2daisy:
             with open(daisy_h_path, "w") as f:
                 f.write(env.get_template("HeavyDaisy.hpp").render(
                     name=patch_name,
+                    board=board,
                     class_name=f"HeavyDaisy_{patch_name}",
                     num_input_channels=num_input_channels,
                     num_output_channels=num_output_channels,
@@ -62,6 +63,7 @@ class c2daisy:
             with open(daisy_cpp_path, "w") as f:
                 f.write(env.get_template("HeavyDaisy.cpp").render(
                     name=patch_name,
+                    board=board,
                     class_name=f"HeavyDaisy_{patch_name}",
                     num_input_channels=num_input_channels,
                     num_output_channels=num_output_channels,

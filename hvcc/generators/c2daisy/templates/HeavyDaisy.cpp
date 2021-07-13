@@ -12,7 +12,7 @@ DSY_BOARD* hardware;
 
 int num_params;
 
-// GENERATE GLOBALS
+Heavy_{{name}} hv(SAMPLE_RATE);
 
 void ProcessControls();
 
@@ -30,33 +30,44 @@ static void sendHook(HeavyContextInterface *c, const char *receiverName, uint32_
 int main(void)
 {
     hardware = &boardsHardware;
-    // GENERATE PREINIT
+    {% if board == 'seed' %}
+    hardware->Configure();
+    {% endif %}
     num_params = hv.getParameterInfo(0,NULL);
 
     hv.setSendHook(sendHook);
 
     hardware->Init();
 
-    // GENERATE ADC
+    {% if board != 'seed' %}
+    hardware->StartAdc();
+    {% endif %}
 
     hardware->StartAudio(audiocallback);
     // GENERATE POSTINIT
     for(;;)
     {
-        // GENERATE INFINITELOOP
+        {% if board == 'patch' %}
+        hardware->DisplayControls(false);
+        {% endif %}
     }
 }
 
 void ProcessControls()
 {
-    // GENERATE DEBOUNCE
+    {% if board != 'seed' %}
+    hardware->DebounceControls();
+    hardware->UpdateAnalogControls();
+    {% endif %}
 
     for (int i = 0; i < num_params; i++)
     {
 	HvParameterInfo info;
 	hv.getParameterInfo(i, &info);
 
-	// GENERATE CONTROLS
+    {% if board == 'seed' %}
+    hv.sendFloatToReceiver(info.hash, 0.f);
+    {% endif %}
 
 	std::string name(info.name);
 

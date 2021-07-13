@@ -1,7 +1,7 @@
 #ifndef DSY_BOARDS_H
 #define DSY_BOARDS_H
 #ifndef DSY_BOARD
-#define DSY_BOARD Daisy{{board|upper}}
+#define DSY_BOARD Daisy{{board.capitalize()}}
 #endif
 #endif
 #include "daisy_seed.h"
