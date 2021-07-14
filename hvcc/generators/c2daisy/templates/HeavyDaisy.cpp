@@ -2,8 +2,6 @@
 
 #include "{{class_name}}.hpp"
 
-#include "daisy_boards.h"
-
 #define SAMPLE_RATE 48000.f
 
 using namespace daisy;

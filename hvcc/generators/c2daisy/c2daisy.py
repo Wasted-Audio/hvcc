@@ -70,17 +70,6 @@ class c2daisy:
                     receivers=receiver_list,
                     pool_sizes_kb=externs["memoryPoolSizesKb"],
                     copyright=copyright_c))
-            daisy_h_path = os.path.join(source_dir, "daisy_boards.h")
-            with open(daisy_h_path, "w") as f:
-                f.write(env.get_template("daisy_boards.h").render(
-                    name=patch_name,
-                    board=board,
-                    class_name=f"HeavyDaisy_{patch_name}",
-                    num_input_channels=num_input_channels,
-                    num_output_channels=num_output_channels,
-                    receivers=receiver_list,
-                    pool_sizes_kb=externs["memoryPoolSizesKb"],
-                    copyright=copyright_c))
 
             # generate list of Heavy source files
             # files = os.listdir(source_dir)
