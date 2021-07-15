@@ -3,7 +3,7 @@ TARGET = HeavyDaisy_{{name}}
 
 # Library Locations
 LIBDAISY_DIR = ../../libdaisy
-HVCC_DIR = c
+HVCC_DIR = ../../c
 
 # HVCC Sources
 CPP_SOURCES = $(wildcard $(HVCC_DIR)/*.cpp)
