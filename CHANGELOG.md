@@ -1,6 +1,11 @@
 CHANGELOG
 =====
 
+Next Release
+-----
+
+* Daisy support
+
 0.1.2
 -----
 
