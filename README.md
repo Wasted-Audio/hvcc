@@ -2,10 +2,7 @@
 
 :warning: This is an attempt to modernize `hvcc` to work with `python3` and add some additional targets. :warning:
 
-:warning: Not all functionality has been tested. Use at your own risk. :warning:
-
-Instead of the old VST2 implementation we now build to Distrho Plugin Framework, this allows us to compile LV2 and VST2 plugin formats, with additional jack-standalone, from the same code base.
-
+:warning: Not all functionality is being tested. Feedback is appreciated. :warning:
 
 # Heavy Compiler Collection (hvcc)
 
@@ -17,21 +14,26 @@ The original need for `hvcc` arose from running against performance limitations 
 
 The goal was to leverage Pure Data as a design interface and statically interpret the resultant patches to generate a low-level, portable and optimised C/C++ program that would be structured to take advantage of modern hardware whilst still generating the same behaviour and audio output as Pure Data.
 
-It has since then been expanded to provide further support for many different platforms and frameworks, especially targeting game audio production tools.
+It has since then been expanded to provide further support for many different platforms and frameworks, targeting game audio design, daw plugins and embedded production tools.
 
 ## Requirements
 
-* python 3
+* python 3.7 or higher
     - `jinja2` (for generator templating)
     - `nose2` (for tests, optional)
 
 ## Installation
+hvcc is available from pypi.org and can be installed using python3 pip:
+
+`$ pip3 install hvcc`
+
+If you want to develop hvcc you can install it from the source directory:
 
 `$ git clone https://github.com/dromer/hvcc.git`
 
 `$ cd hvcc/`
 
-`$ pip3 install .`
+`$ pip3 install -e .`
 
 ## Usage
 
