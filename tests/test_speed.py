@@ -18,7 +18,6 @@ import os
 import shutil
 import subprocess
 import sys
-import time
 import unittest
 
 sys.path.append("../")
@@ -26,22 +25,23 @@ import hvcc
 
 SCRIPT_DIR = os.path.dirname(__file__)
 
+
 class TestPdPatches(unittest.TestCase):
 
     # test results cannot be more than 2% slower than the golden value
     __PERCENT_THRESHOLD = 2.0
 
     def _compile_and_run_patch(self, pd_path, out_dir, samplerate=None, blocksize=None, num_iterations=None, flag=None):
-        hvcc_results = hvcc.compile_dataflow(pd_path, out_dir, verbose=False)
+        hvcc.compile_dataflow(pd_path, out_dir, verbose=False)
 
         # determine correct compiler flags
         flag = flag or "HV_SIMD_NONE"
 
         simd_flags = {
-          "HV_SIMD_NONE" : ["-DHV_SIMD_NONE"],
-          "HV_SIMD_SSE" : ["-msse", "-msse2", "-msse3", "-mssse3", "-msse4.1", "-msse4.2"],
-          "HV_SIMD_AVX" : ["-msse", "-msse2", "-msse3", "-mssse3", "-msse4.1", "-msse4.2", "-mavx", "-mfma"],
-          "HV_SIMD_NEON" : ["-mcpu=cortex-a7", "-mfloat-abi=hard"]
+            "HV_SIMD_NONE": ["-DHV_SIMD_NONE"],
+            "HV_SIMD_SSE": ["-msse", "-msse2", "-msse3", "-mssse3", "-msse4.1", "-msse4.2"],
+            "HV_SIMD_AVX": ["-msse", "-msse2", "-msse3", "-mssse3", "-msse4.1", "-msse4.2", "-mavx", "-mfma"],
+            "HV_SIMD_NEON": ["-mcpu=cortex-a7", "-mfloat-abi=hard"]
         }
 
         self.assertTrue(flag in simd_flags, "Unknown compiler flag: " + flag)
@@ -87,7 +87,7 @@ class TestPdPatches(unittest.TestCase):
 
         json_path = os.path.join(
             os.path.dirname(pd_path),
-            os.path.basename(pd_path)[:-3]+".golden.json")
+            os.path.basename(pd_path)[:-3] + ".golden.json")
         if os.path.exists(json_path):
             with open(json_path, "r") as f:
                 golden = json.load(f)
@@ -95,20 +95,20 @@ class TestPdPatches(unittest.TestCase):
             golden = {}
 
         tick = self._compile_and_run_patch(pd_path, out_dir,
-            golden.get("samplerate", 48000.0),
-            golden.get("blocksize", 512),
-            golden.get("numIterations", 2000000),
-            flag="HV_SIMD_SSE")
+                                           golden.get("samplerate", 48000.0),
+                                           golden.get("blocksize", 512),
+                                           golden.get("numIterations", 2000000),
+                                           flag="HV_SIMD_SSE")
 
-        if "HV_SIMD_SSE" in golden.get("usPerBlock",{}):
+        if "HV_SIMD_SSE" in golden.get("usPerBlock", {}):
             tock = golden["usPerBlock"]["HV_SIMD_SSE"]
-            percent_difference = 100.0*(tick - tock)/tock
-            self.assertTrue(
-                percent_difference < TestPdPatches.__PERCENT_THRESHOLD,
-                "{0} has become {1:g}% slower @ {2}us/block.".format(os.path.basename(pd_path), percent_difference, tick))
+            percent_difference = 100.0 * (tick - tock) / tock
+            self.assertTrue(percent_difference < TestPdPatches.__PERCENT_THRESHOLD,
+                            "{0} has become {1:g}% slower @ {2}us/block.".format(
+                                os.path.basename(pd_path),
+                                percent_difference,
+                                tick))
             if (percent_difference < -TestPdPatches.__PERCENT_THRESHOLD):
-                print "{0} has become significantly faster: {1:g}%".format(
-                    os.path.basename(pd_path),
-                    percent_difference)
+                print(f"{os.path.basename(pd_path)} has become significantly faster: {percent_difference:g}%")
         else:
-            print tick
+            print(tick)

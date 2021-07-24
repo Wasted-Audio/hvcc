@@ -31,6 +31,7 @@ import uploader
 SCRIPT_DIR = os.path.dirname(__file__)
 UNITY_TEST_DIR = os.path.join(os.path.dirname(__file__), "unity", "test")
 
+
 class TestUnityPlugins(unittest.TestCase):
 
     __TEST_TOKEN = "VPwuY6XUCvPKbyjYK3OZ1z01nUbDg1lv"
@@ -52,7 +53,7 @@ class TestUnityPlugins(unittest.TestCase):
 
         # unittest asserts can only be called on instances
         assert exit_code == 0, "Uploader returned with non-zero exit code: {0}".format(exit_code)
-        assert len(reply_json.get("errors",[])) == 0, reply_json["errors"][0]["detail"]
+        assert len(reply_json.get("errors", [])) == 0, reply_json["errors"][0]["detail"]
 
         TestUnityPlugins.__JOB_URL = reply_json["data"]["links"]["files"]["self"]
 
@@ -77,15 +78,15 @@ class TestUnityPlugins(unittest.TestCase):
         try:
             r = requests.get(
                 url,
-                cookies={"token":TestUnityPlugins.__TEST_TOKEN},
-                timeout=30.0) # maximum request time of 30 seconds
+                cookies={"token": TestUnityPlugins.__TEST_TOKEN},
+                timeout=30.0)  # maximum request time of 30 seconds
         except requests.exceptions.Timeout:
             self.fail("Request {0} has timed out. Why is it taking so long?".format(url))
 
         # assert that the file could be downloaded
         self.assertEqual(
             r.status_code,
-            200, # assert that we receive HTTPS status code 200 OK
+            200,  # assert that we receive HTTPS status code 200 OK
             "Received HTTPS {0} for {1}. Could not download asset.".format(r.status_code, url))
 
         # make an output directory and write the asset to disk
@@ -105,7 +106,7 @@ class TestUnityPlugins(unittest.TestCase):
                     should_print = True
 
                 if should_print:
-                    print line,
+                    print(line),
 
                 if line.startswith("-----EndCompilerOutput"):
                     break
@@ -151,4 +152,4 @@ class TestUnityPlugins(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    print "Usage: $ nose2 test_unity.TestUnityPlugins"
+    print("Usage: $ nose2 test_unity.TestUnityPlugins")

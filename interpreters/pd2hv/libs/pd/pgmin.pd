@@ -1,9 +1,0 @@
-#N canvas 1201 454 219 170 10;
-#X obj 88 108 outlet;
-#X obj 31 109 outlet;
-#X obj 31 74 unpack f f;
-#X text 105 74 pgm channel;
-#X obj 31 40 r __hv_pgmin;
-#X connect 2 0 1 0;
-#X connect 2 1 0 0;
-#X connect 4 0 2 0;

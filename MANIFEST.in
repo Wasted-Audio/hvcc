@@ -1,0 +1,3 @@
+recursive-include hvcc/* *.json *.pd *.h *.c *.hpp *.cpp Makefile *.cs *.pbxproj *.sln *.vcxprox *.mk *.md *.lprox *.xcassets *.m *.xcodeproj *.plist *.xib *.storyboard *.rtf *.stringsp *.xib *.txt *.xml *.def *.rc *.plist *.js *.html *
+recursive-exclude tests *.*
+recursive-exclude * *.pyc

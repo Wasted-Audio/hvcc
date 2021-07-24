@@ -24,10 +24,11 @@ import unittest
 
 sys.path.append("../")
 import hvcc
-from interpreters.pd2hv.NotificationEnum import NotificationEnum
+from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
 
 SCRIPT_DIR = os.path.dirname(__file__)
 CONTROL_TEST_DIR = os.path.join(os.path.dirname(__file__), "pd", "control")
+
 
 class TestPdControlPatches(unittest.TestCase):
 
@@ -40,11 +41,11 @@ class TestPdControlPatches(unittest.TestCase):
     def compile_and_run(self, source_files, out_path, num_iterations, flag=None):
 
         simd_flags = {
-            "HV_SIMD_NONE" : ["-DHV_SIMD_NONE"],
-            "HV_SIMD_SSE" : ["-msse", "-msse2", "-msse3", "-mssse3", "-msse4.1"],
-            "HV_SIMD_SSE_FMA" : ["-msse", "-msse2", "-msse3", "-mssse3", "-msse4.1", "-mfma"],
-            "HV_SIMD_AVX" : ["-msse", "-msse2", "-msse3", "-mssse3", "-msse4.1", "-mavx", "-mfma"],
-            "HV_SIMD_NEON" : ["-mcpu=cortex-a7", "-mfloat-abi=hard"]
+            "HV_SIMD_NONE": ["-DHV_SIMD_NONE"],
+            "HV_SIMD_SSE": ["-msse", "-msse2", "-msse3", "-mssse3", "-msse4.1"],
+            "HV_SIMD_SSE_FMA": ["-msse", "-msse2", "-msse3", "-mssse3", "-msse4.1", "-mfma"],
+            "HV_SIMD_AVX": ["-msse", "-msse2", "-msse3", "-mssse3", "-msse4.1", "-mavx", "-mfma"],
+            "HV_SIMD_NEON": ["-mcpu=cortex-a7", "-mfloat-abi=hard"]
         }
 
         # template Makefile
@@ -360,12 +361,11 @@ class TestPdControlPatches(unittest.TestCase):
         for r in hvcc_results.values():
             if r["notifs"].get("has_error", False):
                 if r["stage"] == "pd2hv":
-                    self.assertTrue(expected_enum in \
-                        [e["enum"] for e in hvcc_results["pd2hv"]["notifs"]["errors"]])
+                    self.assertTrue(expected_enum in [e["enum"] for e in hvcc_results["pd2hv"]["notifs"]["errors"]])
                     return
                 elif r["stage"] == "hvcc":
                     if len(hvcc_results["hvcc"]["notifs"]["errors"]) > 0:
-                        return # hvcc isn't using Notification enums so just pass
+                        return  # hvcc isn't using Notification enums so just pass
 
         self.fail("Expected error enum: " + str(expected_enum))
 
@@ -380,8 +380,7 @@ class TestPdControlPatches(unittest.TestCase):
         hvcc_results = hvcc.compile_dataflow(pd_path, out_dir, verbose=False)
         for r in hvcc_results.values():
             if r["stage"] == "pd2hv":
-                self.assertTrue(expected_enum in \
-                    [w["enum"] for w in hvcc_results["pd2hv"]["notifs"]["warnings"]])
+                self.assertTrue(expected_enum in [w["enum"] for w in hvcc_results["pd2hv"]["notifs"]["warnings"]])
                 return
 
         self.fail("Expected warning enum: " + str(expected_enum))
@@ -429,7 +428,7 @@ class TestPdControlPatches(unittest.TestCase):
         # don't delete the output dir
         # if the test fails, we can examine the output
 
-        golden_path = os.path.join(os.path.dirname(pd_path), patch_name.split(".")[0]+".golden.txt")
+        golden_path = os.path.join(os.path.dirname(pd_path), patch_name.split(".")[0] + ".golden.txt")
         if os.path.exists(golden_path):
             with open(golden_path, "r") as f:
                 golden = "".join(f.readlines()).splitlines()
@@ -464,6 +463,7 @@ class TestPdControlPatches(unittest.TestCase):
         else:
             self.fail("{0} could not be found.".format(os.path.basename(golden_path)))
 
+
 def main():
     # TODO(mhroth): make this work
     parser = argparse.ArgumentParser(
@@ -474,9 +474,10 @@ def main():
     args = parser.parse_args()
     if os.path.exists(args.pd_path):
         result = TestPdControlPatches._test_control_patch(args.pd_path)
-        print result
+        print(result)
     else:
-        print "Pd file path '{0}' doesn't exist".format(args.pd_path)
+        print(f"Pd file path '{args.pd_path}' doesn't exist")
+
 
 if __name__ == "__main__":
     main()

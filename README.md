@@ -1,9 +1,15 @@
+![Build Status](https://github.com/Wasted-Audio/hvcc/actions/workflows/python.yml/badge.svg)
+
+:warning: This is an attempt to modernize `hvcc` to work with `python3` and add some additional targets. :warning:
+
+:warning: Not all functionality has been tested. Use at your own risk. :warning:
+
+Instead of the old VST2 implementation we now build to Distrho Plugin Framework, this allows us to compile LV2 and VST2 plugin formats, with additional jack-standalone, from the same code base.
+
+
 # Heavy Compiler Collection (hvcc)
 
 `hvcc` is a python-based dataflow audio programming language compiler that generates C/C++ code and a variety of specific framework wrappers.
-
-#### IMPORTANT!
-This repo is currently **unsupported** and looking for a maintainer. The original authors will not respond to messages or issues. Bugs will not be fixed. Features will not be added. You are on your own. Good luck.
 
 ## Background
 
@@ -15,18 +21,17 @@ It has since then been expanded to provide further support for many different pl
 
 ## Requirements
 
-* python 2.7
-    - `enum` (for error reporting)
+* python 3
     - `jinja2` (for generator templating)
     - `nose2` (for tests, optional)
 
 ## Installation
 
-`$ git clone https://github.com/enzienaudio/hvcc.git`
+`$ git clone https://github.com/dromer/hvcc.git`
 
 `$ cd hvcc/`
 
-`$ pip2.7 install -r requirements.txt`
+`$ pip3 install .`
 
 ## Usage
 
@@ -34,7 +39,7 @@ It has since then been expanded to provide further support for many different pl
 
 Generate a C/C++ program from `input.pd` and place the files in `~/myProject/`
 
-`$ python2.7 hvcc.py ~/myProject/_main.pd`
+`$ hvcc ~/myProject/_main.pd`
 
 This command will generate the following directories:
 
@@ -50,7 +55,7 @@ The `-o` or `--out_dir` parameter will specify where the output files are placed
 
 For example:
 
-`$ python2.7 hvcc.py ~/myProject/_main.pd -o ~/Desktop/somewhere/else/`
+`$ hvcc ~/myProject/_main.pd -o ~/Desktop/somewhere/else/`
 
 Will place all the generated files in `~/Desktop/somewhere/else/`.
 
@@ -58,7 +63,7 @@ Will place all the generated files in `~/Desktop/somewhere/else/`.
 
 The `-n` or `--name` parameter can be used to easily namespace the generated code so that there are no conflicts when integrating multiple patches into the same project.
 
-`$ python2.7 hvcc.py ~/myProject/_main.pd -o ~/Desktop/somewhere/else/ -n mySynth`
+`$ hvcc ~/myProject/_main.pd -o ~/Desktop/somewhere/else/ -n mySynth`
 
 ### `-g` Generators
 
@@ -66,13 +71,13 @@ Once `hvcc` has generated internal information about the patch the `-g` or `--ge
 
 For example:
 
-`$ python2.7 hvcc.py ~/myProject/_main.pd -o ~/Desktop/somewhere/else/ -n mySynth -g unity`
+`$ hvcc ~/myProject/_main.pd -o ~/Desktop/somewhere/else/ -n mySynth -g unity`
 
 Will also generate a `unity` section in the output directory contain all the build projects and source files to compile a Unity plugin.
 
 It is also possible to pass a list of generators:
 
-`$ python2.7 hvcc.py ~/myProject/_main.pd -o ~/Desktop/somewhere/else/ -n mySynth -g unity wwise js`
+`$ hvcc ~/myProject/_main.pd -o ~/Desktop/somewhere/else/ -n mySynth -g unity wwise js`
 
 Available generator options:
 
@@ -82,7 +87,10 @@ Available generator options:
 * `js`
 * `pdext`
 * `unity`
-* `vst2`
+* `dpf`
+  * `vst2`
+  * `lv2`
+  * `jack`
 * `wwise`
 
 
@@ -92,7 +100,7 @@ Available generator options:
 
 This can be handy when using a third-party patch library for example https://github.com/enzienaudio/heavylib.
 
-`$ python2.7 hvcc.py ~/myProject/_main.pd -o ~/Desktop/somewhere/else/ -n mySynth -p "[~/Workspace/Projects/Enzien/heavylib/, ~/Desktop/myLib/]"`
+`$ hvcc ~/myProject/_main.pd -o ~/Desktop/somewhere/else/ -n mySynth -p "[~/Workspace/Projects/Enzien/heavylib/, ~/Desktop/myLib/]"`
 
 ### `--copyright` User Copyright
 
@@ -102,7 +110,7 @@ By default all the generated source files via `hvcc` will have the following cop
 
 This can be changed with `--copyright` parameter
 
-`$ python2.7 hvcc.py ~/myProject/_main.pd -o ~/Desktop/somewhere/else/ -n mySynth --copyright "Copyright (c) Los Pollos Hermanos 2019"`
+`$ hvcc ~/myProject/_main.pd -o ~/Desktop/somewhere/else/ -n mySynth --copyright "Copyright (c) Los Pollos Hermanos 2019"`
 
 ### `--help`
 
@@ -120,7 +128,7 @@ Displays all the available parameters and options for hvcc.
 * [Unity](/docs/05.unity.md)
 * [Wwise](/docs/06.wwise.md)
 * [Javascript](/docs/07.javascript.md)
-* [VST](/docs/08.vst.md)
+* [DPF](/docs/08.dpf.md)
 * [MIDI](/docs/09.midi.md)
 * [C API](/docs/10.c.md)
 * [C++ API](/docs/11.cpp.md)

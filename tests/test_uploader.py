@@ -24,9 +24,11 @@ import urlparse
 sys.path.append("../../../hv-uploader")
 import hv_uploader
 
+
 class TestUploader(unittest.TestCase):
 
-    __TEST_TOKEN = "eyJhbGciOiAiSFMyNTYiLCAidHlwIjogIkpXVCJ9.eyJzdGFydERhdGUiOiAiMjAxNy0wMS0xNlQxOToyNTo1OS41MDIyMjkiLCAibmFtZSI6ICJlbnppZW5fYm90In0=.9nvA3uAsJksYUKLYb4r6T1DKMSoa_wBbqJFN8e_d5cQ="
+    __TEST_TOKEN = "eyJhbGciOiAiSFMyNTYiLCAidHlwIjogIkpXVCJ9.eyJzdGFydERhdGUiOiAiMjAxNy0wMS0xNlQxOToyNTo1OS41MDIyMj\
+                    kiLCAibmFtZSI6ICJlbnppZW5fYm90In0=.9nvA3uAsJksYUKLYb4r6T1DKMSoa_wBbqJFN8e_d5cQ="
 
     # called once before any tests are run
     @classmethod
@@ -47,7 +49,7 @@ class TestUploader(unittest.TestCase):
 
         # unittest asserts can only be called on instances
         assert exit_code == 0, "Uploader returned with non-zero exit code: {0}".format(exit_code)
-        assert len(reply_json.get("errors",[])) == 0, reply_json["errors"][0]["detail"]
+        assert len(reply_json.get("errors", [])) == 0, reply_json["errors"][0]["detail"]
 
         TestUploader.__JOB_URL = urlparse.urljoin(domain, reply_json["data"]["links"]["html"])
 
@@ -72,15 +74,15 @@ class TestUploader(unittest.TestCase):
         try:
             r = requests.get(
                 url,
-                cookies={"token":TestUploader.__TEST_TOKEN},
-                timeout=30.0) # maximum request time of 30 seconds
+                cookies={"token": TestUploader.__TEST_TOKEN},
+                timeout=30.0)  # maximum request time of 30 seconds
         except requests.exceptions.Timeout:
             self.fail("Request {0} has timed out. Why is it taking so long?".format(url))
 
         # assert that the file could be downloaded
         self.assertEqual(
             r.status_code,
-            200, # assert that we receive HTTPS status code 200 OK
+            200,  # assert that we receive HTTPS status code 200 OK
             "Received HTTPS {0} for {1}. Could not download asset.".format(r.status_code, url))
 
         # make an output directory and write the asset to disk
@@ -157,5 +159,6 @@ class TestUploader(unittest.TestCase):
     def test_fabric_android_armv7a(self):
         self.check_file_for_generator("fabric", "android", "armv7a")
 
+
 if __name__ == "__main__":
-    print "Usage: $ nose2 test_uploader.TestUploader"
+    print("Usage: $ nose2 test_uploader.TestUploader")

@@ -30,6 +30,7 @@ import hvcc
 SCRIPT_DIR = os.path.dirname(__file__)
 SIGNAL_TEST_DIR = os.path.join(os.path.dirname(__file__), "pd", "signal")
 
+
 class TestPdSignalPatches(unittest.TestCase):
 
     __ENV__ = jinja2.Environment()
@@ -39,14 +40,14 @@ class TestPdSignalPatches(unittest.TestCase):
 
     @classmethod
     def _compile_and_run(clazz, out_dir, source_files,
-            sample_rate=None, block_size=None, num_iterations=None, flag=None):
+                         sample_rate=None, block_size=None, num_iterations=None, flag=None):
 
         simd_flags = {
-            "HV_SIMD_NONE" : ["-DHV_SIMD_NONE"],
-            "HV_SIMD_SSE" : ["-msse", "-msse2", "-msse3", "-mssse3", "-msse4.1"],
-            "HV_SIMD_SSE_FMA" : ["-msse", "-msse2", "-msse3", "-mssse3", "-msse4.1", "-mfma"],
-            "HV_SIMD_AVX" : ["-msse", "-msse2", "-msse3", "-mssse3", "-msse4.1", "-mavx", "-mfma"],
-            "HV_SIMD_NEON" : ["-mcpu=cortex-a7", "-mfloat-abi=hard"]
+            "HV_SIMD_NONE": ["-DHV_SIMD_NONE"],
+            "HV_SIMD_SSE": ["-msse", "-msse2", "-msse3", "-mssse3", "-msse4.1"],
+            "HV_SIMD_SSE_FMA": ["-msse", "-msse2", "-msse3", "-mssse3", "-msse4.1", "-mfma"],
+            "HV_SIMD_AVX": ["-msse", "-msse2", "-msse3", "-mssse3", "-msse4.1", "-mavx", "-mfma"],
+            "HV_SIMD_NEON": ["-mcpu=cortex-a7", "-mfloat-abi=hard"]
         }
 
         exe_path = os.path.join(out_dir, "heavy")
@@ -119,8 +120,8 @@ class TestPdSignalPatches(unittest.TestCase):
 
         pd_path = os.path.join(SIGNAL_TEST_DIR, pd_file)
         patch_name = os.path.splitext(os.path.basename(pd_path))[0]
-        golden_path = os.path.join(SIGNAL_TEST_DIR, patch_name+".golden.wav")
-        self.assertTrue(os.path.exists(golden_path), "File not found: {0}".format(golden_path))
+        golden_path = os.path.join(SIGNAL_TEST_DIR, patch_name + ".golden.wav")
+        self.assertTrue(os.path.exists(golden_path), f"File not found: {golden_path}")
 
         try:
             out_dir = TestPdSignalPatches._run_hvcc(pd_path)
@@ -154,6 +155,7 @@ class TestPdSignalPatches(unittest.TestCase):
 
     def test_phasor_control(self):
         self._test_signal_patch("test-phasor-control.pd")
+
 
 def main():
     parser = argparse.ArgumentParser(
@@ -200,7 +202,8 @@ def main():
         flag=args.simd)
 
     if args.verbose:
-        print os.path.abspath(wav_path)
+        print(os.path.abspath(wav_path))
+
 
 if __name__ == "__main__":
     main()
