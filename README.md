@@ -140,7 +140,7 @@ Displays all the available parameters and options for hvcc.
 ## Contact
 There are several places where heavy/hvcc conversation is happening:
 * [Discord](https://discord.gg/fmxJveg)
-* [IRC](irc://#dataflow@irc.libera.chat)
+* [IRC](irc://irc.libera.chat/#dataflow)
 * A number of forums:
   * [Bela](https://forum.bela.io/?q=hvcc)
   * [Rebel Technology](https://community.rebeltech.org/tags/puredata)
