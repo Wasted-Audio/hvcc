@@ -136,3 +136,14 @@ Displays all the available parameters and options for hvcc.
 * [C++ API](/docs/11.cpp.md)
 * [Heavy Lang Info](/docs/12.heavy_lang.md)
 * [Heavy IR Info](/docs/13.heavy_ir_lang.md)
+
+## Contact
+There are several places where heavy/hvcc conversation is happening:
+* [Discord](https://discord.gg/fmxJveg)
+* [IRC](irc://#dataflow@irc.libera.chat)
+* A number of forums:
+  * [Bela](https://forum.bela.io/?q=hvcc)
+  * [Rebel Technology](https://community.rebeltech.org/tags/puredata)
+  * [Daisy](https://forum.electro-smith.com/t/pure-data/110)
+
+Or you can use the [discussions](https://github.com/Wasted-Audio/hvcc/discussions) tab of this repository
