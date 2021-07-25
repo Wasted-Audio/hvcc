@@ -31,6 +31,7 @@ static float scaleParameterForIndex(uint32_t index, float value)
 
 void {{class_name}}::initParameter(uint32_t index, Parameter& parameter)
 {
+  {%- if receivers|length > 0 %}
   // initialise parameters with defaults
   switch (index)
   {
@@ -46,6 +47,7 @@ void {{class_name}}::initParameter(uint32_t index, Parameter& parameter)
         break;
     {%- endfor %}
   }
+  {%- endif %}
   _context = nullptr;
   // // sampleRateChanged(0.0f); // initialise sample rate
   sampleRateChanged(44100.0f); // set sample rate to some default
@@ -121,7 +123,7 @@ void {{class_name}}::run(const float** inputs, float** outputs, uint32_t frames,
         case 0x80:   // note off
         case 0x90: { // note on
           _context->sendMessageToReceiverV(0x67E37CA3, // __hv_notein
-              1000.0/getSampleRate(), "fff",
+              1000.0*frames/getSampleRate(), "fff",
               (float) data1, // pitch
               (float) data2, // velocity
               (float) channel);
@@ -129,7 +131,7 @@ void {{class_name}}::run(const float** inputs, float** outputs, uint32_t frames,
         }
         case 0xB0: { // control change
           _context->sendMessageToReceiverV(0x41BE0F9C, // __hv_ctlin
-              1000.0/getSampleRate(), "fff",
+              1000.0*frames/getSampleRate(), "fff",
               (float) data2, // value
               (float) data1, // controller number
               (float) channel);
@@ -137,14 +139,14 @@ void {{class_name}}::run(const float** inputs, float** outputs, uint32_t frames,
         }
         case 0xC0: { // program change
           _context->sendMessageToReceiverV(0x2E1EA03D, // __hv_pgmin,
-              1000.0/getSampleRate(), "ff",
+              1000.0*frames/getSampleRate(), "ff",
               (float) data1,
               (float) channel);
           break;
         }
         case 0xD0: { // aftertouch
           _context->sendMessageToReceiverV(0x553925BD, // __hv_touchin
-              1000.0/getSampleRate(), "ff",
+              1000.0*frames/getSampleRate(), "ff",
               (float) data1,
               (float) channel);
           break;
@@ -152,7 +154,7 @@ void {{class_name}}::run(const float** inputs, float** outputs, uint32_t frames,
         case 0xE0: { // pitch bend
           hv_uint32_t value = (((hv_uint32_t) data2) << 7) | ((hv_uint32_t) data1);
           _context->sendMessageToReceiverV(0x3083F0F7, // __hv_bendin
-              1000.0/getSampleRate(), "ff",
+              1000.0*frames/getSampleRate(), "ff",
               (float) value,
               (float) channel);
           break;
