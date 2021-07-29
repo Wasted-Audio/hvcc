@@ -28,6 +28,7 @@ from hvcc.generators.ir2c import ir2c_perf
 from hvcc.generators.c2bela import c2bela
 from hvcc.generators.c2fabric import c2fabric
 from hvcc.generators.c2js import c2js
+from hvcc.generators.c2daisy import c2daisy
 from hvcc.generators.c2dpf import c2dpf
 from hvcc.generators.c2pdext import c2pdext
 from hvcc.generators.c2wwise import c2wwise
@@ -130,7 +131,7 @@ def generate_extern_info(hvir, results):
     }
 
 
-def compile_dataflow(in_path, out_dir, patch_name=None,
+def compile_dataflow(in_path, out_dir, patch_name=None, patch_meta=None,
                      search_paths=None, generators=None, verbose=False,
                      copyright=None, hvir=None):
 
@@ -145,6 +146,14 @@ def compile_dataflow(in_path, out_dir, patch_name=None,
             return add_error(results, "Can only process c directories.")
     else:
         return add_error(results, "Unknown input path {0}".format(in_path))
+
+    if patch_meta:
+        if os.path.isfile(patch_meta):
+            with open(patch_meta) as json_file:
+                try:
+                    patch_meta = json.load(json_file)
+                except Exception as e:
+                    raise e
 
     patch_name = patch_name or "heavy"
     generators = generators or {"c"}
@@ -270,6 +279,20 @@ def compile_dataflow(in_path, out_dir, patch_name=None,
             copyright=copyright,
             verbose=verbose)
 
+    if "daisy" in generators:
+        if verbose:
+            print("--> Generating Daisy module")
+        results["c2daisy"] = c2daisy.c2daisy.compile(
+            c_src_dir=c_src_dir,
+            out_dir=os.path.join(out_dir, "daisy"),
+            patch_name=patch_name,
+            board=patch_meta["board"],
+            num_input_channels=num_input_channels,
+            num_output_channels=num_output_channels,
+            externs=externs,
+            copyright=copyright,
+            verbose=verbose)
+
     if "dpf" in generators:
         if verbose:
             print("--> Generating DPF plugin")
@@ -349,11 +372,15 @@ def main():
         default="heavy",
         help="Provides a name for the generated Heavy context.")
     parser.add_argument(
+        "-m",
+        "--meta",
+        help="Provide metadata file (json) for generator")
+    parser.add_argument(
         "-g",
         "--gen",
         nargs="+",
         default=["c"],
-        help="List of generator outputs: c, unity, wwise, js, pdext, dpf, fabric")
+        help="List of generator outputs: c, unity, wwise, js, pdext, daisy, dpf, fabric")
     parser.add_argument(
         "--results_path",
         help="Write results dictionary to the given path as a JSON-formatted string."
@@ -373,6 +400,7 @@ def main():
         in_path=in_path,
         out_dir=args.out_dir or os.path.dirname(in_path),
         patch_name=args.name,
+        patch_meta=args.meta,
         search_paths=args.search_paths,
         generators=args.gen,
         verbose=args.verbose,

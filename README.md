@@ -89,6 +89,7 @@ Available generator options:
 * `js`
 * `pdext`
 * `unity`
+* `daisy`
 * `dpf`
   * `vst2`
   * `lv2`
@@ -103,6 +104,10 @@ Available generator options:
 This can be handy when using a third-party patch library for example https://github.com/enzienaudio/heavylib.
 
 `$ hvcc ~/myProject/_main.pd -o ~/Desktop/somewhere/else/ -n mySynth -p "[~/Workspace/Projects/Enzien/heavylib/, ~/Desktop/myLib/]"`
+
+
+### `-m` Meta Data
+`hvcc` can take extra meta-data via a supplied json file. It depends on the generator which fields are supported.
 
 ### `--copyright` User Copyright
 

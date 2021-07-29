@@ -1,5 +1,4 @@
 # import datetime
-import hashlib
 import os
 import shutil
 import time
@@ -8,22 +7,14 @@ from ..buildjson import buildjson
 from ..copyright import copyright_manager
 
 
-class c2dpf:
-    """ Generates a DPF wrapper for a given patch.
+class c2daisy:
+    """ Generates a Daisy wrapper for a given patch.
     """
 
     @classmethod
-    def filter_uniqueid(clazz, s):
-        """ Return a unique id (in hexadcemial) for the VST interface.
-        """
-        s = hashlib.md5(s.encode('utf-8'))
-        s = s.hexdigest().upper()[0:8]
-        s = f"0x{s}"
-        return s
-
-    @classmethod
     def compile(clazz, c_src_dir, out_dir, externs,
-                patch_name=None, num_input_channels=0, num_output_channels=0,
+                patch_name=None, board: str = None,
+                num_input_channels=0, num_output_channels=0,
                 copyright=None, verbose=False):
 
         tick = time.time()
@@ -31,6 +22,7 @@ class c2dpf:
         receiver_list = externs['parameters']['in']
 
         patch_name = patch_name or "heavy"
+        board = board or "seed"
 
         copyright_c = copyright_manager.get_copyright_for_c(copyright)
         # copyright_plist = copyright or u"Copyright {0} Enzien Audio, Ltd." \
@@ -51,36 +43,28 @@ class c2dpf:
 
             # initialize the jinja template environment
             env = jinja2.Environment()
-            env.filters["uniqueid"] = c2dpf.filter_uniqueid
 
             env.loader = jinja2.FileSystemLoader(
                 os.path.join(os.path.dirname(os.path.abspath(__file__)), "templates"))
 
-            # generate DPF wrapper from template
-            dpf_h_path = os.path.join(source_dir, f"HeavyDPF_{patch_name}.hpp")
-            with open(dpf_h_path, "w") as f:
-                f.write(env.get_template("HeavyDPF.hpp").render(
+            # generate Daisy wrapper from template
+
+            daisy_h_path = os.path.join(source_dir, f"HeavyDaisy_{patch_name}.hpp")
+            with open(daisy_h_path, "w") as f:
+                f.write(env.get_template("HeavyDaisy.hpp").render(
                     name=patch_name,
-                    class_name=f"HeavyDPF_{patch_name}",
+                    board=board,
+                    class_name=f"HeavyDaisy_{patch_name}",
                     num_input_channels=num_input_channels,
                     num_output_channels=num_output_channels,
                     receivers=receiver_list,
                     copyright=copyright_c))
-            dpf_cpp_path = os.path.join(source_dir, f"HeavyDPF_{patch_name}.cpp")
-            with open(dpf_cpp_path, "w") as f:
-                f.write(env.get_template("HeavyDPF.cpp").render(
+            daisy_cpp_path = os.path.join(source_dir, f"HeavyDaisy_{patch_name}.cpp")
+            with open(daisy_cpp_path, "w") as f:
+                f.write(env.get_template("HeavyDaisy.cpp").render(
                     name=patch_name,
-                    class_name=f"HeavyDPF_{patch_name}",
-                    num_input_channels=num_input_channels,
-                    num_output_channels=num_output_channels,
-                    receivers=receiver_list,
-                    pool_sizes_kb=externs["memoryPoolSizesKb"],
-                    copyright=copyright_c))
-            dpf_h_path = os.path.join(source_dir, "DistrhoPluginInfo.h")
-            with open(dpf_h_path, "w") as f:
-                f.write(env.get_template("DistrhoPluginInfo.h").render(
-                    name=patch_name,
-                    class_name=f"HeavyDPF_{patch_name}",
+                    board=board,
+                    class_name=f"HeavyDaisy_{patch_name}",
                     num_input_channels=num_input_channels,
                     num_output_channels=num_output_channels,
                     receivers=receiver_list,
@@ -99,7 +83,7 @@ class c2dpf:
             with open(os.path.join(source_dir, "Makefile"), "w") as f:
                 f.write(env.get_template("Makefile").render(
                     name=patch_name,
-                    class_name=f"HeavyDPF_{patch_name}"))
+                    class_name=f"HeavyDaisy_{patch_name}"))
 
             buildjson.generate_json(
                 out_dir,
@@ -112,7 +96,7 @@ class c2dpf:
             #               "/t:Rebuild", "{0}.sln".format(patch_name), "/m"])
 
             return {
-                "stage": "c2dpf",
+                "stage": "c2daisy",
                 "notifs": {
                     "has_error": False,
                     "exception": None,
@@ -122,13 +106,13 @@ class c2dpf:
                 "in_dir": c_src_dir,
                 "in_file": "",
                 "out_dir": out_dir,
-                "out_file": os.path.basename(dpf_h_path),
+                "out_file": os.path.basename(daisy_h_path),
                 "compile_time": time.time() - tick
             }
 
         except Exception as e:
             return {
-                "stage": "c2dpf",
+                "stage": "c2daisy",
                 "notifs": {
                     "has_error": True,
                     "exception": e,
