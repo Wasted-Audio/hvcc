@@ -131,7 +131,7 @@ def generate_extern_info(hvir, results):
     }
 
 
-def compile_dataflow(in_path, out_dir, patch_name=None, patch_meta=None,
+def compile_dataflow(in_path, out_dir, patch_name=None, patch_meta_file=None,
                      search_paths=None, generators=None, verbose=False,
                      copyright=None, hvir=None):
 
@@ -145,15 +145,16 @@ def compile_dataflow(in_path, out_dir, patch_name=None, patch_meta=None,
         if not os.path.basename("c"):
             return add_error(results, "Can only process c directories.")
     else:
-        return add_error(results, "Unknown input path {0}".format(in_path))
+        return add_error(results, f"Unknown input path {in_path}")
 
-    if patch_meta:
-        if os.path.isfile(patch_meta):
-            with open(patch_meta) as json_file:
+    if patch_meta_file:
+        if os.path.isfile(patch_meta_file):
+            with open(patch_meta_file) as json_file:
                 try:
                     patch_meta = json.load(json_file)
                 except Exception as e:
-                    raise e
+                    return add_error(results, f"Unable to open json_file: {e}")
+
 
     patch_name = patch_name or "heavy"
     generators = generators or {"c"}
@@ -235,7 +236,7 @@ def compile_dataflow(in_path, out_dir, patch_name=None, patch_meta=None,
                 else:
                     return add_error(results, "Cannot find hvir file.")
             except Exception as e:
-                return add_error(results, "ir could not be found or loaded: {0}.".format(e))
+                return add_error(results, f"ir could not be found or loaded: {e}.")
 
     # run the c2x generators, merge the results
     num_input_channels = hvir["signal"]["numInputBuffers"]
@@ -400,7 +401,7 @@ def main():
         in_path=in_path,
         out_dir=args.out_dir or os.path.dirname(in_path),
         patch_name=args.name,
-        patch_meta=args.meta,
+        patch_meta_file=args.meta,
         search_paths=args.search_paths,
         generators=args.gen,
         verbose=args.verbose,
