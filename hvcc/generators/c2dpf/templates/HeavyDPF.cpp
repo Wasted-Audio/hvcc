@@ -42,6 +42,8 @@ void {{class_name}}::initParameter(uint32_t index, Parameter& parameter)
         parameter.hints = kParameterIsAutomable
       {%- if v.attributes.type == 'bool': -%}
         | kParameterIsBoolean
+      {%- elif v.attributes.type == 'trig': -%}
+        | kParameterIsTrigger
       {%- endif -%};
         parameter.ranges.def = {{(v.attributes.default-v.attributes.min)/(v.attributes.max-v.attributes.min)}}f;
         break;
