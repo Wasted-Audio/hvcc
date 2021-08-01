@@ -30,6 +30,7 @@ from hvcc.generators.c2fabric import c2fabric
 from hvcc.generators.c2js import c2js
 from hvcc.generators.c2daisy import c2daisy
 from hvcc.generators.c2dpf import c2dpf
+from hvcc.generators.c2owl import c2owl
 from hvcc.generators.c2pdext import c2pdext
 from hvcc.generators.c2wwise import c2wwise
 from hvcc.generators.c2unity import c2unity
@@ -297,6 +298,19 @@ def compile_dataflow(in_path, out_dir, patch_name=None, patch_meta=None,
         if verbose:
             print("--> Generating DPF plugin")
         results["c2dpf"] = c2dpf.c2dpf.compile(
+            c_src_dir=c_src_dir,
+            out_dir=os.path.join(out_dir, "plugin"),
+            patch_name=patch_name,
+            num_input_channels=num_input_channels,
+            num_output_channels=num_output_channels,
+            externs=externs,
+            copyright=copyright,
+            verbose=verbose)
+
+    if "owl" in generators:
+        if verbose:
+            print("--> Generating OWL plugin")
+        results["c2owl"] = c2owl.c2owl.compile(
             c_src_dir=c_src_dir,
             out_dir=os.path.join(out_dir, "plugin"),
             patch_name=patch_name,
