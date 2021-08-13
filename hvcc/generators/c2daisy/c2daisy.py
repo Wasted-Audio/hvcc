@@ -13,7 +13,7 @@ class c2daisy:
 
     @classmethod
     def compile(clazz, c_src_dir, out_dir, externs,
-                patch_name=None, board: str = None,
+                patch_name=None, patch_meta: dict = None,
                 num_input_channels=0, num_output_channels=0,
                 copyright=None, verbose=False):
 
@@ -21,8 +21,13 @@ class c2daisy:
 
         receiver_list = externs['parameters']['in']
 
-        patch_name = patch_name or "heavy"
-        board = board or "seed"
+        if patch_meta:
+            patch_name = patch_meta.get("name", patch_name)
+            daisy_meta = patch_meta.get("daisy")
+        else:
+            daisy_meta = {}
+
+        board = daisy_meta.get("board", "seed")
 
         copyright_c = copyright_manager.get_copyright_for_c(copyright)
         # copyright_plist = copyright or u"Copyright {0} Enzien Audio, Ltd." \

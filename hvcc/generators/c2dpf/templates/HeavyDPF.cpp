@@ -10,9 +10,9 @@ START_NAMESPACE_DISTRHO
 static float scaleParameterForIndex(uint32_t index, float value)
 {
   switch (index) {
-    {%- for k, v in receivers %}
+    {% for k, v in receivers %}
     case {{loop.index-1}}: return ({{v.attributes.max-v.attributes.min}}f*value) + {{v.attributes.min}}f; // {{v.display}}
-    {%- endfor %}
+    {% endfor %}
     default: return 0.0f;
   }
 }
@@ -20,9 +20,9 @@ static float scaleParameterForIndex(uint32_t index, float value)
 {{class_name}}::{{class_name}}()
  : Plugin(HV_LV2_NUM_PARAMETERS, 0, 0)
 {
-    {%- for k, v in receivers %}
+    {% for k, v in receivers %}
         _parameters[{{loop.index-1}}] = {{(v.attributes.default-v.attributes.min)/(v.attributes.max-v.attributes.min)}}f; // {{v.display}}
-    {%- endfor %}
+    {% endfor %}
 }
 
 {{class_name}}::~{{class_name}}() {
@@ -31,25 +31,25 @@ static float scaleParameterForIndex(uint32_t index, float value)
 
 void {{class_name}}::initParameter(uint32_t index, Parameter& parameter)
 {
-  {%- if receivers|length > 0 %}
+  {% if receivers|length > 0 %}
   // initialise parameters with defaults
   switch (index)
   {
-    {%- for k, v in receivers %}
+    {% for k, v in receivers %}
       case param{{v.display}}:
         parameter.name = "{{v.display.replace('_', ' ')}}";
         parameter.symbol = "{{v.display|lower}}";
         parameter.hints = kParameterIsAutomable
-      {%- if v.attributes.type == 'bool': -%}
+      {% if v.attributes.type == 'bool': %}
         | kParameterIsBoolean
-      {%- elif v.attributes.type == 'trig': -%}
+      {% elif v.attributes.type == 'trig': %}
         | kParameterIsTrigger
-      {%- endif -%};
+      {% endif %};
         parameter.ranges.def = {{(v.attributes.default-v.attributes.min)/(v.attributes.max-v.attributes.min)}}f;
         break;
-    {%- endfor %}
+    {% endfor %}
   }
-  {%- endif %}
+  {% endif %}
   _context = nullptr;
   // // sampleRateChanged(0.0f); // initialise sample rate
   sampleRateChanged(44100.0f); // set sample rate to some default
@@ -60,31 +60,31 @@ void {{class_name}}::initParameter(uint32_t index, Parameter& parameter)
 
 float {{class_name}}::getParameterValue(uint32_t index) const
 {
-  {%- if receivers|length > 0 %}
+  {% if receivers|length > 0 %}
   return _parameters[index];
-  {%- else %}
+  {% else %}
   return 0.0f;
-  {%- endif %}
+  {% endif %}
 }
 
 void {{class_name}}::setParameterValue(uint32_t index, float value)
 {
-  {%- if receivers|length > 0 %}
+  {% if receivers|length > 0 %}
   switch (index) {
-    {%- for k, v  in receivers %}
+    {% for k, v  in receivers %}
     case {{loop.index-1}}: {
       _context->sendFloatToReceiver(
           Heavy_{{name}}::Parameter::In::{{k|upper}},
           scaleParameterForIndex(index, value));
       break;
     }
-    {%- endfor %}
+    {% endfor %}
     default: return;
   }
   _parameters[index] = value;
-  {%- else %}
+  {% else %}
   // nothing to do
-  {%- endif %}
+  {% endif %}
 }
 
 
@@ -179,12 +179,12 @@ void {{class_name}}::sampleRateChanged(double newSampleRate)
 
     _context = new Heavy_{{name}}(newSampleRate, {{pool_sizes_kb.internal}}, {{pool_sizes_kb.inputQueue}}, {{pool_sizes_kb.outputQueue}});
 
-    {%- if receivers|length > 0 %}
+    {% if receivers|length > 0 %}
     // ensure that the new context has the current parameters
     for (int i = 0; i < HV_LV2_NUM_PARAMETERS; ++i) {
       setParameterValue(i, _parameters[i]);
     }
-    {%- endif %}
+    {% endif %}
   }
 }
 

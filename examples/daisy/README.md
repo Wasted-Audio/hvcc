@@ -1,3 +1,5 @@
+# Daisy Generator example help
+
 To build these test patches:
 
 Install `arm-none-eabi-gcc` on your respective OS.

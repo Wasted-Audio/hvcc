@@ -1,3 +1,5 @@
 {
-    "board": "seed"
+    "daisy": {
+        "board": "seed"
+    }
 }

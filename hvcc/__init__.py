@@ -147,6 +147,7 @@ def compile_dataflow(in_path, out_dir, patch_name=None, patch_meta_file=None,
     else:
         return add_error(results, f"Unknown input path {in_path}")
 
+    # meta-data file
     if patch_meta_file:
         if os.path.isfile(patch_meta_file):
             with open(patch_meta_file) as json_file:
@@ -154,7 +155,8 @@ def compile_dataflow(in_path, out_dir, patch_name=None, patch_meta_file=None,
                     patch_meta = json.load(json_file)
                 except Exception as e:
                     return add_error(results, f"Unable to open json_file: {e}")
-
+    else:
+        patch_meta = {}
 
     patch_name = patch_name or "heavy"
     generators = generators or {"c"}
@@ -287,7 +289,7 @@ def compile_dataflow(in_path, out_dir, patch_name=None, patch_meta_file=None,
             c_src_dir=c_src_dir,
             out_dir=os.path.join(out_dir, "daisy"),
             patch_name=patch_name,
-            board=patch_meta["board"],
+            patch_meta=patch_meta,
             num_input_channels=num_input_channels,
             num_output_channels=num_output_channels,
             externs=externs,
@@ -301,6 +303,7 @@ def compile_dataflow(in_path, out_dir, patch_name=None, patch_meta_file=None,
             c_src_dir=c_src_dir,
             out_dir=os.path.join(out_dir, "plugin"),
             patch_name=patch_name,
+            patch_meta=patch_meta,
             num_input_channels=num_input_channels,
             num_output_channels=num_output_channels,
             externs=externs,

@@ -1,3 +1,5 @@
 {
-    "board": "patch"
+    "daisy": {
+        "board": "patch"
+    }
 }
