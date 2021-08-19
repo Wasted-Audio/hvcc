@@ -7,22 +7,17 @@
 
 START_NAMESPACE_DISTRHO
 
-static float scaleParameterForIndex(uint32_t index, float value)
-{
-  switch (index) {
-    {% for k, v in receivers %}
-    case {{loop.index-1}}: return ({{v.attributes.max-v.attributes.min}}f*value) + {{v.attributes.min}}f; // {{v.display}}
-    {% endfor %}
-    default: return 0.0f;
-  }
-}
 
 {{class_name}}::{{class_name}}()
  : Plugin(HV_LV2_NUM_PARAMETERS, 0, 0)
 {
     {% for k, v in receivers %}
+<<<<<<< HEAD
         _parameters[{{loop.index-1}}] = {{(v.attributes.default-v.attributes.min)/(v.attributes.max-v.attributes.min)}}f; // {{v.display}}
         // _parameters[{{loop.index-1}}] = {{(v.attributes.default)}}f; // {{v.display}}
+=======
+        _parameters[{{loop.index-1}}] = {{v.attributes.default}}f;
+>>>>>>> cleanup2
     {% endfor %}
 }
 
@@ -46,16 +41,22 @@ void {{class_name}}::initParameter(uint32_t index, Parameter& parameter)
       {% elif v.attributes.type == 'trig': %}
         | kParameterIsTrigger
       {% endif %};
+<<<<<<< HEAD
         parameter.ranges.def = {{(v.attributes.default-v.attributes.min)/(v.attributes.max-v.attributes.min)}}f; // normalized default
         // parameter.ranges.min = {{v.attributes.min}}f;
         // parameter.ranges.max = {{v.attributes.max}}f;
         // parameter.ranges.def = {{v.attributes.default}}f;
+=======
+        parameter.ranges.min = {{v.attributes.min}}f;
+        parameter.ranges.max = {{v.attributes.max}}f;
+        parameter.ranges.def = {{v.attributes.default}}f;
+>>>>>>> cleanup2
         break;
     {% endfor %}
   }
   {% endif %}
   _context = nullptr;
-  sampleRateChanged(0.0f); // initialise sample rate with some value
+  sampleRateChanged(44100.0f); // set sample rate to some default
 }
 
 // -------------------------------------------------------------------
@@ -78,8 +79,12 @@ void {{class_name}}::setParameterValue(uint32_t index, float value)
     case {{loop.index-1}}: {
       _context->sendFloatToReceiver(
           Heavy_{{name}}::Parameter::In::{{k|upper}},
+<<<<<<< HEAD
           scaleParameterForIndex(index, value));
           // value);
+=======
+          value);
+>>>>>>> cleanup2
       break;
     }
     {% endfor %}
