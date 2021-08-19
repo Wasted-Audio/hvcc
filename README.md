@@ -83,7 +83,7 @@ It is also possible to pass a list of generators:
 
 Available generator options:
 
-* `c` {default}
+* `c`
 * `bela`
 * `daisy`
 * `dpf`
