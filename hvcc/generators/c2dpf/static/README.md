@@ -19,7 +19,7 @@ $ make
 
 This will result in an `bin/` folder with all binary assets.
 
-* LV2 - move `bin/<plugin>.lv2/` forder to your local `~/.lv2/` dir
+* LV2 - move `bin/<plugin>.lv2/` folder to your local `~/.lv2/` dir
 * VST2 - move `bin/<plugin>-vst.so`, can be placed directly into your `~/.vst/` dir
 
 ## Jack
