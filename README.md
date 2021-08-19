@@ -83,7 +83,7 @@ It is also possible to pass a list of generators:
 
 Available generator options:
 
-* `c` {default}
+* `c`
 * `bela`
 * `daisy`
 * `dpf`
@@ -128,11 +128,13 @@ Displays all the available parameters and options for hvcc.
   - [Licensing](/docs/01.introduction.md#licensing)
 * [Getting Started](/docs/02.getting_started.md)
 * [Generators](/docs/03.generators.md)
-* [MIDI](/docs/09.midi.md)
-* [C API](/docs/10.c.md)
-* [C++ API](/docs/11.cpp.md)
-* [Heavy Lang Info](/docs/12.heavy_lang.md)
-* [Heavy IR Info](/docs/13.heavy_ir_lang.md)
+* [MIDI](/docs/04.midi.md)
+* [C API](/docs/05.c.md)
+* [C++ API](/docs/06.cpp.md)
+* [Heavy Lang Info](/docs/07.heavy_lang.md)
+* [Heavy IR Info](/docs/08.heavy_ir_lang.md)
+* [Supported vanilla objects](/docs/09.supported_vanilla_objects)
+* [Supported vanilla objects](/docs/10.unsupported_vanilla_objects)
 
 ## Contact
 There are several places where heavy/hvcc conversation is happening:
