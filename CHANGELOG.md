@@ -9,6 +9,7 @@ Next Release
 * Daisy platform support
 * DPF cleanup + meta + trig
 * documentation update
+* DPF makefiles + meaningful values + docs
 
 0.1.2
 -----
