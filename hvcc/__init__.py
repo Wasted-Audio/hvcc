@@ -247,7 +247,7 @@ def compile_dataflow(in_path, out_dir, patch_name=None, patch_meta_file=None,
     if "bela" in generators:
         if verbose:
             print("--> Generating Bela plugin")
-        results["c2fabric"] = c2bela.c2bela.compile(
+        results["c2bela"] = c2bela.c2bela.compile(
             c_src_dir=c_src_dir,
             out_dir=os.path.join(out_dir, "bela"),
             patch_name=patch_name,

@@ -34,8 +34,10 @@ class c2dpf:
         if patch_meta:
             patch_name = patch_meta.get("name", patch_name)
             dpf_meta = patch_meta.get("dpf", {})
+            dpf_project = dpf_meta.get('project')
         else:
             dpf_meta = {}
+            dpf_project = None
 
         copyright_c = copyright_manager.get_copyright_for_c(copyright)
         # copyright_plist = copyright or u"Copyright {0} Enzien Audio, Ltd." \
@@ -49,6 +51,9 @@ class c2dpf:
 
             # copy over static files
             shutil.copytree(os.path.join(os.path.dirname(__file__), "static"), out_dir)
+
+            if dpf_project:
+                shutil.copy(os.path.join(os.path.dirname(__file__), "static/README.md"), f'{out_dir}/../')
 
             # copy over generated C source files
             source_dir = os.path.join(out_dir, "source")
@@ -100,15 +105,19 @@ class c2dpf:
 
             # ======================================================================================
             # Linux
-            #
-            # linux_path = os.path.join(out_dir, "linux")
-            # os.makedirs(linux_path)
 
+            # plugin makefile
             with open(os.path.join(source_dir, "Makefile"), "w") as f:
                 f.write(env.get_template("Makefile").render(
                     name=patch_name,
-                    meta=dpf_meta,
-                    class_name=f"HeavyDPF_{patch_name}"))
+                    meta=dpf_meta))
+
+            # project makefile
+            if dpf_project:
+                with open(os.path.join(source_dir, "../../Makefile"), "w") as f:
+                    f.write(env.get_template("Makefile_project").render(
+                        name=patch_name,
+                        meta=dpf_meta))
 
             buildjson.generate_json(
                 out_dir,

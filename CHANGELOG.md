@@ -4,7 +4,11 @@ CHANGELOG
 Next Release
 -----
 
-* Daisy support
+* metadata json for generator config
+* add trig attribute type
+* Daisy platform support
+* DPF cleanup + meta + trig
+* documentation update
 
 0.1.2
 -----

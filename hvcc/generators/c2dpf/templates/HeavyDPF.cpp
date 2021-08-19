@@ -51,8 +51,7 @@ void {{class_name}}::initParameter(uint32_t index, Parameter& parameter)
   }
   {% endif %}
   _context = nullptr;
-  // // sampleRateChanged(0.0f); // initialise sample rate
-  sampleRateChanged(44100.0f); // set sample rate to some default
+  sampleRateChanged(0.0f); // initialise sample rate with some value
 }
 
 // -------------------------------------------------------------------

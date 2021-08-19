@@ -1,22 +1,13 @@
 # Distrho Plugin Format Generator example help
 
-DPF generator supports extra configuration via a supplied meta-data file. Each of these are optional and have either a default value or are entirely optional (description and homepage). Midi i/o ports are on by default, but can be set to `0` and they will be disabled.
+To build the sample run hvcc with the DPF generator and metadata option on an output directory:
 
-```json
-{
-    "dpf": {
-        "description": "super simple test patch",
-        "maker": "nobody",
-        "homepage": "https://wasted.audio/plugin/test",
-        "plugin_uri": "lv2://wasted.audio/lv2/testplugin",
-        "version": "6, 6, 6",
-        "license": "WTFPL",
-        "midi_input": 0,
-        "midi_output": 1,
-        "plugin_formats": [
-            "lv2_dsp",
-            "vst"
-        ]
-    }
-}
+```bash
+$ mkdir dpf_example
+$ hvcc dpf_example.pd -o dpf_example/ -g dpf -m dpf_example.json
+$ cd dpf_example/
+$ git clone https://github.com/DISTRHO/DPF.git dpf
+$ make
 ```
+
+The binaries will be in `bin/`
