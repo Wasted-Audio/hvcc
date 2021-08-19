@@ -1,4 +1,4 @@
-#N canvas 268 61 958 796 12;
+#N canvas 268 61 512 452 12;
 #X obj 89 84 r freq @hv_param 100 2000 500;
 #X obj 89 167 osc~;
 #X obj 89 275 *~;

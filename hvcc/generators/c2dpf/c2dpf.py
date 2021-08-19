@@ -34,10 +34,9 @@ class c2dpf:
         if patch_meta:
             patch_name = patch_meta.get("name", patch_name)
             dpf_meta = patch_meta.get("dpf", {})
-            dpf_project = dpf_meta.get('project')
         else:
             dpf_meta = {}
-            dpf_project = None
+        dpf_project = dpf_meta.get('project')
 
         copyright_c = copyright_manager.get_copyright_for_c(copyright)
         # copyright_plist = copyright or u"Copyright {0} Enzien Audio, Ltd." \
@@ -115,7 +114,7 @@ class c2dpf:
             # project makefile
             if dpf_project:
                 with open(os.path.join(source_dir, "../../Makefile"), "w") as f:
-                    f.write(env.get_template("Makefile_project").render(
+                    f.write(env.get_template("Makefile.project").render(
                         name=patch_name,
                         meta=dpf_meta))
 
