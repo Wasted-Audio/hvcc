@@ -172,18 +172,15 @@ void {{class_name}}::run(const float** inputs, float** outputs, uint32_t frames,
 
 void {{class_name}}::sampleRateChanged(double newSampleRate)
 {
-  if (getSampleRate() != newSampleRate) {
-    delete _context;
+  delete _context;
+  _context = new Heavy_{{name}}(newSampleRate, {{pool_sizes_kb.internal}}, {{pool_sizes_kb.inputQueue}}, {{pool_sizes_kb.outputQueue}});
 
-    _context = new Heavy_{{name}}(newSampleRate, {{pool_sizes_kb.internal}}, {{pool_sizes_kb.inputQueue}}, {{pool_sizes_kb.outputQueue}});
-
-    {% if receivers|length > 0 %}
-    // ensure that the new context has the current parameters
-    for (int i = 0; i < HV_LV2_NUM_PARAMETERS; ++i) {
-      setParameterValue(i, _parameters[i]);
-    }
-    {% endif %}
+  {% if receivers|length > 0 %}
+  // ensure that the new context has the current parameters
+  for (int i = 0; i < HV_LV2_NUM_PARAMETERS; ++i) {
+    setParameterValue(i, _parameters[i]);
   }
+  {% endif %}
 }
 
 // -----------------------------------------------------------------------
