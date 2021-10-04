@@ -12,8 +12,16 @@ START_NAMESPACE_DISTRHO
  : Plugin(HV_LV2_NUM_PARAMETERS, 0, 0)
 {
     {% for k, v in receivers %}
-        _parameters[{{loop.index-1}}] = {{v.attributes.default}}f;
+    _parameters[{{loop.index-1}}] = {{v.attributes.default}}f;
     {% endfor %}
+
+    _context = new Heavy_{{name}}(getSampleRate(), {{pool_sizes_kb.internal}}, {{pool_sizes_kb.inputQueue}}, {{pool_sizes_kb.outputQueue}});
+    {% if receivers|length > 0 %}
+    // ensure that the new context has the current parameters
+    for (int i = 0; i < HV_LV2_NUM_PARAMETERS; ++i) {
+      setParameterValue(i, _parameters[i]);
+    }
+    {% endif %}
 }
 
 {{class_name}}::~{{class_name}}() {
@@ -43,8 +51,6 @@ void {{class_name}}::initParameter(uint32_t index, Parameter& parameter)
     {% endfor %}
   }
   {% endif %}
-  _context = nullptr;
-  sampleRateChanged(44100.0f); // set sample rate to some default
 }
 
 // -------------------------------------------------------------------
