@@ -99,12 +99,47 @@ void {{class_name}}::setParameterValue(uint32_t index, float value)
 
 // }
 
+static void sendHook(HeavyContextInterface *c, const char *sendName, uint32_t sendHash, const HvMessage *m)
+{
+  switch(sendHash){
+    case 0xD1D4AC2: // __hv_noteout
+    {
+      // uint8_t note = hv_msg_getFloat(m, 0);
+      // uint8_t velocity = hv_msg_getFloat(m, 1);
+      // uint8_t ch = hv_msg_getFloat(m, 2);
+      // debugMessage("noteout", note, velocity, ch);
+
+      MidiEvent midiEvent;
+      midiEvent.frame = m->timestamp;
+      midiEvent.size = m->numBytes;
+      midiEvent.dataExt = nullptr;
+
+      uint32_t i = 0;
+      for (; i < m->numElements; ++i)
+          midiEvent.data[i] = hv_msg_getFloat(m, i);
+      for (; i < MidiEvent::kDataSize; ++i)
+          midiEvent.data[i] = 0;
+
+      // return Plugin::writeMidiEvent(m->timestamp, ch, m->numBytes, m->elem.data.f);
+      // return {{class_name}}::writeMidiEvent(m->timestamp, ch, m->numBytes, m->elem.data.f);
+      // return writeMidiEvent(midiEvent);
+      // return midiEvent;
+      printf("> received message from send \"%s\".", sendName);
+      break;
+    }
+    default: return;
+  }
+
+}
+
+
 void {{class_name}}::run(const float** inputs, float** outputs, uint32_t frames, const MidiEvent* midiEvents, uint32_t midiEventCount)
 {
   uint32_t framesDone = 0;
   uint32_t curEventIndex = 0;
 
   _context->process((float**)inputs, outputs, frames);
+  hv_setSendHook(_context, sendHook);
 
   while (framesDone < frames)
   {
@@ -122,41 +157,46 @@ void {{class_name}}::run(const float** inputs, float** outputs, uint32_t frames,
       switch (command) {
         case 0x80:   // note off
         case 0x90: { // note on
-          _context->sendMessageToReceiverV(0x67E37CA3, // __hv_notein
-              1000.0*frames/getSampleRate(), "fff",
-              (float) data1, // pitch
-              (float) data2, // velocity
-              (float) channel);
+          _context->sendMessageToReceiverV(
+            hv_stringToHash("__hv_notein"),
+            1000.0*frames/getSampleRate(), "fff",
+            (float) data1, // pitch
+            (float) data2, // velocity
+            (float) channel);
           break;
         }
         case 0xB0: { // control change
-          _context->sendMessageToReceiverV(0x41BE0F9C, // __hv_ctlin
-              1000.0*frames/getSampleRate(), "fff",
-              (float) data2, // value
-              (float) data1, // controller number
-              (float) channel);
+          _context->sendMessageToReceiverV(
+            hv_stringToHash("__hv_ctlin"),
+            1000.0*frames/getSampleRate(), "fff",
+            (float) data2, // value
+            (float) data1, // controller number
+            (float) channel);
           break;
         }
         case 0xC0: { // program change
-          _context->sendMessageToReceiverV(0x2E1EA03D, // __hv_pgmin,
-              1000.0*frames/getSampleRate(), "ff",
-              (float) data1,
-              (float) channel);
+          _context->sendMessageToReceiverV(
+            hv_stringToHash("__hv_pgmin"),
+            1000.0*frames/getSampleRate(), "ff",
+            (float) data1,
+            (float) channel);
           break;
         }
         case 0xD0: { // aftertouch
-          _context->sendMessageToReceiverV(0x553925BD, // __hv_touchin
-              1000.0*frames/getSampleRate(), "ff",
-              (float) data1,
-              (float) channel);
+          _context->sendMessageToReceiverV(
+            hv_stringToHash("__hv_touchin"),
+            1000.0*frames/getSampleRate(), "ff",
+            (float) data1,
+            (float) channel);
           break;
         }
         case 0xE0: { // pitch bend
           hv_uint32_t value = (((hv_uint32_t) data2) << 7) | ((hv_uint32_t) data1);
-          _context->sendMessageToReceiverV(0x3083F0F7, // __hv_bendin
-              1000.0*frames/getSampleRate(), "ff",
-              (float) value,
-              (float) channel);
+          _context->sendMessageToReceiverV(
+            hv_stringToHash("__hv_bendin"),
+            1000.0*frames/getSampleRate(), "ff",
+            (float) value,
+            (float) channel);
           break;
         }
         default: break;
