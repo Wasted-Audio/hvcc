@@ -16,6 +16,8 @@ START_NAMESPACE_DISTRHO
     {% endfor %}
 
     _context = new Heavy_{{name}}(getSampleRate(), {{pool_sizes_kb.internal}}, {{pool_sizes_kb.inputQueue}}, {{pool_sizes_kb.outputQueue}});
+    // _context->setSendHook(&{{class_name}}::sendHook);
+    hv_setSendHook(_context, &{{class_name}}::sendHook);
     {% if receivers|length > 0 %}
     // ensure that the new context has the current parameters
     for (int i = 0; i < HV_LV2_NUM_PARAMETERS; ++i) {
@@ -99,39 +101,6 @@ void {{class_name}}::setParameterValue(uint32_t index, float value)
 
 // }
 
-static void sendHook(HeavyContextInterface *c, const char *sendName, uint32_t sendHash, const HvMessage *m)
-{
-  switch(sendHash){
-    case 0xD1D4AC2: // __hv_noteout
-    {
-      // uint8_t note = hv_msg_getFloat(m, 0);
-      // uint8_t velocity = hv_msg_getFloat(m, 1);
-      // uint8_t ch = hv_msg_getFloat(m, 2);
-      // debugMessage("noteout", note, velocity, ch);
-
-      MidiEvent midiEvent;
-      midiEvent.frame = m->timestamp;
-      midiEvent.size = m->numBytes;
-      midiEvent.dataExt = nullptr;
-
-      uint32_t i = 0;
-      for (; i < m->numElements; ++i)
-          midiEvent.data[i] = hv_msg_getFloat(m, i);
-      for (; i < MidiEvent::kDataSize; ++i)
-          midiEvent.data[i] = 0;
-
-      // return Plugin::writeMidiEvent(m->timestamp, ch, m->numBytes, m->elem.data.f);
-      // return {{class_name}}::writeMidiEvent(m->timestamp, ch, m->numBytes, m->elem.data.f);
-      // return writeMidiEvent(midiEvent);
-      // return midiEvent;
-      printf("> received message from send \"%s\".", sendName);
-      break;
-    }
-    default: return;
-  }
-
-}
-
 
 void {{class_name}}::run(const float** inputs, float** outputs, uint32_t frames, const MidiEvent* midiEvents, uint32_t midiEventCount)
 {
@@ -139,7 +108,14 @@ void {{class_name}}::run(const float** inputs, float** outputs, uint32_t frames,
   uint32_t curEventIndex = 0;
 
   _context->process((float**)inputs, outputs, frames);
-  hv_setSendHook(_context, sendHook);
+
+
+  // for (uint32_t i=0; i<midiEventCount; ++i)
+  //     writeMidiEvent(midiEvents[i]);
+
+  // for (uint32_t i=0; i<midiSendEventCount; ++i)
+  //   writeMidiEvent(midiSendEvent[i]);
+
 
   while (framesDone < frames)
   {
@@ -214,6 +190,7 @@ void {{class_name}}::sampleRateChanged(double newSampleRate)
 {
   delete _context;
   _context = new Heavy_{{name}}(newSampleRate, {{pool_sizes_kb.internal}}, {{pool_sizes_kb.inputQueue}}, {{pool_sizes_kb.outputQueue}});
+  // _context->setSendHook(&{{class_name}}::sendHook);
 
   {% if receivers|length > 0 %}
   // ensure that the new context has the current parameters
@@ -221,6 +198,33 @@ void {{class_name}}::sampleRateChanged(double newSampleRate)
     setParameterValue(i, _parameters[i]);
   }
   {% endif %}
+}
+
+void {{class_name}}::sendHook(HeavyContextInterface *c, const char *sendName, uint32_t sendHash, const HvMessage *m)
+{
+    switch(sendHash){
+      case 0xD1D4AC2: // __hv_noteout
+      {
+        // {{class_name}}::heavyWriteMidiEvent(m);
+        MidiEvent midiSendEvent;
+        midiSendEvent.frame = m->timestamp;
+        midiSendEvent.size = m->numBytes;
+        midiSendEvent.dataExt = nullptr;
+
+        uint32_t i = 0;
+        for (; i < m->numElements; ++i)
+            midiSendEvent.data[i] = hv_msg_getFloat(m, i);
+        for (; i < MidiEvent::kDataSize; ++i)
+            midiSendEvent.data[i] = 0;
+
+        writeMidiEvent(midiSendEvent);
+
+        break;
+      }
+      default:
+        break;
+  }
+
 }
 
 // -----------------------------------------------------------------------

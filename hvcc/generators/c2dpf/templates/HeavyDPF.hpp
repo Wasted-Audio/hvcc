@@ -4,6 +4,7 @@
 #define _HEAVY_LV2_{{name|upper}}_
 
 #include "DistrhoPlugin.hpp"
+#include "DistrhoPluginInfo.h"
 #include "Heavy_{{name}}.hpp"
 
 START_NAMESPACE_DISTRHO
@@ -98,6 +99,7 @@ protected:
   // Callbacks
 
   void sampleRateChanged(double newSampleRate) override;
+  void sendHook(HeavyContextInterface *c, const char *sendName, uint32_t sendHash, const HvMessage *m) override;
 
   // -------------------------------------------------------------------
 
