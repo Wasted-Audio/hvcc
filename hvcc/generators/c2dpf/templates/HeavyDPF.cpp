@@ -207,28 +207,46 @@ void {{class_name}}::handleMidi(uint32_t sendHash, const HvMessage *m)
     switch(sendHash){
       case 0xD1D4AC2: // __hv_noteout
       {
-
         uint8_t note = hv_msg_getFloat(m, 0);
         uint8_t velocity = hv_msg_getFloat(m, 1);
         uint8_t ch = hv_msg_getFloat(m, 2);
-        printf("> note: %d - velocity: %d - ch: %d \n", note, velocity, ch);
+        // printf("> note: %d - velocity: %d - ch: %d \n", note, velocity, ch);
 
-        // {{class_name}}::heavyWriteMidiEvent(m);
         MidiEvent midiSendEvent;
-        midiSendEvent.frame = m->timestamp;
-        midiSendEvent.size = m->numBytes;
+        midiSendEvent.frame = 0;
+        midiSendEvent.size = m->numElements;
         midiSendEvent.dataExt = nullptr;
 
+        if (hv_msg_getFloat(m, 1) == 127){
+          midiSendEvent.data[0] = 0x80 | ch;
+        } else {
+          midiSendEvent.data[0] = 0x90 | ch;
+        }
+        midiSendEvent.data[1] = note;
+        midiSendEvent.data[2] = velocity;
+        midiSendEvent.data[3] = 0;
 
-        uint32_t i = 0;
-        for (; i < m->numElements; ++i)
-            midiSendEvent.data[i] = hv_msg_getFloat(m, i);
-        for (; i < MidiEvent::kDataSize; ++i)
-            midiSendEvent.data[i] = 0;
+        writeMidiEvent(midiSendEvent);
+        break;
+      }
+      case 0xE5E2A040: // __hv_ctlout
+      {
+        uint8_t cc_val = hv_msg_getFloat(m, 0);
+        uint8_t cc_num = hv_msg_getFloat(m, 1);
+        uint8_t ch = hv_msg_getFloat(m, 2);
+        // printf("> cc_val: %d - cc_num: %d - ch: %d \n", cc_val, cc_num, ch);
 
-        bool something = writeMidiEvent(midiSendEvent);
-        printf("%d \n", something);
+        MidiEvent midiSendEvent;
+        midiSendEvent.frame = 0;
+        midiSendEvent.size = m->numElements;
+        midiSendEvent.dataExt = nullptr;
 
+        midiSendEvent.data[0] = 0xB0; // send CC
+        midiSendEvent.data[1] = cc_num;
+        midiSendEvent.data[2] = cc_val;
+        midiSendEvent.data[3] = 0;
+
+        writeMidiEvent(midiSendEvent);
         break;
       }
       default:
