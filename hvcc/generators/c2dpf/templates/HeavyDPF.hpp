@@ -9,6 +9,8 @@
 
 START_NAMESPACE_DISTRHO
 
+static void sendHookFunc(HeavyContextInterface *c, const char *sendName, uint32_t sendHash, const HvMessage *m);
+
 class {{class_name}} : public Plugin
 {
 public:
@@ -21,6 +23,8 @@ public:
 
   {{class_name}}();
   ~{{class_name}}() override;
+
+  void handleMidi(uint32_t sendHash, const HvMessage *m);
 
 protected:
   // -------------------------------------------------------------------
@@ -99,7 +103,7 @@ protected:
   // Callbacks
 
   void sampleRateChanged(double newSampleRate) override;
-  void sendHook(HeavyContextInterface *c, const char *sendName, uint32_t sendHash, const HvMessage *m) override;
+  // void sendHook(HeavyContextInterface *c, const char *sendName, uint32_t sendHash, const HvMessage *m) override;
 
   // -------------------------------------------------------------------
 

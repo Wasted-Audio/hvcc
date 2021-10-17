@@ -16,8 +16,9 @@ START_NAMESPACE_DISTRHO
     {% endfor %}
 
     _context = new Heavy_{{name}}(getSampleRate(), {{pool_sizes_kb.internal}}, {{pool_sizes_kb.inputQueue}}, {{pool_sizes_kb.outputQueue}});
-    // _context->setSendHook(&{{class_name}}::sendHook);
-    hv_setSendHook(_context, &{{class_name}}::sendHook);
+    _context->setUserData(this);
+    _context->setSendHook(&sendHookFunc);
+
     {% if receivers|length > 0 %}
     // ensure that the new context has the current parameters
     for (int i = 0; i < HV_LV2_NUM_PARAMETERS; ++i) {
@@ -191,6 +192,7 @@ void {{class_name}}::sampleRateChanged(double newSampleRate)
   delete _context;
   _context = new Heavy_{{name}}(newSampleRate, {{pool_sizes_kb.internal}}, {{pool_sizes_kb.inputQueue}}, {{pool_sizes_kb.outputQueue}});
   // _context->setSendHook(&{{class_name}}::sendHook);
+  // hv_setSendHook(_context, &{{class_name}}::sendHook);
 
   {% if receivers|length > 0 %}
   // ensure that the new context has the current parameters
@@ -200,16 +202,23 @@ void {{class_name}}::sampleRateChanged(double newSampleRate)
   {% endif %}
 }
 
-void {{class_name}}::sendHook(HeavyContextInterface *c, const char *sendName, uint32_t sendHash, const HvMessage *m)
+void {{class_name}}::handleMidi(uint32_t sendHash, const HvMessage *m)
 {
     switch(sendHash){
       case 0xD1D4AC2: // __hv_noteout
       {
+
+        uint8_t note = hv_msg_getFloat(m, 0);
+        uint8_t velocity = hv_msg_getFloat(m, 1);
+        uint8_t ch = hv_msg_getFloat(m, 2);
+        printf("> note: %d - velocity: %d - ch: %d \n", note, velocity, ch);
+
         // {{class_name}}::heavyWriteMidiEvent(m);
         MidiEvent midiSendEvent;
         midiSendEvent.frame = m->timestamp;
         midiSendEvent.size = m->numBytes;
         midiSendEvent.dataExt = nullptr;
+
 
         uint32_t i = 0;
         for (; i < m->numElements; ++i)
@@ -217,7 +226,8 @@ void {{class_name}}::sendHook(HeavyContextInterface *c, const char *sendName, ui
         for (; i < MidiEvent::kDataSize; ++i)
             midiSendEvent.data[i] = 0;
 
-        writeMidiEvent(midiSendEvent);
+        bool something = writeMidiEvent(midiSendEvent);
+        printf("%d \n", something);
 
         break;
       }
@@ -225,6 +235,15 @@ void {{class_name}}::sendHook(HeavyContextInterface *c, const char *sendName, ui
         break;
   }
 
+}
+
+static void sendHookFunc(HeavyContextInterface *c, const char *sendName, uint32_t sendHash, const HvMessage *m)
+{
+  {{class_name}}* plugin = ({{class_name}}*)c->getUserData();
+  if (plugin != nullptr)
+  {
+    plugin->handleMidi(sendHash, m);
+  }
 }
 
 // -----------------------------------------------------------------------
