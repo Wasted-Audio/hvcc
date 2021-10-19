@@ -10,6 +10,7 @@
 START_NAMESPACE_DISTRHO
 
 static void sendHookFunc(HeavyContextInterface *c, const char *sendName, uint32_t sendHash, const HvMessage *m);
+static void owlPrintHook(HeavyContextInterface* ctxt, const char *printLabel, const char *msgString, const HvMessage *m);
 
 class {{class_name}} : public Plugin
 {
@@ -24,7 +25,8 @@ public:
   {{class_name}}();
   ~{{class_name}}() override;
 
-  void handleMidi(uint32_t sendHash, const HvMessage *m);
+  void handleMidiInput(uint32_t curEventIndex, const MidiEvent* midiEvents, uint32_t midiEventCount);
+  void handleMidiSend(uint32_t sendHash, const HvMessage *m);
 
 protected:
   // -------------------------------------------------------------------
@@ -103,7 +105,6 @@ protected:
   // Callbacks
 
   void sampleRateChanged(double newSampleRate) override;
-  // void sendHook(HeavyContextInterface *c, const char *sendName, uint32_t sendHash, const HvMessage *m) override;
 
   // -------------------------------------------------------------------
 
