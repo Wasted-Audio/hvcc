@@ -1,0 +1,146 @@
+{
+	"Switch": {
+		"map_init": "{name}.Init(driver.GetPin({pin}), driver.AudioCallbackRate(), {type}, {polarity}, {pull});",
+		"typename": "daisy::Switch",
+		"pin": "a",
+		"type": "daisy::Switch::TYPE_MOMENTARY",
+		"polarity": "daisy::Switch::POLARITY_INVERTED",
+		"pull": "daisy::Switch::PULL_UP",
+		"process": "{name}.Debounce();",
+		"updaterate": "{name}.SetUpdateRate(driver.AudioCallbackRate());",
+		"mapping": [
+			{ "name": "{name}", "get": "(hardware.{name}.Pressed()?1.f:0.f)", "range": [0, 1] },
+			{
+				"name": "{name}_rise",
+				"get": "(hardware.{name}.RisingEdge()?1.f:0.f)",
+				"range": [0, 1]
+			},
+			{
+				"name": "{name}_fall",
+				"get": "(hardware.{name}.FallingEdge()?1.f:0.f)",
+				"range": [0, 1]
+			},
+			{
+				"name": "{name}_seconds",
+				"get": "(hardware.{name}.TimeHeldMs()*0.001f)",
+				"range": null
+			}
+	  	]
+	},
+	"Switch3": {
+		"map_init": "{name}.Init(driver.GetPin({pin_a}), driver.GetPin({pin_b}));",
+		"typename": "daisy::Switch3",
+		"pin": "a,b",
+		"mapping": [
+			{ "name": "{name}", "get": "(hardware.{name}.Read()*0.5f+0.5f)", "range": [0, 2] }
+		]
+	},
+	"Encoder": {
+		"map_init": "{name}.Init(driver.GetPin({pin_a}), driver.GetPin({pin_b}), driver.GetPin({pin_click}), driver.AudioCallbackRate());",
+		"typename": "daisy::Encoder",
+		"pin": "a,b,click",
+		"process": "{name}.Debounce();",
+		"updaterate": "{name}.SetUpdateRate(driver.AudioCallbackRate());",
+		"mapping": [
+			{
+				"name": "{name}",
+				"get": "(hardware.{name}.Increment()*0.5f+0.5f)",
+				"range": [-1, 1]
+			},
+			{
+				"name": "{name}_press",
+				"get": "(hardware.{name}.Pressed()?1.f:0.f)",
+				"range": [0, 1]
+			},
+			{
+				"name": "{name}_rise",
+				"get": "(hardware.{name}.RisingEdge()?1.f:0.f)",
+				"range": [0, 1]
+			},
+			{
+				"name": "{name}_fall",
+				"get": "(hardware.{name}.FallingEdge()?1.f:0.f)",
+				"range": [0, 1]
+			},
+			{
+				"name": "{name}_seconds",
+				"get": "(hardware.{name}.TimeHeldMs()*0.001f)",
+				"range": null
+			}
+		]
+	},
+	"GateIn": {
+		"map_init": "dsy_gpio_pin {name}_pin = driver.GetPin({pin});\n\t\t{name}.Init(&{name}_pin);",
+		"typename": "daisy::GateIn",
+		"pin": "a",
+		"mapping": [
+			{ "name": "{name}", "get": "(hardware.{name}.State()?1.f:0.f)", "range": [0, 1] },
+			{ "name": "{name}_trig", "get": "(hardware.{name}.Trig()?1.f:0.f)", "range": [0, 1] }
+		]
+	},
+	"AnalogControl": {
+		"init_single": "cfg[{i}].InitSingle(driver.GetPin({pin}));",
+		"map_init": "{name}.Init(driver.adc.GetPtr({i}), driver.AudioCallbackRate(), {flip}, {invert});",
+		"typename": "daisy::AnalogControl",
+		"pin": "a",
+		"flip": false,
+		"invert": false,
+		"slew": "1.0/driver.AudioCallbackRate()",
+		"process": "{name}.Process();",
+		"updaterate": "{name}.SetSampleRate(driver.AudioCallbackRate());",
+		"mapping": [{ "name": "{name}", "get": "(hardware.{name}.Value())", "range": [0, 1] }]
+	},
+	"Led": {
+		"map_init": "{name}.Init(driver.GetPin({pin}), {invert});\n\t\t{name}.Set(0.0f);",
+		"typename": "daisy::Led",
+		"pin": "a",
+		"invert": true,
+		"postprocess": "{name}.Update();",
+		"mapping": [{ "name": "{name}", "set": "hardware.{name}.Set(<name>);" }]
+	},
+	"RgbLed": {
+		"map_init": "{name}.Init(driver.GetPin({pin_r}), driver.GetPin({pin_g}), driver.GetPin({pin_b}), {invert});\n\t\t{name}.Set(0.0f, 0.0f, 0.0f);",
+		"typename": "daisy::RgbLed",
+		"pin": "r,g,b",
+		"invert": true,
+		"postprocess": "{name}.Update();",
+		"mapping": [
+			{ "name": "{name}_red", "set": "hardware.{name}.SetRed(<name>);" },
+			{ "name": "{name}_green", "set": "hardware.{name}.SetGreen(<name>);" },
+			{ "name": "{name}_blue", "set": "hardware.{name}.SetBlue(<name>);" },
+			{ "name": "{name}", "set": "hardware.{name}.Set(clamp(-<name>, 0.f, 1.f), 0.f, clamp(<name>, 0.f, 1.f));" },
+			{ "name": "{name}_white", "set": "hardware.{name}.Set(<name>,<name>,<name>);" }
+		]
+	},
+	"GateOut": {
+		"map_init": "{name}.pin  = driver.GetPin({pin});\n\t\t{name}.mode = {mode};\n\t\t{name}.pull = {pull};\n\t\tdsy_gpio_init(&{name});",
+		"typename": "dsy_gpio",
+		"pin": "a",
+		"mode": "DSY_GPIO_MODE_OUTPUT_PP",
+		"pull": "DSY_GPIO_NOPULL",
+		"mapping": [
+			{ "name": "{name}", "set": "dsy_gpio_write(&hardware.{name}, <name> } 0.f);" }
+		]
+	},
+	"CVOuts": {
+		"map_init": "{name}.bitdepth = {bitdepth};\n\t\t{name}.buff_state = {buff_state};\n\t\t{name}.mode = {mode};\n\t\t{name}.chn = {channel};\n\t\tdriver.dac.Init({name});\n\t\tdriver.dac.WriteValue({channel}, 0);",
+		"typename": "daisy::DacHandle::Config",
+		"pin": "",
+		"bitdepth": "daisy::DacHandle::BitDepth::BITS_12",
+		"buff_state": "daisy::DacHandle::BufferState::ENABLED",
+		"mode": "daisy::DacHandle::Mode::POLLING",
+		"channel": "daisy::DacHandle::Channel::BOTH",
+		"mapping": [
+			{
+				"name": "{name}1",
+				"set": "hardware.{name}.WriteValue(daisy::DacHandle::Channel::ONE, <name> * 4095)",
+				"where": "main"
+			},
+			{
+				"name": "{name}2",
+				"set": "hardware.{name}.WriteValue(daisy::DacHandle::Channel::TWO, <name> * 4095)",
+				"where": "main"
+			}
+		]
+	}
+}
