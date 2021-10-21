@@ -43,12 +43,12 @@
 		"gateout": {
 			"component": "GateOut",
 			"pin": 1998,
-			"display": "display code for gateout;"
+			"display": ""
 		},
 		"led3": {
 			"component": "Led",
 			"pin": 100,
-			"display": "display code for led3;"
+			"display": ""
 		},
 		"cvout": {
 			"component": "CVOuts"
@@ -70,6 +70,7 @@
 		"button1": "sw1",
 		"switch2": "sw2",
 		"button2": "sw2",
+		"encswitch": "encoder_press",
 		"enp": "encoder_press",
 		"switch3": "encoder_press",
 		"press": "encoder_press",
