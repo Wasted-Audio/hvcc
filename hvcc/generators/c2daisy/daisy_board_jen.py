@@ -9,9 +9,27 @@ import jinja2
 # Largely adapted from grrrwaaa's oopsy #
 #############################################################
 
-# TODO: add an argument to make these paths configurable
 json_defaults_file = "component_defaults.json"
-template_path = 'template'
+
+def verify_param(name, components):
+	for comp in components:
+		if comp['name'] == name:
+			return True
+		if comp['component'] == 'Encoder':
+			possible_values = [
+				f"{comp['name']}_press", 
+				f"{comp['name']}_rise", 
+				f"{comp['name']}_fall", 
+				f"{comp['name']}_seconds"
+			]
+			if name in possible_values:
+				return True
+	return False
+
+def de_alias(name, aliases):
+	if name in aliases:
+		return aliases[name]
+	return name
 
 # helper for loading and processing the defaults, component list, etc
 def map_load(pair):
@@ -74,12 +92,13 @@ def bools_to_lower_str(comp):
 
 	return new_comp
 
-def generate_target_struct(target, hpp_temp, cpp_temp, defaults, class_name='', copyright=''):
+def generate_target_struct(target, hpp_temp, cpp_temp, defaults, parameters=[], name='seed', class_name='', copyright=''):
 	# flesh out target components:
-	global json_defaults_file
-	json_defaults_file = defaults
 	target = json.loads(target)
 	components = target['components']
+
+	global json_defaults_file
+	json_defaults_file = defaults
 
 	# alphabetize by component name
 	components = sorted(components.items(), key=lambda x: x[1]['component'])
@@ -96,6 +115,9 @@ def generate_target_struct(target, hpp_temp, cpp_temp, defaults, class_name='', 
 	if not 'name' in target:
 		target['name'] = 'custom'
 
+	if not 'aliases' in target:
+		target['aliases'] = {}
+
 	if 'display' in target:
 		# apply defaults
 		target['display'] = {
@@ -108,8 +130,20 @@ def generate_target_struct(target, hpp_temp, cpp_temp, defaults, class_name='', 
 		target['defines']['OOPSY_OLED_DISPLAY_WIDTH'] = target['display']['dim'][0]
 		target['defines']['OOPSY_OLED_DISPLAY_HEIGHT'] = target['display']['dim'][1]
 
+	# Verify that the params are valid and remove unused components
+	params_in = {de_alias(key.lower(), target['aliases']): item for key, item in parameters['in']}
+	params_out = {de_alias(key.lower(), target['aliases']): item for key, item in parameters['out']}
+
+	for key in params_in:
+		if not verify_param(key, components):
+			raise NameError(f'Unknown parameter "{key}"')
+
+	for i in range(len(components) - 1, -1, -1):
+		if components[i]['name'] not in params_in and components[i]['name'] not in params_out:
+			components.pop(i)
+
 	replacements = {}
-	replacements['name'] = target['name']
+	replacements['name'] = name
 	if 'driver' not in target:
 		target['driver'] = 'seed'
 	replacements['driver'] = target['driver']
@@ -124,8 +158,7 @@ def generate_target_struct(target, hpp_temp, cpp_temp, defaults, class_name='', 
 	replacements['gatein'] = filter_map_init(components, 'typename', 'daisy::GateIn')
 	replacements['encoder'] = filter_map_init(components, 'typename', 'daisy::Encoder')
 	replacements['switch3'] = filter_map_init(components, 'typename', 'daisy::Switch3')
-	replacements['encoder'] = filter_map_init(components, 'typename', 'daisy::Encoder')
-	replacements['analogcount'] = 'static const int ANALOG_COUNT = ' + str(len(list(filter_match(components, 'typename', 'daisy::AnalogControl')))) + ';'
+	replacements['analogcount'] = len(list(filter_match(components, 'typename', 'daisy::AnalogControl')))
 
 	replacements['init_single'] = filter_map_ctrl(components, 'typename', 'daisy::AnalogControl', 'init_single')
 	replacements['ctrl_init'] = filter_map_ctrl(components, 'typename', 'daisy::AnalogControl', 'map_init')	
@@ -153,16 +186,13 @@ def generate_target_struct(target, hpp_temp, cpp_temp, defaults, class_name='', 
 	replacements['dispdec'] = ('daisy::OledDisplay<' + target['display']['driver'] + '> display;') if ('display' in target) else  "// no display"
 
 	# [print(x) for x in target['components']]
+	
 
 	replacements['parameters'] = []
-	valid_comps = ['AnalogControl', 'Switch', 'Encoder']
 	analog_count = 0
 	for comp in target['components']:
-		if comp['component'] in valid_comps:
-			param = {'name': comp['name'], 'type': comp['component'].upper()}
-			replacements['parameters'].append(param)
-
-
+		param = {'hash': params_in[comp['name']]['hash'], 'name': comp['name'], 'type': comp['component'].upper()}
+		replacements['parameters'].append(param)
 
 	# initialize the jinja template environment
 	env = jinja2.Environment()
