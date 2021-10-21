@@ -6,79 +6,72 @@
 
 using namespace daisy;
 
-DSY_BOARD* hardware;
-
+Daisy hardware;
 int num_params;
 
 Heavy_{{name}} hv(SAMPLE_RATE);
 
 void ProcessControls();
 
-void audiocallback(float **in, float **out, size_t size)
+void audiocallback(daisy::AudioHandle::InterleavingInputBuffer in, daisy::AudioHandle::InterleavingOutputBuffer out, size_t size)
 {
-    hv.process(in, out, size);
-    ProcessControls();
+  hv.process((float**)in, (float**)out, size);
+  ProcessControls();
+  hardware.PostProcess();
 }
 
-static void sendHook(HeavyContextInterface *c, const char *receiverName, uint32_t receiverHash, const HvMessage * m) {
+static void sendHook(HeavyContextInterface *c, const char *receiverName, uint32_t receiverHash, const HvMessage * m) 
+{
   // Do something with message sent from Pd patch through
   // [send receiverName @hv_event] object(s)
 }
 
 int main(void)
 {
-    hardware = &boardsHardware;
-    {% if board == 'seed' %}
-    hardware->Configure();
-    {% endif %}
-    num_params = hv.getParameterInfo(0,NULL);
+  hardware.Init(true);
+  hardware.driver.StartAudio(audiocallback);
 
-    hv.setSendHook(sendHook);
+  num_params = hv.getParameterInfo(0,NULL);
+  hv.setSendHook(sendHook);
 
-    hardware->Init();
-
-    {% if board != 'seed' %}
-    hardware->StartAdc();
-    {% endif %}
-
-    hardware->StartAudio(audiocallback);
-    // GENERATE POSTINIT
-    for(;;)
-    {
-        {% if board == 'patch' %}
-        hardware->DisplayControls(false);
-        {% endif %}
-    }
+  // GENERATE POSTINIT
+  for(;;)
+  {
+    hardware.Display();
+  }
 }
 
 void ProcessControls()
 {
-    {% if board != 'seed' %}
-    hardware->DebounceControls();
-    hardware->UpdateAnalogControls();
-    {% endif %}
+  hardware.ProcessAllControls();
 
-    for (int i = 0; i < num_params; i++)
+  for (int i = 0; i < num_params; i++)
+  {
+    HvParameterInfo info;
+    hv.getParameterInfo(i, &info);
+
+    if (DaisyNumParameters == 0)
+      hv.sendFloatToReceiver(info.hash, 0.f);
+
+    std::string name(info.name);
+
+    for (int j = 0; j < DaisyNumParameters; j++)
     {
-	HvParameterInfo info;
-	hv.getParameterInfo(i, &info);
+      if (DaisyParameters[j].name == name)
+      {
+        float sig = DaisyParameters[j].Process();
 
-    {% if board == 'seed' %}
-    hv.sendFloatToReceiver(info.hash, 0.f);
-    {% endif %}
-
-	std::string name(info.name);
-
-	for (int j = 0; j < DaisyNumParameters; j++){
-	    if (DaisyParameters[j].name == name)
-	    {
-		float sig = DaisyParameters[j].Process();
-
-		if (DaisyParameters[j].mode == ENCODER || DaisyParameters[j].mode == KNOB)
-		    hv.sendFloatToReceiver(info.hash, sig);
-		else if(sig)
-		    hv.sendBangToReceiver(info.hash);
-	    }
-	}
+        if (DaisyParameters[j].mode == ENCODER || DaisyParameters[j].mode == ANALOGCONTROL)
+          hv.sendFloatToReceiver(info.hash, sig);
+        else if(sig)
+          hv.sendBangToReceiver(info.hash);
+      }
     }
+  }
 }
+
+DaisyHvParam DaisyParameters[DaisyNumParameters] = {
+	{% for param in parameters %}
+		{"{{param.name}}", &hardware.{{param.name}}, {{param.type}}},
+	{% endfor %}
+};
