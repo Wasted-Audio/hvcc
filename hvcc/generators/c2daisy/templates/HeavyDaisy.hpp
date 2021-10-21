@@ -1,7 +1,12 @@
+{{copyright}}
 #ifndef _HEAVY_DAISY_{{name|upper}}_
 #define _HEAVY_DAISY_{{name|upper}}_
 
-#include <string>
+// #include <string>
+
+#include "Heavy_{{name}}.hpp"
+
+#define ANALOG_COUNT {{analogcount}}
 
 {% if driver == 'seed' %}
 #include "daisy_seed.h"
@@ -29,8 +34,6 @@ struct Daisy {
 		{{gatein}}
 		
 		{{encoder}}
-		
-		{{analogcount}}
 		
 		{{init_single}}
 		
@@ -78,12 +81,12 @@ struct Daisy {
 
 	{% if driver == 'seed' %}
 	daisy::DaisySeed driver;
+	daisy::AdcChannelConfig cfg[ANALOG_COUNT];
 	{% else %}
 	daisy::patch_sm::PatchSM driver;
 	{% endif %}
 	
 	{{comps}}
-	AdcChannelConfig cfg[{{analogcount}}];
 	
 	{{dispdec}}
 	
@@ -96,6 +99,7 @@ using namespace daisy;
 enum ControlType
 {
 	ENCODER,
+	ENCODER_PRESS,
 	SWITCH,
 	ANALOGCONTROL,
 	GATE,
@@ -104,7 +108,8 @@ enum ControlType
 //All the info we need for our parameters
 struct DaisyHvParam
 {
-	std::string name;
+	// std::string name;
+	uint32_t hash;
 	void* control;
 	ControlType mode;
 
@@ -119,6 +124,11 @@ struct DaisyHvParam
 			{
 				Encoder* enc = static_cast<Encoder*>(control);
 				return enc->Increment();
+			}
+			case ENCODER_PRESS:
+			{
+				Encoder* enc = static_cast<Encoder*>(control);
+				return enc->Pressed();
 			}
 			case SWITCH:
 			{

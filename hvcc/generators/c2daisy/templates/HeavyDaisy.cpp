@@ -53,11 +53,9 @@ void ProcessControls()
     if (DaisyNumParameters == 0)
       hv.sendFloatToReceiver(info.hash, 0.f);
 
-    std::string name(info.name);
-
     for (int j = 0; j < DaisyNumParameters; j++)
     {
-      if (DaisyParameters[j].name == name)
+      if (DaisyParameters[j].hash == info.hash)
       {
         float sig = DaisyParameters[j].Process();
 
@@ -72,6 +70,6 @@ void ProcessControls()
 
 DaisyHvParam DaisyParameters[DaisyNumParameters] = {
 	{% for param in parameters %}
-		{"{{param.name}}", &hardware.{{param.name}}, {{param.type}}},
+		{ {{param.hash}}, &hardware.{{param.name}}, {{param.type}} },
 	{% endfor %}
 };
