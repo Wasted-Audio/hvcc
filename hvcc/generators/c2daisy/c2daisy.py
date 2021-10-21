@@ -5,6 +5,7 @@ import time
 import jinja2
 from ..buildjson import buildjson
 from ..copyright import copyright_manager
+from .daisy_board_jen import generate_target_struct
 
 
 class c2daisy:
@@ -21,13 +22,13 @@ class c2daisy:
 
         receiver_list = externs['parameters']['in']
 
-        if patch_meta:
-            patch_name = patch_meta.get("name", patch_name)
-            daisy_meta = patch_meta.get("daisy")
-        else:
-            daisy_meta = {}
+        # if patch_meta:
+        #     patch_name = patch_meta.get("name", patch_name)
+        #     daisy_meta = patch_meta.get("daisy")
+        # else:
+        #     daisy_meta = {}
 
-        board = daisy_meta.get("board", "seed")
+        # board = daisy_meta.get("board", "seed")
 
         copyright_c = copyright_manager.get_copyright_for_c(copyright)
         # copyright_plist = copyright or u"Copyright {0} Enzien Audio, Ltd." \
@@ -52,29 +53,46 @@ class c2daisy:
             env.loader = jinja2.FileSystemLoader(
                 os.path.join(os.path.dirname(os.path.abspath(__file__)), "templates"))
 
-            # generate Daisy wrapper from template
+            # # generate Daisy wrapper from template
+
+            # daisy_h_path = os.path.join(source_dir, f"HeavyDaisy_{patch_name}.hpp")
+            # with open(daisy_h_path, "w") as f:
+            #     f.write(env.get_template("HeavyDaisy.hpp").render(
+            #         name=patch_name,
+            #         board=board,
+            #         class_name=f"HeavyDaisy_{patch_name}",
+            #         num_input_channels=num_input_channels,
+            #         num_output_channels=num_output_channels,
+            #         receivers=receiver_list,
+            #         copyright=copyright_c))
+            # daisy_cpp_path = os.path.join(source_dir, f"HeavyDaisy_{patch_name}.cpp")
+            # with open(daisy_cpp_path, "w") as f:
+            #     f.write(env.get_template("HeavyDaisy.cpp").render(
+            #         name=patch_name,
+            #         board=board,
+            #         class_name=f"HeavyDaisy_{patch_name}",
+            #         num_input_channels=num_input_channels,
+            #         num_output_channels=num_output_channels,
+            #         receivers=receiver_list,
+            #         pool_sizes_kb=externs["memoryPoolSizesKb"],
+            #         copyright=copyright_c))
+
+            targ = os.path.join(os.path.dirname(os.path.abspath(__file__)), "static", 'seed.pod.json')
+            with open(targ, 'r') as file:
+                targ_json = file.read()
+            defaults = os.path.join(os.path.dirname(os.path.abspath(__file__)), "static", 'component_defaults.json')
+            hpp, cpp = generate_target_struct(targ_json, "HeavyDaisy.hpp", "HeavyDaisy.cpp", defaults, class_name=f"HeavyDaisy_{patch_name}", copyright=copyright_c)
+
+            
 
             daisy_h_path = os.path.join(source_dir, f"HeavyDaisy_{patch_name}.hpp")
             with open(daisy_h_path, "w") as f:
-                f.write(env.get_template("HeavyDaisy.hpp").render(
-                    name=patch_name,
-                    board=board,
-                    class_name=f"HeavyDaisy_{patch_name}",
-                    num_input_channels=num_input_channels,
-                    num_output_channels=num_output_channels,
-                    receivers=receiver_list,
-                    copyright=copyright_c))
+                f.write(hpp)
+            
             daisy_cpp_path = os.path.join(source_dir, f"HeavyDaisy_{patch_name}.cpp")
             with open(daisy_cpp_path, "w") as f:
-                f.write(env.get_template("HeavyDaisy.cpp").render(
-                    name=patch_name,
-                    board=board,
-                    class_name=f"HeavyDaisy_{patch_name}",
-                    num_input_channels=num_input_channels,
-                    num_output_channels=num_output_channels,
-                    receivers=receiver_list,
-                    pool_sizes_kb=externs["memoryPoolSizesKb"],
-                    copyright=copyright_c))
+                f.write(cpp)
+
 
             # generate list of Heavy source files
             # files = os.listdir(source_dir)
