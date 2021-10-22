@@ -47,10 +47,10 @@
 		},
 		"led3": {
 			"component": "Led",
-			"pin": 100,
+			"pin": 10,
 			"display": ""
 		},
-		"cvout": {
+		"cvout1": {
 			"component": "CVOuts"
 		},
 		"gatein": {
@@ -64,6 +64,7 @@
 
 	},
 	"aliases": {
+		"cvout": "cvout1",
 		"switch": "sw1",
 		"button": "sw1",
 		"switch1": "sw1",

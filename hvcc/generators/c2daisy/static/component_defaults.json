@@ -102,7 +102,7 @@
 		"pin": "a",
 		"invert": true,
 		"postprocess": "{name}.Update();",
-		"mapping": [{ "name": "{name}", "set": "hardware.{name}.Set(<name>);" }]
+		"mapping": [{ "name": "{name}", "set": "{name}.Set({value});" }]
 	},
 	"RgbLed": {
 		"map_init": "{name}.Init(driver.GetPin({pin_r}), driver.GetPin({pin_g}), driver.GetPin({pin_b}), {invert});\n\t\t{name}.Set(0.0f, 0.0f, 0.0f);",
@@ -112,11 +112,11 @@
 		"invert": true,
 		"postprocess": "{name}.Update();",
 		"mapping": [
-			{ "name": "{name}_red", "set": "hardware.{name}.SetRed(<name>);" },
-			{ "name": "{name}_green", "set": "hardware.{name}.SetGreen(<name>);" },
-			{ "name": "{name}_blue", "set": "hardware.{name}.SetBlue(<name>);" },
-			{ "name": "{name}", "set": "hardware.{name}.Set(clamp(-<name>, 0.f, 1.f), 0.f, clamp(<name>, 0.f, 1.f));" },
-			{ "name": "{name}_white", "set": "hardware.{name}.Set(<name>,<name>,<name>);" }
+			{ "name": "{name}_red", "set": "{name}.SetRed({value});" },
+			{ "name": "{name}_green", "set": "{name}.SetGreen({value});" },
+			{ "name": "{name}_blue", "set": "{name}.SetBlue({value});" },
+			{ "name": "{name}", "set": "{name}.Set(clamp(-{value}, 0.f, 1.f), 0.f, clamp({value}, 0.f, 1.f));" },
+			{ "name": "{name}_white", "set": "{name}.Set({value},{value},{value});" }
 		]
 	},
 	"GateOut": {
@@ -127,7 +127,7 @@
 		"mode": "DSY_GPIO_MODE_OUTPUT_PP",
 		"pull": "DSY_GPIO_NOPULL",
 		"mapping": [
-			{ "name": "{name}", "set": "dsy_gpio_write(&hardware.{name}, <name> } 0.f);" }
+			{ "name": "{name}", "set": "dsy_gpio_write(&{name}, {value});" }
 		]
 	},
 	"CVOuts": {
@@ -142,12 +142,12 @@
 		"mapping": [
 			{
 				"name": "{name}1",
-				"set": "hardware.{name}.WriteValue(daisy::DacHandle::Channel::ONE, <name> * 4095)",
+				"set": "driver.dac.WriteValue(daisy::DacHandle::Channel::ONE, {value} * 4095);",
 				"where": "main"
 			},
 			{
 				"name": "{name}2",
-				"set": "hardware.{name}.WriteValue(daisy::DacHandle::Channel::TWO, <name> * 4095)",
+				"set": "driver.dac.WriteValue(daisy::DacHandle::Channel::TWO, {value} * 4095);",
 				"where": "main"
 			}
 		]
