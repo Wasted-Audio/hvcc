@@ -21,7 +21,6 @@ START_NAMESPACE_DISTRHO
 
 static void sendHookFunc(HeavyContextInterface *c, const char *sendName, uint32_t sendHash, const HvMessage *m)
 {
-  printf("> midi output stuff! \n");
   {{class_name}}* plugin = ({{class_name}}*)c->getUserData();
   if (plugin != nullptr)
   {
@@ -29,36 +28,35 @@ static void sendHookFunc(HeavyContextInterface *c, const char *sendName, uint32_
   }
 }
 
-  static void hvPrintHook(HeavyContextInterface* ctxt, const char *printLabel, const char *msgString, const HvMessage *m)
-  {
-    char buf[64];
-    char* dst = buf;
-    int len = strnlen(printLabel, 48);
-    dst = stpncpy(dst, printLabel, len);
-    dst = stpcpy(dst, " ");
-    dst = stpncpy(dst, msgString, 63-len);
-    printf("> %s \n", buf);
-  }
-
+static void hvPrintHook(HeavyContextInterface* ctxt, const char *printLabel, const char *msgString, const HvMessage *m)
+{
+  char buf[64];
+  char* dst = buf;
+  int len = strnlen(printLabel, 48);
+  dst = stpncpy(dst, printLabel, len);
+  dst = stpcpy(dst, " ");
+  dst = stpncpy(dst, msgString, 63-len);
+  printf("> %s \n", buf);
+}
 
 {{class_name}}::{{class_name}}()
  : Plugin(HV_LV2_NUM_PARAMETERS, 0, 0)
 {
-    {% for k, v in receivers %}
-    _parameters[{{loop.index-1}}] = {{v.attributes.default}}f;
-    {% endfor %}
+  {% for k, v in receivers %}
+  _parameters[{{loop.index-1}}] = {{v.attributes.default}}f;
+  {% endfor %}
 
-    _context = new Heavy_{{name}}(getSampleRate(), {{pool_sizes_kb.internal}}, {{pool_sizes_kb.inputQueue}}, {{pool_sizes_kb.outputQueue}});
-    _context->setUserData(this);
-    _context->setSendHook(&sendHookFunc);
-    _context->setPrintHook(&hvPrintHook);
+  _context = new Heavy_{{name}}(getSampleRate(), {{pool_sizes_kb.internal}}, {{pool_sizes_kb.inputQueue}}, {{pool_sizes_kb.outputQueue}});
+  _context->setUserData(this);
+  _context->setSendHook(&sendHookFunc);
+  _context->setPrintHook(&hvPrintHook);
 
-    {% if receivers|length > 0 %}
-    // ensure that the new context has the current parameters
-    for (int i = 0; i < HV_LV2_NUM_PARAMETERS; ++i) {
-      setParameterValue(i, _parameters[i]);
-    }
-    {% endif %}
+  {% if receivers|length > 0 %}
+  // ensure that the new context has the current parameters
+  for (int i = 0; i < HV_LV2_NUM_PARAMETERS; ++i) {
+    setParameterValue(i, _parameters[i]);
+  }
+  {% endif %}
 }
 
 {{class_name}}::~{{class_name}}() {
@@ -145,10 +143,14 @@ void {{class_name}}::handleMidiInput(uint32_t curEventIndex, const MidiEvent* mi
   int data2   = midiEvents[curEventIndex].data[2];
 
   switch (command) {
-    case 0x80:   // note off
+    case 0x80: {  // note off
+      _context->sendMessageToReceiverV(HV_HASH_NOTEIN, 0, "fff",
+        (float) data1, // pitch
+        (float) 0, // velocity
+        (float) channel);
+      break;
+    }
     case 0x90: { // note on
-      printf("> midi input stuff! \n");
-      printf("> note: %d - velocity: %d - ch: %d \n", data1, data2, channel);
       _context->sendMessageToReceiverV(HV_HASH_NOTEIN, 0, "fff",
         (float) data1, // pitch
         (float) data2, // velocity
@@ -158,7 +160,7 @@ void {{class_name}}::handleMidiInput(uint32_t curEventIndex, const MidiEvent* mi
     case 0xB0: { // control change
       _context->sendMessageToReceiverV(HV_HASH_CTLIN, 0, "fff",
         (float) data2, // value
-        (float) data1, // controller number
+        (float) data1, // cc number
         (float) channel);
       break;
     }
@@ -193,31 +195,30 @@ void {{class_name}}::handleMidiSend(uint32_t sendHash, const HvMessage *m)
         uint8_t note = hv_msg_getFloat(m, 0);
         uint8_t velocity = hv_msg_getFloat(m, 1);
         uint8_t ch = hv_msg_getFloat(m, 2);
-        printf("> note: %d - velocity: %d - ch: %d \n", note, velocity, ch);
 
         MidiEvent midiSendEvent;
         midiSendEvent.frame = 0;
         midiSendEvent.size = m->numElements;
         midiSendEvent.dataExt = nullptr;
 
-        if (velocity == 127){
-          midiSendEvent.data[0] = 0x80 | ch; // noteoff
-        } else {
+        if (velocity > 0){
           midiSendEvent.data[0] = 0x90 | ch; // noteon
+        } else {
+          midiSendEvent.data[0] = 0x80 | ch; // noteoff
         }
         midiSendEvent.data[1] = note;
         midiSendEvent.data[2] = velocity;
         midiSendEvent.data[3] = 0;
 
         writeMidiEvent(midiSendEvent);
-        break;
+        return;
       }
       case HV_HASH_CTLOUT:
       {
         uint8_t value = hv_msg_getFloat(m, 0);
         uint8_t cc = hv_msg_getFloat(m, 1);
         uint8_t ch = hv_msg_getFloat(m, 2);
-        printf("> value: %d - cc: %d - ch: %d \n", value, cc, ch);
+        // printf("> value: %d - cc: %d - ch: %d \n", value, cc, ch);
 
         MidiEvent midiSendEvent;
         midiSendEvent.frame = 0;
@@ -230,14 +231,13 @@ void {{class_name}}::handleMidiSend(uint32_t sendHash, const HvMessage *m)
         midiSendEvent.data[3] = 0;
 
         writeMidiEvent(midiSendEvent);
-        break;
+        return;
       }
       case HV_HASH_PGMOUT:
       {
-        uint8_t cc_val = hv_msg_getFloat(m, 0);
-        uint8_t cc_num = hv_msg_getFloat(m, 1);
-        uint8_t ch = hv_msg_getFloat(m, 2);
-        printf("> cc_val: %d - cc_num: %d - ch: %d \n", cc_val, cc_num, ch);
+        uint8_t pgm = hv_msg_getFloat(m, 0);
+        uint8_t ch = hv_msg_getFloat(m, 1);
+        // printf("> pgm: %d - ch: %d \n", pgm. ch);
 
         MidiEvent midiSendEvent;
         midiSendEvent.frame = 0;
@@ -245,16 +245,18 @@ void {{class_name}}::handleMidiSend(uint32_t sendHash, const HvMessage *m)
         midiSendEvent.dataExt = nullptr;
 
         midiSendEvent.data[0] = 0xC0 | ch; // send Program Change
-        midiSendEvent.data[1] = cc_num;
-        midiSendEvent.data[2] = cc_val;
+        midiSendEvent.data[1] = pgm;
+        midiSendEvent.data[2] = 0;
         midiSendEvent.data[3] = 0;
-        break;
+
+        writeMidiEvent(midiSendEvent);
+        return;
       }
       case HV_HASH_TOUCHOUT:
       {
         uint8_t value = hv_msg_getFloat(m, 0);
-        uint8_t ch = hv_msg_getFloat(m, 2);
-        printf("> value: %d - ch: %d \n", value, ch);
+        uint8_t ch = hv_msg_getFloat(m, 1);
+        // printf("> value: %d - ch: %d \n", value, ch);
 
         MidiEvent midiSendEvent;
         midiSendEvent.frame = 0;
@@ -265,14 +267,16 @@ void {{class_name}}::handleMidiSend(uint32_t sendHash, const HvMessage *m)
         midiSendEvent.data[1] = value;
         midiSendEvent.data[2] = 0;
         midiSendEvent.data[3] = 0;
-        break;
+
+        writeMidiEvent(midiSendEvent);
+        return;
       }
       case HV_HASH_BENDOUT:
       {
-        break;
+        return;
       }
       default:
-        break;
+        return;
   }
 
 }
@@ -281,19 +285,6 @@ void {{class_name}}::run(const float** inputs, float** outputs, uint32_t frames,
 {
   uint32_t framesDone = 0;
   uint32_t curEventIndex = 0;
-
-  // while (framesDone < frames)
-  // {
-  //   while (curEventIndex < midiEventCount && framesDone == midiEvents[curEventIndex].frame)
-  //   {
-  //     if (midiEvents[curEventIndex].size > MidiEvent::kDataSize)
-  //       continue;
-
-  //     handleMidiInput(curEventIndex, midiEvents, midiEventCount);
-  //     curEventIndex++;
-  //   }
-  //   framesDone++;
-  // }
 
   for (uint32_t i=0; i < midiEventCount; ++i)
   {
@@ -309,9 +300,11 @@ void {{class_name}}::run(const float** inputs, float** outputs, uint32_t frames,
 void {{class_name}}::sampleRateChanged(double newSampleRate)
 {
   delete _context;
+
   _context = new Heavy_{{name}}(newSampleRate, {{pool_sizes_kb.internal}}, {{pool_sizes_kb.inputQueue}}, {{pool_sizes_kb.outputQueue}});
   _context->setUserData(this);
   _context->setSendHook(&sendHookFunc);
+  _context->setPrintHook(&hvPrintHook);
 
   {% if receivers|length > 0 %}
   // ensure that the new context has the current parameters

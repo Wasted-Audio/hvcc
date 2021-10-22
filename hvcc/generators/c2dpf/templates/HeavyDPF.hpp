@@ -10,7 +10,7 @@
 START_NAMESPACE_DISTRHO
 
 static void sendHookFunc(HeavyContextInterface *c, const char *sendName, uint32_t sendHash, const HvMessage *m);
-static void owlPrintHook(HeavyContextInterface* ctxt, const char *printLabel, const char *msgString, const HvMessage *m);
+static void hvPrintHook(HeavyContextInterface* ctxt, const char *printLabel, const char *msgString, const HvMessage *m);
 
 class {{class_name}} : public Plugin
 {
