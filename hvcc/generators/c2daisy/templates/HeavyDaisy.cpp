@@ -18,13 +18,18 @@ void audiocallback(daisy::AudioHandle::InterleavingInputBuffer in, daisy::AudioH
   hv.process((float**)in, (float**)out, size);
   ProcessControls();
   hardware.PostProcess();
-  {{callback_write_out}}
+  hardware.CallbackWriteOut();
 }
 
 static void sendHook(HeavyContextInterface *c, const char *receiverName, uint32_t receiverHash, const HvMessage * m) 
 {
-  // Do something with message sent from Pd patch through
-  // [send receiverName @hv_event] object(s)
+  for (int i = 0; i < DaisyNumOutputParameters; i++)
+  {
+    if (DaisyOutputParameters[i].hash == receiverHash)
+    {
+      DaisyOutputParameters[i].process(msg_getFloat(m, 0));
+    }
+  }
 }
 
 int main(void)
@@ -39,7 +44,7 @@ int main(void)
   for(;;)
   {
     hardware.Display();
-    {{loop_write_out}}
+    hardware.LoopWriteOut();
   }
 }
 
@@ -76,8 +81,8 @@ DaisyHvParam DaisyParameters[DaisyNumParameters] = {
 	{% endfor %}
 };
 
-DaisyHvParam DaisyOutputParameters[DaisyNumOutputParameters] = {
+DaisyHvParamOut DaisyOutputParameters[DaisyNumOutputParameters] = {
 	{% for param in output_parameters %}
-		{ {{param.hash}}, &hardware.{{param.name}}, {{param.type}} },
+		{ {{param.hash}}, {{param.index}} },
 	{% endfor %}
 };

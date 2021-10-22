@@ -70,6 +70,14 @@ struct Daisy {
 		{{displayprocess}}
 	}
 
+	void LoopWriteOut() {
+		{{loop_write_out}}
+	}
+
+	void CallbackWriteOut() {
+		{{callback_write_out}}
+	}
+
 	void SetAudioSampleRate(daisy::SaiHandle::Config::SampleRate samplerate) {
 		driver.SetAudioSampleRate(samplerate);
 		SetHidUpdateRates();
@@ -91,7 +99,7 @@ struct Daisy {
 	{% endif %}
 	
 	{{comps}}
-	{{output_arrays}}
+	float output_data[{{output_comps}}];
 	
 	{{dispdec}}
 	
@@ -160,13 +168,12 @@ constexpr int DaisyNumParameters = {{parameters|length}};
 constexpr int DaisyNumOutputParameters = {{output_parameters|length}};
 extern Daisy hardware;
 extern DaisyHvParam DaisyParameters[DaisyNumParameters];
-extern DaisyHvParam DaisyOutputParameters[DaisyNumOutputParameters];
 
 enum ControlTypeOut
 {
 	LED,
 	CVOUTS,
-	GATE,
+	GATEOUT,
 };
 
 //All the info we need for our parameters
@@ -181,53 +188,9 @@ struct DaisyHvParamOut
 	void Process(float sig)
 	{
 		DaisyOutputParameters[index] = sig;
-		// if (control == nullptr)
-		// 	return 0.f;
-
-		// switch (mode)
-		// {
-		// 	case ENCODER:
-		// 	{
-		// 		Encoder* enc = static_cast<Encoder*>(control);
-		// 		return enc->Increment();
-		// 	}
-		// 	case ENCODER_PRESS:
-		// 	{
-		// 		Encoder* enc = static_cast<Encoder*>(control);
-		// 		return enc->RisingEdge();
-		// 	}
-		// 	case SWITCH:
-		// 	{
-		// 		Switch* sw = static_cast<Switch*>(control);
-		// 		return sw->RisingEdge();
-		// 	}
-		// 	case ANALOGCONTROL:
-		// 	{
-		// 		AnalogControl* knob = static_cast<AnalogControl*>(control);
-		// 		return knob->Process();
-		// 	}
-		// 	case GATE:
-		// 	{
-		// 		GateIn* gate = static_cast<GateIn*>(control);
-		// 		return gate->Trig();
-		// 	}
-		// 	case LED:
-		// 	{
-		// 		Led* led = static_cast<Led*>(control);
-		// 		return 
-		// 	}
-		// 	case CVOUTS:
-		// 	{
-
-		// 	}
-		// 	case GATE:
-		// 	{
-
-		// 	}
-		// }
-
-		// return 0.f;
 	}
+
+	extern DaisyHvParamOut DaisyOutputParameters[DaisyNumOutputParameters];
 };
 
 #endif // _HEAVY_DAISY_{{name|upper}}_
