@@ -58,10 +58,6 @@ struct Daisy {
 		{{process}}
 	}
 
-	void ProcessAllOutput() {
-		{{output}}
-	}
-
 	void PostProcess() {
 		{{postprocess}}
 	}
@@ -99,7 +95,9 @@ struct Daisy {
 	{% endif %}
 	
 	{{comps}}
+	{% if  output_parameters|length > 0 %}
 	float output_data[{{output_comps}}];
+	{% endif %}
 	
 	{{dispdec}}
 	
@@ -121,7 +119,6 @@ enum ControlType
 //All the info we need for our parameters
 struct DaisyHvParam
 {
-	// std::string name;
 	uint32_t hash;
 	void* control;
 	ControlType mode;
@@ -165,9 +162,10 @@ struct DaisyHvParam
 };
 
 constexpr int DaisyNumParameters = {{parameters|length}};
-constexpr int DaisyNumOutputParameters = {{output_parameters|length}};
 extern Daisy hardware;
 extern DaisyHvParam DaisyParameters[DaisyNumParameters];
+
+{% if  output_parameters|length > 0 %}
 
 enum ControlTypeOut
 {
@@ -176,21 +174,21 @@ enum ControlTypeOut
 	GATEOUT,
 };
 
-//All the info we need for our parameters
 struct DaisyHvParamOut
 {
-	// std::string name;
 	uint32_t hash;
-	// void* control;
-	// ControlType mode;
 	uint32_t index;
 
 	void Process(float sig)
 	{
-		DaisyOutputParameters[index] = sig;
+		hardware.output_data[index] = sig;
 	}
 
-	extern DaisyHvParamOut DaisyOutputParameters[DaisyNumOutputParameters];
 };
+
+constexpr int DaisyNumOutputParameters = {{output_parameters|length}};
+extern DaisyHvParamOut DaisyOutputParameters[DaisyNumOutputParameters];
+
+{% endif %}
 
 #endif // _HEAVY_DAISY_{{name|upper}}_

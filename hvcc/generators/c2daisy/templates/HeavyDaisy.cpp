@@ -17,19 +17,23 @@ void audiocallback(daisy::AudioHandle::InterleavingInputBuffer in, daisy::AudioH
 {
   hv.process((float**)in, (float**)out, size);
   ProcessControls();
-  hardware.PostProcess();
+  {% if  output_parameters|length > 0 %}
   hardware.CallbackWriteOut();
+  {% endif %}
+  hardware.PostProcess();
 }
 
 static void sendHook(HeavyContextInterface *c, const char *receiverName, uint32_t receiverHash, const HvMessage * m) 
 {
+  {% if  output_parameters|length > 0 %}
   for (int i = 0; i < DaisyNumOutputParameters; i++)
   {
     if (DaisyOutputParameters[i].hash == receiverHash)
     {
-      DaisyOutputParameters[i].process(msg_getFloat(m, 0));
+      DaisyOutputParameters[i].Process(msg_getFloat(m, 0));
     }
   }
+  {% endif %}
 }
 
 int main(void)
@@ -40,11 +44,12 @@ int main(void)
   num_params = hv.getParameterInfo(0,NULL);
   hv.setSendHook(sendHook);
 
-  // GENERATE POSTINIT
   for(;;)
   {
     hardware.Display();
+    {% if  output_parameters|length > 0 %}
     hardware.LoopWriteOut();
+    {% endif %}
   }
 }
 
@@ -81,8 +86,10 @@ DaisyHvParam DaisyParameters[DaisyNumParameters] = {
 	{% endfor %}
 };
 
+{% if  output_parameters|length > 0 %}
 DaisyHvParamOut DaisyOutputParameters[DaisyNumOutputParameters] = {
 	{% for param in output_parameters %}
-		{ {{param.hash}}, {{param.index}} },
+		{ {{param.hash}}, {{param.index}} }, // {{param.name}}
 	{% endfor %}
 };
+{% endif %}
