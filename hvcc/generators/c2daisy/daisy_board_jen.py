@@ -13,16 +13,26 @@ json_defaults_file = "component_defaults.json"
 
 def verify_param(name, components):
 	for comp in components:
-		if comp['name'] == name:
-			return True
-		if comp['component'] == 'Encoder':
-			possible_values = [
-				f"{comp['name']}_press", 
-				f"{comp['name']}_rise", 
-				f"{comp['name']}_fall", 
-				f"{comp['name']}_seconds"
-			]
-			if name in possible_values:
+
+		# Dealing with the cvouts the way we have it set up is really annoying
+		if comp['component'] == 'CVOuts':
+			if name == comp['name']:
+				return True
+		else:
+			variants = [mapping['name'].format_map({'name': comp['name']}) for mapping in comp['mapping']]
+			if name in variants:
+				return True
+
+	return False
+
+def verify_param_used(component, params_in, params_out):
+	for param in params_in | params_out:
+		if component['component'] == 'CVOuts':
+			if param == component['name']:
+				return True
+		else:
+			variants = [mapping['name'].format_map({'name': component['name']}) for mapping in component['mapping']]
+			if param in variants:
 				return True
 	return False
 
@@ -63,6 +73,10 @@ def filter_has(set, key):
 def filter_map_init(set, key, match):
 	filtered = filter_match(set, key, match)
 	return "\n\t\t".join(map(lambda x: x['map_init'].format_map(x), filtered)) 
+
+def filter_map_set(set, key, match):
+	filtered = filter_match(set, key, match)
+	return "\n\t\t".join(map(lambda x: x['mapping'][0]['set'].format_map(x['mapping'][0]['name'].format_map(x)), filtered))
 
 def filter_map_ctrl(set, key, match, init_key):
 	set = filter_match(set, key, match)
@@ -147,7 +161,7 @@ def generate_target_struct(target, hpp_temp, cpp_temp, defaults, parameters=[], 
 			raise NameError(f'Unknown parameter "{key}"')
 
 	for i in range(len(components) - 1, -1, -1):
-		if components[i]['name'] not in params_in and components[i]['name'] not in params_out:
+		if not verify_param_used(components[i], params_in, params_out):
 			components.pop(i)
 
 	replacements = {}
@@ -175,6 +189,8 @@ def generate_target_struct(target, hpp_temp, cpp_temp, defaults, parameters=[], 
 	replacements['rgbled'] = filter_map_init(components, 'typename', 'daisy::RgbLed')
 	replacements['gateout'] = filter_map_init(components, 'typename', 'daisy::dsy_gpio')
 	replacements['dachandle'] = filter_map_init(components, 'typename', 'daisy::DacHandle::Config')
+
+	# replacements['callback_write_out'] = filter_map_set(components, 'direction', 'out')
 	
 	replacements['display'] = '// no display' if not 'display' in target else \
 		'daisy::OledDisplay<' + target['display']['driver'] + '>::Config display_config;\n\t\t' +\
@@ -193,20 +209,43 @@ def generate_target_struct(target, hpp_temp, cpp_temp, defaults, parameters=[], 
 	replacements['comps'] = ";\n\t".join(map(lambda x: x['typename'] + ' ' + x['name'], components)) + ';'
 	replacements['dispdec'] = ('daisy::OledDisplay<' + target['display']['driver'] + '> display;') if ('display' in target) else  "// no display"
 
-	# [print(x['name']) for x in components]
+	[print(x['name']) for x in components]
 	replacements['output_arrays'] = get_output_array(components)
 
 	replacements['parameters'] = []
 	replacements['output_parameters'] = []
+	replacements['callback_write_out'] = ''
 	out_idx = 0
 	for comp in components:
+		# looks for the component in the input list
 		try:
 			param = {'hash': params_in[comp['name']]['hash'], 'name': comp['name'], 'type': comp['component'].upper()}
 			replacements['parameters'].append(param)
+		# if it's not there, then it's an output
 		except KeyError:
-			param = {'hash': params_out[comp['name']]['hash'], 'name': comp['name'], 'type': comp['component'].upper(), 'index': out_idx}
-			out_idx += 1
+			param = {'hash': params_out[comp['name']]['hash'], 'index': out_idx, 'name': comp['name']}
 			replacements['output_parameters'].append(param)
+
+			mapping = {}
+			root_component = comp['name']
+			for variant in comp['mapping']:
+				stripped = variant['name'].format_map({'name': ''})
+				if stripped == '':
+					# sets the default mapping:
+					mapping = variant
+					continue
+				if stripped in comp['name']:
+					mapping = variant
+					root_component = comp['name'].replace(stripped, '')
+					break
+
+			if len(mapping) == 0:
+				raise NameError(f'Unknown parameter variant "{comp["name"]}"')
+
+			replacements['callback_write_out'] += f'\n\t\t{mapping["set"].format_map({"name": root_component, "value": "output_data[{}]".format(out_idx)})}'
+			out_idx += 1
+
+	replacements['output_comps'] = len(replacements['output_parameters'])
 		
 
 	# initialize the jinja template environment
