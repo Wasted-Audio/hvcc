@@ -18,6 +18,7 @@ void audiocallback(daisy::AudioHandle::InterleavingInputBuffer in, daisy::AudioH
   hv.process((float**)in, (float**)out, size);
   ProcessControls();
   hardware.PostProcess();
+  {{callback_write_out}}
 }
 
 static void sendHook(HeavyContextInterface *c, const char *receiverName, uint32_t receiverHash, const HvMessage * m) 
@@ -38,6 +39,7 @@ int main(void)
   for(;;)
   {
     hardware.Display();
+    {{loop_write_out}}
   }
 }
 
@@ -70,6 +72,12 @@ void ProcessControls()
 
 DaisyHvParam DaisyParameters[DaisyNumParameters] = {
 	{% for param in parameters %}
+		{ {{param.hash}}, &hardware.{{param.name}}, {{param.type}} },
+	{% endfor %}
+};
+
+DaisyHvParam DaisyOutputParameters[DaisyNumOutputParameters] = {
+	{% for param in output_parameters %}
 		{ {{param.hash}}, &hardware.{{param.name}}, {{param.type}} },
 	{% endfor %}
 };

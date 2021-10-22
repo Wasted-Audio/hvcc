@@ -92,6 +92,10 @@ def bools_to_lower_str(comp):
 
 	return new_comp
 
+def get_output_array(components):
+	output_comps = len(list(filter_match(components, 'direction', 'out')))
+	return 'float output_data[{output_comps}];'
+
 def generate_target_struct(target, hpp_temp, cpp_temp, defaults, parameters=[], name='seed', class_name='', copyright=''):
 	# flesh out target components:
 	target = json.loads(target)
@@ -135,6 +139,10 @@ def generate_target_struct(target, hpp_temp, cpp_temp, defaults, parameters=[], 
 	params_out = {de_alias(key.lower(), target['aliases']): item for key, item in parameters['out']}
 
 	for key in params_in:
+		if not verify_param(key, components):
+			raise NameError(f'Unknown parameter "{key}"')
+
+	for key in params_out:
 		if not verify_param(key, components):
 			raise NameError(f'Unknown parameter "{key}"')
 
@@ -185,14 +193,21 @@ def generate_target_struct(target, hpp_temp, cpp_temp, defaults, parameters=[], 
 	replacements['comps'] = ";\n\t".join(map(lambda x: x['typename'] + ' ' + x['name'], components)) + ';'
 	replacements['dispdec'] = ('daisy::OledDisplay<' + target['display']['driver'] + '> display;') if ('display' in target) else  "// no display"
 
-	# [print(x) for x in target['components']]
-	
+	# [print(x['name']) for x in components]
+	replacements['output_arrays'] = get_output_array(components)
 
 	replacements['parameters'] = []
-	analog_count = 0
-	for comp in target['components']:
-		param = {'hash': params_in[comp['name']]['hash'], 'name': comp['name'], 'type': comp['component'].upper()}
-		replacements['parameters'].append(param)
+	replacements['output_parameters'] = []
+	out_idx = 0
+	for comp in components:
+		try:
+			param = {'hash': params_in[comp['name']]['hash'], 'name': comp['name'], 'type': comp['component'].upper()}
+			replacements['parameters'].append(param)
+		except KeyError:
+			param = {'hash': params_out[comp['name']]['hash'], 'name': comp['name'], 'type': comp['component'].upper(), 'index': out_idx}
+			out_idx += 1
+			replacements['output_parameters'].append(param)
+		
 
 	# initialize the jinja template environment
 	env = jinja2.Environment()
