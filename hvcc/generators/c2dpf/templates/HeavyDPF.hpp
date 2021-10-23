@@ -9,8 +9,8 @@
 
 START_NAMESPACE_DISTRHO
 
-static void sendHookFunc(HeavyContextInterface *c, const char *sendName, uint32_t sendHash, const HvMessage *m);
-static void hvPrintHook(HeavyContextInterface* ctxt, const char *printLabel, const char *msgString, const HvMessage *m);
+static void hvSendHookFunc(HeavyContextInterface *c, const char *sendName, uint32_t sendHash, const HvMessage *m);
+static void hvPrintHookFunc(HeavyContextInterface *c, const char *printLabel, const char *msgString, const HvMessage *m);
 
 class {{class_name}} : public Plugin
 {
@@ -25,7 +25,7 @@ public:
   {{class_name}}();
   ~{{class_name}}() override;
 
-  void handleMidiInput(uint32_t curEventIndex, const MidiEvent* midiEvents, uint32_t midiEventCount);
+  void handleMidiInput(uint32_t curEventIndex, const MidiEvent* midiEvents);
   void handleMidiSend(uint32_t sendHash, const HvMessage *m);
 
 protected:
@@ -99,7 +99,12 @@ protected:
 
   // void activate() override;
   // void deactivate() override;
+
+#if DISTRHO_PLUGIN_WANT_MIDI_INPUT
   void run(const float** inputs, float** outputs, uint32_t frames, const MidiEvent* midiEvents, uint32_t midiEventCount) override;
+#else
+  void run(const float** inputs, float** outputs, uint32_t frames) override;
+#endif
 
   // -------------------------------------------------------------------
   // Callbacks

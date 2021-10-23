@@ -1,0 +1,10 @@
+#N canvas 1069 603 354 149 12;
+#X obj 30 25 bendin;
+#X obj 155 54 hsl 128 15 0 16383 0 0 empty empty empty -2 -8 0 10 -262144
+-1 -1 0 1;
+#X obj 121 24 r bend @hv_param 0 16383 8192;
+#X obj 30 58 print;
+#X obj 121 97 bendout;
+#X connect 0 0 3 0;
+#X connect 1 0 4 0;
+#X connect 2 0 4 0;

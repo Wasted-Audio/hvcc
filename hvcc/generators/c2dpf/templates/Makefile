@@ -6,6 +6,8 @@ FILES_DSP += $(wildcard *.c)
 include ../../dpf/Makefile.plugins.mk
 
 LINK_FLAGS += -lpthread
+CFLAGS += -Wno-unused-parameter
+CXXFLAGS += -Wno-unused-parameter
 
 {% if meta.plugin_formats is defined %}
 	{% for format in meta.plugin_formats %}

@@ -7,28 +7,30 @@
 
 #define HV_HASH_NOTEIN    0x67e37ca3
 #define HV_HASH_CTLIN     0x41be0f9c
-#define HV_HASH_BENDIN    0x3083f0f7
-#define HV_HASH_TOUCHIN   0x553925bd
 #define HV_HASH_PGMIN     0x2e1ea03d
+#define HV_HASH_TOUCHIN   0x553925bd
+#define HV_HASH_BENDIN    0x3083f0f7
 
 #define HV_HASH_NOTEOUT   0xd1d4ac2
 #define HV_HASH_CTLOUT    0xe5e2a040
-#define HV_HASH_BENDOUT   0xe8458013
-#define HV_HASH_TOUCHOUT  0x476d4387
 #define HV_HASH_PGMOUT    0x8753e39e
+#define HV_HASH_TOUCHOUT  0x476d4387
+#define HV_HASH_BENDOUT   0xe8458013
 
 START_NAMESPACE_DISTRHO
 
-static void sendHookFunc(HeavyContextInterface *c, const char *sendName, uint32_t sendHash, const HvMessage *m)
+static void hvSendHookFunc(HeavyContextInterface *c, const char *sendName, uint32_t sendHash, const HvMessage *m)
 {
   {{class_name}}* plugin = ({{class_name}}*)c->getUserData();
   if (plugin != nullptr)
   {
+#if DISTRHO_PLUGIN_WANT_MIDI_OUTPUT
     plugin->handleMidiSend(sendHash, m);
+#endif
   }
 }
 
-static void hvPrintHook(HeavyContextInterface* ctxt, const char *printLabel, const char *msgString, const HvMessage *m)
+static void hvPrintHookFunc(HeavyContextInterface *c, const char *printLabel, const char *msgString, const HvMessage *m)
 {
   char buf[64];
   char* dst = buf;
@@ -48,8 +50,8 @@ static void hvPrintHook(HeavyContextInterface* ctxt, const char *printLabel, con
 
   _context = new Heavy_{{name}}(getSampleRate(), {{pool_sizes_kb.internal}}, {{pool_sizes_kb.inputQueue}}, {{pool_sizes_kb.outputQueue}});
   _context->setUserData(this);
-  _context->setSendHook(&sendHookFunc);
-  _context->setPrintHook(&hvPrintHook);
+  _context->setSendHook(&hvSendHookFunc);
+  _context->setPrintHook(&hvPrintHookFunc);
 
   {% if receivers|length > 0 %}
   // ensure that the new context has the current parameters
@@ -134,7 +136,8 @@ void {{class_name}}::setParameterValue(uint32_t index, float value)
 
 // }
 
-void {{class_name}}::handleMidiInput(uint32_t curEventIndex, const MidiEvent* midiEvents, uint32_t midiEventCount)
+#if DISTRHO_PLUGIN_WANT_MIDI_INPUT
+void {{class_name}}::handleMidiInput(uint32_t curEventIndex, const MidiEvent* midiEvents)
 {
   int status = midiEvents[curEventIndex].data[0];
   int command = status & 0xF0;
@@ -177,6 +180,7 @@ void {{class_name}}::handleMidiInput(uint32_t curEventIndex, const MidiEvent* mi
       break;
     }
     case 0xE0: { // pitch bend
+      // combine 7bit lsb and msb into 32bit int
       hv_uint32_t value = (((hv_uint32_t) data2) << 7) | ((hv_uint32_t) data1);
       _context->sendMessageToReceiverV(HV_HASH_BENDIN, 0, "ff",
         (float) value,
@@ -186,110 +190,111 @@ void {{class_name}}::handleMidiInput(uint32_t curEventIndex, const MidiEvent* mi
     default: break;
   }
 }
+#endif
 
+#if DISTRHO_PLUGIN_WANT_MIDI_OUTPUT
 void {{class_name}}::handleMidiSend(uint32_t sendHash, const HvMessage *m)
 {
-    switch(sendHash){
-      case HV_HASH_NOTEOUT: // __hv_noteout
-      {
-        uint8_t note = hv_msg_getFloat(m, 0);
-        uint8_t velocity = hv_msg_getFloat(m, 1);
-        uint8_t ch = hv_msg_getFloat(m, 2);
+  MidiEvent midiSendEvent;
+  midiSendEvent.frame = 0;
+  midiSendEvent.dataExt = nullptr;
 
-        MidiEvent midiSendEvent;
-        midiSendEvent.frame = 0;
-        midiSendEvent.size = m->numElements;
-        midiSendEvent.dataExt = nullptr;
+  switch(sendHash){
+    case HV_HASH_NOTEOUT: // __hv_noteout
+    {
+      uint8_t note = hv_msg_getFloat(m, 0);
+      uint8_t velocity = hv_msg_getFloat(m, 1);
+      uint8_t ch = hv_msg_getFloat(m, 2);
 
-        if (velocity > 0){
-          midiSendEvent.data[0] = 0x90 | ch; // noteon
-        } else {
-          midiSendEvent.data[0] = 0x80 | ch; // noteoff
-        }
-        midiSendEvent.data[1] = note;
-        midiSendEvent.data[2] = velocity;
-        midiSendEvent.data[3] = 0;
-
-        writeMidiEvent(midiSendEvent);
-        return;
+      midiSendEvent.size = 3;
+      if (velocity > 0){
+        midiSendEvent.data[0] = 0x90 | ch; // noteon
+      } else {
+        midiSendEvent.data[0] = 0x80 | ch; // noteoff
       }
-      case HV_HASH_CTLOUT:
-      {
-        uint8_t value = hv_msg_getFloat(m, 0);
-        uint8_t cc = hv_msg_getFloat(m, 1);
-        uint8_t ch = hv_msg_getFloat(m, 2);
-        // printf("> value: %d - cc: %d - ch: %d \n", value, cc, ch);
+      midiSendEvent.data[1] = note;
+      midiSendEvent.data[2] = velocity;
+      midiSendEvent.data[3] = 0;
 
-        MidiEvent midiSendEvent;
-        midiSendEvent.frame = 0;
-        midiSendEvent.size = m->numElements;
-        midiSendEvent.dataExt = nullptr;
+      writeMidiEvent(midiSendEvent);
+      break;
+    }
+    case HV_HASH_CTLOUT:
+    {
+      uint8_t value = hv_msg_getFloat(m, 0);
+      uint8_t cc = hv_msg_getFloat(m, 1);
+      uint8_t ch = hv_msg_getFloat(m, 2);
 
-        midiSendEvent.data[0] = 0xB0 | ch; // send CC
-        midiSendEvent.data[1] = cc;
-        midiSendEvent.data[2] = value;
-        midiSendEvent.data[3] = 0;
+      midiSendEvent.size = 3;
+      midiSendEvent.data[0] = 0xB0 | ch; // send CC
+      midiSendEvent.data[1] = cc;
+      midiSendEvent.data[2] = value;
+      midiSendEvent.data[3] = 0;
 
-        writeMidiEvent(midiSendEvent);
-        return;
-      }
-      case HV_HASH_PGMOUT:
-      {
-        uint8_t pgm = hv_msg_getFloat(m, 0);
-        uint8_t ch = hv_msg_getFloat(m, 1);
-        // printf("> pgm: %d - ch: %d \n", pgm. ch);
+      writeMidiEvent(midiSendEvent);
+      break;
+    }
+    case HV_HASH_PGMOUT:
+    {
+      uint8_t pgm = hv_msg_getFloat(m, 0);
+      uint8_t ch = hv_msg_getFloat(m, 1);
 
-        MidiEvent midiSendEvent;
-        midiSendEvent.frame = 0;
-        midiSendEvent.size = m->numElements;
-        midiSendEvent.dataExt = nullptr;
+      midiSendEvent.size = 2;
+      midiSendEvent.data[0] = 0xC0 | ch; // send Program Change
+      midiSendEvent.data[1] = pgm;
+      midiSendEvent.data[2] = 0;
+      midiSendEvent.data[3] = 0;
 
-        midiSendEvent.data[0] = 0xC0 | ch; // send Program Change
-        midiSendEvent.data[1] = pgm;
-        midiSendEvent.data[2] = 0;
-        midiSendEvent.data[3] = 0;
+      writeMidiEvent(midiSendEvent);
+      break;
+    }
+    case HV_HASH_TOUCHOUT:
+    {
+      uint8_t value = hv_msg_getFloat(m, 0);
+      uint8_t ch = hv_msg_getFloat(m, 1);
 
-        writeMidiEvent(midiSendEvent);
-        return;
-      }
-      case HV_HASH_TOUCHOUT:
-      {
-        uint8_t value = hv_msg_getFloat(m, 0);
-        uint8_t ch = hv_msg_getFloat(m, 1);
-        // printf("> value: %d - ch: %d \n", value, ch);
+      midiSendEvent.size = 2;
+      midiSendEvent.data[0] = 0xD0 | ch; // send Touch
+      midiSendEvent.data[1] = value;
+      midiSendEvent.data[2] = 0;
+      midiSendEvent.data[3] = 0;
 
-        MidiEvent midiSendEvent;
-        midiSendEvent.frame = 0;
-        midiSendEvent.size = m->numElements;
-        midiSendEvent.dataExt = nullptr;
+      writeMidiEvent(midiSendEvent);
+      break;
+    }
+    case HV_HASH_BENDOUT:
+    {
+      uint16_t value = hv_msg_getFloat(m, 0);
+      uint8_t lsb  = value & 0x7F;
+      uint8_t msb  = (value >> 7) & 0x7F;
+      uint8_t ch = hv_msg_getFloat(m, 1);
 
-        midiSendEvent.data[0] = 0xD0 | ch; // send Touch
-        midiSendEvent.data[1] = value;
-        midiSendEvent.data[2] = 0;
-        midiSendEvent.data[3] = 0;
+      midiSendEvent.size = 3;
+      midiSendEvent.data[0] = 0xE0 | ch; // send Bend
+      midiSendEvent.data[1] = lsb;
+      midiSendEvent.data[2] = msb;
+      midiSendEvent.data[3] = 0;
 
-        writeMidiEvent(midiSendEvent);
-        return;
-      }
-      case HV_HASH_BENDOUT:
-      {
-        return;
-      }
-      default:
-        return;
+      writeMidiEvent(midiSendEvent);
+      break;
+    }
+    default:
+      break;
   }
-
 }
+#endif
 
+#if DISTRHO_PLUGIN_WANT_MIDI_INPUT
 void {{class_name}}::run(const float** inputs, float** outputs, uint32_t frames, const MidiEvent* midiEvents, uint32_t midiEventCount)
 {
-  uint32_t framesDone = 0;
-  uint32_t curEventIndex = 0;
-
   for (uint32_t i=0; i < midiEventCount; ++i)
   {
-    handleMidiInput(i, midiEvents, midiEventCount);
+    handleMidiInput(i, midiEvents);
   }
+#else
+void {{class_name}}::run(const float** inputs, float** outputs, uint32_t frames)
+{
+#endif
 
   _context->process((float**)inputs, outputs, frames);
 }
@@ -303,8 +308,8 @@ void {{class_name}}::sampleRateChanged(double newSampleRate)
 
   _context = new Heavy_{{name}}(newSampleRate, {{pool_sizes_kb.internal}}, {{pool_sizes_kb.inputQueue}}, {{pool_sizes_kb.outputQueue}});
   _context->setUserData(this);
-  _context->setSendHook(&sendHookFunc);
-  _context->setPrintHook(&hvPrintHook);
+  _context->setSendHook(&hvSendHookFunc);
+  _context->setPrintHook(&hvPrintHookFunc);
 
   {% if receivers|length > 0 %}
   // ensure that the new context has the current parameters
