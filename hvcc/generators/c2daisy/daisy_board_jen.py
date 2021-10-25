@@ -11,7 +11,7 @@ import jinja2
 
 json_defaults_file = "component_defaults.json"
 
-def verify_param(name, components):
+def verify_param_exists(name, components):
 	for comp in components:
 
 		# Dealing with the cvouts the way we have it set up is really annoying
@@ -25,15 +25,32 @@ def verify_param(name, components):
 
 	return False
 
-def verify_param_used(component, params_in, params_out):
-	for param in params_in | params_out:
-		if component['component'] == 'CVOuts':
-			if param == component['name']:
-				return True
+def get_root_component(variant, components):
+	for comp in components:
+		if comp['component'] == 'CVOuts':
+			if variant == comp['name']:
+				return variant
 		else:
-			variants = [mapping['name'].format_map({'name': component['name']}) for mapping in component['mapping']]
-			if param in variants:
-				return True
+			variants = [mapping['name'].format_map({'name': comp['name']}) for mapping in comp['mapping']]
+			if variant in variants:
+				return comp['name']
+	raise NameError(f'Unknown parameter "{variant}"')
+
+def get_component_mapping(component_variant, component, components):
+	for variant in component['mapping']:
+		if component['component'] == 'CVOuts':
+			stripped = variant['name'].format_map({'name': ''})
+			if stripped in component['name']:
+				return variant
+		elif variant['name'].format_map({'name': component['name']}) == component_variant:
+			return variant
+	raise NameError(f'Unknown parameter "{variant}"')
+
+def verify_param_used(component, params_in, params_out, components):
+	for param in params_in | params_out:
+		root = get_root_component(param, components)
+		if root == component['name']:
+			return True
 	return False
 
 def de_alias(name, aliases):
@@ -153,15 +170,15 @@ def generate_target_struct(target, hpp_temp, cpp_temp, defaults, parameters=[], 
 	params_out = {de_alias(key.lower(), target['aliases']): item for key, item in parameters['out']}
 
 	for key in params_in:
-		if not verify_param(key, components):
+		if not verify_param_exists(key, components):
 			raise NameError(f'Unknown parameter "{key}"')
 
 	for key in params_out:
-		if not verify_param(key, components):
+		if not verify_param_exists(key, components):
 			raise NameError(f'Unknown parameter "{key}"')
 
 	for i in range(len(components) - 1, -1, -1):
-		if not verify_param_used(components[i], params_in, params_out):
+		if not verify_param_used(components[i], params_in, params_out, components):
 			components.pop(i)
 
 	replacements = {}
@@ -215,35 +232,26 @@ def generate_target_struct(target, hpp_temp, cpp_temp, defaults, parameters=[], 
 	replacements['parameters'] = []
 	replacements['output_parameters'] = []
 	replacements['callback_write_out'] = ''
+	replacements['loop_write_out'] = ''
 	out_idx = 0
-	for comp in components:
-		# looks for the component in the input list
-		try:
-			param = {'hash': params_in[comp['name']]['hash'], 'name': comp['name'], 'type': comp['component'].upper()}
-			replacements['parameters'].append(param)
-		# if it's not there, then it's an output
-		except KeyError:
-			param = {'hash': params_out[comp['name']]['hash'], 'index': out_idx, 'name': comp['name']}
-			replacements['output_parameters'].append(param)
 
-			mapping = {}
-			root_component = comp['name']
-			for variant in comp['mapping']:
-				stripped = variant['name'].format_map({'name': ''})
-				if stripped == '':
-					# sets the default mapping:
-					mapping = variant
-					continue
-				if stripped in comp['name']:
-					mapping = variant
-					root_component = comp['name'].replace(stripped, '')
-					break
+	for param_name, param in params_in.items():
+		root = get_root_component(param_name, components)
+		component = list(filter_match(components, 'name', root))[0]
+		param_struct = {'hash': param['hash'], 'name': root, 'type': component['component'].upper()}
+		replacements['parameters'].append(param_struct)
 
-			if len(mapping) == 0:
-				raise NameError(f'Unknown parameter variant "{comp["name"]}"')
+	for param_name, param in params_out.items():
+		root = get_root_component(param_name, components)
+		component = list(filter_match(components, 'name', root))[0]
+		param_struct = {'hash': param['hash'], 'index': out_idx, 'name': param_name}
+		replacements['output_parameters'].append(param_struct)
+		mapping = get_component_mapping(param_name, component, components)
 
-			replacements['callback_write_out'] += f'\n\t\t{mapping["set"].format_map({"name": root_component, "value": "output_data[{}]".format(out_idx)})}'
-			out_idx += 1
+		write_location = 'callback_write_out' if mapping.get('where', 'callback') == 'callback' else 'loop_write_out'
+
+		replacements[write_location] += f'\n\t\t{mapping["set"].format_map({"name": root, "value": "output_data[{}]".format(out_idx)})}'
+		out_idx += 1
 
 	replacements['output_comps'] = len(replacements['output_parameters'])
 		
