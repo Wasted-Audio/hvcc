@@ -183,9 +183,8 @@ def generate_target_struct(target, hpp_temp, cpp_temp, defaults, parameters=[], 
 
 	replacements = {}
 	replacements['name'] = name
-	if 'driver' not in target:
-		target['driver'] = 'seed'
-	replacements['driver'] = target['driver']
+	replacements['driver'] = target.get('driver', 'seed')
+	replacements['external_codecs'] = target.get('external_codecs', [])
 
 	replacements['class_name'] = class_name
 
@@ -233,6 +232,7 @@ def generate_target_struct(target, hpp_temp, cpp_temp, defaults, parameters=[], 
 	replacements['output_parameters'] = []
 	replacements['callback_write_out'] = ''
 	replacements['loop_write_out'] = ''
+	replacements['callback_write_in'] = []
 	out_idx = 0
 
 	for param_name, param in params_in.items():
@@ -240,6 +240,15 @@ def generate_target_struct(target, hpp_temp, cpp_temp, defaults, parameters=[], 
 		component = list(filter_match(components, 'name', root))[0]
 		param_struct = {'hash': param['hash'], 'name': root, 'type': component['component'].upper()}
 		replacements['parameters'].append(param_struct)
+		mapping = get_component_mapping(param_name, component, components)
+
+		print(param_name, mapping)
+		try:
+			process = mapping["get"].format_map({"name": root})
+		except KeyError:
+			raise TypeError(f'"{param_name}" cannot be used as an input')
+
+		replacements['callback_write_in'].append({"process": process, "bool": mapping["bool"], "hash": param["hash"]})
 
 	for param_name, param in params_out.items():
 		root = get_root_component(param_name, components)
@@ -250,7 +259,10 @@ def generate_target_struct(target, hpp_temp, cpp_temp, defaults, parameters=[], 
 
 		write_location = 'callback_write_out' if mapping.get('where', 'callback') == 'callback' else 'loop_write_out'
 
-		replacements[write_location] += f'\n\t\t{mapping["set"].format_map({"name": root, "value": "output_data[{}]".format(out_idx)})}'
+		try:
+			replacements[write_location] += f'\n\t\t{mapping["set"].format_map({"name": root, "value": "output_data[{}]".format(out_idx)})}'
+		except KeyError:
+			raise TypeError(f'"{param_name}" cannot be used as an output')
 		out_idx += 1
 
 	replacements['output_comps'] = len(replacements['output_parameters'])
@@ -258,6 +270,9 @@ def generate_target_struct(target, hpp_temp, cpp_temp, defaults, parameters=[], 
 
 	# initialize the jinja template environment
 	env = jinja2.Environment()
+
+	env.trim_blocks = True
+	env.lstrip_blocks = True
 
 	env.loader = jinja2.FileSystemLoader(
 			os.path.join(os.path.dirname(os.path.abspath(__file__)), "templates"))
