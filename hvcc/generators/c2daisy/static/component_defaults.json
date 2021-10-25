@@ -10,21 +10,24 @@
 		"process": "{name}.Debounce();",
 		"updaterate": "{name}.SetUpdateRate(driver.AudioCallbackRate());",
 		"mapping": [
-			{ "name": "{name}", "get": "(hardware.{name}.Pressed()?1.f:0.f)", "range": [0, 1] },
+			{ "name": "{name}", "get": "({name}.Pressed()?1.f:0.f)", "range": [0, 1], "bool": false },
 			{
 				"name": "{name}_rise",
-				"get": "(hardware.{name}.RisingEdge()?1.f:0.f)",
-				"range": [0, 1]
+				"get": "({name}.RisingEdge()?1.f:0.f)",
+				"range": [0, 1],
+				"bool": true
 			},
 			{
 				"name": "{name}_fall",
-				"get": "(hardware.{name}.FallingEdge()?1.f:0.f)",
-				"range": [0, 1]
+				"get": "({name}.FallingEdge()?1.f:0.f)",
+				"range": [0, 1],
+				"bool": true
 			},
 			{
 				"name": "{name}_seconds",
-				"get": "(hardware.{name}.TimeHeldMs()*0.001f)",
-				"range": null
+				"get": "({name}.TimeHeldMs()*0.001f)",
+				"range": null,
+				"bool": false
 			}
 	  	]
 	},
@@ -34,7 +37,7 @@
 		"direction": "in",
 		"pin": "a,b",
 		"mapping": [
-			{ "name": "{name}", "get": "(hardware.{name}.Read()*0.5f+0.5f)", "range": [0, 2] }
+			{ "name": "{name}", "get": "({name}.Read()*0.5f+0.5f)", "range": [0, 2] , "bool": false}
 		]
 	},
 	"Encoder": {
@@ -47,28 +50,33 @@
 		"mapping": [
 			{
 				"name": "{name}",
-				"get": "(hardware.{name}.Increment()*0.5f+0.5f)",
-				"range": [-1, 1]
+				"get": "({name}.Increment()*0.5f+0.5f)",
+				"range": [-1, 1],
+				"bool": false
 			},
 			{
 				"name": "{name}_press",
-				"get": "(hardware.{name}.Pressed()?1.f:0.f)",
-				"range": [0, 1]
+				"get": "({name}.Pressed()?1.f:0.f)",
+				"range": [0, 1],
+				"bool": false
 			},
 			{
 				"name": "{name}_rise",
-				"get": "(hardware.{name}.RisingEdge()?1.f:0.f)",
-				"range": [0, 1]
+				"get": "({name}.RisingEdge()?1.f:0.f)",
+				"range": [0, 1],
+				"bool": true
 			},
 			{
 				"name": "{name}_fall",
-				"get": "(hardware.{name}.FallingEdge()?1.f:0.f)",
-				"range": [0, 1]
+				"get": "({name}.FallingEdge()?1.f:0.f)",
+				"range": [0, 1],
+				"bool": true
 			},
 			{
 				"name": "{name}_seconds",
-				"get": "(hardware.{name}.TimeHeldMs()*0.001f)",
-				"range": null
+				"get": "({name}.TimeHeldMs()*0.001f)",
+				"range": null,
+				"bool": false
 			}
 		]
 	},
@@ -78,8 +86,8 @@
 		"direction": "in",
 		"pin": "a",
 		"mapping": [
-			{ "name": "{name}", "get": "(hardware.{name}.State()?1.f:0.f)", "range": [0, 1] },
-			{ "name": "{name}_trig", "get": "(hardware.{name}.Trig()?1.f:0.f)", "range": [0, 1] }
+			{ "name": "{name}", "get": "({name}.State()?1.f:0.f)", "range": [0, 1], "bool": true },
+			{ "name": "{name}_trig", "get": "({name}.Trig()?1.f:0.f)", "range": [0, 1], "bool": true }
 		]
 	},
 	"AnalogControl": {
@@ -93,7 +101,7 @@
 		"slew": "1.0/driver.AudioCallbackRate()",
 		"process": "{name}.Process();",
 		"updaterate": "{name}.SetSampleRate(driver.AudioCallbackRate());",
-		"mapping": [{ "name": "{name}", "get": "(hardware.{name}.Value())", "range": [0, 1] }]
+		"mapping": [{ "name": "{name}", "get": "({name}.Value())", "range": [0, 1], "bool": false }]
 	},
 	"Led": {
 		"map_init": "{name}.Init(driver.GetPin({pin}), {invert});\n\t\t{name}.Set(0.0f);",
