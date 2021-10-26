@@ -114,6 +114,10 @@ struct Daisy {
 
 		{% endif %}
 
+		{% if driver == 'seed' %}
+		driver.adc.Start();
+		{% endif %}
+
 	}
 
 	void ProcessAllControls() {
