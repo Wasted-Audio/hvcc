@@ -83,12 +83,13 @@ class c2daisy:
             except FileNotFoundError:
                 raise FileNotFoundError(f'Unknown Daisy board "{board}"')
 
-            defaults = os.path.join(os.path.dirname(os.path.abspath(__file__)), "static", 'component_defaults.json')
+            seed_defaults = os.path.join(os.path.dirname(os.path.abspath(__file__)), "static", 'component_defaults.json')
+            patchsm_defaults = os.path.join(os.path.dirname(os.path.abspath(__file__)), "static", 'component_defaults_patchsm.json')
             hpp, cpp = generate_target_struct(
                 targ_json, 
                 "HeavyDaisy.hpp", 
                 "HeavyDaisy.cpp", 
-                defaults, 
+                {'seed': seed_defaults, 'patch_sm': patchsm_defaults}, 
                 parameters=externs['parameters'],
                 name=patch_name,
                 class_name=f"HeavyDaisy_{patch_name}", 
