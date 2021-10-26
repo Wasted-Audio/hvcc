@@ -85,9 +85,10 @@
 		"typename": "daisy::GateIn",
 		"direction": "in",
 		"pin": "a",
+		"default_prefix": "driver.",
 		"mapping": [
-			{ "name": "{name}", "get": "({name}.State()?1.f:0.f)", "range": [0, 1], "bool": false },
-			{ "name": "{name}_trig", "get": "({name}.Trig()?1.f:0.f)", "range": [0, 1], "bool": true }
+			{ "name": "{name}", "get": "({default_prefix}{name}.State()?1.f:0.f)", "range": [0, 1], "bool": false },
+			{ "name": "{name}_trig", "get": "({default_prefix}{name}.Trig()?1.f:0.f)", "range": [0, 1], "bool": true }
 		]
 	},
 	"AnalogControl": {
@@ -132,10 +133,11 @@
 		"typename": "dsy_gpio",
 		"direction": "out",
 		"pin": "a",
+		"default_prefix": "driver.",
 		"mode": "DSY_GPIO_MODE_OUTPUT_PP",
 		"pull": "DSY_GPIO_NOPULL",
 		"mapping": [
-			{ "name": "{name}", "set": "dsy_gpio_write(&{name}, {value});" }
+			{ "name": "{name}", "set": "dsy_gpio_write(&{default_prefix}{name}, {value});" }
 		]
 	},
 	"CVOuts": {

@@ -272,7 +272,9 @@ def generate_target_struct(target, hpp_temp, cpp_temp, defaults, parameters=[], 
 	replacements['displayprocess'] = filter_map_template(components, 'display', key_exclude='default', match_exclude=True)
 	replacements['hidupdaterates'] = filter_map_template(components, 'updaterate', key_exclude='default', match_exclude=True)
 
-	replacements['comps'] = ";\n\t".join(map(lambda x: x['typename'] + ' ' + x['name'], components)) + ';'
+	component_declarations = list(filter(lambda x: not x.get('default', False), components))
+	if len(component_declarations) > 0:
+		replacements['comps'] = ";\n\t".join(map(lambda x: x['typename'] + ' ' + x['name'], component_declarations)) + ';'
 	replacements['dispdec'] = ('daisy::OledDisplay<' + target['display']['driver'] + '> display;') if ('display' in target) else  "// no display"
 
 	replacements['output_arrays'] = get_output_array(components)
@@ -293,7 +295,8 @@ def generate_target_struct(target, hpp_temp, cpp_temp, defaults, parameters=[], 
 
 		# A bit of a hack to get cv_1, etc to be written as CV_1
 		input_name = root.upper() if driver == 'patch_sm' and component['component'] == 'AnalogControl' else root
-		process = mapping["get"].format_map({"name": input_name})
+		default_prefix = component.get("default_prefix", '') if component.get('default', False) else ''
+		process = mapping["get"].format_map({"name": input_name, "default_prefix": default_prefix})
 
 		replacements['callback_write_in'].append({"process": process, "bool": mapping["bool"], "hash": param["hash"]})
 
@@ -304,10 +307,11 @@ def generate_target_struct(target, hpp_temp, cpp_temp, defaults, parameters=[], 
 		replacements['output_parameters'].append(param_struct)
 		mapping = get_component_mapping(param_name, params_out_original_names[param_name], component, components)
 
+		default_prefix = component.get("default_prefix", '') if component.get('default', False) else ''
 		write_location = 'callback_write_out' if mapping.get('where', 'callback') == 'callback' else 'loop_write_out'
+		write = mapping["set"].format_map({"name": root, "value": "output_data[{}]".format(out_idx), "default_prefix": default_prefix})
 
-		replacements[write_location] += f'\n\t\t{mapping["set"].format_map({"name": root, "value": "output_data[{}]".format(out_idx)})}'
-
+		replacements[write_location] += f'\n\t\t{write}'
 		out_idx += 1
 
 	replacements['output_comps'] = len(replacements['output_parameters'])
