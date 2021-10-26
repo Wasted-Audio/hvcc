@@ -21,12 +21,6 @@ class c2daisy:
 
         tick = time.time()
 
-        receiver_list = externs['parameters']['in']
-
-        # print(externs['parameters'])
-
-        # print(patch_name)
-
         if patch_meta:
             patch_name = patch_meta.get("name", patch_name)
             daisy_meta = patch_meta.get("daisy")

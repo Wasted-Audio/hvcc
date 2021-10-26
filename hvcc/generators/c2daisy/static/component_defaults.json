@@ -86,7 +86,7 @@
 		"direction": "in",
 		"pin": "a",
 		"mapping": [
-			{ "name": "{name}", "get": "({name}.State()?1.f:0.f)", "range": [0, 1], "bool": true },
+			{ "name": "{name}", "get": "({name}.State()?1.f:0.f)", "range": [0, 1], "bool": false },
 			{ "name": "{name}_trig", "get": "({name}.Trig()?1.f:0.f)", "range": [0, 1], "bool": true }
 		]
 	},

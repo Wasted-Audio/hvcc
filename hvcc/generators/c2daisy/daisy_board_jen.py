@@ -225,7 +225,6 @@ def generate_target_struct(target, hpp_temp, cpp_temp, defaults, parameters=[], 
 	replacements['comps'] = ";\n\t".join(map(lambda x: x['typename'] + ' ' + x['name'], components)) + ';'
 	replacements['dispdec'] = ('daisy::OledDisplay<' + target['display']['driver'] + '> display;') if ('display' in target) else  "// no display"
 
-	[print(x['name']) for x in components]
 	replacements['output_arrays'] = get_output_array(components)
 
 	replacements['parameters'] = []
@@ -242,7 +241,6 @@ def generate_target_struct(target, hpp_temp, cpp_temp, defaults, parameters=[], 
 		replacements['parameters'].append(param_struct)
 		mapping = get_component_mapping(param_name, component, components)
 
-		print(param_name, mapping)
 		try:
 			process = mapping["get"].format_map({"name": root})
 		except KeyError:
