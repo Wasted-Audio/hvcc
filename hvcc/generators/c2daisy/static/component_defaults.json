@@ -10,9 +10,9 @@
 		"process": "{name}.Debounce();",
 		"updaterate": "{name}.SetUpdateRate(driver.AudioCallbackRate());",
 		"mapping": [
-			{ "name": "{name}", "get": "({name}.Pressed()?1.f:0.f)", "range": [0, 1], "bool": false },
+			{ "name": "{name}_press", "get": "({name}.Pressed()?1.f:0.f)", "range": [0, 1], "bool": false },
 			{
-				"name": "{name}_rise",
+				"name": "{name}",
 				"get": "({name}.RisingEdge()?1.f:0.f)",
 				"range": [0, 1],
 				"bool": true
@@ -50,7 +50,7 @@
 		"mapping": [
 			{
 				"name": "{name}",
-				"get": "({name}.Increment()*0.5f+0.5f)",
+				"get": "({name}.Increment())",
 				"range": [-1, 1],
 				"bool": false
 			},

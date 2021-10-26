@@ -67,7 +67,7 @@
     "gate1": "gatein1",
     "gate2": "gatein2",
 		"cvout": "cvout1",
-		"encswitch": "encoder_press",
+		"encswitch": "encoder_rise",
 		"enp": "encoder_press",
 		"press": "encoder_press",
 		"knob": "knob1",
