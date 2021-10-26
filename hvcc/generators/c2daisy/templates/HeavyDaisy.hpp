@@ -122,6 +122,9 @@ struct Daisy {
 
 	void ProcessAllControls() {
 		{{process}}
+		{% if driver == 'patch_sm' %}
+		driver.ProcessAllControls();
+		{% endif %}
 	}
 
 	void PostProcess() {
@@ -168,7 +171,7 @@ struct Daisy {
 	daisy::DaisySeed driver;
 	daisy::AdcChannelConfig cfg[ANALOG_COUNT];
 	{% else %}
-	daisy::patch_sm::PatchSM driver;
+	daisy::patch_sm::DaisyPatchSM driver;
 	{% endif %}
 	
 	{{comps}}
