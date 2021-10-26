@@ -108,7 +108,7 @@
 		"typename": "daisy::Led",
 		"direction": "out",
 		"pin": "a",
-		"invert": true,
+		"invert": "true",
 		"postprocess": "{name}.Update();",
 		"mapping": [{ "name": "{name}", "set": "{name}.Set({value});" }]
 	},
@@ -117,7 +117,7 @@
 		"typename": "daisy::RgbLed",
 		"direction": "out",
 		"pin": "r,g,b",
-		"invert": true,
+		"invert": "true",
 		"postprocess": "{name}.Update();",
 		"mapping": [
 			{ "name": "{name}_red", "set": "{name}.SetRed({value});" },
