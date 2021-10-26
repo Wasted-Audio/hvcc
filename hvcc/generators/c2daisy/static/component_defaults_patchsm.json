@@ -1,0 +1,163 @@
+{
+	"Switch": {
+		"map_init": "{name}.Init(daisy::patch_sm::DaisyPatchSM::{pin}, driver.AudioCallbackRate(), {type}, {polarity}, {pull});",
+		"typename": "daisy::Switch",
+		"direction": "in",
+		"pin": "a",
+		"type": "daisy::Switch::TYPE_MOMENTARY",
+		"polarity": "daisy::Switch::POLARITY_INVERTED",
+		"pull": "daisy::Switch::PULL_UP",
+		"process": "{name}.Debounce();",
+		"updaterate": "{name}.SetUpdateRate(driver.AudioCallbackRate());",
+		"mapping": [
+			{ "name": "{name}_press", "get": "({name}.Pressed()?1.f:0.f)", "range": [0, 1], "bool": false },
+			{
+				"name": "{name}",
+				"get": "({name}.RisingEdge()?1.f:0.f)",
+				"range": [0, 1],
+				"bool": true
+			},
+			{
+				"name": "{name}_fall",
+				"get": "({name}.FallingEdge()?1.f:0.f)",
+				"range": [0, 1],
+				"bool": true
+			},
+			{
+				"name": "{name}_seconds",
+				"get": "({name}.TimeHeldMs()*0.001f)",
+				"range": null,
+				"bool": false
+			}
+	  	]
+	},
+	"Switch3": {
+		"map_init": "{name}.Init(daisy::patch_sm::DaisyPatchSM::{pin_a}, daisy::patch_sm::DaisyPatchSM::{pin_b}));",
+		"typename": "daisy::Switch3",
+		"direction": "in",
+		"pin": "a,b",
+		"mapping": [
+			{ "name": "{name}", "get": "({name}.Read()*0.5f+0.5f)", "range": [0, 2] , "bool": false}
+		]
+	},
+	"Encoder": {
+		"map_init": "{name}.Init(daisy::patch_sm::DaisyPatchSM::{pin_a}, daisy::patch_sm::DaisyPatchSM::{pin_b}, daisy::patch_sm::DaisyPatchSM::{pin_click}, driver.AudioCallbackRate());",
+		"typename": "daisy::Encoder",
+		"direction": "in",
+		"pin": "a,b,click",
+		"process": "{name}.Debounce();",
+		"updaterate": "{name}.SetUpdateRate(driver.AudioCallbackRate());",
+		"mapping": [
+			{
+				"name": "{name}",
+				"get": "({name}.Increment())",
+				"range": [-1, 1],
+				"bool": false
+			},
+			{
+				"name": "{name}_press",
+				"get": "({name}.Pressed()?1.f:0.f)",
+				"range": [0, 1],
+				"bool": false
+			},
+			{
+				"name": "{name}_rise",
+				"get": "({name}.RisingEdge()?1.f:0.f)",
+				"range": [0, 1],
+				"bool": true
+			},
+			{
+				"name": "{name}_fall",
+				"get": "({name}.FallingEdge()?1.f:0.f)",
+				"range": [0, 1],
+				"bool": true
+			},
+			{
+				"name": "{name}_seconds",
+				"get": "({name}.TimeHeldMs()*0.001f)",
+				"range": null,
+				"bool": false
+			}
+		]
+	},
+	"GateIn": {
+		"map_init": "{name}.Init(&daisy::patch_sm::DaisyPatchSM::{pin});",
+		"typename": "daisy::GateIn",
+		"direction": "in",
+		"pin": "a",
+		"mapping": [
+			{ "name": "{name}", "get": "({name}.State()?1.f:0.f)", "range": [0, 1], "bool": false },
+			{ "name": "{name}_trig", "get": "({name}.Trig()?1.f:0.f)", "range": [0, 1], "bool": true }
+		]
+	},
+	"AnalogControl": {
+		"init_single": "cfg[{i}].InitSingle(daisy::patch_sm::DaisyPatchSM::{pin});",
+		"map_init": "{name}.Init(driver.adc.GetPtr({i}), driver.AudioCallbackRate(), {flip}, {invert});",
+		"typename": "daisy::AnalogControl",
+		"direction": "in",
+		"pin": "a",
+		"flip": false,
+		"invert": false,
+		"slew": "1.0/driver.AudioCallbackRate()",
+		"process": "{name}.Process();",
+		"updaterate": "{name}.SetSampleRate(driver.AudioCallbackRate());",
+		"mapping": [{ "name": "{name}", "get": "(driver.GetAdcValue((int)daisy::patch_sm::{name}))", "range": [0, 1], "bool": false }]
+	},
+	"Led": {
+		"map_init": "{name}.Init(daisy::patch_sm::DaisyPatchSM::{pin}), {invert});\n\t\t{name}.Set(0.0f);",
+		"typename": "daisy::Led",
+		"direction": "out",
+		"pin": "a",
+		"invert": "true",
+		"postprocess": "{name}.Update();",
+		"mapping": [{ "name": "{name}", "set": "{name}.Set({value});" }]
+	},
+	"RgbLed": {
+		"map_init": "{name}.Init(daisy::patch_sm::DaisyPatchSM::{pin_r}, daisy::patch_sm::DaisyPatchSM::{pin_g}, daisy::patch_sm::DaisyPatchSM::{pin_b}, {invert});\n\t\t{name}.Set(0.0f, 0.0f, 0.0f);",
+		"typename": "daisy::RgbLed",
+		"direction": "out",
+		"pin": "r,g,b",
+		"invert": "true",
+		"postprocess": "{name}.Update();",
+		"mapping": [
+			{ "name": "{name}_red", "set": "{name}.SetRed({value});" },
+			{ "name": "{name}_green", "set": "{name}.SetGreen({value});" },
+			{ "name": "{name}_blue", "set": "{name}.SetBlue({value});" },
+			{ "name": "{name}", "set": "{name}.Set(clamp(-{value}, 0.f, 1.f), 0.f, clamp({value}, 0.f, 1.f));" },
+			{ "name": "{name}_white", "set": "{name}.Set({value},{value},{value});" }
+		]
+	},
+	"GateOut": {
+		"map_init": "{name}.pin  = daisy::patch_sm::DaisyPatchSM::{pin};\n\t\t{name}.mode = {mode};\n\t\t{name}.pull = {pull};\n\t\tdsy_gpio_init(&{name});",
+		"typename": "dsy_gpio",
+		"direction": "out",
+		"pin": "a",
+		"mode": "DSY_GPIO_MODE_OUTPUT_PP",
+		"pull": "DSY_GPIO_NOPULL",
+		"mapping": [
+			{ "name": "{name}", "set": "dsy_gpio_write(&{name}, {value});" }
+		]
+	},
+	"CVOuts": {
+		"map_init": "{name}.bitdepth = {bitdepth};\n\t\t{name}.buff_state = {buff_state};\n\t\t{name}.mode = {mode};\n\t\t{name}.chn = {channel};\n\t\tdriver.dac.Init({name});\n\t\tdriver.dac.WriteValue({channel}, 0);",
+		"typename": "daisy::DacHandle::Config",
+		"direction": "out",
+		"pin": "",
+		"bitdepth": "daisy::DacHandle::BitDepth::BITS_12",
+		"buff_state": "daisy::DacHandle::BufferState::ENABLED",
+		"mode": "daisy::DacHandle::Mode::POLLING",
+		"channel": "daisy::DacHandle::Channel::BOTH",
+		"mapping": [
+			{
+				"name": "{name}1",
+				"set": "driver.WriteCvOut(daisy::patch_sm::CV_OUT_1, {value} * 5.f);",
+				"where": "main"
+			},
+			{
+				"name": "{name}2",
+				"set": "driver.WriteCvOut(daisy::patch_sm::CV_OUT_2, {value} * 5.f);",
+				"where": "main"
+			}
+		]
+	}
+}
