@@ -12,7 +12,7 @@ Heavy_{{name}} hv(SAMPLE_RATE);
 
 void ProcessControls();
 
-void audiocallback(daisy::AudioHandle::InterleavingInputBuffer in, daisy::AudioHandle::InterleavingOutputBuffer out, size_t size)
+void audiocallback(daisy::AudioHandle::InputBuffer in, daisy::AudioHandle::OutputBuffer out, size_t size)
 {
   hv.process((float**)in, (float**)out, size);
   {% if  parameters|length > 0 %}
