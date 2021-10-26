@@ -13,7 +13,6 @@ json_defaults_file = "component_defaults.json"
 json_defaults_patchsm = "component_defaults_patchsm.json"
 
 def verify_param_exists(name, original_name, components, input=True):
-	print(name, original_name)
 	for comp in components:
 
 		# Dealing with the cvouts the way we have it set up is really annoying
