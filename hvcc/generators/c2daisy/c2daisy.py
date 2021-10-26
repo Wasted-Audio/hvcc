@@ -77,14 +77,14 @@ class c2daisy:
             #         copyright=copyright_c))
 
             try:
-                targ = os.path.join(os.path.dirname(os.path.abspath(__file__)), "static", f'{board}.json')
+                targ = os.path.join(os.path.dirname(os.path.abspath(__file__)), "templates", f'{board}.json')
                 with open(targ, 'r') as file:
                     targ_json = file.read()
             except FileNotFoundError:
                 raise FileNotFoundError(f'Unknown Daisy board "{board}"')
 
-            seed_defaults = os.path.join(os.path.dirname(os.path.abspath(__file__)), "static", 'component_defaults.json')
-            patchsm_defaults = os.path.join(os.path.dirname(os.path.abspath(__file__)), "static", 'component_defaults_patchsm.json')
+            seed_defaults = os.path.join(os.path.dirname(os.path.abspath(__file__)), "templates", 'component_defaults.json')
+            patchsm_defaults = os.path.join(os.path.dirname(os.path.abspath(__file__)), "templates", 'component_defaults_patchsm.json')
             hpp, cpp = generate_target_struct(
                 targ_json, 
                 "HeavyDaisy.hpp", 
