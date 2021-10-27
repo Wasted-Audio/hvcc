@@ -85,7 +85,7 @@ class c2daisy:
 
             seed_defaults = os.path.join(os.path.dirname(os.path.abspath(__file__)), "templates", 'component_defaults.json')
             patchsm_defaults = os.path.join(os.path.dirname(os.path.abspath(__file__)), "templates", 'component_defaults_patchsm.json')
-            hpp, cpp = generate_target_struct(
+            hpp, cpp, makefile = generate_target_struct(
                 targ_json, 
                 "HeavyDaisy.hpp", 
                 "HeavyDaisy.cpp", 
@@ -93,7 +93,8 @@ class c2daisy:
                 parameters=externs['parameters'],
                 name=patch_name,
                 class_name=f"HeavyDaisy_{patch_name}", 
-                copyright=copyright_c
+                copyright=copyright_c,
+                meta=patch_meta
             )
 
             daisy_h_path = os.path.join(source_dir, f"HeavyDaisy_{patch_name}.hpp")
@@ -104,7 +105,8 @@ class c2daisy:
             with open(daisy_cpp_path, "w") as f:
                 f.write(cpp)
 
-
+            with open(os.path.join(source_dir, "Makefile"), "w") as f:
+                f.write(makefile)
             # generate list of Heavy source files
             # files = os.listdir(source_dir)
 
@@ -113,11 +115,6 @@ class c2daisy:
             #
             # linux_path = os.path.join(out_dir, "linux")
             # os.makedirs(linux_path)
-
-            with open(os.path.join(source_dir, "Makefile"), "w") as f:
-                f.write(env.get_template("Makefile").render(
-                    name=patch_name,
-                    class_name=f"HeavyDaisy_{patch_name}"))
 
             buildjson.generate_json(
                 out_dir,

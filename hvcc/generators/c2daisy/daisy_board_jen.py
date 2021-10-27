@@ -161,7 +161,7 @@ def get_output_array(components):
 	output_comps = len(list(filter_match(components, 'direction', 'out')))
 	return 'float output_data[{output_comps}];'
 
-def generate_target_struct(target, hpp_temp, cpp_temp, defaults, parameters=[], name='seed', class_name='', copyright=''):
+def generate_target_struct(target, hpp_temp, cpp_temp, defaults, parameters=[], name='seed', class_name='', copyright='', meta={}):
 	# flesh out target components:
 	target = json.loads(target)
 	components = target['components']
@@ -235,6 +235,20 @@ def generate_target_struct(target, hpp_temp, cpp_temp, defaults, parameters=[], 
 	replacements['name'] = name
 	replacements['driver'] = driver
 	replacements['external_codecs'] = target.get('external_codecs', [])
+
+	replacements['bootloader'] = ''
+	if meta['daisy'].get('bootloader', False):
+		files = os.listdir(os.path.join(os.path.dirname(os.path.abspath(__file__)), "static"))
+		for file in files:
+			if 'dsy_bootloader' in file:
+				replacements['bootloader'] = f'../{file}'
+
+	replacements['linker_script'] = meta['daisy'].get('linker_script', '')
+	if replacements['linker_script'] != '':
+		replacements['linker_script'] = f'../{meta["daisy"]["linker_script"]}'
+
+	depth = meta['daisy'].get('libdaisy_depth', 3)
+	replacements['libdaisy_path'] = f'{"../" * depth}libdaisy'
 
 	replacements['class_name'] = class_name
 
@@ -327,10 +341,10 @@ def generate_target_struct(target, hpp_temp, cpp_temp, defaults, parameters=[], 
 			os.path.join(os.path.dirname(os.path.abspath(__file__)), "templates"))
 
 	template_hpp = env.get_template(hpp_temp).render(replacements)
-
 	template_cpp = env.get_template(cpp_temp).render(replacements)
+	template_make = env.get_template("Makefile").render(replacements)
 
-	return template_hpp, template_cpp
+	return template_hpp, template_cpp, template_make
 
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description='Utility for generating board support files from JSON.')
