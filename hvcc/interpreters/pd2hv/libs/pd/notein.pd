@@ -1,4 +1,4 @@
-#N canvas 480 155 410 434 10;
+#N canvas 717 144 384 316 10;
 #X text 18 13 data0/pitch data1/velocity channel;
 #X obj 241 252 outlet;
 #X obj 285 252 outlet;
@@ -19,9 +19,10 @@
 #X obj 147 197 spigot;
 #X obj 196 227 spigot;
 #X obj 30 54 r __hv_notein;
+#X obj 285 190 + 1;
 #X connect 3 1 18 0;
-#X connect 3 2 2 0;
 #X connect 3 2 15 0;
+#X connect 3 2 20 0;
 #X connect 5 0 11 0;
 #X connect 5 0 12 0;
 #X connect 6 0 7 0;
@@ -43,3 +44,4 @@
 #X connect 18 0 1 0;
 #X connect 19 0 3 0;
 #X connect 19 0 10 0;
+#X connect 20 0 2 0;

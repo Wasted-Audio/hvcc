@@ -1,4 +1,4 @@
-#N canvas 1276 250 553 486 10;
+#N canvas 1030 523 378 302 10;
 #X obj 234 233 outlet;
 #X obj 278 233 outlet;
 #X obj 209 110 unpack f f f;
@@ -19,9 +19,10 @@
 #X obj 68 178 spigot;
 #X obj 140 178 spigot;
 #X obj 189 208 spigot;
+#X obj 278 164 + 1;
 #X connect 2 1 19 0;
-#X connect 2 2 1 0;
 #X connect 2 2 16 0;
+#X connect 2 2 20 0;
 #X connect 3 0 2 0;
 #X connect 3 0 11 0;
 #X connect 6 0 12 0;
@@ -43,3 +44,4 @@
 #X connect 17 0 5 0;
 #X connect 18 0 5 0;
 #X connect 19 0 0 0;
+#X connect 20 0 1 0;
