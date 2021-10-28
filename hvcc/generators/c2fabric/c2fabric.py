@@ -30,19 +30,22 @@ class c2fabric:
     def filter_xcode_copy(clazz, s):
         """Return a copyref hash suitable for use in an Xcode project file.
         """
-        return hashlib.md5(s + "_copy").hexdigest().upper()[0:24]
+        s = hashlib.md5(f"{s}_copy".encode('utf-8'))
+        return s.hexdigest().upper()[0:24]
 
     @classmethod
     def filter_xcode_build(clazz, s):
         """Return a build hash suitable for use in an Xcode project file.
         """
-        return hashlib.md5(s + "_build").hexdigest().upper()[0:24]
+        s = hashlib.md5(f"{s}_build".encode('utf-8'))
+        return s.hexdigest().upper()[0:24]
 
     @classmethod
     def filter_xcode_fileref(clazz, s):
         """Return a fileref hash suitable for use in an Xcode project file.
         """
-        return hashlib.md5(s + "_fileref").hexdigest().upper()[0:24]
+        s = hashlib.md5(f"{s}_fileref".encode('utf-8'))
+        return s.hexdigest().upper()[0:24]
 
     @classmethod
     def filter_templates(clazz, template_name):

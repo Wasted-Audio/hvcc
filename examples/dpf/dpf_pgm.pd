@@ -1,0 +1,10 @@
+#N canvas 1070 197 355 151 12;
+#X obj 144 52 hsl 128 15 0 127 0 0 empty empty empty -2 -8 0 10 -262144
+-1 -1 0 1;
+#X obj 19 56 print;
+#X obj 110 84 pgmout;
+#X obj 19 23 pgmin;
+#X obj 110 22 r program @hv_param 0 127 0;
+#X connect 0 0 2 0;
+#X connect 3 0 1 0;
+#X connect 4 0 2 0;

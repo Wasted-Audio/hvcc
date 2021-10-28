@@ -1,0 +1,9 @@
+theme: jekyll-theme-modernist
+markdown: GFM
+plugins:
+  - jekyll-sitemap
+  - jekyll-relative-links
+  - jekyll-github-metadata
+relative_links:
+  enabled: true
+  collections: true

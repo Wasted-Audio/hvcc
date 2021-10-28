@@ -4,22 +4,29 @@
 #define _HEAVY_LV2_{{name|upper}}_
 
 #include "DistrhoPlugin.hpp"
+#include "DistrhoPluginInfo.h"
 #include "Heavy_{{name}}.hpp"
 
 START_NAMESPACE_DISTRHO
+
+static void hvSendHookFunc(HeavyContextInterface *c, const char *sendName, uint32_t sendHash, const HvMessage *m);
+static void hvPrintHookFunc(HeavyContextInterface *c, const char *printLabel, const char *msgString, const HvMessage *m);
 
 class {{class_name}} : public Plugin
 {
 public:
   enum Parameters
   {
-    {%- for k, v in receivers %}
+    {% for k, v in receivers %}
       param{{v.display}},
-    {%- endfor %}
+    {% endfor %}
   };
 
   {{class_name}}();
   ~{{class_name}}() override;
+
+  void handleMidiInput(uint32_t curEventIndex, const MidiEvent* midiEvents);
+  void handleMidiSend(uint32_t sendHash, const HvMessage *m);
 
 protected:
   // -------------------------------------------------------------------
@@ -30,34 +37,49 @@ protected:
     return "{{name}}";
   }
 
+{% if meta.description is defined %}
   const char* getDescription() const override
   {
-    return "{{description}}";
+    return "{{meta.description}}";
   }
+{% endif %}
 
   const char* getMaker() const noexcept override
   {
+{% if meta.maker is defined %}
+    return "{{meta.maker}}";
+{% else %}
     return "Wasted Audio";
-}
+{% endif %}
+  }
 
+{% if meta.homepage is defined %}
   const char* getHomePage() const override
   {
-    return "https://github.com/wasted.audio/{{name}}";
+    return "{{meta.homepage}}";
   }
+{% endif %}
 
   const char* getLicense() const noexcept override
   {
+{% if meta.license is defined %}
+    return "{{meta.license}}";
+{% else %}
     return "GPL v3+";
+{% endif %}
   }
 
   uint32_t getVersion() const noexcept override
   {
+{% if meta.version is defined %}
+    return d_version({{meta.version}});
+{% else %}
     return d_version(0, 0, 1);
+{% endif %}
   }
 
   int64_t getUniqueId() const noexcept override
   {
-    // return d_cconst('W', 'S', 't', 'd');
     return int64_t( {{class_name|uniqueid}} );
   }
 
@@ -77,7 +99,12 @@ protected:
 
   // void activate() override;
   // void deactivate() override;
+
+#if DISTRHO_PLUGIN_WANT_MIDI_INPUT
   void run(const float** inputs, float** outputs, uint32_t frames, const MidiEvent* midiEvents, uint32_t midiEventCount) override;
+#else
+  void run(const float** inputs, float** outputs, uint32_t frames) override;
+#endif
 
   // -------------------------------------------------------------------
   // Callbacks
@@ -87,10 +114,10 @@ protected:
   // -------------------------------------------------------------------
 
 private:
-  {%- if receivers|length > 0 %}
+  {% if receivers|length > 0 %}
   // parameters
   float _parameters[{{receivers|length}}]; // in range of [0,1]
-  {%- endif %}
+  {% endif %}
 
   // heavy context
   HeavyContextInterface *_context;

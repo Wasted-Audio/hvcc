@@ -1,6 +1,24 @@
 CHANGELOG
 =====
 
+Next Release
+-----
+
+* Midi I/O extensions for DPF
+* Midi bugfixes for [notein], [noteout], [pgmin], [touchin], [bendin]
+* Midi docs update
+* DPF minimal Midi examples
+
+0.2.0
+-----
+
+* metadata json for generator config
+* add trig attribute type
+* Daisy platform support
+* DPF cleanup + meta + trig
+* documentation update
+* DPF makefiles + meaningful values + docs
+
 0.1.2
 -----
 
