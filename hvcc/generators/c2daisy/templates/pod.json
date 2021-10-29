@@ -1,6 +1,6 @@
 {
-	"name":"pod",
-	"driver":"seed",
+	"name": "pod",
+	"driver": "seed",
 	"defines": {
 		"OOPSY_TARGET_HAS_MIDI_INPUT": 1
 	},
@@ -30,15 +30,27 @@
 		},
 		"encoder": {
 			"component": "Encoder",
-			"pin": {"a":26, "b":25, "click":13 }
+			"pin": {
+				"a": 26,
+				"b": 25,
+				"click": 13
+			}
 		},
 		"led1": {
 			"component": "RgbLed",
-			"pin": {"r":20, "g":19, "b":18 }
+			"pin": {
+				"r": 20,
+				"g": 19,
+				"b": 18
+			}
 		},
 		"led2": {
 			"component": "RgbLed",
-			"pin": {"r":17, "g":24, "b":23 }
+			"pin": {
+				"r": 17,
+				"g": 24,
+				"b": 23
+			}
 		},
 		"gateout": {
 			"component": "GateOut",
@@ -59,9 +71,11 @@
 		},
 		"sw3": {
 			"component": "Switch3",
-			"pin": {"a": 1, "b": 2}
+			"pin": {
+				"a": 1,
+				"b": 2
+			}
 		}
-
 	},
 	"aliases": {
 		"cvout": "cvout1",

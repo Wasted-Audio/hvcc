@@ -10,17 +10,31 @@
 		"process": "{name}.Debounce();",
 		"updaterate": "{name}.SetUpdateRate(driver.AudioCallbackRate());",
 		"mapping": [
-			{ "name": "{name}_press", "get": "({name}.Pressed()?1.f:0.f)", "range": [0, 1], "bool": false },
+			{
+				"name": "{name}_press",
+				"get": "({name}.Pressed()?1.f:0.f)",
+				"range": [
+					0,
+					1
+				],
+				"bool": false
+			},
 			{
 				"name": "{name}",
 				"get": "({name}.RisingEdge()?1.f:0.f)",
-				"range": [0, 1],
+				"range": [
+					0,
+					1
+				],
 				"bool": true
 			},
 			{
 				"name": "{name}_fall",
 				"get": "({name}.FallingEdge()?1.f:0.f)",
-				"range": [0, 1],
+				"range": [
+					0,
+					1
+				],
 				"bool": true
 			},
 			{
@@ -29,7 +43,7 @@
 				"range": null,
 				"bool": false
 			}
-	  	]
+		]
 	},
 	"Switch3": {
 		"map_init": "{name}.Init(driver.GetPin({pin_a}), driver.GetPin({pin_b}));",
@@ -37,7 +51,15 @@
 		"direction": "in",
 		"pin": "a,b",
 		"mapping": [
-			{ "name": "{name}", "get": "({name}.Read()*0.5f+0.5f)", "range": [0, 2] , "bool": false}
+			{
+				"name": "{name}",
+				"get": "({name}.Read()*0.5f+0.5f)",
+				"range": [
+					0,
+					2
+				],
+				"bool": false
+			}
 		]
 	},
 	"Encoder": {
@@ -51,25 +73,37 @@
 			{
 				"name": "{name}",
 				"get": "({name}.Increment())",
-				"range": [-1, 1],
+				"range": [
+					-1,
+					1
+				],
 				"bool": false
 			},
 			{
 				"name": "{name}_press",
 				"get": "({name}.Pressed()?1.f:0.f)",
-				"range": [0, 1],
+				"range": [
+					0,
+					1
+				],
 				"bool": false
 			},
 			{
 				"name": "{name}_rise",
 				"get": "({name}.RisingEdge()?1.f:0.f)",
-				"range": [0, 1],
+				"range": [
+					0,
+					1
+				],
 				"bool": true
 			},
 			{
 				"name": "{name}_fall",
 				"get": "({name}.FallingEdge()?1.f:0.f)",
-				"range": [0, 1],
+				"range": [
+					0,
+					1
+				],
 				"bool": true
 			},
 			{
@@ -86,8 +120,24 @@
 		"direction": "in",
 		"pin": "a",
 		"mapping": [
-			{ "name": "{name}", "get": "({name}.State()?1.f:0.f)", "range": [0, 1], "bool": false },
-			{ "name": "{name}_trig", "get": "({name}.Trig()?1.f:0.f)", "range": [0, 1], "bool": true }
+			{
+				"name": "{name}",
+				"get": "({name}.State()?1.f:0.f)",
+				"range": [
+					0,
+					1
+				],
+				"bool": false
+			},
+			{
+				"name": "{name}_trig",
+				"get": "({name}.Trig()?1.f:0.f)",
+				"range": [
+					0,
+					1
+				],
+				"bool": true
+			}
 		]
 	},
 	"AnalogControl": {
@@ -101,7 +151,17 @@
 		"slew": "1.0/driver.AudioCallbackRate()",
 		"process": "{name}.Process();",
 		"updaterate": "{name}.SetSampleRate(driver.AudioCallbackRate());",
-		"mapping": [{ "name": "{name}", "get": "({name}.Value())", "range": [0, 1], "bool": false }]
+		"mapping": [
+			{
+				"name": "{name}",
+				"get": "({name}.Value())",
+				"range": [
+					0,
+					1
+				],
+				"bool": false
+			}
+		]
 	},
 	"Led": {
 		"map_init": "{name}.Init(driver.GetPin({pin}), {invert});\n\t\t{name}.Set(0.0f);",
@@ -110,7 +170,12 @@
 		"pin": "a",
 		"invert": "true",
 		"postprocess": "{name}.Update();",
-		"mapping": [{ "name": "{name}", "set": "{name}.Set({value});" }]
+		"mapping": [
+			{
+				"name": "{name}",
+				"set": "{name}.Set({value});"
+			}
+		]
 	},
 	"RgbLed": {
 		"map_init": "{name}.Init(driver.GetPin({pin_r}), driver.GetPin({pin_g}), driver.GetPin({pin_b}), {invert});\n\t\t{name}.Set(0.0f, 0.0f, 0.0f);",
@@ -120,11 +185,26 @@
 		"invert": "true",
 		"postprocess": "{name}.Update();",
 		"mapping": [
-			{ "name": "{name}_red", "set": "{name}.SetRed({value});" },
-			{ "name": "{name}_green", "set": "{name}.SetGreen({value});" },
-			{ "name": "{name}_blue", "set": "{name}.SetBlue({value});" },
-			{ "name": "{name}", "set": "{name}.Set(clamp(-{value}, 0.f, 1.f), 0.f, clamp({value}, 0.f, 1.f));" },
-			{ "name": "{name}_white", "set": "{name}.Set({value},{value},{value});" }
+			{
+				"name": "{name}_red",
+				"set": "{name}.SetRed({value});"
+			},
+			{
+				"name": "{name}_green",
+				"set": "{name}.SetGreen({value});"
+			},
+			{
+				"name": "{name}_blue",
+				"set": "{name}.SetBlue({value});"
+			},
+			{
+				"name": "{name}",
+				"set": "{name}.Set(clamp(-{value}, 0.f, 1.f), 0.f, clamp({value}, 0.f, 1.f));"
+			},
+			{
+				"name": "{name}_white",
+				"set": "{name}.Set({value},{value},{value});"
+			}
 		]
 	},
 	"GateOut": {
@@ -135,7 +215,10 @@
 		"mode": "DSY_GPIO_MODE_OUTPUT_PP",
 		"pull": "DSY_GPIO_NOPULL",
 		"mapping": [
-			{ "name": "{name}", "set": "dsy_gpio_write(&{name}, {value});" }
+			{
+				"name": "{name}",
+				"set": "dsy_gpio_write(&{name}, {value});"
+			}
 		]
 	},
 	"CVOuts": {

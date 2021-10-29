@@ -1,6 +1,6 @@
 {
-	"name":"patch",
-	"driver":"seed",
+	"name": "patch",
+	"driver": "seed",
 	"defines": {
 		"OOPSY_TARGET_HAS_MIDI_INPUT": 1
 	},
@@ -11,16 +11,22 @@
 			"thing3": "conf3;"
 		}
 	},
-  "external_codecs": [
-    {
-      "periph": "SAI_2",
-      "a_sync": "SLAVE",
-      "b_sync": "MASTER",
-      "a_dir": "TRANSMIT",
-      "b_dir": "RECEIVE",
-      "pin": {"fs": 27, "mclk": 24, "sck": 28, "sb": 25, "sa": 26}
-    }
-  ],
+	"external_codecs": [
+		{
+			"periph": "SAI_2",
+			"a_sync": "SLAVE",
+			"b_sync": "MASTER",
+			"a_dir": "TRANSMIT",
+			"b_dir": "RECEIVE",
+			"pin": {
+				"fs": 27,
+				"mclk": 24,
+				"sck": 28,
+				"sb": 25,
+				"sa": 26
+			}
+		}
+	],
 	"components": {
 		"knob1": {
 			"component": "AnalogControl",
@@ -30,7 +36,7 @@
 			"component": "AnalogControl",
 			"pin": 16
 		},
-    "knob3": {
+		"knob3": {
 			"component": "AnalogControl",
 			"pin": 21
 		},
@@ -40,7 +46,11 @@
 		},
 		"encoder": {
 			"component": "Encoder",
-			"pin": {"a":12, "b":11, "click":0 }
+			"pin": {
+				"a": 12,
+				"b": 11,
+				"click": 0
+			}
 		},
 		"gateout": {
 			"component": "GateOut",
@@ -50,22 +60,22 @@
 		"cvout1": {
 			"component": "CVOuts"
 		},
-    "cvout2": {
+		"cvout2": {
 			"component": "CVOuts"
 		},
 		"gatein1": {
 			"component": "GateIn",
 			"pin": 20
 		},
-    "gatein2": {
+		"gatein2": {
 			"component": "GateIn",
 			"pin": 19
 		}
 	},
 	"aliases": {
-    "gate": "gatein1",
-    "gate1": "gatein1",
-    "gate2": "gatein2",
+		"gate": "gatein1",
+		"gate1": "gatein1",
+		"gate2": "gatein2",
 		"cvout": "cvout1",
 		"encswitch": "encoder_rise",
 		"enp": "encoder_press",
@@ -74,7 +84,7 @@
 		"ctrl": "knob1",
 		"ctrl1": "knob1",
 		"ctrl2": "knob2",
-    "ctrl3": "knob3",
+		"ctrl3": "knob3",
 		"ctrl4": "knob4"
 	}
 }
