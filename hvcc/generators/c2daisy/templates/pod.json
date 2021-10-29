@@ -4,13 +4,7 @@
 	"defines": {
 		"OOPSY_TARGET_HAS_MIDI_INPUT": 1
 	},
-	"display": {
-		"config": {
-			"thing1": "conf1;",
-			"thing2": "conf2;",
-			"thing3": "conf3;"
-		}
-	},
+	"display": {},
 	"components": {
 		"sw1": {
 			"component": "Switch",
@@ -51,11 +45,6 @@
 				"g": 24,
 				"b": 23
 			}
-		},
-		"gateout": {
-			"component": "GateOut",
-			"pin": 1998,
-			"display": ""
 		},
 		"led3": {
 			"component": "Led",
