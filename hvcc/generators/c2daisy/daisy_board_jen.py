@@ -2,6 +2,7 @@ import argparse
 import os
 import json
 import jinja2
+from copy import deepcopy
 
 #############################################################
 ### Python script to turn JSON into board support files ###
@@ -63,6 +64,9 @@ def get_component_mapping(component_variant, original_name, component, component
 	raise NameError(f'Unknown parameter "{original_name}"')
 
 def verify_param_used(component, params_in, params_out, params_in_original_name, params_out_original_name, components):
+	# Exclude parents, since they don't have 1-1 i/o mapping
+	if component.get('is_parent', False):
+		return True
 	for param in params_in | params_out:
 		root = get_root_component(param, (params_in_original_name | params_out_original_name)[param], components)
 		if root == component['name']:
@@ -150,6 +154,17 @@ def flatten_pin_dicts(comp):
 
 	return newcomp
 
+def flatten_index_dicts(comp):
+	newcomp = {}
+	for key,val in comp.items():
+		if (isinstance(val, dict) and key == 'index'):
+			for subkey, subval in val.items():
+				newcomp[key + '_' + subkey] = subval
+		else:
+			newcomp[key] = val
+
+	return newcomp
+
 def bools_to_lower_str(comp):
 	new_comp = {}
 	for key, val in comp.items():
@@ -165,6 +180,11 @@ def generate_target_struct(target, hpp_temp, cpp_temp, defaults, parameters=[], 
 	# flesh out target components:
 	target = json.loads(target)
 	components = target['components']
+	parents = target.get('parents', {})
+
+	for key in parents:
+		parents[key]['is_parent'] = True
+	components.update(parents)
 
 	driver = target.get('driver', 'seed')
 
@@ -181,6 +201,7 @@ def generate_target_struct(target, hpp_temp, cpp_temp, defaults, parameters=[], 
 	# flatten pin dicts into multiple entries
 	# e.g. "pin": {"a": 12} => "pin_a": 12
 	components = [flatten_pin_dicts(comp) for comp in components]
+	components = [flatten_index_dicts(comp) for comp in components]
 
 	"""
 	This corrupts booleans that might be used for python parsing, and
@@ -256,19 +277,21 @@ def generate_target_struct(target, hpp_temp, cpp_temp, defaults, parameters=[], 
 	replacements['target_name'] = target['name']
 	replacements['init'] = filter_map_template(components, 'init', key_exclude='default', match_exclude=True)
 
-	replacements['switch'] = filter_map_init(components, 'typename', 'daisy::Switch', key_exclude='default', match_exclude=True)
-	replacements['gatein'] = filter_map_init(components, 'typename', 'daisy::GateIn', key_exclude='default', match_exclude=True)
-	replacements['encoder'] = filter_map_init(components, 'typename', 'daisy::Encoder', key_exclude='default', match_exclude=True)
-	replacements['switch3'] = filter_map_init(components, 'typename', 'daisy::Switch3', key_exclude='default', match_exclude=True)
-	replacements['analogcount'] = len(list(filter_match(components, 'typename', 'daisy::AnalogControl', key_exclude='default', match_exclude=True)))
+	replacements['i2c'] = filter_map_init(components, 'component', 'i2c', key_exclude='default', match_exclude=True)
+	replacements['pca9685'] = filter_map_init(components, 'component', 'PCA9685', key_exclude='default', match_exclude=True)
+	replacements['switch'] = filter_map_init(components, 'component', 'Switch', key_exclude='default', match_exclude=True)
+	replacements['gatein'] = filter_map_init(components, 'component', 'GateIn', key_exclude='default', match_exclude=True)
+	replacements['encoder'] = filter_map_init(components, 'component', 'Encoder', key_exclude='default', match_exclude=True)
+	replacements['switch3'] = filter_map_init(components, 'component', 'Switch3', key_exclude='default', match_exclude=True)
+	replacements['analogcount'] = len(list(filter_match(components, 'component', 'AnalogControl', key_exclude='default', match_exclude=True)))
 
-	replacements['init_single'] = filter_map_ctrl(components, 'typename', 'daisy::AnalogControl', 'init_single', key_exclude='default', match_exclude=True)
-	replacements['ctrl_init'] = filter_map_ctrl(components, 'typename', 'daisy::AnalogControl', 'map_init', key_exclude='default', match_exclude=True)	
+	replacements['init_single'] = filter_map_ctrl(components, 'component', 'AnalogControl', 'init_single', key_exclude='default', match_exclude=True)
+	replacements['ctrl_init'] = filter_map_ctrl(components, 'component', 'AnalogControl', 'map_init', key_exclude='default', match_exclude=True)	
 
-	replacements['led'] = filter_map_init(components, 'typename', 'daisy::Led', key_exclude='default', match_exclude=True)
-	replacements['rgbled'] = filter_map_init(components, 'typename', 'daisy::RgbLed', key_exclude='default', match_exclude=True)
-	replacements['gateout'] = filter_map_init(components, 'typename', 'daisy::dsy_gpio', key_exclude='default', match_exclude=True)
-	replacements['dachandle'] = filter_map_init(components, 'typename', 'daisy::DacHandle::Config', key_exclude='default', match_exclude=True)
+	replacements['led'] = filter_map_init(components, 'component', 'Led', key_exclude='default', match_exclude=True)
+	replacements['rgbled'] = filter_map_init(components, 'component', 'RgbLed', key_exclude='default', match_exclude=True)
+	replacements['gateout'] = filter_map_init(components, 'component', 'GateOut', key_exclude='default', match_exclude=True)
+	replacements['dachandle'] = filter_map_init(components, 'component', 'CVOuts', key_exclude='default', match_exclude=True)
 
 	# replacements['callback_write_out'] = filter_map_set(components, 'direction', 'out')
 	
@@ -287,8 +310,13 @@ def generate_target_struct(target, hpp_temp, cpp_temp, defaults, parameters=[], 
 	replacements['hidupdaterates'] = filter_map_template(components, 'updaterate', key_exclude='default', match_exclude=True)
 
 	component_declarations = list(filter(lambda x: not x.get('default', False), components))
+	component_declarations = list(filter(lambda x: x.get('typename', '') != '', component_declarations))
 	if len(component_declarations) > 0:
-		replacements['comps'] = ";\n\t".join(map(lambda x: x['typename'] + ' ' + x['name'], component_declarations)) + ';'
+		replacements['comps'] = ";\n\t".join(map(lambda x: x['typename'].format_map(x) + ' ' + x['name'], component_declarations)) + ';'
+	non_class_declarations = list(filter(lambda x: 'non_class_decl' in x, component_declarations))
+	if len(non_class_declarations) > 0:
+		replacements['non_class_declarations'] = "\n\t".join(map(lambda x: x['non_class_decl'].format_map(x), non_class_declarations))
+
 	replacements['dispdec'] = ('daisy::OledDisplay<' + target['display']['driver'] + '> display;') if ('display' in target) else  "// no display"
 
 	replacements['output_arrays'] = get_output_array(components)
@@ -323,7 +351,11 @@ def generate_target_struct(target, hpp_temp, cpp_temp, defaults, parameters=[], 
 
 		default_prefix = component.get("default_prefix", '') if component.get('default', False) else ''
 		write_location = 'callback_write_out' if mapping.get('where', 'callback') == 'callback' else 'loop_write_out'
-		write = mapping["set"].format_map({"name": root, "value": "output_data[{}]".format(out_idx), "default_prefix": default_prefix})
+		component_info = deepcopy(component)
+		component_info['name'] = root
+		component_info['value'] = f'output_data[{out_idx}]'
+		component_info['default_prefix'] = default_prefix
+		write = mapping["set"].format_map(component_info)
 
 		replacements[write_location] += f'\n\t\t{write}'
 		out_idx += 1

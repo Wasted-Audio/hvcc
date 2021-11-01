@@ -242,5 +242,72 @@
 				"where": "main"
 			}
 		]
+	},
+	"i2c": {
+		"map_init": "{name}.Init({{{peripheral}, {{driver.GetPin({pin_scl}), driver.GetPin({pin_sda})}}, {speed}}});",
+		"typename": "I2CHandle",
+		"pin": "scl,sda",
+		"peripheral": "daisy::I2CHandle::Config::Peripheral::I2C_1",
+		"speed": "daisy::I2CHandle::Config::Speed::I2C_1MHZ",
+		"mapping": []
+	},
+	"PCA9685": {
+		"map_init": "{name}.Init({parent}, {address}, {name}_dma_buffer_a, {name}_dma_buffer_b);",
+		"typename": "LedDriverPca9685<{driver_count}, true>",
+		"non_class_decl": "LedDriverPca9685<{driver_count}, true>::DmaBuffer DMA_BUFFER_MEM_SECTION {name}_dma_buffer_a, {name}_dma_buffer_b;",
+		"driver_count": 1,
+		"address": "{0x00}",
+		"parent": "",
+		"pin": "",
+		"postprocess": "{name}.SwapBuffersAndTransmit();",
+		"mapping": []
+	},
+	"PCA9685Led": {
+		"map_init": "",
+		"pin": "",
+		"typename": "",
+		"parent": "",
+		"direction": "out",
+		"index": 0,
+		"mapping": [
+			{
+				"name": "{name}",
+				"set": "{parent}.SetLed({index}, {value});"
+			}
+		]
+	},
+	"PCA9685RgbLed": {
+		"map_init": "",
+		"typename": "",
+		"direction": "out",
+		"parent": "",
+		"pin": "",
+		"index": {
+			"red": 0,
+			"green": 1,
+			"blue": 2
+		},
+		"mapping": [
+			{
+				"name": "{name}_red",
+				"set": "{parent}.SetLed({index_red}, {value});"
+			},
+			{
+				"name": "{name}_green",
+				"set": "{parent}.SetLed({index_green}, {value});"
+			},
+			{
+				"name": "{name}_blue",
+				"set": "{parent}.SetLed({index_blue}, {value});"
+			},
+			{
+				"name": "{name}",
+				"set": "{parent}.SetLed({index_red}, {value});\n\t\t{parent}.SetLed({index_green}, {value});\n\t\t{parent}.SetLed({index_blue}, {value});"
+			},
+			{
+				"name": "{name}_white",
+				"set": "{parent}.SetLed({index_red}, {value});\n\t\t{parent}.SetLed({index_green}, {value});\n\t\t{parent}.SetLed({index_blue}, {value});"
+			}
+		]
 	}
 }
