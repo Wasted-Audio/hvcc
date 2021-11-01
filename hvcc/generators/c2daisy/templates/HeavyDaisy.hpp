@@ -17,6 +17,8 @@
 
 using namespace daisy;
 
+{{non_class_declarations}}
+
 {{display_conditional}}
 // name: {{target_name}}
 struct Daisy {
@@ -30,6 +32,10 @@ struct Daisy {
 		{% endif %}
         
 		{{init}}
+
+		{{i2c}}
+
+		{{pca9685}}
         
 		{{switch}}
         
