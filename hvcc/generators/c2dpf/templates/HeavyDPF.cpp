@@ -194,16 +194,20 @@ void {{class_name}}::handleMidiInput(uint32_t frames, const MidiEvent* midiEvent
     float samplesPerBeat = 60 * getSampleRate() / timePos.bbt.beatsPerMinute;
     float samplesPerTick = samplesPerBeat / 24.0;
 
-    int i = 1;
-    while (samplesProcessed > samplesPerTick)
-    {
-      _context->sendMessageToReceiverV(HV_HASH_MIDIREALTIMEIN, i * 1000.0*samplesPerTick/getSampleRate(),
+    /* get state */
+    double nextClockTick = this->nextClockTick;
+    double sampleAtCycleStart = this->sampleAtCycleStart;
+    double sampleAtCycleEnd = sampleAtCycleStart + frames;
+
+    while (nextClockTick < sampleAtCycleEnd) {
+      _context->sendMessageToReceiverV(HV_HASH_MIDIREALTIMEIN, 1000*(nextClockTick - sampleAtCycleStart)/getSampleRate(),
         "ff", (float) MIDI_RT_CLOCK);
-      samplesProcessed -= samplesPerTick;
-      i++;
+      nextClockTick += samplesPerTick;
     }
-    samplesProcessed += frames;
-    // printf("> ticks: %f - samples: %f \n", samplesPerTick, samplesProcessed);
+
+    /* save variables for next cycle */
+    this->sampleAtCycleStart = sampleAtCycleEnd;
+    this->nextClockTick = nextClockTick;
   }
 
   // Midi events

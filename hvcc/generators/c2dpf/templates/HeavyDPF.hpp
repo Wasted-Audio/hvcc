@@ -122,6 +122,8 @@ private:
   // transport values
   bool wasPlaying;
   float samplesProcessed;
+  double nextClockTick;
+  double sampleAtCycleStart;
 
   // heavy context
   HeavyContextInterface *_context;
