@@ -345,14 +345,14 @@
 		]
 	},
 	"CD4051": {
-		"map_init": "size_t {name}_mux_index = {i};\n\t\tcfg[mux_index].InitMux({{ driver.GetPin({pin_adc}), {mux_count}, driver.GetPin({pin_sel0}), driver.GetPin({pin_sel1}), driver.GetPin({pin_sel2}) }});",
+		"init_single": "size_t {name}_index = {i};\n\t\tcfg[{name}_index].InitMux(driver.GetPin({pin_adc}), {mux_count}, driver.GetPin({pin_sel0}), driver.GetPin({pin_sel1}), driver.GetPin({pin_sel2}));",
 		"typename": "",
 		"mux_count": 1,
 		"pin": "adc,sel0,sel1,sel2",
 		"mapping": []
 	},
 	"CD4051AnalogControl": {
-		"map_init": "{name}.Init(driver.adc.GetMuxPtr({parent}_mux_index, {index}), driver.AudioCallbackRate(), {flip}, {invert});",
+		"map_init": "{name}.Init(driver.adc.GetMuxPtr({parent}_index, {index}), driver.AudioCallbackRate(), {flip}, {invert});",
 		"parent": "",
 		"index": 0,
 		"typename": "daisy::AnalogControl",

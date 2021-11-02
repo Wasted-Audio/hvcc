@@ -122,6 +122,12 @@ def filter_match(set, key, match, key_exclude=None, match_exclude=None):
 	else:
 		return filter(lambda x: x.get(key, '') == match, set)
 
+def filter_matches(set, key, matches, key_exclude=None, match_exclude=None):
+	if (key_exclude is not None and match_exclude is not None):
+		return filter(lambda x: x.get(key, '') in matches and x.get(key_exclude, '') != match_exclude, set)
+	else:
+		return filter(lambda x: x.get(key, '') in matches, set)
+
 def filter_has(set, key, key_exclude=None, match_exclude=None):
 	if (key_exclude is not None and match_exclude is not None):
 		return filter(lambda x: x.get(key, '') != '' and x.get(key_exclude, '') != match_exclude, set)
@@ -137,8 +143,8 @@ def filter_map_set(set, key, match, key_exclude=None, match_exclude=None):
 	filtered = filter_match(set, key, match, key_exclude=key_exclude, match_exclude=match_exclude)
 	return "\n\t\t".join(map(lambda x: x['mapping'][0]['set'].format_map(x['mapping'][0]['name'].format_map(x)), filtered))
 
-def filter_map_ctrl(set, key, match, init_key, key_exclude=None, match_exclude=None):
-	set = filter_match(set, key, match, key_exclude=key_exclude, match_exclude=match_exclude)
+def filter_map_ctrl(set, key, matches, init_key, key_exclude=None, match_exclude=None):
+	set = filter_matches(set, key, matches, key_exclude=key_exclude, match_exclude=match_exclude)
 	set = map(lambda x, i: x | {'i': i}, set, range(1000))
 	return "\n\t\t".join(map(lambda x: x[init_key].format_map(x), set))
 
@@ -288,10 +294,12 @@ def generate_target_struct(target, hpp_temp, cpp_temp, defaults, parameters=[], 
 	replacements['gatein'] = filter_map_init(components, 'component', 'GateIn', key_exclude='default', match_exclude=True)
 	replacements['encoder'] = filter_map_init(components, 'component', 'Encoder', key_exclude='default', match_exclude=True)
 	replacements['switch3'] = filter_map_init(components, 'component', 'Switch3', key_exclude='default', match_exclude=True)
-	replacements['analogcount'] = len(list(filter_match(components, 'component', 'AnalogControl', key_exclude='default', match_exclude=True)))
+	replacements['analogcount'] = len(list(filter_matches(components, 'component', ['AnalogControl', 'AnalogControlBipolar', 'CD4051'], key_exclude='default', match_exclude=True)))
 
-	replacements['init_single'] = filter_map_ctrl(components, 'component', 'AnalogControl', 'init_single', key_exclude='default', match_exclude=True)
-	replacements['ctrl_init'] = filter_map_ctrl(components, 'component', 'AnalogControl', 'map_init', key_exclude='default', match_exclude=True)	
+	replacements['init_single'] = filter_map_ctrl(components, 'component', ['AnalogControl', 'AnalogControlBipolar', 'CD4051'], 'init_single', key_exclude='default', match_exclude=True)
+	replacements['ctrl_init'] = filter_map_ctrl(components, 'component', ['AnalogControl', 'AnalogControlBipolar'], 'map_init', key_exclude='default', match_exclude=True)	
+
+	replacements['ctrl_mux_init'] = filter_map_init(components, 'component', 'CD4051AnalogControl', key_exclude='default', match_exclude=True)
 
 	replacements['led'] = filter_map_init(components, 'component', 'Led', key_exclude='default', match_exclude=True)
 	replacements['rgbled'] = filter_map_init(components, 'component', 'RgbLed', key_exclude='default', match_exclude=True)

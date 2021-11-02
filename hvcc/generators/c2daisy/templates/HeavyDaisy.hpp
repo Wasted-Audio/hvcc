@@ -54,6 +54,8 @@ struct Daisy {
 		{% endif %}
 
 		{{ctrl_init}}
+
+		{{ctrl_mux_init}}
 		
 		{{led}}
 		
