@@ -1,10 +1,10 @@
 {
-	"name": "field",
-	"driver": "seed",
-	"defines": {
-		"OOPSY_TARGET_HAS_MIDI_INPUT": 1
-	},
-	"display": {},
+  "name": "field",
+  "driver": "seed",
+  "defines": {
+    "OOPSY_TARGET_HAS_MIDI_INPUT": 1
+  },
+  "display": {},
   "parents": {
     "i2c": {
       "component": "i2c",
@@ -39,15 +39,15 @@
       }
     }
   },
-	"components": {
-		"sw1": {
-			"component": "Switch",
-			"pin": 30
-		},
+  "components": {
+    "sw1": {
+      "component": "Switch",
+      "pin": 30
+    },
     "sw2": {
-			"component": "Switch",
-			"pin": 29
-		},
+      "component": "Switch",
+      "pin": 29
+    },
     "cv1": {
       "component": "AnalogControlBipolar",
       "pin": 17
@@ -105,19 +105,19 @@
       "parent": "pot_mux"
     },
     "cvout1": {
-			"component": "CVOuts"
-		},
+      "component": "CVOuts"
+    },
     "cvout2": {
-			"component": "CVOuts"
-		},
-		"gatein": {
-			"component": "GateIn",
-			"pin": 0
-		},
+      "component": "CVOuts"
+    },
+    "gatein": {
+      "component": "GateIn",
+      "pin": 0
+    },
     "gateout": {
-			"component": "GateOut",
-			"pin": 15
-		},
+      "component": "GateOut",
+      "pin": 15
+    },
     "pada1": {
       "component": "CD4021Switch",
       "parent": "pad_shift",
@@ -198,7 +198,7 @@
       "parent": "pad_shift",
       "index": 8
     },
-		"led_key_b1": {
+    "led_key_b1": {
       "component": "PCA9685Led",
       "index": 0,
       "parent": "led_driver"
@@ -328,23 +328,23 @@
       "index": 25,
       "parent": "led_driver"
     }
-	},
-	"aliases": {
-		"cvout": "cvout1",
-		"switch": "sw1",
-		"button": "sw1",
-		"switch1": "sw1",
-		"button1": "sw1",
-		"switch2": "sw2",
-		"button2": "sw2",
-		"encswitch": "encoder_rise",
-		"enp": "encoder_press",
-		"switch3": "encoder_rise",
-		"press": "encoder_press",
-		"knob": "knob1",
-		"ctrl": "knob1",
-		"ctrl1": "knob1",
-		"ctrl2": "knob2",
-		"led": "led1"
-	}
+  },
+  "aliases": {
+    "cvout": "cvout1",
+    "switch": "sw1",
+    "button": "sw1",
+    "switch1": "sw1",
+    "button1": "sw1",
+    "switch2": "sw2",
+    "button2": "sw2",
+    "encswitch": "encoder_rise",
+    "enp": "encoder_press",
+    "switch3": "encoder_rise",
+    "press": "encoder_press",
+    "knob": "knob1",
+    "ctrl": "knob1",
+    "ctrl1": "knob1",
+    "ctrl2": "knob2",
+    "led": "led1"
+  }
 }
