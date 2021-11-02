@@ -27,6 +27,16 @@
         "cs": 27,
         "data": 26
       }
+    },
+    "pot_mux": {
+      "component": "CD4051",
+      "mux_count": 8,
+      "pin": {
+        "adc": 16,
+        "sel0": 21,
+        "sel1": 20,
+        "sel2": 19
+      }
     }
   },
 	"components": {
@@ -37,6 +47,76 @@
     "sw2": {
 			"component": "Switch",
 			"pin": 29
+		},
+    "cv1": {
+      "component": "AnalogControlBipolar",
+      "pin": 17
+    },
+    "cv2": {
+      "component": "AnalogControlBipolar",
+      "pin": 18
+    },
+    "cv3": {
+      "component": "AnalogControlBipolar",
+      "pin": 25
+    },
+    "cv4": {
+      "component": "AnalogControlBipolar",
+      "pin": 24
+    },
+    "knob1": {
+      "component": "CD4051AnalogControl",
+      "index": 0,
+      "parent": "pot_mux"
+    },
+    "knob2": {
+      "component": "CD4051AnalogControl",
+      "index": 3,
+      "parent": "pot_mux"
+    },
+    "knob3": {
+      "component": "CD4051AnalogControl",
+      "index": 1,
+      "parent": "pot_mux"
+    },
+    "knob4": {
+      "component": "CD4051AnalogControl",
+      "index": 4,
+      "parent": "pot_mux"
+    },
+    "knob5": {
+      "component": "CD4051AnalogControl",
+      "index": 2,
+      "parent": "pot_mux"
+    },
+    "knob6": {
+      "component": "CD4051AnalogControl",
+      "index": 5,
+      "parent": "pot_mux"
+    },
+    "knob7": {
+      "component": "CD4051AnalogControl",
+      "index": 6,
+      "parent": "pot_mux"
+    },
+    "knob8": {
+      "component": "CD4051AnalogControl",
+      "index": 7,
+      "parent": "pot_mux"
+    },
+    "cvout1": {
+			"component": "CVOuts"
+		},
+    "cvout2": {
+			"component": "CVOuts"
+		},
+		"gatein": {
+			"component": "GateIn",
+			"pin": 0
+		},
+    "gateout": {
+			"component": "GateOut",
+			"pin": 15
 		},
     "pada1": {
       "component": "CD4021Switch",
@@ -118,14 +198,6 @@
       "parent": "pad_shift",
       "index": 8
     },
-		"knob1": {
-			"component": "AnalogControl",
-			"pin": 21
-		},
-		"knob2": {
-			"component": "AnalogControl",
-			"pin": 15
-		},
 		"led_key_b1": {
       "component": "PCA9685Led",
       "index": 0,
@@ -255,21 +327,7 @@
       "component": "PCA9685Led",
       "index": 25,
       "parent": "led_driver"
-    },
-		"cvout1": {
-			"component": "CVOuts"
-		},
-    "cvout2": {
-			"component": "CVOuts"
-		},
-		"gatein": {
-			"component": "GateIn",
-			"pin": 0
-		},
-    "gateout": {
-			"component": "GateOut",
-			"pin": 15
-		}
+    }
 	},
 	"aliases": {
 		"cvout": "cvout1",

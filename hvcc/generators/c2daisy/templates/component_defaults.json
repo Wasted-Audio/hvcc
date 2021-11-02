@@ -315,11 +315,7 @@
 		"typename": "ShiftRegister4021<{driver_count}>",
 		"non_class_decl": "uint8_t {name}_debounced[8*{driver_count}];",
 		"driver_count": 1,
-		"pin": {
-			"clk": 0,
-			"cs": 1,
-			"data": 2
-		},
+		"pin": "clk,cs,data",
 		"postprocess": "{name}.Update();",
 		"mapping": []
 	},
@@ -345,6 +341,57 @@
 				"name": "{name}_fall",
 				"get": "({parent}_debounced[{index}] == 0b10000000)",
 				"bool": true
+			}
+		]
+	},
+	"CD4051": {
+		"map_init": "size_t {name}_mux_index = {i};\n\t\tcfg[mux_index].InitMux({{ driver.GetPin({pin_adc}), {mux_count}, driver.GetPin({pin_sel0}), driver.GetPin({pin_sel1}), driver.GetPin({pin_sel2}) }});",
+		"typename": "",
+		"mux_count": 1,
+		"pin": "adc,sel0,sel1,sel2",
+		"mapping": []
+	},
+	"CD4051AnalogControl": {
+		"map_init": "{name}.Init(driver.adc.GetMuxPtr({parent}_mux_index, {index}), driver.AudioCallbackRate(), {flip}, {invert});",
+		"parent": "",
+		"index": 0,
+		"typename": "daisy::AnalogControl",
+		"direction": "in",
+		"flip": "false",
+		"invert": "false",
+		"slew": "1.0/driver.AudioCallbackRate()",
+		"process": "{name}.Process();",
+		"updaterate": "{name}.SetSampleRate(driver.AudioCallbackRate());",
+		"mapping": [
+			{
+				"name": "{name}",
+				"get": "({name}.Value())",
+				"range": [
+					0,
+					1
+				],
+				"bool": false
+			}
+		]
+	},
+	"AnalogControlBipolar": {
+		"init_single": "cfg[{i}].InitSingle(driver.GetPin({pin}));",
+		"map_init": "{name}.InitBipolarCv(driver.adc.GetPtr({i}), driver.AudioCallbackRate());",
+		"typename": "daisy::AnalogControl",
+		"direction": "in",
+		"pin": "a",
+		"slew": "1.0/driver.AudioCallbackRate()",
+		"process": "{name}.Process();",
+		"updaterate": "{name}.SetSampleRate(driver.AudioCallbackRate());",
+		"mapping": [
+			{
+				"name": "{name}",
+				"get": "({name}.Value())",
+				"range": [
+					0,
+					1
+				],
+				"bool": false
 			}
 		]
 	}
