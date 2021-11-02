@@ -2,6 +2,7 @@
 import os
 import shutil
 import time
+import json
 from typing import DefaultDict
 import jinja2
 from ..buildjson import buildjson
@@ -75,13 +76,15 @@ class c2daisy:
             #         receivers=receiver_list,
             #         pool_sizes_kb=externs["memoryPoolSizesKb"],
             #         copyright=copyright_c))
-
-            try:
-                targ = os.path.join(os.path.dirname(os.path.abspath(__file__)), "templates", f'{board}.json')
-                with open(targ, 'r') as file:
-                    targ_json = file.read()
-            except FileNotFoundError:
-                raise FileNotFoundError(f'Unknown Daisy board "{board}"')
+            if daisy_meta.get('description', {}):
+                targ_json = daisy_meta['description']
+            else:
+                try:
+                    targ = os.path.join(os.path.dirname(os.path.abspath(__file__)), "templates", f'{board}.json')
+                    with open(targ, 'r') as file:
+                        targ_json = json.load()
+                except FileNotFoundError:
+                    raise FileNotFoundError(f'Unknown Daisy board "{board}"')
 
             seed_defaults = os.path.join(os.path.dirname(os.path.abspath(__file__)), "templates", 'component_defaults.json')
             patchsm_defaults = os.path.join(os.path.dirname(os.path.abspath(__file__)), "templates", 'component_defaults_patchsm.json')

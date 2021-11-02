@@ -188,7 +188,6 @@ def get_output_array(components):
 
 def generate_target_struct(target, hpp_temp, cpp_temp, defaults, parameters=[], name='seed', class_name='', copyright='', meta={}):
 	# flesh out target components:
-	target = json.loads(target)
 	components = target['components']
 	parents = target.get('parents', {})
 
