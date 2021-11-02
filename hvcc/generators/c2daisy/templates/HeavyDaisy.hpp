@@ -40,6 +40,8 @@ struct Daisy {
 		{{switch}}
         
 		{{switch3}}
+
+		{{cd4021}}
         
 		{{gatein}}
 		

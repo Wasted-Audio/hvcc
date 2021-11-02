@@ -81,12 +81,16 @@ def de_alias(name, aliases, components):
 	# aliased variant
 	potential_aliases = list(filter(lambda x: x in low, aliases))
 	for alias in potential_aliases:
-		target_component = list(filter_match(components, 'name', aliases[alias]))[0]
-		# The CVOuts setup really bothers me
-		if target_component['component'] != 'CVOuts':
-			for mapping in target_component['mapping']:
-				if mapping['name'].format_map({'name': alias}) == low:
-					return mapping['name'].format_map({'name': aliases[alias]})
+		try:
+			target_component = list(filter_match(components, 'name', aliases[alias]))[0]
+			# The CVOuts setup really bothers me
+			if target_component['component'] != 'CVOuts':
+				for mapping in target_component['mapping']:
+					if mapping['name'].format_map({'name': alias}) == low:
+						return mapping['name'].format_map({'name': aliases[alias]})
+		except IndexError:
+			# No matching alias from filter
+			pass
 	# otherwise, it's a direct parameter or unkown one
 	return low
 
@@ -277,6 +281,7 @@ def generate_target_struct(target, hpp_temp, cpp_temp, defaults, parameters=[], 
 	replacements['target_name'] = target['name']
 	replacements['init'] = filter_map_template(components, 'init', key_exclude='default', match_exclude=True)
 
+	replacements['cd4021'] = filter_map_init(components, 'component', 'CD4021', key_exclude='default', match_exclude=True)
 	replacements['i2c'] = filter_map_init(components, 'component', 'i2c', key_exclude='default', match_exclude=True)
 	replacements['pca9685'] = filter_map_init(components, 'component', 'PCA9685', key_exclude='default', match_exclude=True)
 	replacements['switch'] = filter_map_init(components, 'component', 'Switch', key_exclude='default', match_exclude=True)
@@ -335,10 +340,14 @@ def generate_target_struct(target, hpp_temp, cpp_temp, defaults, parameters=[], 
 		replacements['parameters'].append(param_struct)
 		mapping = get_component_mapping(param_name, params_in_original_names[param_name], component, components)
 
+		
+		write_location = 'callback_write_out' if mapping.get('where', 'callback') == 'callback' else 'loop_write_out'
+		component_info = deepcopy(component)
 		# A bit of a hack to get cv_1, etc to be written as CV_1
-		input_name = root.upper() if driver == 'patch_sm' and component['component'] == 'AnalogControl' else root
-		default_prefix = component.get("default_prefix", '') if component.get('default', False) else ''
-		process = mapping["get"].format_map({"name": input_name, "default_prefix": default_prefix})
+		component_info['name'] = root.upper() if driver == 'patch_sm' and component['component'] == 'AnalogControl' else root
+		component_info['value'] = f'output_data[{out_idx}]'
+		component_info['default_prefix'] = component.get("default_prefix", '') if component.get('default', False) else ''
+		process = mapping["get"].format_map(component_info)
 
 		replacements['callback_write_in'].append({"process": process, "bool": mapping["bool"], "hash": param["hash"]})
 
