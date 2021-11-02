@@ -309,5 +309,43 @@
 				"set": "{parent}.SetLed({index_red}, {value});\n\t\t{parent}.SetLed({index_green}, {value});\n\t\t{parent}.SetLed({index_blue}, {value});"
 			}
 		]
+	},
+	"CD4021": {
+		"map_init": "{name}.Init({{ driver.GetPin({pin_clk}), driver.GetPin({pin_cs}), {{ driver.GetPin({pin_data}) }} }});",
+		"typename": "ShiftRegister4021<{driver_count}>",
+		"non_class_decl": "uint8_t {name}_debounced[8*{driver_count}];",
+		"driver_count": 1,
+		"pin": {
+			"clk": 0,
+			"cs": 1,
+			"data": 2
+		},
+		"postprocess": "{name}.Update();",
+		"mapping": []
+	},
+	"CD4021Switch": {
+		"map_init": "",
+		"typename": "",
+		"direction": "in",
+		"parent": "",
+		"index": 0,
+		"postprocess": "{parent}_debounced[{index}] = {parent}.State({index}) | ({parent}_debounced[{index}] << 1);",
+		"mapping": [
+			{
+				"name": "{name}",
+				"get": "({parent}_debounced[{index}] == 1)",
+				"bool": true
+			},
+			{
+				"name": "{name}_press",
+				"get": "({parent}_debounced[{index}] != 0)",
+				"bool": false
+			},
+			{
+				"name": "{name}_fall",
+				"get": "({parent}_debounced[{index}] == 0b10000000)",
+				"bool": true
+			}
+		]
 	}
 }
