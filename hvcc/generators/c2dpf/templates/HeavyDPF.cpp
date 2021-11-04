@@ -61,9 +61,9 @@ static void hvPrintHookFunc(HeavyContextInterface *c, const char *printLabel, co
   char buf[64];
   char* dst = buf;
   int len = strnlen(printLabel, 48);
-  dst = stpncpy(dst, printLabel, len);
-  dst = stpcpy(dst, " ");
-  dst = stpncpy(dst, msgString, 63-len);
+  dst = strncpy(dst, printLabel, len);
+  dst = strcpy(dst, " ");
+  dst = strncpy(dst, msgString, 63-len);
   printf("> %s \n", buf);
 }
 
