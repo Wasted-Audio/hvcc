@@ -2,9 +2,7 @@
 import os
 import shutil
 import time
-import json
 from typing import DefaultDict
-import jinja2
 from ..buildjson import buildjson
 from ..copyright import copyright_manager
 from json2daisy import board_gen
