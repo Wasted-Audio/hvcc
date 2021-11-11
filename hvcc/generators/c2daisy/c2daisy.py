@@ -7,7 +7,7 @@ from typing import DefaultDict
 import jinja2
 from ..buildjson import buildjson
 from ..copyright import copyright_manager
-from .daisy_board_jen import generate_target_struct
+from json2daisy import board_gen
 
 
 class c2daisy:
@@ -47,52 +47,16 @@ class c2daisy:
             source_dir = os.path.join(out_dir, "source")
             shutil.copytree(c_src_dir, source_dir)
 
-            # initialize the jinja template environment
-            env = jinja2.Environment()
-
-            env.loader = jinja2.FileSystemLoader(
-                os.path.join(os.path.dirname(os.path.abspath(__file__)), "templates"))
-
-            # # generate Daisy wrapper from template
-
-            # daisy_h_path = os.path.join(source_dir, f"HeavyDaisy_{patch_name}.hpp")
-            # with open(daisy_h_path, "w") as f:
-            #     f.write(env.get_template("HeavyDaisy.hpp").render(
-            #         name=patch_name,
-            #         board=board,
-            #         class_name=f"HeavyDaisy_{patch_name}",
-            #         num_input_channels=num_input_channels,
-            #         num_output_channels=num_output_channels,
-            #         receivers=receiver_list,
-            #         copyright=copyright_c))
-            # daisy_cpp_path = os.path.join(source_dir, f"HeavyDaisy_{patch_name}.cpp")
-            # with open(daisy_cpp_path, "w") as f:
-            #     f.write(env.get_template("HeavyDaisy.cpp").render(
-            #         name=patch_name,
-            #         board=board,
-            #         class_name=f"HeavyDaisy_{patch_name}",
-            #         num_input_channels=num_input_channels,
-            #         num_output_channels=num_output_channels,
-            #         receivers=receiver_list,
-            #         pool_sizes_kb=externs["memoryPoolSizesKb"],
-            #         copyright=copyright_c))
-            if daisy_meta.get('description', {}):
-                targ_json = daisy_meta['description']
+            # supply a custom board description file, if it exists
+            if daisy_meta.get('board_file', {}):
+                board_description_file = daisy_meta['board_file']
             else:
-                try:
-                    targ = os.path.join(os.path.dirname(os.path.abspath(__file__)), "templates", f'{board}.json')
-                    with open(targ, 'r') as file:
-                        targ_json = json.load()
-                except FileNotFoundError:
-                    raise FileNotFoundError(f'Unknown Daisy board "{board}"')
+                board_description_file = ''
 
-            seed_defaults = os.path.join(os.path.dirname(os.path.abspath(__file__)), "templates", 'component_defaults.json')
-            patchsm_defaults = os.path.join(os.path.dirname(os.path.abspath(__file__)), "templates", 'component_defaults_patchsm.json')
-            hpp, cpp, makefile = generate_target_struct(
-                targ_json, 
-                "HeavyDaisy.hpp", 
-                "HeavyDaisy.cpp", 
-                {'seed': seed_defaults, 'patch_sm': patchsm_defaults}, 
+            # call the json2daisy module function
+            hpp, cpp, makefile = board_gen.generate_board(
+                board,
+                board_description_file, 
                 parameters=externs['parameters'],
                 name=patch_name,
                 class_name=f"HeavyDaisy_{patch_name}", 
