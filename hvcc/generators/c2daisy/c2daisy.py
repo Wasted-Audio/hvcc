@@ -2,7 +2,6 @@
 import os
 import shutil
 import time
-from typing import DefaultDict
 from ..buildjson import buildjson
 from ..copyright import copyright_manager
 from json2daisy import board_gen
