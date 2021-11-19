@@ -1,6 +1,5 @@
 
 from copy import deepcopy
-from os import replace
 
 def filter_match(set, key, match, key_exclude=None, match_exclude=None):
   if (key_exclude is not None and match_exclude is not None):
@@ -89,7 +88,15 @@ def de_alias(name, aliases, components):
   # otherwise, it's a direct parameter or unkown one
   return low
 
-def hvcc_ioparse(parameters, components, aliases, object_name):
+def parse_parameters(parameters, components, aliases, object_name):
+
+  """
+  Parses the `parameters` passed from hvcc and generates getters and setters
+  according to the info in `components`. The `aliases` help disambiguate parameters
+  and the `object_name` sets the identifier for the generated Daisy hardware class,
+  in this case `hardware`.
+  """
+
   # Verify that the params are valid and remove unused components
   replacements = {}
   params_in = {}

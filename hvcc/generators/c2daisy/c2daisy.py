@@ -45,12 +45,12 @@ class c2daisy:
             source_dir = os.path.join(out_dir, "source")
             shutil.copytree(c_src_dir, source_dir)
 
-            if daisy_meta.get('board_file', {}):
+            if daisy_meta.get('board_file'):
                 header, name, components, aliases = json2daisy.generate_header_from_file(daisy_meta['board_file'])
             else:
                 header, name, components, aliases = json2daisy.generate_header_from_name(board)
 
-            component_glue = parameters.hvcc_ioparse(externs['parameters'], components, aliases, 'hardware')
+            component_glue = parameters.parse_parameters(externs['parameters'], components, aliases, 'hardware')
             component_glue['class_name'] = name
             component_glue['patch_name'] = patch_name
             component_glue['header'] = f"HeavyDaisy_{patch_name}.hpp"
@@ -81,24 +81,11 @@ class c2daisy:
             with open(os.path.join(source_dir, "Makefile"), "w") as f:
                 f.write(rendered_makefile)
 
-            # generate list of Heavy source files
-            # files = os.listdir(source_dir)
-
             # ======================================================================================
-            # Linux
-            #
-            # linux_path = os.path.join(out_dir, "linux")
-            # os.makedirs(linux_path)
 
             buildjson.generate_json(
                 out_dir,
                 linux_x64_args=["-j"])
-            # macos_x64_args=["-project", "{0}.xcodeproj".format(patch_name), "-arch",
-            #                 "x86_64", "-alltargets"],
-            # win_x64_args=["/property:Configuration=Release", "/property:Platform=x64",
-            #               "/t:Rebuild", "{0}.sln".format(patch_name), "/m"],
-            # win_x86_args=["/property:Configuration=Release", "/property:Platform=x86",
-            #               "/t:Rebuild", "{0}.sln".format(patch_name), "/m"])
 
             return {
                 "stage": "c2daisy",
