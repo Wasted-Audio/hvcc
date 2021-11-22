@@ -134,8 +134,8 @@ def parse_parameters(parameters, components, aliases, object_name):
 
     for i in range(len(components) - 1, -1, -1):
         if not verify_param_used(
-                components[i], params_in, params_out, 
-                params_in_original_names, params_out_original_names, 
+                components[i], params_in, params_out,
+                params_in_original_names, params_out_original_names,
                 components):
             components.pop(i)
 
@@ -170,8 +170,8 @@ def parse_parameters(parameters, components, aliases, object_name):
         process = mapping["get"].format_map(component_info)
 
         replacements['callback_write_in'].append(
-            {"process": process, "bool": mapping["bool"], 
-            "hash_enum": params_in_original_names[param_name]})
+            {"process": process, "bool": mapping["bool"],
+                "hash_enum": params_in_original_names[param_name]})
 
     for param_name, param in params_out.items():
         root = get_root_component(

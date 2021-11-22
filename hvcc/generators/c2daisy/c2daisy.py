@@ -8,6 +8,7 @@ from ..copyright import copyright_manager
 import json2daisy
 from . import parameters
 
+
 class c2daisy:
     """ Generates a Daisy wrapper for a given patch.
     """
@@ -72,7 +73,7 @@ class c2daisy:
             makefile_replacements = {'name': patch_name}
             makefile_replacements['linker_script'] = daisy_meta.get('linker_script', '')
             if makefile_replacements['linker_script'] != '':
-              makefile_replacements['linker_script'] = f'../{daisy_meta["linker_script"]}'
+                makefile_replacements['linker_script'] = f'../{daisy_meta["linker_script"]}'
             depth = daisy_meta.get('libdaisy_depth', 2)
             makefile_replacements['libdaisy_path'] = f'{"../" * depth}libdaisy'
             makefile_replacements['bootloader'] = daisy_meta.get('bootloader', False)
