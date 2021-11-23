@@ -54,6 +54,7 @@ int main(void)
 
   for(;;)
   {
+    hardware.LoopProcess();
     Display();
     {% if  output_parameters|length > 0 %}
     LoopWriteOut();
