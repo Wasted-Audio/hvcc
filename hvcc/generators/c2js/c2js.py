@@ -17,6 +17,10 @@ import os
 import subprocess
 import time
 import jinja2
+
+from shutil import which
+
+from hvcc.core.hv2ir.HeavyException import HeavyException
 from ..copyright import copyright_manager
 
 
@@ -55,20 +59,12 @@ class c2js:
     def run_emscripten(clazz, c_src_dir, out_dir, patch_name, post_js_path):
         """Run the emcc command to compile C source files to a javascript library.
         """
-        emcc_path = os.path.abspath(os.path.join(
-            os.path.dirname(__file__), "emsdk", "emscripten", "1.37.38", "emcc"))
 
-        emcpp_path = os.path.abspath(os.path.join(
-            os.path.dirname(__file__), "emsdk", "emscripten", "1.37.38", "em++"))
-
-        if not os.path.isfile(emcc_path):
-            raise Exception("Emscripten emcc command line tool not installed, should be here: " + emcc_path)
-
-        if not os.path.isfile(emcpp_path):
-            raise Exception("Emscripten em++ command line tool not installed, should be here: " + emcpp_path)
+        if not which("emcc"):
+            raise HeavyException("emcc is not in the PATH")
 
         c_flags = [
-            "-I" + c_src_dir,
+            f"-I {c_src_dir}",
             "-DHV_SIMD_NONE",
             "-ffast-math",
             "-DNDEBUG",
@@ -82,49 +78,48 @@ class c2js:
 
         # compile C files
         for c in c_src_paths:
-            obj_path = os.path.splitext(c)[0] + ".o"
-            cmd = [emcc_path] + c_flags + ["-c", "-o", obj_path, c]
+            obj_path = f"{os.path.splitext(c)[0]}.o"
+            cmd = ["emcc"] + c_flags + ["-c", "-o", obj_path, c]
             subprocess.check_output(cmd)  # run emscripten
             obj_paths += [obj_path]
 
         # compile C++ files
         for cpp in cpp_src_paths:
-            obj_path = os.path.splitext(cpp)[0] + ".o"
-            cmd = [emcpp_path] + c_flags + ["-std=c++11"] + ["-c", "-o", obj_path, cpp]
+            obj_path = f"{os.path.splitext(cpp)[0]}.o"
+            cmd = ["emcc"] + c_flags + ["-std=c++11"] + ["-c", "-o", obj_path, cpp]
             subprocess.check_output(cmd)  # run emscripten
             obj_paths += [obj_path]
 
         # exported heavy api methods
-        hv_api_defs = ", ".join(["\"{0}\"".format(x) for x in c2js.__HV_API])
+        hv_api_defs = ", ".join([f"\"{x.format(patch_name)}\"" for x in c2js.__HV_API])
 
         # output path
-        asm_js_path = os.path.join(out_dir, "{0}.asm.js".format(patch_name))
-        wasm_js_path = os.path.join(out_dir, "{0}.js".format(patch_name))
+        asm_js_path = os.path.join(out_dir, f"{patch_name}.asm.js")
+        wasm_js_path = os.path.join(out_dir, f"{patch_name}.js")
 
         linker_flags = [
             "-O3",
             "--memory-init-file", "0",
             "-s", "RESERVED_FUNCTION_POINTERS=2",
-            "-s", "EXPORTED_FUNCTIONS=[" + hv_api_defs.format(patch_name) + "]",
+            "-s", f"EXPORTED_FUNCTIONS=[{hv_api_defs}]",
             "-s", "MODULARIZE=1",
-            "-s", "BINARYEN_TRAP_MODE='clamp'",
             "--post-js", post_js_path
         ]
 
         # include C/C++ obj files in js library
-        cmd = [emcc_path] + obj_paths + linker_flags
+        cmd = ["emcc"] + obj_paths + linker_flags
 
         # run emscripten twice!
         subprocess.check_output(  # fallback asm.js build
             cmd + [
-                "-s", "EXPORT_NAME='{0}_AsmModule'".format(patch_name),
+                "-s", f"EXPORT_NAME='{patch_name}_AsmModule'",
                 "-o", asm_js_path
             ])
 
         subprocess.check_output(  # WASM
             cmd + [
                 "-s", "WASM=1",
-                "-s", "EXPORT_NAME='{0}_Module'".format(patch_name),
+                "-s", f"EXPORT_NAME='{patch_name}_Module'",
                 "-o", wasm_js_path
             ])
 
@@ -185,7 +180,7 @@ class c2js:
             with open(os.path.join(out_dir, "index.html"), "w") as f:
                 f.write(env.get_template("index.html").render(
                     name=patch_name,
-                    includes=["./{0}".format(js_out_file)],
+                    includes=[f"./{js_out_file}"],
                     parameters=parameter_list,
                     events=event_list,
                     copyright=copyright_html))
