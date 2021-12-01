@@ -47,14 +47,16 @@ class c2daisy:
             shutil.copytree(c_src_dir, source_dir)
 
             if daisy_meta.get('board_file'):
-                header, name, components, aliases = json2daisy.generate_header_from_file(daisy_meta['board_file'])
+                header, board_info = json2daisy.generate_header_from_file(daisy_meta['board_file'])
             else:
-                header, name, components, aliases = json2daisy.generate_header_from_name(board)
+                header, board_info = json2daisy.generate_header_from_name(board)
 
-            component_glue = parameters.parse_parameters(externs['parameters'], components, aliases, 'hardware')
-            component_glue['class_name'] = name
+            component_glue = parameters.parse_parameters(externs['parameters'], board_info['components'], board_info['aliases'], 'hardware')
+            component_glue['class_name'] = board_info['name']
             component_glue['patch_name'] = patch_name
             component_glue['header'] = f"HeavyDaisy_{patch_name}.hpp"
+            component_glue['max_channels'] = board_info['channels']
+            component_glue['num_output_channels'] = num_output_channels
 
             component_glue['copyright'] = copyright_c
 

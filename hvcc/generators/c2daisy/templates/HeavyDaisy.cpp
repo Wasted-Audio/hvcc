@@ -67,6 +67,14 @@ int main(void)
  */
 void audiocallback(daisy::AudioHandle::InputBuffer in, daisy::AudioHandle::OutputBuffer out, size_t size)
 {
+  {% if num_output_channels == 0 %}
+  // A zero fill to keep I/O quiet for a patch lacking ADC~/DAC~
+  for (size_t chn = 0; chn < {{max_channels}}; chn++)
+  {
+    for (size_t i = 0; i < size; i++)
+      out[chn][i] = 0;
+  }
+  {% endif %}
   hv.process((float**)in, (float**)out, size);
   {% if  parameters|length > 0 %}
   hardware.ProcessAllControls();
