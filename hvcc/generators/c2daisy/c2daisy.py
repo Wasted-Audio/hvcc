@@ -51,7 +51,8 @@ class c2daisy:
             else:
                 header, board_info = json2daisy.generate_header_from_name(board)
 
-            component_glue = parameters.parse_parameters(externs['parameters'], board_info['components'], board_info['aliases'], 'hardware')
+            component_glue = parameters.parse_parameters(
+                externs['parameters'], board_info['components'], board_info['aliases'], 'hardware')
             component_glue['class_name'] = board_info['name']
             component_glue['patch_name'] = patch_name
             component_glue['header'] = f"HeavyDaisy_{patch_name}.hpp"
