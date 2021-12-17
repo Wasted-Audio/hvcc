@@ -195,7 +195,8 @@ def parse_parameters(parameters, components, aliases, object_name):
         component_info['default_prefix'] = default_prefix
         write = mapping["set"].format_map(component_info)
 
-        replacements[write_location].append({"process": write, "bool": mapping.get('bool', False), "value": component_info['value']})
+        replacements[write_location].append(
+            {"process": write, "bool": mapping.get('bool', False), "value": component_info['value']})
         out_idx += 1
 
     replacements['output_comps'] = len(replacements['output_parameters'])
