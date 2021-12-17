@@ -143,8 +143,8 @@ def parse_parameters(parameters, components, aliases, object_name):
 
     replacements['parameters'] = []
     replacements['output_parameters'] = []
-    replacements['callback_write_out'] = ''
-    replacements['loop_write_out'] = ''
+    replacements['callback_write_out'] = []
+    replacements['loop_write_out'] = []
     replacements['callback_write_in'] = []
 
     for param_name, param in params_in.items():
@@ -170,7 +170,7 @@ def parse_parameters(parameters, components, aliases, object_name):
         process = mapping["get"].format_map(component_info)
 
         replacements['callback_write_in'].append(
-            {"process": process, "bool": mapping["bool"],
+            {"process": process, "bool": mapping.get('bool', False),
                 "hash_enum": params_in_original_names[param_name]})
 
     for param_name, param in params_out.items():
@@ -195,7 +195,7 @@ def parse_parameters(parameters, components, aliases, object_name):
         component_info['default_prefix'] = default_prefix
         write = mapping["set"].format_map(component_info)
 
-        replacements[write_location] += f'\n  {write}'
+        replacements[write_location].append({"process": write, "bool": mapping.get('bool', False), "value": component_info['value']})
         out_idx += 1
 
     replacements['output_comps'] = len(replacements['output_parameters'])

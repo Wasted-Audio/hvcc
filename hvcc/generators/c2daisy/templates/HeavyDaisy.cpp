@@ -75,11 +75,11 @@ void audiocallback(daisy::AudioHandle::InputBuffer in, daisy::AudioHandle::Outpu
       out[chn][i] = 0;
   }
   {% endif %}
-  hv.process((float**)in, (float**)out, size);
   {% if  parameters|length > 0 %}
   hardware.ProcessAllControls();
   CallbackWriteIn(hv);
   {% endif %}
+  hv.process((float**)in, (float**)out, size);
   {% if  output_parameters|length > 0 %}
   CallbackWriteOut();
   {% endif %}
@@ -121,14 +121,28 @@ void CallbackWriteIn(Heavy_{{patch_name}}& hv)
  * 
  */
 void LoopWriteOut() {
-  {{loop_write_out}}
+  {% for param in loop_write_out %}
+  {% if param.bool %} 
+  if ({{param.value}})
+    {{param.process}}
+  {% else %}
+  {{param.process}}
+  {% endif %}
+  {% endfor %}
 }
 
 /** Writes the values sent to PD's receive objects to the Daisy hardware during the audio callback
  * 
  */
 void CallbackWriteOut() {
-  {{callback_write_out}}
+  {% for param in callback_write_out %}
+  {% if param.bool %} 
+  if ({{param.value}})
+    {{param.process}}
+  {% else %}
+  {{param.process}}
+  {% endif %}
+  {% endfor %}
 }
 
 /** Handles the display code if the hardware defines a display
