@@ -15,6 +15,7 @@ Heavy_{{patch_name}} hv(SAMPLE_RATE);
 void audiocallback(daisy::AudioHandle::InputBuffer in, daisy::AudioHandle::OutputBuffer out, size_t size);
 static void sendHook(HeavyContextInterface *c, const char *receiverName, uint32_t receiverHash, const HvMessage * m);
 void CallbackWriteIn(Heavy_{{patch_name}}& hv);
+void LoopWriteIn(Heavy_{{patch_name}}& hv);
 void CallbackWriteOut();
 void LoopWriteOut();
 void PostProcess();
@@ -31,16 +32,29 @@ struct DaisyHvParamOut
 {
 	uint32_t hash;
 	uint32_t index;
+  void (*hook_write_out)(float);
 
 	void Process(float sig)
 	{
 		output_data[index] = sig;
+    if (hook_write_out)
+      (*hook_write_out)(sig);
 	}
 };
 
+{% for param in hook_write_out %}
+void {{param.name}}_hook(float sig) {
+  {{param.process}}
+};
+{% endfor %}
+
 DaisyHvParamOut DaisyOutputParameters[DaisyNumOutputParameters] = {
 	{% for param in output_parameters %}
-		{ (uint32_t) HV_{{patch_name|upper}}_PARAM_OUT_{{param.hash_enum|upper}}, {{param.index}} }, // {{param.name}}
+  {% if param.hook %}
+    { (uint32_t) HV_{{patch_name|upper}}_PARAM_OUT_{{param.hash_enum|upper}}, {{param.index}}, &{{param.name}}_hook }, // {{param.name}}
+  {% else %}
+		{ (uint32_t) HV_{{patch_name|upper}}_PARAM_OUT_{{param.hash_enum|upper}}, {{param.index}}, nullptr }, // {{param.name}}
+  {% endif %}
 	{% endfor %}
 };
 {% endif %}
@@ -56,6 +70,9 @@ int main(void)
   {
     hardware.LoopProcess();
     Display();
+    {% if loop_write_in|length > 0 %}
+    LoopWriteIn(hv);
+    {% endif %}
     {% if  output_parameters|length > 0 %}
     LoopWriteOut();
     {% endif %}
@@ -102,7 +119,22 @@ static void sendHook(HeavyContextInterface *c, const char *receiverName, uint32_
   {% endif %}
 }
 
-/** Sends signals from the Daisy hardware to the PD patch via the receive objects.
+/** Sends signals from the Daisy hardware to the PD patch via the receive objects during the main loop
+ * 
+ */
+void LoopWriteIn(Heavy_{{patch_name}}& hv)
+{
+  {% for param in loop_write_in %}
+  {% if param.bool %} 
+  if ({{param.process}})
+    hv.sendBangToReceiver((uint32_t) HV_{{patch_name|upper}}_PARAM_IN_{{param.hash_enum|upper}}); 
+  {% else %}
+  hv.sendFloatToReceiver((uint32_t) HV_{{patch_name|upper}}_PARAM_IN_{{param.hash_enum|upper}}, {{param.process}}); 
+  {% endif %}
+  {% endfor %}
+}
+
+/** Sends signals from the Daisy hardware to the PD patch via the receive objects during the audio callback
  * 
  */
 void CallbackWriteIn(Heavy_{{patch_name}}& hv)

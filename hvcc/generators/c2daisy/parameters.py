@@ -143,8 +143,10 @@ def parse_parameters(parameters, components, aliases, object_name):
 
     replacements['parameters'] = []
     replacements['output_parameters'] = []
+    replacements['loop_write_in'] = []
     replacements['callback_write_out'] = []
     replacements['loop_write_out'] = []
+    replacements['hook_write_out'] = []
     replacements['callback_write_in'] = []
 
     for param_name, param in params_in.items():
@@ -157,8 +159,8 @@ def parse_parameters(parameters, components, aliases, object_name):
         mapping = get_component_mapping(
             param_name, params_in_original_names[param_name], component, components)
 
-        write_location = 'callback_write_out' if mapping.get(
-            'where', 'callback') == 'callback' else 'loop_write_out'
+        write_location = 'callback_write_in' if mapping.get(
+            'where', 'callback') == 'callback' else 'loop_write_in'
         component_info = deepcopy(component)
         component_info['name'] = root
         component_info['class_name'] = object_name
@@ -169,7 +171,7 @@ def parse_parameters(parameters, components, aliases, object_name):
             "default_prefix", '') if component.get('default', False) else ''
         process = mapping["get"].format_map(component_info)
 
-        replacements['callback_write_in'].append(
+        replacements[write_location].append(
             {"process": process, "bool": mapping.get('bool', False),
                 "hash_enum": params_in_original_names[param_name]})
 
@@ -177,26 +179,40 @@ def parse_parameters(parameters, components, aliases, object_name):
         root = get_root_component(
             param_name, params_out_original_names[param_name], components)
         component = list(filter_match(components, 'name', root))[0]
-        param_struct = {
-            'hash_enum': params_out_original_names[param_name], 'index': out_idx, 'name': param_name}
-        replacements['output_parameters'].append(param_struct)
+
         mapping = get_component_mapping(
             param_name, params_out_original_names[param_name], component, components)
 
         default_prefix = component.get(
             "default_prefix", '') if component.get('default', False) else ''
-        write_location = 'callback_write_out' if mapping.get(
-            'where', 'callback') == 'callback' else 'loop_write_out'
+
+        write_locations = {'callback': 'callback_write_out',
+                           'loop': 'loop_write_out',
+                           'hook': 'hook_write_out'}
+
+        write_location = write_locations.get(mapping.get('where', 'callback'), 'callback_write_out')
+
+        param_struct = {
+            'hash_enum': params_out_original_names[param_name],
+            'index': out_idx, 'name': param_name,
+            'hook': write_location == 'hook_write_out'}
+        replacements['output_parameters'].append(param_struct)
+
         component_info = deepcopy(component)
         component_info['hash_enum'] = params_out_original_names[param_name]
         component_info['name'] = root
         component_info['class_name'] = object_name
-        component_info['value'] = f'output_data[{out_idx}]'
+        component_info['value'] = f'output_data[{out_idx}]' if \
+            write_location != 'hook_write_out' else 'sig'
         component_info['default_prefix'] = default_prefix
         write = mapping["set"].format_map(component_info)
 
         replacements[write_location].append(
-            {"process": write, "bool": mapping.get('bool', False), "value": component_info['value']})
+            {"name": param_name,
+             "process": write,
+             "bool": mapping.get('bool', False),
+             "value": component_info['value']})
+
         out_idx += 1
 
     replacements['output_comps'] = len(replacements['output_parameters'])
