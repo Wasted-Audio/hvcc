@@ -1,10 +1,33 @@
 CHANGELOG
 =====
 
-Next Release
+0.4.0
 -----
 
-* Daisy support
+* Midi realtime messages
+* Host transport to midi-rt
+* Midi message scheduling improvements
+* Bugfix: minimum midi channel
+* Bugfix: windows console_script
+
+0.3.0
+-----
+
+* Midi I/O extensions for DPF
+* Midi bugfixes for [notein], [pgmin], [touchin], [bendin], [midiin]
+* Midi bugfixes for [noteout], [pgmout], [touchout], [bendout], [midiout]
+* Midi docs update
+* DPF minimal Midi examples
+
+0.2.0
+-----
+
+* metadata json for generator config
+* add trig attribute type
+* Daisy platform support
+* DPF cleanup + meta + trig
+* documentation update
+* DPF makefiles + meaningful values + docs
 
 0.1.2
 -----

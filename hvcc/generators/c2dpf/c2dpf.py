@@ -14,7 +14,7 @@ class c2dpf:
 
     @classmethod
     def filter_uniqueid(clazz, s):
-        """ Return a unique id (in hexadcemial) for the VST interface.
+        """ Return a unique id (in hexadecimal) for the Plugin interface.
         """
         s = hashlib.md5(s.encode('utf-8'))
         s = s.hexdigest().upper()[0:8]
@@ -23,14 +23,20 @@ class c2dpf:
 
     @classmethod
     def compile(clazz, c_src_dir, out_dir, externs,
-                patch_name=None, num_input_channels=0, num_output_channels=0,
+                patch_name=None, patch_meta: dict = None,
+                num_input_channels=0, num_output_channels=0,
                 copyright=None, verbose=False):
 
         tick = time.time()
 
         receiver_list = externs['parameters']['in']
 
-        patch_name = patch_name or "heavy"
+        if patch_meta:
+            patch_name = patch_meta.get("name", patch_name)
+            dpf_meta = patch_meta.get("dpf", {})
+        else:
+            dpf_meta = {}
+        dpf_project = dpf_meta.get('project')
 
         copyright_c = copyright_manager.get_copyright_for_c(copyright)
         # copyright_plist = copyright or u"Copyright {0} Enzien Audio, Ltd." \
@@ -44,6 +50,9 @@ class c2dpf:
 
             # copy over static files
             shutil.copytree(os.path.join(os.path.dirname(__file__), "static"), out_dir)
+
+            if dpf_project:
+                shutil.copy(os.path.join(os.path.dirname(__file__), "static/README.md"), f'{out_dir}/../')
 
             # copy over generated C source files
             source_dir = os.path.join(out_dir, "source")
@@ -61,6 +70,7 @@ class c2dpf:
             with open(dpf_h_path, "w") as f:
                 f.write(env.get_template("HeavyDPF.hpp").render(
                     name=patch_name,
+                    meta=dpf_meta,
                     class_name=f"HeavyDPF_{patch_name}",
                     num_input_channels=num_input_channels,
                     num_output_channels=num_output_channels,
@@ -70,6 +80,7 @@ class c2dpf:
             with open(dpf_cpp_path, "w") as f:
                 f.write(env.get_template("HeavyDPF.cpp").render(
                     name=patch_name,
+                    meta=dpf_meta,
                     class_name=f"HeavyDPF_{patch_name}",
                     num_input_channels=num_input_channels,
                     num_output_channels=num_output_channels,
@@ -80,6 +91,7 @@ class c2dpf:
             with open(dpf_h_path, "w") as f:
                 f.write(env.get_template("DistrhoPluginInfo.h").render(
                     name=patch_name,
+                    meta=dpf_meta,
                     class_name=f"HeavyDPF_{patch_name}",
                     num_input_channels=num_input_channels,
                     num_output_channels=num_output_channels,
@@ -92,14 +104,19 @@ class c2dpf:
 
             # ======================================================================================
             # Linux
-            #
-            # linux_path = os.path.join(out_dir, "linux")
-            # os.makedirs(linux_path)
 
+            # plugin makefile
             with open(os.path.join(source_dir, "Makefile"), "w") as f:
                 f.write(env.get_template("Makefile").render(
                     name=patch_name,
-                    class_name=f"HeavyDPF_{patch_name}"))
+                    meta=dpf_meta))
+
+            # project makefile
+            if dpf_project:
+                with open(os.path.join(source_dir, "../../Makefile"), "w") as f:
+                    f.write(env.get_template("Makefile.project").render(
+                        name=patch_name,
+                        meta=dpf_meta))
 
             buildjson.generate_json(
                 out_dir,

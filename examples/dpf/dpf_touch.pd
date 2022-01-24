@@ -1,0 +1,10 @@
+#N canvas 1067 404 356 143 12;
+#X obj 150 53 hsl 128 15 0 127 0 0 empty empty empty -2 -8 0 10 -262144
+-1 -1 0 1;
+#X obj 25 57 print;
+#X obj 25 24 touchin;
+#X obj 116 100 touchout;
+#X obj 116 23 r touch @hv_param 0 127 0;
+#X connect 0 0 3 0;
+#X connect 2 0 1 0;
+#X connect 4 0 3 0;
