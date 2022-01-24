@@ -4,8 +4,14 @@ import os
 import shutil
 import time
 import jinja2
+import json
 from ..buildjson import buildjson
 from ..copyright import copyright_manager
+import hvcc.core.hv2ir.HeavyLangObject as HeavyLangObject
+
+
+heavy_hash = HeavyLangObject.HeavyLangObject.get_hash
+OWL_BUTTONS = ['Push', 'B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8']
 
 
 class c2owl:
@@ -28,13 +34,53 @@ class c2owl:
 
         tick = time.time()
 
-        receiver_list = externs['parameters']['in']
+        def make_jdata(patch_ir):
+            jdata = list()
+
+            with open(patch_ir, mode="r") as f:
+                ir = json.load(f)
+
+                for name, v in ir['control']['receivers'].items():
+                    # skip __hv_init and similar
+                    if name.startswith("__"):
+                        continue
+
+                    # If a name has been specified
+                    if 'owl' in v['attributes'] and v['attributes']['owl'] is not None:
+                        key = v['attributes']['owl']
+                        jdata.append((key, name, 'RECV', f"0x{heavy_hash(name)}",
+                                      v['attributes']['min'],
+                                      v['attributes']['max'],
+                                      v['attributes']['default'],
+                                      key in OWL_BUTTONS))
+
+                    elif name.startswith('Channel-'):
+                        key = name.split('Channel-', 1)[1]
+                        jdata.append((key, name, 'RECV', f"0x{heavy_hash(name)}",
+                                      0, 1, None, key in OWL_BUTTONS))
+
+                for k, v in ir['objects'].items():
+                    try:
+                        if v['type'] == '__send':
+                            name = v['args']['name']
+                            if 'owl' in v['args']['attributes'] and v['args']['attributes']['owl'] is not None:
+                                key = v['args']['attributes']['owl']
+                                jdata.append((key, f'{name}>', 'SEND', f"0x{heavy_hash(name)}",
+                                              v['args']['attributes']['min'],
+                                              v['args']['attributes']['max'],
+                                              v['args']['attributes']['default'],
+                                              key in OWL_BUTTONS))
+                            elif name.startswith('Channel-'):
+                                key = name.split('Channel-', 1)[1]
+                                jdata.append((key, f'{name}>', 'SEND', f"0x{heavy_hash(name)}",
+                                              0, 1, None, key in OWL_BUTTONS))
+                    except Exception:
+                        pass
+
+                return jdata
 
         patch_name = patch_name or "heavy"
-
         copyright_c = copyright_manager.get_copyright_for_c(copyright)
-        # copyright_plist = copyright or u"Copyright {0} Enzien Audio, Ltd." \
-        #     " All Rights Reserved.".format(datetime.datetime.now().year)
 
         try:
             # ensure that the output directory does not exist
@@ -56,25 +102,22 @@ class c2owl:
             env.loader = jinja2.FileSystemLoader(
                 os.path.join(os.path.dirname(os.path.abspath(__file__)), "templates"))
 
+            # construct jdata from ir
+            ir_dir = os.path.join(c_src_dir, "../ir")
+            patch_ir = os.path.join(ir_dir, f"{patch_name}.heavy.ir.json")
+            jdata = make_jdata(patch_ir)
+
             # generate OWL wrapper from template
             owl_h_path = os.path.join(source_dir, f"HeavyOWL_{patch_name}.hpp")
             with open(owl_h_path, "w") as f:
-                f.write(env.get_template("HeavyOWL.hpp").render(
+                f.write(env.get_template("HeavyOwl.hpp").render(
+                    jdata=jdata,
                     name=patch_name,
-                    class_name=f"HeavyOWL_{patch_name}",
-                    num_input_channels=num_input_channels,
-                    num_output_channels=num_output_channels,
-                    receivers=receiver_list,
                     copyright=copyright_c))
             owl_h_path = os.path.join(source_dir, "HeavyOwlConstants.h")
             with open(owl_h_path, "w") as f:
                 f.write(env.get_template("HeavyOwlConstants.h").render(
-                    name=patch_name,
-                    class_name=f"HeavyOWL_{patch_name}",
-                    num_input_channels=num_input_channels,
-                    num_output_channels=num_output_channels,
-                    receivers=receiver_list,
-                    pool_sizes_kb=externs["memoryPoolSizesKb"],
+                    jdata=jdata,
                     copyright=copyright_c))
 
             # generate list of Heavy source files
@@ -86,10 +129,10 @@ class c2owl:
             # linux_path = os.path.join(out_dir, "linux")
             # os.makedirs(linux_path)
 
-            with open(os.path.join(source_dir, "Makefile"), "w") as f:
-                f.write(env.get_template("Makefile").render(
-                    name=patch_name,
-                    class_name=f"HeavyOWL_{patch_name}"))
+            # with open(os.path.join(source_dir, "Makefile"), "w") as f:
+            #     f.write(env.get_template("Makefile").render(
+            #         name=patch_name,
+            #         class_name=f"HeavyOWL_{patch_name}"))
 
             buildjson.generate_json(
                 out_dir,

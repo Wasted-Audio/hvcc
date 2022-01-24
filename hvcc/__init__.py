@@ -316,7 +316,7 @@ def compile_dataflow(in_path, out_dir, patch_name=None, patch_meta_file=None,
             print("--> Generating OWL plugin")
         results["c2owl"] = c2owl.c2owl.compile(
             c_src_dir=c_src_dir,
-            out_dir=os.path.join(out_dir, "plugin"),
+            out_dir=os.path.join(out_dir, "owl"),
             patch_name=patch_name,
             num_input_channels=num_input_channels,
             num_output_channels=num_output_channels,
