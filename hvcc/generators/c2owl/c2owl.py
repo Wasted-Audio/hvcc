@@ -19,13 +19,51 @@ class c2owl:
     """
 
     @classmethod
-    def filter_uniqueid(clazz, s):
-        """ Return a unique id (in hexadcemial) for the VST interface.
-        """
-        s = hashlib.md5(s.encode('utf-8'))
-        s = s.hexdigest().upper()[0:8]
-        s = f"0x{s}"
-        return s
+    def make_jdata(clazz, patch_ir):
+        jdata = list()
+
+        with open(patch_ir, mode="r") as f:
+            ir = json.load(f)
+
+            for name, v in ir['control']['receivers'].items():
+                # skip __hv_init and similar
+                if name.startswith("__"):
+                    continue
+
+                # If a name has been specified
+                if 'owl' in v['attributes'] and v['attributes']['owl'] is not None:
+                    key = v['attributes']['owl']
+                    jdata.append((key, name, 'RECV', f"0x{heavy_hash(name)}",
+                                    v['attributes']['min'],
+                                    v['attributes']['max'],
+                                    v['attributes']['default'],
+                                    key in OWL_BUTTONS))
+
+                elif name.startswith('Channel-'):
+                    key = name.split('Channel-', 1)[1]
+                    jdata.append((key, name, 'RECV', f"0x{heavy_hash(name)}",
+                                    0, 1, None, key in OWL_BUTTONS))
+
+            for k, v in ir['objects'].items():
+                try:
+                    if v['type'] == '__send':
+                        name = v['args']['name']
+                        if 'owl' in v['args']['attributes'] and v['args']['attributes']['owl'] is not None:
+                            key = v['args']['attributes']['owl']
+                            jdata.append((key, f'{name}>', 'SEND', f"0x{heavy_hash(name)}",
+                                            v['args']['attributes']['min'],
+                                            v['args']['attributes']['max'],
+                                            v['args']['attributes']['default'],
+                                            key in OWL_BUTTONS))
+                        elif name.startswith('Channel-'):
+                            key = name.split('Channel-', 1)[1]
+                            jdata.append((key, f'{name}>', 'SEND', f"0x{heavy_hash(name)}",
+                                            0, 1, None, key in OWL_BUTTONS))
+                except Exception:
+                    pass
+
+            return jdata
+
 
     @classmethod
     def compile(clazz, c_src_dir, out_dir, externs,
@@ -34,50 +72,6 @@ class c2owl:
 
         tick = time.time()
 
-        def make_jdata(patch_ir):
-            jdata = list()
-
-            with open(patch_ir, mode="r") as f:
-                ir = json.load(f)
-
-                for name, v in ir['control']['receivers'].items():
-                    # skip __hv_init and similar
-                    if name.startswith("__"):
-                        continue
-
-                    # If a name has been specified
-                    if 'owl' in v['attributes'] and v['attributes']['owl'] is not None:
-                        key = v['attributes']['owl']
-                        jdata.append((key, name, 'RECV', f"0x{heavy_hash(name)}",
-                                      v['attributes']['min'],
-                                      v['attributes']['max'],
-                                      v['attributes']['default'],
-                                      key in OWL_BUTTONS))
-
-                    elif name.startswith('Channel-'):
-                        key = name.split('Channel-', 1)[1]
-                        jdata.append((key, name, 'RECV', f"0x{heavy_hash(name)}",
-                                      0, 1, None, key in OWL_BUTTONS))
-
-                for k, v in ir['objects'].items():
-                    try:
-                        if v['type'] == '__send':
-                            name = v['args']['name']
-                            if 'owl' in v['args']['attributes'] and v['args']['attributes']['owl'] is not None:
-                                key = v['args']['attributes']['owl']
-                                jdata.append((key, f'{name}>', 'SEND', f"0x{heavy_hash(name)}",
-                                              v['args']['attributes']['min'],
-                                              v['args']['attributes']['max'],
-                                              v['args']['attributes']['default'],
-                                              key in OWL_BUTTONS))
-                            elif name.startswith('Channel-'):
-                                key = name.split('Channel-', 1)[1]
-                                jdata.append((key, f'{name}>', 'SEND', f"0x{heavy_hash(name)}",
-                                              0, 1, None, key in OWL_BUTTONS))
-                    except Exception:
-                        pass
-
-                return jdata
 
         patch_name = patch_name or "heavy"
         copyright_c = copyright_manager.get_copyright_for_c(copyright)
@@ -95,9 +89,11 @@ class c2owl:
             source_dir = os.path.join(out_dir, "source")
             shutil.copytree(c_src_dir, source_dir)
 
+            # copy over deps
+            shutil.copytree(os.path.join(os.path.dirname(__file__), "deps"), source_dir, dirs_exist_ok=True)
+
             # initialize the jinja template environment
             env = jinja2.Environment()
-            env.filters["uniqueid"] = c2owl.filter_uniqueid
 
             env.loader = jinja2.FileSystemLoader(
                 os.path.join(os.path.dirname(os.path.abspath(__file__)), "templates"))
@@ -105,7 +101,7 @@ class c2owl:
             # construct jdata from ir
             ir_dir = os.path.join(c_src_dir, "../ir")
             patch_ir = os.path.join(ir_dir, f"{patch_name}.heavy.ir.json")
-            jdata = make_jdata(patch_ir)
+            jdata = c2owl.make_jdata(patch_ir)
 
             # generate OWL wrapper from template
             owl_h_path = os.path.join(source_dir, f"HeavyOWL_{patch_name}.hpp")
