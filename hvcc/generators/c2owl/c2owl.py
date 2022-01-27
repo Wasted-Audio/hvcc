@@ -1,5 +1,4 @@
 # import datetime
-import hashlib
 import os
 import shutil
 import time
@@ -34,15 +33,15 @@ class c2owl:
                 if 'owl' in v['attributes'] and v['attributes']['owl'] is not None:
                     key = v['attributes']['owl']
                     jdata.append((key, name, 'RECV', f"0x{heavy_hash(name)}",
-                                    v['attributes']['min'],
-                                    v['attributes']['max'],
-                                    v['attributes']['default'],
-                                    key in OWL_BUTTONS))
+                                  v['attributes']['min'],
+                                  v['attributes']['max'],
+                                  v['attributes']['default'],
+                                  key in OWL_BUTTONS))
 
                 elif name.startswith('Channel-'):
                     key = name.split('Channel-', 1)[1]
                     jdata.append((key, name, 'RECV', f"0x{heavy_hash(name)}",
-                                    0, 1, None, key in OWL_BUTTONS))
+                                  0, 1, None, key in OWL_BUTTONS))
 
             for k, v in ir['objects'].items():
                 try:
@@ -51,19 +50,18 @@ class c2owl:
                         if 'owl' in v['args']['attributes'] and v['args']['attributes']['owl'] is not None:
                             key = v['args']['attributes']['owl']
                             jdata.append((key, f'{name}>', 'SEND', f"0x{heavy_hash(name)}",
-                                            v['args']['attributes']['min'],
-                                            v['args']['attributes']['max'],
-                                            v['args']['attributes']['default'],
-                                            key in OWL_BUTTONS))
+                                          v['args']['attributes']['min'],
+                                          v['args']['attributes']['max'],
+                                          v['args']['attributes']['default'],
+                                          key in OWL_BUTTONS))
                         elif name.startswith('Channel-'):
                             key = name.split('Channel-', 1)[1]
                             jdata.append((key, f'{name}>', 'SEND', f"0x{heavy_hash(name)}",
-                                            0, 1, None, key in OWL_BUTTONS))
+                                          0, 1, None, key in OWL_BUTTONS))
                 except Exception:
                     pass
 
             return jdata
-
 
     @classmethod
     def compile(clazz, c_src_dir, out_dir, externs,
@@ -71,7 +69,6 @@ class c2owl:
                 copyright=None, verbose=False):
 
         tick = time.time()
-
 
         patch_name = patch_name or "heavy"
         copyright_c = copyright_manager.get_copyright_for_c(copyright)
@@ -82,15 +79,11 @@ class c2owl:
             if os.path.exists(out_dir):
                 shutil.rmtree(out_dir)
 
-            # copy over static files
-            shutil.copytree(os.path.join(os.path.dirname(__file__), "static"), out_dir)
-
             # copy over generated C source files
-            source_dir = os.path.join(out_dir, "source")
-            shutil.copytree(c_src_dir, source_dir)
+            shutil.copytree(c_src_dir, out_dir)
 
             # copy over deps
-            shutil.copytree(os.path.join(os.path.dirname(__file__), "deps"), source_dir, dirs_exist_ok=True)
+            shutil.copytree(os.path.join(os.path.dirname(__file__), "deps"), out_dir, dirs_exist_ok=True)
 
             # initialize the jinja template environment
             env = jinja2.Environment()
@@ -104,20 +97,20 @@ class c2owl:
             jdata = c2owl.make_jdata(patch_ir)
 
             # generate OWL wrapper from template
-            owl_h_path = os.path.join(source_dir, f"HeavyOWL_{patch_name}.hpp")
+            owl_h_path = os.path.join(out_dir, f"HeavyOWL_{patch_name}.hpp")
             with open(owl_h_path, "w") as f:
                 f.write(env.get_template("HeavyOwl.hpp").render(
                     jdata=jdata,
                     name=patch_name,
                     copyright=copyright_c))
-            owl_h_path = os.path.join(source_dir, "HeavyOwlConstants.h")
+            owl_h_path = os.path.join(out_dir, "HeavyOwlConstants.h")
             with open(owl_h_path, "w") as f:
                 f.write(env.get_template("HeavyOwlConstants.h").render(
                     jdata=jdata,
                     copyright=copyright_c))
 
             # generate list of Heavy source files
-            # files = os.listdir(source_dir)
+            # files = os.listdir(out_dir)
 
             # ======================================================================================
             # Linux
@@ -125,7 +118,7 @@ class c2owl:
             # linux_path = os.path.join(out_dir, "linux")
             # os.makedirs(linux_path)
 
-            # with open(os.path.join(source_dir, "Makefile"), "w") as f:
+            # with open(os.path.join(out_dir, "Makefile"), "w") as f:
             #     f.write(env.get_template("Makefile").render(
             #         name=patch_name,
             #         class_name=f"HeavyOWL_{patch_name}"))
