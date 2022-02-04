@@ -94,7 +94,7 @@ class HeavyGraph(HeavyIrObject):
                         # set to the default value. These unset variables are simply
                         # removed from the argument dictionary
                         args.pop(key, None)
-                        self.add_warning("Variable \"{0}\":\"{1}\" could not be resolved.".format(key, value))
+                        self.add_warning(f"Variable \"{key}\":\"{value}\" could not be resolved.")
                     else:
                         args[key] = value
         return args
@@ -106,7 +106,7 @@ class HeavyGraph(HeavyIrObject):
         """
         if require_intra_graph_connection:
             assert c.from_object.graph is c.to_object.graph, \
-                "Conection established between two objects not in the same graph: {0}".format(c)
+                f"Conection established between two objects not in the same graph: {c}"
 
         # add the connection from the parent to the child
         c.from_object.add_connection(c)
@@ -142,7 +142,7 @@ class HeavyGraph(HeavyIrObject):
                 for n in n_list:
                     n.from_object.add_connection(n)
             else:
-                raise HeavyException("Connections must have a common endpoint: {0} / {1}".format(c, n))
+                raise HeavyException(f"Connections must have a common endpoint: {c} / {n}")
         elif c is not None and len(n_list) == 0:
             self.disconnect_objects(c)  # remove connection c
         elif c is None and len(n_list) > 0:
@@ -192,7 +192,7 @@ class HeavyGraph(HeavyIrObject):
                     static=obj.static,
                     unique=True)
         else:
-            self.add_error("Duplicate object id {0} found in graph.".format(obj_id))
+            self.add_error(f"Duplicate object id {obj_id} found in graph.")
 
     def __register_named_object(self, obj, name=None, static=False, unique=False):
         """ Register a named object at the appropriate graph level.
@@ -209,7 +209,7 @@ class HeavyGraph(HeavyIrObject):
         elif obj.scope == "public" or static:
             self.get_root_graph().local_vars.register_object(obj, name, static, unique)
         else:
-            raise HeavyException("Unknown scope \"{0}\" for object {1}.".format(obj.scope, obj))
+            raise HeavyException(f"Unknown scope \"{obj.scope}\" for object {obj}.")
 
     def __unregister_named_object(self, obj, name=None, static=False, unique=False):
         """ Unregister a named object at the appropriate graph level.
@@ -225,7 +225,7 @@ class HeavyGraph(HeavyIrObject):
         elif obj.scope == "public" or static:
             self.get_root_graph().local_vars.unregister_object(obj, name)
         else:
-            raise HeavyException("Unknown scope \"{0}\" for object {1}.".format(obj.scope, obj))
+            raise HeavyException(f"Unknown scope \"{obj.scope}\" for object {obj}.")
 
     def resolve_objects_for_name(self, name, obj_types, local_graph=None):
         """ Returns all objects with the given name and type that are visible
@@ -697,13 +697,12 @@ class HeavyGraph(HeavyIrObject):
             scope = list(set([r.annotations["scope"] for r in receivers]))
 
             if len(extern) > 1:
-                self.add_error("Parameter \"{0}\" has conflicting extern types: {1} != {2}".format(
-                    name, extern[0], extern[1]))
+                self.add_error(f"Parameter \"{name}\" has conflicting extern types: {extern[0]} != {extern[1]}")
 
             # NOTE(mhroth): not checking for conflicting scope types right now. Not sure what to do with it.
 
             if not all(attributes[0] == a for a in attributes):
-                self.add_error("Conflicting min/max/default values for parameter \"{0}\"".format(name))
+                self.add_error(f"Conflicting min/max/default values for parameter \"{name}\"")
 
             # create a new receiver
             recv = HIrReceive("__receive",
@@ -773,10 +772,8 @@ class HeavyGraph(HeavyIrObject):
                 self.buffer_pool.retain_buffer(buf,
                                                len([c for c in inlet_obj.outlet_connections[0] if c.is_signal]) - 1)
             else:
-                raise HeavyException("Object {0} in graph {1} has {2} (> 1) signal inputs.".format(
-                    inlet_obj,
-                    inlet_obj.graph.file,
-                    len(c_list)))
+                raise HeavyException(
+                    f"Object {inlet_obj} in graph {inlet_obj.graph.file} has {len(c_list)} (> 1) signal inputs.")
 
         # for all objects in the signal order
         for o in self.signal_order:
@@ -794,20 +791,15 @@ class HeavyGraph(HeavyIrObject):
                 self.outlet_buffers[i] = buf
                 self.buffer_pool.retain_buffer(buf, len(self.outlet_connections[i]) - 1)
             else:
-                raise HeavyException("Object {0} in graph {1} has {2} (> 1) signal inputs.".format(
-                    outlet_obj,
-                    outlet_obj.graph.file,
-                    len(c_list)))
+                raise HeavyException(
+                    f"Object {outlet_obj} in graph {outlet_obj.graph.file} has {len(c_list)} (> 1) signal inputs.")
 
     def __repr__(self):
         if self.xname is not None:
             # TODO(mhroth): does not handle nested subgraph
-            return "__graph.{0}({1}/{2})".format(
-                self.id,
-                os.path.basename(self.file),
-                self.xname)
+            return f"__graph.{self.id}({os.path.basename(self.file)}/{self.xname})"
         else:
-            return "__graph.{0}({1})".format(self.id, os.path.basename(self.file))
+            return f"__graph.{self.id}({os.path.basename(self.file)})"
 
     #
     # Intermediate Representation generators
@@ -890,12 +882,12 @@ class HeavyGraph(HeavyIrObject):
         e = {}
         for k, v in d.items():
             # escape table key to be used as the value for code stubs
-            key = ("_" + k) if re.match("\d", k) else k
+            key = (f"_{k}") if re.match("\d", k) else k
             if key not in e:
                 e[key] = {
                     "id": v[0].id,
                     "display": k,
-                    "hash": "0x{0:X}".format(HeavyLangObject.get_hash(k)),
+                    "hash": f"0x{HeavyLangObject.get_hash(k):X}",
                     "extern": v[0].args["extern"]
                 }
         return e
@@ -908,9 +900,9 @@ class HeavyGraph(HeavyIrObject):
         # as the grouping of control receivers should have grouped all same-named
         # receivers into one logical receiver.
         # NOTE(mhroth): a code-compatible name is only necessary for externed receivers
-        return {(("_" + k) if re.match("\d", k) else k): {
+        return {((f"_{k}") if re.match("\d", k) else k): {
             "display": k,
-            "hash": "0x{0:X}".format(HeavyLangObject.get_hash(k)),
+            "hash": f"0x{HeavyLangObject.get_hash(k):X}",
             "extern": v[0].args["extern"],
             "attributes": v[0].args["attributes"],
             "ids": [v[0].id]

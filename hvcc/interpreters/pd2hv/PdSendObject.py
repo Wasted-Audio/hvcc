@@ -40,7 +40,7 @@ class PdSendObject(PdObject):
         except Exception:
             pass
 
-        if '@raw' in self.obj_args or '@owl' in self.obj_args:
+        if '@raw' in self.obj_args or '@owl' in self.obj_args:  # TODO(dromer): deprecate @owl on next stable release
             try:
                 pd_raw_args = parse_pd_raw_args(self.obj_args)
                 self.__attributes.update(pd_raw_args)

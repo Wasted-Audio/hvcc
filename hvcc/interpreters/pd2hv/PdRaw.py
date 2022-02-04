@@ -17,17 +17,12 @@ class PdRawException(Exception):
     pass
 
 
-hv_raw_params = ['@raw', '@raw_min', '@raw_max', '@raw_default', '@raw_param']
-owl_raw_params = ['@owl', '@owl_min', '@owl_max', '@owl_default', '@owl_param']
-raw_params = hv_raw_params + owl_raw_params
-
 def replace_owl(args):
     new_args = []
     for arg in args:
         new_arg = arg.replace('owl', 'raw')
         new_args.append(new_arg)
     return new_args
-
 
 
 def parse_pd_raw_args(args):
@@ -42,12 +37,13 @@ def parse_pd_raw_args(args):
     attrdict["max"] = 1.0
     attrdict["default"] = None
 
-    for raw_param in raw_params:
+    args = replace_owl(args)  # TODO(dromer): deprecate @owl on next stable release
+
+    for raw_param in ['@raw', '@raw_min', '@raw_max', '@raw_default', '@raw_param']:
         if raw_param not in args:
             continue
 
-        args = replace_owl(args)
-        print(args)
+        i = args.index(raw_param)
 
         if raw_param in ['@raw', '@raw_param']:
             try:
