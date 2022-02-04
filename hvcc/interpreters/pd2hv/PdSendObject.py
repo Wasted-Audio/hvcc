@@ -15,7 +15,7 @@
 
 from .NotificationEnum import NotificationEnum
 from .PdObject import PdObject
-from .pdowl import parse_pd_owl_args, PdOwlException
+from .PdRaw import parse_pd_raw_args, PdRawException
 
 
 class PdSendObject(PdObject):
@@ -40,19 +40,19 @@ class PdSendObject(PdObject):
         except Exception:
             pass
 
-        if '@owl' in self.obj_args or '@owl_param' in self.obj_args:
+        if '@raw' in self.obj_args or '@owl' in self.obj_args:
             try:
-                pd_owl_args = parse_pd_owl_args(self.obj_args)
-                self.__attributes.update(pd_owl_args)
+                pd_raw_args = parse_pd_raw_args(self.obj_args)
+                self.__attributes.update(pd_raw_args)
                 self.__extern_type = "param"  # make sure output code is generated
-            except PdOwlException as e:
+            except PdRawException as e:
                 self.add_error(e)
 
     def validate_configuration(self):
         if len(self.obj_args) == 0:
             self.add_warning(
-                "No name was given to this {0} object. "
-                "It should have a name to reduce the risk of errors.".format(self.obj_type),
+                f"No name was given to this {self.obj_type} object. "
+                "It should have a name to reduce the risk of errors.",
                 NotificationEnum.WARNING_USELESS_OBJECT)
         if len(self._inlet_connections.get("0", [])) == 0:
             self.add_warning(

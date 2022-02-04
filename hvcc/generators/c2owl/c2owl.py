@@ -30,8 +30,8 @@ class c2owl:
                     continue
 
                 # If a name has been specified
-                if 'owl' in v['attributes'] and v['attributes']['owl'] is not None:
-                    key = v['attributes']['owl']
+                if v['attributes'].get('raw'):
+                    key = v['attributes']['raw']
                     jdata.append((key, name, 'RECV', f"0x{heavy_hash(name)}",
                                   v['attributes']['min'],
                                   v['attributes']['max'],
@@ -47,8 +47,8 @@ class c2owl:
                 try:
                     if v['type'] == '__send':
                         name = v['args']['name']
-                        if 'owl' in v['args']['attributes'] and v['args']['attributes']['owl'] is not None:
-                            key = v['args']['attributes']['owl']
+                        if v['args']['attributes'].get('raw'):
+                            key = v['args']['attributes']['raw']
                             jdata.append((key, f'{name}>', 'SEND', f"0x{heavy_hash(name)}",
                                           v['args']['attributes']['min'],
                                           v['args']['attributes']['max'],
@@ -64,9 +64,7 @@ class c2owl:
             return jdata
 
     @classmethod
-    def compile(clazz, c_src_dir, out_dir, externs,
-                patch_name=None, num_input_channels=0, num_output_channels=0,
-                copyright=None, verbose=False):
+    def compile(clazz, c_src_dir, out_dir, patch_name=None, copyright=None, verbose=False):
 
         tick = time.time()
 
