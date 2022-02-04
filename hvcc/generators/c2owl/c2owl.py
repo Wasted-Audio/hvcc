@@ -93,6 +93,7 @@ class c2owl:
             ir_dir = os.path.join(c_src_dir, "../ir")
             patch_ir = os.path.join(ir_dir, f"{patch_name}.heavy.ir.json")
             jdata = c2owl.make_jdata(patch_ir)
+            print(jdata)
 
             # generate OWL wrapper from template
             owl_h_path = os.path.join(out_dir, f"HeavyOWL_{patch_name}.hpp")
