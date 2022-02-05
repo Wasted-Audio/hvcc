@@ -182,10 +182,11 @@ def compile_dataflow(in_path, out_dir, patch_name=None, patch_meta_file=None,
         if list(results.values())[0]["notifs"].get("has_error", False):
             return results
 
+        subst_name = re.sub(r'\W', '_', patch_name)
         results["hv2ir"] = hv2ir.hv2ir.compile(
             hv_file=os.path.join(list(results.values())[0]["out_dir"], list(results.values())[0]["out_file"]),
             # ensure that the ir filename has no funky characters in it
-            ir_file=os.path.join(out_dir, "ir", re.sub(r"\W", "_", patch_name) + ".heavy.ir.json"),
+            ir_file=os.path.join(out_dir, "ir", f"{subst_name}.heavy.ir.json"),
             patch_name=patch_name,
             verbose=verbose)
 
@@ -318,9 +319,6 @@ def compile_dataflow(in_path, out_dir, patch_name=None, patch_meta_file=None,
             c_src_dir=c_src_dir,
             out_dir=os.path.join(out_dir, "Source"),
             patch_name=patch_name,
-            num_input_channels=num_input_channels,
-            num_output_channels=num_output_channels,
-            externs=externs,
             copyright=copyright,
             verbose=verbose)
 

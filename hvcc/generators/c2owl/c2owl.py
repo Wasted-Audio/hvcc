@@ -30,9 +30,9 @@ class c2owl:
                     continue
 
                 # If a name has been specified
-                if 'owl' in v['attributes'] and v['attributes']['owl'] is not None:
-                    key = v['attributes']['owl']
-                    jdata.append((key, name, 'RECV', f"0x{heavy_hash(name)}",
+                if v['attributes'].get('raw'):
+                    key = v['attributes']['raw']
+                    jdata.append((key, name, 'RECV', f"0x{heavy_hash(name):X}",
                                   v['attributes']['min'],
                                   v['attributes']['max'],
                                   v['attributes']['default'],
@@ -40,23 +40,23 @@ class c2owl:
 
                 elif name.startswith('Channel-'):
                     key = name.split('Channel-', 1)[1]
-                    jdata.append((key, name, 'RECV', f"0x{heavy_hash(name)}",
+                    jdata.append((key, name, 'RECV', f"0x{heavy_hash(name):X}",
                                   0, 1, None, key in OWL_BUTTONS))
 
             for k, v in ir['objects'].items():
                 try:
                     if v['type'] == '__send':
                         name = v['args']['name']
-                        if 'owl' in v['args']['attributes'] and v['args']['attributes']['owl'] is not None:
-                            key = v['args']['attributes']['owl']
-                            jdata.append((key, f'{name}>', 'SEND', f"0x{heavy_hash(name)}",
+                        if v['args']['attributes'].get('raw'):
+                            key = v['args']['attributes']['raw']
+                            jdata.append((key, f'{name}>', 'SEND', f"0x{heavy_hash(name):X}",
                                           v['args']['attributes']['min'],
                                           v['args']['attributes']['max'],
                                           v['args']['attributes']['default'],
                                           key in OWL_BUTTONS))
                         elif name.startswith('Channel-'):
                             key = name.split('Channel-', 1)[1]
-                            jdata.append((key, f'{name}>', 'SEND', f"0x{heavy_hash(name)}",
+                            jdata.append((key, f'{name}>', 'SEND', f"0x{heavy_hash(name):X}",
                                           0, 1, None, key in OWL_BUTTONS))
                 except Exception:
                     pass
@@ -64,9 +64,7 @@ class c2owl:
             return jdata
 
     @classmethod
-    def compile(clazz, c_src_dir, out_dir, externs,
-                patch_name=None, num_input_channels=0, num_output_channels=0,
-                copyright=None, verbose=False):
+    def compile(clazz, c_src_dir, out_dir, patch_name=None, copyright=None, verbose=False):
 
         tick = time.time()
 
@@ -97,8 +95,8 @@ class c2owl:
             jdata = c2owl.make_jdata(patch_ir)
 
             # generate OWL wrapper from template
-            owl_h_path = os.path.join(out_dir, f"HeavyOWL_{patch_name}.hpp")
-            with open(owl_h_path, "w") as f:
+            owl_hpp_path = os.path.join(out_dir, f"HeavyOWL_{patch_name}.hpp")
+            with open(owl_hpp_path, "w") as f:
                 f.write(env.get_template("HeavyOwl.hpp").render(
                     jdata=jdata,
                     name=patch_name,
