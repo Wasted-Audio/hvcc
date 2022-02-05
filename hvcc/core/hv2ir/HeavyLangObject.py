@@ -394,5 +394,5 @@ class HeavyLangObject:
             raise Exception("Message element hashes can only be computed for float and string types.")
 
     def __repr__(self):
-        arg_str = " ".join(["{0}:{1}".format(k, o) for (k, o) in self.args.iteritems()])
-        return "{0} {{{1}}}".format(self.type, arg_str) if len(arg_str) > 0 else self.type
+        arg_str = " ".join([f"{k}:{o}" for (k, o) in self.args.iteritems()])
+        return f"{self.type} {{{arg_str}}}" if len(arg_str) > 0 else self.type

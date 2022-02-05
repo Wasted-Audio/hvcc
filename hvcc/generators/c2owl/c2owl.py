@@ -32,7 +32,7 @@ class c2owl:
                 # If a name has been specified
                 if v['attributes'].get('raw'):
                     key = v['attributes']['raw']
-                    jdata.append((key, name, 'RECV', f"0x{heavy_hash(name)}",
+                    jdata.append((key, name, 'RECV', f"0x{heavy_hash(name):X}",
                                   v['attributes']['min'],
                                   v['attributes']['max'],
                                   v['attributes']['default'],
@@ -40,7 +40,7 @@ class c2owl:
 
                 elif name.startswith('Channel-'):
                     key = name.split('Channel-', 1)[1]
-                    jdata.append((key, name, 'RECV', f"0x{heavy_hash(name)}",
+                    jdata.append((key, name, 'RECV', f"0x{heavy_hash(name):X}",
                                   0, 1, None, key in OWL_BUTTONS))
 
             for k, v in ir['objects'].items():
@@ -49,14 +49,14 @@ class c2owl:
                         name = v['args']['name']
                         if v['args']['attributes'].get('raw'):
                             key = v['args']['attributes']['raw']
-                            jdata.append((key, f'{name}>', 'SEND', f"0x{heavy_hash(name)}",
+                            jdata.append((key, f'{name}>', 'SEND', f"0x{heavy_hash(name):X}",
                                           v['args']['attributes']['min'],
                                           v['args']['attributes']['max'],
                                           v['args']['attributes']['default'],
                                           key in OWL_BUTTONS))
                         elif name.startswith('Channel-'):
                             key = name.split('Channel-', 1)[1]
-                            jdata.append((key, f'{name}>', 'SEND', f"0x{heavy_hash(name)}",
+                            jdata.append((key, f'{name}>', 'SEND', f"0x{heavy_hash(name):X}",
                                           0, 1, None, key in OWL_BUTTONS))
                 except Exception:
                     pass
