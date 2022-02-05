@@ -1,6 +1,12 @@
 CHANGELOG
 =====
 
+Next Release
+-----
+
+* c2owl generator
+* migrate @owl to @raw
+
 0.4.0
 -----
 
