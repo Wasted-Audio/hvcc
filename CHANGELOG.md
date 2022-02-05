@@ -1,13 +1,14 @@
 CHANGELOG
 =====
 
-Next Release
+0.4.0
 -----
 
 * Midi realtime messages
-* Host transport to midi-rt (TODO: Continue and Reset)
+* Host transport to midi-rt
 * Midi message scheduling improvements
-# Bugfix: minimum midi channel
+* Bugfix: minimum midi channel
+* Bugfix: windows console_script
 
 0.3.0
 -----

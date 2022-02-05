@@ -172,24 +172,41 @@ void {{class_name}}::setParameterValue(uint32_t index, float value)
 void {{class_name}}::handleMidiInput(uint32_t frames, const MidiEvent* midiEvents, uint32_t midiEventCount)
 {
   // Realtime events
-  // TODO: Continue and Reset
-
   const TimePosition& timePos(getTimePosition());
-  const bool playing = timePos.playing;
-  if (playing != wasPlaying)
+  bool reset = false;
+
+  if (timePos.playing)
   {
-    if (playing)
+    if (timePos.frame == 0)
     {
       _context->sendMessageToReceiverV(HV_HASH_MIDIREALTIMEIN, 0,
-        "ff", (float) MIDI_RT_START);
-    } else {
-      _context->sendMessageToReceiverV(HV_HASH_MIDIREALTIMEIN, 0,
-        "ff", (float) MIDI_RT_STOP);
+        "ff", (float) MIDI_RT_RESET);
+      reset = true;
     }
-    wasPlaying = playing;
-  }
 
-  if (playing && timePos.bbt.valid)
+    if (! this->wasPlaying)
+    {
+      if (timePos.frame == 0)
+      {
+        _context->sendMessageToReceiverV(HV_HASH_MIDIREALTIMEIN, 0,
+          "ff", (float) MIDI_RT_START);
+      }
+      if (! reset)
+      {
+        _context->sendMessageToReceiverV(HV_HASH_MIDIREALTIMEIN, 0,
+          "ff", (float) MIDI_RT_CONTINUE);
+      }
+    }
+  }
+  else if (this->wasPlaying)
+  {
+    _context->sendMessageToReceiverV(HV_HASH_MIDIREALTIMEIN, 0,
+      "ff", (float) MIDI_RT_STOP);
+  }
+  this->wasPlaying = timePos.playing;
+
+  // sending clock ticks
+  if (timePos.playing && timePos.bbt.valid)
   {
     float samplesPerBeat = 60 * getSampleRate() / timePos.bbt.beatsPerMinute;
     float samplesPerTick = samplesPerBeat / 24.0;
