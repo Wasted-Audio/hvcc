@@ -142,7 +142,7 @@ class HeavyGraph(HeavyIrObject):
                 for n in n_list:
                     n.from_object.add_connection(n)
             else:
-                raise HeavyException(f"Connections must have a common endpoint: {c} / {n}")
+                raise HeavyException(f"Connections must have a common endpoint: {c} / {n_list}")
         elif c is not None and len(n_list) == 0:
             self.disconnect_objects(c)  # remove connection c
         elif c is None and len(n_list) > 0:
@@ -815,7 +815,7 @@ class HeavyGraph(HeavyIrObject):
 
         return {
             "name": {
-                "escaped": re.sub("\W", "_", self.xname),
+                "escaped": re.sub(r"\W", "_", self.xname),
                 "display": self.xname
             },
             "objects": self.get_object_dict(),
@@ -882,7 +882,7 @@ class HeavyGraph(HeavyIrObject):
         e = {}
         for k, v in d.items():
             # escape table key to be used as the value for code stubs
-            key = (f"_{k}") if re.match("\d", k) else k
+            key = (f"_{k}") if re.match(r"\d", k) else k
             if key not in e:
                 e[key] = {
                     "id": v[0].id,
@@ -900,7 +900,7 @@ class HeavyGraph(HeavyIrObject):
         # as the grouping of control receivers should have grouped all same-named
         # receivers into one logical receiver.
         # NOTE(mhroth): a code-compatible name is only necessary for externed receivers
-        return {((f"_{k}") if re.match("\d", k) else k): {
+        return {((f"_{k}") if re.match(r"\d", k) else k): {
             "display": k,
             "hash": f"0x{HeavyLangObject.get_hash(k):X}",
             "extern": v[0].args["extern"],

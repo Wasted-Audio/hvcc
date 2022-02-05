@@ -182,7 +182,7 @@ def compile_dataflow(in_path, out_dir, patch_name=None, patch_meta_file=None,
         if list(results.values())[0]["notifs"].get("has_error", False):
             return results
 
-        subst_name = re.sub('\W', '_', patch_name)
+        subst_name = re.sub(r'\W', '_', patch_name)
         results["hv2ir"] = hv2ir.hv2ir.compile(
             hv_file=os.path.join(list(results.values())[0]["out_dir"], list(results.values())[0]["out_file"]),
             # ensure that the ir filename has no funky characters in it

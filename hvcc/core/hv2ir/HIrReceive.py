@@ -26,6 +26,6 @@ class HIrReceive(HeavyIrObject):
         if args["extern"]:
             # externed receivers must contain only alphanumeric characters or underscores,
             # so that the names can be easily and transparently turned into code
-            if re.search("\W", args["name"]):
+            if re.search(r"\W", args["name"]):
                 self.add_error("Parameter and Event names may only contain"
                                f"alphanumeric characters or underscore: '{args['name']}'")

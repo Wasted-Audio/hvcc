@@ -25,8 +25,11 @@ import zipfile
 # sys.path.append("../")
 # import hvcc
 
+raise unittest.SkipTest()
+
 sys.path.append("../../../royal/tools")
 import uploader
+
 
 SCRIPT_DIR = os.path.dirname(__file__)
 UNITY_TEST_DIR = os.path.join(os.path.dirname(__file__), "unity", "test")
