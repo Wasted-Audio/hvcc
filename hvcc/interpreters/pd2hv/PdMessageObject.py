@@ -9,7 +9,7 @@ import re
 class PdMessageObject(PdObject):
 
     # only allow dollar argumnets if they are alone
-    __RE_DOLLAR = re.compile("\$(\d+)")
+    __RE_DOLLAR = re.compile(r"\$(\d+)")
 
     def __init__(self, obj_type, obj_args=None, pos_x=0, pos_y=0):
         assert obj_type == "msg"
@@ -19,13 +19,13 @@ class PdMessageObject(PdObject):
 
         # parse messages
         # remove prepended slash from $. Heavy does not use that.
-        semi_split = obj_args[0].replace("\$", "$").split("\;")
+        semi_split = obj_args[0].replace(r"\$", "$").split(r"\;")
         semi_split = [x for x in semi_split if x]  # remove empty strings
 
         # parse local messages
         # ensure that empty message are not passed on
         if len(semi_split) > 0:
-            self.obj_args["local"] = [li.strip().split() for li in semi_split[0].split("\,") if len(li.strip()) > 0]
+            self.obj_args["local"] = [li.strip().split() for li in semi_split[0].split(r"\,") if len(li.strip()) > 0]
         else:
             self.obj_args["local"] = []
             self.add_warning(

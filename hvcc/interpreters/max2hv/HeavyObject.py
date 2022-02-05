@@ -15,7 +15,7 @@ class HeavyObject(MaxObject):
     with open(os.path.join(os.path.dirname(__file__), "../../core/json/heavy.ir.json"), "r") as f:
         __HEAVY_IR_OBJS = json.loads(f.read())
 
-    __re_dollar = re.compile("\$(\d+)")
+    __re_dollar = re.compile(r"\$(\d+)")
 
     def __init__(self, obj_type, obj_args=None, obj_id=None, pos_x=0, pos_y=0):
         MaxObject.__init__(self, obj_type, obj_args, obj_id, pos_x, pos_y)
@@ -26,7 +26,7 @@ class HeavyObject(MaxObject):
         elif self.is_hvir:
             self.__obj_dict = HeavyObject.__HEAVY_IR_OBJS[obj_type]
         else:
-            raise Exception("{0} is not a Heavy Lang or IR object.".format(obj_type))
+            raise Exception(f"{obj_type} is not a Heavy Lang or IR object.")
 
         # resolve arguments
         obj_args = obj_args or []

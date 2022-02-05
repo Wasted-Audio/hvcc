@@ -22,45 +22,45 @@ import os
 import shutil
 import time
 
-from .PrettyfyC import PrettyfyC
-from ..copyright import copyright_manager
+from hvcc.generators.ir2c.PrettyfyC import PrettyfyC
+from hvcc.generators.copyright import copyright_manager
 
-from .ControlBinop import ControlBinop
-from .ControlCast import ControlCast
-from .ControlDelay import ControlDelay
-from .ControlIf import ControlIf
-from .ControlMessage import ControlMessage
-from .ControlPack import ControlPack
-from .ControlPrint import ControlPrint
-from .ControlReceive import ControlReceive
-from .ControlRandom import ControlRandom
-from .ControlSend import ControlSend
-from .ControlSlice import ControlSlice
-from .ControlSwitchcase import ControlSwitchcase
-from .ControlSystem import ControlSystem
-from .ControlTabhead import ControlTabhead
-from .ControlTabread import ControlTabread
-from .ControlTabwrite import ControlTabwrite
-from .ControlUnop import ControlUnop
-from .ControlVar import ControlVar
-from .HeavyObject import HeavyObject
-from .HeavyTable import HeavyTable
-from .SignalConvolution import SignalConvolution
-from .SignalBiquad import SignalBiquad
-from .SignalCPole import SignalCPole
-from .SignalDel1 import SignalDel1
-from .SignalEnvelope import SignalEnvelope
-from .SignalLine import SignalLine
-from .SignalLorenz import SignalLorenz
-from .SignalMath import SignalMath
-from .SignalPhasor import SignalPhasor
-from .SignalRPole import SignalRPole
-from .SignalSample import SignalSample
-from .SignalSamphold import SignalSamphold
-from .SignalTabhead import SignalTabhead
-from .SignalTabread import SignalTabread
-from .SignalTabwrite import SignalTabwrite
-from .SignalVar import SignalVar
+from hvcc.generators.ir2c.ControlBinop import ControlBinop
+from hvcc.generators.ir2c.ControlCast import ControlCast
+from hvcc.generators.ir2c.ControlDelay import ControlDelay
+from hvcc.generators.ir2c.ControlIf import ControlIf
+from hvcc.generators.ir2c.ControlMessage import ControlMessage
+from hvcc.generators.ir2c.ControlPack import ControlPack
+from hvcc.generators.ir2c.ControlPrint import ControlPrint
+from hvcc.generators.ir2c.ControlReceive import ControlReceive
+from hvcc.generators.ir2c.ControlRandom import ControlRandom
+from hvcc.generators.ir2c.ControlSend import ControlSend
+from hvcc.generators.ir2c.ControlSlice import ControlSlice
+from hvcc.generators.ir2c.ControlSwitchcase import ControlSwitchcase
+from hvcc.generators.ir2c.ControlSystem import ControlSystem
+from hvcc.generators.ir2c.ControlTabhead import ControlTabhead
+from hvcc.generators.ir2c.ControlTabread import ControlTabread
+from hvcc.generators.ir2c.ControlTabwrite import ControlTabwrite
+from hvcc.generators.ir2c.ControlUnop import ControlUnop
+from hvcc.generators.ir2c.ControlVar import ControlVar
+from hvcc.generators.ir2c.HeavyObject import HeavyObject
+from hvcc.generators.ir2c.HeavyTable import HeavyTable
+from hvcc.generators.ir2c.SignalConvolution import SignalConvolution
+from hvcc.generators.ir2c.SignalBiquad import SignalBiquad
+from hvcc.generators.ir2c.SignalCPole import SignalCPole
+from hvcc.generators.ir2c.SignalDel1 import SignalDel1
+from hvcc.generators.ir2c.SignalEnvelope import SignalEnvelope
+from hvcc.generators.ir2c.SignalLine import SignalLine
+from hvcc.generators.ir2c.SignalLorenz import SignalLorenz
+from hvcc.generators.ir2c.SignalMath import SignalMath
+from hvcc.generators.ir2c.SignalPhasor import SignalPhasor
+from hvcc.generators.ir2c.SignalRPole import SignalRPole
+from hvcc.generators.ir2c.SignalSample import SignalSample
+from hvcc.generators.ir2c.SignalSamphold import SignalSamphold
+from hvcc.generators.ir2c.SignalTabhead import SignalTabhead
+from hvcc.generators.ir2c.SignalTabread import SignalTabread
+from hvcc.generators.ir2c.SignalTabwrite import SignalTabwrite
+from hvcc.generators.ir2c.SignalVar import SignalVar
 
 
 class ir2c:
@@ -319,10 +319,19 @@ def main():
     parser.add_argument("-v", "--verbose", action="count")
     args = parser.parse_args()
 
+    externs = {
+        "parameters": {
+            "in": {},
+            "out": {}
+        },
+        "events": {}
+    }
+
     results = ir2c.compile(
         args.hv_ir_path,
         args.static_dir,
         args.output_dir,
+        externs,
         args.copyright)
 
     if args.verbose:

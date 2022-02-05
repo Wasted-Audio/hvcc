@@ -33,8 +33,7 @@ class PdRouteObject(PdObject):
         if len(set(obj_args)) != len(obj_args):
             c = Counter(obj_args).most_common(1)
             self.add_error(
-                "All arguments to [route] must be unique. Argument \"{0}\" is "
-                "repeated {1} times.".format(c[0][0], c[0][1]),
+                f"All arguments to [route] must be unique. Argument \"{c[0][0]}\" is repeated {c[0][1]} times.",
                 NotificationEnum.ERROR_UNIQUE_ARGUMENTS_REQUIRED)
 
         # convert to obj_args to mixedarray, such that correct switchcase hash
@@ -47,21 +46,19 @@ class PdRouteObject(PdObject):
 
     def validate_configuration(self):
         if len(self._inlet_connections.get("1", [])) > 0:
-            self.add_warning(
-                "The right inlet of route is not supported. "
-                "It will not do anything.")
+            self.add_warning("The right inlet of route is not supported. It will not do anything.")
 
     def to_hv(self):
         """Creates a graph dynamically based on the number of arguments.
-        An unconnected right inlet is added.
+            An unconnected right inlet is added.
 
-        [inlet]                                         [inlet]
-        |
-        [@hv_obj switchcase [arg list (N elements)]           ]
-        |                             |                       |
-        [@hv_obj __slice 1 -1]        [@hv_obj __slice 1 -1]  |
-        |        |                    |          |            |
-        [outlet_0]                    [outlet_N-1]            [outlet_right]
+            [inlet]                                         [inlet]
+            |
+            [@hv_obj switchcase [arg list (N elements)]           ]
+            |                             |                       |
+            [@hv_obj __slice 1 -1]        [@hv_obj __slice 1 -1]  |
+            |        |                    |          |            |
+            [outlet_0]                    [outlet_N-1]            [outlet_right]
         """
 
         route_graph = {
@@ -119,7 +116,7 @@ class PdRouteObject(PdObject):
         # add slices to graph
         for i, a in enumerate(self.obj_args):
             # add slices to graph
-            route_graph["objects"]["slice_{0}".format(i)] = {
+            route_graph["objects"][f"slice_{i}"] = {
                 "type": "slice",
                 "args": {
                     "index": 1,
@@ -129,7 +126,7 @@ class PdRouteObject(PdObject):
             }
 
             # add outlets to graph
-            route_graph["objects"]["outlet_{0}".format(i)] = {
+            route_graph["objects"][f"outlet_{i}"] = {
                 "type": "outlet",
                 "args": {
                     "type": "-->",
@@ -141,19 +138,19 @@ class PdRouteObject(PdObject):
             # add connection from switchcase to slice
             route_graph["connections"].append({
                 "from": {"id": "switchcase", "outlet": i},
-                "to": {"id": "slice_{0}".format(i), "inlet": 0},
+                "to": {"id": f"slice_{i}", "inlet": 0},
                 "type": "-->"
             })
 
             # add connection from slice outlets 0 and 1 to outlet
             route_graph["connections"].append({
-                "from": {"id": "slice_{0}".format(i), "outlet": 0},
-                "to": {"id": "outlet_{0}".format(i), "inlet": 0},
+                "from": {"id": f"slice_{i}", "outlet": 0},
+                "to": {"id": f"outlet_{i}", "inlet": 0},
                 "type": "-->"
             })
             route_graph["connections"].append({
-                "from": {"id": "slice_{0}".format(i), "outlet": 1},
-                "to": {"id": "outlet_{0}".format(i), "inlet": 0},
+                "from": {"id": f"slice_{i}", "outlet": 1},
+                "to": {"id": f"outlet_{i}", "inlet": 0},
                 "type": "-->"
             })
 
