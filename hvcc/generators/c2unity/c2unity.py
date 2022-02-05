@@ -30,19 +30,25 @@ class c2unity:
     def filter_xcode_build(clazz, s):
         """Return a build hash suitable for use in an Xcode project file.
         """
-        return hashlib.md5(s + "_build").hexdigest().upper()[0:24]
+        s = f"{s}_build"
+        s = hashlib.md5(s.encode('utf-8'))
+        s = s.hexdigest().upper()[0:24]
+        return s
 
     @classmethod
     def filter_xcode_fileref(clazz, s):
         """Return a fileref hash suitable for use in an Xcode project file.
         """
-        return hashlib.md5(s + "_fileref").hexdigest().upper()[0:24]
+        f"{s}_fileref"
+        s = hashlib.md5(s.encode('utf-8'))
+        s = s.hexdigest().upper()[0:24]
+        return s
 
     @classmethod
     def filter_string_cap(clazz, s, li):
         """Returns a truncated string with ellipsis if it exceeds a certain length.
         """
-        return s if (len(s) <= li) else s[0:li - 3] + "..."
+        return s if (len(s) <= li) else f"{s[0:li - 3]}..."
 
     @classmethod
     def filter_templates(clazz, template_name):
@@ -113,12 +119,12 @@ class c2unity:
                 out_dir,
                 android_armv7a_args=["APP_ABI=armeabi-v7a", "-j"],
                 linux_x64_args=["-j"],
-                macos_x64_args=["-project", "Hv_{0}_Unity.xcodeproj".format(patch_name),
+                macos_x64_args=["-project", f"Hv_{patch_name}_Unity.xcodeproj",
                                 "-arch", "x86_64", "-alltargets"],
                 win_x64_args=["/property:Configuration=Release", "/property:Platform=x64",
-                              "/t:Rebuild", "Hv_{0}_Unity.sln".format(patch_name), "/m"],
+                              "/t:Rebuild", f"Hv_{patch_name}_Unity.sln", "/m"],
                 win_x86_args=["/property:Configuration=Release", "/property:Platform=x86",
-                              "/t:Rebuild", "Hv_{0}_Unity.sln".format(patch_name), "/m"])
+                              "/t:Rebuild", f"Hv_{patch_name}_Unity.sln", "/m"])
 
             return {
                 "stage": "c2unity",

@@ -16,7 +16,7 @@
  */
 
 #include "HvUtils.h"
-#include "hv_heavy.h"
+#include "Heavy_heavy.h"
 #include "tinywav.h"
 
 int main(int argc, const char *argv[]) {
@@ -44,7 +44,7 @@ int main(int argc, const char *argv[]) {
       hv_getNumOutputChannels(context) * blockSize * sizeof(float));
 
   for (int i = 0; i < numIterations; ++i) {
-    hv_process_inline(context, NULL, outBuffers, blockSize);
+    hv_processInline(context, NULL, outBuffers, blockSize);
 
     // write buffer to output
     tinywav_write_f(&tw, outBuffers, blockSize);

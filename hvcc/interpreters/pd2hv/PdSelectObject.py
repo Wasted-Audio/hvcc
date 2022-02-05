@@ -28,8 +28,7 @@ class PdSelectObject(PdObject):
         if len(set(obj_args)) != len(obj_args):
             c = Counter(obj_args).most_common(1)
             self.add_error(
-                "All arguments to [select] must be unique. Argument \"{0}\" is "
-                "repeated {1} times.".format(c[0][0], c[0][1]),
+                f"All arguments to [select] must be unique. Argument \"{c[0][0]}\" is repeated {c[0][1]} times.",
                 NotificationEnum.ERROR_UNIQUE_ARGUMENTS_REQUIRED)
 
         # convert to obj_args to mixedarray, such that correct switchcase hash
@@ -42,9 +41,7 @@ class PdSelectObject(PdObject):
 
     def validate_configuration(self):
         if len(self._inlet_connections.get("1", [])) > 0:
-            self.add_warning(
-                "The right inlet of select is not supported. "
-                "It will not do anything.")
+            self.add_warning("The right inlet of select is not supported. It will not do anything.")
 
     def to_hv(self):
         """ Creates a graph dynamically based on the number of arguments.
@@ -113,14 +110,14 @@ class PdSelectObject(PdObject):
 
         for i in range(len(self.obj_args)):
             # add __cast_b to graph
-            route_graph["objects"]["__cast_b_{0}".format(i)] = {
+            route_graph["objects"][f"__cast_b_{i}"] = {
                 "type": "__cast_b",
                 "args": {},
                 "properties": {"x": 0, "y": 0}
             }
 
             # add outlets to graph
-            route_graph["objects"]["outlet_{0}".format(i)] = {
+            route_graph["objects"][f"outlet_{i}"] = {
                 "type": "outlet",
                 "args": {
                     "type": "-->",
@@ -132,14 +129,14 @@ class PdSelectObject(PdObject):
             # add connection from switchcase to slice
             route_graph["connections"].append({
                 "from": {"id": "switchcase", "outlet": i},
-                "to": {"id": "__cast_b_{0}".format(i), "inlet": 0},
+                "to": {"id": f"__cast_b_{i}", "inlet": 0},
                 "type": "-->"
             })
 
             # add connection from slice to outlet
             route_graph["connections"].append({
-                "from": {"id": "__cast_b_{0}".format(i), "outlet": 0},
-                "to": {"id": "outlet_{0}".format(i), "inlet": 0},
+                "from": {"id": f"__cast_b_{i}", "outlet": 0},
+                "to": {"id": f"outlet_{i}", "inlet": 0},
                 "type": "-->"
             })
 
