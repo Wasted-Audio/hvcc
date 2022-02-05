@@ -19,17 +19,21 @@
 #define BUTTON_B7 BUTTON_G
 #define BUTTON_B8 BUTTON_H
 
-#define HV_HASH_NOTEIN 0x67e37ca3
-#define HV_HASH_CTLIN 0x41be0f9c
-#define HV_HASH_BENDIN 0x3083f0f7
-#define HV_HASH_TOUCHIN 0x553925bd
-#define HV_HASH_PGMIN 0x2e1ea03d
+#define HV_HASH_NOTEIN          0x67E37CA3
+#define HV_HASH_CTLIN           0x41BE0f9C
+#define HV_HASH_PGMIN           0x2E1EA03D
+#define HV_HASH_TOUCHIN         0x553925BD
+#define HV_HASH_BENDIN          0x3083F0F7
+#define HV_HASH_MIDIIN          0x149631bE
+#define HV_HASH_MIDIREALTIMEIN  0x6FFF0BCF
 
-#define HV_HASH_NOTEOUT 0xd1d4ac2
-#define HV_HASH_CTLOUT 0xe5e2a040
-#define HV_HASH_BENDOUT 0xe8458013
-#define HV_HASH_TOUCHOUT 0x476d4387
-#define HV_HASH_PGMOUT 0x8753e39e
+#define HV_HASH_NOTEOUT         0xD1D4AC2
+#define HV_HASH_CTLOUT          0xE5e2A040
+#define HV_HASH_PGMOUT          0x8753E39E
+#define HV_HASH_TOUCHOUT        0x476D4387
+#define HV_HASH_BENDOUT         0xE8458013
+#define HV_HASH_MIDIOUT         0x6511DE55
+#define HV_HASH_MIDIOUTPORT     0x165707E4
 
 #define HEAVY_MESSAGE_POOL_SIZE  4 // in kB (default 10kB)
 #define HEAVY_MESSAGE_IN_QUEUE_SIZE 1 // in kB (default 2kB)
@@ -105,19 +109,19 @@ public:
       break;
     case HV_HASH_CTLOUT:
       {
-	uint8_t value = hv_msg_getFloat(m, 0);
-	uint8_t cc = hv_msg_getFloat(m, 1);
-	uint8_t ch = hv_msg_getFloat(m, 2);
-	// debugMessage("ctlout", value, cc, ch);
-	sendMidi(MidiMessage::cc(ch, cc, value));
+      uint8_t value = hv_msg_getFloat(m, 0);
+      uint8_t cc = hv_msg_getFloat(m, 1);
+      uint8_t ch = hv_msg_getFloat(m, 2);
+      // debugMessage("ctlout", value, cc, ch);
+      sendMidi(MidiMessage::cc(ch, cc, value));
       }
       break;
     case HV_HASH_BENDOUT:
       {
-	uint16_t value = hv_msg_getFloat(m, 0);
-	uint8_t ch = hv_msg_getFloat(m, 1);
+      uint16_t value = hv_msg_getFloat(m, 0);
+      uint8_t ch = hv_msg_getFloat(m, 1);
       // debugMessage("bendout", value, ch);
-	sendMidi(MidiMessage::pb(ch, value));
+      sendMidi(MidiMessage::pb(ch, value));
       }
       break;
     case HV_HASH_TOUCHOUT:
