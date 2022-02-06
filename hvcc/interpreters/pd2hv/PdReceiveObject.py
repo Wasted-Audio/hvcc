@@ -14,7 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from .PdObject import PdObject
-from .pdowl import parse_pd_owl_args, PdOwlException
+from .PdRaw import parse_pd_raw_args, PdRawException
 
 
 class PdReceiveObject(PdObject):
@@ -81,12 +81,12 @@ class PdReceiveObject(PdObject):
                                    self.__attributes["max"]))
                 self.__extern_type = None
 
-        if '@owl' in self.obj_args or '@owl_param' in self.obj_args:
+        if '@raw' in self.obj_args or '@owl' in self.obj_args:  # TODO(dromer): deprecate @owl on next stable release
             try:
-                pd_owl_args = parse_pd_owl_args(self.obj_args)
-                self.__attributes.update(pd_owl_args)
+                pd_raw_args = parse_pd_raw_args(self.obj_args)
+                self.__attributes.update(pd_raw_args)
                 self.__extern_type = "param"  # make sure output code is generated
-            except PdOwlException as e:
+            except PdRawException as e:
                 self.add_error(e)
 
     def validate_configuration(self):
@@ -112,7 +112,7 @@ class PdReceiveObject(PdObject):
         return {
             "type": "receive",
             "args": {
-                "name": names[self.obj_type] + self.__receiver_name,
+                "name": f"{names[self.obj_type]}{self.__receiver_name}",
                 "extern": self.__extern_type,
                 "attributes": self.__attributes,
                 "priority": self.__priority

@@ -772,8 +772,8 @@ class HeavyGraph(HeavyIrObject):
                 self.buffer_pool.retain_buffer(buf,
                                                len([c for c in inlet_obj.outlet_connections[0] if c.is_signal]) - 1)
             else:
-                raise HeavyException(f"Object {inlet_obj} in graph {inlet_obj.graph.file} "
-                                     f"has {len(c_list)} (> 1) signal inputs.")
+                raise HeavyException(
+                    f"Object {inlet_obj} in graph {inlet_obj.graph.file} has {len(c_list)} (> 1) signal inputs.")
 
         # for all objects in the signal order
         for o in self.signal_order:
@@ -791,8 +791,8 @@ class HeavyGraph(HeavyIrObject):
                 self.outlet_buffers[i] = buf
                 self.buffer_pool.retain_buffer(buf, len(self.outlet_connections[i]) - 1)
             else:
-                raise HeavyException(f"Object {outlet_obj} in graph {outlet_obj.graph.file,} "
-                                     f"has {len(c_list)} (> 1) signal inputs.")
+                raise HeavyException(
+                    f"Object {outlet_obj} in graph {outlet_obj.graph.file} has {len(c_list)} (> 1) signal inputs.")
 
     def __repr__(self):
         if self.xname is not None:
@@ -882,7 +882,7 @@ class HeavyGraph(HeavyIrObject):
         e = {}
         for k, v in d.items():
             # escape table key to be used as the value for code stubs
-            key = ("_" + k) if re.match(r"\d", k) else k
+            key = (f"_{k}") if re.match(r"\d", k) else k
             if key not in e:
                 e[key] = {
                     "id": v[0].id,
@@ -900,7 +900,7 @@ class HeavyGraph(HeavyIrObject):
         # as the grouping of control receivers should have grouped all same-named
         # receivers into one logical receiver.
         # NOTE(mhroth): a code-compatible name is only necessary for externed receivers
-        return {(("_" + k) if re.match(r"\d", k) else k): {
+        return {((f"_{k}") if re.match(r"\d", k) else k): {
             "display": k,
             "hash": f"0x{HeavyLangObject.get_hash(k):X}",
             "extern": v[0].args["extern"],

@@ -55,7 +55,7 @@ class TestUnityPlugins(unittest.TestCase):
             x=False)
 
         # unittest asserts can only be called on instances
-        assert exit_code == 0, "Uploader returned with non-zero exit code: {0}".format(exit_code)
+        assert exit_code == 0, f"Uploader returned with non-zero exit code: {exit_code}"
         assert len(reply_json.get("errors", [])) == 0, reply_json["errors"][0]["detail"]
 
         TestUnityPlugins.__JOB_URL = reply_json["data"]["links"]["files"]["self"]
@@ -71,11 +71,11 @@ class TestUnityPlugins(unittest.TestCase):
         """
 
         if platform == "src":
-            url = "{0}/{1}/src/archive.zip".format(TestUnityPlugins.__JOB_URL, generator)
+            url = f"{TestUnityPlugins.__JOB_URL}/{generator}/src/archive.zip"
             out_path = os.path.join(TestUnityPlugins.__OUT_DIR, generator, platform, "out.zip")
         else:
             self.assertIsNotNone(architecture)
-            url = "{0}/{1}/{2}/{3}/archive.zip".format(TestUnityPlugins.__JOB_URL, generator, platform, architecture)
+            url = f"{TestUnityPlugins.__JOB_URL}/{generator}/{platform}/{architecture}/archive.zip"
             out_path = os.path.join(TestUnityPlugins.__OUT_DIR, generator, platform, architecture, "out.zip")
 
         try:
@@ -84,13 +84,13 @@ class TestUnityPlugins(unittest.TestCase):
                 cookies={"token": TestUnityPlugins.__TEST_TOKEN},
                 timeout=30.0)  # maximum request time of 30 seconds
         except requests.exceptions.Timeout:
-            self.fail("Request {0} has timed out. Why is it taking so long?".format(url))
+            self.fail(f"Request {url} has timed out. Why is it taking so long?")
 
         # assert that the file could be downloaded
         self.assertEqual(
             r.status_code,
             200,  # assert that we receive HTTPS status code 200 OK
-            "Received HTTPS {0} for {1}. Could not download asset.".format(r.status_code, url))
+            f"Received HTTPS {r.status_code} for {url}. Could not download asset.")
 
         # make an output directory and write the asset to disk
         os.makedirs(os.path.dirname(out_path))
@@ -130,7 +130,7 @@ class TestUnityPlugins(unittest.TestCase):
             unity_app_path = "unknown"
             zip_path = self.generate_plugin("unity", "win", "x86_64")
         else:
-            self.fail("Unsupported test platform ({0})".format(platform))
+            self.fail(f"Unsupported test platform ({platform})")
 
         with (zipfile.ZipFile(zip_path, "r")) as z:
             z.extractall(out_dir)
@@ -151,7 +151,7 @@ class TestUnityPlugins(unittest.TestCase):
             subprocess.check_output(cmd)
         except subprocess.CalledProcessError as e:
             self.check_unity_log(log_file)
-            self.fail("Unity Build failed: ExitCode=" + str(e.returncode) + ", check" + log_file + " for more info.")
+            self.fail(f"Unity Build failed: ExitCode={e.returncode}, check {log_file} for more info.")
 
 
 if __name__ == "__main__":
