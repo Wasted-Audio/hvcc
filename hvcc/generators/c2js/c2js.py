@@ -101,7 +101,7 @@ class c2js:
             "-O3",
             "--memory-init-file", "0",
             "-s", "RESERVED_FUNCTION_POINTERS=2",
-            "-s", f"EXPORTED_FUNCTIONS=[{hv_api_defs}]",
+            "-s", f"EXPORTED_FUNCTIONS=[{hv_api_defs.format(patch_name)}]",
             "-s", "MODULARIZE=1",
             "--post-js", post_js_path
         ]
