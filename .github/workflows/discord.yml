@@ -1,0 +1,12 @@
+name: discord message
+on: [push]
+jobs:
+
+  notification:
+    name: Discord notification
+    steps:
+    - name: send message
+      uses: appleboy/discord-action@master
+      with:
+        webhook_id: ${{ secrets.WEBHOOK_ID }}
+        webhook_token: ${{ secrets.WEBHOOK_TOKEN }}

@@ -33,7 +33,7 @@ class HLangTable(HeavyLangObject):
         if self.args["extern"]:
             # externed tables must contain only alphanumeric characters or underscores,
             # so that the names can be easily and transparently turned into code
-            if re.search("\W", args["name"]):
+            if re.search(r"\W", args["name"]):
                 self.add_error("Table names may only contain alphanumeric characters"
                                f"or underscore: '{args['name']}'")
 

@@ -38,7 +38,7 @@ class BufferPool:
         elif connection_type in self.pool:
             return sum(len(v) for v in self.pool[connection_type].values())
         else:
-            raise HeavyException("Unknown connection type: \"{0}\"".format(connection_type))
+            raise HeavyException(f"Unknown connection type: \"{connection_type}\"")
 
     def get_buffer(self, connection_type, count=1, excludeSet=None):
         """ Returns a currently unused buffer. The buffer can be assigned a retain count. An optional
@@ -71,7 +71,7 @@ class BufferPool:
                     v.remove(b)
                     pool[k + count].append(b)
                     return k + count  # return the new retain count
-            raise HeavyException("{0} not found in BufferPool!".format(b))
+            raise HeavyException(f"{b} not found in BufferPool!")
 
     def release_buffer(self, b, count=1):
         """ Reduces the retain count of the buffer. Returns the new count.
@@ -88,7 +88,7 @@ class BufferPool:
                     v.remove(b)
                     pool[k - count].append(b)
                     return k - count  # return the new retain count
-            raise HeavyException("{0} not found in BufferPool!".format(b))
+            raise HeavyException(f"{b} not found in BufferPool!")
 
     def __repr__(self):
         return self.pool["~f>"].__repr__() + self.pool["~i>"].__repr__()

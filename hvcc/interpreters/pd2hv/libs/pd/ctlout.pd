@@ -1,14 +1,15 @@
-#N canvas 971 214 309 367 10;
-#X obj 59 267 pack f f f;
+#N canvas 21 409 309 367 10;
+#X obj 59 278 pack f f f;
 #X obj 155 76 loadbang;
 #X obj 116 156 inlet channel;
-#X obj 59 299 s __hv_ctlout @hv_param;
+#X obj 59 310 s __hv_ctlout @hv_param;
 #X obj 59 46 inlet value;
 #X obj 116 203 f \$2;
 #X obj 87 76 inlet cc;
 #X obj 87 118 f \$1;
 #X obj 155 98 t b b;
 #X obj 116 225 - 1;
+#X obj 116 248 max;
 #X connect 0 0 3 0;
 #X connect 1 0 8 0;
 #X connect 2 0 5 0;
@@ -18,4 +19,5 @@
 #X connect 7 0 0 1;
 #X connect 8 0 7 0;
 #X connect 8 1 5 0;
-#X connect 9 0 0 2;
+#X connect 9 0 10 0;
+#X connect 10 0 0 2;

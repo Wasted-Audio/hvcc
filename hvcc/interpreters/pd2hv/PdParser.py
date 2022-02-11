@@ -49,10 +49,10 @@ class PdParser:
     __PDLIB_CONVERTED_DIR = os.path.join(os.path.dirname(__file__), "libs", "pd_converted")
 
     # detect a dollar argument in a string
-    __RE_DOLLAR = re.compile("\$(\d+)")
+    __RE_DOLLAR = re.compile(r"\$(\d+)")
 
     # detect width parameter e.g. "#X obj 172 79 t b b, f 22;"
-    __RE_WIDTH = re.compile(", f \d+$")
+    __RE_WIDTH = re.compile(r", f \d+$")
 
     def __init__(self):
         # the current global value of $0
@@ -101,14 +101,14 @@ class PdParser:
             for li in f:
                 # concatenate split lines in the Pd file here
                 li = li.rstrip("\r\n")  # account for windows CRLF
-                if li.endswith(";") and not li.endswith("\;"):
+                if li.endswith(";") and not li.endswith(r"\;"):
                     out = li[:-1]  # remove single ";"
                     if len(concat) > 0:
-                        out = concat + " " + out
+                        out = f'{concat} {out}'
                         concat = ""  # reset concatenation state
                     yield out
                 else:
-                    concat = (concat + " " + li) if len(concat) > 0 else li
+                    concat = (f'{concat} {li}') if len(concat) > 0 else f'{li}'
 
     def add_absolute_search_directory(self, search_dir):
         if os.path.isdir(search_dir):
@@ -128,7 +128,7 @@ class PdParser:
             Checks the local directory first, then all declared paths.
         """
 
-        abs_filename = abs_name + ".pd"
+        abs_filename = f'{abs_name}.pd'
 
         # check local directory first
         abs_path = os.path.join(os.path.abspath(local_dir), abs_filename)
@@ -163,7 +163,7 @@ class PdParser:
 
         if not canvas_line.startswith("#N canvas"):
             g = pd_graph_class(graph_args, file_path, pos_x, pos_y)
-            g.add_error("Pd files must begin with \"#N canvas\": {0}".format(canvas_line))
+            g.add_error(f"Pd files must begin with \"#N canvas\": {canvas_line}")
             return g
 
         g = self.graph_from_canvas(
@@ -328,27 +328,27 @@ class PdParser:
                                 is_root=False)
 
                         # is this object in lib/pd_converted?
-                        elif os.path.isfile(os.path.join(PdParser.__PDLIB_CONVERTED_DIR, obj_type + ".hv.json")):
+                        elif os.path.isfile(os.path.join(PdParser.__PDLIB_CONVERTED_DIR, f"{obj_type}.hv.json")):
                             self.obj_counter[obj_type] += 1
-                            hv_path = os.path.join(PdParser.__PDLIB_CONVERTED_DIR, obj_type + ".hv.json")
+                            hv_path = os.path.join(PdParser.__PDLIB_CONVERTED_DIR, f"{obj_type}.hv.json")
                             x = HeavyGraph(
                                 hv_path=hv_path,
                                 obj_args=obj_args,
                                 pos_x=int(line[2]), pos_y=int(line[3]))
 
                         # is this object in lib/heavy_converted?
-                        elif os.path.isfile(os.path.join(PdParser.__HVLIB_CONVERTED_DIR, obj_type + ".hv.json")):
+                        elif os.path.isfile(os.path.join(PdParser.__HVLIB_CONVERTED_DIR, f"{obj_type}.hv.json")):
                             self.obj_counter[obj_type] += 1
-                            hv_path = os.path.join(PdParser.__HVLIB_CONVERTED_DIR, obj_type + ".hv.json")
+                            hv_path = os.path.join(PdParser.__HVLIB_CONVERTED_DIR, f"{obj_type}.hv.json")
                             x = HeavyGraph(
                                 hv_path=hv_path,
                                 obj_args=obj_args,
                                 pos_x=int(line[2]), pos_y=int(line[3]))
 
                         # is this object in lib/pd?
-                        elif os.path.isfile(os.path.join(PdParser.__PDLIB_DIR, obj_type + ".pd")):
+                        elif os.path.isfile(os.path.join(PdParser.__PDLIB_DIR, f"{obj_type}.pd")):
                             self.obj_counter[obj_type] += 1
-                            pdlib_path = os.path.join(PdParser.__PDLIB_DIR, obj_type + ".pd")
+                            pdlib_path = os.path.join(PdParser.__PDLIB_DIR, f"{obj_type}.pd")
 
                             # mapping of pd/lib abstraction objects to classes
                             # for checking connection validity
@@ -382,13 +382,13 @@ class PdParser:
                             # register any object-specific warnings or errors
                             if obj_type in ["rzero~", "rzero_rev~", "czero~", "czero_rev~"]:
                                 g.add_warning(
-                                    "[{0}] accepts only signal input. "
-                                    "Arguments and control connections are ignored.".format(obj_type))
+                                    f"[{obj_type}] accepts only signal input. "
+                                    "Arguments and control connections are ignored.")
 
                         # is this object in lib/heavy?
-                        elif os.path.isfile(os.path.join(PdParser.__HVLIB_DIR, obj_type + ".pd")):
+                        elif os.path.isfile(os.path.join(PdParser.__HVLIB_DIR, f"{obj_type}.pd")):
                             self.obj_counter[obj_type] += 1
-                            hvlib_path = os.path.join(PdParser.__HVLIB_DIR, obj_type + ".pd")
+                            hvlib_path = os.path.join(PdParser.__HVLIB_DIR, f"{obj_type}.pd")
                             x = self.graph_from_file(
                                 file_path=hvlib_path,
                                 obj_args=obj_args,
@@ -414,20 +414,20 @@ class PdParser:
 
                         else:
                             g.add_error(
-                                "Don't know how to parse object \"{0}\". Is it an "
+                                f"Don't know how to parse object \"{obj_type}\". Is it an "
                                 "object supported by Heavy? Is it an abstraction? "
-                                "Have the search paths been correctly configured?".format(obj_type),
+                                "Have the search paths been correctly configured?",
                                 NotificationEnum.ERROR_UNKNOWN_OBJECT)
                             x = HeavyObject(
                                 obj_type="comment",
-                                obj_args=["null object placeholder ({0})".format(obj_type)])
+                                obj_args=[f"null object placeholder ({obj_type})"])
 
                         g.add_object(x)
 
                     elif line[1] in ["floatatom", "symbolatom"]:
                         self.obj_counter[line[1]] += 1
                         x = self.graph_from_file(
-                            file_path=os.path.join(PdParser.__PDLIB_DIR, line[1] + ".pd"),
+                            file_path=os.path.join(PdParser.__PDLIB_DIR, f"{line[1]}.pd"),
                             obj_args=[],
                             pos_x=int(line[2]), pos_y=int(line[3]),
                             is_root=False)
@@ -475,8 +475,8 @@ class PdParser:
                             did_add = self.add_relative_search_directory(line[3])
                             if not did_add:
                                 g.add_warning(
-                                    "\"{0}\" is not a valid relative abstraction "
-                                    "search path. It will be ignored.".format(line[3]))
+                                    f"\"{line[3]}\" is not a valid relative abstraction "
+                                    "search path. It will be ignored.")
 
                         else:
                             g.add_warning(
@@ -488,8 +488,7 @@ class PdParser:
                         pass  # don't do anything with this command
 
                     else:
-                        g.add_error("Don't know how to parse line: {0}".format(
-                            " ".join(line)))
+                        g.add_error("Don't know how to parse line: {0}".format(" ".join(line)))
 
                 elif line[0] == "#A":
                     obj_array.obj_args["values"].extend([float(f) for f in line[2:]])
@@ -525,16 +524,15 @@ class PdParser:
             for m in set(PdParser.__RE_DOLLAR.findall(a)):
                 x = int(m)  # the dollar index (i.e. $x)
                 if len(graph.obj_args) > x:
-                    a = a.replace("\$" + m, str(graph.obj_args[x]))
+                    a = a.replace(fr"\${m}", str(graph.obj_args[x]))
 
                 # check if hv_args can be used to supply a default value
                 elif len(graph.hv_args) > (x - 1):  # heavy args are zero-indexed
                     if not graph.hv_args[x - 1]["required"]:
-                        a = a.replace("\$" + m, str(graph.hv_args[x - 1]["default"]))
+                        a = a.replace(fr"\${m}", str(graph.hv_args[x - 1]["default"]))
                     else:
                         graph.add_error(
-                            "There is a missing required argument named \"{0}\".".format(
-                                graph.hv_args[x - 1]["name"]),
+                            f"There is a missing required argument named \"{graph.hv_args[x - 1]['name']}\".",
                             NotificationEnum.ERROR_MISSING_REQUIRED_ARGUMENT)
 
                 elif is_root:
@@ -544,7 +542,7 @@ class PdParser:
                     #     "${0} in \"{1}\" in the top-level graph is resolved to "
                     #     "\"0\". It is recommended that you remove $-arguments "
                     #     "from the top-level graph.".format(m, a))
-                    a = a.replace("\$" + m, "0")
+                    a = a.replace(fr"\${m}", "0")
 
                 else:
                     if raise_on_failure:
@@ -554,7 +552,7 @@ class PdParser:
                         #     "Object [{0}] requires argument \"{1}\" but the parent "
                         #     "patch does not provide one ({2}). A default value of "
                         #     "\"0\" will be used.".format(obj_type, a, graph.obj_args))
-                        a = a.replace("\$" + m, "0")
+                        a = a.replace(fr"\${m}", "0")
                     else:
                         a = None  # indicate that this argument could not be resolved by replacing it with None
             resolved_obj_args[i] = a

@@ -4,8 +4,24 @@ CHANGELOG
 Next Release
 -----
 
+* c2owl generator
+* migrate @owl to @raw
+
+0.4.0
+-----
+
+* Midi realtime messages
+* Host transport to midi-rt
+* Midi message scheduling improvements
+* Bugfix: minimum midi channel
+* Bugfix: windows console_script
+
+0.3.0
+-----
+
 * Midi I/O extensions for DPF
-* Midi bugfixes for [notein], [noteout], [pgmin], [touchin], [bendin]
+* Midi bugfixes for [notein], [pgmin], [touchin], [bendin], [midiin]
+* Midi bugfixes for [noteout], [pgmout], [touchout], [bendout], [midiout]
 * Midi docs update
 * DPF minimal Midi examples
 

@@ -122,8 +122,8 @@ class HeavyLangObject:
         """ Returns a dictionary of all warnings and errors at this object.
         """
         return {
-            "warnings": [{"message": "{0}: {1}".format(self, n["message"])} for n in self.warnings],
-            "errors": [{"message": "{0}: {1}".format(self, n["message"])} for n in self.errors],
+            "warnings": [{"message": f"{self}: {n['message']}"} for n in self.warnings],
+            "errors": [{"message": f"{self}: {n['message']}"} for n in self.errors],
         }
 
     @classmethod
@@ -187,9 +187,7 @@ class HeavyLangObject:
                         # if the argument is not required, use the default
                         self.args[arg["name"]] = arg["default"]
                     else:
-                        self.add_error("Required argument \"{0}\" not present for object {1}.".format(
-                            arg["name"],
-                            self))
+                        self.add_error(f"Required argument \"{arg['name']}\" not present for object {self}.")
                 else:
                     # enforce argument types
                     self.args[arg["name"]] = HeavyLangObject.force_arg_type(
@@ -214,9 +212,9 @@ class HeavyLangObject:
             elif c.from_object is self:
                 self.outlet_connections[c.outlet_index].append(c)
             else:
-                raise HeavyException("Connection {0} does not connect to this object {1}.".format(c, self))
+                raise HeavyException(f"Connection {c} does not connect to this object {self}.")
         except Exception:
-            raise HeavyException("Connection {0} connects to out-of-range let.".format(c))
+            raise HeavyException(f"Connection {c} connects to out-of-range let.")
 
     def remove_connection(self, c):
         """ Remove a connection to this object.
@@ -226,7 +224,7 @@ class HeavyLangObject:
         elif c.from_object is self:
             self.outlet_connections[c.outlet_index].remove(c)
         else:
-            raise HeavyException("Connection {0} does not connect to this object {1}.".format(c, self))
+            raise HeavyException(f"Connection {c} does not connect to this object {self}.")
 
     def replace_connection(self, c, n_list):
         """ Replaces connection c with connection list n_list, maintaining connection order
@@ -243,7 +241,7 @@ class HeavyLangObject:
             self.inlet_connections[c.inlet_index].remove(c)
             self.inlet_connections[c.inlet_index].extend(n_list)
         else:
-            raise HeavyException("Connections must have a common endpoint: {0} / {1}".format(c, n_list))
+            raise HeavyException(f"Connections must have a common endpoint: {c} / {n_list}")
 
     def get_connection_move_list(self, o, connection_type_filter="-~>"):
         """ Create a list of commands to move all connections from this object
@@ -270,9 +268,7 @@ class HeavyLangObject:
                 elif "~i>" in s:
                     fmt.append("i")
                 else:
-                    raise Exception("Unknown connection type in set {0} in file {1}.".format(
-                        cc,
-                        cc[0].from_object.graph.file))
+                    raise Exception(f"Unknown connection type in set {cc} in file {cc[0].from_object.graph.file}.")
             elif s in [{"~f>", "-->"}, {"~i>", "-->"}]:
                 fmt.append("m")
             else:
@@ -394,5 +390,5 @@ class HeavyLangObject:
             raise Exception("Message element hashes can only be computed for float and string types.")
 
     def __repr__(self):
-        arg_str = " ".join(["{0}:{1}".format(k, o) for (k, o) in self.args.iteritems()])
-        return "{0} {{{1}}}".format(self.type, arg_str) if len(arg_str) > 0 else self.type
+        arg_str = " ".join([f"{k}:{o}" for (k, o) in self.args.iteritems()])
+        return f"{self.type} {{{arg_str}}}" if len(arg_str) > 0 else self.type

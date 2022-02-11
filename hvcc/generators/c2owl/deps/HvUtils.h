@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014-2018 Enzien Audio Ltd.
+ * Copyright (c) 2014,2015,2016 Enzien Audio Ltd.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -18,8 +18,11 @@
 #define _HEAVY_UTILS_H_
 
 // platform definitions
-#if _WIN32 || _WIN64 || _MSC_VER
+#if _WIN32 || _WIN64
   #define HV_WIN 1
+#ifdef _MSC_VER
+  #define HV_MSVC 1
+#endif
 #elif __APPLE__
   #define HV_APPLE 1
 #elif __ANDROID__
@@ -36,8 +39,13 @@
 
 // basic includes
 #include <stdarg.h>
+#ifdef ARM_CORTEX
+#include <basicmaths.h>
+#else
 #include <stdio.h>
 #include <stdlib.h>
+#endif
+
 
 // type definitions
 #include <stdint.h>
@@ -124,18 +132,17 @@
 // Strings
 #include <string.h>
 #define hv_strlen(a) strlen(a)
+#define hv_strncpy(a, b, c) strncpy(a, b, c)
 #define hv_strcmp(a, b) strcmp(a, b)
 #define hv_snprintf(a, b, c, ...) snprintf(a, b, c, __VA_ARGS__)
-#if HV_WIN
-#define hv_strncpy(_dst, _src, _len) strncpy_s(_dst, _len, _src, _TRUNCATE)
-#else
-#define hv_strncpy(_dst, _src, _len) strncpy(_dst, _src, _len)
-#endif
 
 // Memory management
+#ifndef ARM_CORTEX
+#define hv_realloc(a, b) realloc(a, b)
+#endif // ARM_CORTEX
 #define hv_memcpy(a, b, c) memcpy(a, b, c)
 #define hv_memclear(a, b) memset(a, 0, b)
-#if HV_WIN
+#if HV_MSVC
   #include <malloc.h>
   #define hv_alloca(_n) _alloca(_n)
   #if HV_SIMD_AVX
@@ -148,7 +155,6 @@
     #define hv_free(x) _aligned_free(x)
   #else // HV_SIMD_NONE
     #define hv_malloc(_n) malloc(_n)
-    #define hv_realloc(a, b) realloc(a, b)
     #define hv_free(_n) free(_n)
   #endif
 #elif HV_APPLE
@@ -170,24 +176,21 @@
     #define hv_malloc(_n) malloc(_n)
     #define hv_free(x) free(x)
   #endif
+#elif defined ARM_CORTEX
+  #include <alloca.h>
+  #define hv_alloca(_n)  alloca(_n)
+  #define hv_malloc(_n) pvPortMalloc(_n)
+  #define hv_free(_n) vPortFree(_n)
+  #define hv_realloc(a, b) pvPortRealloc(a, b)
 #else
   #include <alloca.h>
-  #define hv_alloca(_n) alloca(_n)
-  #define hv_realloc(a, b) realloc(a, b)
+  #define hv_alloca(_n)  alloca(_n)
   #if HV_SIMD_AVX
     #define hv_malloc(_n) aligned_alloc(32, _n)
     #define hv_free(x) free(x)
-  #elif HV_SIMD_SSE
+  #elif HV_SIMD_SSE || HV_SIMD_NEON
     #define hv_malloc(_n) aligned_alloc(16, _n)
     #define hv_free(x) free(x)
-  #elif HV_SIMD_NEON
-    #if HV_ANDROID
-      #define hv_malloc(_n) memalign(16, _n)
-      #define hv_free(x) free(x)
-    #else
-      #define hv_malloc(_n) aligned_alloc(16, _n)
-      #define hv_free(x) free(x)
-    #endif
   #else // HV_SIMD_NONE
     #define hv_malloc(_n) malloc(_n)
     #define hv_free(_n) free(_n)
@@ -195,11 +198,16 @@
 #endif
 
 // Assert
+#ifdef ARM_CORTEX
+#include "message.h"
+#define hv_assert(e) ASSERT((e), "Heavy assertion failed")
+#else
 #include <assert.h>
 #define hv_assert(e) assert(e)
+#endif
 
 // Export and Inline
-#if HV_WIN
+#if HV_MSVC
 #define HV_EXPORT __declspec(dllexport)
 #define inline __inline
 #define HV_FORCE_INLINE __forceinline
@@ -218,11 +226,15 @@ extern "C" {
 #endif
 
 // Math
+#ifndef ARM_CORTEX
 #include <math.h>
+#endif
+
 static inline hv_size_t __hv_utils_max_ui(hv_size_t x, hv_size_t y) { return (x > y) ? x : y; }
 static inline hv_size_t __hv_utils_min_ui(hv_size_t x, hv_size_t y) { return (x < y) ? x : y; }
 static inline hv_int32_t __hv_utils_max_i(hv_int32_t x, hv_int32_t y) { return (x > y) ? x : y; }
 static inline hv_int32_t __hv_utils_min_i(hv_int32_t x, hv_int32_t y) { return (x < y) ? x : y; }
+
 #define hv_max_ui(a, b) __hv_utils_max_ui(a, b)
 #define hv_min_ui(a, b) __hv_utils_min_ui(a, b)
 #define hv_max_i(a, b) __hv_utils_max_i(a, b)
@@ -231,9 +243,22 @@ static inline hv_int32_t __hv_utils_min_i(hv_int32_t x, hv_int32_t y) { return (
 #define hv_min_f(a, b) fminf(a, b)
 #define hv_max_d(a, b) fmax(a, b)
 #define hv_min_d(a, b) fmin(a, b)
+#ifdef ARM_CORTEX
+#define hv_sin_f(a) arm_sin_f32(a)
+#define hv_cos_f(a) arm_cos_f32(a)
+#define hv_sqrt_f(a) arm_sqrtf(a)
+#define hv_pow_f(a, b) fast_powf(a, b)
+#define hv_exp_f(a) fast_expf(a)
+#define hv_log_f(a) fast_logf(a)
+#else
 #define hv_sin_f(a) sinf(a)
-#define hv_sinh_f(a) sinhf(a)
 #define hv_cos_f(a) cosf(a)
+#define hv_sqrt_f(a) sqrtf(a)
+#define hv_pow_f(a, b) powf(a, b)
+#define hv_exp_f(a) expf(a)
+#define hv_log_f(a) logf(a)
+#endif
+#define hv_sinh_f(a) sinhf(a)
 #define hv_cosh_f(a) coshf(a)
 #define hv_tan_f(a) tanf(a)
 #define hv_tanh_f(a) tanhf(a)
@@ -244,20 +269,23 @@ static inline hv_int32_t __hv_utils_min_i(hv_int32_t x, hv_int32_t y) { return (
 #define hv_atan_f(a) atanf(a)
 #define hv_atanh_f(a) atanhf(a)
 #define hv_atan2_f(a, b) atan2f(a, b)
-#define hv_exp_f(a) expf(a)
 #define hv_abs_f(a) fabsf(a)
-#define hv_sqrt_f(a) sqrtf(a)
-#define hv_log_f(a) logf(a)
+#if HV_ANDROID
+  // NOTE(mhroth): for whatever silly reason, log2f is not defined!
+  #define hv_log2_f(a) (1.44269504088896f*logf(a))
+#else
+  #define hv_log2_f(a) log2f(a)
+#endif // HV_ANDROID
+#define hv_log10_f(a) log10f(a)
 #define hv_ceil_f(a) ceilf(a)
 #define hv_floor_f(a) floorf(a)
 #define hv_round_f(a) roundf(a)
-#define hv_pow_f(a, b) powf(a, b)
-#if HV_EMSCRIPTEN
-#define hv_fma_f(a, b, c) ((a*b)+c) // emscripten does not support fmaf (yet?)
+#if HV_EMSCRIPTEN || defined ARM_CORTEX
+#define hv_fma_f(a, b, c) ((a*b)+c) // emscripten does not support fmaf (yet?). Inefficient on ARM Cortex M
 #else
 #define hv_fma_f(a, b, c) fmaf(a, b, c)
 #endif
-#if HV_WIN
+#if HV_MSVC
   // finds ceil(log2(x))
   #include <intrin.h>
   static inline hv_uint32_t __hv_utils_min_max_log2(hv_uint32_t x) {
@@ -274,7 +302,7 @@ static inline hv_int32_t __hv_utils_min_i(hv_int32_t x, hv_int32_t y) { return (
 
 // Atomics
 #if HV_WIN
-  #include <windows.h>
+  #include <Windows.h>
   #define hv_atomic_bool volatile LONG
   #define HV_SPINLOCK_ACQUIRE(_x) while (InterlockedCompareExchange(&_x, true, false)) { }
   #define HV_SPINLOCK_TRY(_x) return !InterlockedCompareExchange(&_x, true, false)
@@ -286,6 +314,12 @@ static inline hv_int32_t __hv_utils_min_i(hv_int32_t x, hv_int32_t y) { return (
   #define HV_SPINLOCK_ACQUIRE(_x) while (__sync_lock_test_and_set(&_x, 1))
   #define HV_SPINLOCK_TRY(_x) return !__sync_lock_test_and_set(&_x, 1)
   #define HV_SPINLOCK_RELEASE(_x) __sync_lock_release(&_x)
+#elif defined ARM_CORTEX || HV_EMSCRIPTEN
+  /* no spinlock if we don't have pre-emptive scheduling */
+  #define hv_atomic_bool volatile bool
+  #define HV_SPINLOCK_ACQUIRE(_x) { extern volatile bool _msgLock; _msgLock = true; }
+  #define HV_SPINLOCK_TRY(_x)  { extern volatile bool _msgLock; return !_msgLock; }
+  #define HV_SPINLOCK_RELEASE(_x) { extern volatile bool _msgLock; _msgLock = false; }
 #elif __cplusplus
   #include <atomic>
   #define hv_atomic_bool std::atomic_flag
@@ -301,6 +335,7 @@ static inline hv_int32_t __hv_utils_min_i(hv_int32_t x, hv_int32_t y) { return (
     #define HV_SPINLOCK_RELEASE(_x) atomic_flag_clear_explicit(memory_order_release)
   #endif
 #endif
+
 #ifndef hv_atomic_bool
   #define hv_atomic_bool volatile bool
   #define HV_SPINLOCK_ACQUIRE(_x) \

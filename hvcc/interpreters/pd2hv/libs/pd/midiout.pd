@@ -1,4 +1,4 @@
-#N canvas 2597 700 377 246 10;
+#N canvas 1026 489 417 247 10;
 #X obj 56 62 inlet data;
 #X obj 140 63 inlet port;
 #X obj 56 190 s __hv_midiout @hv_param;

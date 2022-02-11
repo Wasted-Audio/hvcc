@@ -26,7 +26,7 @@ class HIrSend(HeavyIrObject):
         if args["extern"]:
             # output parameters must contain only alphanumeric characters or underscores,
             # so that the names can be easily and transparently turned into code
-            if re.search("\W", args["name"]):
+            if re.search(r"\W", args["name"]):
                 self.add_error(f"Parameter and Event names may only contain \
                                 alphanumeric characters or underscore: '{args['name']}'")
 
@@ -39,5 +39,5 @@ class HIrSend(HeavyIrObject):
             "extern": self.args["extern"],
             "hash": self.args["hash"],
             "display": self.args["name"],
-            "name": (("_" + self.args["name"]) if re.match("\d", self.args["name"]) else self.args["name"])
+            "name": ((f"_{self.args['name']}") if re.match(r"\d", self.args["name"]) else self.args["name"])
         }]

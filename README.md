@@ -1,4 +1,4 @@
-![Build Status](https://github.com/Wasted-Audio/hvcc/actions/workflows/python.yml/badge.svg)
+[![Build Status](https://github.com/Wasted-Audio/hvcc/actions/workflows/python.yml/badge.svg)](https://github.com/Wasted-Audio/hvcc/actions)
 
 This is an attempt to modernize `hvcc` to work with `python3` and add some additional targets.
 
@@ -20,7 +20,7 @@ It has since then been expanded to provide further support for many different pl
 
 * python 3.7 or higher
     - `jinja2` (for generator templating)
-    - `nose2` (for tests, optional)
+    - `tox` (for tests, optional)
 
 ## Installation
 hvcc is available from pypi.org and can be installed using python3 pip:
@@ -81,17 +81,7 @@ It is also possible to pass a list of generators:
 
 `$ hvcc ~/myProject/_main.pd -o ~/Desktop/somewhere/else/ -n mySynth -g unity wwise js`
 
-Available generator options:
-
-* `c`
-* `bela`
-* `daisy`
-* `dpf`
-* `fabric`
-* `js`
-* `pdext`
-* `unity`
-* `wwise`
+A list of available generator options can be found [here](/docs/03.generators.md)
 
 ### `-p` Search Paths
 
@@ -139,7 +129,7 @@ Displays all the available parameters and options for hvcc.
 ## Contact
 There are several places where heavy/hvcc conversation is happening:
 * [Discord](https://discord.gg/fmxJveg)
-* [IRC](https://web.libera.chat/#dataflow)
+* [IRC](https://web.libera.chat/#hvcc)
 * A number of forums:
   * [Bela](https://forum.bela.io/?q=hvcc)
   * [Rebel Technology](https://community.rebeltech.org/tags/puredata)

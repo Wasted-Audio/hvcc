@@ -25,7 +25,7 @@ public:
   {{class_name}}();
   ~{{class_name}}() override;
 
-  void handleMidiInput(uint32_t curEventIndex, const MidiEvent* midiEvents);
+  void handleMidiInput(uint32_t frames, const MidiEvent* midiEvents, uint32_t midiEventCount);
   void handleMidiSend(uint32_t sendHash, const HvMessage *m);
 
 protected:
@@ -118,6 +118,12 @@ private:
   // parameters
   float _parameters[{{receivers|length}}]; // in range of [0,1]
   {% endif %}
+
+  // transport values
+  bool wasPlaying;
+  float samplesProcessed;
+  double nextClockTick;
+  double sampleAtCycleStart;
 
   // heavy context
   HeavyContextInterface *_context;

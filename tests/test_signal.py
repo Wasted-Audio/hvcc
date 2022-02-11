@@ -66,7 +66,7 @@ class TestPdSignalPatches(unittest.TestCase):
 
         # run executable
         # e.g. $ /path/heavy /path/heavy.wav 48000 480 1000
-        wav_path = os.path.join(out_dir, "heavy.{0}.wav".format(flag))
+        wav_path = os.path.join(out_dir, f"heavy.{flag}.wav")
         subprocess.check_output([
             exe_path,
             wav_path,
@@ -82,16 +82,16 @@ class TestPdSignalPatches(unittest.TestCase):
 
         TestPdSignalPatches._compile_and_run(out_dir, c_sources, flag=flag)
 
-        [r_fs, result] = wavfile.read(os.path.join(out_dir, "heavy.{0}.wav".format(flag)))
+        [r_fs, result] = wavfile.read(os.path.join(out_dir, f"heavy.{flag}.wav"))
         [g_fs, golden] = wavfile.read(golden_path)
-        self.assertEqual(g_fs, r_fs, "Expected WAV sample rate of {0}Hz, got {1}Hz.".format(g_fs, r_fs))
+        self.assertEqual(g_fs, r_fs, f"Expected WAV sample rate of {g_fs}Hz, got {r_fs}Hz.")
         try:
             numpy.testing.assert_array_almost_equal(
                 result,
                 golden,
                 decimal=4,
                 verbose=True,
-                err_msg="Generated WAV does not match the golden file with {0}.".format(flag))
+                err_msg=f"Generated WAV does not match the golden file with {flag}.")
         except AssertionError as e:
             self.fail(e)
 
@@ -120,7 +120,7 @@ class TestPdSignalPatches(unittest.TestCase):
 
         pd_path = os.path.join(SIGNAL_TEST_DIR, pd_file)
         patch_name = os.path.splitext(os.path.basename(pd_path))[0]
-        golden_path = os.path.join(SIGNAL_TEST_DIR, patch_name + ".golden.wav")
+        golden_path = os.path.join(SIGNAL_TEST_DIR, f"{patch_name}.golden.wav")
         self.assertTrue(os.path.exists(golden_path), f"File not found: {golden_path}")
 
         try:

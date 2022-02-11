@@ -1,4 +1,4 @@
-#N canvas 472 394 409 184 12;
+#N canvas 559 367 576 125 12;
 #X obj 22 19 notein;
 #X obj 22 59 noteout;
 #X obj 98 19 ctlin;
@@ -10,6 +10,8 @@
 #X obj 318 19 bendin;
 #X obj 318 69 bendout;
 #X obj 318 44 - 8192;
+#X obj 417 22 midirealtimein;
+#X obj 417 59 midiout;
 #X connect 0 0 1 0;
 #X connect 0 1 1 1;
 #X connect 0 2 1 2;
@@ -23,3 +25,5 @@
 #X connect 8 0 10 0;
 #X connect 8 1 9 1;
 #X connect 10 0 9 0;
+#X connect 11 0 12 0;
+#X connect 11 1 12 1;
