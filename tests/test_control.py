@@ -271,6 +271,9 @@ class TestPdControlPatches(unittest.TestCase):
     def test_select(self):
         self._test_control_patch("test-select.pd")
 
+    def test_select_symbol(self):
+        self._test_control_patch("test-select-symbol.pd")
+
     def test_send_receive(self):
         self._test_control_patch("test-send_receive.pd")
 

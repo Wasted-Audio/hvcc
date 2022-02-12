@@ -49,17 +49,29 @@ class ControlSwitchcase(HeavyObject):
         ]
         out_list.append("switch (msg_getHash(m, 0)) {")
         cases = objects[obj_id]["args"]["cases"]
+        # check symbol messages in secondary switch
+        out_list.append(f"case {HeavyObject.get_hash_string('symbol')}: {{ // \"symbol\"")
+        out_list.append("switch (msg_getHash(m, 1)) {")
         for i, c in enumerate(cases):
-            out_list.append("case {0}: {{ // \"{1}\"".format(
-                HeavyObject.get_hash_string(c),
-                c))
-            out_list.extend(
-                HeavyObject._get_on_message_list(on_message_list[i], obj_class_dict, objects))
+            out_list.append(f"case {HeavyObject.get_hash_string(c)}: {{ // \"{c}\"")
+            out_list.extend(HeavyObject._get_on_message_list(on_message_list[i], obj_class_dict, objects))
             out_list.append("break;")
             out_list.append("}")
         out_list.append("default: {")
-        out_list.extend(
-            HeavyObject._get_on_message_list(on_message_list[-1], obj_class_dict, objects))
+        out_list.extend(HeavyObject._get_on_message_list(on_message_list[-1], obj_class_dict, objects))
+        out_list.append("break;")
+        out_list.append("}")  # end default
+        out_list.append("}")  # end secondary switch
+        out_list.append("break;")
+        out_list.append("}")
+        # check non-symbol messages
+        for i, c in enumerate(cases):
+            out_list.append(f"case {HeavyObject.get_hash_string(c)}: {{ // \"{c}\"")
+            out_list.extend(HeavyObject._get_on_message_list(on_message_list[i], obj_class_dict, objects))
+            out_list.append("break;")
+            out_list.append("}")
+        out_list.append("default: {")
+        out_list.extend(HeavyObject._get_on_message_list(on_message_list[-1], obj_class_dict, objects))
         out_list.append("break;")
         out_list.append("}")  # end default
         out_list.append("}")  # end switch

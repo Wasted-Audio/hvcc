@@ -1,0 +1,7 @@
+[@ 0.000] C: symbol bill
+[@ 0.000] B: bang
+[@ 0.000] A: bang
+[@ 0.000] A: bang
+[@ 0.000] B: bang
+[@ 0.000] C: bang
+[@ 0.000] D: 234
