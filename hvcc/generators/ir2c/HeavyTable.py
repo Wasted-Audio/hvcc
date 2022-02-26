@@ -44,7 +44,7 @@ class HeavyTable(HeavyObject):
                 "float hTable_{0}_data[{1}] = {{{2}}};".format(
                     obj_id,
                     len(args["values"]),
-                    ", ".join(["{0}f".format(float(v)) for v in args["values"]]))]
+                    ", ".join([f"{float(v)}f" for v in args["values"]]))]
         else:
             return []
 
@@ -63,7 +63,9 @@ class HeavyTable(HeavyObject):
 
     @classmethod
     def get_C_free(clazz, obj_type, obj_id, args):
-        return ["{0}_free(&{0}_{1});".format(clazz.preamble, obj_id)]
+        return ["{0}_free(&{0}_{1});".format(
+            clazz.preamble,
+            obj_id)]
 
     @classmethod
     def get_C_onMessage(clazz, obj_type, obj_id, inlet_index, args):

@@ -242,7 +242,7 @@ class ir2c:
         send_receive = OrderedDict(sorted([(k, v) for k, v in ir["control"]["receivers"].items()], key=lambda x: x[0]))
 
         # write HeavyContext.h
-        with open(os.path.join(output_dir, "Heavy_{0}.hpp".format(name)), "w") as f:
+        with open(os.path.join(output_dir, f"Heavy_{name}.hpp"), "w") as f:
             f.write(env.get_template("Heavy_NAME.hpp").render(
                 name=name,
                 include_set=include_set,
@@ -253,7 +253,7 @@ class ir2c:
                 externs=externs))
 
         # write C++ implementation
-        with open(os.path.join(output_dir, "Heavy_{0}.cpp".format(name)), "w") as f:
+        with open(os.path.join(output_dir, f"Heavy_{name}.cpp"), "w") as f:
             f.write(env.get_template("Heavy_NAME.cpp").render(
                 name=name,
                 signal=ir["signal"],
@@ -267,7 +267,7 @@ class ir2c:
                 copyright=copyright))
 
         # write C API, hv_NAME.h
-        with open(os.path.join(output_dir, "Heavy_{0}.h".format(name)), "w") as f:
+        with open(os.path.join(output_dir, f"Heavy_{name}.h"), "w") as f:
             f.write(env.get_template("Heavy_NAME.h").render(
                 name=name,
                 copyright=copyright,

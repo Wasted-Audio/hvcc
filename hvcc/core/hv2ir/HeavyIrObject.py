@@ -62,9 +62,7 @@ class HeavyIrObject(HeavyLangObject):
                         # if the argument is not required, use the default
                         self.args[arg["name"]] = arg["default"]
                     else:
-                        self.add_error("Required argument \"{0}\" not present for object {1}.".format(
-                            arg["name"],
-                            self))
+                        self.add_error(f"Required argument \"{arg['name']}\" not present for object {self}.")
                 else:
                     # enforce argument types.
                     # if the default argument is null, don't worry about about the arg
@@ -140,7 +138,7 @@ class HeavyIrObject(HeavyLangObject):
                 # decrease the retain count of the buffer
                 buffer_pool.release_buffer(buf)
             else:
-                raise HeavyException("This object has {0} (> 1) signal inputs.".format(len(cc)))
+                raise HeavyException(f"This object has {len(cc)} (> 1) signal inputs.")
 
         # assign the output buffers
         exclude_set = set()

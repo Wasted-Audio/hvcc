@@ -32,4 +32,4 @@ class HIrTabwrite(HeavyIrObject):
             self.args["table_id"] = table_obj.id
             return ({self}, [])
         else:
-            self.add_error("Can't find table with name \"{0}\".".format(self.args["table"]))
+            self.add_error(f"Can't find table with name \"{self.args['table']}\".")

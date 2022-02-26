@@ -26,9 +26,7 @@ class HLangVario(HeavyLangObject):
     def reduce(self):
         var_obj = self.graph.resolve_object_for_name(self.name, "var")
         if var_obj is None:
-            raise HeavyException("No corresponding \"var\" object found for object {0} in file {1}".format(
-                self,
-                self.graph.file))
+            raise HeavyException(f"No corresponding \"var\" object found for object {self} in file {self.graph.file}")
 
         if self.has_inlet_connection_format("f") and self.has_outlet_connection_format("_"):
             x = HeavyIrObject("__varwrite~f", {"var_id": var_obj.id})

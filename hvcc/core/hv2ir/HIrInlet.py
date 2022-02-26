@@ -34,5 +34,5 @@ class HIrInlet(HeavyIrObject):
             return list(connection_type_set)[0]
         else:
             raise HeavyException(
-                "{0} has multiple incident connections of differing type. "
-                "The outlet type cannot be explicitly resolved.".format(self))
+                f"{self} has multiple incident connections of differing type. "
+                "The outlet type cannot be explicitly resolved.")
