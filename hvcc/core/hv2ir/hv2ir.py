@@ -18,8 +18,8 @@ import json
 import os
 import time
 
-from .HeavyException import HeavyException
-from .HeavyParser import HeavyParser
+from hvcc.core.hv2ir.HeavyException import HeavyException
+from hvcc.core.hv2ir.HeavyParser import HeavyParser
 
 
 class hv2ir:
