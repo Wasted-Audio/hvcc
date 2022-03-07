@@ -42,4 +42,4 @@ class HLangBiquad(HeavyLangObject):
             return {x}, self.get_connection_move_list(x)
 
         else:
-            raise HeavyException("Unsupported connection format to biquad: {0}".format(fmt))
+            raise HeavyException(f"Unsupported connection format to biquad: {fmt}")

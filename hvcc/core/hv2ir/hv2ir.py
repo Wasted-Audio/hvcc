@@ -18,8 +18,8 @@ import json
 import os
 import time
 
-from .HeavyException import HeavyException
-from .HeavyParser import HeavyParser
+from hvcc.core.hv2ir.HeavyException import HeavyException
+from hvcc.core.hv2ir.HeavyParser import HeavyParser
 
 
 class hv2ir:
@@ -108,7 +108,7 @@ class hv2ir:
                     if len(o["args"]) > 0:
                         print("{0} {{{1}}}".format(
                             o["type"],
-                            " ".join(["{0}:{1}".format(k, v) for k, v in o["args"].items()])))
+                            " ".join([f"{k}:{v}" for k, v in o["args"].items()])))
                     else:
                         print(o["type"])
 
@@ -149,7 +149,7 @@ def main():
         verbose=args.verbose)
 
     if args.verbose:
-        print("Total hv2ir time: {0:.2f}ms".format(d["compile_time"] * 1000))
+        print(f"Total hv2ir time: {(d['compile_time'] * 1000):.2f}ms")
 
 
 if __name__ == "__main__":

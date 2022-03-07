@@ -32,4 +32,4 @@ class HIrTabread(HeavyIrObject):
             self.args["table_id"] = table_obj.id
             return ({self}, [])
         else:
-            self.add_error("Cannot find table named \"{0}\" for object {1}.".format(self.args["table"], self))
+            self.add_error(f"Cannot find table named \"{self.args['table']}\" for object {self}.")

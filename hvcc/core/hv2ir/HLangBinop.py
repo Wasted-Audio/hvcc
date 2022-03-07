@@ -204,7 +204,6 @@ class HLangBinop(HeavyLangObject):
             if "m" in fmt:
                 self.add_error(
                     "A binary operator cannot have both a signal and control "
-                    "connection to the same inlet: {0}".format(fmt))
+                    f"connection to the same inlet: {fmt}")
             else:
-                self.add_error(
-                    "Unknown inlet configuration: {0}".format(fmt))
+                self.add_error(f"Unknown inlet configuration: {fmt}")

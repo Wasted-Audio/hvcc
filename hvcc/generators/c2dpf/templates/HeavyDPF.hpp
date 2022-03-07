@@ -4,9 +4,13 @@
 #define _HEAVY_LV2_{{name|upper}}_
 
 #include "DistrhoPlugin.hpp"
+#include "DistrhoPluginInfo.h"
 #include "Heavy_{{name}}.hpp"
 
 START_NAMESPACE_DISTRHO
+
+static void hvSendHookFunc(HeavyContextInterface *c, const char *sendName, uint32_t sendHash, const HvMessage *m);
+static void hvPrintHookFunc(HeavyContextInterface *c, const char *printLabel, const char *msgString, const HvMessage *m);
 
 class {{class_name}} : public Plugin
 {
@@ -20,6 +24,9 @@ public:
 
   {{class_name}}();
   ~{{class_name}}() override;
+
+  void handleMidiInput(uint32_t frames, const MidiEvent* midiEvents, uint32_t midiEventCount);
+  void handleMidiSend(uint32_t sendHash, const HvMessage *m);
 
 protected:
   // -------------------------------------------------------------------
@@ -92,7 +99,12 @@ protected:
 
   // void activate() override;
   // void deactivate() override;
+
+#if DISTRHO_PLUGIN_WANT_MIDI_INPUT
   void run(const float** inputs, float** outputs, uint32_t frames, const MidiEvent* midiEvents, uint32_t midiEventCount) override;
+#else
+  void run(const float** inputs, float** outputs, uint32_t frames) override;
+#endif
 
   // -------------------------------------------------------------------
   // Callbacks
@@ -106,6 +118,12 @@ private:
   // parameters
   float _parameters[{{receivers|length}}]; // in range of [0,1]
   {% endif %}
+
+  // transport values
+  bool wasPlaying;
+  float samplesProcessed;
+  double nextClockTick;
+  double sampleAtCycleStart;
 
   // heavy context
   HeavyContextInterface *_context;

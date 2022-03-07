@@ -1,0 +1,17 @@
+{
+    "dpf": {
+        "project": true,
+        "description": "super simple midi thru patch",
+        "maker": "dreamer",
+        "version": "6, 6, 6",
+        "license": "WTFPL",
+        "midi_input": 1,
+        "midi_output": 1,
+        "plugin_formats": [
+            "lv2_dsp",
+            "vst2",
+            "vst3",
+            "jack"
+        ]
+    }
+}

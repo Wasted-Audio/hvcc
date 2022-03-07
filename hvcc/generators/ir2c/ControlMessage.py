@@ -50,7 +50,7 @@ class ControlMessage(HeavyObject):
                     if e in ["bang"]:
                         # is the message a bang?
                         send_message_list.append(f"msg_setBang(m, {i});")
-                    elif re.match("\$[\d]+", e):
+                    elif re.match(r"\$[\d]+", e):
                         send_message_list.append(f"msg_setElementToFrom(m, {i}, n, {int(e[1:]) - 1});")
                     elif e == "@HV_N_SIMD":
                         # NOTE(mhroth): messages can contain special arguments

@@ -57,9 +57,7 @@ class ControlDelay(HeavyObject):
         send_message_list = [
             f"cDelay_{obj_id}_sendMessage(HeavyContextInterface *_c, int letIn, const HvMessage *const m) {{"
         ]
-        send_message_list.append("cDelay_clearExecutingMessage(&Context(_c)->cDelay_{0}, m);".format(
-            obj_id
-        ))
+        send_message_list.append(f"cDelay_clearExecutingMessage(&Context(_c)->cDelay_{obj_id}, m);")
         send_message_list.extend(
             HeavyObject._get_on_message_list(on_message_list[0], get_obj_class, objects))
         send_message_list.append("}")  # end function

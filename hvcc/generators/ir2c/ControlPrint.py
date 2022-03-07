@@ -39,7 +39,7 @@ class ControlPrint(HeavyObject):
 
     @classmethod
     def get_C_onMessage(clazz, obj_type, obj_id, inlet_index, args):
-        return ["cPrint_onMessage(_c, m, \"{0}\");".format(args["label"])]
+        return [f"cPrint_onMessage(_c, m, \"{args['label']}\");"]
 
     @classmethod
     def get_C_decl(clazz, obj_type, obj_id, args):

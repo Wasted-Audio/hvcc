@@ -131,7 +131,7 @@ class PdObject:
         elif c.from_obj is self:
             self._outlet_connections[str(c.outlet_index)].remove(c)
         else:
-            raise Exception("Connection {0} does not connect to this object {1}.".format(c, self))
+            raise Exception(f"Connection {c} does not connect to this object {self}.")
 
     def get_graph_heirarchy(self):
         """ Returns an indication of the graph "path" of this object.
@@ -166,8 +166,6 @@ class PdObject:
 
     def __repr__(self):
         if len(self.obj_args) == 0:
-            return "[{0}]".format(self.obj_type)
+            return f"[{self.obj_type}]"
         else:
-            return "[{0} {1}]".format(
-                self.obj_type,
-                " ".join([str(o) for o in self.obj_args]))
+            return f"[{self.obj_type} {' '.join([str(o) for o in self.obj_args])}]"

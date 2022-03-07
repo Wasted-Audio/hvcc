@@ -18,11 +18,8 @@
 #define _HEAVY_UTILS_H_
 
 // platform definitions
-#if _WIN32 || _WIN64
+#if _WIN32 || _WIN64 || _MSC_VER
   #define HV_WIN 1
-#ifdef _MSC_VER
-  #define HV_MSVC 1
-#endif
 #elif __APPLE__
   #define HV_APPLE 1
 #elif __ANDROID__
@@ -138,7 +135,7 @@
 // Memory management
 #define hv_memcpy(a, b, c) memcpy(a, b, c)
 #define hv_memclear(a, b) memset(a, 0, b)
-#if HV_MSVC
+#if HV_WIN
   #include <malloc.h>
   #define hv_alloca(_n) _alloca(_n)
   #if HV_SIMD_AVX
@@ -202,7 +199,7 @@
 #define hv_assert(e) assert(e)
 
 // Export and Inline
-#if HV_MSVC
+#if HV_WIN
 #define HV_EXPORT __declspec(dllexport)
 #define inline __inline
 #define HV_FORCE_INLINE __forceinline
@@ -260,7 +257,7 @@ static inline hv_int32_t __hv_utils_min_i(hv_int32_t x, hv_int32_t y) { return (
 #else
 #define hv_fma_f(a, b, c) fmaf(a, b, c)
 #endif
-#if HV_MSVC
+#if HV_WIN
   // finds ceil(log2(x))
   #include <intrin.h>
   static inline hv_uint32_t __hv_utils_min_max_log2(hv_uint32_t x) {
@@ -277,7 +274,7 @@ static inline hv_int32_t __hv_utils_min_i(hv_int32_t x, hv_int32_t y) { return (
 
 // Atomics
 #if HV_WIN
-  #include <Windows.h>
+  #include <windows.h>
   #define hv_atomic_bool volatile LONG
   #define HV_SPINLOCK_ACQUIRE(_x) while (InterlockedCompareExchange(&_x, true, false)) { }
   #define HV_SPINLOCK_TRY(_x) return !InterlockedCompareExchange(&_x, true, false)

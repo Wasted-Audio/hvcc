@@ -1,0 +1,11 @@
+#N canvas 951 312 204 190 12;
+#X obj 87 127 outlet;
+#X obj 20 148 outlet;
+#X text 23 13 data port;
+#X obj 20 61 unpack f f;
+#X obj 87 94 + 1;
+#X obj 20 37 r __hv_midirealtimein;
+#X connect 3 0 1 0;
+#X connect 3 1 4 0;
+#X connect 4 0 0 0;
+#X connect 5 0 3 0;
