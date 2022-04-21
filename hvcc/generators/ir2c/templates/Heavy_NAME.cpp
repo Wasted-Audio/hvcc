@@ -32,13 +32,14 @@ extern "C" {
 {%- endfor %}
 {%- endif %}
 
-
+#ifdef __EXCEPTIONS
 class my_bad_alloc : public std::bad_alloc {
   virtual const char* what() const noexcept
   {
     return "Heavy_{{name}} object is improperly aligned. Avoid heap allocation, use operator new or use -std=c++17\n";
   }
 };
+#endif // __EXCEPTIONS
 
 /*
  * Class Functions
@@ -46,11 +47,13 @@ class my_bad_alloc : public std::bad_alloc {
 
 Heavy_{{name}}::Heavy_{{name}}(double sampleRate, int poolKb, int inQueueKb, int outQueueKb)
     : HeavyContext(sampleRate, poolKb, inQueueKb, outQueueKb) {
+#ifdef __EXCEPTIONS
   if(size_t(this) & size_t(alignof(Heavy_{{name}}) - 1))
   {
     my_bad_alloc e;
     throw(e);
   }
+#endif // __EXCEPTIONS
   {%- for x in init_list %}
   numBytes += {{x}}
   {%- endfor %}

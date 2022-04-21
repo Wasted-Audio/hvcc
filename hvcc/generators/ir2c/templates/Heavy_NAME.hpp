@@ -19,11 +19,13 @@ class Heavy_{{name}} : public HeavyContext {
   // ensure desired alignment is achieved even for heap allocation
   void* operator new(size_t sz) {
     auto ptr = aligned_alloc(alignof(Heavy_{{name}}), sz);
+#ifdef __EXCEPTIONS
     if(!ptr)
     {
       std::bad_alloc e;
       throw(e);
     }
+#endif // __EXCEPTIONS
     return ptr;
   }
   const char *getName() override { return "{{name}}"; }
