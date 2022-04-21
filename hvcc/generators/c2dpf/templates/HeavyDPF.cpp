@@ -1,5 +1,6 @@
 {{copyright}}
 
+#include "Heavy_{{name}}.h"
 #include "{{class_name}}.hpp"
 #include <set>
 
@@ -77,7 +78,7 @@ static void hvPrintHookFunc(HeavyContextInterface *c, const char *printLabel, co
   _parameters[{{loop.index-1}}] = {{v.attributes.default}}f;
   {% endfor %}
 
-  _context = new Heavy_{{name}}(getSampleRate(), {{pool_sizes_kb.internal}}, {{pool_sizes_kb.inputQueue}}, {{pool_sizes_kb.outputQueue}});
+  _context = hv_{{name}}_new_with_options(getSampleRate(), {{pool_sizes_kb.internal}}, {{pool_sizes_kb.inputQueue}}, {{pool_sizes_kb.outputQueue}});
   _context->setUserData(this);
   _context->setSendHook(&hvSendHookFunc);
   _context->setPrintHook(&hvPrintHookFunc);
@@ -91,7 +92,7 @@ static void hvPrintHookFunc(HeavyContextInterface *c, const char *printLabel, co
 }
 
 {{class_name}}::~{{class_name}}() {
-  delete _context;
+  hv_{{name}}_free(_context);
 }
 
 void {{class_name}}::initParameter(uint32_t index, Parameter& parameter)
@@ -440,9 +441,9 @@ void {{class_name}}::run(const float** inputs, float** outputs, uint32_t frames)
 
 void {{class_name}}::sampleRateChanged(double newSampleRate)
 {
-  delete _context;
+  hv_{{name}}_free(_context);
 
-  _context = new Heavy_{{name}}(newSampleRate, {{pool_sizes_kb.internal}}, {{pool_sizes_kb.inputQueue}}, {{pool_sizes_kb.outputQueue}});
+  _context = hv_{{name}}_new_with_options(getSampleRate(), {{pool_sizes_kb.internal}}, {{pool_sizes_kb.inputQueue}}, {{pool_sizes_kb.outputQueue}});
   _context->setUserData(this);
   _context->setSendHook(&hvSendHookFunc);
   _context->setPrintHook(&hvPrintHookFunc);
