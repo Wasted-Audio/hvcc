@@ -2,7 +2,15 @@
 TARGET = HeavyDaisy_{{name}}
 
 # Library Locations
-LIBDAISY_DIR = ../../libdaisy
+LIBDAISY_DIR = {{libdaisy_path}}
+
+{% if linker_script != '' %}
+LDSCRIPT = {{linker_script}}
+{% endif %}
+
+{% if bootloader %}
+C_DEFS += -DBOOT_APP
+{% endif %}
 
 # Project Source
 C_SOURCES = $(wildcard *.c)

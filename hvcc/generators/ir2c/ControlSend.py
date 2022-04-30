@@ -23,7 +23,7 @@ class ControlSend(HeavyObject):
 
     @classmethod
     def get_C_onMessage(clazz, obj_type, obj_id, inlet_index, args):
-        return ["cSend_{0}_sendMessage(_c, 0, m);".format(obj_id)]
+        return [f"cSend_{obj_id}_sendMessage(_c, 0, m);"]
 
     @classmethod
     def get_C_impl(clazz, obj_type, obj_id, on_message_list, get_obj_class, objects):

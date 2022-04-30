@@ -35,7 +35,7 @@ class LocalVars:
 
     def find_path_for_abstraction(self, name):
         # the file name based on the abstraction name
-        file_name = "{0}.hv.json".format(name)
+        file_name = f"{name}.hv.json"
 
         # iterate in order through the declared paths in order to find the file
         for d in self.declared_paths:

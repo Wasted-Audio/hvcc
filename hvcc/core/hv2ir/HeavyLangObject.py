@@ -172,7 +172,7 @@ class HeavyLangObject:
             # not be resolved to anything other than what it already is.
             # This happens most often with message objects.
             # if graph is not None:
-            #     graph.add_warning("Unknown value type \"{0}\" for value: {1}".format(value_type, value))
+            #     graph.add_warning(f"Unknown value type \"{value_type}\" for value: {value}")
             return value
 
     def __resolve_default_lang_args(self):

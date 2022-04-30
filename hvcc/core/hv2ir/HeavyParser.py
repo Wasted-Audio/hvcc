@@ -71,9 +71,7 @@ class HeavyParser:
         # copy the path stack such that no changes are made to the calling stack
         path_stack = path_stack or set()
         if hv_file in path_stack:
-            raise HeavyException("Abstraction recursion detected. Rereading {0} on stack {1}.".format(
-                hv_file,
-                path_stack))
+            raise HeavyException(f"Abstraction recursion detected. Rereading {hv_file} on stack {path_stack}.")
         else:
             path_stack.add(hv_file)
 
@@ -96,7 +94,7 @@ class HeavyParser:
         for a in json_heavy["args"]:
             if a["name"] not in graph_args:
                 if a["required"]:
-                    raise HeavyException("Required argument \"{0}\" not present.".format(a["name"]))
+                    raise HeavyException(f"Required argument \"{a['name']}\" not present.")
                 else:
                     graph_args[a["name"]] = a["default"]
             else:
@@ -154,7 +152,7 @@ class HeavyParser:
 
                     # an object definition can't be found
                     else:
-                        g.add_error("Object type \"{0}\" cannot be found.".format(o["type"]))
+                        g.add_error(f"Object type \"{o['type']}\" cannot be found.")
                         # note that add_error() raises an exception. So really, there is no continue.
                         continue
 
@@ -219,8 +217,8 @@ class HLangIf(HeavyLangObject):
             # TODO(mhroth): implement this
             x = HeavyParser.graph_from_file("./hvlib/if~i.hv.json")
         else:
-            raise HeavyException("Unhandled connection configuration to object [if]: {0}".format(
-                self._get_connection_format(self.inlet_connections)))
+            fmt = self._get_connection_format(self.inlet_connections)
+            raise HeavyException(f"Unhandled connection configuration to object [if]: {fmt}")
 
         return ({x}, self.get_connection_move_list(x))
 

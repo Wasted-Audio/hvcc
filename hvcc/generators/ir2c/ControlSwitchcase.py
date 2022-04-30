@@ -50,9 +50,8 @@ class ControlSwitchcase(HeavyObject):
         out_list.append("switch (msg_getHash(m, 0)) {")
         cases = objects[obj_id]["args"]["cases"]
         for i, c in enumerate(cases):
-            out_list.append("case {0}: {{ // \"{1}\"".format(
-                HeavyObject.get_hash_string(c),
-                c))
+            hv_hash = HeavyObject.get_hash_string(c)
+            out_list.append(f"case {hv_hash}: {{ // \"{c}\"")
             out_list.extend(
                 HeavyObject._get_on_message_list(on_message_list[i], obj_class_dict, objects))
             out_list.append("break;")

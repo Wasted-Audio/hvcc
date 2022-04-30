@@ -92,12 +92,8 @@ class ControlBinop(HeavyObject):
         if obj_type.endswith("_k"):
             return []
         else:
-            return [
-                "cBinop_init(&cBinop_{0}, {1}f); // {2}".format(
-                    obj_id,
-                    float(list(args.values())[0]),
-                    obj_type)
-            ]
+            obj_arg = float(list(args.values())[0])
+            return [f"cBinop_init(&cBinop_{obj_id}, {obj_arg}f); // {obj_type}"]
 
     @classmethod
     def get_C_free(clazz, obj_type, obj_id, args):
