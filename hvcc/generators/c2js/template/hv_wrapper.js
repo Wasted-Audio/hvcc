@@ -144,9 +144,10 @@ var tableHashes = {
     var printHook = addFunction(function(context, printName, str, msg) {
         // Converts Heavy print callback to a printable message
         var timeInSecs =_hv_samplesToMilliseconds(context, _hv_msg_getTimestamp(msg)) / 1000.0;
-        var m = Pointer_stringify(printName) + " [" + timeInSecs.toFixed(3) + "]: " + Pointer_stringify(str);
+        var m = UTF8ToString(printName) + " [" + timeInSecs.toFixed(3) + "]: " + UTF8ToString(str);
         hook(m);
-      }
+      },
+      "viiii"
     );
     _hv_setPrintHook(this.heavyContext, printHook);
   }
@@ -162,8 +163,9 @@ var tableHashes = {
     // typedef void (HvSendHook_t) (HeavyContextInterface *context, const char *sendName, hv_uint32_t sendHash, const HvMessage *msg);
     var sendHook = addFunction(function(context, sendName, sendHash, msg) {
         // Converts sendhook callback to (sendName, float) message
-        hook(Pointer_stringify(sendName), _hv_msg_getFloat(msg, 0));
-      }
+        hook(UTF8ToString(sendName), _hv_msg_getFloat(msg, 0));
+      },
+      "viiii"
     );
     _hv_setSendHook(this.heavyContext, sendHook);
   }

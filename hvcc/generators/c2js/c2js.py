@@ -52,7 +52,8 @@ class c2js:
         "_hv_table_getLength",
         "_hv_table_setLength",
         "_hv_table_getBuffer",
-        "_hv_sendMessageToReceiverV"
+        "_hv_sendMessageToReceiverV",
+        "_malloc" # Rationale: https://github.com/emscripten-core/emscripten/issues/6882#issuecomment-406745898
     ]
 
     @classmethod
@@ -103,6 +104,7 @@ class c2js:
             "-s", "RESERVED_FUNCTION_POINTERS=2",
             "-s", f"EXPORTED_FUNCTIONS=[{hv_api_defs.format(patch_name)}]",
             "-s", "MODULARIZE=1",
+            '-s', 'ASSERTIONS=1',
             "--post-js", post_js_path
         ]
 

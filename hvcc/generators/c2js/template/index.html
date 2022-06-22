@@ -31,8 +31,10 @@
 
       window.onload = function() {
         if (webAssemblySupported) {
-          heavyModule = {{name}}_Module();
-          heavyModule['onRuntimeInitialized'] = moduleLoaded;
+          {{name}}_Module().then(loadedModule => {
+            heavyModule = loadedModule;
+            moduleLoaded();
+          });
         }
         else {
           console.warn("heavy: web assembly not found, falling back to asm.js");
@@ -40,8 +42,10 @@
           var script = document.createElement('script');
           script.src = "{{name}}.asm.js";
           script.onload = function() {
-            heavyModule = {{name}}_AsmModule();
-            moduleLoaded();
+            {{name}}_AsmModule().then(loadedModule => {
+              heavyModule = loadedModule;
+              moduleLoaded();
+            });
           }
           document.body.appendChild(script);
         }
@@ -50,24 +54,26 @@
 
       function moduleLoaded() {
         loader = new heavyModule.AudioLibLoader();
-        loader.init({
-          // optional: set audio processing block size, default is 2048
-          blockSize: 2048,
-          // optional: provide a callback handler for [print] messages
-          printHook: onPrint,
-          // optional: provide a callback handler for [s {sendName} @hv_param] messages
-          sendHook: onFloatMessage,
-          // optional: pass an existing web audio context, otherwise a new one
-          // will be constructed.
-          webAudioContext: null
-        });
-        {% for k, v in parameters -%}
-        updateSlider_{{k}}({{v.attributes.default}});
-        {% endfor -%}
         document.getElementById("transportButton").style.visibility = "visible";
       }
 
       function start() {
+        if(!loader.webAudioContext) {
+          loader.init({
+            // optional: set audio processing block size, default is 2048
+            blockSize: 2048,
+            // optional: provide a callback handler for [print] messages
+            printHook: onPrint,
+            // optional: provide a callback handler for [s {sendName} @hv_param] messages
+            sendHook: onFloatMessage,
+            // optional: pass an existing web audio context, otherwise a new one
+            // will be constructed.
+            webAudioContext: null
+          });
+          {% for k, v in parameters -%}
+          updateSlider_{{k}}({{v.attributes.default}});
+          {% endfor -%}
+        }
         loader.start();
       }
 
