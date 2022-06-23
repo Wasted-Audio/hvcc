@@ -58,7 +58,7 @@ class c2js:
 
     @classmethod
     def run_emscripten(clazz, c_src_dir, out_dir, patch_name, output_name, post_js_path, should_modularize, 
-        environment, pre_js_path="", should_single_file=0):
+        environment, pre_js_path=""):
         """Run the emcc command to compile C source files to a javascript library.
         """
 
@@ -96,7 +96,6 @@ class c2js:
         hv_api_defs = ", ".join([f"\"{x.format(patch_name)}\"" for x in c2js.__HV_API])
 
         # output path
-        asm_js_path = os.path.join(out_dir, f"{output_name}.asm.js")
         wasm_js_path = os.path.join(out_dir, f"{output_name}.js")
 
         linker_flags = [
@@ -107,7 +106,7 @@ class c2js:
             "-s", f"MODULARIZE={should_modularize}",
             '-s', 'ASSERTIONS=1',
             '-s', f'ENVIRONMENT={environment}',
-            '-s', f'SINGLE_FILE={should_single_file}',
+            '-s', 'SINGLE_FILE=1',
             "--post-js", post_js_path
         ]
 
@@ -118,15 +117,6 @@ class c2js:
 
         # include C/C++ obj files in js library
         cmd = ["emcc"] + obj_paths + linker_flags
-        print("RUNNING: " + str(cmd))
-
-        # run emscripten twice!
-        subprocess.check_output(  # fallback asm.js build
-            cmd + [
-                "-s", f"EXPORT_NAME='{output_name}_AsmModule'",
-                "-o", asm_js_path
-            ])
-
         subprocess.check_output(  # WASM
             cmd + [
                 "-s", "WASM=1",
@@ -225,8 +215,7 @@ class c2js:
                                           post_js_path=post_js_path,
                                           should_modularize=0,
                                           environment="worker",
-                                          pre_js_path=pre_js_path,
-                                          should_single_file=1)
+                                          pre_js_path=pre_js_path)
 
             # delete temporary files
             os.remove(post_js_path)

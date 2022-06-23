@@ -24,31 +24,14 @@
     </style>
 
     <script type="text/javascript">
-
-      var webAssemblySupported = (typeof WebAssembly === 'object');
       var heavyModule = null;
       var loader = null;
 
       window.onload = function() {
-        if (webAssemblySupported) {
-          {{name}}_Module().then(loadedModule => {
-            heavyModule = loadedModule;
-            moduleLoaded();
-          });
-        }
-        else {
-          console.warn("heavy: web assembly not found, falling back to asm.js");
-
-          var script = document.createElement('script');
-          script.src = "{{name}}.asm.js";
-          script.onload = function() {
-            {{name}}_AsmModule().then(loadedModule => {
-              heavyModule = loadedModule;
-              moduleLoaded();
-            });
-          }
-          document.body.appendChild(script);
-        }
+        {{name}}_Module().then(loadedModule => {
+          heavyModule = loadedModule;
+          moduleLoaded();
+        });
         document.getElementById("transportButton").style.visibility = "hidden";
       }
 
