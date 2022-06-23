@@ -1,5 +1,7 @@
 {{copyright}}
 
+var audioWorkletSupported = (typeof AudioWorklet === 'function');
+
 /*
  * AudioLibLoader - Convenience functions for setting up the web audio context
  * and initialising the AudioLib context
@@ -9,6 +11,7 @@ var AudioLibLoader = function() {
   this.isPlaying = false;
   this.webAudioContext = null;
   this.webAudioProcessor = null;
+  this.webAudioWorklet = null;
   this.audiolib = null;
 }
 
@@ -18,37 +21,67 @@ var AudioLibLoader = function() {
  *   @param options.printHook (Function) callback that gets triggered on each print message
  *   @param options.sendHook (Function) callback that gets triggered for messages sent via @hv_param/@hv_event
  */
-AudioLibLoader.prototype.init = function(options) {
+AudioLibLoader.prototype.init = async function(options) {
   // use provided web audio context or create a new one
   this.webAudioContext = options.webAudioContext ||
       (new (window.AudioContext || window.webkitAudioContext || null));
 
   if (this.webAudioContext) {
     var blockSize = options.blockSize || 2048;
-    var instance = new {{name}}_AudioLib({
-        sampleRate: this.webAudioContext.sampleRate,
-        blockSize: blockSize,
-        printHook: options.printHook,
-        sendHook: options.sendHook
-    });
-    this.audiolib = instance;
-    this.webAudioProcessor = this.webAudioContext.createScriptProcessor(blockSize, instance.getNumInputChannels(), Math.max(instance.getNumOutputChannels(), 1));
-    this.webAudioProcessor.onaudioprocess = (function(e) {
-        instance.process(e)
-    })
+    if (audioWorkletSupported) {
+      await this.webAudioContext.audioWorklet.addModule("{{name}}_AudioLibWorklet.js");
+      this.webAudioWorklet = new AudioWorkletNode(this.webAudioContext, "{{name}}_AudioLibWorklet", {
+        outputChannelCount: [2],
+        processorOptions: {
+          sampleRate: this.webAudioContext.sampleRate,
+          blockSize,
+          printHook: options.printHook && options.printHook.toString(),
+          sendHook: options.sendHook && options.sendHook.toString()
+        }
+      });
+    } else {
+      console.warn('heavy: AudioWorklet not supported, reverting to ScriptProcessorNode');
+      var instance = new {{name}}_AudioLib({
+          sampleRate: this.webAudioContext.sampleRate,
+          blockSize: blockSize,
+          printHook: options.printHook,
+          sendHook: options.sendHook
+      });
+      this.audiolib = instance;
+      this.webAudioProcessor = this.webAudioContext.createScriptProcessor(blockSize, instance.getNumInputChannels(), Math.max(instance.getNumOutputChannels(), 1));
+      this.webAudioProcessor.onaudioprocess = (function(e) {
+          instance.process(e)
+      })
+    }
   } else {
     console.error("heavy: failed to load - WebAudio API not available in this browser")
   }
 }
 
 AudioLibLoader.prototype.start = function() {
-  this.webAudioProcessor.connect(this.webAudioContext.destination);
+  if (audioWorkletSupported) {
+    this.webAudioWorklet.connect(this.webAudioContext.destination);
+  } else {
+    this.webAudioProcessor.connect(this.webAudioContext.destination);
+  }
   this.isPlaying = true;
 }
 
 AudioLibLoader.prototype.stop = function() {
-  this.webAudioProcessor.disconnect(this.webAudioContext.destination);
+  if (audioWorkletSupported) {
+    this.webAudioWorklet.disconnect(this.webAudioContext.destination);
+  } else {
+    this.webAudioProcessor.disconnect(this.webAudioContext.destination);
+  }
   this.isPlaying = false;
+}
+
+AudioLibLoader.prototype.sendFloatParameterToWorklet = function(name, value) {
+  this.webAudioWorklet.port.postMessage({
+    type:'setFloatParameter',
+    name,
+    value
+  });
 }
 
 Module.AudioLibLoader = AudioLibLoader;

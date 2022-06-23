@@ -57,9 +57,9 @@
         document.getElementById("transportButton").style.visibility = "visible";
       }
 
-      function start() {
+      async function start() {
         if(!loader.webAudioContext) {
-          loader.init({
+          await loader.init({
             // optional: set audio processing block size, default is 2048
             blockSize: 2048,
             // optional: provide a callback handler for [print] messages
@@ -107,7 +107,11 @@
 {%- for k, v in parameters %}
       function updateSlider_{{k}}(value) {
         document.getElementById("value_{{k}}").textContent = Number(value).toFixed(2);
-        loader.audiolib.setFloatParameter("{{v.display}}", value);
+        if(loader.webAudioWorklet) {
+          loader.sendFloatParameterToWorklet("{{v.display}}", value)
+        } else {
+          loader.audiolib.setFloatParameter("{{v.display}}", value);
+        }
       }
 {% endfor %}
       {%- endif %}
