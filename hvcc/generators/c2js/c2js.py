@@ -58,7 +58,7 @@ class c2js:
 
     @classmethod
     def run_emscripten(clazz, c_src_dir, out_dir, patch_name, output_name, post_js_path, should_modularize, 
-        environment, pre_js_path=""):
+        environment, pre_js_path="", binaryen_async=1):
         """Run the emcc command to compile C source files to a javascript library.
         """
 
@@ -107,6 +107,7 @@ class c2js:
             '-s', 'ASSERTIONS=1',
             '-s', f'ENVIRONMENT={environment}',
             '-s', 'SINGLE_FILE=1',
+            '-s', f'BINARYEN_ASYNC_COMPILATION={binaryen_async}', # Set this to 0 for the worklet so we don't wait for promises when instantiating
             "--post-js", post_js_path
         ]
 
@@ -215,7 +216,8 @@ class c2js:
                                           post_js_path=post_js_path,
                                           should_modularize=0,
                                           environment="worker",
-                                          pre_js_path=pre_js_path)
+                                          pre_js_path=pre_js_path,
+                                          binaryen_async=0)
 
             # delete temporary files
             os.remove(post_js_path)
