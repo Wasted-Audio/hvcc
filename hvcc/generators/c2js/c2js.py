@@ -214,7 +214,7 @@ class c2js:
             js_path = c2js.run_emscripten(c_src_dir=c_src_dir,
                                           out_dir=out_dir,
                                           patch_name=patch_name,
-                                          output_name=patch_name+"_AudioLibWorklet",
+                                          output_name=f"{patch_name}_AudioLibWorklet",
                                           post_js_path=post_js_path,
                                           should_modularize=0,
                                           environment="worker",
