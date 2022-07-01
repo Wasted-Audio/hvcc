@@ -65,6 +65,8 @@ class c2js:
         if not which("emcc"):
             raise HeavyException("emcc is not in the PATH")
 
+        emcc_path = which("emcc")
+
         c_flags = [
             f"-I {c_src_dir}",
             "-DHV_SIMD_NONE",
@@ -81,14 +83,14 @@ class c2js:
         # compile C files
         for c in c_src_paths:
             obj_path = f"{os.path.splitext(c)[0]}.o"
-            cmd = ["emcc"] + c_flags + ["-c", "-o", obj_path, c]
+            cmd = [emcc_path] + c_flags + ["-c", "-o", obj_path, c]
             subprocess.check_output(cmd)  # run emscripten
             obj_paths += [obj_path]
 
         # compile C++ files
         for cpp in cpp_src_paths:
             obj_path = f"{os.path.splitext(cpp)[0]}.o"
-            cmd = ["emcc"] + c_flags + ["-std=c++11"] + ["-c", "-o", obj_path, cpp]
+            cmd = [emcc_path] + c_flags + ["-std=c++11"] + ["-c", "-o", obj_path, cpp]
             subprocess.check_output(cmd)  # run emscripten
             obj_paths += [obj_path]
 
@@ -117,7 +119,7 @@ class c2js:
             ]
 
         # include C/C++ obj files in js library
-        cmd = ["emcc"] + obj_paths + linker_flags
+        cmd = [emcc_path] + obj_paths + linker_flags
         subprocess.check_output(  # WASM
             cmd + [
                 "-s", "WASM=1",
