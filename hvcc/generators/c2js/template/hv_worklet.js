@@ -46,6 +46,7 @@ class {{name}}_AudioLibWorklet extends AudioWorkletProcessor {
     }
 
     process(inputs, outputs, parameters) {
+      try{
         _hv_processInline(this.heavyContext, null, this.processBuffer.byteOffset, this.blockSize);
 
         // TODO: Figure out what "multiple outputs" means if not multiple channels
@@ -59,7 +60,10 @@ class {{name}}_AudioLibWorklet extends AudioWorkletProcessor {
             channel[j] = this.processBuffer[offset+j];
           }
         }
-        return true;
+      } catch(e){
+        this.port.postMessage({ type:'error', error: e.toString() });
+      }
+      return true;
     }
 
     getNumInputChannels() {

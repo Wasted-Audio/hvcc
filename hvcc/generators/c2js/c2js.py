@@ -101,7 +101,7 @@ class c2js:
         wasm_js_path = os.path.join(out_dir, f"{output_name}.js")
 
         linker_flags = [
-            "-O1",
+            "-O3",
             "--memory-init-file", "0",
             "-s", "RESERVED_FUNCTION_POINTERS=2",
             "-s", f"EXPORTED_FUNCTIONS=[{hv_api_defs.format(patch_name)}]",

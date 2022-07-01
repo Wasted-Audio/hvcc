@@ -40,9 +40,9 @@
         document.getElementById("transportButton").style.visibility = "visible";
       }
 
-      async function start() {
+      function start() {
         if(!loader.webAudioContext) {
-          await loader.init({
+          loader.init({
             // optional: set audio processing block size, default is 2048
             blockSize: 2048,
             // optional: provide a callback handler for [print] messages
@@ -52,10 +52,11 @@
             // optional: pass an existing web audio context, otherwise a new one
             // will be constructed.
             webAudioContext: null
+          }).then(() => {
+            {% for k, v in parameters -%}
+            updateSlider_{{k}}({{v.attributes.default}});
+            {% endfor -%}
           });
-          {% for k, v in parameters -%}
-          updateSlider_{{k}}({{v.attributes.default}});
-          {% endfor -%}
         }
         loader.start();
       }
