@@ -52,23 +52,27 @@ class c2js:
         "_hv_table_getLength",
         "_hv_table_setLength",
         "_hv_table_getBuffer",
-        "_hv_sendMessageToReceiverV"
+        "_hv_sendMessageToReceiverV",
+        "_malloc" # Rationale: https://github.com/emscripten-core/emscripten/issues/6882#issuecomment-406745898
     ]
 
     @classmethod
-    def run_emscripten(clazz, c_src_dir, out_dir, patch_name, post_js_path):
+    def run_emscripten(clazz, c_src_dir, out_dir, patch_name, output_name, post_js_path, should_modularize, 
+        environment, pre_js_path="", binaryen_async=1):
         """Run the emcc command to compile C source files to a javascript library.
         """
 
         if not which("emcc"):
             raise HeavyException("emcc is not in the PATH")
 
+        emcc_path = which("emcc")
+
         c_flags = [
             f"-I {c_src_dir}",
             "-DHV_SIMD_NONE",
             "-ffast-math",
             "-DNDEBUG",
-            "-Wall"
+            # "-Wall"
         ]
 
         c_src_paths = [os.path.join(c_src_dir, c) for c in os.listdir(c_src_dir) if c.endswith((".c"))]
@@ -79,14 +83,14 @@ class c2js:
         # compile C files
         for c in c_src_paths:
             obj_path = f"{os.path.splitext(c)[0]}.o"
-            cmd = ["emcc"] + c_flags + ["-c", "-o", obj_path, c]
+            cmd = [emcc_path] + c_flags + ["-c", "-o", obj_path, c]
             subprocess.check_output(cmd)  # run emscripten
             obj_paths += [obj_path]
 
         # compile C++ files
         for cpp in cpp_src_paths:
             obj_path = f"{os.path.splitext(cpp)[0]}.o"
-            cmd = ["emcc"] + c_flags + ["-std=c++11"] + ["-c", "-o", obj_path, cpp]
+            cmd = [emcc_path] + c_flags + ["-std=c++11"] + ["-c", "-o", obj_path, cpp]
             subprocess.check_output(cmd)  # run emscripten
             obj_paths += [obj_path]
 
@@ -94,32 +98,32 @@ class c2js:
         hv_api_defs = ", ".join([f"\"{x.format(patch_name)}\"" for x in c2js.__HV_API])
 
         # output path
-        asm_js_path = os.path.join(out_dir, f"{patch_name}.asm.js")
-        wasm_js_path = os.path.join(out_dir, f"{patch_name}.js")
+        wasm_js_path = os.path.join(out_dir, f"{output_name}.js")
 
         linker_flags = [
             "-O3",
             "--memory-init-file", "0",
             "-s", "RESERVED_FUNCTION_POINTERS=2",
             "-s", f"EXPORTED_FUNCTIONS=[{hv_api_defs.format(patch_name)}]",
-            "-s", "MODULARIZE=1",
+            "-s", f"MODULARIZE={should_modularize}",
+            '-s', 'ASSERTIONS=1',
+            '-s', f'ENVIRONMENT={environment}',
+            '-s', 'SINGLE_FILE=1',
+            '-s', f'BINARYEN_ASYNC_COMPILATION={binaryen_async}', # Set this to 0 for the worklet so we don't wait for promises when instantiating
             "--post-js", post_js_path
         ]
 
+        if len(pre_js_path):
+            linker_flags = linker_flags + [
+                "--pre-js", pre_js_path
+            ]
+
         # include C/C++ obj files in js library
-        cmd = ["emcc"] + obj_paths + linker_flags
-
-        # run emscripten twice!
-        subprocess.check_output(  # fallback asm.js build
-            cmd + [
-                "-s", f"EXPORT_NAME='{patch_name}_AsmModule'",
-                "-o", asm_js_path
-            ])
-
+        cmd = [emcc_path] + obj_paths + linker_flags
         subprocess.check_output(  # WASM
             cmd + [
                 "-s", "WASM=1",
-                "-s", f"EXPORT_NAME='{patch_name}_Module'",
+                "-s", f"EXPORT_NAME='{output_name}_Module'",
                 "-o", wasm_js_path
             ])
 
@@ -169,7 +173,10 @@ class c2js:
             js_path = c2js.run_emscripten(c_src_dir=c_src_dir,
                                           out_dir=out_dir,
                                           patch_name=patch_name,
-                                          post_js_path=post_js_path)
+                                          output_name=patch_name,
+                                          post_js_path=post_js_path,
+                                          should_modularize=1,
+                                          environment="web")
 
             # delete temporary files
             os.remove(post_js_path)
@@ -184,6 +191,39 @@ class c2js:
                     parameters=parameter_list,
                     events=event_list,
                     copyright=copyright_html))
+
+            # generate heavy js worklet from template
+            # Note: this file will be incorporated into the emscripten output
+            # and removed afterwards
+            post_js_path = os.path.join(out_dir, "hv_worklet.js")
+            with open(post_js_path, "w") as f:
+                f.write(env.get_template("hv_worklet.js").render(
+                    name=patch_name,
+                    copyright=copyright_js,
+                    externs=externs,
+                    pool_sizes_kb=externs["memoryPoolSizesKb"]))
+
+            pre_js_path = os.path.join(out_dir, "hv_worklet_start.js")
+            with open(pre_js_path, "w") as f:
+                f.write(env.get_template("hv_worklet_start.js").render(
+                    name=patch_name,
+                    copyright=copyright_js,
+                    externs=externs,
+                    pool_sizes_kb=externs["memoryPoolSizesKb"]))
+
+            js_path = c2js.run_emscripten(c_src_dir=c_src_dir,
+                                          out_dir=out_dir,
+                                          patch_name=patch_name,
+                                          output_name=f"{patch_name}_AudioLibWorklet",
+                                          post_js_path=post_js_path,
+                                          should_modularize=0,
+                                          environment="worker",
+                                          pre_js_path=pre_js_path,
+                                          binaryen_async=0)
+
+            # delete temporary files
+            os.remove(post_js_path)
+            os.remove(pre_js_path)
 
             return {
                 "stage": "c2js",
