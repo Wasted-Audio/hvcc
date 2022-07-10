@@ -53,26 +53,26 @@ class c2js:
         "_hv_table_setLength",
         "_hv_table_getBuffer",
         "_hv_sendMessageToReceiverV",
-        "_malloc" # Rationale: https://github.com/emscripten-core/emscripten/issues/6882#issuecomment-406745898
+        "_malloc"  # Rationale: https://github.com/emscripten-core/emscripten/issues/6882#issuecomment-406745898
     ]
 
     @classmethod
-    def run_emscripten(clazz, c_src_dir, out_dir, patch_name, output_name, post_js_path, should_modularize, 
-        environment, pre_js_path="", binaryen_async=1):
+    def run_emscripten(clazz, c_src_dir, out_dir, patch_name, output_name, post_js_path, should_modularize,
+                       environment, pre_js_path="", binaryen_async=1):
         """Run the emcc command to compile C source files to a javascript library.
         """
 
-        if not which("emcc"):
-            raise HeavyException("emcc is not in the PATH")
-
         emcc_path = which("emcc")
+
+        if not emcc_path:
+            raise HeavyException("emcc is not in the PATH")
 
         c_flags = [
             f"-I {c_src_dir}",
             "-DHV_SIMD_NONE",
             "-ffast-math",
             "-DNDEBUG",
-            # "-Wall"
+            "-Wall"
         ]
 
         c_src_paths = [os.path.join(c_src_dir, c) for c in os.listdir(c_src_dir) if c.endswith((".c"))]
@@ -109,7 +109,8 @@ class c2js:
             '-s', 'ASSERTIONS=1',
             '-s', f'ENVIRONMENT={environment}',
             '-s', 'SINGLE_FILE=1',
-            '-s', f'BINARYEN_ASYNC_COMPILATION={binaryen_async}', # Set this to 0 for the worklet so we don't wait for promises when instantiating
+            '-s', f'BINARYEN_ASYNC_COMPILATION={binaryen_async}',  # Set this to 0 for the worklet so we don't
+                                                                   # wait for promises when instantiating
             "--post-js", post_js_path
         ]
 
