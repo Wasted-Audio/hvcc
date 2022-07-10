@@ -31,22 +31,22 @@ class c2pdext:
         """
         return max(int(i), int(j))
 
-    @classmethod
-    def filter_xcode_build(clazz, s):
-        """Return a build hash suitable for use in an Xcode project file.
-        """
-        s = f"{s}_build"
-        s = hashlib.md5(s.encode('utf-8'))
-        s = s.hexdigest().upper()[0:24]
-        return s
+    # @classmethod
+    # def filter_xcode_build(clazz, s):
+    #     """Return a build hash suitable for use in an Xcode project file.
+    #     """
+    #     s = f"{s}_build"
+    #     s = hashlib.md5(s.encode('utf-8'))
+    #     s = s.hexdigest().upper()[0:24]
+    #     return s
 
-    @classmethod
-    def filter_xcode_fileref(clazz, s):
-        """Return a fileref hash suitable for use in an Xcode project file.
-        """
-        s = f"{s}_fileref"
-        s = hashlib.md5(s.encode('utf-8'))
-        s = s.hexdigest().upper()[0:24]
+    # @classmethod
+    # def filter_xcode_fileref(clazz, s):
+    #     """Return a fileref hash suitable for use in an Xcode project file.
+    #     """
+    #     s = f"{s}_fileref"
+    #     s = hashlib.md5(s.encode('utf-8'))
+    #     s = s.hexdigest().upper()[0:24]
         return s
 
     @classmethod
@@ -61,8 +61,9 @@ class c2pdext:
         copyright = copyright_manager.get_copyright_for_c(copyright)
 
         patch_name = patch_name or "heavy"
-        ext_name = ext_name or (patch_name + "~")
-        struct_name = patch_name + "_tilde"
+        ext_name = ext_name or (f"{patch_name}~")
+        print(ext_name)
+        struct_name = f"{patch_name}_tilde"
 
         # ensure that the output directory does not exist
         out_dir = os.path.abspath(out_dir)
@@ -73,22 +74,22 @@ class c2pdext:
         shutil.copytree(c_src_dir, out_dir)
 
         # copy over static files
-        shutil.copy(
-            os.path.join(os.path.dirname(os.path.abspath(__file__)), "static", "m_pd.h"),
-            out_dir)
+        # shutil.copy(
+        #     os.path.join(os.path.dirname(os.path.abspath(__file__)), "static", "m_pd.h"),
+        #     out_dir)
 
         try:
             # initialise the jinja template environment
             env = jinja2.Environment()
             env.filters["max"] = c2pdext.filter_max
-            env.filters["xcode_build"] = c2pdext.filter_xcode_build
-            env.filters["xcode_fileref"] = c2pdext.filter_xcode_fileref
+            # env.filters["xcode_build"] = c2pdext.filter_xcode_build
+            # env.filters["xcode_fileref"] = c2pdext.filter_xcode_fileref
             env.loader = jinja2.FileSystemLoader(
                 os.path.join(os.path.dirname(os.path.abspath(__file__)), "templates"))
 
             # generate Pd external wrapper from template
-            pdext_path = os.path.join(out_dir, "{0}.c".format(struct_name))
-            with open(pdext_path, "w") as f:
+            makefile_path = os.path.join(out_dir, f"{ext_name}.c")
+            with open(makefile_path, "w") as f:
                 f.write(env.get_template("pd_external.c").render(
                     name=patch_name,
                     struct_name=struct_name,
@@ -98,19 +99,31 @@ class c2pdext:
                     receivers=receiver_list,
                     copyright=copyright))
 
-            # generate Xcode project
-            xcode_path = os.path.join(out_dir, "{0}.xcodeproj".format(struct_name))
-            os.mkdir(xcode_path)  # create the xcode project bundle
-            pbxproj_path = os.path.join(xcode_path, "project.pbxproj")
+            # generate Makefile from template
+            makefile_path = os.path.join(out_dir, "../Makefile")
+            with open(makefile_path, "w") as f:
+                f.write(env.get_template("Makefile").render(
+                    name=patch_name,
+                    struct_name=struct_name,
+                    display_name=ext_name,
+                    num_input_channels=num_input_channels,
+                    num_output_channels=num_output_channels,
+                    receivers=receiver_list,
+                    copyright=copyright))
 
-            # generate list of source files
-            files = [g for g in os.listdir(out_dir) if g.endswith((".h", ".hpp", ".c", ".cpp"))]
+            # # generate Xcode project
+            # xcode_path = os.path.join(out_dir, f"{struct_name}.xcodeproj")
+            # os.mkdir(xcode_path)  # create the xcode project bundle
+            # pbxproj_path = os.path.join(xcode_path, "project.pbxproj")
 
-            # render the pbxproj file
-            with open(pbxproj_path, "w") as f:
-                f.write(env.get_template("project.pbxproj").render(
-                    name=ext_name,
-                    files=files))
+            # # generate list of source files
+            # files = [g for g in os.listdir(out_dir) if g.endswith((".h", ".hpp", ".c", ".cpp"))]
+
+            # # render the pbxproj file
+            # with open(pbxproj_path, "w") as f:
+            #     f.write(env.get_template("project.pbxproj").render(
+            #         name=ext_name,
+            #         files=files))
 
             return {
                 "stage": "c2pdext",
@@ -123,7 +136,7 @@ class c2pdext:
                 "in_dir": c_src_dir,
                 "in_file": "",
                 "out_dir": out_dir,
-                "out_file": os.path.basename(pdext_path),
+                "out_file": os.path.basename(makefile_path),
                 "compile_time": time.time() - tick
             }
 
@@ -142,6 +155,6 @@ class c2pdext:
                 "in_dir": c_src_dir,
                 "in_file": "",
                 "out_dir": out_dir,
-                "out_file": os.path.basename(pdext_path),
+                "out_file": os.path.basename(makefile_path),
                 "compile_time": time.time() - tick
             }
