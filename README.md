@@ -134,5 +134,6 @@ There are several places where heavy/hvcc conversation is happening:
   * [Bela](https://forum.bela.io/?q=hvcc)
   * [Rebel Technology](https://community.rebeltech.org/tags/puredata)
   * [Daisy](https://forum.electro-smith.com/t/pure-data/110)
+  * [MOD](https://forum.moddevices.com/c/developers/pure-data/56)
 
 Or you can use the [discussions](https://github.com/Wasted-Audio/hvcc/discussions) tab of this repository
