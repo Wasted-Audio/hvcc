@@ -82,6 +82,14 @@ AudioLibLoader.prototype.sendFloatParameterToWorklet = function(name, value) {
   });
 }
 
+AudioLibLoader.prototype.sendEvent = function(name, value) {
+  this.webAudioWorklet.port.postMessage({
+    type:'sendEvent',
+    name,
+    value
+  });
+}
+
 Module.AudioLibLoader = AudioLibLoader;
 
 

@@ -10,7 +10,7 @@ class {{name}}_AudioLibWorklet extends AudioWorkletProcessor {
         this.sampleRate = processorOptions.sampleRate || 44100.0;
 
         // As of right now (June 2022), blockSize is always 128.
-        // In the future, it could become dynamic, 
+        // In the future, it could become dynamic,
         // and we'll have to read the lengths of incoming outputs and re-alloc the processBuffer if it changes.
         this.blockSize = 128;
 
@@ -32,12 +32,15 @@ class {{name}}_AudioLibWorklet extends AudioWorkletProcessor {
             Module._malloc(lengthInSamples * Float32Array.BYTES_PER_ELEMENT),
             lengthInSamples);
 
-        
+
         this.port.onmessage = (e) => {
           console.log(e.data);
           switch(e.data.type){
             case 'setFloatParameter':
               this.setFloatParameter(e.data.name, e.data.value);
+              break;
+            case 'sendEvent':
+              this.sendEvent(e.data.name);
               break;
             default:
               console.error('No handler for message of type: ', e.data.type);
@@ -51,10 +54,10 @@ class {{name}}_AudioLibWorklet extends AudioWorkletProcessor {
 
         // TODO: Figure out what "multiple outputs" means if not multiple channels
         var output = outputs[0];
-    
+
         for (var i = 0; i < this.getNumOutputChannels(); ++i) {
           var channel = output[i];
-    
+
           var offset = i * this.blockSize;
           for (var j = 0; j < this.blockSize; ++j) {
             channel[j] = this.processBuffer[offset+j];
@@ -69,17 +72,17 @@ class {{name}}_AudioLibWorklet extends AudioWorkletProcessor {
     getNumInputChannels() {
       return (this.heavyContext) ? _hv_getNumInputChannels(this.heavyContext) : -1;
     }
-    
+
     getNumOutputChannels() {
       return (this.heavyContext) ? _hv_getNumOutputChannels(this.heavyContext) : -1;
     }
-    
+
     setPrintHook(hook) {
       if (!this.heavyContext) {
         console.error("heavy: Can't set Print Hook, no Heavy Context instantiated");
         return;
       }
-    
+
       if (hook) {
         // typedef void (HvPrintHook_t) (HeavyContextInterface *context, const char *printName, const char *str, const HvMessage *msg);
         var printHook = addFunction(function(context, printName, str, msg) {
@@ -93,13 +96,13 @@ class {{name}}_AudioLibWorklet extends AudioWorkletProcessor {
         _hv_setPrintHook(this.heavyContext, printHook);
       }
     }
-    
+
     setSendHook(hook) {
       if (!this.heavyContext) {
           console.error("heavy: Can't set Send Hook, no Heavy Context instantiated");
           return;
       }
-    
+
       if (hook) {
         // typedef void (HvSendHook_t) (HeavyContextInterface *context, const char *sendName, hv_uint32_t sendHash, const HvMessage *msg);
         var sendHook = addFunction(function(context, sendName, sendHash, msg) {
@@ -111,19 +114,19 @@ class {{name}}_AudioLibWorklet extends AudioWorkletProcessor {
         _hv_setSendHook(this.heavyContext, sendHook);
       }
     }
-    
+
     sendEvent(name) {
       if (this.heavyContext) {
         _hv_sendBangToReceiver(this.heavyContext, eventInHashes[name]);
       }
     }
-    
+
     setFloatParameter(name, floatValue) {
       if (this.heavyContext) {
         _hv_sendFloatToReceiver(this.heavyContext, parameterInHashes[name], parseFloat(floatValue));
       }
     }
-    
+
     sendStringToReceiver(name, message) {
       // Note(joe): it's not a good idea to call this frequently it is possible for
       // the stack memory to run out over time.
@@ -133,20 +136,20 @@ class {{name}}_AudioLibWorklet extends AudioWorkletProcessor {
         _hv_sendSymbolToReceiver(this.heavyContext, _hv_stringToHash(r), m);
       }
     }
-    
+
     fillTableWithFloatBuffer(name, buffer) {
       var tableHash = tableHashes[name];
       if (_hv_table_getBuffer(this.heavyContext, tableHash) !== 0) {
-    
+
         // resize current table to new buffer length
         _hv_table_setLength(this.heavyContext, tableHash, buffer.length);
-    
+
         // access internal float buffer from table
         tableBuffer = new Float32Array(
           Module.HEAPF32.buffer,
           _hv_table_getBuffer(this.heavyContext, tableHash),
           buffer.length);
-    
+
         // set the table buffer with the data from the 1st channel (mono)
         tableBuffer.set(buffer);
       } else {
