@@ -5,6 +5,8 @@ Next Release
 -----
 
 * aligned memory and freed patch instance
+* WASM AudioWorklet
+* deprecate asm.js
 
 0.5.0
 -----
