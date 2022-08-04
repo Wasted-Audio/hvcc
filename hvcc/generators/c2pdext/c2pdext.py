@@ -13,7 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import hashlib
 import os
 import shutil
 import time
@@ -30,24 +29,6 @@ class c2pdext:
         """Calculate the maximum of two integers.
         """
         return max(int(i), int(j))
-
-    # @classmethod
-    # def filter_xcode_build(clazz, s):
-    #     """Return a build hash suitable for use in an Xcode project file.
-    #     """
-    #     s = f"{s}_build"
-    #     s = hashlib.md5(s.encode('utf-8'))
-    #     s = s.hexdigest().upper()[0:24]
-    #     return s
-
-    # @classmethod
-    # def filter_xcode_fileref(clazz, s):
-    #     """Return a fileref hash suitable for use in an Xcode project file.
-    #     """
-    #     s = f"{s}_fileref"
-    #     s = hashlib.md5(s.encode('utf-8'))
-    #     s = s.hexdigest().upper()[0:24]
-        return s
 
     @classmethod
     def compile(clazz, c_src_dir, out_dir, externs,
@@ -74,9 +55,10 @@ class c2pdext:
         shutil.copytree(c_src_dir, out_dir)
 
         # copy over static files
-        # shutil.copy(
-        #     os.path.join(os.path.dirname(os.path.abspath(__file__)), "static", "m_pd.h"),
-        #     out_dir)
+        shutil.copy(
+            # os.path.join(os.path.dirname(os.path.abspath(__file__)), "static", "m_pd.h"),
+            os.path.join(os.path.dirname(os.path.abspath(__file__)), "static", "Makefile.pdlibbuilder"),
+            f"{out_dir}/../")
 
         try:
             # initialise the jinja template environment
