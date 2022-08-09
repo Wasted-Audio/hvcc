@@ -19,6 +19,7 @@ import json
 import os
 import re
 import time
+import sys
 
 from hvcc.interpreters.pd2hv import pd2hv
 from hvcc.interpreters.max2hv import max2hv
@@ -422,15 +423,18 @@ def main():
         verbose=args.verbose,
         copyright=args.copyright)
 
+    errorCount = 0
     for r in list(results.values()):
         # print any errors
         if r["notifs"].get("has_error", False):
             for i, error in enumerate(r["notifs"].get("errors", [])):
+                errorCount += 1
                 print("{4:3d}) {2}Error{3} {0}: {1}".format(
                     r["stage"], error["message"], Colours.red, Colours.end, i + 1))
 
             # only print exception if no errors are indicated
             if len(r["notifs"].get("errors", [])) == 0 and r["notifs"].get("exception", None) is not None:
+                errorCount += 1
                 print("{2}Error{3} {0} exception: {1}".format(
                     r["stage"], r["notifs"]["exception"], Colours.red, Colours.end))
 
@@ -454,7 +458,9 @@ def main():
 
     if args.verbose:
         print("Total compile time: {0:.2f}ms".format(1000 * (time.time() - tick)))
+    return errorCount != 0
 
 
 if __name__ == "__main__":
-    main()
+    ret = main()
+    sys.exit(ret)
