@@ -19,7 +19,11 @@
 
 #include "HvUtils.h"
 
-#define MP_NUM_MESSAGE_LISTS 4
+#ifdef HV_MP_NUM_MESSAGE_LISTS
+#define MP_NUM_MESSAGE_LISTS HV_MP_NUM_MESSAGE_LISTS
+#else // HV_MP_NUM_MESSAGE_LISTS
+#define MP_NUM_MESSAGE_LISTS 5
+#endif // HV_MP_NUM_MESSAGE_LISTS
 
 #ifdef __cplusplus
 extern "C" {
