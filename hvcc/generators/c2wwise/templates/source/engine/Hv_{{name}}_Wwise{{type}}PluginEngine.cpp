@@ -235,7 +235,11 @@ void Hv_{{name}}_WwisePluginEngine::SetOutRTPC(const char *rtpcName,
   m_pPluginContext->GlobalContext()->SetRTPCValue(
       hashFunc.Compute((unsigned char *) rtpcName, nameLength*sizeof(char)),
       value,
+#if AK_WWISESDK_VERSION_MAJOR <= 2019
       m_pPluginContext->GetVoiceInfo()->GetGameObjectID(),
+#else
+      m_pPluginContext->GetGameObjectInfo()->GetGameObjectID(),
+#endif
       0,
       AkCurveInterpolation_Linear,
       true); // disable interpolation, let the plugin handle it internally
