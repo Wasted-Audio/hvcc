@@ -18,7 +18,7 @@ from .HeavyObject import HeavyObject
 
 class ControlExpr(HeavyObject):
     """Just a stub to get the thing working"""
-    
+
     c_struct = "ControlExpr"
     preamble = "cExpr"
 
