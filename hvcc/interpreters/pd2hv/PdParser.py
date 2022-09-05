@@ -24,6 +24,7 @@ from .HeavyGraph import HeavyGraph              # pre-converted Heavy graphs
 from .HvSwitchcase import HvSwitchcase          # __switchcase
 from .PdAudioIoObject import PdAudioIoObject    # adc~/dac~
 from .PdBinopObject import PdBinopObject        # binary arithmatic operators
+from .PdExprObject import PdExprObject          # expr/expr~
 from .PdGraph import PdGraph                    # canvas
 from .PdLetObject import PdLetObject            # inlet/inlet~/outlet/outlet~
 from .PdMessageObject import PdMessageObject    # msg
@@ -320,6 +321,7 @@ class PdParser:
                         # do we have an abstraction for this object?
                         abs_path = self.find_abstraction_path(os.path.dirname(pd_path), obj_type)
                         if abs_path is not None and not g.is_abstraction_on_call_stack(abs_path):
+                            print("PdParser: find object - abstraction")
                             # ensure that infinite recursion into abstractions is not possible
                             x = self.graph_from_file(
                                 file_path=abs_path,
@@ -329,6 +331,7 @@ class PdParser:
 
                         # is this object in lib/pd_converted?
                         elif os.path.isfile(os.path.join(PdParser.__PDLIB_CONVERTED_DIR, f"{obj_type}.hv.json")):
+                            print("PdParser: find object - pd_converted")
                             self.obj_counter[obj_type] += 1
                             hv_path = os.path.join(PdParser.__PDLIB_CONVERTED_DIR, f"{obj_type}.hv.json")
                             x = HeavyGraph(
@@ -338,6 +341,7 @@ class PdParser:
 
                         # is this object in lib/heavy_converted?
                         elif os.path.isfile(os.path.join(PdParser.__HVLIB_CONVERTED_DIR, f"{obj_type}.hv.json")):
+                            print("PdParser: find object - heavy_converted")
                             self.obj_counter[obj_type] += 1
                             hv_path = os.path.join(PdParser.__HVLIB_CONVERTED_DIR, f"{obj_type}.hv.json")
                             x = HeavyGraph(
@@ -347,6 +351,7 @@ class PdParser:
 
                         # is this object in lib/pd?
                         elif os.path.isfile(os.path.join(PdParser.__PDLIB_DIR, f"{obj_type}.pd")):
+                            print("PdParser: find object - pd")
                             self.obj_counter[obj_type] += 1
                             pdlib_path = os.path.join(PdParser.__PDLIB_DIR, f"{obj_type}.pd")
 
@@ -387,6 +392,7 @@ class PdParser:
 
                         # is this object in lib/heavy?
                         elif os.path.isfile(os.path.join(PdParser.__HVLIB_DIR, f"{obj_type}.pd")):
+                            print("PdParser: find object - heavy")
                             self.obj_counter[obj_type] += 1
                             hvlib_path = os.path.join(PdParser.__HVLIB_DIR, f"{obj_type}.pd")
                             x = self.graph_from_file(
@@ -397,6 +403,7 @@ class PdParser:
 
                         # is this an object that must be programatically parsed?
                         elif obj_type in PdParser.__PD_CLASSES:
+                            print("PdParser: find object - prog-parse")
                             self.obj_counter[obj_type] += 1
                             obj_class = PdParser.__PD_CLASSES[obj_type]
                             x = obj_class(
@@ -405,6 +412,7 @@ class PdParser:
                                 pos_x=int(line[2]), pos_y=int(line[3]))
 
                         elif PdParser.__is_float(obj_type):
+                            print("PdParser: find object - float")
                             # parse float literals
                             self.obj_counter["float"] += 1
                             x = HeavyObject(
@@ -562,6 +570,8 @@ class PdParser:
     __PD_CLASSES = {
         "adc~": PdAudioIoObject,
         "dac~": PdAudioIoObject,
+        "expr": PdExprObject,
+        "expr~": PdExprObject,
         "inlet": PdLetObject,
         "inlet~": PdLetObject,
         "outlet": PdLetObject,

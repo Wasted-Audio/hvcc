@@ -28,6 +28,7 @@ from hvcc.generators.copyright import copyright_manager
 from hvcc.generators.ir2c.ControlBinop import ControlBinop
 from hvcc.generators.ir2c.ControlCast import ControlCast
 from hvcc.generators.ir2c.ControlDelay import ControlDelay
+from hvcc.generators.ir2c.ControlExpr import ControlExpr
 from hvcc.generators.ir2c.ControlIf import ControlIf
 from hvcc.generators.ir2c.ControlMessage import ControlMessage
 from hvcc.generators.ir2c.ControlPack import ControlPack
@@ -75,6 +76,8 @@ class ir2c:
         "__cast_b": ControlCast,
         "__cast_f": ControlCast,
         "__cast_s": ControlCast,
+        "__expr": ControlExpr,
+        # "__expr~f": SignalExpr,
         "__message": ControlMessage,
         "__system": ControlSystem,
         "__receive": ControlReceive,

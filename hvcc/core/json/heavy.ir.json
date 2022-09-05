@@ -1016,6 +1016,30 @@
 
     ]
   },
+  "__expr": {
+    "inlets": [],
+    "ir": {
+      "control": true,
+      "signal": false,
+      "init": false
+    },
+    "outlets": [
+      "-->"
+    ],
+    "args": []
+  },
+  "__expr~f": {
+    "inlets": [],
+    "ir": {
+      "control": false,
+      "signal": true,
+      "init": false
+    },
+    "outlets": [
+      "~f>"
+    ],
+    "args": []
+  },
   "__floor": {
     "inlets": [
       "-->"

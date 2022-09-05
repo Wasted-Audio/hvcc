@@ -17,6 +17,7 @@ import json
 import os
 
 from .HIrConvolution import HIrConvolution
+from .HIrExpr import HIrExpr
 from .HIrInlet import HIrInlet
 from .HIrLorenz import HIrLorenz
 from .HIrOutlet import HIrOutlet
@@ -265,5 +266,6 @@ LANG_CLASS_DICT = {
     "send": HLangSend,
     "__switchcase": HIrSwitchcase,
     "switchcase": HIrSwitchcase,
-    "__pack": HIrPack
+    "__pack": HIrPack,
+    "__expr": HIrExpr,
 }
