@@ -24,16 +24,16 @@ class ControlExpr(HeavyObject):
 
     @classmethod
     def get_C_header_set(clazz):
-        return {"HvControlCast.h"}
+        return {"HvControlExpr.h"}
 
     @classmethod
     def get_C_file_set(clazz):
-        return {"HvControlCast.h", "HvControlCast.c"}
+        return {"HvControlExpr.h", "HvControlExpr.c"}
 
     @classmethod
     def get_C_onMessage(clazz, obj_type, obj_id, inlet_index, args):
         return [
-            "cExpr_onMessage(_c, &Context(_c)->cExpr_{0}, {1}, m, &cExpr_{0}_sendMessage);".format(
+            "cExpr_onMessage(_c, NULL, {1}, m, &cExpr_{0}_sendMessage);".format(
                 obj_id,
                 inlet_index)
         ]
