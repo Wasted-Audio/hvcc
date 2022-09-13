@@ -23,6 +23,7 @@ class ControlExpr(HeavyObject):
 
     c_struct = "ControlExpr"
     preamble = "cExpr"
+    _expr = None
 
     @classmethod
     def get_C_header_set(clazz):
@@ -34,11 +35,9 @@ class ControlExpr(HeavyObject):
 
     @classmethod
     def get_C_init(clazz, obj_type, obj_id, args):
+        clazz._expr = args["expressions"][0]
         eval_f = f"&Heavy_heavy::{clazz.preamble}_{obj_id}_evaluate"
-        return [
-            # f"cExpr_init(&cExpr_{obj_id}, 43);"
-            f"cExpr_init(&cExpr_{obj_id}, {eval_f});"
-        ]
+        return [f"cExpr_init(&cExpr_{obj_id}, {eval_f});"]
     """
     """
 
@@ -81,7 +80,7 @@ class ControlExpr(HeavyObject):
     @classmethod
     def get_C_impl(clazz, obj_type, obj_id, on_message_list, get_obj_class, objects):
         lines = super().get_C_impl(obj_type, obj_id, on_message_list, get_obj_class, objects)
-        bound_expr = bind_expr("$f1+3", "args")
+        bound_expr = bind_expr(clazz._expr, "args")
         lines.extend([
             "",
             f"float Heavy_heavy::{clazz.preamble}_{obj_id}_evaluate(float* args) {{",
