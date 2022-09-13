@@ -16,35 +16,56 @@
 
 #include "HvControlExpr.h"
 
-// hv_size_t cExpr_init(ControlExpr *o, int nargs, ...) {
-//   hv_size_t numBytes = msg_getCoreSize(nargs);
-//   o->msg = (HvMessage *) hv_malloc(numBytes);
-//   hv_assert(o->msg != NULL);
-//   msg_init(o->msg, nargs, 0);
+hv_size_t cExpr_init(ControlExpr *o, float(*eval_fptr)(float*)) {
+  o->eval_fptr = eval_fptr;
+  for(int i=0; i < MAX_EXPR_ARGS; i++) {
+    o->args[i] = 0.0f;
+  }
+  return 0;
+}
 
-//   // variable arguments are used as float initialisers for the Expr elements
-//   va_list ap;
-//   va_start(ap, nargs);
-//   for (int i = 0; i < nargs; ++i) {
-//     msg_setFloat(o->msg, i, (float) va_arg(ap, double));
-//   }
-//   va_end(ap);
-//   return numBytes;
-// }
+void cExpr_free(ControlExpr *o) {
+  // hv_free(o->msg);
+  ;
+}
 
-// void cExpr_free(ControlExpr *o) {
-//   hv_free(o->msg);
-// }
 
 void cExpr_onMessage(HeavyContextInterface *_c, ControlExpr *o, int letIn, const HvMessage *m,
     void (*sendMessage)(HeavyContextInterface *, int, const HvMessage *)) {
-  // ensure let index is less than number elements in internal msg
-  // int numElements = msg_getNumElements(o->msg);
+
+  int numElements = msg_getNumElements(m);
   switch (letIn) {
     case 0: { // first inlet stores all values of input msg and triggers an output
+      if (msg_isBang(m,0)) {
+        ; // do nothing
+
+      } else if (! msg_isFloat(m,0)) {
+        printf("Got value other than bang or float\n");
+        break;
+
+      } else {
+        for (int i = hv_min_i(numElements, msg_getNumElements(m))-1; i >= 0; --i) {
+          if (msg_isFloat(m, i)) {
+            o->args[i] = msg_getFloat(m, i);
+          } else {
+            printf("Got value other than float\n");
+          }
+        }
+      }
+
+      // send result of expression
+      HvMessage *n = HV_MESSAGE_ON_STACK(1);
+      float f = o->eval_fptr(o->args);
+      msg_initWithFloat(n, msg_getTimestamp(m), f);
+      sendMessage(_c, 0, n);
       break;
     }
     default: { // rest of inlets just store values
+      if (msg_isFloat(m,0)) {
+        o->args[letIn] = msg_getFloat(m, 0);
+      } else {
+        printf("Got value other than float\n");
+      }
       break;
     }
   }

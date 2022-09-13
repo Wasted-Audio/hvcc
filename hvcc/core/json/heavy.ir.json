@@ -1021,7 +1021,7 @@
     "ir": {
       "control": true,
       "signal": false,
-      "init": false
+      "init": true
     },
     "outlets": [
       "-->"
@@ -1033,7 +1033,7 @@
     "ir": {
       "control": false,
       "signal": true,
-      "init": false
+      "init": true
     },
     "outlets": [
       "~f>"

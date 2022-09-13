@@ -191,6 +191,10 @@ class PatchRunner:
     def assertEqual(self, test, expected, message=None):
         assert test == expected, message
 
+    def fail(self, msg):
+        print(msg)
+        exit()
+
     def test_exp(self):
         print("DGB: looking for something---------------------------")
         self._test_control_patch("test-exp.pd")
