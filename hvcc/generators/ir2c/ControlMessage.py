@@ -27,7 +27,7 @@ class ControlMessage(HeavyObject):
         return [f"cMsg_{obj_id}_sendMessage(_c, 0, m);"]
 
     @classmethod
-    def get_C_impl(clazz, obj_type, obj_id, on_message_list, get_obj_class, objects):
+    def get_C_impl(clazz, obj_type, obj_id, on_message_list, get_obj_class, objects, args):
         send_message_list = [
             f"cMsg_{obj_id}_sendMessage(HeavyContextInterface *_c, int letIn, const HvMessage *const n) {{"
         ]

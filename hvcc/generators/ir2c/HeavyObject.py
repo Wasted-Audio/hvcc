@@ -65,7 +65,7 @@ class HeavyObject:
                 obj_id)]
 
     @classmethod
-    def get_C_impl(clazz, obj_type, obj_id, on_message_list, get_obj_class, objects):
+    def get_C_impl(clazz, obj_type, obj_id, on_message_list, get_obj_class, objects, args):
         send_message_list = [
             "{0}_{1}_sendMessage(HeavyContextInterface *_c, int letIn, const HvMessage *m) {{".format(
                 clazz.get_preamble(obj_type),

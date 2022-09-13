@@ -26,7 +26,7 @@ class ControlSend(HeavyObject):
         return [f"cSend_{obj_id}_sendMessage(_c, 0, m);"]
 
     @classmethod
-    def get_C_impl(clazz, obj_type, obj_id, on_message_list, get_obj_class, objects):
+    def get_C_impl(clazz, obj_type, obj_id, on_message_list, get_obj_class, objects, args):
         # Note(joe): if no corresponding receivers exist and there's no extern indicator
         # then there is not much need to generate code stub
         send_message_list = [

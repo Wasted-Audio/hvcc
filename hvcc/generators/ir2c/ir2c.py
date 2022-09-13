@@ -206,7 +206,8 @@ class ir2c:
                 obj_id,
                 x["onMessage"],
                 ir2c.get_class,
-                ir["objects"])
+                ir["objects"],
+                o["args"])
             impl_list.append("\n".join(PrettyfyC.prettyfy_list(impl)))
             decl_list.extend(obj_class.get_C_decl(o["type"], obj_id, o["args"]))
 

@@ -78,9 +78,10 @@ class ControlExpr(HeavyObject):
     """
 
     @classmethod
-    def get_C_impl(clazz, obj_type, obj_id, on_message_list, get_obj_class, objects):
-        lines = super().get_C_impl(obj_type, obj_id, on_message_list, get_obj_class, objects)
-        bound_expr = bind_expr(clazz._expr, "args")
+    def get_C_impl(clazz, obj_type, obj_id, on_message_list, get_obj_class, objects, args):
+        lines = super().get_C_impl(obj_type, obj_id, on_message_list, get_obj_class, objects, args)
+        expr = args["expressions"][0]
+        bound_expr = bind_expr(expr, "args")
         lines.extend([
             "",
             f"float Heavy_heavy::{clazz.preamble}_{obj_id}_evaluate(float* args) {{",

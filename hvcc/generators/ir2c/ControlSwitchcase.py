@@ -41,7 +41,7 @@ class ControlSwitchcase(HeavyObject):
         return [f"cSwitchcase_{obj_id}_onMessage(_c, NULL, {inlet_index}, m, NULL);"]
 
     @classmethod
-    def get_C_impl(clazz, obj_type, obj_id, on_message_list, obj_class_dict, objects):
+    def get_C_impl(clazz, obj_type, obj_id, on_message_list, obj_class_dict, objects, args):
         # generate the onMessage implementation
         out_list = [
             f"cSwitchcase_{obj_id}_onMessage(HeavyContextInterface *_c, void *o, int letIn, "
