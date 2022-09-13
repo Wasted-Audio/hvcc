@@ -23,7 +23,6 @@ class ControlExpr(HeavyObject):
 
     c_struct = "ControlExpr"
     preamble = "cExpr"
-    _expr = None
 
     @classmethod
     def get_C_header_set(clazz):
@@ -35,7 +34,6 @@ class ControlExpr(HeavyObject):
 
     @classmethod
     def get_C_init(clazz, obj_type, obj_id, args):
-        clazz._expr = args["expressions"][0]
         eval_f = f"&Heavy_heavy::{clazz.preamble}_{obj_id}_evaluate"
         return [f"cExpr_init(&cExpr_{obj_id}, {eval_f});"]
     """

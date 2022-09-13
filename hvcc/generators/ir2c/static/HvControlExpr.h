@@ -25,18 +25,11 @@ extern "C" {
 
 #define MAX_EXPR_ARGS 10
 
-// typedef struct ControlExpr {
-//   // HvMessage *inlets;
-//   HvMessage *msg;
-//   // stick the instance specific eval function here?
-// } ControlExpr;
-
 typedef struct ControlExpr {
   float args[MAX_EXPR_ARGS];
   float(*eval_fptr)(float*);
 } ControlExpr;
 
-// hv_size_t cExpr_init(ControlExpr *o, int nargs, ...);
 hv_size_t cExpr_init(ControlExpr *o, float(*eval_fptr)(float*));
 
 void cExpr_free(ControlExpr *o);

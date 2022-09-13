@@ -25,7 +25,6 @@ hv_size_t cExpr_init(ControlExpr *o, float(*eval_fptr)(float*)) {
 }
 
 void cExpr_free(ControlExpr *o) {
-  // hv_free(o->msg);
   ;
 }
 
