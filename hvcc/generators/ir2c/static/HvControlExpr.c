@@ -36,7 +36,7 @@ void cExpr_onMessage(HeavyContextInterface *_c, ControlExpr *o, int letIn, const
   switch (letIn) {
     case 0: { // first inlet stores all values of input msg and triggers an output
       if (msg_isBang(m,0)) {
-        ; // do nothing
+        ; // pass through to sending the msg below
 
       } else if (! msg_isFloat(m,0)) {
         printf("Got value other than bang or float\n");

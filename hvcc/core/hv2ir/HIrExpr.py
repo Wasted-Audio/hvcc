@@ -20,8 +20,7 @@ class HIrExpr(HeavyIrObject):
     """Just a stub to get it going..."""
 
     def __init__(self, obj_type, args=None, graph=None, annotations=None):
-        num_inlets = 2  # need to have this figured out before next step
         HeavyIrObject.__init__(self, obj_type, args=args, graph=graph,
-                               num_inlets=num_inlets,
+                               num_inlets=args["num_inlets"],
                                num_outlets=1,
                                annotations=annotations)

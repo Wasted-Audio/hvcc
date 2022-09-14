@@ -12,45 +12,51 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+import re
 
 from .PdObject import PdObject
 
 
 class PdExprObject(PdObject):
     """
-        Validate the expr object and any heavy restrictions, then
-        convert it directly into a HeavyIR object.
+    Limitations compared to vanilla pd
+    - only supports a single expression
+    - pd docs say expr support 9 variables, experiments show that
+      it supports at least 20... This version currently supports up
+      to 10 variables as defined in HvControlExpr.h
+    - I don't know what pd-expr does with strings, haven't experimented
+      and haven't given it any thought yet here
     """
 
     def __init__(self, obj_type, obj_args=None, pos_x=0, pos_y=0):
+        """
+            Validate the expr object and any heavy restrictions, then
+            convert it directly into a HeavyIR object.
+        """
+
         print("In Pd expr Obj")
         assert obj_type in ["expr", "expr~"]
         PdObject.__init__(self, obj_type, obj_args, pos_x, pos_y)
 
-        # turn the arguments into a list of expressions, separated
-        # by any semicolons encountered
+        # turn the arguments into a list of expressions, but only one for now
         if len(self.obj_args) == 0:
             self.add_error("Empty expression")
 
-        expressions = [
-            e.strip() for e in
-            " ".join(self.obj_args).split("\\;")
-        ]
+        expressions = [e.strip() for e in " ".join(self.obj_args).split("\\;")]
         if len(expressions) > 1:
-            self.add_error("Heavy expr does NOT support multiple expressions")
+            self.add_error("Heavy expr does not support multiple expressions")
         else:
             self.expressions = expressions
 
-        # below is code to start sussing out the inlets, kicking to IR for now.
-        # main reason to do it here is if there is an advantage to knowing the
-        # number of inlets before we get to the IR level...
-        # var_re = re.compile(r"\$[fis]\d+")
-        # variables = set()
-        # for e in self.expressions:
-        #     variables |= set(re.findall(var_re, e))
-
-        # var_nums = set([re.search(r"\d+", var)[0] for var in variables])
-        # self.num_inlets = len(var_nums)
+        # count the number of inlets
+        var_nums = {
+            re.search(r"\d+", var)[0]
+            for var in
+            re.findall(r"\$[fis]\d+", self.expressions[0])
+        }
+        self.num_inlets = max(1, len(var_nums))
+        if self.num_inlets > 10:
+            self.add_error("Heavy expr supports upto 10 variables")
 
     def validate_configuration(self):
         # things that could be validated:
@@ -61,7 +67,8 @@ class PdExprObject(PdObject):
         return {
             "type": "__expr",
             "args": {
-                "expressions": self.expressions
+                "expressions": self.expressions,
+                "num_inlets": self.num_inlets
             },
             "properties": {
                 "x": self.pos_x,
