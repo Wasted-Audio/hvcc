@@ -1,0 +1,11 @@
+[@ 0.000]
+print: 3
+print: 2.25
+print: 3
+print: 3
+print: 2.42857
+inlet: expected 'float' but got 'junk'
+print: 2.28571
+expr: no method for 'junk'
+expr: type mismatch
+print: 3.66667
