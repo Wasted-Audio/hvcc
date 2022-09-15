@@ -19,13 +19,16 @@ from .PdObject import PdObject
 
 class PdExprObject(PdObject):
     """
-    Limitations compared to vanilla pd
+    Limitations (compared to vanilla pd):
     - only supports a single expression
     - pd docs say expr support 9 variables, experiments show that
       it supports at least 20... This version currently supports up
       to 10 variables as defined in HvControlExpr.h
     - I don't know what pd-expr does with strings, haven't experimented
       and haven't given it any thought yet here
+
+    Bugs:
+    - skipped variables cause crash, like "$f1 + $f3"
     """
 
     def __init__(self, obj_type, obj_args=None, pos_x=0, pos_y=0):
@@ -50,11 +53,10 @@ class PdExprObject(PdObject):
 
         # count the number of inlets
         var_nums = {
-            re.search(r"\d+", var)[0]
-            for var in
+            int(var[2:]) for var in
             re.findall(r"\$[fis]\d+", self.expressions[0])
         }
-        self.num_inlets = max(1, len(var_nums))
+        self.num_inlets = max(var_nums) if len(var_nums) > 0 else 1
         if self.num_inlets > 10:
             self.add_error("Heavy expr supports upto 10 variables")
 
