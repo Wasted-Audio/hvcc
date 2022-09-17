@@ -155,6 +155,15 @@ void Heavy_{{name}}::{{x}}
 {%- endfor %}
 
 
+/*
+ * Experimental code for expr/expr~ implementation
+ * Write out the generic header code
+ */
+ 
+ {%- for line in obj_impl_lines %}
+ {{line}}
+ {%- endfor %}
+
 
 /*
  * Context Process Implementation

@@ -236,12 +236,12 @@ class ir2c:
                 ir["objects"][obj_id]["args"]))
 
             # begin experiment for expr~
-            ir2c.get_class(o["type"]).get_C_obj_header_code(
+            obj_header_lines.extend(ir2c.get_class(o["type"]).get_C_obj_header_code(
                 o["type"], obj_id, o["args"]
-            )
-            ir2c.get_class(o["type"]).get_C_obj_impl_code(
+            ))
+            obj_impl_lines.extend(ir2c.get_class(o["type"]).get_C_obj_impl_code(
                 o["type"], obj_id, o["args"]
-            )
+            ))
 
         #
         # Load the C-language template files and use the parsed strings to fill them in.

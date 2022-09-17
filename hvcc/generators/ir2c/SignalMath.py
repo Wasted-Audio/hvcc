@@ -91,7 +91,7 @@ class SignalMath(HeavyObject):
         # static inline void __hv_add_f(hv_bInf_t bIn0, hv_bInf_t bIn1, hv_bOutf_t bOut) {
         lines = super().get_C_obj_header_code(obj_type, obj_id, args)
         # lines.append(f"static inline void {clazz.preamble}_{obj_id}_evaluate(hv_bInf_t* bIns, hv_bInf_t bOut);")
-        print(f"static inline void {clazz.preamble}_{obj_id}_evaluate(hv_bInf_t* bIns, hv_bInf_t bOut);")
+        lines.append(f"static inline void {clazz.preamble}_{obj_id}_evaluate(hv_bInf_t* bIns, hv_bInf_t bOut);")
         return lines        
 
     @classmethod
@@ -101,20 +101,15 @@ class SignalMath(HeavyObject):
         send messages to this object.
         """
         
-        lines = super().get_C_impl(clazz, obj_type, obj_id, args)
+        lines = super().get_C_obj_impl_code(obj_type, obj_id, args)
         
-        expr = args["expressions"][0]
+        # expr = args["expressions"][0]
         bound_expr = ""  # bind_expr(expr, "args")
-        # lines.extend([
-        #     "",
-        #     f"float Heavy_heavy::{clazz.preamble}_{obj_id}_evaluate(float* args) {{",
-        #     f"\treturn {bound_expr};",
-        #     "}",
-        # ])
-        print([
+        
+        lines.extend([
             "",
-            f"float Heavy_heavy::{clazz.preamble}_{obj_id}_evaluate(hv_bInf_t* bIns, hv_bInf_t bOut) {{",
-            f"\treturn // expression here;",
+            f"void Heavy_heavy::{clazz.preamble}_{obj_id}_evaluate(hv_bInf_t* bIns, hv_bInf_t bOut) {{",
+            f"\t// per-obj expression evaluation code here;",
             "}",
         ])
         return lines
