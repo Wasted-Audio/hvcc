@@ -87,56 +87,20 @@ class SignalMath(HeavyObject):
         return {"HvMath.h"}
 
     @classmethod
-    def get_C_obj_header_code(clazz, obj_type, obj_id, args):
-        # static inline void __hv_add_f(hv_bInf_t bIn0, hv_bInf_t bIn1, hv_bOutf_t bOut) {
-        lines = super().get_C_obj_header_code(obj_type, obj_id, args)
-        # lines.append(f"static inline void {clazz.preamble}_{obj_id}_evaluate(hv_bInf_t* bIns, hv_bInf_t bOut);")
-        print(f"static inline void {clazz.preamble}_{obj_id}_evaluate(hv_bInf_t* bIns, hv_bInf_t bOut);")
-        return lines        
-
-    @classmethod
-    def get_C_obj_impl_code(clazz, obj_type, obj_id, args):
-        """
-        (Per object) this creates the _sendMessage function that other objects use to
-        send messages to this object.
-        """
-        
-        lines = super().get_C_impl(clazz, obj_type, obj_id, args)
-        
-        expr = args["expressions"][0]
-        bound_expr = ""  # bind_expr(expr, "args")
-        # lines.extend([
-        #     "",
-        #     f"float Heavy_heavy::{clazz.preamble}_{obj_id}_evaluate(float* args) {{",
-        #     f"\treturn {bound_expr};",
-        #     "}",
-        # ])
-        print([
-            "",
-            f"float Heavy_heavy::{clazz.preamble}_{obj_id}_evaluate(hv_bInf_t* bIns, hv_bInf_t bOut) {{",
-            f"\treturn // expression here;",
-            "}",
-        ])
-        return lines
-
-    @classmethod
-    def _func(clazz):
-        pass
-
-    @classmethod
     def get_C_process(clazz, obj_type, process_dict, objects):
-        # print("------------- in SignalMath doing Expr experiments -------------")
-        # args = []
-        # for b in process_dict["inputBuffers"]:
-        #     buf = HeavyObject._c_buffer(b)
-        #     args.append(f"VIf({buf})")
-        # args.append("VOf(Bf0)")
-        # call = f"__hv_expr_f(" + ", ".join(args) + ");"
-        # print("\texperimental call:", call)
-        # print("------------- in SignalMath, experiments DONE -------------")
-        print("------------- in SignalMath, need to jam VIf(Bf1) things into an array to send to evaluate -------------")
+        print("------------- calling get_C_process() ------------------")
 
-        ret = [
+        #  example: __hv_mul_f(VIf(Bf0), VIf(Bf1), VOf(Bf1));
+        args = []
+        for b in process_dict["inputBuffers"]:
+            buf = HeavyObject._c_buffer(b)
+            args.append(f"VIf({buf})")
+        args.append("VOf(Bf0)")
+        
+        call = f"__hv_expr_f(" + ", ".join(args) + ");"
+
+
+        return [
             "{0}({1}, {2});".format(
                 SignalMath.__OPERATION_DICT[obj_type],
                 ", ".join(["VI{0}({1})".format(
@@ -146,5 +110,3 @@ class SignalMath(HeavyObject):
                     "i" if b["type"] == "~i>" else "f",
                     HeavyObject._c_buffer(b)) for b in process_dict["outputBuffers"]])
             )]
-        # print(ret)
-        return ret

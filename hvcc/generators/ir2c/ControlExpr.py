@@ -34,36 +34,36 @@ class ControlExpr(HeavyObject):
 
     @classmethod
     def get_C_init(clazz, obj_type, obj_id, args):
+        """(Per object) code that gets inserted into from the Heavy_heavy ctor."""
+
         eval_f = f"&Heavy_heavy::{clazz.preamble}_{obj_id}_evaluate"
         return [f"cExpr_init(&cExpr_{obj_id}, {eval_f});"]
-    """
-    """
 
     @classmethod
     def get_C_def(clazz, obj_type, obj_id):
-        lines = ["{0} {1}_{2};".format(
-            clazz.get_c_struct(obj_type),
-            clazz.get_preamble(obj_type),
-            obj_id)]
+        """(Per object) code that gets inserted into the header file"""
+
+        lines = super().get_C_def(obj_type, obj_id)
+        # ["{0} {1}_{2};".format(
+        #     clazz.get_c_struct(obj_type),
+        #     clazz.get_preamble(obj_type),
+        #     obj_id)]
         lines.append("// --------------- big ol' comment ------------")
         lines.append(f"static float {clazz.preamble}_{obj_id}_evaluate(float* args);")
         return lines
-    """
-    The get_C_def method creates the object definitions that go into the .hpp file.
-    This is a place where other things could be inserted in
-    """
 
     @classmethod
     def get_C_onMessage(clazz, obj_type, obj_id, inlet_index, args):
+        """
+        (Per object) code that gets inserted into the c<PREAMBLE>_<OBJID>_sendMessage
+        method in the .cpp file
+        """
+
         return [
             "cExpr_onMessage(_c, &Context(_c)->cExpr_{0}, {1}, m, &cExpr_{0}_sendMessage);".format(
                 obj_id,
                 inlet_index)
         ]
-    """
-    The get_C_onMessage method returns the code that will get inserted into
-    the cReceive_<UID>_sendMessage method
-    """
 
     # @classmethod
     # def get_C_process(clazz, obj_type, process_dict, objects):
@@ -77,6 +77,11 @@ class ControlExpr(HeavyObject):
 
     @classmethod
     def get_C_impl(clazz, obj_type, obj_id, on_message_list, get_obj_class, objects, args):
+        """
+        (Per object) this creates the _sendMessage function that other objects use to
+        send messages to this object.
+        """
+        
         lines = super().get_C_impl(obj_type, obj_id, on_message_list, get_obj_class, objects, args)
         expr = args["expressions"][0]
         bound_expr = bind_expr(expr, "args")
@@ -87,15 +92,6 @@ class ControlExpr(HeavyObject):
             "}",
         ])
         return lines
-    """
-    Th get_C_impl method overrides the creation of the cExpr_<UID>_sendMessage() method that
-    the translator will create as below by default:
-
-    void Heavy_heavy::cExpr_pynQY0UK_sendMessage(HeavyContextInterface *_c, int letIn, const HvMessage *m) {
-    cPrint_onMessage(_c, m, "print");
-    }
-    """
-
 
 """
 Below is code to rewrite the input expression into one that uses local variables

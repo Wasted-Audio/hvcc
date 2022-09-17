@@ -1,4 +1,4 @@
-# Copyright (C) 2014-2018 Enzien Audio, Ltd.
+ # Copyright (C) 2014-2018 Enzien Audio, Ltd.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -189,6 +189,8 @@ class ir2c:
         free_list = []
         def_list = []
         decl_list = []
+        obj_header_lines = []
+        obj_impl_lines = []
         for obj_id in ir["init"]["order"]:
             o = ir["objects"][obj_id]
             obj_class = ir2c.get_class(o["type"])
@@ -223,13 +225,23 @@ class ir2c:
 
         # generate the list of functions to process
         process_list = []
+        # print("--------------- for each signal in order")
         for x in ir["signal"]["processOrder"]:
+            # print("--- signal", x["id"], o["type"], ir2c.get_class(o["type"]))
             obj_id = x["id"]
             o = ir["objects"][obj_id]
             process_list.extend(ir2c.get_class(o["type"]).get_C_process(
                 o["type"],
                 x,
                 ir["objects"][obj_id]["args"]))
+
+            # begin experiment for expr~
+            ir2c.get_class(o["type"]).get_C_obj_header_code(
+                o["type"], obj_id, o["args"]
+            )
+            ir2c.get_class(o["type"]).get_C_obj_impl_code(
+                o["type"], obj_id, o["args"]
+            )
 
         #
         # Load the C-language template files and use the parsed strings to fill them in.
@@ -254,7 +266,8 @@ class ir2c:
                 def_list=def_list,
                 signal=ir["signal"],
                 copyright=copyright,
-                externs=externs))
+                externs=externs,
+                obj_header_lines=obj_header_lines))
 
         # write C++ implementation
         with open(os.path.join(output_dir, f"Heavy_{name}.cpp"), "w") as f:
@@ -268,7 +281,8 @@ class ir2c:
                 send_table=ir["tables"],
                 process_list=process_list,
                 table_data_list=table_data_list,
-                copyright=copyright))
+                copyright=copyright,
+                obj_impl_lines=obj_impl_lines))
 
         # write C API, hv_NAME.h
         with open(os.path.join(output_dir, f"Heavy_{name}.h"), "w") as f:

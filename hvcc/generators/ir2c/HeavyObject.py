@@ -46,6 +46,10 @@ class HeavyObject:
         return set()
 
     @classmethod
+    def get_C_init(clazz, obj_type, obj_id, args):
+        return [f"{clazz.preamble}_init(&{clazz.preamble}_{obj_id})"]
+
+    @classmethod
     def get_C_def(clazz, obj_type, obj_id):
         return ["{0} {1}_{2};".format(
             clazz.get_c_struct(obj_type),
@@ -86,6 +90,30 @@ class HeavyObject:
             send_message_list.append("}")  # end switch
         send_message_list.append("}")  # end function
         return send_message_list
+
+    @classmethod
+    def get_C_obj_header_code(clazz, obj_type, obj_id, args):
+        return []
+
+    @classmethod
+    def get_C_obj_impl_code(clazz, obj_type, obj_id, args):
+
+        return []
+    @classmethod
+    def get_C_class_header_code(clazz, obj_type, obj_id, args):
+        return []
+
+    @classmethod
+    def get_C_class_impl_code(clazz, obj_type, obj_id, args):
+        return []
+
+    @classmethod
+    def get_C_process(clazz, obj_type, process_dict, objects):
+        return []
+
+    @classmethod
+    def get_C_onMessage(clazz, obj_type, obj_id, inlet_index, args):
+        return []
 
     @classmethod
     def _get_on_message_list(clazz, on_message_list, get_obj_class, objects):
