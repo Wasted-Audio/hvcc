@@ -15,6 +15,7 @@
 
 from struct import unpack, pack
 
+
 class HeavyObject:
     
     c_struct = ""

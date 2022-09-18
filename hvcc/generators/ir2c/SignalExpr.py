@@ -79,9 +79,9 @@ class SignalExpr(HeavyObject):
         return lines
 
     @classmethod
-    def get_C_process(clazz, obj_type, process_dict, objects):
+    def get_C_process(clazz, process_dict, obj_type, obj_id, args):
         print("------------- calling get_C_process() ------------------")
-        print(objects)
+        print(args)
 
         #  example: __hv_mul_f(VIf(Bf0), VIf(Bf1), VOf(Bf1));
         args = []
