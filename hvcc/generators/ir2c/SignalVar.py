@@ -80,7 +80,7 @@ class SignalVar(HeavyObject):
                 obj_id)]
 
     @classmethod
-    def get_C_process(clazz, obj_type, process_dict, args):
+    def get_C_process(clazz, process_dict, obj_type, obj_id, args):
         fmt = obj_type[-1]
         if obj_type in ["__var~f", "__var~i"]:
             # NOTE(mhroth): signal rate variables do not process anything

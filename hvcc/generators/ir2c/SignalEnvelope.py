@@ -39,7 +39,7 @@ class SignalEnvelope(HeavyObject):
         ]
 
     @classmethod
-    def get_C_process(clazz, obj_type, process_dict, args):
+    def get_C_process(clazz, process_dict, obj_type, obj_id, args):
         return [
             "sEnv_process(this, &sEnv_{0}, VIf({1}), &sEnv_{0}_sendMessage);".format(
                 process_dict["id"],

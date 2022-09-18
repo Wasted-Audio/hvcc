@@ -46,7 +46,7 @@ class SignalLine(HeavyObject):
         ]
 
     @classmethod
-    def get_C_process(clazz, obj_type, process_dict, args):
+    def get_C_process(clazz, process_dict, obj_type, obj_id, args):
         return [
             "__hv_line_f(&sLine_{0}, VOf({1}));".format(
                 process_dict["id"],
