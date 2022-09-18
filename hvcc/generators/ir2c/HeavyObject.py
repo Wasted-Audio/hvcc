@@ -88,10 +88,6 @@ class HeavyObject:
         return send_message_list
 
     @classmethod
-    def get_C_class_impl_code(clazz, obj_type, obj_id, args):
-        return []
-
-    @classmethod
     def get_C_process(clazz, process_dict, obj_type, obj_id, args):
         raise NotImplementedError("method get_C_process not implemented")
 
