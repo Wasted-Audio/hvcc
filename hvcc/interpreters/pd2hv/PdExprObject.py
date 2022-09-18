@@ -36,6 +36,7 @@ class PdExprObject(PdObject):
             Validate the expr object and any heavy restrictions, then
             convert it directly into a HeavyIR object.
         """
+        # self.obj_type = obj_type
 
         print("In Pd expr Obj")
         assert obj_type in ["expr", "expr~"]
@@ -54,7 +55,9 @@ class PdExprObject(PdObject):
         # count the number of inlets
         var_nums = {
             int(var[2:]) for var in
-            re.findall(r"\$[fis]\d+", self.expressions[0])
+            # this should be checked separately for control vs. signal instances
+            # fis for control, v for signal
+            re.findall(r"\$[fisv]\d+", self.expressions[0])
         }
         self.num_inlets = max(var_nums) if len(var_nums) > 0 else 1
         if self.num_inlets > 10:
@@ -67,7 +70,7 @@ class PdExprObject(PdObject):
 
     def to_hv(self):
         return {
-            "type": "__expr",
+            "type": f"__{self.obj_type}",
             "args": {
                 "expressions": self.expressions,
                 "num_inlets": self.num_inlets

@@ -86,37 +86,33 @@ class SignalMath(HeavyObject):
     def get_C_header_set(clazz):
         return {"HvMath.h"}
 
-    @classmethod
-    def get_C_obj_header_code(clazz, obj_type, obj_id, args):
-        # static inline void __hv_add_f(hv_bInf_t bIn0, hv_bInf_t bIn1, hv_bOutf_t bOut) {
-        lines = super().get_C_obj_header_code(obj_type, obj_id, args)
-        # lines.append(f"static inline void {clazz.preamble}_{obj_id}_evaluate(hv_bInf_t* bIns, hv_bInf_t bOut);")
-        lines.append(f"static inline void {clazz.preamble}_{obj_id}_evaluate(hv_bInf_t* bIns, hv_bInf_t bOut);")
-        return lines        
+    # @classmethod
+    # def get_C_obj_header_code(clazz, obj_type, obj_id, args):
+    #     # static inline void __hv_add_f(hv_bInf_t bIn0, hv_bInf_t bIn1, hv_bOutf_t bOut) {
+    #     lines = super().get_C_obj_header_code(obj_type, obj_id, args)
+    #     # lines.append(f"static inline void {clazz.preamble}_{obj_id}_evaluate(hv_bInf_t* bIns, hv_bInf_t bOut);")
+    #     lines.append(f"static inline void {clazz.preamble}_{obj_id}_evaluate(hv_bInf_t* bIns, hv_bInf_t bOut);")
+    #     return lines        
 
-    @classmethod
-    def get_C_obj_impl_code(clazz, obj_type, obj_id, args):
-        """
-        (Per object) this creates the _sendMessage function that other objects use to
-        send messages to this object.
-        """
+    # @classmethod
+    # def get_C_obj_impl_code(clazz, obj_type, obj_id, args):
+    #     """
+    #     (Per object) this creates the _sendMessage function that other objects use to
+    #     send messages to this object.
+    #     """
         
-        lines = super().get_C_obj_impl_code(obj_type, obj_id, args)
+    #     lines = super().get_C_obj_impl_code(obj_type, obj_id, args)
         
-        # expr = args["expressions"][0]
-        bound_expr = ""  # bind_expr(expr, "args")
+    #     # expr = args["expressions"][0]
+    #     bound_expr = ""  # bind_expr(expr, "args")
         
-        lines.extend([
-            "",
-            f"void Heavy_heavy::{clazz.preamble}_{obj_id}_evaluate(hv_bInf_t* bIns, hv_bInf_t bOut) {{",
-            f"\t// per-obj expression evaluation code here;",
-            "}",
-        ])
-        return lines
-
-    @classmethod
-    def _func(clazz):
-        pass
+    #     lines.extend([
+    #         "",
+    #         f"void Heavy_heavy::{clazz.preamble}_{obj_id}_evaluate(hv_bInf_t* bIns, hv_bInf_t bOut) {{",
+    #         f"\t// per-obj expression evaluation code here;",
+    #         "}",
+    #     ])
+    #     return lines
 
     @classmethod
     def get_C_process(clazz, obj_type, process_dict, objects):

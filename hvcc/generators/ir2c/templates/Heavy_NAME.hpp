@@ -91,6 +91,12 @@ class Heavy_{{name}} : public HeavyContext {
   * Write out the generic header code
   */
 
+  // per class code
+  {%- for line in class_header_lines %}
+  {{line}}
+  {%- endfor %}
+
+  // per object code
   {%- for line in obj_header_lines %}
   {{line}}
   {%- endfor %}

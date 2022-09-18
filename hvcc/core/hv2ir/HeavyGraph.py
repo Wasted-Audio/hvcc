@@ -795,7 +795,7 @@ class HeavyGraph(HeavyIrObject):
                     f"Object {outlet_obj} in graph {outlet_obj.graph.file} has {len(c_list)} (> 1) signal inputs.")
 
     def __repr__(self):
-        if self.xname is not None:
+        if "xname" in dir(self) and self.xname is not None:
             # TODO(mhroth): does not handle nested subgraph
             return f"__graph.{self.id}({os.path.basename(self.file)}/{self.xname})"
         else:

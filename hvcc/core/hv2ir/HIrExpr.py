@@ -14,7 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from .HeavyIrObject import HeavyIrObject
-
+from .HeavyException import HeavyException
 
 class HIrExpr(HeavyIrObject):
     """Just a stub to get it going..."""
@@ -24,3 +24,11 @@ class HIrExpr(HeavyIrObject):
                                num_inlets=args["num_inlets"],
                                num_outlets=1,
                                annotations=annotations)
+
+    def inlet_requires_signal(self, inlet_index=0):
+        """ Overriding HeavyIrObject to deal with variable number of inlets
+        """
+        if inlet_index >= self.num_inlets:
+            raise HeavyException(f"inlet_index: {inlet_index} is greater than number of inlets")
+        return True
+        

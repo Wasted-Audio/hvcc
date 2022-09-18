@@ -34,14 +34,18 @@ class ControlExpr(HeavyObject):
 
     @classmethod
     def get_C_init(clazz, obj_type, obj_id, args):
-        """(Per object) code that gets inserted into from the Heavy_heavy ctor."""
+        """(Per object) code that gets inserted into from the Heavy_heavy ctor.
+            Only if "ir[init]" == true
+        """
 
         eval_f = f"&Heavy_heavy::{clazz.preamble}_{obj_id}_evaluate"
         return [f"cExpr_init(&cExpr_{obj_id}, {eval_f});"]
 
     @classmethod
     def get_C_def(clazz, obj_type, obj_id):
-        """(Per object) code that gets inserted into the header file"""
+        """(Per object) code that gets inserted into the header file
+            Only if "ir[init]" == true
+        """
 
         lines = super().get_C_def(obj_type, obj_id)
         # ["{0} {1}_{2};".format(

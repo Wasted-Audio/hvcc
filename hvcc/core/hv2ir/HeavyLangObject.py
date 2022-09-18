@@ -59,6 +59,7 @@ class HeavyLangObject:
 
         # the list of connections at each inlet
         num_inlets = num_inlets if num_inlets >= 0 else len(self._obj_desc["inlets"])
+        # print("=-=-=-=-   HeavyLangObject::__init__", self.type, self._obj_desc)
         self.inlet_connections = [[] for _ in range(num_inlets)]
 
         # the list of connections at each outlet
@@ -208,6 +209,8 @@ class HeavyLangObject:
         """
         try:
             if c.to_object is self:
+                print("-------- c props", c)
+                print("-------- inlet cons", self.inlet_connections)
                 self.inlet_connections[c.inlet_index].append(c)
             elif c.from_object is self:
                 self.outlet_connections[c.outlet_index].append(c)

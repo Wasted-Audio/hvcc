@@ -51,6 +51,7 @@ from hvcc.generators.ir2c.SignalBiquad import SignalBiquad
 from hvcc.generators.ir2c.SignalCPole import SignalCPole
 from hvcc.generators.ir2c.SignalDel1 import SignalDel1
 from hvcc.generators.ir2c.SignalEnvelope import SignalEnvelope
+from hvcc.generators.ir2c.SignalExpr import SignalExpr
 from hvcc.generators.ir2c.SignalLine import SignalLine
 from hvcc.generators.ir2c.SignalLorenz import SignalLorenz
 from hvcc.generators.ir2c.SignalMath import SignalMath
@@ -77,7 +78,7 @@ class ir2c:
         "__cast_f": ControlCast,
         "__cast_s": ControlCast,
         "__expr": ControlExpr,
-        # "__expr~f": SignalExpr,
+        "__expr~": SignalExpr,
         "__message": ControlMessage,
         "__system": ControlSystem,
         "__receive": ControlReceive,
@@ -191,6 +192,8 @@ class ir2c:
         decl_list = []
         obj_header_lines = []
         obj_impl_lines = []
+        class_header_lines = []
+        class_impl_lines = []
         for obj_id in ir["init"]["order"]:
             o = ir["objects"][obj_id]
             obj_class = ir2c.get_class(o["type"])
@@ -242,7 +245,12 @@ class ir2c:
             obj_impl_lines.extend(ir2c.get_class(o["type"]).get_C_obj_impl_code(
                 o["type"], obj_id, o["args"]
             ))
-
+            class_header_lines.extend(ir2c.get_class(o["type"]).get_C_class_header_code(
+                o["type"], obj_id, o["args"]
+            ))
+            class_impl_lines.extend(ir2c.get_class(o["type"]).get_C_class_impl_code(
+                o["type"], obj_id, o["args"]
+            ))
         #
         # Load the C-language template files and use the parsed strings to fill them in.
         #
@@ -267,6 +275,7 @@ class ir2c:
                 signal=ir["signal"],
                 copyright=copyright,
                 externs=externs,
+                class_header_lines=class_header_lines,
                 obj_header_lines=obj_header_lines))
 
         # write C++ implementation
@@ -282,6 +291,7 @@ class ir2c:
                 process_list=process_list,
                 table_data_list=table_data_list,
                 copyright=copyright,
+                class_impl_lines=class_impl_lines,
                 obj_impl_lines=obj_impl_lines))
 
         # write C API, hv_NAME.h
