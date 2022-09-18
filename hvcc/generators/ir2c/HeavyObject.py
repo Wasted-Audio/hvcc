@@ -15,6 +15,7 @@
 
 from struct import unpack, pack
 
+
 class HeavyObject:
 
     c_struct = ""
@@ -86,7 +87,6 @@ class HeavyObject:
         send_message_list.append("}")  # end function
         return send_message_list
 
-
     @classmethod
     def get_C_class_impl_code(clazz, obj_type, obj_id, args):
         return []
@@ -98,7 +98,6 @@ class HeavyObject:
     @classmethod
     def get_C_onMessage(clazz, obj_type, obj_id, inlet_index, args):
         raise NotImplementedError("method get_C_onMessage not implemented")
-
 
     @classmethod
     def _get_on_message_list(clazz, on_message_list, get_obj_class, objects):
