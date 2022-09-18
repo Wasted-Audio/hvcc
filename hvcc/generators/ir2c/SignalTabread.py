@@ -57,7 +57,7 @@ class SignalTabread(HeavyObject):
                     inlet_index)]
 
     @classmethod
-    def get_C_process(clazz, obj_type, process_dict, objects):
+    def get_C_process(clazz, process_dict, obj_type, obj_id, args):
         if obj_type == "__tabread~if":
             return [
                 "__hv_tabread_if(&sTabread_{0}, {1}, {2});".format(

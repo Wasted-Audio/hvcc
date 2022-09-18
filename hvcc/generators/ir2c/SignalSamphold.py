@@ -42,7 +42,7 @@ class SignalSamphold(HeavyObject):
         raise Exception()
 
     @classmethod
-    def get_C_process(clazz, obj_type, process_dict, args):
+    def get_C_process(clazz, process_dict, obj_type, obj_id, args):
         return [
             "__hv_samphold_f(&sSamphold_{0}, VIf({1}), VIf({2}), VOf({3}));".format(
                 process_dict["id"],

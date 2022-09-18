@@ -49,7 +49,7 @@ class SignalSample(HeavyObject):
         ]
 
     @classmethod
-    def get_C_process(clazz, obj_type, process_dict, args):
+    def get_C_process(clazz, process_dict, obj_type, obj_id, args):
         return [
             "__hv_sample_f(this, &sSample_{0}, VIf({1}), &{2}_{0}_sendMessage);".format(
                 process_dict["id"],

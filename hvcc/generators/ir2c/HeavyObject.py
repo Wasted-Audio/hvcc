@@ -88,6 +88,19 @@ class HeavyObject:
         return send_message_list
 
     @classmethod
+    def get_C_class_impl_code(clazz, obj_type, obj_id, args):
+        return []
+
+    @classmethod
+    def get_C_process(clazz, process_dict, obj_type, obj_id, args):
+        return []
+
+    @classmethod
+    def get_C_onMessage(clazz, obj_type, obj_id, inlet_index, args):
+        return []
+
+
+    @classmethod
     def _get_on_message_list(clazz, on_message_list, get_obj_class, objects):
         out_list = []
         for om in on_message_list:
