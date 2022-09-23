@@ -196,6 +196,7 @@ class ir2c:
         class_impl_lines = []
         for obj_id in ir["init"]["order"]:
             o = ir["objects"][obj_id]
+            print("init objects:", o["type"])
             obj_class = ir2c.get_class(o["type"])
             init_list.extend(obj_class.get_C_init(o["type"], obj_id, o["args"]))
             def_list.extend(obj_class.get_C_def(o["type"], obj_id))
@@ -205,6 +206,7 @@ class ir2c:
         for x in ir["control"]["sendMessage"]:
             obj_id = x["id"]
             o = ir["objects"][obj_id]
+            print("control objects:", o["type"])
             obj_class = ir2c.get_class(o["type"])
             impl = obj_class.get_C_impl(
                 o["type"],
@@ -233,6 +235,7 @@ class ir2c:
             # print("--- signal", x["id"], o["type"], ir2c.get_class(o["type"]))
             obj_id = x["id"]
             o = ir["objects"][obj_id]
+            print("process objects:", o["type"])
             process_list.extend(ir2c.get_class(o["type"]).get_C_process(
                 x,
                 o["type"],
