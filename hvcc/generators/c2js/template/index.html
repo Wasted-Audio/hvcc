@@ -83,7 +83,7 @@
 {%- for k, v in events %}
       function sendEvent_{{k}}() {
         if(loader.webAudioWorklet) {
-          loader.sendEvent("{{v.display}}")
+          loader.sendEvent("{{v.display}}");
         } else {
           loader.audiolib.sendEvent("{{v.display}}");
         }
@@ -104,7 +104,7 @@
         document.getElementById("value_{{k}}").textContent = Number(value).toFixed(2);
         document.getElementById("parameter_{{k}}").value = value;
         if(loader.webAudioWorklet) {
-          loader.sendFloatParameterToWorklet("{{v.display}}", value)
+          loader.sendFloatParameterToWorklet("{{v.display}}", value);
         } else {
           loader.audiolib.setFloatParameter("{{v.display}}", value);
         }
