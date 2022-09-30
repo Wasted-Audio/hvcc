@@ -4,8 +4,18 @@ CHANGELOG
 Next Release
 -----
 
+* aligned memory and freed patch instance
+* WASM AudioWorklet
+* deprecate asm.js
+
+0.5.0
+-----
+
 * c2owl generator
 * migrate @owl to @raw
+* c2daisy json2daisy integration
+* enable control and signal tests
+* push f-string usage
 
 0.4.0
 -----

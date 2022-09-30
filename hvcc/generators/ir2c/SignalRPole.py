@@ -48,7 +48,7 @@ class SignalRPole(HeavyObject):
         return []
 
     @classmethod
-    def get_C_process(clazz, obj_type, process_dict, objects):
+    def get_C_process(clazz, process_dict, obj_type, obj_id, args):
         return [
             "__hv_rpole_f(&sRPole_{0}, VIf({1}), VIf({2}), VOf({3}));".format(
                 process_dict["id"],

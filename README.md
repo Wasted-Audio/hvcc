@@ -85,7 +85,7 @@ A list of available generator options can be found [here](/docs/03.generators.md
 
 ### `-p` Search Paths
 
-`hvcc` will iterate through various directories when resolving patch objects and abstractions. The `-p` or `--search_paths` argument can be used to add additional folders for `hvcc` to look in.
+`hvcc` will iterate through various directories when resolving patch objects and abstractions. The `-p` or `--search_paths` argument can be used to add additional folders for `hvcc` to look in. Note that this argument is not needed for abstractions in the same folder as the top-level patch.
 
 This can be handy when using a third-party patch library for example https://github.com/Wasted-Audio/heavylib.
 
@@ -134,5 +134,6 @@ There are several places where heavy/hvcc conversation is happening:
   * [Bela](https://forum.bela.io/?q=hvcc)
   * [Rebel Technology](https://community.rebeltech.org/tags/puredata)
   * [Daisy](https://forum.electro-smith.com/t/pure-data/110)
+  * [MOD](https://forum.moddevices.com/c/developers/pure-data/56)
 
 Or you can use the [discussions](https://github.com/Wasted-Audio/hvcc/discussions) tab of this repository

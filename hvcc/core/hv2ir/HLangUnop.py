@@ -72,17 +72,17 @@ class HLangUnop(HeavyLangObject):
             x = HeavyIrObject(self.type)  # is this correct? no idea what x is otherwise
             return ({HeavyIrObject("__cast~if", {})}, self.get_connection_move_list(x))
         elif self.has_inlet_connection_format("f"):
-            ir_type = "__{0}~f".format(self.type)
+            ir_type = f"__{self.type}~f"
             assert ir_type in HLangUnop.__HEAVY_DICT[self.type]
             x = HeavyIrObject(ir_type)
             return ({x}, self.get_connection_move_list(x, "~f>"))
         elif self.has_inlet_connection_format("i"):
-            ir_type = "__{0}~i".format(self.type)
+            ir_type = f"__{self.type}~i"
             assert ir_type in HLangUnop.__HEAVY_DICT[self.type]
             x = HeavyIrObject(ir_type)
             return ({x}, self.get_connection_move_list(x, "~i>"))
         elif self.has_inlet_connection_format("c"):
-            ir_type = "__{0}".format(self.type)
+            ir_type = f"__{self.type}"
             assert ir_type in HLangUnop.__HEAVY_DICT[self.type]
             x = HeavyIrObject(ir_type)
             return ({x}, self.get_connection_move_list(x, "-->"))

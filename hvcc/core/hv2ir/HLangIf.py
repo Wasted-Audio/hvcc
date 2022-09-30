@@ -42,7 +42,7 @@
 #             # TODO(mhroth): implement this
 #             x = HeavyParser.graph_from_file("./hvlib/if~i.hv.json")
 #         else:
-#             raise HeavyException("Unhandled connection configuration to object [if]: {0}".format(
-#                 self._get_connection_format(self.inlet_connections)))
+#             fmt = self._get_connection_format(self.inlet_connections)
+#             raise HeavyException(f"Unhandled connection configuration to object [if]: {fmt}")
 
 #         return ({x}, self.get_connection_move_list(x))

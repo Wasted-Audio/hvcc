@@ -52,7 +52,7 @@ class SignalLorenz(HeavyObject):
         ]
 
     @classmethod
-    def get_C_process(clazz, obj_type, process_dict, args):
+    def get_C_process(clazz, process_dict, obj_type, obj_id, args):
         return [
             "__hv_lorenz_f(&sLorenz_{0}, {1}, {2});".format(
                 process_dict["id"],

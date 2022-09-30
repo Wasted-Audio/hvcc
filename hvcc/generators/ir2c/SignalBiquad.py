@@ -34,9 +34,9 @@ class SignalBiquad(HeavyObject):
     @classmethod
     def get_C_def(clazz, obj_type, obj_id):
         if obj_type == "__biquad_k~f":
-            return ["SignalBiquad_k sBiquad_k_{0};".format(obj_id)]
+            return [f"SignalBiquad_k sBiquad_k_{obj_id};"]
         elif obj_type == "__biquad~f":
-            return ["SignalBiquad sBiquad_s_{0};".format(obj_id)]
+            return [f"SignalBiquad sBiquad_s_{obj_id};"]
         else:
             raise Exception()
 
@@ -51,7 +51,7 @@ class SignalBiquad(HeavyObject):
                 float(args["fb1"]),
                 float(args["fb2"]))]
         elif obj_type == "__biquad~f":
-            return ["sBiquad_init(&sBiquad_s_{0});".format(obj_id)]
+            return [f"sBiquad_init(&sBiquad_s_{obj_id});"]
         else:
             raise Exception()
 
@@ -66,7 +66,7 @@ class SignalBiquad(HeavyObject):
             inlet_index)]
 
     @classmethod
-    def get_C_process(clazz, obj_type, process_dict, objects):
+    def get_C_process(clazz, process_dict, obj_type, obj_id, args):
         if obj_type == "__biquad_k~f":
             return [
                 "__hv_biquad_k_f(&sBiquad_k_{0}, VIf({1}), VOf({2}));".format(
@@ -78,6 +78,6 @@ class SignalBiquad(HeavyObject):
             return [
                 "__hv_biquad_f(&sBiquad_s_{0}, {1}, {2});".format(
                     process_dict["id"],
-                    ", ".join(["VIf({0})".format(HeavyObject._c_buffer(b)) for b in process_dict["inputBuffers"]]),
-                    ", ".join(["VOf({0})".format(HeavyObject._c_buffer(b)) for b in process_dict["outputBuffers"]])
+                    ", ".join([f"VIf({HeavyObject._c_buffer(b)})" for b in process_dict["inputBuffers"]]),
+                    ", ".join([f"VOf({HeavyObject._c_buffer(b)})" for b in process_dict["outputBuffers"]])
                 )]

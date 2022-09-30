@@ -51,7 +51,7 @@ class SignalTabwrite(HeavyObject):
         ]
 
     @classmethod
-    def get_C_process(clazz, obj_type, process_dict, objects):
+    def get_C_process(clazz, process_dict, obj_type, obj_id, args):
         if obj_type == "__tabwrite~f":
             return [
                 "__hv_tabwrite_f(&sTabwrite_{0}, {1});".format(

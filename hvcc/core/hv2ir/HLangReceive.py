@@ -42,4 +42,4 @@ class HLangReceive(HeavyLangObject):
 
         else:
             fmt = self._get_connection_format(self.outlet_connections)
-            self.add_error("Unknown outlet configuration: {0}".format(fmt))
+            self.add_error(f"Unknown outlet configuration: {fmt}")

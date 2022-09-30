@@ -29,7 +29,7 @@ class HLangSend(HeavyLangObject):
     def reduce(self):
         if self.has_inlet_connection_format("c"):
             ir_args = dict(self.args)
-            ir_args["hash"] = "0x{0:X}".format(HeavyLangObject.get_hash(ir_args["name"]))
+            ir_args["hash"] = f"0x{HeavyLangObject.get_hash(ir_args['name']):X}"
             x = HIrSend("__send", ir_args, annotations=self.annotations)
             return ({x}, self.get_connection_move_list(x))
 
@@ -49,4 +49,4 @@ class HLangSend(HeavyLangObject):
 
         else:
             fmt = self._get_connection_format(self.inlet_connections)
-            self.add_error("Unknown inlet configuration: {0}".format(fmt))
+            self.add_error(f"Unknown inlet configuration: {fmt}")

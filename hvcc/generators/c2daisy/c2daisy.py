@@ -1,10 +1,12 @@
 # import datetime
+import jinja2
 import os
 import shutil
 import time
-import jinja2
 from ..buildjson import buildjson
 from ..copyright import copyright_manager
+import json2daisy
+from . import parameters
 
 
 class c2daisy:
@@ -18,8 +20,6 @@ class c2daisy:
                 copyright=None, verbose=False):
 
         tick = time.time()
-
-        receiver_list = externs['parameters']['in']
 
         if patch_meta:
             patch_name = patch_meta.get("name", patch_name)
@@ -46,59 +46,50 @@ class c2daisy:
             source_dir = os.path.join(out_dir, "source")
             shutil.copytree(c_src_dir, source_dir)
 
-            # initialize the jinja template environment
-            env = jinja2.Environment()
+            if daisy_meta.get('board_file'):
+                header, board_info = json2daisy.generate_header_from_file(daisy_meta['board_file'])
+            else:
+                header, board_info = json2daisy.generate_header_from_name(board)
 
-            env.loader = jinja2.FileSystemLoader(
-                os.path.join(os.path.dirname(os.path.abspath(__file__)), "templates"))
+            component_glue = parameters.parse_parameters(
+                externs['parameters'], board_info['components'], board_info['aliases'], 'hardware')
+            component_glue['class_name'] = board_info['name']
+            component_glue['patch_name'] = patch_name
+            component_glue['header'] = f"HeavyDaisy_{patch_name}.hpp"
+            component_glue['max_channels'] = board_info['channels']
+            component_glue['num_output_channels'] = num_output_channels
 
-            # generate Daisy wrapper from template
+            component_glue['copyright'] = copyright_c
 
             daisy_h_path = os.path.join(source_dir, f"HeavyDaisy_{patch_name}.hpp")
             with open(daisy_h_path, "w") as f:
-                f.write(env.get_template("HeavyDaisy.hpp").render(
-                    name=patch_name,
-                    board=board,
-                    class_name=f"HeavyDaisy_{patch_name}",
-                    num_input_channels=num_input_channels,
-                    num_output_channels=num_output_channels,
-                    receivers=receiver_list,
-                    copyright=copyright_c))
-            daisy_cpp_path = os.path.join(source_dir, f"HeavyDaisy_{patch_name}.cpp")
-            with open(daisy_cpp_path, "w") as f:
-                f.write(env.get_template("HeavyDaisy.cpp").render(
-                    name=patch_name,
-                    board=board,
-                    class_name=f"HeavyDaisy_{patch_name}",
-                    num_input_channels=num_input_channels,
-                    num_output_channels=num_output_channels,
-                    receivers=receiver_list,
-                    pool_sizes_kb=externs["memoryPoolSizesKb"],
-                    copyright=copyright_c))
+                f.write(header)
 
-            # generate list of Heavy source files
-            # files = os.listdir(source_dir)
+            loader = jinja2.FileSystemLoader(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates'))
+            env = jinja2.Environment(loader=loader, trim_blocks=True, lstrip_blocks=True)
+            daisy_cpp_path = os.path.join(source_dir, f"HeavyDaisy_{patch_name}.cpp")
+
+            rendered_cpp = env.get_template('HeavyDaisy.cpp').render(component_glue)
+            with open(daisy_cpp_path, 'w') as file:
+                file.write(rendered_cpp)
+
+            makefile_replacements = {'name': patch_name}
+            makefile_replacements['linker_script'] = daisy_meta.get('linker_script', '')
+            if makefile_replacements['linker_script'] != '':
+                makefile_replacements['linker_script'] = f'../{daisy_meta["linker_script"]}'
+            depth = daisy_meta.get('libdaisy_depth', 2)
+            makefile_replacements['libdaisy_path'] = f'{"../" * depth}libdaisy'
+            makefile_replacements['bootloader'] = daisy_meta.get('bootloader', False)
+
+            rendered_makefile = env.get_template('Makefile').render(makefile_replacements)
+            with open(os.path.join(source_dir, "Makefile"), "w") as f:
+                f.write(rendered_makefile)
 
             # ======================================================================================
-            # Linux
-            #
-            # linux_path = os.path.join(out_dir, "linux")
-            # os.makedirs(linux_path)
-
-            with open(os.path.join(source_dir, "Makefile"), "w") as f:
-                f.write(env.get_template("Makefile").render(
-                    name=patch_name,
-                    class_name=f"HeavyDaisy_{patch_name}"))
 
             buildjson.generate_json(
                 out_dir,
                 linux_x64_args=["-j"])
-            # macos_x64_args=["-project", "{0}.xcodeproj".format(patch_name), "-arch",
-            #                 "x86_64", "-alltargets"],
-            # win_x64_args=["/property:Configuration=Release", "/property:Platform=x64",
-            #               "/t:Rebuild", "{0}.sln".format(patch_name), "/m"],
-            # win_x86_args=["/property:Configuration=Release", "/property:Platform=x86",
-            #               "/t:Rebuild", "{0}.sln".format(patch_name), "/m"])
 
             return {
                 "stage": "c2daisy",

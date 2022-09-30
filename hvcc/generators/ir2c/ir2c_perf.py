@@ -41,9 +41,9 @@ class ir2c_perf:
                     perf = perf + c
                     per_object_perf[obj_type] = per_object_perf[obj_type] + c
                 else:
-                    print("{0} requires perf information.".format(obj_type))
+                    print(f"{obj_type} requires perf information.")
             else:
-                print("ERROR: Unknown object type {0}".format(obj_type))
+                print(f"ERROR: Unknown object type {obj_type}")
 
         if verbose:
             print("AVX: {0} cycles / {1} cycles per frame".format(perf["avx"], perf["avx"] / 8.0))

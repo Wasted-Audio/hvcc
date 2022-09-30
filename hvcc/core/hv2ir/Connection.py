@@ -70,4 +70,4 @@ class Connection:
         return self.__hash
 
     def __repr__(self):
-        return f"[{self.from_object}:{self.outlet_index}] {self.to_object} [{self.inlet_index}:{self.type}]"
+        return f"[{self.from_object}:{self.outlet_index}] {self.type} [{self.to_object}:{self.inlet_index}]"

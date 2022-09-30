@@ -73,6 +73,12 @@ HeavyContextInterface *hv_{{name}}_new(double sampleRate);
  */
 HeavyContextInterface *hv_{{name}}_new_with_options(double sampleRate, int poolKb, int inQueueKb, int outQueueKb);
 
+/**
+ * Free the patch instance.
+ */
+void hv_{{name}}_free(HeavyContextInterface *instance);
+
+
 #ifdef __cplusplus
 } // extern "C"
 #endif

@@ -47,11 +47,16 @@ class HeavyObject:
 
     @classmethod
     def get_C_def(clazz, obj_type, obj_id):
-        return ["{0} {1}_{2};".format(clazz.get_c_struct(obj_type), clazz.get_preamble(obj_type), obj_id)]
+        return ["{0} {1}_{2};".format(
+            clazz.get_c_struct(obj_type),
+            clazz.get_preamble(obj_type),
+            obj_id)]
 
     @classmethod
     def get_C_free(clazz, obj_type, obj_id, args):
-        return ["{0}_free(&{0}_{1});".format(clazz.get_preamble(obj_type), obj_id)]
+        return ["{0}_free(&{0}_{1});".format(
+            clazz.get_preamble(obj_type),
+            obj_id)]
 
     @classmethod
     def get_C_decl(clazz, obj_type, obj_id, args):
@@ -72,7 +77,7 @@ class HeavyObject:
         else:
             send_message_list.append("switch (letIn) {")
             for i in range(len(on_message_list)):
-                send_message_list.append("case {0}: {{".format(i))
+                send_message_list.append(f"case {i}: {{")
                 send_message_list.extend(
                     HeavyObject._get_on_message_list(on_message_list[i], get_obj_class, objects))
                 send_message_list.append("break;")
@@ -81,6 +86,14 @@ class HeavyObject:
             send_message_list.append("}")  # end switch
         send_message_list.append("}")  # end function
         return send_message_list
+
+    @classmethod
+    def get_C_process(clazz, process_dict, obj_type, obj_id, args):
+        raise NotImplementedError("method get_C_process not implemented")
+
+    @classmethod
+    def get_C_onMessage(clazz, obj_type, obj_id, inlet_index, args):
+        raise NotImplementedError("method get_C_onMessage not implemented")
 
     @classmethod
     def _get_on_message_list(clazz, on_message_list, get_obj_class, objects):
@@ -154,4 +167,4 @@ class HeavyObject:
     def get_hash_string(clazz, x):
         """ Returns the hash as a hex string.
         """
-        return "0x{0:X}".format(HeavyObject.get_hash(x))
+        return f"0x{HeavyObject.get_hash(x):X}"
