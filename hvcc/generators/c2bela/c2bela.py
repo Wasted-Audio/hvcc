@@ -31,6 +31,7 @@ class c2bela:
                 copyright=None, verbose=False):
 
         tick = time.time()
+        out_dir = os.path.join(out_dir, "bela")
         patch_name = patch_name or "heavy"
 
         try:

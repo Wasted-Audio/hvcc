@@ -64,7 +64,7 @@ class SignalPhasor(HeavyObject):
             raise Exception()
 
     @classmethod
-    def get_C_process(clazz, obj_type, process_dict, args):
+    def get_C_process(clazz, process_dict, obj_type, obj_id, args):
         if obj_type == "__phasor~f":
             return [
                 "__hv_phasor_f(&sPhasor_{0}, VIf({1}), VOf({2}));".format(

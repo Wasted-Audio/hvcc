@@ -44,7 +44,7 @@ class SignalDel1(HeavyObject):
         return []
 
     @classmethod
-    def get_C_process(clazz, obj_type, process_dict, objects):
+    def get_C_process(clazz, process_dict, obj_type, obj_id, args):
         return [
             "__hv_del1_f(&sDel1_{0}, VIf({1}), VOf({2}));".format(
                 process_dict["id"],

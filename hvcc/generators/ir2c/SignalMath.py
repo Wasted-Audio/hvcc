@@ -87,7 +87,7 @@ class SignalMath(HeavyObject):
         return {"HvMath.h"}
 
     @classmethod
-    def get_C_process(clazz, obj_type, process_dict, objects):
+    def get_C_process(clazz, process_dict, obj_type, obj_id, args):
         return [
             "{0}({1}, {2});".format(
                 SignalMath.__OPERATION_DICT[obj_type],

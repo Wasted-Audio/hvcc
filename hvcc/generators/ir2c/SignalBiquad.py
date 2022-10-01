@@ -66,7 +66,7 @@ class SignalBiquad(HeavyObject):
             inlet_index)]
 
     @classmethod
-    def get_C_process(clazz, obj_type, process_dict, objects):
+    def get_C_process(clazz, process_dict, obj_type, obj_id, args):
         if obj_type == "__biquad_k~f":
             return [
                 "__hv_biquad_k_f(&sBiquad_k_{0}, VIf({1}), VOf({2}));".format(

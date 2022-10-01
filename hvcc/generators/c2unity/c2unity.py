@@ -65,6 +65,7 @@ class c2unity:
         event_list = externs["events"]["in"]
         table_list = externs["tables"]
 
+        out_dir = os.path.join(out_dir, "unity")
         patch_name = patch_name or "heavy"
 
         copyright = copyright_manager.get_copyright_for_c(copyright)

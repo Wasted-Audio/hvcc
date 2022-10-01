@@ -21,6 +21,8 @@ class c2daisy:
 
         tick = time.time()
 
+        out_dir = os.path.join(out_dir, "daisy")
+
         if patch_meta:
             patch_name = patch_meta.get("name", patch_name)
             daisy_meta = patch_meta.get("daisy")

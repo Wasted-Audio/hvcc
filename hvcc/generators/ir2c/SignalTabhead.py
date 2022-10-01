@@ -47,7 +47,7 @@ class SignalTabhead(HeavyObject):
         return []  # TODO(mhroth): deal with this later
 
     @classmethod
-    def get_C_process(clazz, obj_type, process_dict, objects):
+    def get_C_process(clazz, process_dict, obj_type, obj_id, args):
         return [
             "__hv_tabhead_f(&sTabhead_{0}, {1});".format(
                 process_dict["id"],

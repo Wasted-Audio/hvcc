@@ -3,7 +3,11 @@ NAME = {{name}}
 FILES_DSP = $(wildcard *.cpp)
 FILES_DSP += $(wildcard *.c)
 
-include ../../dpf/Makefile.plugins.mk
+DPF_TARGET_DIR = ../../bin
+DPF_BUILD_DIR = ../../build
+DPF_PATH = ../../{{dpf_path}}dpf
+
+include ../../{{dpf_path}}dpf/Makefile.plugins.mk
 
 LINK_FLAGS += -lpthread
 CFLAGS += -Wno-unused-parameter

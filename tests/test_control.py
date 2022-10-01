@@ -277,6 +277,9 @@ class TestPdControlPatches(unittest.TestCase):
     def test_sin(self):
         self._test_control_patch("test-sin.pd")
 
+    def test_stripnote(self):
+        self._test_control_patch("test-stripnote.pd")
+
     def test_spigot(self):
         self._test_control_patch("test-spigot.pd")
 
