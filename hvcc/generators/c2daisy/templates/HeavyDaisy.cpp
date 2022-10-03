@@ -90,7 +90,7 @@ void HandleMidiMessage(MidiEvent m)
   {
     case NoteOff: {
       NoteOnEvent p = m.AsNoteOn();
-      hv.sendMessageToReceiverV(HV_HASH_NOTEIN, 1000*daisy::System::GetUs(), "fff",
+      hv.sendMessageToReceiverV(HV_HASH_NOTEIN, 0, "fff",
         (float) p.note, // pitch
         (float) 0, // velocity
         (float) p.channel);
@@ -98,43 +98,43 @@ void HandleMidiMessage(MidiEvent m)
     }
     case NoteOn: {
       NoteOnEvent p = m.AsNoteOn();
-      hv.sendMessageToReceiverV(HV_HASH_NOTEIN, 1000*daisy::System::GetUs(), "fff",
+      hv.sendMessageToReceiverV(HV_HASH_NOTEIN, 0, "fff",
         (float) p.note, // pitch
         (float) p.velocity, // velocity
         (float) p.channel);
       break;
     }
-    // case ControlChange: {
-    //   ControlChangeEvent p = m.AsControlChange();
-    //   hv.sendMessageToReceiverV(HV_HASH_CTLIN, 1000.0/SAMPLE_RATE, "fff",
-    //     (float) p.value, // value
-    //     (float) p.control_number, // cc number
-    //     (float) p.channel);
-    //   break;
-    // }
-    // case ProgramChange: {
-    //   ProgramChangeEvent p = m.AsProgramChange();
-    //   hv.sendMessageToReceiverV(HV_HASH_PGMIN, 1000.0/SAMPLE_RATE, "ff",
-    //     (float) p.program,
-    //     (float) p.channel);
-    //   break;
-    // }
-    // case ChannelPressure: {
-    //   ChannelPressureEvent p = m.AsChannelPressure();
-    //   hv.sendMessageToReceiverV(HV_HASH_TOUCHIN, 1000.0/SAMPLE_RATE, "ff",
-    //     (float) p.pressure,
-    //     (float) p.channel);
-    //   break;
-    // }
-    // case PitchBend: {
-    //   PitchBendEvent p = m.AsPitchBend();
-    //   // combine 7bit lsb and msb into 32bit int
-    //   hv_uint32_t value = (((hv_uint32_t) m.data[1]) << 7) | ((hv_uint32_t) m.data[0]);
-    //   hv.sendMessageToReceiverV(HV_HASH_BENDIN, 1000.0/SAMPLE_RATE, "ff",
-    //     (float) value,
-    //     (float) p.channel);
-    //   break;
-    // }
+    case ControlChange: {
+      ControlChangeEvent p = m.AsControlChange();
+      hv.sendMessageToReceiverV(HV_HASH_CTLIN, 0, "fff",
+        (float) p.value, // value
+        (float) p.control_number, // cc number
+        (float) p.channel);
+      break;
+    }
+    case ProgramChange: {
+      ProgramChangeEvent p = m.AsProgramChange();
+      hv.sendMessageToReceiverV(HV_HASH_PGMIN, 0, "ff",
+        (float) p.program,
+        (float) p.channel);
+      break;
+    }
+    case ChannelPressure: {
+      ChannelPressureEvent p = m.AsChannelPressure();
+      hv.sendMessageToReceiverV(HV_HASH_TOUCHIN, 0, "ff",
+        (float) p.pressure,
+        (float) p.channel);
+      break;
+    }
+    case PitchBend: {
+      PitchBendEvent p = m.AsPitchBend();
+      // combine 7bit lsb and msb into 32bit int
+      hv_uint32_t value = (((hv_uint32_t) m.data[1]) << 7) | ((hv_uint32_t) m.data[0]);
+      hv.sendMessageToReceiverV(HV_HASH_BENDIN, 0, "ff",
+        (float) value,
+        (float) p.channel);
+      break;
+    }
 
     default: break;
   }
