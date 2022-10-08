@@ -1,5 +1,7 @@
 {{copyright}}
 
+var audioWorkletSupported = (typeof AudioWorklet === 'function');
+
 /*
  * AudioLibLoader - Convenience functions for setting up the web audio context
  * and initialising the AudioLib context
@@ -9,6 +11,7 @@ var AudioLibLoader = function() {
   this.isPlaying = false;
   this.webAudioContext = null;
   this.webAudioProcessor = null;
+  this.webAudioWorklet = null;
   this.audiolib = null;
 }
 
@@ -24,31 +27,67 @@ AudioLibLoader.prototype.init = function(options) {
       (new (window.AudioContext || window.webkitAudioContext || null));
 
   if (this.webAudioContext) {
-    var blockSize = options.blockSize || 2048;
-    var instance = new {{name}}_AudioLib({
-        sampleRate: this.webAudioContext.sampleRate,
-        blockSize: blockSize,
-        printHook: options.printHook,
-        sendHook: options.sendHook
-    });
-    this.audiolib = instance;
-    this.webAudioProcessor = this.webAudioContext.createScriptProcessor(blockSize, instance.getNumInputChannels(), Math.max(instance.getNumOutputChannels(), 1));
-    this.webAudioProcessor.onaudioprocess = (function(e) {
-        instance.process(e)
-    })
+    return (async() => {
+      var blockSize = options.blockSize || 2048;
+      if (audioWorkletSupported) {
+        await this.webAudioContext.audioWorklet.addModule("{{name}}_AudioLibWorklet.js");
+        this.webAudioWorklet = new AudioWorkletNode(this.webAudioContext, "{{name}}_AudioLibWorklet", {
+          outputChannelCount: [2],
+          processorOptions: {
+            sampleRate: this.webAudioContext.sampleRate,
+            blockSize,
+            printHook: options.printHook && options.printHook.toString(),
+            sendHook: options.sendHook && options.sendHook.toString()
+          }
+        });
+        this.webAudioWorklet.port.onmessage = (event) => {
+          console.log('Message from {{name}}_AudioLibWorklet:', event.data);
+        };
+        this.webAudioWorklet.connect(this.webAudioContext.destination);
+      } else {
+        console.warn('heavy: AudioWorklet not supported, reverting to ScriptProcessorNode');
+        var instance = new {{name}}_AudioLib({
+            sampleRate: this.webAudioContext.sampleRate,
+            blockSize: blockSize,
+            printHook: options.printHook,
+            sendHook: options.sendHook
+        });
+        this.audiolib = instance;
+        this.webAudioProcessor = this.webAudioContext.createScriptProcessor(blockSize, instance.getNumInputChannels(), Math.max(instance.getNumOutputChannels(), 1));
+        this.webAudioProcessor.onaudioprocess = (function(e) {
+            instance.process(e)
+        })
+      }
+    })();
   } else {
     console.error("heavy: failed to load - WebAudio API not available in this browser")
   }
 }
 
 AudioLibLoader.prototype.start = function() {
-  this.webAudioProcessor.connect(this.webAudioContext.destination);
+  this.webAudioContext.resume();
   this.isPlaying = true;
 }
 
 AudioLibLoader.prototype.stop = function() {
-  this.webAudioProcessor.disconnect(this.webAudioContext.destination);
+  this.webAudioContext.suspend();
   this.isPlaying = false;
+}
+
+AudioLibLoader.prototype.sendFloatParameterToWorklet = function(name, value) {
+  this.webAudioWorklet.port.postMessage({
+    type:'setFloatParameter',
+    name,
+    value
+  });
+}
+
+AudioLibLoader.prototype.sendEvent = function(name, value) {
+  this.webAudioWorklet.port.postMessage({
+    type:'sendEvent',
+    name,
+    value
+  });
 }
 
 Module.AudioLibLoader = AudioLibLoader;
@@ -144,9 +183,10 @@ var tableHashes = {
     var printHook = addFunction(function(context, printName, str, msg) {
         // Converts Heavy print callback to a printable message
         var timeInSecs =_hv_samplesToMilliseconds(context, _hv_msg_getTimestamp(msg)) / 1000.0;
-        var m = Pointer_stringify(printName) + " [" + timeInSecs.toFixed(3) + "]: " + Pointer_stringify(str);
+        var m = UTF8ToString(printName) + " [" + timeInSecs.toFixed(3) + "]: " + UTF8ToString(str);
         hook(m);
-      }
+      },
+      "viiii"
     );
     _hv_setPrintHook(this.heavyContext, printHook);
   }
@@ -162,8 +202,9 @@ var tableHashes = {
     // typedef void (HvSendHook_t) (HeavyContextInterface *context, const char *sendName, hv_uint32_t sendHash, const HvMessage *msg);
     var sendHook = addFunction(function(context, sendName, sendHash, msg) {
         // Converts sendhook callback to (sendName, float) message
-        hook(Pointer_stringify(sendName), _hv_msg_getFloat(msg, 0));
-      }
+        hook(UTF8ToString(sendName), _hv_msg_getFloat(msg, 0));
+      },
+      "viiii"
     );
     _hv_setSendHook(this.heavyContext, sendHook);
   }

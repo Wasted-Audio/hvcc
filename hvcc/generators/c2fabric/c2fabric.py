@@ -63,6 +63,7 @@ class c2fabric:
         in_event_list = externs["events"]["in"]
         out_event_list = externs["events"]["out"]
 
+        out_dir = os.path.join(out_dir, "fabric")
         patch_name = patch_name or "heavy"
 
         copyright = copyright_manager.get_copyright_for_c(copyright)
@@ -88,7 +89,7 @@ class c2fabric:
             src_out_dir = os.path.join(out_dir, "source", "heavy")
             shutil.copytree(c_src_dir, src_out_dir)
 
-            files_to_copy = [w.format(patch_name) for w in ["Hv_{0}_FabricDSP.cs", "Hv_{0}_FabricDSPEditor.cs"]]
+            files_to_copy = [f"Hv_{patch_name}_FabricDSP.cs", f"Hv_{patch_name}_FabricDSPEditor.cs"]
 
             # generate files from templates
             for f in env.list_templates(filter_func=c2fabric.filter_templates):
@@ -101,7 +102,7 @@ class c2fabric:
                 with open(file_path, "w") as g:
                     g.write(env.get_template(f).render(
                         patch_name=patch_name,
-                        project_name="Hv_{0}_Fabric".format(patch_name),
+                        project_name=f"Hv_{patch_name}_Fabric",
                         lib_name=patch_name,
                         num_input_channels=num_input_channels,
                         num_output_channels=num_output_channels,
@@ -117,12 +118,12 @@ class c2fabric:
                 out_dir,
                 android_armv7a_args=["APP_ABI=armeabi-v7a", "-j"],
                 linux_x64_args=["-j"],
-                macos_x64_args=["-project", "Hv_{0}_Fabric.xcodeproj".format(patch_name),
+                macos_x64_args=["-project", f"Hv_{patch_name}_Fabric.xcodeproj",
                                 "-arch", "x86_64", "-alltargets"],
                 win_x64_args=["/property:Configuration=Release", "/property:Platform=x64",
-                              "/t:Rebuild", "Hv_{0}_Fabric.sln".format(patch_name), "/m"],
+                              "/t:Rebuild", f"Hv_{patch_name}_Fabric.sln", "/m"],
                 win_x86_args=["/property:Configuration=Release", "/property:Platform=x86",
-                              "/t:Rebuild", "Hv_{0}_Fabric.sln".format(patch_name), "/m"])
+                              "/t:Rebuild", f"Hv_{patch_name}_Fabric.sln", "/m"])
 
             return {
                 "stage": "c2fabric",

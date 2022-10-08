@@ -31,13 +31,29 @@ class c2wwise:
     def filter_xcode_build(clazz, s):
         """Return a build hash suitable for use in an Xcode project file.
         """
-        return hashlib.md5(s + "_build").hexdigest().upper()[0:24]
+        s = f"{s}_build"
+        s = hashlib.md5(s.encode('utf-8'))
+        s = s.hexdigest().upper()[0:24]
+        return s
 
     @classmethod
     def filter_xcode_fileref(clazz, s):
         """Return a fileref hash suitable for use in an Xcode project file.
         """
-        return hashlib.md5(s + "_fileref").hexdigest().upper()[0:24]
+        s = f"{s}_fileref"
+        s = hashlib.md5(s.encode('utf-8'))
+        s = s.hexdigest().upper()[0:24]
+        return s
+
+    @classmethod
+    def filter_plugin_id(clazz, s):
+        """ Return a unique id from patch name
+            [0...32767
+        """
+        s = hashlib.md5(s.encode('utf-8'))
+        s = s.hexdigest()[:4]
+        s = int(s, 16) & 0x7FFF
+        return s
 
     @classmethod
     def compile(clazz, c_src_dir, out_dir, externs,
@@ -51,6 +67,7 @@ class c2wwise:
         event_list = externs["events"]["in"]
         table_list = externs["tables"]
 
+        out_dir = os.path.join(out_dir, "wwise")
         patch_name = patch_name or "heavy"
 
         copyright_c = copyright_manager.get_copyright_for_c(copyright)
@@ -63,7 +80,7 @@ class c2wwise:
 
         templates_dir = os.path.join(os.path.dirname(__file__), "templates")
         plugin_type = "Source" if num_input_channels == 0 else "FX"
-        plugin_id = int(hashlib.md5(patch_name).hexdigest()[:4], 16) & 0x7FFF  # unique id from patch name [0...32767]
+        plugin_id = c2wwise.filter_plugin_id(patch_name)
 
         env = jinja2.Environment()
         env.filters["xcode_build"] = c2wwise.filter_xcode_build
@@ -179,29 +196,29 @@ class c2wwise:
                     files=files,
                     wwise_version=wwise_sdk_version))
 
-            proj_name = "Hv_{0}_Wwise{1}Plugin".format(patch_name, plugin_type)
+            proj_name = f"Hv_{patch_name}_Wwise{plugin_type}Plugin"
 
             buildjson.generate_json(
                 out_dir,
                 ios_armv7a_args=[
                     "-arch", "armv7s",
-                    "-target", "{0}_iOS".format(proj_name),
-                    "-project", "{0}.xcodeproj".format(proj_name)],
+                    "-target", f"{proj_name}_iOS",
+                    "-project", f"{proj_name}.xcodeproj"],
                 linux_x64_args=["-j"],
                 macos_x64_args=[
                     "-arch", "x86_64",
-                    "-target", "{0}".format(proj_name),
-                    "-project", "{0}.xcodeproj".format(proj_name)],
+                    "-target", f"{proj_name}",
+                    "-project", f"{proj_name}.xcodeproj"],
                 win_x64_args=[
                     "/property:Configuration=Release",
                     "/property:Platform=x64",
                     "/t:Rebuild", "/m",
-                    "{0}.sln".format(proj_name)],
+                    f"{proj_name}.sln"],
                 win_x86_args=[
                     "/property:Configuration=Release",
                     "/property:Platform=x86",
                     "/t:Rebuild", "/m",
-                    "{0}.sln".format(proj_name)])
+                    f"{proj_name}.sln"])
 
             return {
                 "stage": "c2wwise",

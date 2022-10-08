@@ -50,18 +50,18 @@ class c2pdext:
         return s
 
     @classmethod
-    def compile(clazz, c_src_dir, out_dir, externs,
-                patch_name=None, ext_name=None,
-                num_input_channels=0, num_output_channels=0,
-                copyright=None, verbose=False):
+    def compile(clazz, c_src_dir, out_dir, externs, patch_name=None,
+                num_input_channels=0, num_output_channels=0, copyright=None, verbose=False):
 
         tick = time.time()
+
+        out_dir = os.path.join(out_dir, "pdext")
         receiver_list = externs["parameters"]["in"]
 
         copyright = copyright_manager.get_copyright_for_c(copyright)
 
         patch_name = patch_name or "heavy"
-        ext_name = ext_name or (patch_name + "~")
+        ext_name = f"{patch_name}~"
         struct_name = patch_name + "_tilde"
 
         # ensure that the output directory does not exist
