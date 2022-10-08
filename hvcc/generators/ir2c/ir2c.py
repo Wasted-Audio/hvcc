@@ -227,9 +227,10 @@ class ir2c:
             obj_id = x["id"]
             o = ir["objects"][obj_id]
             process_list.extend(ir2c.get_class(o["type"]).get_C_process(
-                o["type"],
                 x,
-                ir["objects"][obj_id]["args"]))
+                o["type"],
+                obj_id,
+                o["args"]))
 
         #
         # Load the C-language template files and use the parsed strings to fill them in.

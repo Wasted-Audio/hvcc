@@ -105,7 +105,7 @@ void {{class_name}}::initParameter(uint32_t index, Parameter& parameter)
       case param{{v.display}}:
         parameter.name = "{{v.display.replace('_', ' ')}}";
         parameter.symbol = "{{v.display|lower}}";
-        parameter.hints = kParameterIsAutomable
+        parameter.hints = kParameterIsAutomatable
       {% if v.attributes.type == 'bool': %}
         | kParameterIsBoolean
       {% elif v.attributes.type == 'trig': %}

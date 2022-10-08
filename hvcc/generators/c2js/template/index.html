@@ -24,50 +24,40 @@
     </style>
 
     <script type="text/javascript">
-
-      var webAssemblySupported = (typeof WebAssembly === 'object');
       var heavyModule = null;
       var loader = null;
 
       window.onload = function() {
-        if (webAssemblySupported) {
-          heavyModule = {{name}}_Module();
-          heavyModule['onRuntimeInitialized'] = moduleLoaded;
-        }
-        else {
-          console.warn("heavy: web assembly not found, falling back to asm.js");
-
-          var script = document.createElement('script');
-          script.src = "{{name}}.asm.js";
-          script.onload = function() {
-            heavyModule = {{name}}_AsmModule();
-            moduleLoaded();
-          }
-          document.body.appendChild(script);
-        }
+        {{name}}_Module().then(loadedModule => {
+          heavyModule = loadedModule;
+          moduleLoaded();
+        });
         document.getElementById("transportButton").style.visibility = "hidden";
       }
 
       function moduleLoaded() {
         loader = new heavyModule.AudioLibLoader();
-        loader.init({
-          // optional: set audio processing block size, default is 2048
-          blockSize: 2048,
-          // optional: provide a callback handler for [print] messages
-          printHook: onPrint,
-          // optional: provide a callback handler for [s {sendName} @hv_param] messages
-          sendHook: onFloatMessage,
-          // optional: pass an existing web audio context, otherwise a new one
-          // will be constructed.
-          webAudioContext: null
-        });
-        {% for k, v in parameters -%}
-        updateSlider_{{k}}({{v.attributes.default}});
-        {% endfor -%}
         document.getElementById("transportButton").style.visibility = "visible";
       }
 
       function start() {
+        if(!loader.webAudioContext) {
+          loader.init({
+            // optional: set audio processing block size, default is 2048
+            blockSize: 2048,
+            // optional: provide a callback handler for [print] messages
+            printHook: onPrint,
+            // optional: provide a callback handler for [s {sendName} @hv_param] messages
+            sendHook: onFloatMessage,
+            // optional: pass an existing web audio context, otherwise a new one
+            // will be constructed.
+            webAudioContext: null
+          }).then(() => {
+            {% for k, v in parameters -%}
+            updateSlider_{{k}}({{v.attributes.default}});
+            {% endfor -%}
+          });
+        }
         loader.start();
       }
 
@@ -92,16 +82,32 @@
       // Generated Event Update Methods
 {%- for k, v in events %}
       function sendEvent_{{k}}() {
-        loader.audiolib.sendEvent("{{v.display}}");
+        if(loader.webAudioWorklet) {
+          loader.sendEvent("{{v.display}}");
+        } else {
+          loader.audiolib.sendEvent("{{v.display}}");
+        }
       }
 {% endfor %}
       {%- endif %}
+
+      // randomizer
+      function randomiseParameters() {
+{%- for k, v in parameters %}
+        updateSlider_{{k}}(Math.random());
+{% endfor %}
+      }
       {%- if parameters | length %}
       // Generated Parameter Update Methods
 {%- for k, v in parameters %}
       function updateSlider_{{k}}(value) {
         document.getElementById("value_{{k}}").textContent = Number(value).toFixed(2);
-        loader.audiolib.setFloatParameter("{{v.display}}", value);
+        document.getElementById("parameter_{{k}}").value = value;
+        if(loader.webAudioWorklet) {
+          loader.sendFloatParameterToWorklet("{{v.display}}", value);
+        } else {
+          loader.audiolib.setFloatParameter("{{v.display}}", value);
+        }
       }
 {% endfor %}
       {%- endif %}
@@ -116,6 +122,9 @@
             start / stop
             <input type="checkbox" id="transportButton" onchange="toggleTransport();">
           </label>
+        </div>
+        <div>
+          <button style="padding: 10px;" type="button" id="randomiseButton" onclick="randomiseParameters();">Randomise</button>
         </div>
       </div>
       {%- if events | length %}
@@ -139,7 +148,7 @@
       {%- endfor %}
       {%- endif %}
       <div class="row">
-        <span class="link"><em>powered by <a href="https://enzienaudio.com"><strong>heavy</strong></em></a></span>
+        <span class="link"><em>powered by <a href="https://github.com/Wasted-Audio/hvcc"><strong>heavy</strong></em></a></span>
       </div>
     </div>
   </body>

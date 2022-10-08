@@ -68,6 +68,7 @@ class c2owl:
 
         tick = time.time()
 
+        out_dir = os.path.join(out_dir, "Source")
         patch_name = patch_name or "heavy"
         copyright_c = copyright_manager.get_copyright_for_c(copyright)
 

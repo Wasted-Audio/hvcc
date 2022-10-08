@@ -48,7 +48,7 @@ class SignalCPole(HeavyObject):
         return []
 
     @classmethod
-    def get_C_process(clazz, obj_type, process_dict, objects):
+    def get_C_process(clazz, process_dict, obj_type, obj_id, args):
         return [
             "__hv_cpole_f(&sCPole_{0}, VIf({1}), VIf({2}), VIf({3}), VIf({4}), VOf({5}), VOf({6}));".format(
                 process_dict["id"],
