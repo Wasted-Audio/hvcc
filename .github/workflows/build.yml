@@ -1,0 +1,45 @@
+name: HVCC
+
+on:
+  push:
+  pull_request:
+    branches: [ develop ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.7, 3.8, 3.9, 3.10-dev]
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+          lfs: true
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install tox tox-gh-actions
+          git lfs pull
+      - name: Run tox
+        run: tox
+
+  dispatch:
+    needs: build
+    strategy:
+      matrix:
+        repo: ['Wasted-Audio/hvcc-examples-dpf']
+    runs-on: ubuntu-latest
+    steps:
+      - name: Repository Dispatch
+        uses: peter-evans/repository-dispatch@v2
+        with:
+          token: ${{ secrets.HVCC_REPOSITORY_DISPATCH_TOKEN }}
+          repository: ${{ matrix.repo }}
+          event-type: nightly
+          client-payload: '{"nightly": true, "branch": "develop"}'
+        if: ${{ github.ref == 'refs/heads/develop' }}
