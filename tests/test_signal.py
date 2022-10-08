@@ -14,7 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import argparse
-import jinja2
 import numpy
 import os
 import platform
@@ -22,35 +21,26 @@ import shutil
 from scipy.io import wavfile
 import subprocess
 import sys
-import unittest
 
 sys.path.append("../")
-import hvcc
 
-from tests.framework.base_test import HvBaseTest, simd_flags
-
-SIGNAL_TEST_DIR = os.path.join(os.path.dirname(__file__), "pd", "signal")
+from tests.framework.base_test import HvBaseTest
 
 
 class TestPdSignalPatches(HvBaseTest):
     SCRIPT_DIR = os.path.dirname(__file__)
+    TEST_DIR = os.path.join(os.path.dirname(__file__), "pd", "signal")
 
-    def compile_and_run(self, out_dir, source_files,
-                         sample_rate=None, block_size=None, num_iterations=None, flag=None):
-
-        exe_path = os.path.join(out_dir, "heavy")
-
-        # template Makefile
-        # NOTE(mhroth): assertions are NOT turned off (help to catch errors)
-        makefile_path = os.path.join(out_dir, "c", "Makefile")
-        with open(makefile_path, "w") as f:
-            f.write(self.env.get_template("Makefile").render(
-                simd_flags=simd_flags[flag or "HV_SIMD_NONE"],
-                source_files=source_files,
-                out_path=exe_path))
-
-        # run the compile command
-        subprocess.check_output(["make", "-C", os.path.dirname(makefile_path), "-j"])
+    def compile_and_run(
+        self,
+        out_dir,
+        source_files,
+        sample_rate=None,
+        block_size=None,
+        num_iterations=None,
+        flag=None
+    ):
+        exe_path = self._compile_and_run(source_files, out_dir, flag)
 
         # run executable
         # e.g. $ /path/heavy /path/heavy.wav 48000 480 1000
@@ -87,11 +77,11 @@ class TestPdSignalPatches(HvBaseTest):
         """Compiles, runs, and tests a signal patch.
         """
 
-        pd_path = os.path.join(SIGNAL_TEST_DIR, pd_file)
+        pd_path = os.path.join(self.TEST_DIR, pd_file)
 
         # setup
         patch_name = os.path.splitext(os.path.basename(pd_path))[0]
-        golden_path = os.path.join(SIGNAL_TEST_DIR, f"{patch_name}.golden.wav")
+        golden_path = os.path.join(self.TEST_DIR, f"{patch_name}.golden.wav")
         self.assertTrue(os.path.exists(golden_path), f"File not found: {golden_path}")
 
         try:
