@@ -18,18 +18,17 @@ import jinja2
 import os
 import shutil
 import subprocess
-import sys
 import unittest
 
-sys.path.append("../")
+# sys.path.append("../")
 import hvcc
 
 
 simd_flags = {
     "HV_SIMD_NONE": ["-DHV_SIMD_NONE"],
-    "HV_SIMD_SSE": ["-msse", "-msse2", "-msse3", "-mssse3", "-msse4.1"],
-    "HV_SIMD_SSE_FMA": ["-msse", "-msse2", "-msse3", "-mssse3", "-msse4.1", "-mfma"],
-    "HV_SIMD_AVX": ["-msse", "-msse2", "-msse3", "-mssse3", "-msse4.1", "-mavx", "-mfma"],
+    "HV_SIMD_SSE": ["-msse", "-msse2", "-msse3", "-mssse3", "-msse4.1", "-msse4.2"],
+    "HV_SIMD_SSE_FMA": ["-msse", "-msse2", "-msse3", "-mssse3", "-msse4.1", "-msse4.2", "-mfma"],
+    "HV_SIMD_AVX": ["-msse", "-msse2", "-msse3", "-mssse3", "-msse4.1", "-msse4.2", "-mavx", "-mfma"],
     "HV_SIMD_NEON": ["-mcpu=cortex-a7", "-mfloat-abi=hard"]
 }
 
@@ -78,6 +77,7 @@ class HvBaseTest(unittest.TestCase):
                             expected_enum in [w["enum"] for w in hvcc_results["pd2hv"]["notifs"]["warnings"]]
                         )
                         return
+
                 self.fail(f"Expected warning enum: {expected_enum}")
 
             if expect_fail and r["notifs"].get("has_error", False):
@@ -111,5 +111,33 @@ class HvBaseTest(unittest.TestCase):
 
         # run the compile command
         subprocess.check_output(["make", "-C", os.path.dirname(makefile_path), "-j"])
+
+        return exe_path
+
+    def _compile_and_run_clang(
+        self,
+        c_sources,
+        out_dir,
+        flag=None,
+    ):
+        flag = flag or "HV_SIMD_NONE"
+        self.assertTrue(flag in simd_flags, f"Unknown compiler flag: {flag}")
+
+        c_flags = simd_flags[flag]
+
+        # all warnings are errors (except for #warning)
+        # assertions are NOT turned off (help to catch errors)
+        c_flags += [
+            "-std=c11",
+            "-O3", "-ffast-math", "-DNDEBUG",
+            "-Werror", "-Wno-#warnings", "-Wno-unused-function",
+            "-lm"]
+
+        exe_path = os.path.join(out_dir, "heavy")
+
+        # run the compile command
+        cmd = ["clang"] + c_flags + c_sources + ["-o", exe_path]  # + ['-v']
+        print(cmd)
+        subprocess.check_output(cmd)
 
         return exe_path
