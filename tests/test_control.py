@@ -26,28 +26,15 @@ sys.path.append("../")
 import hvcc
 from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
 
-SCRIPT_DIR = os.path.dirname(__file__)
+from tests.framework.base_test import HvBaseTest, simd_flags
+
 CONTROL_TEST_DIR = os.path.join(os.path.dirname(__file__), "pd", "control")
 
 
-class TestPdControlPatches(unittest.TestCase):
-
-    def setUp(self):
-        self.env = jinja2.Environment()
-        self.env.loader = jinja2.FileSystemLoader(os.path.join(
-            os.path.dirname(__file__),
-            "template"))
+class TestPdControlPatches(HvBaseTest):
+    SCRIPT_DIR = os.path.dirname(__file__)
 
     def compile_and_run(self, source_files, out_path, num_iterations, flag=None):
-
-        simd_flags = {
-            "HV_SIMD_NONE": ["-DHV_SIMD_NONE"],
-            "HV_SIMD_SSE": ["-msse", "-msse2", "-msse3", "-mssse3", "-msse4.1"],
-            "HV_SIMD_SSE_FMA": ["-msse", "-msse2", "-msse3", "-mssse3", "-msse4.1", "-mfma"],
-            "HV_SIMD_AVX": ["-msse", "-msse2", "-msse3", "-mssse3", "-msse4.1", "-mavx", "-mfma"],
-            "HV_SIMD_NEON": ["-mcpu=cortex-a7", "-mfloat-abi=hard"]
-        }
-
         # template Makefile
         # NOTE(mhroth): assertions are NOT turned off (help to catch errors)
         makefile_path = os.path.join(os.path.dirname(out_path), "c", "Makefile")
@@ -352,7 +339,7 @@ class TestPdControlPatches(unittest.TestCase):
         pd_path = os.path.join(CONTROL_TEST_DIR, pd_file)
 
         # clean any existing output directories
-        out_dir = os.path.abspath(os.path.join(SCRIPT_DIR, "./build"))
+        out_dir = os.path.abspath(os.path.join(self.SCRIPT_DIR, "./build"))
         if os.path.exists(out_dir):
             shutil.rmtree(out_dir)
 
@@ -372,7 +359,7 @@ class TestPdControlPatches(unittest.TestCase):
         pd_path = os.path.join(CONTROL_TEST_DIR, pd_file)
 
         # clean any existing output directories
-        out_dir = os.path.abspath(os.path.join(SCRIPT_DIR, "./build"))
+        out_dir = os.path.abspath(os.path.join(self.SCRIPT_DIR, "./build"))
         if os.path.exists(out_dir):
             shutil.rmtree(out_dir)
 
@@ -395,29 +382,14 @@ class TestPdControlPatches(unittest.TestCase):
         # setup
         patch_name = os.path.splitext(os.path.basename(pd_path))[0]
 
-        # clean any existing output directories
-        out_dir = os.path.abspath(os.path.join(SCRIPT_DIR, "./build"))
-        if os.path.exists(out_dir):
-            shutil.rmtree(out_dir)
-
-        hvcc_results = hvcc.compile_dataflow(pd_path, out_dir, verbose=False)
-        for r in hvcc_results.values():
-            # if there are any errors from hvcc, fail immediately
-            # TODO(mhroth): standardise how errors and warnings are returned
-            # between stages
-            if r["notifs"].get("has_error", False):
-                if r["stage"] == "pd2hv":
-                    self.fail(hvcc_results["pd2hv"]["notifs"]["errors"][0])
-                else:
-                    self.fail(str(r["notifs"]))
-
-            if not allow_warnings:
-                if len(hvcc_results["pd2hv"]["notifs"]["warnings"]) > 0:
-                    self.fail(hvcc_results["pd2hv"]["notifs"]["warnings"][0]["message"])
+        try:
+            out_dir = self._run_hvcc(pd_path)
+        except Exception as e:
+            self.fail(str(e))
 
         # copy over additional C assets
         c_src_dir = os.path.join(out_dir, "c")
-        shutil.copy2(os.path.join(SCRIPT_DIR, "test_control.c"), c_src_dir)
+        shutil.copy2(os.path.join(self.SCRIPT_DIR, "test_control.c"), c_src_dir)
 
         # prepare the clang command
         exe_file = os.path.join(out_dir, "heavy")

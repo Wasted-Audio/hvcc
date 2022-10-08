@@ -27,28 +27,16 @@ import unittest
 sys.path.append("../")
 import hvcc
 
-SCRIPT_DIR = os.path.dirname(__file__)
+from tests.framework.base_test import HvBaseTest, simd_flags
+
 SIGNAL_TEST_DIR = os.path.join(os.path.dirname(__file__), "pd", "signal")
 
 
-class TestPdSignalPatches(unittest.TestCase):
+class TestPdSignalPatches(HvBaseTest):
+    SCRIPT_DIR = os.path.dirname(__file__)
 
-    __ENV__ = jinja2.Environment()
-    __ENV__.loader = jinja2.FileSystemLoader(os.path.join(
-        os.path.dirname(__file__),
-        "template"))
-
-    @classmethod
-    def _compile_and_run(clazz, out_dir, source_files,
+    def compile_and_run(self, out_dir, source_files,
                          sample_rate=None, block_size=None, num_iterations=None, flag=None):
-
-        simd_flags = {
-            "HV_SIMD_NONE": ["-DHV_SIMD_NONE"],
-            "HV_SIMD_SSE": ["-msse", "-msse2", "-msse3", "-mssse3", "-msse4.1"],
-            "HV_SIMD_SSE_FMA": ["-msse", "-msse2", "-msse3", "-mssse3", "-msse4.1", "-mfma"],
-            "HV_SIMD_AVX": ["-msse", "-msse2", "-msse3", "-mssse3", "-msse4.1", "-mavx", "-mfma"],
-            "HV_SIMD_NEON": ["-mcpu=cortex-a7", "-mfloat-abi=hard"]
-        }
 
         exe_path = os.path.join(out_dir, "heavy")
 
@@ -56,7 +44,7 @@ class TestPdSignalPatches(unittest.TestCase):
         # NOTE(mhroth): assertions are NOT turned off (help to catch errors)
         makefile_path = os.path.join(out_dir, "c", "Makefile")
         with open(makefile_path, "w") as f:
-            f.write(TestPdSignalPatches.__ENV__.get_template("Makefile").render(
+            f.write(self.env.get_template("Makefile").render(
                 simd_flags=simd_flags[flag or "HV_SIMD_NONE"],
                 source_files=source_files,
                 out_path=exe_path))
@@ -80,7 +68,7 @@ class TestPdSignalPatches(unittest.TestCase):
         # http://stackoverflow.com/questions/10580676/comparing-two-numpy-arrays-for-equality-element-wise
         # http://docs.scipy.org/doc/numpy/reference/routines.testing.html
 
-        TestPdSignalPatches._compile_and_run(out_dir, c_sources, flag=flag)
+        self.compile_and_run(out_dir, c_sources, flag=flag)
 
         [r_fs, result] = wavfile.read(os.path.join(out_dir, f"heavy.{flag}.wav"))
         [g_fs, golden] = wavfile.read(golden_path)
@@ -95,43 +83,26 @@ class TestPdSignalPatches(unittest.TestCase):
         except AssertionError as e:
             self.fail(e)
 
-    @classmethod
-    def _run_hvcc(clazz, pd_path):
-        """Run hvcc on a Pd file. Returns the output directory.
-        """
-
-        # clean default output directories
-        out_dir = os.path.join(SCRIPT_DIR, "build")
-        if os.path.exists(out_dir):
-            shutil.rmtree(out_dir)
-
-        hvcc_results = hvcc.compile_dataflow(pd_path, out_dir)
-        for r in hvcc_results.values():
-            # if there are any errors from hvcc, fail immediately
-            # TODO(mhroth): standardise how errors and warnings are returned between stages
-            if r["notifs"].get("has_error", False):
-                raise Exception(r["notifs"]["errors"][0] if r["stage"] == "pd2hv" else str(r["notifs"]))
-
-        return out_dir
-
     def _test_signal_patch(self, pd_file):
         """Compiles, runs, and tests a signal patch.
         """
 
         pd_path = os.path.join(SIGNAL_TEST_DIR, pd_file)
+
+        # setup
         patch_name = os.path.splitext(os.path.basename(pd_path))[0]
         golden_path = os.path.join(SIGNAL_TEST_DIR, f"{patch_name}.golden.wav")
         self.assertTrue(os.path.exists(golden_path), f"File not found: {golden_path}")
 
         try:
-            out_dir = TestPdSignalPatches._run_hvcc(pd_path)
+            out_dir = self._run_hvcc(pd_path)
         except Exception as e:
             self.fail(str(e))
 
         # copy over additional C assets
         c_src_dir = os.path.join(out_dir, "c")
-        for c in os.listdir(os.path.join(SCRIPT_DIR, "src", "signal")):
-            shutil.copy2(os.path.join(SCRIPT_DIR, "src", "signal", c), c_src_dir)
+        for c in os.listdir(os.path.join(self.SCRIPT_DIR, "src", "signal")):
+            shutil.copy2(os.path.join(self.SCRIPT_DIR, "src", "signal", c), c_src_dir)
 
         # prepare the clang command
         source_files = os.listdir(c_src_dir)
@@ -193,7 +164,7 @@ def main():
     c_src_dir = os.path.join(out_dir, "c")
     c_sources = [os.path.join(c_src_dir, c) for c in os.listdir(c_src_dir) if c.endswith(".c")]
 
-    wav_path = TestPdSignalPatches._compile_and_run(
+    wav_path = TestPdSignalPatches.compile_and_run(
         out_dir,
         c_sources,
         args.samplerate,
