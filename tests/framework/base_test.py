@@ -20,7 +20,6 @@ import shutil
 import subprocess
 import unittest
 
-# sys.path.append("../")
 import hvcc
 
 
@@ -88,7 +87,7 @@ class HvBaseTest(unittest.TestCase):
                     if len(hvcc_results["hvcc"]["notifs"]["errors"]) > 0:
                         return  # hvcc isn't using Notification enums so just pass
 
-                self.fail("Expected error enum: " + str(expected_enum))
+                self.fail(f"Expected error enum: {expected_enum}")
 
         return out_dir
 
@@ -116,7 +115,7 @@ class HvBaseTest(unittest.TestCase):
 
     def _compile_and_run_clang(
         self,
-        c_sources,
+        source_files,
         out_dir,
         flag=None,
     ):
@@ -136,8 +135,7 @@ class HvBaseTest(unittest.TestCase):
         exe_path = os.path.join(out_dir, "heavy")
 
         # run the compile command
-        cmd = ["clang"] + c_flags + c_sources + ["-o", exe_path]  # + ['-v']
-        print(cmd)
+        cmd = ["clang"] + c_flags + source_files + ["-o", exe_path]  # + ['-v']
         subprocess.check_output(cmd)
 
         return exe_path
