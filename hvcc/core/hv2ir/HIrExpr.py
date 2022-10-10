@@ -16,6 +16,7 @@
 from .HeavyIrObject import HeavyIrObject
 from .HeavyException import HeavyException
 
+
 class HIrExpr(HeavyIrObject):
     """Just a stub to get it going..."""
 
@@ -31,4 +32,3 @@ class HIrExpr(HeavyIrObject):
         if inlet_index >= self.num_inlets:
             raise HeavyException(f"inlet_index: {inlet_index} is greater than number of inlets")
         return True
-        

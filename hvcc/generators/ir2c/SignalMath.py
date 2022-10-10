@@ -97,4 +97,4 @@ class SignalMath(HeavyObject):
                 ", ".join(["VO{0}({1})".format(
                     "i" if b["type"] == "~i>" else "f",
                     HeavyObject._c_buffer(b)) for b in process_dict["outputBuffers"]])
-        )]
+            )]

@@ -13,13 +13,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from .HeavyObject import HeavyObject
 import re
 
-from .HeavyObject import HeavyObject
 
 class ControlExpr(HeavyObject):
     """Just a stub to get the thing working"""
-
 
     c_struct = "ControlExpr"
     preamble = "cExpr"
@@ -48,10 +47,6 @@ class ControlExpr(HeavyObject):
         """
 
         lines = super().get_C_def(obj_type, obj_id)
-        # ["{0} {1}_{2};".format(
-        #     clazz.get_c_struct(obj_type),
-        #     clazz.get_preamble(obj_type),
-        #     obj_id)]
         lines.append("// --------------- big ol' comment ------------")
         lines.append(f"static float {clazz.preamble}_{obj_id}_evaluate(float* args);")
         return lines
@@ -69,23 +64,13 @@ class ControlExpr(HeavyObject):
                 inlet_index)
         ]
 
-    # @classmethod
-    # def get_C_process(clazz, obj_type, process_dict, objects):
-    #     return [
-    #         "printf(\"hello world\")"
-    #     ]
-    """
-    The get_C_process method seems to only get called by Signal IR objects, it does
-    not get called for Control IR objects
-    """
-
     @classmethod
     def get_C_impl(clazz, obj_type, obj_id, on_message_list, get_obj_class, objects, args):
         """
         (Per object) this creates the _sendMessage function that other objects use to
         send messages to this object.
         """
-        
+
         lines = super().get_C_impl(obj_type, obj_id, on_message_list, get_obj_class, objects, args)
         expr = args["expressions"][0]
         bound_expr = bind_expr(expr, "args")
@@ -97,10 +82,12 @@ class ControlExpr(HeavyObject):
         ])
         return lines
 
+
 """
 Below is code to rewrite the input expression into one that uses local variables
 that have been cast to either float or int
 """
+
 
 # todo(dgb): need to handle the 's' type
 def var_n(a_name, var):

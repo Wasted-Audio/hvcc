@@ -17,7 +17,7 @@ from struct import unpack, pack
 
 
 class HeavyObject:
-    
+
     c_struct = ""
     preamble = ""
 
@@ -97,7 +97,7 @@ class HeavyObject:
 
     @classmethod
     def get_C_onMessage(clazz, obj_type, obj_id, inlet_index, args):
-        raise NotImplementedError("method get_C_onMessage not implemented")
+        raise NotImplementedError("method get_C_onMessage not implemented", clazz, obj_type)
 
     @classmethod
     def get_C_obj_header_code(clazz, obj_type, obj_id, args):
@@ -108,11 +108,11 @@ class HeavyObject:
         return []
 
     @classmethod
-    def get_C_class_header_code(clazz, obj_type, obj_id, args):
+    def get_C_class_header_code(clazz, obj_type, args):
         return []
 
     @classmethod
-    def get_C_class_impl_code(clazz, obj_type, obj_id, args):
+    def get_C_class_impl_code(clazz, obj_type, args):
         return []
 
     @classmethod
