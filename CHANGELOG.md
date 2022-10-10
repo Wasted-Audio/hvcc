@@ -12,6 +12,7 @@ Next Release
 * deprecate max2hv
 * documentation updates
 * code cleanup
+* tests: refactor and deprecate test_uploader
 
 0.5.0
 -----

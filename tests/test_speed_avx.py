@@ -1,4 +1,5 @@
 # Copyright (C) 2014-2018 Enzien Audio, Ltd.
+# Copyright (C) 2022 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -47,8 +48,8 @@ def compile_and_run_patch(pd_file):
 
     # hv2ir
     py_script = os.path.join(SCRIPT_DIR, "../hvcc/core/hv2ir/hv2ir.py")
-    hv_file = os.path.join(out_dir, patch_name + ".hv.json")
-    ir_file = os.path.join(out_dir, patch_name + ".ir.hv.json")
+    hv_file = os.path.join(out_dir, f"{patch_name}.hv.json")
+    ir_file = os.path.join(out_dir, f"{patch_name}.ir.hv.json")
     cmd = (["python", py_script, hv_file, "--hv_ir_path", ir_file])
     print(subprocess.check_output(cmd))
 
