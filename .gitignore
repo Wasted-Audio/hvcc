@@ -176,6 +176,6 @@ generators/vs2015/Heavy/generated
 generators/c2js/emsdk_portable/
 generators/c2js/emsdk/
 
-## Added by dgb
-hvcc/core/json/heavy.ir.blocks
-hvcc/core/json/heavy.lang.blocks
+## added by dgbillotte to ignore my dev stuff, feel free to remove
+test/pd/*/dgb*
+
