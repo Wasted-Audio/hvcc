@@ -1,7 +1,7 @@
 CHANGELOG
 =====
 
-Next Release
+0.6.0
 -----
 
 * aligned memory and freed patch instance
@@ -12,6 +12,7 @@ Next Release
 * deprecate max2hv
 * documentation updates
 * code cleanup
+* tests: refactor and deprecate test_uploader
 
 0.5.0
 -----
