@@ -8,6 +8,16 @@ import json2daisy
 from . import parameters
 
 
+hv_midi_messages = {
+    "__hv_noteout",
+    "__hv_ctlout",
+    "__hv_pgmout",
+    "__hv_touchout",
+    "__hv_bendout",
+    "__hv_midiout"
+}
+
+
 class c2daisy:
     """ Generates a Daisy wrapper for a given patch.
     """
@@ -52,10 +62,9 @@ class c2daisy:
             else:
                 header, board_info = json2daisy.generate_header_from_name(board)
 
-            # remove heavy params from externs
-            for item in externs['parameters']['out']:
-                if '__hv_noteout' in item:
-                    externs['parameters']['out'].remove(item)
+            # remove heavy out params from externs
+            externs['parameters']['out'] = [
+                t for t in externs['parameters']['out'] if not any(x == y for x in hv_midi_messages for y in t)]
 
             component_glue = parameters.parse_parameters(
                 externs['parameters'], board_info['components'], board_info['aliases'], 'hardware')

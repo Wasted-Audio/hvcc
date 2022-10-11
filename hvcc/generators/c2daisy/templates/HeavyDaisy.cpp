@@ -205,16 +205,118 @@ void audiocallback(daisy::AudioHandle::InputBuffer in, daisy::AudioHandle::Outpu
 
 void HandleMidiSend(uint32_t sendHash, const HvMessage *m)
 {
-  const uint8_t numElements = m->numElements;
-  uint8_t midiData[numElements];
+  switch(sendHash){
+    case HV_HASH_NOTEOUT: // __hv_noteout
+    {
+      uint8_t note = hv_msg_getFloat(m, 0);
+      uint8_t velocity = hv_msg_getFloat(m, 1);
+      uint8_t ch = hv_msg_getFloat(m, 2);
+      ch %= 16;  // drop any pd "ports"
 
-  for (int i = 0; i < numElements; ++i)
-  {
-    midiData[i] = hv_msg_getFloat(m, i);
+      const uint8_t numElements = 3;
+      uint8_t midiData[numElements];
+
+      if (velocity > 0){
+        midiData[0] = 0x90 | ch; // noteon
+      } else {
+        midiData[0] = 0x80 | ch; // noteoff
+      }
+      midiData[1] = note;
+      midiData[2] = velocity;
+
+      hardware.midi.SendMessage(midiData, numElements);
+      hardware.midiusb.SendMessage(midiData, numElements);
+      break;
+    }
+    case HV_HASH_CTLOUT:
+    {
+      uint8_t value = hv_msg_getFloat(m, 0);
+      uint8_t cc = hv_msg_getFloat(m, 1);
+      uint8_t ch = hv_msg_getFloat(m, 2);
+      ch %= 16;
+
+      const uint8_t numElements = 3;
+      uint8_t midiData[numElements];
+      midiData[0] = 0xB0 | ch; // send CC
+      midiData[1] = cc;
+      midiData[2] = value;
+
+      hardware.midi.SendMessage(midiData, numElements);
+      hardware.midiusb.SendMessage(midiData, numElements);
+      break;
+    }
+    case HV_HASH_PGMOUT:
+    {
+      uint8_t pgm = hv_msg_getFloat(m, 0);
+      uint8_t ch = hv_msg_getFloat(m, 1);
+      ch %= 16;
+
+      const uint8_t numElements = 2;
+      uint8_t midiData[numElements];
+      midiData[0] = 0xC0 | ch; // send Program Change
+      midiData[1] = pgm;
+
+      hardware.midi.SendMessage(midiData, numElements);
+      hardware.midiusb.SendMessage(midiData, numElements);
+      break;
+    }
+    case HV_HASH_TOUCHOUT:
+    {
+      uint8_t value = hv_msg_getFloat(m, 0);
+      uint8_t ch = hv_msg_getFloat(m, 1);
+      ch %= 16;
+
+      const uint8_t numElements = 2;
+      uint8_t midiData[numElements];
+      midiData[0] = 0xD0 | ch; // send Touch
+      midiData[1] = value;
+
+      hardware.midi.SendMessage(midiData, numElements);
+      hardware.midiusb.SendMessage(midiData, numElements);
+      break;
+    }
+    case HV_HASH_BENDOUT:
+    {
+      uint16_t value = hv_msg_getFloat(m, 0);
+      uint8_t lsb  = value & 0x7F;
+      uint8_t msb  = (value >> 7) & 0x7F;
+      uint8_t ch = hv_msg_getFloat(m, 1);
+      ch %= 16;
+
+      const uint8_t numElements = 3;
+      uint8_t midiData[numElements];
+      midiData[0] = 0xE0 | ch; // send Bend
+      midiData[1] = lsb;
+      midiData[2] = msb;
+
+      hardware.midi.SendMessage(midiData, numElements);
+      hardware.midiusb.SendMessage(midiData, numElements);
+      break;
+    }
+    case HV_HASH_MIDIOUT: // __hv_midiout
+    {
+      const uint8_t numElements = m->numElements;
+      uint8_t midiData[numElements];
+      if (numElements <=4 )
+      {
+        for (int i = 0; i < numElements; ++i)
+        {
+          midiData[i] = hv_msg_getFloat(m, i);
+        }
+      }
+      else
+      {
+        printf("> we do not support sysex yet \n");
+        break;
+      }
+
+      hardware.midi.SendMessage(midiData, numElements);
+      hardware.midiusb.SendMessage(midiData, numElements);
+      break;
+    }
+    default:
+      break;
   }
-
-  hardware.midi.SendMessage(midiData, numElements);
-  hardware.midiusb.SendMessage(midiData, numElements);
 }
 
 
