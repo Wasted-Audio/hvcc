@@ -202,6 +202,22 @@ void audiocallback(daisy::AudioHandle::InputBuffer in, daisy::AudioHandle::Outpu
   hardware.PostProcess();
 }
 
+
+void HandleMidiSend(uint32_t sendHash, const HvMessage *m)
+{
+  const uint8_t numElements = m->numElements;
+  uint8_t midiData[numElements];
+
+  for (int i = 0; i < numElements; ++i)
+  {
+    midiData[i] = hv_msg_getFloat(m, i);
+  }
+
+  hardware.midi.SendMessage(midiData, numElements);
+  hardware.midiusb.SendMessage(midiData, numElements);
+}
+
+
 /** Receives messages from PD and writes them to the appropriate
  *  index in the `output_data` array, to be written later.
  */
@@ -216,6 +232,8 @@ static void sendHook(HeavyContextInterface *c, const char *receiverName, uint32_
     }
   }
   {% endif %}
+
+  HandleMidiSend(receiverHash, m);
 }
 
 /** Sends signals from the Daisy hardware to the PD patch via the receive objects during the main loop

@@ -1,4 +1,3 @@
-# import datetime
 import jinja2
 import os
 import shutil
@@ -52,6 +51,11 @@ class c2daisy:
                 header, board_info = json2daisy.generate_header_from_file(daisy_meta['board_file'])
             else:
                 header, board_info = json2daisy.generate_header_from_name(board)
+
+            # remove heavy params from externs
+            for item in externs['parameters']['out']:
+                if '__hv_noteout' in item:
+                    externs['parameters']['out'].remove(item)
 
             component_glue = parameters.parse_parameters(
                 externs['parameters'], board_info['components'], board_info['aliases'], 'hardware')
