@@ -3,11 +3,13 @@
 #pragma once
 
 #define DISTRHO_PLUGIN_NAME                 "{{name}}"
-{% if meta.plugin_uri is defined %}
+{%- if meta.plugin_uri is defined %}
 #define DISTRHO_PLUGIN_URI                  "{{meta.plugin_uri}}"
+#define DISTRHO_PLUGIN_CLAP_ID              "{{meta.plugin_uri}}"
 {% else %}
 #define DISTRHO_PLUGIN_URI                  "http://wasted.audio/lv2/plugin/{{name}}"
-{% endif %}
+#define DISTRHO_PLUGIN_CLAP_ID              "http://wasted.audio/lv2/plugin/{{name}}"
+{%- endif %}
 #define DISTRHO_PLUGIN_NUM_INPUTS           {{num_input_channels}}
 #define DISTRHO_PLUGIN_NUM_OUTPUTS          {{num_output_channels}}
 #define DISTRHO_PLUGIN_IS_SYNTH             {{1 if num_output_channels > 0 and meta.midi_input else 0}}

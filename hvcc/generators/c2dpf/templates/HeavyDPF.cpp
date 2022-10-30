@@ -74,7 +74,7 @@ static void hvPrintHookFunc(HeavyContextInterface *c, const char *printLabel, co
 {{class_name}}::{{class_name}}()
  : Plugin(HV_LV2_NUM_PARAMETERS, 0, 0)
 {
-  {% for k, v in receivers %}
+  {% for k, v in receivers -%}
   _parameters[{{loop.index-1}}] = {{v.attributes.default}}f;
   {% endfor %}
 
@@ -88,7 +88,7 @@ static void hvPrintHookFunc(HeavyContextInterface *c, const char *printLabel, co
   for (int i = 0; i < HV_LV2_NUM_PARAMETERS; ++i) {
     setParameterValue(i, _parameters[i]);
   }
-  {% endif %}
+  {%- endif %}
 }
 
 {{class_name}}::~{{class_name}}() {
@@ -97,20 +97,22 @@ static void hvPrintHookFunc(HeavyContextInterface *c, const char *printLabel, co
 
 void {{class_name}}::initParameter(uint32_t index, Parameter& parameter)
 {
-  {% if receivers|length > 0 %}
+  {%- if receivers|length > 0 -%}
   // initialise parameters with defaults
   switch (index)
   {
-    {% for k, v in receivers %}
+    {% for k, v in receivers -%}
       case param{{v.display}}:
         parameter.name = "{{v.display.replace('_', ' ')}}";
         parameter.symbol = "{{v.display|lower}}";
         parameter.hints = kParameterIsAutomatable
-      {% if v.attributes.type == 'bool': %}
+      {%- if v.attributes.type == 'bool': %}
         | kParameterIsBoolean
-      {% elif v.attributes.type == 'trig': %}
+      {%- elif v.attributes.type == 'trig': -%}
         | kParameterIsTrigger
-      {% endif %};
+      {%- elif v.attributes.type == 'log': -%}
+        | kParameterIsLogarithmic
+      {%- endif %};
         parameter.ranges.min = {{v.attributes.min}}f;
         parameter.ranges.max = {{v.attributes.max}}f;
         parameter.ranges.def = {{v.attributes.default}}f;
@@ -125,18 +127,18 @@ void {{class_name}}::initParameter(uint32_t index, Parameter& parameter)
 
 float {{class_name}}::getParameterValue(uint32_t index) const
 {
-  {% if receivers|length > 0 %}
+  {%- if receivers|length > 0 %}
   return _parameters[index];
   {% else %}
   return 0.0f;
-  {% endif %}
+  {%- endif %}
 }
 
 void {{class_name}}::setParameterValue(uint32_t index, float value)
 {
-  {% if receivers|length > 0 %}
+  {%- if receivers|length > 0 %}
   switch (index) {
-    {% for k, v  in receivers %}
+    {% for k, v  in receivers -%}
     case {{loop.index-1}}: {
       _context->sendFloatToReceiver(
           Heavy_{{name}}::Parameter::In::{{k|upper}},
@@ -149,7 +151,7 @@ void {{class_name}}::setParameterValue(uint32_t index, float value)
   _parameters[index] = value;
   {% else %}
   // nothing to do
-  {% endif %}
+  {%- endif %}
 }
 
 
@@ -448,12 +450,12 @@ void {{class_name}}::sampleRateChanged(double newSampleRate)
   _context->setSendHook(&hvSendHookFunc);
   _context->setPrintHook(&hvPrintHookFunc);
 
-  {% if receivers|length > 0 %}
+  {% if receivers|length > 0 -%}
   // ensure that the new context has the current parameters
   for (int i = 0; i < HV_LV2_NUM_PARAMETERS; ++i) {
     setParameterValue(i, _parameters[i]);
   }
-  {% endif %}
+  {%- endif %}
 }
 
 
