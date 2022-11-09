@@ -1,6 +1,12 @@
 CHANGELOG
 =====
 
+Next
+-----
+
+* dpf: add CLAP to docs; cleanup templates
+* dpf: bugfix -> wrong frame count used for sendMessageToReceiverV()
+
 0.6.1
 -----
 
