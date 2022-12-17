@@ -567,6 +567,7 @@ class PdParser:
         "outlet": PdLetObject,
         "outlet~": PdLetObject,
         "pack": PdPackObject,
+        "pd": PdGraph,
         "route": PdRouteObject,
         "sel": PdSelectObject,
         "select": PdSelectObject,
