@@ -1,0 +1,12 @@
+#N canvas 806 405 414 266 12;
+#X obj 119 73 loadbang;
+#N canvas 278 681 381 275 something 0;
+#X obj 147 63 inlet;
+#X obj 147 143 outlet;
+#X msg 147 102 a message;
+#X connect 0 0 2 0;
+#X connect 2 0 1 0;
+#X restore 119 109 pd something;
+#X obj 119 140 print;
+#X connect 0 0 1 0;
+#X connect 1 0 2 0;
