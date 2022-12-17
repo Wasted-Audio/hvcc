@@ -61,7 +61,7 @@ class Connection:
 
     @classmethod
     def is_signal_type(clazz, type):
-        return type in ["~i>", "~f>"]
+        return type in {"~i>", "~f>"}
 
     def __eq__(self, other):
         return self.__hash == other.__hash__() if isinstance(other, Connection) else False

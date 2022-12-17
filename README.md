@@ -89,7 +89,9 @@ A list of available generator options can be found [here](/docs/03.generators.md
 
 This can be handy when using a third-party patch library for example https://github.com/Wasted-Audio/heavylib.
 
-`$ hvcc ~/myProject/_main.pd -o ~/Desktop/somewhere/else/ -n mySynth -p "[~/Workspace/Projects/Enzien/heavylib/, ~/Desktop/myLib/]"`
+Simply append any folder paths after the `-p` flag like so:
+
+`$ hvcc ~/myProject/_main.pd -o ~/Desktop/somewhere/else/ -n mySynth -p ~/Workspace/Projects/Enzien/heavylib/ ~/Desktop/myLib/`
 
 ### `-m` Meta Data
 `hvcc` can take extra meta-data via a supplied json file. It depends on the generator which fields are supported.

@@ -58,7 +58,7 @@ class PdUnpackObject(PdObject):
         # added in the correct order
         for i in reversed(range(len(self.obj_args))):
             # add slices to graph
-            hv_graph["objects"]["slice_{0}".format(i)] = {
+            hv_graph["objects"][f"slice_{i}"] = {
                 "type": "slice",
                 "args": {
                     "index": i,
@@ -68,7 +68,7 @@ class PdUnpackObject(PdObject):
             }
 
             # add outlets to graph
-            hv_graph["objects"]["outlet_{0}".format(i)] = {
+            hv_graph["objects"][f"outlet_{i}"] = {
                 "type": "outlet",
                 "args": {
                     "type": "-->",
@@ -80,14 +80,14 @@ class PdUnpackObject(PdObject):
             # add connection from inlet to slice
             hv_graph["connections"].append({
                 "from": {"id": "inlet", "outlet": 0},
-                "to": {"id": "slice_{0}".format(i), "inlet": 0},
+                "to": {"id": f"slice_{i}", "inlet": 0},
                 "type": "-->"
             })
 
             # add connection from slice to outlet
             hv_graph["connections"].append({
-                "from": {"id": "slice_{0}".format(i), "outlet": 0},
-                "to": {"id": "outlet_{0}".format(i), "inlet": 0},
+                "from": {"id": f"slice_{i}", "outlet": 0},
+                "to": {"id": f"outlet_{i}", "inlet": 0},
                 "type": "-->"
             })
 

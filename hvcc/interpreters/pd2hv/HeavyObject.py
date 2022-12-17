@@ -40,7 +40,7 @@ class HeavyObject(PdObject):
         elif self.is_hvir:
             self.__obj_dict = HeavyObject.__HEAVY_IR_OBJS[obj_type]
         else:
-            assert False, "{0} is not a Heavy Lang or IR object.".format(obj_type)
+            assert False, f"{obj_type} is not a Heavy Lang or IR object."
 
         # resolve arguments
         obj_args = obj_args or []
@@ -56,20 +56,13 @@ class HeavyObject(PdObject):
                         a["value_type"])
                 except Exception as e:
                     self.add_error(
-                        "Heavy {0} cannot convert argument \"{1}\" with value \"{2}\" to type {3}: {4}".format(
-                            obj_type,
-                            a["name"],
-                            obj_args[i],
-                            a["value_type"],
-                            str(e)))
+                        f"Heavy {obj_type} cannot convert argument \"{a['name']}\""
+                        f" with value \"{obj_args[i]}\" to type {a['value_type']}: {e}")
             else:
                 # the default argument is required
                 if a["required"]:
                     self.add_error(
-                        "Required argument \"{0}\" to object {1} not present: {2}".format(
-                            a["name"],
-                            obj_type,
-                            obj_args))
+                        f"Required argument \"{a['name']}\" to object {obj_type} not present: {obj_args}")
                 else:
                     # don't worry about supplying a default,
                     # let hv2ir take care of it. pd2hv only passes on the
@@ -100,7 +93,7 @@ class HeavyObject(PdObject):
             return str(value)
         elif value_type == "boolean":
             if isinstance(value, str):
-                return value.strip().lower() not in ["false", "f", "0"]
+                return value.strip().lower() not in {"false", "f", "0"}
             else:
                 return bool(value)
         elif value_type == "floatarray":

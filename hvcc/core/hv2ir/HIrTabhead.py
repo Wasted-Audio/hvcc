@@ -21,7 +21,7 @@ class HIrTabhead(HeavyIrObject):
     """
 
     def __init__(self, obj_type, args=None, graph=None, annotations=None):
-        assert obj_type in ["__tabhead~f", "__tabhead"]
+        assert obj_type in {"__tabhead~f", "__tabhead"}
         HeavyIrObject.__init__(self, obj_type, args=args, graph=graph, annotations=annotations)
 
     def reduce(self):

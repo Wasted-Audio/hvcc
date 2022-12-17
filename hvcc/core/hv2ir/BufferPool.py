@@ -62,7 +62,7 @@ class BufferPool:
         """ Increases the retain count of the buffer. Returns the new count.
         """
         # adc~ and ZERO_BUFFER are special. They cannot be retained.
-        if b[0] in ["zero", "input"]:
+        if b[0] in {"zero", "input"}:
             return 0
         else:
             pool = self.pool[b[0]]
@@ -79,7 +79,7 @@ class BufferPool:
         # adc~, ZERO_BUFFER, send~ buffers are special. They can not be released.
         # if the buffer is otherwise unknown (as may be in the case that objects provide their own),
         # they cannot be released
-        if b[0] in ["zero", "input"]:
+        if b[0] in {"zero", "input"}:
             return 0
         else:
             pool = self.pool[b[0]]

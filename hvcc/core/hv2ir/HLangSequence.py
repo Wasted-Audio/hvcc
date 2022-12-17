@@ -31,13 +31,13 @@ class HLangSequence(HeavyLangObject):
     def reduce(self):
         cast_objs = []
         for a in self.args[self.name_for_arg()]:
-            if a in ["a", "anything", "l", "list"]:
+            if a in {"a", "anything", "l", "list"}:
                 cast_objs.append(None)  # pass through
-            elif a in ["b", "bang"]:
+            elif a in {"b", "bang"}:
                 cast_objs.append(HeavyIrObject("__cast_b", {}))
-            elif a in ["f", "float"]:
+            elif a in {"f", "float"}:
                 cast_objs.append(HeavyIrObject("__cast_f", {}))
-            elif a in ["s", "symbol"]:
+            elif a in {"s", "symbol"}:
                 cast_objs.append(HeavyIrObject("__cast_s", {}))
             else:
                 raise HeavyException(f"Unsupported cast type '{a}'.")

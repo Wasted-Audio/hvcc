@@ -78,7 +78,7 @@ class HeavyGraph(HeavyIrObject):
                     for k in self.args:
                         # replace all instances of $k with the argument value
                         # do this for all keys in the graph's argument dictionary
-                        dollar_key = "$" + k
+                        dollar_key = f"${k}"
                         if value.find(dollar_key) > -1:
                             if value == dollar_key:
                                 value = self.args[k]  # maintain the original data type
@@ -160,32 +160,32 @@ class HeavyGraph(HeavyIrObject):
             self.objs[obj_id] = obj
 
             # some object needs to be specially handled when added to the graph
-            if obj.type in ["inlet", "__inlet"]:
+            if obj.type in {"inlet", "__inlet"}:
                 self.inlet_connections.append([])
                 self.inlet_buffers.append(("zero", 0))
                 self.inlet_objs.append(obj)
                 # sort inlet objects according to their index, ascending
                 self.inlet_objs.sort(key=lambda o: o.args["index"])
-            elif obj.type in ["outlet", "__outlet"]:
+            elif obj.type in {"outlet", "__outlet"}:
                 self.outlet_connections.append([])
                 self.outlet_buffers.append(("zero", 0))
                 self.outlet_objs.append(obj)
                 self.outlet_objs.sort(key=lambda o: o.args["index"])
-            elif obj.type in ["adc"]:
+            elif obj.type in {"adc"}:
                 self.input_channel_set.update(obj.args["channels"])
-            elif obj.type in ["dac"]:
+            elif obj.type in {"dac"}:
                 # if the object is a dac, keep track of the output channels
                 # that this graph is writing to
                 self.output_channel_set.update(obj.args["channels"])
-            elif obj.type in ["receive", "__receive", "send", "__send"]:
+            elif obj.type in {"receive", "__receive", "send", "__send"}:
                 self.__register_named_object(obj, obj.name)
-            elif obj.type in ["table", "__table"]:
+            elif obj.type in {"table", "__table"}:
                 self.__register_named_object(
                     obj,
                     obj.name,
                     static=obj.static,
                     unique=True)
-            elif obj.type in ["var"] and obj.name is not None:
+            elif obj.type in {"var"} and obj.name is not None:
                 self.__register_named_object(
                     obj,
                     obj.name,
@@ -291,7 +291,7 @@ class HeavyGraph(HeavyIrObject):
                 del self.objs[k]
                 break
 
-        if o.type in ["receive", "__receive", "send", "__send"]:
+        if o.type in {"receive", "__receive", "send", "__send"}:
             self.__unregister_named_object(o, o.name)
 
     def get_inlet_object(self, index):
@@ -358,7 +358,7 @@ class HeavyGraph(HeavyIrObject):
         for o in self.objs.values():
             if o.type == "__graph" and recursive:
                 c += o.get_object_counter(recursive=True)
-            elif o.type in ["__inlet", "__outlet"]:
+            elif o.type in {"__inlet", "__outlet"}:
                 c[o.type[2:]] += 1  # remove leading "__"
             else:
                 c[o.type] += 1

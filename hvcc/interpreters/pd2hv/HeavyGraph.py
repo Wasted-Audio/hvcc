@@ -42,7 +42,7 @@ class HeavyGraph(PdObject):
             if i < len(self.obj_args):
                 arg_value = self.obj_args[i]
             elif a["required"]:
-                self.add_error("Required argument \"{0}\" not found.".format(a["name"]))
+                self.add_error(f"Required argument \"{a['name']}\" not found.")
                 continue
             else:
                 arg_value = a["default"]
@@ -50,12 +50,9 @@ class HeavyGraph(PdObject):
             try:
                 arg_value = HeavyObject.force_arg_type(arg_value, a["value_type"])
             except Exception as e:
-                self.add_error("Heavy {0} cannot convert argument \"{1}\" with value \"{2}\" to type {3}: {4}".format(
-                               self.obj_type,
-                               a["name"],
-                               arg_value,
-                               a["value_type"],
-                               str(e)))
+                self.add_error(
+                    f"Heavy {self.obj_type} cannot convert argument \"{a['name']}\""
+                    f" with value \"{arg_value}\" to type {a['value_type']}: {e}")
 
             # resolve all arguments for each object in the graph
             for o in self.hv_json["objects"].values():

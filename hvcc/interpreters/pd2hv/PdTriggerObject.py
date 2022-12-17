@@ -19,7 +19,7 @@ from .PdObject import PdObject
 
 class PdTriggerObject(PdObject):
     def __init__(self, obj_type, obj_args=None, pos_x=0, pos_y=0):
-        assert obj_type in ["trigger", "t"]
+        assert obj_type in {"trigger", "t"}
         PdObject.__init__(self, "trigger", obj_args, pos_x, pos_y)
 
         # convert all numeric casts to "f"

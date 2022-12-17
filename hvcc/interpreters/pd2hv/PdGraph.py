@@ -125,12 +125,12 @@ class PdGraph(PdObject):
 
     def validate_configuration(self):
         if self.is_root:
-            if any((o.obj_type in ["inlet~", "outlet~"]) for o in self.__objs):
+            if any((o.obj_type in {"inlet~", "outlet~"}) for o in self.__objs):
                 self.add_error(
                     "Top-level graphs may not contain inlet~ or outlet~ objects. "
                     "Use adc~ and dac~.",
                     NotificationEnum.ERROR_NO_TOPLEVEL_SIGNAL_LETS)
-            if any((o.obj_type in ["inlet", "outlet"]) for o in self.__objs):
+            if any((o.obj_type in {"inlet", "outlet"}) for o in self.__objs):
                 self.add_warning(
                     "Control inlets and outlets in top-level graphs don't do "
                     "anything. Use receive and send objects.")

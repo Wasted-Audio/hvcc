@@ -275,13 +275,13 @@ class HeavyLangObject:
                 fmt.append("m")
         return "".join(fmt)
 
-    def has_inlet_connection_format(self, fmts=[]):
+    def has_inlet_connection_format(self, fmts=None):
         """ Returns true if the object has given format at its inlets.
         """
         fmts = fmts if isinstance(fmts, list) else [fmts]
         return self._get_connection_format(self.inlet_connections) in fmts
 
-    def has_outlet_connection_format(self, fmts=[]):
+    def has_outlet_connection_format(self, fmts=None):
         """ Returns true if the object has given format at its outlets.
             Take either litteral or list as input.
         """

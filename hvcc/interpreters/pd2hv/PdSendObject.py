@@ -20,7 +20,7 @@ from .PdRaw import parse_pd_raw_args, PdRawException
 
 class PdSendObject(PdObject):
     def __init__(self, obj_type, obj_args=None, pos_x=0, pos_y=0):
-        assert obj_type in ["s", "send", "s~", "send~", "throw~"]
+        assert obj_type in {"s", "send", "s~", "send~", "throw~"}
         PdObject.__init__(self, obj_type, obj_args, pos_x, pos_y)
 
         self.__send_name = ""
@@ -32,7 +32,7 @@ class PdSendObject(PdObject):
             self.__send_name = self.obj_args[0]
 
             # only extern control rate sends
-            if obj_type in ["s", "send"]:
+            if obj_type in {"s", "send"}:
                 if self.obj_args[1] == "@hv_param":
                     self.__extern_type = "param"
                 elif self.obj_args[1] == "@hv_event":
@@ -59,7 +59,7 @@ class PdSendObject(PdObject):
                 "This object has no inlet connections. "
                 "It does nothing and will be removed.",
                 NotificationEnum.WARNING_USELESS_OBJECT)
-        if self.obj_type in ["s", "send"] and len(self._inlet_connections.get("1", [])) > 0:
+        if self.obj_type in {"s", "send"} and len(self._inlet_connections.get("1", [])) > 0:
             self.add_error(
                 "Connections to the right inlet of a send object "
                 "are not supported. A name should be given.",

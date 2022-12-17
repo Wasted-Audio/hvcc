@@ -39,13 +39,13 @@ def parse_pd_raw_args(args):
 
     args = replace_owl(args)  # TODO(dromer): deprecate @owl on next stable release
 
-    for raw_param in ['@raw', '@raw_min', '@raw_max', '@raw_default', '@raw_param']:
+    for raw_param in {'@raw', '@raw_min', '@raw_max', '@raw_default', '@raw_param'}:
         if raw_param not in args:
             continue
 
         i = args.index(raw_param)
 
-        if raw_param in ['@raw', '@raw_param']:
+        if raw_param in {'@raw', '@raw_param'}:
             try:
                 attrdict["raw"] = args[i + 1]
             except IndexError:
@@ -59,7 +59,7 @@ def parse_pd_raw_args(args):
                 except (IndexError, ValueError):
                     # otherwise keep default
                     pass
-        elif raw_param in ['@raw_min', '@raw_max', '@raw_default']:
+        elif raw_param in {'@raw_min', '@raw_max', '@raw_default'}:
             # make sure that it is a float value
             try:
                 attrdict[raw_param.split('@raw_')[1]] = float(args[i + 1])

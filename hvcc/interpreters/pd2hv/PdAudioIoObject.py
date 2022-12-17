@@ -19,7 +19,7 @@ from .PdObject import PdObject
 
 class PdAudioIoObject(PdObject):
     def __init__(self, obj_type, obj_args=None, pos_x=0, pos_y=0):
-        assert obj_type in ["adc~", "dac~"]
+        assert obj_type in {"adc~", "dac~"}
         PdObject.__init__(self, obj_type, obj_args, pos_x, pos_y)
 
     def validate_configuration(self):
@@ -27,9 +27,7 @@ class PdAudioIoObject(PdObject):
         for i, connections in self._inlet_connections.items():
             if any(c.conn_type == "-->" for c in connections):
                 self.add_error(
-                    "{0} does not support control connections (inlet {1}). They should be removed.".format(
-                        self.obj_type,
-                        i),
+                    f"{self.obj_type} does not support control connections (inlet {i}). They should be removed.",
                     NotificationEnum.ERROR_UNSUPPORTED_CONNECTION)
 
     def to_hv(self):

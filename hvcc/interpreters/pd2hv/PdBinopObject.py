@@ -61,7 +61,7 @@ class PdBinopObject(PdObject):
 
     @classmethod
     def get_supported_objects(clazz):
-        return list(PdBinopObject.__PD_HEAVY_DICT.keys())
+        return set(PdBinopObject.__PD_HEAVY_DICT.keys())
 
     def validate_configuration(self):
         # check signal objects for control connections and auto insert

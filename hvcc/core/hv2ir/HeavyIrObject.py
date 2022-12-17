@@ -93,12 +93,12 @@ class HeavyIrObject(HeavyLangObject):
     def inlet_requires_signal(self, inlet_index=0):
         """ Returns True if the indexed inlet requires a signal connection. False otherwise.
         """
-        return self.__obj_desc["inlets"][inlet_index] in ["~i>", "~f>"]
+        return self.__obj_desc["inlets"][inlet_index] in {"~i>", "~f>"}
 
     def outlet_requires_signal(self, inlet_index=0):
         """ Returns True if the indexed outlet requires a signal connection. False otherwise.
         """
-        return self.__obj_desc["outlets"][inlet_index] in ["~i>", "~f>"]
+        return self.__obj_desc["outlets"][inlet_index] in {"~i>", "~f>"}
 
     def reduce(self):
         # A Heavy IR object is already reduced. Returns itself and no connection changes.

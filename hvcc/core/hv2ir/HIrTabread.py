@@ -21,7 +21,7 @@ class HIrTabread(HeavyIrObject):
     """
 
     def __init__(self, obj_type, args=None, graph=None, annotations=None):
-        assert obj_type in ["__tabread~if", "__tabread~f", "__tabreadu~f", "__tabread"]
+        assert obj_type in {"__tabread~if", "__tabread~f", "__tabreadu~f", "__tabread"}
         HeavyIrObject.__init__(self, obj_type, args=args, graph=graph, annotations=annotations)
 
     def reduce(self):

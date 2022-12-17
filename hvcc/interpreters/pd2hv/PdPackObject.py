@@ -31,11 +31,11 @@ class PdPackObject(PdObject):
             try:
                 self.values.append(float(x))
             except Exception:
-                if (x in ["f", "float"]):
+                if x in {"f", "float"}:
                     self.values.append(0.0)
                 else:
                     self.add_error(
-                        "\"{0}\" argument to [pack] object not supported.".format(x),
+                        f"\"{x}\" argument to [pack] object not supported.",
                         NotificationEnum.ERROR_PACK_FLOAT_ARGUMENTS)
 
     def to_hv(self):

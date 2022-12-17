@@ -21,7 +21,7 @@ class HIrTabwrite(HeavyIrObject):
     """
 
     def __init__(self, obj_type, args=None, graph=None, annotations=None):
-        assert obj_type in ["__tabwrite~f", "__tabwrite_stoppable~f", "__tabwrite"]
+        assert obj_type in {"__tabwrite~f", "__tabwrite_stoppable~f", "__tabwrite"}
         HeavyIrObject.__init__(self, obj_type, args=args, graph=graph, annotations=annotations)
 
     def reduce(self):

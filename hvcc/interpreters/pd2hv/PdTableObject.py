@@ -20,7 +20,7 @@ from .PdObject import PdObject
 class PdTableObject(PdObject):
 
     def __init__(self, obj_type, obj_args=None, pos_x=0, pos_y=0):
-        assert obj_type in ["table"]
+        assert obj_type in {"table"}
         PdObject.__init__(self, obj_type, obj_args, pos_x, pos_y)
 
         self.__table_name = ""

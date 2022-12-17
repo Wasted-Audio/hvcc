@@ -20,7 +20,7 @@ from .PdObject import PdObject
 
 class PdSelectObject(PdObject):
     def __init__(self, obj_type, obj_args=None, pos_x=0, pos_y=0):
-        assert obj_type in ["select", "sel"]
+        assert obj_type in {"select", "sel"}
         PdObject.__init__(self, obj_type, obj_args, pos_x, pos_y)
 
         if len(obj_args) == 0:

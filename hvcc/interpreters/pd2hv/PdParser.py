@@ -380,7 +380,7 @@ class PdParser:
                                 pd_graph_class=clazz)
 
                             # register any object-specific warnings or errors
-                            if obj_type in ["rzero~", "rzero_rev~", "czero~", "czero_rev~"]:
+                            if obj_type in {"rzero~", "rzero_rev~", "czero~", "czero_rev~"}:
                                 g.add_warning(
                                     f"[{obj_type}] accepts only signal input. "
                                     "Arguments and control connections are ignored.")
@@ -424,7 +424,7 @@ class PdParser:
 
                         g.add_object(x)
 
-                    elif line[1] in ["floatatom", "symbolatom"]:
+                    elif line[1] in {"floatatom", "symbolatom"}:
                         self.obj_counter[line[1]] += 1
                         x = self.graph_from_file(
                             file_path=os.path.join(PdParser.__PDLIB_DIR, f"{line[1]}.pd"),
@@ -488,13 +488,13 @@ class PdParser:
                         pass  # don't do anything with this command
 
                     else:
-                        g.add_error("Don't know how to parse line: {0}".format(" ".join(line)))
+                        g.add_error(f"Don't know how to parse line: {' '.join(line)}")
 
                 elif line[0] == "#A":
                     obj_array.obj_args["values"].extend([float(f) for f in line[2:]])
 
                 else:
-                    g.add_error("Don't know how to parse line: {0}".format(" ".join(line)))
+                    g.add_error(f"Don't know how to parse line: {' '.join(line)}")
 
         except Exception as e:
             # bubble the Exception back to the root graph where the graph
