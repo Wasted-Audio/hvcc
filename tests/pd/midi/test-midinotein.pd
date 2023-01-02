@@ -1,0 +1,8 @@
+#N canvas 572 166 503 302 12;
+#X obj 97 61 notein;
+#X obj 97 132 print;
+#X obj 97 96 pack f f f;
+#X connect 0 0 2 0;
+#X connect 0 1 2 1;
+#X connect 0 2 2 2;
+#X connect 2 0 1 0;
