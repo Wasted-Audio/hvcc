@@ -15,6 +15,7 @@
 
 import os
 import unittest
+import subprocess
 
 from tests.framework.base_midi import TestPdMIDIBase
 
@@ -22,6 +23,16 @@ from tests.framework.base_midi import TestPdMIDIBase
 class TestPdMIDIPatches(TestPdMIDIBase):
     SCRIPT_DIR = os.path.dirname(__file__)
     TEST_DIR = os.path.join(os.path.dirname(__file__), "pd", "midi")
+
+    @classmethod
+    def setUpClass(cls):
+        command = "cd tests/src/; " \
+            "g++ create_test_midi.cpp midifile/src/MidiFile.cpp midifile/src/MidiEventList.cpp " \
+            "midifile/src/MidiMessage.cpp midifile/src/MidiEvent.cpp midifile/src/Binasc.cpp -I midifile/include/ " \
+            "-o create_test_midi ; " \
+            "./create_test_midi"
+
+        subprocess.run(command, capture_output=True, shell=True)
 
     def test_midinotein(self):
         self._test_midi_patch("test-midinotein.pd")
@@ -49,7 +60,7 @@ class TestPdMIDIPatches(TestPdMIDIBase):
 
     def test_midipolytouchin_channel(self):
         self._test_midi_patch("test-midipolytouchin-channel.pd")
-    
+
     def test_midipgmin(self):
         self._test_midi_patch("test-midipgmin.pd")
 
