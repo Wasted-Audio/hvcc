@@ -17,6 +17,7 @@ jobs:
       - uses: actions/checkout@v3
         with:
           lfs: true
+          submodules: true
       - name: Initialize lfs
         run: git lfs pull
       - name: Set up Python ${{ matrix.python-version }}
