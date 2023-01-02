@@ -38,6 +38,7 @@
 
 #define HV_HASH_NOTEOUT         0xD1D4AC2
 #define HV_HASH_CTLOUT          0xE5e2A040
+#define HV_HASH_POLYTOUCHOUT    0xD5ACA9D1
 #define HV_HASH_PGMOUT          0x8753E39E
 #define HV_HASH_TOUCHOUT        0x476D4387
 #define HV_HASH_BENDOUT         0xE8458013
