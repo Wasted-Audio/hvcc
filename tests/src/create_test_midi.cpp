@@ -24,7 +24,7 @@ using namespace smf;
 ///////////////////////////////////////////////////////////////////////////
 //
 // To compile:
-// g++ create_test_midi.cpp midifile/src/MidiFile.cpp midifile/src/MidiEventList.cpp midifile/src/MidiMessage.cpp midifile/src/MidiEvent.cpp midifile/src/Binasc.cpp -I midifile/include/ -o create_test_midi
+// clang++ create_test_midi.cpp midifile/src/MidiFile.cpp midifile/src/MidiEventList.cpp midifile/src/MidiMessage.cpp midifile/src/MidiEvent.cpp midifile/src/Binasc.cpp -I midifile/include/ -o create_test_midi
 //
 
 int main(int argc, char** argv) {

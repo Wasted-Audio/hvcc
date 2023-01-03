@@ -27,7 +27,7 @@ class TestPdMIDIPatches(TestPdMIDIBase):
     @classmethod
     def setUpClass(cls):
         command = "cd tests/src/; " \
-            "g++ create_test_midi.cpp midifile/src/MidiFile.cpp midifile/src/MidiEventList.cpp " \
+            "clang++ create_test_midi.cpp midifile/src/MidiFile.cpp midifile/src/MidiEventList.cpp " \
             "midifile/src/MidiMessage.cpp midifile/src/MidiEvent.cpp midifile/src/Binasc.cpp -I midifile/include/ " \
             "-o create_test_midi ; " \
             "./create_test_midi"
