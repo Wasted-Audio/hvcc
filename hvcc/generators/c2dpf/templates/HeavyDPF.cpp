@@ -357,6 +357,20 @@ void {{class_name}}::handleMidiSend(uint32_t sendHash, const HvMessage *m)
       writeMidiEvent(midiSendEvent);
       break;
     }
+    case HV_HASH_POLYTOUCHOUT:
+    {
+      uint8_t value = hv_msg_getFloat(m, 0);
+      uint8_t note = hv_msg_getFloat(m, 1);
+      uint8_t ch = hv_msg_getFloat(m, 2);
+
+      midiSendEvent.size = 3;
+      midiSendEvent.data[0] = 0xA0 | ch; // send Poly Aftertouch
+      midiSendEvent.data[1] = note;
+      midiSendEvent.data[2] = value;
+
+      writeMidiEvent(midiSendEvent);
+      break;
+    }
     case HV_HASH_PGMOUT:
     {
       uint8_t pgm = hv_msg_getFloat(m, 0);
