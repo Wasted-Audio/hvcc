@@ -1,12 +1,19 @@
-//
-// Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
-// Creation Date: Tue Jan  8 10:08:15 PST 2002
-// Last Modified: Mon Feb  9 21:24:41 PST 2015 Updated for C++11.
-// Filename:      ...sig/doc/examples/all/createmidifile/createmidifile.cpp
-// Syntax:        C++
-//
-// Description:   Demonstration of how to create a Multi-track MIDI file.
-//
+/**
+* Copyright (C) 2022 Wasted Audio
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 #include "MidiFile.h"
 #include <iostream>
@@ -23,8 +30,7 @@ using namespace smf;
 int main(int argc, char** argv) {
    MidiFile outputfile;        // create an empty MIDI file with one track
    outputfile.absoluteTicks();  // time information stored as absolute time
-                              // (will be coverted to delta time when written)
-   // outputfile.addTrack(2);     // Add another two tracks to the MIDI file
+                              // (will be converted to delta time when written)
    vector<uchar> midievent;     // temporary storage for MIDI events
    midievent.resize(3);        // set the size of the array to 3 bytes
    int tpq = 120;              // default value in MIDI file is 48
@@ -70,7 +76,6 @@ int main(int argc, char** argv) {
 
    int cc0[50] = {73,74,75,76,77,78,79,77,76,75,76,75,74,73,-1};
    int cc0rhythm[50] = {1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 2,-1};
-
 
    int cc1[50] = {59,60,61,62,63,62,63,62,61,60,59,58,57,56,55,-1};
    int cc1rhythm[50]= {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2,-1};
@@ -134,7 +139,7 @@ int main(int argc, char** argv) {
       actiontime += tpq * bend0rhythm[i];
       i++;
    }
-   
+
    // append second pitch bend to channel 1
    i = 0;
    actiontime = 0;
@@ -242,55 +247,3 @@ int main(int argc, char** argv) {
    outputfile.write("test_midi.mid"); // write Standard MIDI File twinkle.mid
    return 0;
 }
-
-
-/*  FUNCTIONS available in the MidiFile class:
-
-void absoluteTime(void);
-   Set the time information to absolute time.
-int addEvent(int aTrack, int aTime, vector<uchar>& midiData);
-   Add an event to the end of a MIDI track.
-int addTrack(void);
-   Add an empty track to the MIDI file.
-int addTrack(int count);
-   Add a number of empty tracks to the MIDI file.
-void deltaTime(void);
-   Set the time information to delta time.
-void deleteTrack(int aTrack);
-   remove a track from the MIDI file.
-void erase(void);
-   Empty the contents of the MIDI file, leaving one track with no data.
-MFEvent& getEvent(int aTrack, int anIndex);
-   Return a MIDI event from the Track.
-int getTimeState(void);
-   Indicates if the timestate is TIME_STATE_ABSOLUTE or TIME_STATE_DELTA.
-int getTrackState(void);
-   Indicates if the tracks are being processed as multiple tracks or
-   as a single track.
-int getTicksPerQuarterNote(void);
-   Returns the ticks per quarter note value from the MIDI file.
-int getTrackCount(void);
-   Returns the number of tracks in the MIDI file.
-int getNumTracks(void);
-   Alias for getTrackCount();
-int getNumEvents(int aTrack);
-   Return the number of events present in the given track.
-void joinTracks(void);
-   Merge all tracks together into one track.  This function is reversable,
-   unlike mergeTracks().
-void mergeTracks(int aTrack1, int aTrack2);
-   Combine the two tracks into a single track stored in Track1.  Track2
-   is deleted.
-int read(char* aFile);
-   Read the contents of a MIDI file into the MidiFile class data structure
-void setTicksPerQuarterNote    (int ticks);
-   Set the MIDI file's ticks per quarter note information
-void sortTrack(vector<MFEvent>& trackData);
-   If in absolute time, sort particular track into correct time order.
-void sortTracks(void);
-   If in absolute time, sort tracks into correct time order.
-
-*/
-
-
-

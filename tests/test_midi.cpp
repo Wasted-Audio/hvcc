@@ -20,7 +20,6 @@
 #include <stdlib.h>
 #include <set>
 
-// #include "Options.h"
 #include "MidiFile.h"
 #include "Heavy_heavy.h"
 #include "Heavy_heavy.hpp"
@@ -69,19 +68,13 @@ void printHook(HeavyContextInterface *c, const char *name, const char *s, const 
 }
 
 int main(int argc, const char *argv[]) {
-  // Options options;
   MidiFile midifile;
-  // if (options.getArgCount() > 1) midifile.read(options.getArg(2));
-  // else midifile.read(std::cin);
-
   midifile.read(argv[1]);
 
-  // const int numIterations = (argc > 1) ? atoi(argv[1]) : 1;
   const int numIterations = 1;
-
   const int numOutputChannels = 2;
+
   HeavyContextInterface *context = hv_heavy_new_with_options(48000.0, 10, 11, 0);
-  // HeavyContextInterface *context = hv_heavy_new(48000.0);
   hv_setPrintHook(context, &printHook);
 
   MidiEvent* mev;
@@ -90,7 +83,6 @@ int main(int argc, const char *argv[]) {
 
   for (int i = 0; i < numIterations; ++i) {
     for (int event=0; event < midifile[0].size(); event++) {
-      // std::cout << midifile[0].size();
       mev = &midifile[0][event];
 
       int status = (int)(*mev)[0];
@@ -98,11 +90,11 @@ int main(int argc, const char *argv[]) {
       int channel = status & 0x0f;
       int data1 = (int)(*mev)[1];
       int data2 = (int)(*mev)[2];
-      
+
       // realtime messages
       if(mrtSet.find(status) != mrtSet.end())
       {
-        context->sendMessageToReceiverV(HV_HASH_MIDIREALTIMEIN, 0, "ff", 
+        context->sendMessageToReceiverV(HV_HASH_MIDIREALTIMEIN, 0, "ff",
         (float) status);
       }
 
