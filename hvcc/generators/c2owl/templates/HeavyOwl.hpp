@@ -21,6 +21,7 @@
 
 #define HV_HASH_NOTEIN          0x67E37CA3
 #define HV_HASH_CTLIN           0x41BE0f9C
+#define HV_HASH_POLYTOUCHIN     0xBC530F59
 #define HV_HASH_PGMIN           0x2E1EA03D
 #define HV_HASH_TOUCHIN         0x553925BD
 #define HV_HASH_BENDIN          0x3083F0F7
@@ -29,6 +30,7 @@
 
 #define HV_HASH_NOTEOUT         0xD1D4AC2
 #define HV_HASH_CTLOUT          0xE5e2A040
+#define HV_HASH_POLYTOUCHOUT    0xD5ACA9D1
 #define HV_HASH_PGMOUT          0x8753E39E
 #define HV_HASH_TOUCHOUT        0x476D4387
 #define HV_HASH_BENDOUT         0xE8458013
@@ -173,6 +175,13 @@ public:
 	 0.0f, // velocity
 	 (float)msg.getChannel());
       break;
+    case POLY_KEY_PRESSURE:
+      context->sendMessageToReceiverV
+  (HV_HASH_POLYTOUCHIN, 0, "fff"
+   (float)msg.getChannelPressure(),
+   (float)msg.getStatus(),
+   (float)msg.getChannel());
+      break
     case CHANNEL_PRESSURE:
       context->sendMessageToReceiverV
 	(HV_HASH_TOUCHIN, 0, "ff",
