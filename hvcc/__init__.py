@@ -144,6 +144,7 @@ def compile_dataflow(
 ) -> OrderedDict:
 
     results: OrderedDict = OrderedDict()  # default value, empty dictionary
+    patch_meta = {}
 
     # basic error checking on input
     if os.path.isfile(in_path):
@@ -163,8 +164,6 @@ def compile_dataflow(
                     patch_meta = json.load(json_file)
                 except Exception as e:
                     return add_error(results, f"Unable to open json_file: {e}")
-    else:
-        patch_meta = {}
 
     patch_name = patch_name or "heavy"
     generators = ["c"] if generators is None else [x.lower() for x in generators]
