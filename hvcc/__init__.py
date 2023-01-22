@@ -26,7 +26,6 @@ from hvcc.interpreters.pd2hv import pd2hv
 from hvcc.core.hv2ir import hv2ir
 from hvcc.generators.ir2c import ir2c
 from hvcc.generators.ir2c import ir2c_perf
-from hvcc.generators.c2bela import c2bela
 from hvcc.generators.c2fabric import c2fabric
 from hvcc.generators.c2js import c2js
 from hvcc.generators.c2daisy import c2daisy
