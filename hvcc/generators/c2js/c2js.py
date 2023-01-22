@@ -19,6 +19,7 @@ import time
 import jinja2
 
 from shutil import which
+from typing import Dict, Optional
 
 from hvcc.core.hv2ir.HeavyException import HeavyException
 from ..copyright import copyright_manager
@@ -137,8 +138,18 @@ class c2js:
         return wasm_js_path
 
     @classmethod
-    def compile(clazz, c_src_dir, out_dir, externs, patch_name=None, patch_meta: dict = None,
-                num_input_channels=0, num_output_channels=0, copyright=None, verbose=False):
+    def compile(
+        clazz,
+        c_src_dir: str,
+        out_dir: str,
+        externs: Dict,
+        patch_name: Optional[str] = None,
+        patch_meta: Optional[Dict] = None,
+        num_input_channels: int = 0,
+        num_output_channels: int = 0,
+        copyright: Optional[str] = None,
+        verbose: Optional[bool] = False
+    ) -> Dict:
 
         tick = time.time()
 
