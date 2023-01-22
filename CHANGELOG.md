@@ -1,6 +1,15 @@
 CHANGELOG
 =====
 
+Next Release
+-----
+
+* abstractions: use duplicate of delread4~.pd for vd~.pd
+* deprecated: internal Bela implementation (use downstream instead)
+* docs: add notes
+* docs: fix markdown syntax
+* bugfixes: issues #87 and #86 
+
 0.6.3
 -----
 
