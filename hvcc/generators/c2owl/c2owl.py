@@ -4,6 +4,7 @@ import shutil
 import time
 import jinja2
 import json
+from typing import Dict, Optional
 from ..buildjson import buildjson
 from ..copyright import copyright_manager
 import hvcc.core.hv2ir.HeavyLangObject as HeavyLangObject
@@ -64,8 +65,18 @@ class c2owl:
             return jdata
 
     @classmethod
-    def compile(clazz, c_src_dir, out_dir, externs, patch_name=None, patch_meta: dict = None,
-                num_input_channels=0, num_output_channels=0, copyright=None, verbose=False):
+    def compile(
+        clazz,
+        c_src_dir: str,
+        out_dir: str,
+        externs: Dict,
+        patch_name: Optional[str] = None,
+        patch_meta: Optional[Dict] = None,
+        num_input_channels: int = 0,
+        num_output_channels: int = 0,
+        copyright: Optional[str] = None,
+        verbose: Optional[bool] = False
+    ) -> Dict:
 
         tick = time.time()
 

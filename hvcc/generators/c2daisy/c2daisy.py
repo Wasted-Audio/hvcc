@@ -3,9 +3,10 @@ import jinja2
 import os
 import shutil
 import time
+from typing import Dict, Optional
 from ..buildjson import buildjson
 from ..copyright import copyright_manager
-import json2daisy
+import json2daisy  # type: ignore
 from . import parameters
 
 
@@ -14,8 +15,18 @@ class c2daisy:
     """
 
     @classmethod
-    def compile(clazz, c_src_dir, out_dir, externs, patch_name=None, patch_meta: dict = None,
-                num_input_channels=0, num_output_channels=0, copyright=None, verbose=False):
+    def compile(
+        clazz,
+        c_src_dir: str,
+        out_dir: str,
+        externs: Dict,
+        patch_name: Optional[str] = None,
+        patch_meta: Optional[Dict] = None,
+        num_input_channels: int = 0,
+        num_output_channels: int = 0,
+        copyright: Optional[str] = None,
+        verbose: Optional[bool] = False
+    ) -> Dict:
 
         tick = time.time()
 
@@ -23,11 +34,11 @@ class c2daisy:
 
         if patch_meta:
             patch_name = patch_meta.get("name", patch_name)
-            daisy_meta = patch_meta.get("daisy")
+            daisy_meta = patch_meta.get("daisy", {})
         else:
             daisy_meta = {}
 
-        board = daisy_meta.get("board", "seed")
+        board = daisy_meta.get("board", "pod")
 
         copyright_c = copyright_manager.get_copyright_for_c(copyright)
         # copyright_plist = copyright or u"Copyright {0} Enzien Audio, Ltd." \

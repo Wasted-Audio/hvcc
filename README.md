@@ -1,10 +1,6 @@
-[![Build Status](https://github.com/Wasted-Audio/hvcc/actions/workflows/build.yml/badge.svg)](https://github.com/Wasted-Audio/hvcc/actions)
-
-This is an attempt to modernize `hvcc` to work with `python3` and add some additional targets.
-
-Not all functionality is being tested. Bugreports and feedback are appreciated.
-
 # Heavy Compiler Collection (hvcc)
+
+[![Build Status](https://github.com/Wasted-Audio/hvcc/actions/workflows/build.yml/badge.svg)](https://github.com/Wasted-Audio/hvcc/actions)
 
 `hvcc` is a python-based dataflow audio programming language compiler that generates C/C++ code and a variety of specific framework wrappers.
 
@@ -19,13 +15,14 @@ It has since then been expanded to provide further support for many different pl
 ## Requirements
 
 * python 3.7 or higher
-    - `jinja2` (for generator templating)
-    - `importlib_resources` (for reading static resources)
-    - `json2daisy` (for daisy integration)
-    - `tox` (for tests, optional)
-    - `clang/clang++` (for building tests, optional)
+  * `jinja2` (for generator templating)
+  * `importlib_resources` (for reading static resources)
+  * `json2daisy` (for daisy integration)
+  * `tox` (for tests, optional)
+  * `clang/clang++` (for building tests, optional)
 
 ## Installation
+
 hvcc is available from pypi.org and can be installed using python3 pip:
 
 `$ pip3 install hvcc`
@@ -90,13 +87,14 @@ A list of available generator options can be found [here](/docs/03.generators.md
 
 `hvcc` will iterate through various directories when resolving patch objects and abstractions. The `-p` or `--search_paths` argument can be used to add additional folders for `hvcc` to look in. Note that this argument is not needed for abstractions in the same folder as the top-level patch.
 
-This can be handy when using a third-party patch library for example https://github.com/Wasted-Audio/heavylib.
+This can be handy when using a third-party patch library like [heavylib](https://github.com/Wasted-Audio/heavylib) for example.
 
 Simply append any folder paths after the `-p` flag like so:
 
 `$ hvcc ~/myProject/_main.pd -o ~/Desktop/somewhere/else/ -n mySynth -p ~/Workspace/Projects/Enzien/heavylib/ ~/Desktop/myLib/`
 
 ### `-m` Meta Data
+
 `hvcc` can take extra meta-data via a supplied json file. It depends on the generator which fields are supported.
 
 ### `--copyright` User Copyright
@@ -116,11 +114,11 @@ Displays all the available parameters and options for hvcc.
 ## Documentation
 
 * [Introduction](/docs/01.introduction.md)
-  - [What is heavy?](/docs/01.introduction.md#what-is-heavy)
-  - [Supported patch formats](/docs/01.introduction.md#supported-patch-formats)
-  - [Supported platforms](/docs/01.introduction.md#supported-platforms)
-  - [Supported frameworks](/docs/01.introduction.md#supported-frameworks)
-  - [Licensing](/docs/01.introduction.md#licensing)
+  * [What is heavy?](/docs/01.introduction.md#what-is-heavy)
+  * [Supported patch formats](/docs/01.introduction.md#supported-patch-formats)
+  * [Supported platforms](/docs/01.introduction.md#supported-platforms)
+  * [Supported frameworks](/docs/01.introduction.md#supported-frameworks)
+  * [Licensing](/docs/01.introduction.md#licensing)
 * [Getting Started](/docs/02.getting_started.md)
 * [Generators](/docs/03.generators.md)
 * [MIDI](/docs/04.midi.md)
@@ -132,13 +130,15 @@ Displays all the available parameters and options for hvcc.
 * [Unsupported vanilla objects](/docs/10.unsupported_vanilla_objects.md)
 
 ## Contact
+
 There are several places where heavy/hvcc conversation is happening:
+
 * [Discord](https://discord.gg/fmxJveg)
 * [IRC](https://web.libera.chat/#hvcc)
 * A number of forums:
   * [Bela](https://forum.bela.io/?q=hvcc)
   * [Rebel Technology](https://community.rebeltech.org/tags/puredata)
-  * [Daisy](https://forum.electro-smith.com/t/pure-data/110)
+  * [Daisy](https://forum.electro-smith.com/c/integrations/pure-data/32)
   * [MOD](https://forum.moddevices.com/c/developers/pure-data/56)
 
 Or you can use the [discussions](https://github.com/Wasted-Audio/hvcc/discussions) tab of this repository
