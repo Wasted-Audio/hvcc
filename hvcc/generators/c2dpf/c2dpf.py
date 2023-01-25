@@ -88,6 +88,16 @@ class c2dpf:
                     receivers=receiver_list,
                     pool_sizes_kb=externs["memoryPoolSizesKb"],
                     copyright=copyright_c))
+            dpf_ui_path = os.path.join(source_dir, f"HeavyDPF_{patch_name}_UI.cpp")
+            with open(dpf_ui_path, "w") as f:
+                f.write(env.get_template("HeavyDPF_UI.cpp").render(
+                    name=patch_name,
+                    meta=dpf_meta,
+                    class_name=f"HeavyDPF_{patch_name}",
+                    num_input_channels=num_input_channels,
+                    num_output_channels=num_output_channels,
+                    receivers=receiver_list,
+                    copyright=copyright_c))
             dpf_h_path = os.path.join(source_dir, "DistrhoPluginInfo.h")
             with open(dpf_h_path, "w") as f:
                 f.write(env.get_template("DistrhoPluginInfo.h").render(
