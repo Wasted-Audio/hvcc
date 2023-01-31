@@ -165,7 +165,7 @@ def compile_dataflow(
                 except Exception as e:
                     return add_error(results, f"Unable to open json_file: {e}")
 
-    patch_name = patch_name or "heavy"
+    patch_name = patch_name or patch_meta.get("name", "heavy")  
     generators = ["c"] if generators is None else [x.lower() for x in generators]
 
     if in_path.endswith((".pd")):

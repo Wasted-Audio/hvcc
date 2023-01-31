@@ -21,13 +21,13 @@ CFLAGS += -Wno-unused-parameter
 CXXFLAGS += -Wno-unused-parameter
 
 {% if meta.plugin_formats is defined %}
-	{% for format in meta.plugin_formats %}
+	{%- for format in meta.plugin_formats %}
 TARGETS += {{format}}
-	{% endfor %}
+	{%- endfor %}
 {% else %}
 TARGETS += jack
 TARGETS += lv2_dsp
 TARGETS += vst
-{% endif %}
+{%- endif %}
 
 all: $(TARGETS)
