@@ -22,29 +22,29 @@ class ControlPrint(HeavyObject):
     preamble = "cPrint"
 
     @classmethod
-    def get_C_header_set(clazz):
+    def get_C_header_set(cls):
         return {"HvControlPrint.h"}
 
     @classmethod
-    def get_C_file_set(clazz):
+    def get_C_file_set(cls):
         return {"HvControlPrint.h", "HvControlPrint.c"}
 
     @classmethod
-    def get_C_init(clazz, obj_type, obj_id, args):
+    def get_C_init(cls, obj_type, obj_id, args):
         return []
 
     @classmethod
-    def get_C_free(clazz, obj_type, obj_id, args):
+    def get_C_free(cls, obj_type, obj_id, args):
         return []
 
     @classmethod
-    def get_C_onMessage(clazz, obj_type, obj_id, inlet_index, args):
+    def get_C_onMessage(cls, obj_type, obj_id, inlet_index, args):
         return [f"cPrint_onMessage(_c, m, \"{args['label']}\");"]
 
     @classmethod
-    def get_C_decl(clazz, obj_type, obj_id, args):
+    def get_C_decl(cls, obj_type, obj_id, args):
         return []
 
     @classmethod
-    def get_C_impl(clazz, obj_type, obj_id, on_message_list, obj_class_dict):
+    def get_C_impl(cls, obj_type, obj_id, on_message_list, obj_class_dict):
         return []

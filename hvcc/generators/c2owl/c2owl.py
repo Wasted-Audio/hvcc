@@ -19,7 +19,7 @@ class c2owl:
     """
 
     @classmethod
-    def make_jdata(clazz, patch_ir):
+    def make_jdata(cls, patch_ir):
         jdata = list()
 
         with open(patch_ir, mode="r") as f:
@@ -66,7 +66,7 @@ class c2owl:
 
     @classmethod
     def compile(
-        clazz,
+        cls,
         c_src_dir: str,
         out_dir: str,
         externs: Dict,

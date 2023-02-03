@@ -22,27 +22,27 @@ class SignalSamphold(HeavyObject):
     preamble = "sSamphold"
 
     @classmethod
-    def get_C_header_set(clazz):
+    def get_C_header_set(cls):
         return {"HvSignalSamphold.h"}
 
     @classmethod
-    def get_C_file_set(clazz):
+    def get_C_file_set(cls):
         return {"HvSignalSamphold.h", "HvSignalSamphold.c"}
 
     @classmethod
-    def get_C_init(clazz, obj_type, obj_id, args):
+    def get_C_init(cls, obj_type, obj_id, args):
         return ["sSamphold_init(&sSamphold_{0});".format(obj_id)]
 
     @classmethod
-    def get_C_free(clazz, obj_type, obj_id, args):
+    def get_C_free(cls, obj_type, obj_id, args):
         return []
 
     @classmethod
-    def get_C_onMessage(clazz, obj_type, obj_id, inlet_index, args):
+    def get_C_onMessage(cls, obj_type, obj_id, inlet_index, args):
         raise Exception()
 
     @classmethod
-    def get_C_process(clazz, process_dict, obj_type, obj_id, args):
+    def get_C_process(cls, process_dict, obj_type, obj_id, args):
         return [
             "__hv_samphold_f(&sSamphold_{0}, VIf({1}), VIf({2}), VOf({3}));".format(
                 process_dict["id"],

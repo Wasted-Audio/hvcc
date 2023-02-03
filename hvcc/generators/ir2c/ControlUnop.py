@@ -46,29 +46,29 @@ class ControlUnop(HeavyObject):
     preamble = "cUnop"
 
     @classmethod
-    def handles_type(clazz, obj_type):
+    def handles_type(cls, obj_type):
         """Returns true if the object type can be handled by this class
         """
         return obj_type in ControlUnop.__OPERATION_DICT
 
     @classmethod
-    def get_C_header_set(clazz):
+    def get_C_header_set(cls):
         return {"HvControlUnop.h"}
 
     @classmethod
-    def get_C_file_set(clazz):
+    def get_C_file_set(cls):
         return {"HvControlUnop.h", "HvControlUnop.c"}
 
     @classmethod
-    def get_C_init(clazz, obj_type, obj_id, args):
+    def get_C_init(cls, obj_type, obj_id, args):
         return []
 
     @classmethod
-    def get_C_free(clazz, obj_type, obj_id, args):
+    def get_C_free(cls, obj_type, obj_id, args):
         return []
 
     @classmethod
-    def get_C_onMessage(clazz, obj_type, obj_id, inlet_index, args):
+    def get_C_onMessage(cls, obj_type, obj_id, inlet_index, args):
         return [
             "cUnop_onMessage(_c, {1}, m, &cUnop_{0}_sendMessage);".format(
                 obj_id,

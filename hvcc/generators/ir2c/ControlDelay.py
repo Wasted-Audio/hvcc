@@ -22,38 +22,38 @@ class ControlDelay(HeavyObject):
     preamble = "cDelay"
 
     @classmethod
-    def get_C_header_set(clazz):
+    def get_C_header_set(cls):
         return {"HvControlDelay.h"}
 
     @classmethod
-    def get_C_file_set(clazz):
+    def get_C_file_set(cls):
         return {"HvControlDelay.h", "HvControlDelay.c"}
 
     @classmethod
-    def get_C_init(clazz, obj_type, obj_id, args):
+    def get_C_init(cls, obj_type, obj_id, args):
         return [
             "{0}_init(this, &{0}_{1}, {2}f);".format(
-                clazz.preamble,
+                cls.preamble,
                 obj_id,
                 float(args["delay"]))
         ]
 
     @classmethod
-    def get_C_free(clazz, obj_type, obj_id, args):
+    def get_C_free(cls, obj_type, obj_id, args):
         return []  # no need to free any control binop objects
 
     @classmethod
-    def get_C_onMessage(clazz, obj_type, obj_id, inlet_index, args):
+    def get_C_onMessage(cls, obj_type, obj_id, inlet_index, args):
         return [
             "{0}_onMessage(_c, &Context(_c)->{0}_{1}, {2}, m, "
             "&{0}_{1}_sendMessage);".format(
-                clazz.preamble,
+                cls.preamble,
                 obj_id,
                 inlet_index)
         ]
 
     @classmethod
-    def get_C_impl(clazz, obj_type, obj_id, on_message_list, get_obj_class, objects):
+    def get_C_impl(cls, obj_type, obj_id, on_message_list, get_obj_class, objects):
         send_message_list = [
             f"cDelay_{obj_id}_sendMessage(HeavyContextInterface *_c, int letIn, const HvMessage *const m) {{"
         ]

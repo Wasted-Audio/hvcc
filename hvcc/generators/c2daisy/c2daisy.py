@@ -16,7 +16,7 @@ class c2daisy:
 
     @classmethod
     def compile(
-        clazz,
+        cls,
         c_src_dir: str,
         out_dir: str,
         externs: Dict,

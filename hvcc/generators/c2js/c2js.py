@@ -58,7 +58,7 @@ class c2js:
     ]
 
     @classmethod
-    def run_emscripten(clazz, c_src_dir, out_dir, patch_name, output_name, post_js_path, should_modularize,
+    def run_emscripten(cls, c_src_dir, out_dir, patch_name, output_name, post_js_path, should_modularize,
                        environment, pre_js_path="", binaryen_async=1):
         """Run the emcc command to compile C source files to a javascript library.
         """
@@ -139,7 +139,7 @@ class c2js:
 
     @classmethod
     def compile(
-        clazz,
+        cls,
         c_src_dir: str,
         out_dir: str,
         externs: Dict,

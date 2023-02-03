@@ -23,7 +23,7 @@ import os
 class ir2c_perf:
 
     @classmethod
-    def perf(clazz, ir, blocksize=512, mhz=1000, verbose=False):
+    def perf(cls, ir, blocksize=512, mhz=1000, verbose=False):
         # read the hv.ir.json file
         with open(os.path.join(os.path.dirname(__file__), "../../core/json/heavy.ir.json"), "r") as f:
             HEAVY_IR_JSON = json.load(f)

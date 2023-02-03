@@ -24,19 +24,19 @@ class SignalTabread(HeavyObject):
     preamble = "sTabread"
 
     @classmethod
-    def get_C_header_set(clazz):
+    def get_C_header_set(cls):
         return {"HvSignalTabread.h"}
 
     @classmethod
-    def get_C_file_set(clazz):
+    def get_C_file_set(cls):
         return {"HvSignalTabread.h", "HvSignalTabread.c"}
 
     @classmethod
-    def get_C_free(clazz, obj_type, obj_id, args):
+    def get_C_free(cls, obj_type, obj_id, args):
         return []
 
     @classmethod
-    def get_C_init(clazz, obj_type, obj_id, args):
+    def get_C_init(cls, obj_type, obj_id, args):
         return [
             "sTabread_init(&sTabread_{0}, &hTable_{1}, {2});".format(
                 obj_id,
@@ -44,7 +44,7 @@ class SignalTabread(HeavyObject):
                 "true" if obj_type == "__tabread~f" else "false")]
 
     @classmethod
-    def get_C_onMessage(clazz, obj_type, obj_id, inlet_index, args):
+    def get_C_onMessage(cls, obj_type, obj_id, inlet_index, args):
         if obj_type in ["__tabread~f", "__tabreadu~f"]:
             return [
                 "sTabread_onMessage(_c, &Context(_c)->sTabread_{0}, {1}, m, &sTabread_{0}_sendMessage);".format(
@@ -57,7 +57,7 @@ class SignalTabread(HeavyObject):
                     inlet_index)]
 
     @classmethod
-    def get_C_process(clazz, process_dict, obj_type, obj_id, args):
+    def get_C_process(cls, process_dict, obj_type, obj_id, args):
         if obj_type == "__tabread~if":
             return [
                 "__hv_tabread_if(&sTabread_{0}, {1}, {2});".format(

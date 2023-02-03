@@ -22,15 +22,15 @@ class ControlSlice(HeavyObject):
     preamble = "cSlice"
 
     @classmethod
-    def get_C_header_set(clazz):
+    def get_C_header_set(cls):
         return {"HvControlSlice.h"}
 
     @classmethod
-    def get_C_file_set(clazz):
+    def get_C_file_set(cls):
         return {"HvControlSlice.h", "HvControlSlice.c"}
 
     @classmethod
-    def get_C_init(clazz, obj_type, obj_id, args):
+    def get_C_init(cls, obj_type, obj_id, args):
         return [
             "cSlice_init(&cSlice_{0}, {1}, {2});".format(
                 obj_id,
@@ -38,11 +38,11 @@ class ControlSlice(HeavyObject):
                 int(args["length"]))]
 
     @classmethod
-    def get_C_free(clazz, obj_type, obj_id, args):
+    def get_C_free(cls, obj_type, obj_id, args):
         return []  # nothing to free
 
     @classmethod
-    def get_C_onMessage(clazz, obj_type, obj_id, inlet_index, args):
+    def get_C_onMessage(cls, obj_type, obj_id, inlet_index, args):
         return [
             "cSlice_onMessage(_c, &Context(_c)->cSlice_{0}, {1}, m, &cSlice_{0}_sendMessage);".format(
                 obj_id,

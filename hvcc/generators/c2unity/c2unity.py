@@ -28,7 +28,7 @@ class c2unity:
     """
 
     @classmethod
-    def filter_xcode_build(clazz, s):
+    def filter_xcode_build(cls, s):
         """Return a build hash suitable for use in an Xcode project file.
         """
         s = f"{s}_build"
@@ -37,7 +37,7 @@ class c2unity:
         return s
 
     @classmethod
-    def filter_xcode_fileref(clazz, s):
+    def filter_xcode_fileref(cls, s):
         """Return a fileref hash suitable for use in an Xcode project file.
         """
         f"{s}_fileref"
@@ -46,18 +46,18 @@ class c2unity:
         return s
 
     @classmethod
-    def filter_string_cap(clazz, s, li):
+    def filter_string_cap(cls, s, li):
         """Returns a truncated string with ellipsis if it exceeds a certain length.
         """
         return s if (len(s) <= li) else f"{s[0:li - 3]}..."
 
     @classmethod
-    def filter_templates(clazz, template_name):
+    def filter_templates(cls, template_name):
         return False if os.path.basename(template_name) in [".DS_Store"] else True
 
     @classmethod
     def compile(
-        clazz,
+        cls,
         c_src_dir: str,
         out_dir: str,
         externs: Dict,

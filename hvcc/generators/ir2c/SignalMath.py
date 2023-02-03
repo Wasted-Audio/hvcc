@@ -77,17 +77,17 @@ class SignalMath(HeavyObject):
     }
 
     @classmethod
-    def handles_type(clazz, obj_type):
+    def handles_type(cls, obj_type):
         """Returns true if the object type can be handled by this class
         """
         return obj_type in SignalMath.__OPERATION_DICT
 
     @classmethod
-    def get_C_header_set(clazz):
+    def get_C_header_set(cls):
         return {"HvMath.h"}
 
     @classmethod
-    def get_C_process(clazz, process_dict, obj_type, obj_id, args):
+    def get_C_process(cls, process_dict, obj_type, obj_id, args):
         return [
             "{0}({1}, {2});".format(
                 SignalMath.__OPERATION_DICT[obj_type],

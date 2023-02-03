@@ -24,15 +24,15 @@ class SignalBiquad(HeavyObject):
     preamble = "sBiquad"
 
     @classmethod
-    def get_C_header_set(clazz):
+    def get_C_header_set(cls):
         return {"HvSignalBiquad.h"}
 
     @classmethod
-    def get_C_file_set(clazz):
+    def get_C_file_set(cls):
         return {"HvSignalBiquad.h", "HvSignalBiquad.c"}
 
     @classmethod
-    def get_C_def(clazz, obj_type, obj_id):
+    def get_C_def(cls, obj_type, obj_id):
         if obj_type == "__biquad_k~f":
             return [f"SignalBiquad_k sBiquad_k_{obj_id};"]
         elif obj_type == "__biquad~f":
@@ -41,7 +41,7 @@ class SignalBiquad(HeavyObject):
             raise Exception()
 
     @classmethod
-    def get_C_init(clazz, obj_type, obj_id, args):
+    def get_C_init(cls, obj_type, obj_id, args):
         if obj_type == "__biquad_k~f":
             return ["sBiquad_k_init(&sBiquad_k_{0}, {1}f, {2}f, {3}f, {4}f, {5}f);".format(
                 obj_id,
@@ -56,17 +56,17 @@ class SignalBiquad(HeavyObject):
             raise Exception()
 
     @classmethod
-    def get_C_free(clazz, obj_type, obj_id, args):
+    def get_C_free(cls, obj_type, obj_id, args):
         return []
 
     @classmethod
-    def get_C_onMessage(clazz, obj_type, obj_id, inlet_index, args):
+    def get_C_onMessage(cls, obj_type, obj_id, inlet_index, args):
         return ["sBiquad_k_onMessage(&Context(_c)->sBiquad_k_{0}, {1}, m);".format(
             obj_id,
             inlet_index)]
 
     @classmethod
-    def get_C_process(clazz, process_dict, obj_type, obj_id, args):
+    def get_C_process(cls, process_dict, obj_type, obj_id, args):
         if obj_type == "__biquad_k~f":
             return [
                 "__hv_biquad_k_f(&sBiquad_k_{0}, VIf({1}), VOf({2}));".format(

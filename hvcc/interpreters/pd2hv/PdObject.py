@@ -154,7 +154,7 @@ class PdObject:
         pass
 
     @classmethod
-    def get_supported_objects(clazz):
+    def get_supported_objects(cls):
         """ Returns a list of Pd objects that this class can parse.
         """
         raise NotImplementedError()

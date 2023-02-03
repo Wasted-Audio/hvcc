@@ -73,7 +73,7 @@ class HeavyIrObject(HeavyLangObject):
                             self.graph)
 
     @classmethod
-    def is_ir(clazz, obj_type):
+    def is_ir(cls, obj_type):
         """Returns true if the type is an IR object. False otherwise.
         """
         return obj_type in HeavyIrObject.__HEAVY_OBJS_IR_DICT

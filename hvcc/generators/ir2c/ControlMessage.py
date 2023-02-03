@@ -23,11 +23,11 @@ class ControlMessage(HeavyObject):
     preamble = "cMsg"
 
     @classmethod
-    def get_C_onMessage(clazz, obj_type, obj_id, inlet_index, args):
+    def get_C_onMessage(cls, obj_type, obj_id, inlet_index, args):
         return [f"cMsg_{obj_id}_sendMessage(_c, 0, m);"]
 
     @classmethod
-    def get_C_impl(clazz, obj_type, obj_id, on_message_list, get_obj_class, objects):
+    def get_C_impl(cls, obj_type, obj_id, on_message_list, get_obj_class, objects):
         send_message_list = [
             f"cMsg_{obj_id}_sendMessage(HeavyContextInterface *_c, int letIn, const HvMessage *const n) {{"
         ]

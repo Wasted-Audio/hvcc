@@ -127,7 +127,7 @@ class HeavyLangObject:
         }
 
     @classmethod
-    def force_arg_type(clazz, value, value_type, graph=None):
+    def force_arg_type(cls, value, value_type, graph=None):
         """ Attempts to convert a value to a given value type. Raises an Exception otherwise.
             If the value_type is unknown and a graph is provided, a warning will be registered.
         """
@@ -346,7 +346,7 @@ class HeavyLangObject:
             c.to_object._resolve_connection_types(obj_stack)  # turtle all the way down
 
     @classmethod
-    def get_hash(clazz, x):
+    def get_hash(cls, x):
         """ Compute the message element hash used by msg_getHash(). Returns a 32-bit integer.
         """
         if isinstance(x, float) or isinstance(x, int):

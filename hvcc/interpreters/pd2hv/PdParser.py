@@ -18,6 +18,7 @@ from collections import OrderedDict
 import decimal
 import os
 import re
+from typing import List, Dict, Optional, Type, Any
 
 from .HeavyObject import HeavyObject
 from .HeavyGraph import HeavyGraph              # pre-converted Heavy graphs
@@ -66,28 +67,28 @@ class PdParser:
         self.__search_paths = []
 
     @classmethod
-    def get_supported_objects(clazz):
+    def get_supported_objects(cls) -> List:
         """ Returns a set of all pd objects names supported by the parser.
         """
-        pd_objects = [os.path.splitext(f)[0] for f in os.listdir(clazz.__PDLIB_DIR) if f.endswith(".pd")]
+        pd_objects = [os.path.splitext(f)[0] for f in os.listdir(cls.__PDLIB_DIR) if f.endswith(".pd")]
         pd_objects.extend(PdParser.__PD_CLASSES.keys())
         return pd_objects
 
     @classmethod
-    def __get_hv_args(clazz, pd_path):
+    def __get_hv_args(cls, pd_path: str) -> OrderedDict:
         """ Pre-parse the file for Heavy arguments, such that they are available
             as soon as a graph is created.
         """
         num_canvas = -1
         hv_arg_dict = OrderedDict()
-        hv_arg_list = None
+        hv_arg_list: Optional[List] = None
         with open(pd_path, "r") as f:
             for li in f:
                 if li.startswith("#N canvas"):
                     hv_arg_list = []
                     hv_arg_dict[li.rstrip(";\r\n")] = hv_arg_list
                     num_canvas += 1
-                elif "@hv_arg" in li:
+                elif "@hv_arg" in li and hv_arg_list is not None:
                     hv_arg_list.append(li.rstrip(";\r\n"))
                 elif li.startswith("#X restore"):
                     num_canvas -= 1
@@ -95,7 +96,7 @@ class PdParser:
         return hv_arg_dict
 
     @classmethod
-    def __get_pd_line(clazz, pd_path):
+    def __get_pd_line(cls, pd_path: str):
         concat = ""  # concatination state
         with open(pd_path, "r") as f:
             for li in f:
@@ -110,20 +111,20 @@ class PdParser:
                 else:
                     concat = (f'{concat} {li}') if len(concat) > 0 else f'{li}'
 
-    def add_absolute_search_directory(self, search_dir):
+    def add_absolute_search_directory(self, search_dir: str) -> bool:
         if os.path.isdir(search_dir):
             self.__search_paths.append(search_dir)
             return True
         else:
             return False
 
-    def add_relative_search_directory(self, search_dir):
+    def add_relative_search_directory(self, search_dir: str) -> bool:
         search_dir = os.path.abspath(os.path.join(
             self.__search_paths[0],
             search_dir))
         return self.add_absolute_search_directory(search_dir)
 
-    def find_abstraction_path(self, local_dir, abs_name):
+    def find_abstraction_path(self, local_dir: str, abs_name: str) -> Optional[str]:
         """ Finds the full path for an abstraction.
             Checks the local directory first, then all declared paths.
         """
@@ -143,7 +144,15 @@ class PdParser:
 
         return None
 
-    def graph_from_file(self, file_path, obj_args=None, pos_x=0, pos_y=0, is_root=True, pd_graph_class=PdGraph):
+    def graph_from_file(
+        self,
+        file_path: str,
+        obj_args: Optional[List] = None,
+        pos_x: int = 0,
+        pos_y: int = 0,
+        is_root: bool = True,
+        pd_graph_class: Type[PdGraph] = PdGraph
+    ) -> Any:
         """ Instantiate a PdGraph from a file.
             Note that obj_args does not include $0.
             @param pd_graph_class  The python class to handle specific graph types
@@ -185,8 +194,18 @@ class PdParser:
 
         return g
 
-    def graph_from_canvas(self, file_iterator, file_hv_arg_dict, canvas_line, graph_args,
-                          pd_path, pos_x=0, pos_y=0, is_root=False, pd_graph_class=PdGraph):
+    def graph_from_canvas(
+        self,
+        file_iterator: List,
+        file_hv_arg_dict: Dict,
+        canvas_line: str,
+        graph_args: List,
+        pd_path: str,
+        pos_x: int = 0,
+        pos_y: int = 0,
+        is_root: bool = False,
+        pd_graph_class: Type[PdGraph] = PdGraph
+    ) -> Any:
         """ Instantiate a PdGraph from an existing canvas.
             Note that graph_args includes $0.
             @param file_hv_arg_dict  A dictionary containing all Heavy argument lines
@@ -194,7 +213,7 @@ class PdParser:
             @param canvas_line  The "#N canvas" which initiates this canvas.
             @param pd_graph_class  The python class to handle specific graph types
         """
-        obj_array = None  # an #A (table) object which is currently being parsed
+        obj_array: Optional[HeavyObject] = None  # an #A (table) object which is currently being parsed
 
         g = pd_graph_class(graph_args, pd_path, pos_x, pos_y)
 
@@ -352,7 +371,7 @@ class PdParser:
 
                             # mapping of pd/lib abstraction objects to classes
                             # for checking connection validity
-                            clazz = {
+                            cls = {
                                 "abs~": PdLibSignalGraph,
                                 "clip~": PdLibSignalGraph,
                                 "cos~": PdLibSignalGraph,
@@ -377,7 +396,7 @@ class PdParser:
                                 obj_args=obj_args,
                                 pos_x=int(line[2]), pos_y=int(line[3]),
                                 is_root=False,
-                                pd_graph_class=clazz)
+                                pd_graph_class=cls)
 
                             # register any object-specific warnings or errors
                             if obj_type in {"rzero~", "rzero_rev~", "czero~", "czero_rev~"}:
@@ -490,7 +509,7 @@ class PdParser:
                     else:
                         g.add_error(f"Don't know how to parse line: {' '.join(line)}")
 
-                elif line[0] == "#A":
+                elif line[0] == "#A" and obj_array is not None:
                     obj_array.obj_args["values"].extend([float(f) for f in line[2:]])
 
                 else:
@@ -509,7 +528,14 @@ class PdParser:
         return g
 
     @classmethod
-    def __resolve_object_args(clazz, obj_type, obj_args, graph, raise_on_failure=True, is_root=False):
+    def __resolve_object_args(
+        cls,
+        obj_type: str,
+        obj_args: List,
+        graph: PdGraph,
+        raise_on_failure: bool = True,
+        is_root: bool = False
+    ):
         """ Resolve object arguments against the given graph arguments.
             By default this function raises an Exception if it cannot resolve an
             argument.
@@ -592,7 +618,7 @@ class PdParser:
         __PD_CLASSES[o] = PdBinopObject
 
     @classmethod
-    def __is_float(clazz, x):
+    def __is_float(cls, x: int) -> bool:
         """ Returns True if the input can be converted to a float. False otherwise.
         """
         try:

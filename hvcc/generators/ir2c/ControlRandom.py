@@ -22,27 +22,27 @@ class ControlRandom(HeavyObject):
     preamble = "cRandom"
 
     @classmethod
-    def get_C_header_set(clazz):
+    def get_C_header_set(cls):
         return {"HvControlRandom.h"}
 
     @classmethod
-    def get_C_file_set(clazz):
+    def get_C_file_set(cls):
         return {"HvControlRandom.h", "HvControlRandom.c"}
 
     @classmethod
-    def get_C_init(clazz, obj_type, obj_id, args):
+    def get_C_init(cls, obj_type, obj_id, args):
         return [
             "{0}_init(&{0}_{1}, {2});".format(
-                clazz.preamble, obj_id, int(args["seed"]))
+                cls.preamble, obj_id, int(args["seed"]))
         ]
 
     @classmethod
-    def get_C_free(clazz, obj_type, obj_id, args):
+    def get_C_free(cls, obj_type, obj_id, args):
         return []  # no need to free any control binop objects
 
     @classmethod
-    def get_C_onMessage(clazz, obj_type, obj_id, inlet_index, args):
+    def get_C_onMessage(cls, obj_type, obj_id, inlet_index, args):
         return [
             "{0}_onMessage(_c, &Context(_c)->{0}_{1}, {2}, m, "
-            "&{0}_{1}_sendMessage);".format(clazz.preamble, obj_id, inlet_index)
+            "&{0}_{1}_sendMessage);".format(cls.preamble, obj_id, inlet_index)
         ]

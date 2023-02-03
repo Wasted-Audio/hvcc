@@ -24,11 +24,11 @@ class SignalRPole(HeavyObject):
     preamble = "sRPole"
 
     @classmethod
-    def get_C_header_set(clazz):
+    def get_C_header_set(cls):
         return {"HvSignalRPole.h", "HvSignalDel1.h", "HvMath.h"}
 
     @classmethod
-    def get_C_file_set(clazz):
+    def get_C_file_set(cls):
         return {
             "HvSignalRPole.h", "HvSignalRPole.c",
             "HvSignalDel1.h", "HvSignalDel1.c",
@@ -36,19 +36,19 @@ class SignalRPole(HeavyObject):
         }
 
     @classmethod
-    def get_C_def(clazz, obj_type, obj_id):
+    def get_C_def(cls, obj_type, obj_id):
         return ["SignalRPole sRPole_{0};".format(obj_id)]
 
     @classmethod
-    def get_C_init(clazz, obj_type, obj_id, args):
+    def get_C_init(cls, obj_type, obj_id, args):
         return ["sRPole_init(&sRPole_{0});".format(obj_id)]
 
     @classmethod
-    def get_C_free(clazz, obj_type, obj_id, args):
+    def get_C_free(cls, obj_type, obj_id, args):
         return []
 
     @classmethod
-    def get_C_process(clazz, process_dict, obj_type, obj_id, args):
+    def get_C_process(cls, process_dict, obj_type, obj_id, args):
         return [
             "__hv_rpole_f(&sRPole_{0}, VIf({1}), VIf({2}), VOf({3}));".format(
                 process_dict["id"],

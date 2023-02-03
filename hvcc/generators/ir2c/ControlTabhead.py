@@ -24,26 +24,26 @@ class ControlTabhead(HeavyObject):
     preamble = "cTabhead"
 
     @classmethod
-    def get_C_header_set(clazz):
+    def get_C_header_set(cls):
         return {"HvControlTabhead.h"}
 
     @classmethod
-    def get_C_file_set(clazz):
+    def get_C_file_set(cls):
         return {"HvControlTabhead.h", "HvControlTabhead.c"}
 
     @classmethod
-    def get_C_free(clazz, obj_type, obj_id, args):
+    def get_C_free(cls, obj_type, obj_id, args):
         return []
 
     @classmethod
-    def get_C_init(clazz, obj_type, obj_id, args):
+    def get_C_init(cls, obj_type, obj_id, args):
         return [
             "cTabhead_init(&cTabhead_{0}, &hTable_{1});".format(
                 obj_id,
                 args["table_id"])]
 
     @classmethod
-    def get_C_onMessage(clazz, obj_type, obj_id, inlet_index, args):
+    def get_C_onMessage(cls, obj_type, obj_id, inlet_index, args):
         return [
             "cTabhead_onMessage(_c, &Context(_c)->cTabhead_{0}, 0, m, &cTabhead_{0}_sendMessage);".format(
                 obj_id)]

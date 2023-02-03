@@ -28,33 +28,33 @@ class c2fabric:
     """
 
     @classmethod
-    def filter_xcode_copy(clazz, s):
+    def filter_xcode_copy(cls, s):
         """Return a copyref hash suitable for use in an Xcode project file.
         """
         s = hashlib.md5(f"{s}_copy".encode('utf-8'))
         return s.hexdigest().upper()[0:24]
 
     @classmethod
-    def filter_xcode_build(clazz, s):
+    def filter_xcode_build(cls, s):
         """Return a build hash suitable for use in an Xcode project file.
         """
         s = hashlib.md5(f"{s}_build".encode('utf-8'))
         return s.hexdigest().upper()[0:24]
 
     @classmethod
-    def filter_xcode_fileref(clazz, s):
+    def filter_xcode_fileref(cls, s):
         """Return a fileref hash suitable for use in an Xcode project file.
         """
         s = hashlib.md5(f"{s}_fileref".encode('utf-8'))
         return s.hexdigest().upper()[0:24]
 
     @classmethod
-    def filter_templates(clazz, template_name):
+    def filter_templates(cls, template_name):
         return False if os.path.basename(template_name) in [".DS_Store"] else True
 
     @classmethod
     def compile(
-        clazz,
+        cls,
         c_src_dir: str,
         out_dir: str,
         externs: Dict,

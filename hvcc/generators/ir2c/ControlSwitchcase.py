@@ -22,26 +22,26 @@ class ControlSwitchcase(HeavyObject):
     preamble = "cSwichcase"
 
     @classmethod
-    def get_C_def(clazz, obj_type, obj_id):
+    def get_C_def(cls, obj_type, obj_id):
         return []
 
     @classmethod
-    def get_C_free(clazz, obj_type, obj_id, args):
+    def get_C_free(cls, obj_type, obj_id, args):
         return []
 
     @classmethod
-    def get_C_decl(clazz, obj_type, obj_id, args):
+    def get_C_decl(cls, obj_type, obj_id, args):
         return [
             f"cSwitchcase_{obj_id}_onMessage(HeavyContextInterface *, void *, int letIn, "
             "const HvMessage *const, void *);"
         ]
 
     @classmethod
-    def get_C_onMessage(clazz, obj_type, obj_id, inlet_index, args):
+    def get_C_onMessage(cls, obj_type, obj_id, inlet_index, args):
         return [f"cSwitchcase_{obj_id}_onMessage(_c, NULL, {inlet_index}, m, NULL);"]
 
     @classmethod
-    def get_C_impl(clazz, obj_type, obj_id, on_message_list, obj_class_dict, objects):
+    def get_C_impl(cls, obj_type, obj_id, on_message_list, obj_class_dict, objects):
         # generate the onMessage implementation
         out_list = [
             f"cSwitchcase_{obj_id}_onMessage(HeavyContextInterface *_c, void *o, int letIn, "

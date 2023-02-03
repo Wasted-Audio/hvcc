@@ -47,7 +47,7 @@ class PdTriggerObject(PdObject):
         }
 
     @classmethod
-    def __is_float(clazz, x):
+    def __is_float(cls, x):
         """ Returns True if the input can be converted to a float. False otherwise.
         """
         try:

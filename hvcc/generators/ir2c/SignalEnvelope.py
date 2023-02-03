@@ -22,15 +22,15 @@ class SignalEnvelope(HeavyObject):
     preamble = "sEnv"
 
     @classmethod
-    def get_C_header_set(clazz):
+    def get_C_header_set(cls):
         return {"HvSignalEnvelope.h"}
 
     @classmethod
-    def get_C_file_set(clazz):
+    def get_C_file_set(cls):
         return {"HvSignalEnvelope.h", "HvSignalEnvelope.c"}
 
     @classmethod
-    def get_C_init(clazz, obj_type, obj_id, args):
+    def get_C_init(cls, obj_type, obj_id, args):
         return [
             "sEnv_init(&sEnv_{0}, {1}, {2});".format(
                 obj_id,
@@ -39,7 +39,7 @@ class SignalEnvelope(HeavyObject):
         ]
 
     @classmethod
-    def get_C_process(clazz, process_dict, obj_type, obj_id, args):
+    def get_C_process(cls, process_dict, obj_type, obj_id, args):
         return [
             "sEnv_process(this, &sEnv_{0}, VIf({1}), &sEnv_{0}_sendMessage);".format(
                 process_dict["id"],

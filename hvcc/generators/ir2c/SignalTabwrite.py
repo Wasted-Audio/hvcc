@@ -24,26 +24,26 @@ class SignalTabwrite(HeavyObject):
     preamble = "sTabwrite"
 
     @classmethod
-    def get_C_header_set(clazz):
+    def get_C_header_set(cls):
         return {"HvSignalTabwrite.h"}
 
     @classmethod
-    def get_C_file_set(clazz):
+    def get_C_file_set(cls):
         return {"HvSignalTabwrite.h", "HvSignalTabwrite.c"}
 
     @classmethod
-    def get_C_free(clazz, obj_type, obj_id, args):
+    def get_C_free(cls, obj_type, obj_id, args):
         return []
 
     @classmethod
-    def get_C_init(clazz, obj_type, obj_id, args):
+    def get_C_init(cls, obj_type, obj_id, args):
         return [
             "sTabwrite_init(&sTabwrite_{0}, &hTable_{1});".format(
                 obj_id,
                 args["table_id"])]
 
     @classmethod
-    def get_C_onMessage(clazz, obj_type, obj_id, inlet_index, args):
+    def get_C_onMessage(cls, obj_type, obj_id, inlet_index, args):
         return [
             "sTabwrite_onMessage(_c, &Context(_c)->sTabwrite_{0}, {1}, m, NULL);".format(
                 obj_id,
@@ -51,7 +51,7 @@ class SignalTabwrite(HeavyObject):
         ]
 
     @classmethod
-    def get_C_process(clazz, process_dict, obj_type, obj_id, args):
+    def get_C_process(cls, process_dict, obj_type, obj_id, args):
         if obj_type == "__tabwrite~f":
             return [
                 "__hv_tabwrite_f(&sTabwrite_{0}, {1});".format(

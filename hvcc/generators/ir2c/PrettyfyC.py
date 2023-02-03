@@ -19,7 +19,7 @@ import os
 class PrettyfyC:
 
     @classmethod
-    def prettyfy_file(clazz, file_in, file_out, indent=0, step=2, delete_input_on_finish=False):
+    def prettyfy_file(cls, file_in, file_out, indent=0, step=2, delete_input_on_finish=False):
         with open(file_in, "r") as f:
             with open(file_out, "w") as g:
                 for line in f:
@@ -32,7 +32,7 @@ class PrettyfyC:
             os.path.delete(file_in)
 
     @classmethod
-    def prettyfy_list(clazz, list_in, indent=0, step=2):
+    def prettyfy_list(cls, list_in, indent=0, step=2):
         g = []
         for line in list_in:
             indent -= line.count("}")

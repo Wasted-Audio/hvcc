@@ -26,15 +26,15 @@ class ControlVar(HeavyObject):
     preamble = "cVar"
 
     @classmethod
-    def get_C_header_set(clazz):
+    def get_C_header_set(cls):
         return {"HvControlVar.h"}
 
     @classmethod
-    def get_C_file_set(clazz):
+    def get_C_file_set(cls):
         return {"HvControlVar.h", "HvControlVar.c"}
 
     @classmethod
-    def get_C_init(clazz, obj_type, obj_id, args):
+    def get_C_init(cls, obj_type, obj_id, args):
         if isinstance(args["k"], str):
             return [
                 "cVar_init_s(&cVar_{0}, \"{1}\");".format(
@@ -47,11 +47,11 @@ class ControlVar(HeavyObject):
                     float(args["k"]))]
 
     @classmethod
-    def get_C_free(clazz, obj_type, obj_id, args):
+    def get_C_free(cls, obj_type, obj_id, args):
         return []
 
     @classmethod
-    def get_C_onMessage(clazz, obj_type, obj_id, inlet_index, args):
+    def get_C_onMessage(cls, obj_type, obj_id, inlet_index, args):
         return [
             "cVar_onMessage(_c, &Context(_c)->cVar_{0}, {1}, m, &cVar_{0}_sendMessage);".format(
                 obj_id,

@@ -22,15 +22,15 @@ class ControlSystem(HeavyObject):
     preamble = "cSystem"
 
     @classmethod
-    def get_C_header_set(clazz):
+    def get_C_header_set(cls):
         return {"HvControlSystem.h"}
 
     @classmethod
-    def get_C_file_set(clazz):
+    def get_C_file_set(cls):
         return {"HvControlSystem.h", "HvControlSystem.c"}
 
     @classmethod
-    def get_C_onMessage(clazz, obj_type, obj_id, inlet_index, args):
+    def get_C_onMessage(cls, obj_type, obj_id, inlet_index, args):
         return [
             "cSystem_onMessage(_c, NULL, {1}, m, &cSystem_{0}_sendMessage);".format(
                 obj_id,

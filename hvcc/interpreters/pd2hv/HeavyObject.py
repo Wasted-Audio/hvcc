@@ -16,6 +16,7 @@
 import decimal
 import json
 import importlib_resources
+from typing import Optional, List
 
 from .NotificationEnum import NotificationEnum
 from .PdObject import PdObject
@@ -31,7 +32,13 @@ class HeavyObject(PdObject):
     with open(heavy_ir_json, "r") as f:
         __HEAVY_IR_OBJS = json.load(f)
 
-    def __init__(self, obj_type, obj_args=None, pos_x=0, pos_y=0):
+    def __init__(
+        self,
+        obj_type,
+        obj_args: Optional[List] = None,
+        pos_x: int = 0,
+        pos_y: int = 0
+    ):
         PdObject.__init__(self, obj_type, obj_args, pos_x, pos_y)
 
         # get the object dictionary (note that it is NOT a copy)
@@ -78,7 +85,7 @@ class HeavyObject(PdObject):
             self.__annotations["scope"] = "public"
 
     @classmethod
-    def force_arg_type(clazz, value, value_type):
+    def force_arg_type(cls, value, value_type):
         # TODO(mhroth): add support for mixedarray?
         if value_type == "auto":
             try:

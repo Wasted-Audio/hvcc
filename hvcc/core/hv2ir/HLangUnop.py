@@ -52,7 +52,7 @@ class HLangUnop(HeavyLangObject):
                                  annotations=annotations)
 
     @classmethod
-    def handles_type(clazz, obj_type):
+    def handles_type(cls, obj_type):
         """ Returns True if this class handles the given object type. False otherwise.
         """
         return obj_type in HLangUnop.__HEAVY_DICT

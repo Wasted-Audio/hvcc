@@ -22,15 +22,15 @@ class SignalLorenz(HeavyObject):
     preamble = "sLorenz"
 
     @classmethod
-    def get_C_header_set(clazz):
+    def get_C_header_set(cls):
         return {"HvSignalLorenz.h"}
 
     @classmethod
-    def get_C_file_set(clazz):
+    def get_C_file_set(cls):
         return {"HvSignalLorenz.h", "HvSignalLorenz.c", "HvMath.h"}
 
     @classmethod
-    def get_C_init(clazz, obj_type, obj_id, args):
+    def get_C_init(cls, obj_type, obj_id, args):
         return [
             "sLorenz_init(&sLorenz_{0}, {1}f, {2}f, {3}f);".format(
                 obj_id,
@@ -40,11 +40,11 @@ class SignalLorenz(HeavyObject):
         ]
 
     @classmethod
-    def get_C_free(clazz, obj_type, obj_id, args):
+    def get_C_free(cls, obj_type, obj_id, args):
         return []  # nothing to free
 
     @classmethod
-    def get_C_onMessage(clazz, obj_type, obj_id, inlet_index, args):
+    def get_C_onMessage(cls, obj_type, obj_id, inlet_index, args):
         return [
             "sLorenz_onMessage(_c, &Context(_c)->sLorenz_{0}, {1}, m);".format(
                 obj_id,
@@ -52,7 +52,7 @@ class SignalLorenz(HeavyObject):
         ]
 
     @classmethod
-    def get_C_process(clazz, process_dict, obj_type, obj_id, args):
+    def get_C_process(cls, process_dict, obj_type, obj_id, args):
         return [
             "__hv_lorenz_f(&sLorenz_{0}, {1}, {2});".format(
                 process_dict["id"],

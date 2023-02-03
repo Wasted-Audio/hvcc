@@ -30,7 +30,7 @@ class SignalVar(HeavyObject):
     }
 
     @classmethod
-    def get_c_struct(clazz, obj_type):
+    def get_c_struct(cls, obj_type):
         if obj_type == "__var~f":
             return "SignalVarf"
         elif obj_type == "__var~i":
@@ -39,25 +39,25 @@ class SignalVar(HeavyObject):
             raise Exception()
 
     @classmethod
-    def get_preamble(clazz, obj_type):
+    def get_preamble(cls, obj_type):
         return SignalVar.__OPERATION_DICT[obj_type]
 
     @classmethod
-    def handles_type(clazz, obj_type):
+    def handles_type(cls, obj_type):
         """Returns true if the object type can be handled by this class
         """
         return obj_type in SignalVar.__OPERATION_DICT
 
     @classmethod
-    def get_C_header_set(clazz):
+    def get_C_header_set(cls):
         return {"HvSignalVar.h"}
 
     @classmethod
-    def get_C_file_set(clazz):
+    def get_C_file_set(cls):
         return {"HvSignalVar.h", "HvSignalVar.c"}
 
     @classmethod
-    def get_C_init(clazz, obj_type, obj_id, args):
+    def get_C_init(cls, obj_type, obj_id, args):
         assert obj_type in ["__var~f", "__var~i"], obj_type
         return [
             "{0}_init(&{0}_{1}, {2}, {3}, {4});".format(
@@ -68,11 +68,11 @@ class SignalVar(HeavyObject):
                 "true" if args["reverse"] else "false")]
 
     @classmethod
-    def get_C_free(clazz, obj_type, obj_id, args):
+    def get_C_free(cls, obj_type, obj_id, args):
         return []
 
     @classmethod
-    def get_C_onMessage(clazz, obj_type, obj_id, inlet_index, args):
+    def get_C_onMessage(cls, obj_type, obj_id, inlet_index, args):
         assert obj_type in ["__var~f", "__var~i"]
         return [
             "{0}_onMessage(_c, &Context(_c)->{0}_{1}, m);".format(
@@ -80,7 +80,7 @@ class SignalVar(HeavyObject):
                 obj_id)]
 
     @classmethod
-    def get_C_process(clazz, process_dict, obj_type, obj_id, args):
+    def get_C_process(cls, process_dict, obj_type, obj_id, args):
         fmt = obj_type[-1]
         if obj_type in ["__var~f", "__var~i"]:
             # NOTE(mhroth): signal rate variables do not process anything

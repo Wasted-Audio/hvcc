@@ -30,12 +30,12 @@ class HeavyObject:
     }
 
     @classmethod
-    def get_c_struct(clazz, obj_type=""):
-        return clazz.c_struct
+    def get_c_struct(cls, obj_type=""):
+        return cls.c_struct
 
     @classmethod
-    def get_preamble(clazz, obj_type):
-        return clazz.preamble
+    def get_preamble(cls, obj_type):
+        return cls.preamble
 
     @classmethod
     def get_C_header_set(self):
@@ -46,29 +46,29 @@ class HeavyObject:
         return set()
 
     @classmethod
-    def get_C_def(clazz, obj_type, obj_id):
+    def get_C_def(cls, obj_type, obj_id):
         return ["{0} {1}_{2};".format(
-            clazz.get_c_struct(obj_type),
-            clazz.get_preamble(obj_type),
+            cls.get_c_struct(obj_type),
+            cls.get_preamble(obj_type),
             obj_id)]
 
     @classmethod
-    def get_C_free(clazz, obj_type, obj_id, args):
+    def get_C_free(cls, obj_type, obj_id, args):
         return ["{0}_free(&{0}_{1});".format(
-            clazz.get_preamble(obj_type),
+            cls.get_preamble(obj_type),
             obj_id)]
 
     @classmethod
-    def get_C_decl(clazz, obj_type, obj_id, args):
+    def get_C_decl(cls, obj_type, obj_id, args):
         return ["{0}_{1}_sendMessage(HeavyContextInterface *, int, const HvMessage *);".format(
-                clazz.get_preamble(obj_type),
+                cls.get_preamble(obj_type),
                 obj_id)]
 
     @classmethod
-    def get_C_impl(clazz, obj_type, obj_id, on_message_list, get_obj_class, objects):
+    def get_C_impl(cls, obj_type, obj_id, on_message_list, get_obj_class, objects):
         send_message_list = [
             "{0}_{1}_sendMessage(HeavyContextInterface *_c, int letIn, const HvMessage *m) {{".format(
-                clazz.get_preamble(obj_type),
+                cls.get_preamble(obj_type),
                 obj_id)]
         if len(on_message_list) == 1:
             # if there is only one outlet, skip the switch-case template
@@ -88,15 +88,15 @@ class HeavyObject:
         return send_message_list
 
     @classmethod
-    def get_C_process(clazz, process_dict, obj_type, obj_id, args):
+    def get_C_process(cls, process_dict, obj_type, obj_id, args):
         raise NotImplementedError("method get_C_process not implemented")
 
     @classmethod
-    def get_C_onMessage(clazz, obj_type, obj_id, inlet_index, args):
+    def get_C_onMessage(cls, obj_type, obj_id, inlet_index, args):
         raise NotImplementedError("method get_C_onMessage not implemented")
 
     @classmethod
-    def _get_on_message_list(clazz, on_message_list, get_obj_class, objects):
+    def _get_on_message_list(cls, on_message_list, get_obj_class, objects):
         out_list = []
         for om in on_message_list:
             out_list.extend(
@@ -108,7 +108,7 @@ class HeavyObject:
         return out_list
 
     @classmethod
-    def _c_buffer(clazz, buffer_dict):
+    def _c_buffer(cls, buffer_dict):
         """ Returns the C represenation of the given buffer.
         """
         if buffer_dict["type"] == "zero":
@@ -119,7 +119,7 @@ class HeavyObject:
                 buffer_dict["index"])
 
     @classmethod
-    def get_hash(clazz, x):
+    def get_hash(cls, x):
         """ Compute the message element hash used by msg_getHash().
         Returns a 32-bit integer.
         """
@@ -164,7 +164,7 @@ class HeavyObject:
             raise Exception("Message element hashes can only be computed for float and string types.")
 
     @classmethod
-    def get_hash_string(clazz, x):
+    def get_hash_string(cls, x):
         """ Returns the hash as a hex string.
         """
         return f"0x{HeavyObject.get_hash(x):X}"

@@ -56,11 +56,11 @@ class PdBinopObject(PdObject):
         PdObject.__init__(self, obj_type, obj_args, pos_x, pos_y)
 
     @classmethod
-    def is_binop(clazz, obj_type):
+    def is_binop(cls, obj_type):
         return obj_type in PdBinopObject.__PD_HEAVY_DICT
 
     @classmethod
-    def get_supported_objects(clazz):
+    def get_supported_objects(cls):
         return set(PdBinopObject.__PD_HEAVY_DICT.keys())
 
     def validate_configuration(self):

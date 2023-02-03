@@ -29,7 +29,7 @@ class c2wwise:
     """
 
     @classmethod
-    def filter_xcode_build(clazz, s):
+    def filter_xcode_build(cls, s):
         """Return a build hash suitable for use in an Xcode project file.
         """
         s = f"{s}_build"
@@ -38,7 +38,7 @@ class c2wwise:
         return s
 
     @classmethod
-    def filter_xcode_fileref(clazz, s):
+    def filter_xcode_fileref(cls, s):
         """Return a fileref hash suitable for use in an Xcode project file.
         """
         s = f"{s}_fileref"
@@ -47,7 +47,7 @@ class c2wwise:
         return s
 
     @classmethod
-    def filter_plugin_id(clazz, s):
+    def filter_plugin_id(cls, s):
         """ Return a unique id from patch name
             [0...32767
         """
@@ -58,7 +58,7 @@ class c2wwise:
 
     @classmethod
     def compile(
-        clazz,
+        cls,
         c_src_dir: str,
         out_dir: str,
         externs: Dict,

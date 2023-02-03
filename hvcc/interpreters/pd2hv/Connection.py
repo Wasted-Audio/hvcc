@@ -13,8 +13,22 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from typing import Dict, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from .HeavyObject import HeavyObject
+    from .PdBinopObject import PdBinopObject
+
+
 class Connection:
-    def __init__(self, from_obj, outlet_index, to_obj, inlet_index, conn_type):
+    def __init__(
+        self,
+        from_obj: 'HeavyObject',
+        outlet_index: int,
+        to_obj: 'PdBinopObject',
+        inlet_index: int,
+        conn_type: str
+    ):
         assert from_obj is not None
         assert to_obj is not None
         assert conn_type is not None
@@ -34,7 +48,7 @@ class Connection:
         }
 
     @property
-    def from_obj(self):
+    def from_obj(self) -> 'HeavyObject':
         return self.__from_obj
 
     @property
@@ -46,7 +60,7 @@ class Connection:
         return self.__hv_json["from"]["outlet"]
 
     @property
-    def to_obj(self):
+    def to_obj(self) -> 'PdBinopObject':
         return self.__to_obj
 
     @property
@@ -61,13 +75,13 @@ class Connection:
     def conn_type(self):
         return self.__hv_json["type"]
 
-    def to_hv(self):
+    def to_hv(self) -> Dict:
         return self.__hv_json
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "{0}:{1} {4} {2}:{3}".format(
-            self.__hv_json["from"]["id"],
-            self.__hv_json["from"]["outlet"],
-            self.__hv_json["to"]["id"],
-            self.__hv_json["to"]["inlet"],
-            self.__hv_json["type"])
+            self.from_id,
+            self.outlet_index,
+            self.to_id,
+            self.inlet_index,
+            self.conn_type)

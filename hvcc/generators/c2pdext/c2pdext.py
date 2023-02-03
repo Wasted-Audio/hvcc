@@ -27,13 +27,13 @@ class c2pdext:
     """
 
     @classmethod
-    def filter_max(clazz, i, j):
+    def filter_max(cls, i, j):
         """Calculate the maximum of two integers.
         """
         return max(int(i), int(j))
 
     @classmethod
-    def filter_xcode_build(clazz, s):
+    def filter_xcode_build(cls, s):
         """Return a build hash suitable for use in an Xcode project file.
         """
         s = f"{s}_build"
@@ -42,7 +42,7 @@ class c2pdext:
         return s
 
     @classmethod
-    def filter_xcode_fileref(clazz, s):
+    def filter_xcode_fileref(cls, s):
         """Return a fileref hash suitable for use in an Xcode project file.
         """
         s = f"{s}_fileref"
@@ -52,7 +52,7 @@ class c2pdext:
 
     @classmethod
     def compile(
-        clazz,
+        cls,
         c_src_dir: str,
         out_dir: str,
         externs: Dict,

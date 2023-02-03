@@ -22,5 +22,5 @@ class ControlReceive(HeavyObject):
     preamble = "cReceive"
 
     @classmethod
-    def get_C_onMessage(clazz, obj_type, obj_id, inlet_index, args):
+    def get_C_onMessage(cls, obj_type, obj_id, inlet_index, args):
         return [f"cReceive_{obj_id}_sendMessage(_c, 0, m);"]

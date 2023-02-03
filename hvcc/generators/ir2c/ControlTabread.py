@@ -22,15 +22,15 @@ class ControlTabread(HeavyObject):
     preamble = "cTabread"
 
     @classmethod
-    def get_C_header_set(clazz):
+    def get_C_header_set(cls):
         return {"HvControlTabread.h"}
 
     @classmethod
-    def get_C_file_set(clazz):
+    def get_C_file_set(cls):
         return {"HvControlTabread.h", "HvControlTabread.c"}
 
     @classmethod
-    def get_C_init(clazz, obj_type, obj_id, args):
+    def get_C_init(cls, obj_type, obj_id, args):
         return [
             "cTabread_init(&cTabread_{0}, &hTable_{1}); // {2}".format(
                 obj_id,
@@ -39,11 +39,11 @@ class ControlTabread(HeavyObject):
         ]
 
     @classmethod
-    def get_C_free(clazz, obj_type, obj_id, args):
+    def get_C_free(cls, obj_type, obj_id, args):
         return []
 
     @classmethod
-    def get_C_onMessage(clazz, obj_type, obj_id, inlet_index, args):
+    def get_C_onMessage(cls, obj_type, obj_id, inlet_index, args):
         return [
             "cTabread_onMessage(_c, &Context(_c)->cTabread_{0}, {1}, m, &cTabread_{0}_sendMessage);".format(
                 obj_id,

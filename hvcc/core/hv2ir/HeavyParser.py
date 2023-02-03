@@ -59,7 +59,7 @@ from .Connection import Connection
 class HeavyParser:
 
     @classmethod
-    def graph_from_file(clazz, hv_file, graph=None, graph_args=None, path_stack=None, xname=None):
+    def graph_from_file(cls, hv_file, graph=None, graph_args=None, path_stack=None, xname=None):
         """ Read a graph object from a file.
 
             @param graph  The parent graph of this graph.
@@ -85,7 +85,7 @@ class HeavyParser:
         return HeavyParser.graph_from_object(json_heavy, graph, graph_args, hv_file, path_stack, xname)
 
     @classmethod
-    def graph_from_object(clazz, json_heavy, graph=None, graph_args=None, hv_file=None, path_stack=None, xname=None):
+    def graph_from_object(cls, json_heavy, graph=None, graph_args=None, hv_file=None, path_stack=None, xname=None):
         """ Parse a graph object.
 
             @param graph  The parent graph.
@@ -146,8 +146,8 @@ class HeavyParser:
                     # if we know how to handle this object type natively
                     # either as a custom type or as a generic IR object
                     elif HeavyParser.get_class_for_type(o["type"]) is not None:
-                        obj_clazz = HeavyParser.get_class_for_type(o["type"])
-                        x = obj_clazz(o["type"], args, g, o.get("annotations", {}))
+                        obj_cls = HeavyParser.get_class_for_type(o["type"])
+                        x = obj_cls(o["type"], args, g, o.get("annotations", {}))
 
                     # handle generic IR objects
                     elif HeavyIrObject.is_ir(o["type"]):
@@ -187,7 +187,7 @@ class HeavyParser:
         return g
 
     @classmethod
-    def get_class_for_type(clazz, obj_type):
+    def get_class_for_type(cls, obj_type):
         """ Returns the class which can handle the given object type.
         """
         if HLangUnop.handles_type(obj_type):

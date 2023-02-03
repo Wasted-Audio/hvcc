@@ -23,15 +23,15 @@ class ControlPack(HeavyObject):
     preamble = "cPack"
 
     @classmethod
-    def get_C_header_set(clazz):
+    def get_C_header_set(cls):
         return {"HvControlPack.h"}
 
     @classmethod
-    def get_C_file_set(clazz):
+    def get_C_file_set(cls):
         return {"HvControlPack.h", "HvControlPack.c"}
 
     @classmethod
-    def get_C_init(clazz, obj_type, obj_id, args):
+    def get_C_init(cls, obj_type, obj_id, args):
         return [
             "cPack_init(&cPack_{0}, {1}, {2});".format(
                 obj_id,
@@ -40,7 +40,7 @@ class ControlPack(HeavyObject):
         ]
 
     @classmethod
-    def get_C_onMessage(clazz, obj_type, obj_id, inlet_index, args):
+    def get_C_onMessage(cls, obj_type, obj_id, inlet_index, args):
         return [
             "cPack_onMessage(_c, &Context(_c)->cPack_{0}, {1}, m, &cPack_{0}_sendMessage);".format(
                 obj_id,

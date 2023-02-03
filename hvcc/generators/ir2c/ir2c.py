@@ -120,19 +120,19 @@ class ir2c:
     }
 
     @classmethod
-    def filter_hvhash(clazz, x):
+    def filter_hvhash(cls, x):
         """ Return the hash string of an object.
         """
         return HeavyObject.get_hash_string(x)
 
     @classmethod
-    def filter_extern(clazz, d):
+    def filter_extern(cls, d):
         """ Return a dictionary of objects that are externed.
         """
         return {k: v for k, v in d.items() if v["extern"]}
 
     @classmethod
-    def get_class(clazz, obj_type):
+    def get_class(cls, obj_type):
         if SignalMath.handles_type(obj_type):
             return SignalMath
         elif ControlBinop.handles_type(obj_type):
@@ -147,7 +147,7 @@ class ir2c:
             raise Exception("No class found for object type \"{0}\".".format(obj_type))
 
     @classmethod
-    def compile(clazz, hv_ir_path, static_dir, output_dir, externs, copyright=None):
+    def compile(cls, hv_ir_path, static_dir, output_dir, externs, copyright=None):
         """ Compiles a HeavyIR file into a C.
             Returns a tuple of compile time in seconds, a notification dictionary,
             and a HeavyIR object counter.

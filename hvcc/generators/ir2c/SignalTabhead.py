@@ -24,30 +24,30 @@ class SignalTabhead(HeavyObject):
     preamble = "sTabhead"
 
     @classmethod
-    def get_C_header_set(clazz):
+    def get_C_header_set(cls):
         return {"HvSignalTabread.h"}
 
     @classmethod
-    def get_C_file_set(clazz):
+    def get_C_file_set(cls):
         return {"HvSignalTabread.h", "HvSignalTabread.c"}
 
     @classmethod
-    def get_C_free(clazz, obj_type, obj_id, args):
+    def get_C_free(cls, obj_type, obj_id, args):
         return []
 
     @classmethod
-    def get_C_init(clazz, obj_type, obj_id, args):
+    def get_C_init(cls, obj_type, obj_id, args):
         return [
             "sTabhead_init(&sTabhead_{0}, &hTable_{1});".format(
                 obj_id,
                 args["table_id"])]
 
     @classmethod
-    def get_C_onMessage(clazz, obj_type, obj_id, inlet_index, args):
+    def get_C_onMessage(cls, obj_type, obj_id, inlet_index, args):
         return []  # TODO(mhroth): deal with this later
 
     @classmethod
-    def get_C_process(clazz, process_dict, obj_type, obj_id, args):
+    def get_C_process(cls, process_dict, obj_type, obj_id, args):
         return [
             "__hv_tabhead_f(&sTabhead_{0}, {1});".format(
                 process_dict["id"],

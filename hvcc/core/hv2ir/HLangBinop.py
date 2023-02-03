@@ -50,7 +50,7 @@ class HLangBinop(HeavyLangObject):
         HeavyLangObject.__init__(self, obj_type, args, graph, num_inlets=2, num_outlets=1, annotations=annotations)
 
     @classmethod
-    def handles_type(clazz, obj_type):
+    def handles_type(cls, obj_type):
         """Returns True if this class handles the given object type. False otherwise.
         """
         return obj_type in HLangBinop.__HEAVY_DICT

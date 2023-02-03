@@ -60,7 +60,7 @@ class Connection:
         return self.type == "-~>"
 
     @classmethod
-    def is_signal_type(clazz, type):
+    def is_signal_type(cls, type):
         return type in {"~i>", "~f>"}
 
     def __eq__(self, other):

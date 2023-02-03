@@ -24,11 +24,11 @@ class SignalCPole(HeavyObject):
     preamble = "sCPole"
 
     @classmethod
-    def get_C_header_set(clazz):
+    def get_C_header_set(cls):
         return {"HvSignalCPole.h", "HvSignalDel1.h", "HvMath.h"}
 
     @classmethod
-    def get_C_file_set(clazz):
+    def get_C_file_set(cls):
         return {
             "HvSignalCPole.h", "HvSignalCPole.c",
             "HvSignalDel1.h", "HvSignalDel1.c",
@@ -36,19 +36,19 @@ class SignalCPole(HeavyObject):
         }
 
     @classmethod
-    def get_C_def(clazz, obj_type, obj_id):
+    def get_C_def(cls, obj_type, obj_id):
         return ["SignalCPole sCPole_{0};".format(obj_id)]
 
     @classmethod
-    def get_C_init(clazz, obj_type, obj_id, args):
+    def get_C_init(cls, obj_type, obj_id, args):
         return ["sCPole_init(&sCPole_{0});".format(obj_id)]
 
     @classmethod
-    def get_C_free(clazz, obj_type, obj_id, args):
+    def get_C_free(cls, obj_type, obj_id, args):
         return []
 
     @classmethod
-    def get_C_process(clazz, process_dict, obj_type, obj_id, args):
+    def get_C_process(cls, process_dict, obj_type, obj_id, args):
         return [
             "__hv_cpole_f(&sCPole_{0}, VIf({1}), VIf({2}), VIf({3}), VIf({4}), VOf({5}), VOf({6}));".format(
                 process_dict["id"],

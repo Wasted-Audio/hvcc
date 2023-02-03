@@ -25,7 +25,7 @@ from hvcc.core.hv2ir.HeavyParser import HeavyParser
 class hv2ir:
 
     @classmethod
-    def compile(clazz, hv_file, ir_file, patch_name=None, verbose=False):
+    def compile(cls, hv_file, ir_file, patch_name=None, verbose=False):
         """ Compiles a HeavyLang file into a HeavyIR file.
             Returns a tuple of compile time in seconds, a notification dictionary,
             and a heavy object counter.

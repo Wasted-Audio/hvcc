@@ -74,21 +74,21 @@ class ControlBinop(HeavyObject):
     preamble = "cBinop"
 
     @classmethod
-    def handles_type(clazz, obj_type):
+    def handles_type(cls, obj_type):
         """Returns true if the object type can be handled by this class
         """
         return obj_type in ControlBinop.__OPERATION_DICT
 
     @classmethod
-    def get_C_header_set(clazz):
+    def get_C_header_set(cls):
         return {"HvControlBinop.h"}
 
     @classmethod
-    def get_C_file_set(clazz):
+    def get_C_file_set(cls):
         return {"HvControlBinop.h", "HvControlBinop.c"}
 
     @classmethod
-    def get_C_init(clazz, obj_type, obj_id, args):
+    def get_C_init(cls, obj_type, obj_id, args):
         if obj_type.endswith("_k"):
             return []
         else:
@@ -96,11 +96,11 @@ class ControlBinop(HeavyObject):
             return [f"cBinop_init(&cBinop_{obj_id}, {obj_arg}f); // {obj_type}"]
 
     @classmethod
-    def get_C_free(clazz, obj_type, obj_id, args):
+    def get_C_free(cls, obj_type, obj_id, args):
         return []  # no need to free any control binop objects
 
     @classmethod
-    def get_C_onMessage(clazz, obj_type, obj_id, inlet_index, args):
+    def get_C_onMessage(cls, obj_type, obj_id, inlet_index, args):
         if obj_type.endswith("_k"):
             return [
                 "cBinop_k_onMessage(_c, NULL, {0}, {1}f, {2}, m, &cBinop_{3}_sendMessage);".format(

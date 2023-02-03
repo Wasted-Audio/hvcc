@@ -49,7 +49,7 @@ class Colours:
     end = "\033[0m"
 
 
-def add_error(results: Dict, error: str):
+def add_error(results: OrderedDict, error: str) -> OrderedDict:
     if "hvcc" in results:
         results["hvcc"]["notifs"]["errors"].append({"message": error})
     else:
@@ -65,7 +65,7 @@ def add_error(results: Dict, error: str):
     return results
 
 
-def check_extern_name_conflicts(extern_type: str, extern_list: List, results: Dict):
+def check_extern_name_conflicts(extern_type: str, extern_list: List, results: OrderedDict):
     """ In most of the generator code extern names become capitalised when used
         as enums. This method makes sure that there are no cases where two unique
         keys become the same after being capitalised.
@@ -80,7 +80,7 @@ def check_extern_name_conflicts(extern_type: str, extern_list: List, results: Di
                           "capital letters are not the only difference.")
 
 
-def generate_extern_info(hvir: Dict, results: Dict):
+def generate_extern_info(hvir: Dict, results: OrderedDict) -> Dict:
     """ Simplifies the receiver/send and table lists by only containing values
         externed with @hv_param, @hv_event or @hv_table
     """
@@ -139,7 +139,7 @@ def compile_dataflow(
     patch_meta_file: Optional[str] = None,
     search_paths: Optional[List] = None,
     generators: Optional[List] = None,
-    verbose: Optional[bool] = False,
+    verbose: bool = False,
     copyright: Optional[str] = None
 ) -> OrderedDict:
 
