@@ -34,12 +34,12 @@ class HeavyObject(PdObject):
 
     def __init__(
         self,
-        obj_type,
+        obj_type: str,
         obj_args: Optional[List] = None,
         pos_x: int = 0,
         pos_y: int = 0
     ):
-        PdObject.__init__(self, obj_type, obj_args, pos_x, pos_y)
+        super().__init__(obj_type, obj_args, pos_x, pos_y)
 
         # get the object dictionary (note that it is NOT a copy)
         if self.is_hvlang:
@@ -51,14 +51,14 @@ class HeavyObject(PdObject):
 
         # resolve arguments
         obj_args = obj_args or []
-        self.obj_args = {}
+        self.obj_dict = {}
         for i, a in enumerate(self.__obj_dict["args"]):
             # if the argument exists (and has been correctly resolved)
             if i < len(obj_args) and obj_args[i] is not None:
                 # force the Heavy argument type
                 # Catch type errors as early as possible
                 try:
-                    self.obj_args[a["name"]] = HeavyObject.force_arg_type(
+                    self.obj_dict[a["name"]] = HeavyObject.force_arg_type(
                         obj_args[i],
                         a["value_type"])
                 except Exception as e:
@@ -132,11 +132,11 @@ class HeavyObject(PdObject):
             return value
 
     @property
-    def is_hvlang(self):
+    def is_hvlang(self) -> bool:
         return self.obj_type in HeavyObject.__HEAVY_LANG_OBJS
 
     @property
-    def is_hvir(self):
+    def is_hvir(self) -> bool:
         return self.obj_type in HeavyObject.__HEAVY_IR_OBJS
 
     def get_inlet_connection_type(self, inlet_index):
@@ -188,7 +188,7 @@ class HeavyObject(PdObject):
                 self._inlet_connections[str(c.inlet_index)].append(c)
             else:
                 self.add_error(
-                    f"Connection made to non-existent inlet at [{self.obj_type} {self.obj_args}]:{c.inlet_index}.",
+                    f"Connection made to non-existent inlet at [{self.obj_type} {self.obj_dict}]:{c.inlet_index}.",
                     enum=NotificationEnum.ERROR_UNABLE_TO_CONNECT_OBJECTS)
         else:
             raise Exception("Adding a connection to the wrong object!")
@@ -196,7 +196,7 @@ class HeavyObject(PdObject):
     def to_hv(self):
         return {
             "type": self.obj_type,
-            "args": self.obj_args,
+            "args": self.obj_dict,
             "properties": {
                 "x": self.pos_x,
                 "y": self.pos_y

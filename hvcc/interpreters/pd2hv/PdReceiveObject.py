@@ -23,7 +23,7 @@ class PdReceiveObject(PdObject):
 
     def __init__(self, obj_type, obj_args=None, pos_x=0, pos_y=0):
         assert obj_type in {"r", "r~", "receive", "receive~", "catch~"}
-        PdObject.__init__(self, obj_type, obj_args, pos_x, pos_y)
+        super().__init__(obj_type, obj_args, pos_x, pos_y)
 
         self.__receiver_name = ""
         self.__extern_type = None

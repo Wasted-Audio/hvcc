@@ -13,11 +13,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from typing import List, Dict
+
+
 class PdRawException(Exception):
     pass
 
 
-def replace_owl(args):
+def replace_owl(args: List) -> List:
     new_args = []
     for arg in args:
         new_arg = arg.replace('owl', 'raw')
@@ -25,7 +28,7 @@ def replace_owl(args):
     return new_args
 
 
-def parse_pd_raw_args(args):
+def parse_pd_raw_args(args: List) -> Dict:
     """Parses a list of puredata send or receive objects looking for @raw and legacy @owl*
     annotations, parsing everything and throwing errors when syntax is not
     correct or values are of incorrect type"""
@@ -35,7 +38,6 @@ def parse_pd_raw_args(args):
     # define default values
     attrdict["min"] = 0.0
     attrdict["max"] = 1.0
-    attrdict["default"] = None
 
     args = replace_owl(args)  # TODO(dromer): deprecate @owl on next stable release
 
@@ -68,7 +70,7 @@ def parse_pd_raw_args(args):
             except IndexError:
                 raise PdRawException(f"{raw_param} annotation is missing its value")
 
-    if attrdict["default"] is None:
+    if attrdict.get("default") is None:
         attrdict["default"] = (attrdict["max"] - attrdict["min"]) / 2.0
 
     return attrdict

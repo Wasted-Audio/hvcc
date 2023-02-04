@@ -15,18 +15,21 @@
 
 import json
 import os
+from typing import Optional, List
 
 from .PdObject import PdObject
 from .HeavyObject import HeavyObject
 
 
 class HeavyGraph(PdObject):
-    def __init__(self, hv_path, obj_args=None, pos_x=0, pos_y=0):
-        PdObject.__init__(
-            self,
-            os.path.basename(hv_path).split(".")[0],
-            obj_args,
-            pos_x, pos_y)
+    def __init__(
+        self,
+        hv_path: str,
+        obj_args: Optional[List] = None,
+        pos_x: int = 0,
+        pos_y: int = 0
+    ):
+        super().__init__(os.path.basename(hv_path).split(".")[0], obj_args, pos_x, pos_y)
 
         # read the heavy graph
         with open(hv_path, "r") as f:

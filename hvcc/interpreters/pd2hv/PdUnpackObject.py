@@ -13,13 +13,21 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from typing import Optional, List
+
 from .PdObject import PdObject
 
 
 class PdUnpackObject(PdObject):
-    def __init__(self, obj_type, obj_args=None, pos_x=0, pos_y=0):
+    def __init__(
+        self,
+        obj_type: str,
+        obj_args: Optional[List] = None,
+        pos_x: int = 0,
+        pos_y: int = 0
+    ):
         assert obj_type == "unpack"
-        PdObject.__init__(self, obj_type, obj_args, pos_x, pos_y)
+        super().__init__(obj_type, obj_args, pos_x, pos_y)
 
         if len(self.obj_args) == 0:
             self.add_error("Unpack requires at least one argument.")

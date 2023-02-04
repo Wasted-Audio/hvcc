@@ -14,18 +14,29 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from collections import Counter
+from typing import Optional, List
+
 from .NotificationEnum import NotificationEnum
 from .PdObject import PdObject
 
 
 class PdSelectObject(PdObject):
-    def __init__(self, obj_type, obj_args=None, pos_x=0, pos_y=0):
+    def __init__(
+        self,
+        obj_type: str,
+        obj_args: Optional[List] = None,
+        pos_x: int = 0,
+        pos_y: int = 0
+    ):
         assert obj_type in {"select", "sel"}
-        PdObject.__init__(self, obj_type, obj_args, pos_x, pos_y)
+        super().__init__(obj_type, obj_args, pos_x, pos_y)
 
-        if len(obj_args) == 0:
+        if not obj_args:
+            obj_args = []
+
+        if len(self.obj_args) == 0:
             self.add_error("At least one argument is required.")
-        if len(set(obj_args)) != len(obj_args):
+        if len(set(self.obj_args)) != len(obj_args):
             c = Counter(obj_args).most_common(1)
             self.add_error(
                 f"All arguments to [select] must be unique. Argument \"{c[0][0]}\" is repeated {c[0][1]} times.",

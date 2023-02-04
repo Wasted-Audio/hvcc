@@ -274,23 +274,23 @@ class PdParser:
                             # are we restoring an array object?
                             # do some final sanity checks
                             if obj_array is not None:
-                                declared_size = obj_array.obj_args["size"]
-                                values_size = len(obj_array.obj_args["values"])
+                                declared_size = obj_array.obj_dict["size"]
+                                values_size = len(obj_array.obj_dict["values"])
                                 if declared_size != values_size:
                                     new_size = max(declared_size, values_size)
                                     obj_array.add_warning(
                                         "Table \"{0}\" was declared as having {1} values, "
                                         "but {2} were supplied. It will be resized to {3} "
                                         "values (any unsupplied values will be zeroed).".format(
-                                            obj_array.obj_args["name"],
+                                            obj_array.obj_dict["name"],
                                             declared_size,
                                             values_size,
                                             new_size))
-                                    obj_array.obj_args["size"] = new_size
+                                    obj_array.obj_dict["size"] = new_size
                                     if new_size < declared_size:
-                                        obj_array.obj_args["values"] = obj_args["values"][:new_size]
+                                        obj_array.obj_dict["values"] = obj_args["values"][:new_size]
                                     else:
-                                        obj_array.obj_args["values"].extend([0.0 for _ in
+                                        obj_array.obj_dict["values"].extend([0.0 for _ in
                                                                              range(new_size - declared_size)])
                                 obj_array = None  # done parsing the array
 
@@ -510,7 +510,7 @@ class PdParser:
                         g.add_error(f"Don't know how to parse line: {' '.join(line)}")
 
                 elif line[0] == "#A" and obj_array is not None:
-                    obj_array.obj_args["values"].extend([float(f) for f in line[2:]])
+                    obj_array.obj_dict["values"].extend([float(f) for f in line[2:]])
 
                 else:
                     g.add_error(f"Don't know how to parse line: {' '.join(line)}")
@@ -518,6 +518,7 @@ class PdParser:
         except Exception as e:
             # bubble the Exception back to the root graph where the graph
             # will be returned
+            raise e
             if not g.is_root:
                 raise e
             else:
@@ -535,7 +536,7 @@ class PdParser:
         graph: PdGraph,
         raise_on_failure: bool = True,
         is_root: bool = False
-    ):
+    ) -> Any:
         """ Resolve object arguments against the given graph arguments.
             By default this function raises an Exception if it cannot resolve an
             argument.

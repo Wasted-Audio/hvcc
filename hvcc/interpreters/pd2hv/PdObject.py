@@ -17,7 +17,12 @@ from collections import defaultdict
 import random
 import string
 
-from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
+from typing import Optional, List, Dict, TYPE_CHECKING
+
+from .NotificationEnum import NotificationEnum
+
+if TYPE_CHECKING:
+    from .PdGraph import PdGraph
 
 
 class PdObject:
@@ -25,7 +30,13 @@ class PdObject:
     __RANDOM = random.Random()
     __ID_CHARS = string.ascii_letters + string.digits
 
-    def __init__(self, obj_type, obj_args=None, pos_x=0, pos_y=0):
+    def __init__(
+        self,
+        obj_type: str,
+        obj_args: Optional[List] = None,
+        pos_x: int = 0,
+        pos_y: int = 0
+    ):
         self.obj_type = obj_type
         # all arguments should be resolved when passed to a PdObject
         self.obj_args = obj_args or []
@@ -36,13 +47,13 @@ class PdObject:
         self.pos_y = pos_y
 
         # this is set when the object is added to a graph
-        self.parent_graph = None
+        self.parent_graph: Optional['PdGraph'] = None
 
-        self._inlet_connections = defaultdict(list)
-        self._outlet_connections = defaultdict(list)
+        self._inlet_connections: Dict = defaultdict(list)
+        self._outlet_connections: Dict = defaultdict(list)
 
-        self._warnings = []
-        self._errors = []
+        self._warnings: List = []
+        self._errors: List = []
 
     def add_warning(self, warning, enum=NotificationEnum.WARNING_GENERIC):
         """ Add a warning regarding this object.
@@ -54,7 +65,7 @@ class PdObject:
         """
         self._errors.append({"enum": enum, "message": error})
 
-    def get_notices(self):
+    def get_notices(self) -> Dict:
         """ Returns a dictionary of all warnings and errors at this object.
         """
         # TODO(mhroth): we might want to consider moving to a more expressive format.
@@ -99,14 +110,14 @@ class PdObject:
             ]
         }
 
-    def get_inlet_connection_type(self, inlet_index=0):
+    def get_inlet_connection_type(self, inlet_index: int) -> str:
         """ Returns the inlet connection type of this Pd object.
             For the sake of convenience, the connection type is reported in
             Heavy's format.
         """
         return "~f>" if self.obj_type.endswith("~") else "-->"
 
-    def get_outlet_connection_type(self, outlet_index=0):
+    def get_outlet_connection_type(self, outlet_index: int) -> str:
         """ Returns the outlet connection type of this Pd object.
             For the sake of convenience, the connection type is reported in
             Heavy's format.
@@ -164,7 +175,7 @@ class PdObject:
         """
         raise NotImplementedError()
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         if len(self.obj_args) == 0:
             return f"[{self.obj_type}]"
         else:

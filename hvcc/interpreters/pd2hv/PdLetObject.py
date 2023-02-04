@@ -1,19 +1,27 @@
 # Copyright 2015,2016 Enzien Audio, Ltd. All Rights Reserved.
 
+from typing import Optional, List
+
 from .PdObject import PdObject
 
 
 class PdLetObject(PdObject):
-    def __init__(self, obj_type, obj_args=None, pos_x=0, pos_y=0):
+    def __init__(
+        self,
+        obj_type: str,
+        obj_args: Optional[List] = None,
+        pos_x: int = 0,
+        pos_y: int = 0
+    ):
         assert obj_type in {"inlet", "inlet~", "outlet", "outlet~"}
-        PdObject.__init__(self, obj_type, obj_args, pos_x, pos_y)
+        super().__init__(obj_type, obj_args, pos_x, pos_y)
         self.let_index = 0
 
-    def get_outlet_connection_type(self, outlet_index=0):
+    def get_outlet_connection_type(self, outlet_index: int) -> str:
         if len(self.obj_args) > 0 and self.obj_args[0] in {"-->", "~f>", "~i>", "-~>"}:
             return self.obj_args[0]
         else:
-            return PdObject.get_outlet_connection_type(self)
+            return super().get_outlet_connection_type(outlet_index)
 
     def to_hv(self):
         return {
@@ -21,7 +29,7 @@ class PdLetObject(PdObject):
             "args": {
                 "name": "",  # Pd does not give an inlet name
                 "index": self.let_index,
-                "type": self.get_outlet_connection_type()
+                "type": self.get_outlet_connection_type(self.let_index)
             },
             "properties": {
                 "x": self.pos_x,

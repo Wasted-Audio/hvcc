@@ -21,7 +21,7 @@ from .PdObject import PdObject
 class PdRouteObject(PdObject):
     def __init__(self, obj_type, obj_args=None, pos_x=0, pos_y=0):
         assert obj_type == "route"
-        PdObject.__init__(self, obj_type, obj_args, pos_x, pos_y)
+        super().__init__(obj_type, obj_args, pos_x, pos_y)
         if len(obj_args) == 0:
             self.add_error("At least one argument is required.")
         # NOTE(joe): disabling this warning as it can be quite annoying.

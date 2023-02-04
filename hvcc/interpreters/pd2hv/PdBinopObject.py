@@ -13,9 +13,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from .Connection import Connection
+from typing import Optional, List, Dict
+
+# from .Connection import Connection
+# from .HeavyObject import HeavyObject
 from .PdObject import PdObject
-from .HeavyObject import HeavyObject
 
 
 class PdBinopObject(PdObject):
@@ -51,17 +53,23 @@ class PdBinopObject(PdObject):
         "<<": "<<"
     }
 
-    def __init__(self, obj_type, obj_args=None, pos_x=0, pos_y=0):
-        assert PdBinopObject.is_binop(obj_type)
-        PdObject.__init__(self, obj_type, obj_args, pos_x, pos_y)
+    def __init__(
+        self,
+        obj_type: str,
+        obj_args: Optional[List] = None,
+        pos_x: int = 0,
+        pos_y: int = 0
+    ):
+        assert self.is_binop(obj_type)
+        super().__init__(obj_type, obj_args, pos_x, pos_y)
 
     @classmethod
-    def is_binop(cls, obj_type):
-        return obj_type in PdBinopObject.__PD_HEAVY_DICT
+    def is_binop(cls, obj_type: str) -> bool:
+        return obj_type in cls.__PD_HEAVY_DICT
 
     @classmethod
-    def get_supported_objects(cls):
-        return set(PdBinopObject.__PD_HEAVY_DICT.keys())
+    def get_supported_objects(cls) -> set:
+        return set(cls.__PD_HEAVY_DICT.keys())
 
     def validate_configuration(self):
         # check signal objects for control connections and auto insert
@@ -100,42 +108,48 @@ class PdBinopObject(PdObject):
         else:
             self.__k = 0.0
 
-    def convert_ctrl_to_sig_connections_at_inlet(self, connection_list, inlet_index):
+    def convert_ctrl_to_sig_connections_at_inlet(self, connection_list: List, inlet_index: int):
         """ Auto insert heavy var object inbetween control connections.
         """
-        sig_obj = HeavyObject(obj_type="var",
-                              obj_args=[0],
-                              pos_x=int(self.pos_x),
-                              pos_y=int(self.pos_y - 5))  # shift upwards a few points
+        # TODO(dromer): seems this entire code-path is completely unused.
+        #               `_PdGraph__connections()` function does not exist anywhere in the code.
+        #               Perhaps it should be cleaned up.
+        pass
 
-        # add sig~ object to parent graph
-        self.parent_graph.add_object(sig_obj)
+        # sig_obj = HeavyObject(obj_type="var",
+        #                       obj_args=[0],
+        #                       pos_x=int(self.pos_x),
+        #                       pos_y=int(self.pos_y - 5))  # shift upwards a few points
 
-        # add connection from sig~ to this object
-        c = Connection(sig_obj, 0, self, inlet_index, "~f>")
-        self.parent_graph._PdGraph__connections.append(c)  # update the local connections list
-        sig_obj.add_connection(c)
-        self.add_connection(c)
+        # # add sig~ object to parent graph
+        # if self.parent_graph is not None:
+        #     self.parent_graph.add_object(sig_obj)
 
-        # retrieve all control connections
-        control_conns = [c for c in connection_list if c.conn_type == "-->"]
+        #     # add connection from sig~ to this object
+        #     c = Connection(sig_obj, 0, self, inlet_index, "~f>")
+        #     self.parent_graph._PdGraph__connections.append(c)  # update the local connections list
+        #     sig_obj.add_connection(c)
+        #     self.add_connection(c)
 
-        for old_conn in control_conns:
-            # get from obj
-            from_obj = old_conn.from_obj
+        #     # retrieve all control connections
+        #     control_conns = [c for c in connection_list if c.conn_type == "-->"]
 
-            # add connection from fromobj to new sig
-            new_conn = Connection(from_obj, old_conn.outlet_index, sig_obj, 0, "-->")
-            self.parent_graph._PdGraph__connections.append(new_conn)
-            sig_obj.add_connection(new_conn)
-            from_obj.add_connection(new_conn)
+        #     for old_conn in control_conns:
+        #         # get from obj
+        #         from_obj = old_conn.from_obj
 
-            # remove connection from fromobj
-            self.parent_graph._PdGraph__connections.remove(old_conn)
-            from_obj.remove_connection(old_conn)
-            self.remove_connection(old_conn)
+        #         # add connection from fromobj to new sig
+        #         new_conn = Connection(from_obj, old_conn.outlet_index, sig_obj, 0, "-->")
+        #         self.parent_graph._PdGraph__connections.append(new_conn)
+        #         sig_obj.add_connection(new_conn)
+        #         from_obj.add_connection(new_conn)
 
-    def to_hv(self):
+        #         # remove connection from fromobj
+        #         self.parent_graph._PdGraph__connections.remove(old_conn)
+        #         from_obj.remove_connection(old_conn)
+        #         self.remove_connection(old_conn)
+
+    def to_hv(self) -> Dict:
         return {
             "type": PdBinopObject.__PD_HEAVY_DICT[self.obj_type],
             "args": {

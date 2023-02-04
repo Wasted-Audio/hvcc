@@ -14,6 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
+from typing import Optional, List
 
 from .Connection import Connection
 from .NotificationEnum import NotificationEnum
@@ -22,42 +23,52 @@ from .PdObject import PdObject
 
 class PdGraph(PdObject):
 
-    def __init__(self, obj_args, pd_path, pos_x=0, pos_y=0):
+    # def __init__(self, obj_args, pd_path, pos_x=0, pos_y=0):
+    def __init__(
+        self,
+        obj_args: List,
+        pd_path: str,
+        pos_x: int = 0,
+        pos_y: int = 0
+    ):
         assert len(obj_args) > 0, "PdGraph arguments must contain at least dollar zero."
-        PdObject.__init__(self, "graph", obj_args, pos_x, pos_y)
+        super().__init__("graph", obj_args, pos_x, pos_y)
 
         # file location of this graph
         self.__pd_path = pd_path
 
-        self.__objs = []
-        self.__connections = []
+        self.__objs: List = []
+        self.__connections: List = []
 
-        self.__inlet_objects = []
-        self.__outlet_objects = []
+        self.__inlet_objects: List = []
+        self.__outlet_objects: List = []
 
         # the first search path is always the directory of this graph
-        self.__declared_paths = [os.path.dirname(pd_path)]
+        self.__declared_paths: List = [os.path.dirname(pd_path)]
 
         # heavy graph arguments (added via @hv_arg flag in #X text)
-        self.hv_args = []
+        self.hv_args: List = []
 
         # the subpatch name of this graph
         # only used is this graph is actually a subpatch
-        self.subpatch_name = None
+        self.subpatch_name: Optional[str] = None
 
     @property
     def dollar_zero(self):
         return self.obj_args[0]
 
     @property
-    def is_root(self):
+    def is_root(self) -> bool:
         return self.parent_graph is None
 
     @property
-    def is_subpatch(self):
-        return self.parent_graph.__pd_path == self.__pd_path if not self.is_root else False
+    def is_subpatch(self) -> bool:
+        if not self.parent_graph:
+            return False
+        else:
+            return self.parent_graph.__pd_path == self.__pd_path if not self.is_root else False
 
-    def add_object(self, obj):
+    def add_object(self, obj: PdObject):
         obj.parent_graph = self
         self.__objs.append(obj)
 
@@ -73,7 +84,7 @@ class PdGraph(PdObject):
             for i, o in enumerate(self.__outlet_objects):
                 o.let_index = i
 
-    def add_parsed_connection(self, from_index, from_outlet, to_index, to_inlet):
+    def add_parsed_connection(self, from_index: int, from_outlet: int, to_index: int, to_inlet: int):
         """ Add a connection to the graph which has been parsed externally.
         """
         try:
@@ -117,11 +128,11 @@ class PdGraph(PdObject):
             "required": required
         }
 
-    def get_inlet_connection_type(self, inlet_index):
-        return self.__inlet_objects[inlet_index].get_inlet_connection_type()
+    def get_inlet_connection_type(self, inlet_index: int):
+        return self.__inlet_objects[inlet_index].get_inlet_connection_type(inlet_index)
 
-    def get_outlet_connection_type(self, outlet_index):
-        return self.__outlet_objects[outlet_index].get_outlet_connection_type()
+    def get_outlet_connection_type(self, outlet_index: int):
+        return self.__outlet_objects[outlet_index].get_outlet_connection_type(outlet_index)
 
     def validate_configuration(self):
         if self.is_root:
@@ -139,14 +150,14 @@ class PdGraph(PdObject):
         for o in self.__objs:
             o.validate_configuration()
 
-    def is_abstraction_on_call_stack(self, abs_path):
+    def is_abstraction_on_call_stack(self, abs_path: str) -> bool:
         """ Returns True if the given abstraction name is already on the call
             stack (i.e. it is currently being parsed). This function is used to
             detect recursion within abstractions.
         """
         if self.__pd_path == abs_path:
             return True
-        elif not self.is_root:
+        elif not self.is_root and self.parent_graph:
             return self.parent_graph.is_abstraction_on_call_stack(abs_path)
         else:
             return False
