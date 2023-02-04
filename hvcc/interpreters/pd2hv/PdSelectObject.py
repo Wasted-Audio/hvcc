@@ -14,7 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from collections import Counter
-from typing import Optional, List
+from typing import Optional, List, Dict
 
 from .NotificationEnum import NotificationEnum
 from .PdObject import PdObject
@@ -27,7 +27,7 @@ class PdSelectObject(PdObject):
         obj_args: Optional[List] = None,
         pos_x: int = 0,
         pos_y: int = 0
-    ):
+    ) -> None:
         assert obj_type in {"select", "sel"}
         super().__init__(obj_type, obj_args, pos_x, pos_y)
 
@@ -50,11 +50,11 @@ class PdSelectObject(PdObject):
             except Exception:
                 pass
 
-    def validate_configuration(self):
+    def validate_configuration(self) -> None:
         if len(self._inlet_connections.get("1", [])) > 0:
             self.add_warning("The right inlet of select is not supported. It will not do anything.")
 
-    def to_hv(self):
+    def to_hv(self) -> Dict:
         """ Creates a graph dynamically based on the number of arguments.
             An unconnected right inlet is added.
 
@@ -67,7 +67,7 @@ class PdSelectObject(PdObject):
             [outlet_0]                    [outlet_N-1]            [outlet_right]
         """
 
-        route_graph = {
+        route_graph: Dict = {
             "type": "graph",
             "imports": [],
             "args": [],

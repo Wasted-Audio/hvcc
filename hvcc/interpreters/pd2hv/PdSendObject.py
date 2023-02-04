@@ -13,13 +13,21 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from typing import Optional, List, Dict
+
 from .NotificationEnum import NotificationEnum
 from .PdObject import PdObject
 from .PdRaw import parse_pd_raw_args, PdRawException
 
 
 class PdSendObject(PdObject):
-    def __init__(self, obj_type, obj_args=None, pos_x=0, pos_y=0):
+    def __init__(
+        self,
+        obj_type: str,
+        obj_args: Optional[List] = None,
+        pos_x: int = 0,
+        pos_y: int = 0
+    ) -> None:
         assert obj_type in {"s", "send", "s~", "send~", "throw~"}
         PdObject.__init__(self, obj_type, obj_args, pos_x, pos_y)
 
@@ -48,7 +56,7 @@ class PdSendObject(PdObject):
             except PdRawException as e:
                 self.add_error(e)
 
-    def validate_configuration(self):
+    def validate_configuration(self) -> None:
         if len(self.obj_args) == 0:
             self.add_warning(
                 f"No name was given to this {self.obj_type} object. "
@@ -65,7 +73,7 @@ class PdSendObject(PdObject):
                 "are not supported. A name should be given.",
                 NotificationEnum.ERROR_MISSING_REQUIRED_ARGUMENT)
 
-    def to_hv(self):
+    def to_hv(self) -> Dict:
         # note: control rate send/receive objects should not modify their name argument
         names = {
             "s": "",

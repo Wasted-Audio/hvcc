@@ -15,7 +15,7 @@
 
 import json
 import os
-from typing import Optional, List
+from typing import Optional, List, Dict
 
 from .PdObject import PdObject
 from .HeavyObject import HeavyObject
@@ -28,7 +28,7 @@ class HeavyGraph(PdObject):
         obj_args: Optional[List] = None,
         pos_x: int = 0,
         pos_y: int = 0
-    ):
+    ) -> None:
         super().__init__(os.path.basename(hv_path).split(".")[0], obj_args, pos_x, pos_y)
 
         # read the heavy graph
@@ -69,8 +69,8 @@ class HeavyGraph(PdObject):
         # be supplied (because they are resolved)
         self.hv_json["args"] = []
 
-    def get_outlet_connection_type(self, outlet_index):
+    def get_outlet_connection_type(self, outlet_index: int) -> str:
         return self.__outlet_connection_types[outlet_index]
 
-    def to_hv(self):
+    def to_hv(self) -> Dict:
         return self.hv_json

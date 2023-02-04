@@ -18,7 +18,7 @@ class PdMessageObject(PdObject):
         obj_args: Optional[List] = None,
         pos_x: int = 0,
         pos_y: int = 0
-    ):
+    ) -> None:
         assert obj_type == "msg"
         super().__init__("msg", obj_args, pos_x, pos_y)
 

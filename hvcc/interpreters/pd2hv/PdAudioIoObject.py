@@ -26,11 +26,11 @@ class PdAudioIoObject(PdObject):
         obj_args: Optional[List] = None,
         pos_x: int = 0,
         pos_y: int = 0
-    ):
+    ) -> None:
         assert obj_type in {"adc~", "dac~"}
         super().__init__(obj_type, obj_args, pos_x, pos_y)
 
-    def validate_configuration(self):
+    def validate_configuration(self) -> None:
         # ensure that only signal connections are made to the dac
         for i, connections in self._inlet_connections.items():
             if any(c.conn_type == "-->" for c in connections):

@@ -16,8 +16,9 @@
 import decimal
 import json
 import importlib_resources
-from typing import Optional, List
+from typing import Optional, List, Dict, Any
 
+from .Connection import Connection
 from .NotificationEnum import NotificationEnum
 from .PdObject import PdObject
 
@@ -38,7 +39,7 @@ class HeavyObject(PdObject):
         obj_args: Optional[List] = None,
         pos_x: int = 0,
         pos_y: int = 0
-    ):
+    ) -> None:
         super().__init__(obj_type, obj_args, pos_x, pos_y)
 
         # get the object dictionary (note that it is NOT a copy)
@@ -85,7 +86,7 @@ class HeavyObject(PdObject):
             self.__annotations["scope"] = "public"
 
     @classmethod
-    def force_arg_type(cls, value, value_type):
+    def force_arg_type(cls, value, value_type: str) -> Any:
         # TODO(mhroth): add support for mixedarray?
         if value_type == "auto":
             try:
@@ -139,7 +140,7 @@ class HeavyObject(PdObject):
     def is_hvir(self) -> bool:
         return self.obj_type in HeavyObject.__HEAVY_IR_OBJS
 
-    def get_inlet_connection_type(self, inlet_index):
+    def get_inlet_connection_type(self, inlet_index: int) -> Optional[str]:
         """ Returns the inlet connection type, None if the inlet does not exist.
         """
         # TODO(mhroth): it's stupid that hvlang and hvir json have different data formats here
@@ -156,7 +157,7 @@ class HeavyObject(PdObject):
         else:
             return None
 
-    def get_outlet_connection_type(self, outlet_index):
+    def get_outlet_connection_type(self, outlet_index: int) -> Optional[str]:
         """ Returns the outlet connection type, None if the inlet does not exist.
         """
         # TODO(mhroth): it's stupid that hvlang and hvir json have different data formats here
@@ -173,7 +174,7 @@ class HeavyObject(PdObject):
         else:
             return None
 
-    def add_connection(self, c):
+    def add_connection(self, c: Connection) -> None:
         """ Adds a connection, either inlet or outlet, to this object.
         """
         if c.from_id == self.obj_id:
@@ -193,7 +194,7 @@ class HeavyObject(PdObject):
         else:
             raise Exception("Adding a connection to the wrong object!")
 
-    def to_hv(self):
+    def to_hv(self) -> Dict:
         return {
             "type": self.obj_type,
             "args": self.obj_dict,

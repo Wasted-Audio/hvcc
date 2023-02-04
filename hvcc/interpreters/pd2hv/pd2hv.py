@@ -38,7 +38,7 @@ class Colours:
 class pd2hv:
 
     @classmethod
-    def get_supported_objects(cls):
+    def get_supported_objects(cls) -> List:
         return PdParser.get_supported_objects()
 
     @classmethod

@@ -28,7 +28,7 @@ class Connection:
         to_obj: 'PdBinopObject',
         inlet_index: int,
         conn_type: str
-    ):
+    ) -> None:
         assert from_obj is not None
         assert to_obj is not None
         assert conn_type is not None

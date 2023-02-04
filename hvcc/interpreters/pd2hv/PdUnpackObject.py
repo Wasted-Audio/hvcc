@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from typing import Optional, List
+from typing import Optional, List, Dict
 
 from .PdObject import PdObject
 
@@ -25,7 +25,7 @@ class PdUnpackObject(PdObject):
         obj_args: Optional[List] = None,
         pos_x: int = 0,
         pos_y: int = 0
-    ):
+    ) -> None:
         assert obj_type == "unpack"
         super().__init__(obj_type, obj_args, pos_x, pos_y)
 
@@ -34,7 +34,7 @@ class PdUnpackObject(PdObject):
         if not (set(self.obj_args) <= set(["f", "s"])):
             self.add_warning("Heavy only supports arguments 'f' and 's' to unpack.")
 
-    def to_hv(self):
+    def to_hv(self) -> Dict:
         """ Creates a graph dynamically based on the number of arguments.
 
             [inlet                                                ]
@@ -44,7 +44,7 @@ class PdUnpackObject(PdObject):
             [outlet_0]               ...    [outlet_N-1]
         """
 
-        hv_graph = {
+        hv_graph: Dict = {
             "type": "graph",
             "imports": [],
             "args": [],

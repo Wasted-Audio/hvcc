@@ -14,7 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
-from typing import Optional, List
+from typing import Optional, List, Dict
 
 from .Connection import Connection
 from .NotificationEnum import NotificationEnum
@@ -30,7 +30,7 @@ class PdGraph(PdObject):
         pd_path: str,
         pos_x: int = 0,
         pos_y: int = 0
-    ):
+    ) -> None:
         assert len(obj_args) > 0, "PdGraph arguments must contain at least dollar zero."
         super().__init__("graph", obj_args, pos_x, pos_y)
 
@@ -68,7 +68,7 @@ class PdGraph(PdObject):
         else:
             return self.parent_graph.__pd_path == self.__pd_path if not self.is_root else False
 
-    def add_object(self, obj: PdObject):
+    def add_object(self, obj: PdObject) -> None:
         obj.parent_graph = self
         self.__objs.append(obj)
 
@@ -84,7 +84,7 @@ class PdGraph(PdObject):
             for i, o in enumerate(self.__outlet_objects):
                 o.let_index = i
 
-    def add_parsed_connection(self, from_index: int, from_outlet: int, to_index: int, to_inlet: int):
+    def add_parsed_connection(self, from_index: int, from_outlet: int, to_index: int, to_inlet: int) -> None:
         """ Add a connection to the graph which has been parsed externally.
         """
         try:
@@ -112,7 +112,7 @@ class PdGraph(PdObject):
                            "Have all inlets and outlets been declared?",
                            NotificationEnum.ERROR_UNABLE_TO_CONNECT_OBJECTS)
 
-    def add_hv_arg(self, arg_index, name, value_type, default_value, required):
+    def add_hv_arg(self, arg_index: int, name: str, value_type: str, default_value: str, required: bool) -> None:
         """ Add a Heavy argument to the graph. Indicies are from zero (not one, like Pd).
         """
         # ensure that self.hv_args is big enough, as heavy arguments are not
@@ -134,7 +134,7 @@ class PdGraph(PdObject):
     def get_outlet_connection_type(self, outlet_index: int):
         return self.__outlet_objects[outlet_index].get_outlet_connection_type(outlet_index)
 
-    def validate_configuration(self):
+    def validate_configuration(self) -> None:
         if self.is_root:
             if any((o.obj_type in {"inlet~", "outlet~"}) for o in self.__objs):
                 self.add_error(
@@ -162,7 +162,7 @@ class PdGraph(PdObject):
         else:
             return False
 
-    def get_notices(self):
+    def get_notices(self) -> Dict:
         notices = PdObject.get_notices(self)
         for o in self.__objs:
             n = o.get_notices()
@@ -176,19 +176,24 @@ class PdGraph(PdObject):
 
         return notices
 
-    def get_graph_heirarchy(self):
+    def get_graph_heirarchy(self) -> List:
         """ Returns the "path" of this graph, indicating where it is in the
             graph heirarchy (i.e. with file names, etc.)
         """
-        return [str(self)] if self.is_root else \
-            self.parent_graph.get_graph_heirarchy() + [str(self)]
+        if self.is_root:
+            return [str(self)]
+        elif self.parent_graph is not None:
+            return self.parent_graph.get_graph_heirarchy() + [str(self)]
+        else:
+            # NOTE(dromer): we should never get here
+            raise Exception
 
     def get_depth(self):
         """ Returns the depth of this graph, with the root being at 1.
         """
         return 1 if self.is_root else (1 + self.parent_graph.get_depth())
 
-    def to_hv(self, export_args=False):
+    def to_hv(self, export_args: bool = False) -> Dict:
         # NOTE(mhroth): hv_args are not returned. Because all arguments have
         # been resolved, no arguments are otherwise passed. hv2ir would break
         # on required arguments that are not passed to the graph
@@ -205,5 +210,5 @@ class PdGraph(PdObject):
             }
         }
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return self.subpatch_name or os.path.basename(self.__pd_path)

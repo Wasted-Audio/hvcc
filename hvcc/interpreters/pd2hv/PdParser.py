@@ -18,7 +18,7 @@ from collections import OrderedDict
 import decimal
 import os
 import re
-from typing import List, Dict, Optional, Type, Any
+from typing import List, Dict, Optional, Type, Any, Generator
 
 from .HeavyObject import HeavyObject
 from .HeavyGraph import HeavyGraph              # pre-converted Heavy graphs
@@ -55,16 +55,16 @@ class PdParser:
     # detect width parameter e.g. "#X obj 172 79 t b b, f 22;"
     __RE_WIDTH = re.compile(r", f \d+$")
 
-    def __init__(self):
+    def __init__(self) -> None:
         # the current global value of $0
         # Note(joe): set a high starting value to avoid potential user naming conflicts
         self.__DOLLAR_ZERO = 1000
 
         # a counter of all Pd objects in the graph
-        self.obj_counter = Counter()
+        self.obj_counter: Counter = Counter()
 
         # search paths at this graph level
-        self.__search_paths = []
+        self.__search_paths: List = []
 
     @classmethod
     def get_supported_objects(cls) -> List:
@@ -96,7 +96,7 @@ class PdParser:
         return hv_arg_dict
 
     @classmethod
-    def __get_pd_line(cls, pd_path: str):
+    def __get_pd_line(cls, pd_path: str) -> Generator:
         concat = ""  # concatination state
         with open(pd_path, "r") as f:
             for li in f:
@@ -196,7 +196,7 @@ class PdParser:
 
     def graph_from_canvas(
         self,
-        file_iterator: List,
+        file_iterator: Generator,
         file_hv_arg_dict: Dict,
         canvas_line: str,
         graph_args: List,

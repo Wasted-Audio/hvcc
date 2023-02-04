@@ -19,6 +19,7 @@ import string
 
 from typing import Optional, List, Dict, TYPE_CHECKING
 
+from .Connection import Connection
 from .NotificationEnum import NotificationEnum
 
 if TYPE_CHECKING:
@@ -36,7 +37,7 @@ class PdObject:
         obj_args: Optional[List] = None,
         pos_x: int = 0,
         pos_y: int = 0
-    ):
+    ) -> None:
         self.obj_type = obj_type
         # all arguments should be resolved when passed to a PdObject
         self.obj_args = obj_args or []
@@ -55,12 +56,12 @@ class PdObject:
         self._warnings: List = []
         self._errors: List = []
 
-    def add_warning(self, warning, enum=NotificationEnum.WARNING_GENERIC):
+    def add_warning(self, warning, enum=NotificationEnum.WARNING_GENERIC) -> None:
         """ Add a warning regarding this object.
         """
         self._warnings.append({"enum": enum, "message": warning})
 
-    def add_error(self, error, enum=NotificationEnum.ERROR_GENERIC):
+    def add_error(self, error, enum=NotificationEnum.ERROR_GENERIC) -> None:
         """ Add an error regarding this object.
         """
         self._errors.append({"enum": enum, "message": error})
@@ -110,21 +111,21 @@ class PdObject:
             ]
         }
 
-    def get_inlet_connection_type(self, inlet_index: int) -> str:
+    def get_inlet_connection_type(self, inlet_index: int) -> Optional[str]:
         """ Returns the inlet connection type of this Pd object.
             For the sake of convenience, the connection type is reported in
             Heavy's format.
         """
         return "~f>" if self.obj_type.endswith("~") else "-->"
 
-    def get_outlet_connection_type(self, outlet_index: int) -> str:
+    def get_outlet_connection_type(self, outlet_index: int) -> Optional[str]:
         """ Returns the outlet connection type of this Pd object.
             For the sake of convenience, the connection type is reported in
             Heavy's format.
         """
         return "~f>" if self.obj_type.endswith("~") else "-->"
 
-    def add_connection(self, c):
+    def add_connection(self, c: Connection) -> None:
         """ Adds a connection, either inlet or outlet, to this object.
         """
         if c.from_id == self.obj_id:
@@ -134,7 +135,7 @@ class PdObject:
         else:
             raise Exception("Adding a connection to the wrong object!")
 
-    def remove_connection(self, c):
+    def remove_connection(self, c: Connection) -> None:
         """ Remove a connection to this object.
         """
         if c.to_obj is self:
@@ -144,7 +145,7 @@ class PdObject:
         else:
             raise Exception(f"Connection {c} does not connect to this object {self}.")
 
-    def get_graph_heirarchy(self):
+    def get_graph_heirarchy(self) -> List:
         """ Returns an indication of the graph "path" of this object.
         It only includes unique graphs (not subpatches) E.g. _main/tabosc4~
         The check for None is in case the object is somehow not yet attached.
@@ -152,7 +153,7 @@ class PdObject:
         return self.parent_graph.get_graph_heirarchy() \
             if self.parent_graph is not None else ["unattached"]
 
-    def validate_configuration(self):
+    def validate_configuration(self) -> None:
         """ Called when all graphs are finished parsing, from the root.
             Gives each object the chance to validate it's configuration,
             including connections.

@@ -13,12 +13,20 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from typing import Optional, List, Dict
+
 from .NotificationEnum import NotificationEnum
 from .PdObject import PdObject
 
 
 class PdPackObject(PdObject):
-    def __init__(self, obj_type, obj_args=None, pos_x=0, pos_y=0):
+    def __init__(
+        self,
+        obj_type: str,
+        obj_args: Optional[List] = None,
+        pos_x: int = 0,
+        pos_y: int = 0
+    ) -> None:
         assert obj_type == "pack"
         super().__init__(obj_type, obj_args, pos_x, pos_y)
 
@@ -38,7 +46,7 @@ class PdPackObject(PdObject):
                         f"\"{x}\" argument to [pack] object not supported.",
                         NotificationEnum.ERROR_PACK_FLOAT_ARGUMENTS)
 
-    def to_hv(self):
+    def to_hv(self) -> Dict:
         return {
             "type": "__pack",
             "args": {

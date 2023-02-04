@@ -59,7 +59,7 @@ class PdBinopObject(PdObject):
         obj_args: Optional[List] = None,
         pos_x: int = 0,
         pos_y: int = 0
-    ):
+    ) -> None:
         assert self.is_binop(obj_type)
         super().__init__(obj_type, obj_args, pos_x, pos_y)
 
@@ -71,7 +71,7 @@ class PdBinopObject(PdObject):
     def get_supported_objects(cls) -> set:
         return set(cls.__PD_HEAVY_DICT.keys())
 
-    def validate_configuration(self):
+    def validate_configuration(self) -> None:
         # check signal objects for control connections and auto insert
         # heavy var objects where necessary
         if self.obj_type.endswith("~"):
@@ -108,7 +108,7 @@ class PdBinopObject(PdObject):
         else:
             self.__k = 0.0
 
-    def convert_ctrl_to_sig_connections_at_inlet(self, connection_list: List, inlet_index: int):
+    def convert_ctrl_to_sig_connections_at_inlet(self, connection_list: List, inlet_index: int) -> None:
         """ Auto insert heavy var object inbetween control connections.
         """
         # TODO(dromer): seems this entire code-path is completely unused.
