@@ -40,34 +40,34 @@ class Connection:
                           conn_type=self.type if type is None else type)
 
     @property
-    def is_signal(self):
-        return Connection.is_signal_type(self.type)
+    def is_signal(self) -> bool:
+        return self.is_signal_type(self.type)
 
     @property
-    def is_control(self):
+    def is_control(self) -> bool:
         return self.type == "-->"
 
     @property
-    def is_float_signal(self):
+    def is_float_signal(self) -> bool:
         return self.type == "~f>"
 
     @property
-    def is_integer_signal(self):
+    def is_integer_signal(self) -> bool:
         return self.type == "~i>"
 
     @property
-    def is_mixed(self):
+    def is_mixed(self) -> bool:
         return self.type == "-~>"
 
     @classmethod
-    def is_signal_type(cls, type):
+    def is_signal_type(cls, type: str) -> bool:
         return type in {"~i>", "~f>"}
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
         return self.__hash == other.__hash__() if isinstance(other, Connection) else False
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return self.__hash
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"[{self.from_object}:{self.outlet_index}] {self.type} [{self.to_object}:{self.inlet_index}]"

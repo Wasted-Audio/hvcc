@@ -13,23 +13,35 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from typing import Dict, Optional
+
 from .HeavyIrObject import HeavyIrObject
+from .HeavyGraph import HeavyGraph
 
 
 class HIrTabwrite(HeavyIrObject):
     """ __tabwrite~f
     """
 
-    def __init__(self, obj_type, args=None, graph=None, annotations=None):
+    def __init__(
+        self,
+        obj_type: str,
+        args: Optional[Dict] = None,
+        graph: Optional[HeavyGraph] = None,
+        annotations: Optional[Dict] = None
+    ) -> None:
         assert obj_type in {"__tabwrite~f", "__tabwrite_stoppable~f", "__tabwrite"}
-        HeavyIrObject.__init__(self, obj_type, args=args, graph=graph, annotations=annotations)
+        super().__init__(obj_type, args=args, graph=graph, annotations=annotations)
 
-    def reduce(self):
-        table_obj = self.graph.resolve_object_for_name(
-            self.args["table"],
-            ["table", "__table"])
-        if table_obj is not None:
-            self.args["table_id"] = table_obj.id
-            return ({self}, [])
-        else:
-            self.add_error(f"Can't find table with name \"{self.args['table']}\".")
+    def reduce(self) -> Optional[tuple]:
+        if self.graph is not None:
+            table_obj = self.graph.resolve_object_for_name(
+                self.args["table"],
+                ["table", "__table"])
+            if table_obj is not None:
+                self.args["table_id"] = table_obj.id
+                return ({self}, [])
+            else:
+                self.add_error(f"Can't find table with name \"{self.args['table']}\".")
+
+        return None

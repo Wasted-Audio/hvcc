@@ -13,17 +13,31 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from typing import Dict, Optional
+
 from .HeavyIrObject import HeavyIrObject
+from .HeavyGraph import HeavyGraph
 
 
 class HIrSwitchcase(HeavyIrObject):
     """ A specific implementation of the __switchcase object.
     """
 
-    def __init__(self, obj_type, args=None, graph=None, annotations=None):
-        HeavyIrObject.__init__(self, "__switchcase",
-                               args=args,
-                               graph=graph,
-                               num_inlets=1,
-                               num_outlets=len(args["cases"]) + 1,
-                               annotations=annotations)
+    def __init__(
+        self,
+        obj_type: str,
+        args: Optional[Dict] = None,
+        graph: Optional[HeavyGraph] = None,
+        annotations: Optional[Dict] = None
+    ) -> None:
+        if args is not None:
+            num_cases = len(args["cases"])
+        else:
+            num_cases = 0
+
+        super().__init__("__switchcase",
+                         args=args,
+                         graph=graph,
+                         num_inlets=1,
+                         num_outlets=num_cases + 1,
+                         annotations=annotations)

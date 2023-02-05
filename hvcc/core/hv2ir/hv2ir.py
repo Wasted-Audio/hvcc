@@ -18,6 +18,8 @@ import json
 import os
 import time
 
+from typing import Optional, Dict
+
 from hvcc.core.hv2ir.HeavyException import HeavyException
 from hvcc.core.hv2ir.HeavyParser import HeavyParser
 
@@ -25,7 +27,13 @@ from hvcc.core.hv2ir.HeavyParser import HeavyParser
 class hv2ir:
 
     @classmethod
-    def compile(cls, hv_file, ir_file, patch_name=None, verbose=False):
+    def compile(
+        cls,
+        hv_file: str,
+        ir_file: str,
+        patch_name: Optional[str] = None,
+        verbose: bool = False
+    ) -> Dict:
         """ Compiles a HeavyLang file into a HeavyIR file.
             Returns a tuple of compile time in seconds, a notification dictionary,
             and a heavy object counter.
@@ -99,7 +107,7 @@ class hv2ir:
             else:
                 json.dump(ir, f)
 
-        if verbose:
+        if verbose and ir is not None:
             if len(ir["signal"]["processOrder"]) > 0:
                 print("")
                 print("=== Signal Order ===")

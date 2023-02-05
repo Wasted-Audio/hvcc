@@ -16,9 +16,15 @@
 import json
 import os
 
-from hvcc.core.hv2ir.Connection import Connection
-from hvcc.core.hv2ir.HeavyException import HeavyException
-from hvcc.core.hv2ir.HeavyLangObject import HeavyLangObject
+from typing import Dict, List, Optional, TYPE_CHECKING
+
+from .Connection import Connection
+from .HeavyException import HeavyException
+from .HeavyLangObject import HeavyLangObject
+from .BufferPool import BufferPool
+
+if TYPE_CHECKING:
+    from .HeavyGraph import HeavyGraph
 
 
 class HeavyIrObject(HeavyLangObject):
@@ -31,13 +37,21 @@ class HeavyIrObject(HeavyLangObject):
     with open(os.path.join(os.path.dirname(__file__), "../json/heavy.ir.json"), "r") as f:
         __HEAVY_OBJS_IR_DICT = json.load(f)
 
-    def __init__(self, obj_type, args=None, graph=None, num_inlets=-1, num_outlets=-1, annotations=None):
+    def __init__(
+        self,
+        obj_type: str,
+        args: Optional[Dict] = None,
+        graph: Optional['HeavyGraph'] = None,
+        num_inlets: int = -1,
+        num_outlets: int = -1,
+        annotations: Optional[Dict] = None
+    ) -> None:
         # allow the number of inlets and outlets to be overridden
         num_inlets = len(HeavyIrObject.__HEAVY_OBJS_IR_DICT[obj_type]["inlets"]) if num_inlets < 0 else num_inlets
 
         num_outlets = len(HeavyIrObject.__HEAVY_OBJS_IR_DICT[obj_type]["outlets"]) if num_outlets < 0 else num_outlets
 
-        HeavyLangObject.__init__(self, obj_type, args, graph, num_inlets, num_outlets, annotations)
+        super().__init__(obj_type, args, graph, num_inlets, num_outlets, annotations)
 
         # resolve arguments and fill in missing defaults for HeavyIR objects
         self.__resolve_default_ir_args()
@@ -73,7 +87,7 @@ class HeavyIrObject(HeavyLangObject):
                             self.graph)
 
     @classmethod
-    def is_ir(cls, obj_type):
+    def is_ir(cls, obj_type: str) -> bool:
         """Returns true if the type is an IR object. False otherwise.
         """
         return obj_type in HeavyIrObject.__HEAVY_OBJS_IR_DICT
@@ -100,11 +114,11 @@ class HeavyIrObject(HeavyLangObject):
         """
         return self.__obj_desc["outlets"][inlet_index] in {"~i>", "~f>"}
 
-    def reduce(self):
+    def reduce(self) -> Optional[tuple]:
         # A Heavy IR object is already reduced. Returns itself and no connection changes.
         return ({self}, [])
 
-    def get_parent_order(self):
+    def get_parent_order(self) -> List:
         """ Returns a list of all objects in process order, with this object at the end.
         """
         if self.__is_ordered:
@@ -120,47 +134,48 @@ class HeavyIrObject(HeavyLangObject):
                 order_list.append(self)
                 return order_list
 
-    def assign_signal_buffers(self, buffer_pool):
-        # assign the inlet buffers
-        for cc in self.inlet_connections:
-            cc = [c for c in cc if c.is_signal]  # only need to deal with signal connections
-            if len(cc) == 0:
-                continue
-            if len(cc) == 1:
-                c = cc[0]  # get the connection
+    def assign_signal_buffers(self, buffer_pool: Optional[BufferPool]) -> None:
+        if buffer_pool is not None:
+            # assign the inlet buffers
+            for cc in self.inlet_connections:
+                cc = [c for c in cc if c.is_signal]  # only need to deal with signal connections
+                if len(cc) == 0:
+                    continue
+                if len(cc) == 1:
+                    c = cc[0]  # get the connection
 
-                # get the buffer at the outlet of the connected object
-                buf = c.from_object.outlet_buffers[c.outlet_index]
+                    # get the buffer at the outlet of the connected object
+                    buf = c.from_object.outlet_buffers[c.outlet_index]
 
-                # assign the buffer to the inlet of this object
-                self.inlet_buffers[c.inlet_index] = buf
+                    # assign the buffer to the inlet of this object
+                    self.inlet_buffers[c.inlet_index] = buf
 
-                # decrease the retain count of the buffer
-                buffer_pool.release_buffer(buf)
-            else:
-                raise HeavyException(f"This object has {len(cc)} (> 1) signal inputs.")
+                    # decrease the retain count of the buffer
+                    buffer_pool.release_buffer(buf)
+                else:
+                    raise HeavyException(f"This object has {len(cc)} (> 1) signal inputs.")
 
-        # assign the output buffers
-        exclude_set = set()
+            # assign the output buffers
+            exclude_set: set = set()
 
-        for i in range(self.num_outlets):
-            # buffers are assigned even if the outlet has no connections.
-            # The buffer will still be filled. However, if the buffer has already
-            # been set (i.e. non-zero) (e.g. in the case of dac~),
-            # then we skip this set
+            for i in range(self.num_outlets):
+                # buffers are assigned even if the outlet has no connections.
+                # The buffer will still be filled. However, if the buffer has already
+                # been set (i.e. non-zero) (e.g. in the case of dac~),
+                # then we skip this set
 
-            connection_type = self._resolved_outlet_type(outlet_index=i)
-            if Connection.is_signal_type(connection_type) and self.outlet_buffers[i][0] == "zero":
-                b = buffer_pool.get_buffer(
-                    connection_type,
-                    len(self.outlet_connections[i]),
-                    exclude_set)
-                self.outlet_buffers[i] = b
+                connection_type = self._resolved_outlet_type(outlet_index=i)
+                if Connection.is_signal_type(connection_type) and self.outlet_buffers[i][0] == "zero":
+                    b = buffer_pool.get_buffer(
+                        connection_type,
+                        len(self.outlet_connections[i]),
+                        exclude_set)
+                    self.outlet_buffers[i] = b
 
-                # if the buffer has no dependencies, make sure that it isn't reused
-                # right away. All outlets should have independent buffers.
-                if len(self.outlet_connections[i]) == 0:
-                    exclude_set.add(b)
+                    # if the buffer has no dependencies, make sure that it isn't reused
+                    # right away. All outlets should have independent buffers.
+                    if len(self.outlet_connections[i]) == 0:
+                        exclude_set.add(b)
 
     def _resolved_outlet_type(self, outlet_index=0):
         """ Returns the connection type at the given outlet.
@@ -172,7 +187,7 @@ class HeavyIrObject(HeavyLangObject):
     # Intermediate Representation generators
     #
 
-    def get_object_dict(self):
+    def get_object_dict(self) -> Dict:
         """ Returns a dictionary of all constituent low-level objects,
             indexed by id, including their arguments and type.
         """
@@ -183,12 +198,12 @@ class HeavyIrObject(HeavyLangObject):
             }
         }
 
-    def get_ir_init_list(self):
+    def get_ir_init_list(self) -> List:
         """ Returns a list of all object id for obejcts that need initialisation.
         """
         return [self.id] if self.__obj_desc["ir"]["init"] else []
 
-    def get_ir_on_message(self, inlet_index=0):
+    def get_ir_on_message(self, inlet_index: int = 0) -> List:
         """ Returns an array of dictionaries containing the information for the
             corresponding on_message call.
         """
@@ -197,7 +212,7 @@ class HeavyIrObject(HeavyLangObject):
             "inletIndex": inlet_index
         }]
 
-    def get_ir_control_list(self):
+    def get_ir_control_list(self) -> List:
         """ Returns the intermediate representation for object control functions.
             Basically, does sendMessage() need to be written?
         """
@@ -216,7 +231,7 @@ class HeavyIrObject(HeavyLangObject):
         else:
             return []
 
-    def get_ir_signal_list(self):
+    def get_ir_signal_list(self) -> List:
         """ Returns the intermediate representation for object process functions.
             Only outputs buffer information for lets that require a signal.
         """

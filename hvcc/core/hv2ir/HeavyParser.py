@@ -17,6 +17,8 @@ import json
 import random
 import os
 
+from typing import Any, Dict, Optional
+
 from .HIrConvolution import HIrConvolution
 from .HIrInlet import HIrInlet
 from .HIrLorenz import HIrLorenz
@@ -59,7 +61,14 @@ from .Connection import Connection
 class HeavyParser:
 
     @classmethod
-    def graph_from_file(cls, hv_file, graph=None, graph_args=None, path_stack=None, xname=None):
+    def graph_from_file(
+        cls,
+        hv_file: str,
+        graph: Optional[HeavyGraph] = None,
+        graph_args: Optional[Dict] = None,
+        path_stack: Optional[set] = None,
+        xname=None
+    ) -> HeavyGraph:
         """ Read a graph object from a file.
 
             @param graph  The parent graph of this graph.
@@ -82,10 +91,19 @@ class HeavyParser:
         with open(hv_file, "r") as f:
             json_heavy = json.load(f)
 
-        return HeavyParser.graph_from_object(json_heavy, graph, graph_args, hv_file, path_stack, xname)
+        return cls.graph_from_object(json_heavy, graph, graph_args, hv_file, path_stack, xname)
 
     @classmethod
-    def graph_from_object(cls, json_heavy, graph=None, graph_args=None, hv_file=None, path_stack=None, xname=None):
+    def graph_from_object(
+        cls,
+        json_heavy: Dict,
+        graph: Optional[HeavyGraph] = None,
+        graph_args: Optional[Dict] = None,
+        hv_file=None,
+        path_stack=None,
+        xname: Optional[str] = None
+    ) -> HeavyGraph:
+
         """ Parse a graph object.
 
             @param graph  The parent graph.
@@ -125,7 +143,7 @@ class HeavyParser:
                 elif o["type"] == "graph":
                     # inline HeavyGraph objects (i.e. subgraphs)
                     # require a different set of initialisation arguments
-                    x = HeavyParser.graph_from_object(o, g, g.args, hv_file, path_stack, xname)
+                    x: Any = cls.graph_from_object(o, g, g.args, hv_file, path_stack, xname)
 
                 else:
                     # resolve the arguments dictionary based on the graph args
@@ -137,7 +155,7 @@ class HeavyParser:
                     # name as the type that we are looking for, don't recurse!
                     abs_path = g.find_path_for_abstraction(o["type"])
                     if abs_path is not None and abs_path not in path_stack:
-                        x = HeavyParser.graph_from_file(
+                        x = cls.graph_from_file(
                             hv_file=abs_path,
                             graph=g,
                             graph_args=args,
@@ -187,7 +205,7 @@ class HeavyParser:
         return g
 
     @classmethod
-    def get_class_for_type(cls, obj_type):
+    def get_class_for_type(cls, obj_type: str) -> Any:
         """ Returns the class which can handle the given object type.
         """
         if HLangUnop.handles_type(obj_type):
@@ -204,13 +222,16 @@ class HLangIf(HeavyLangObject):
     """ Translates HeavyLang object [if] to HeavyIR [if] or [if~].
     """
 
-    def __init__(self, obj_type, args, graph, annotations=None):
-        HeavyLangObject.__init__(self, "if", args, graph,
-                                 num_inlets=2,
-                                 num_outlets=2,
-                                 annotations=annotations)
+    def __init__(
+        self,
+        obj_type: str,
+        args: Dict,
+        graph: HeavyGraph,
+        annotations: Optional[Dict] = None
+    ) -> None:
+        super().__init__("if", args, graph, num_inlets=2, num_outlets=2, annotations=annotations)
 
-    def reduce(self):
+    def reduce(self) -> tuple:
         if self.has_inlet_connection_format(["cc", "_c", "c_", "__"]):
             x = HeavyIrObject("__if", self.args)
         elif self.has_inlet_connection_format("ff"):
@@ -230,14 +251,17 @@ class HLangNoise(HeavyLangObject):
     """ Handles the HeavyLang "noise" object.
     """
 
-    def __init__(self, obj_type, args, graph, annotations=None):
+    def __init__(
+        self,
+        obj_type: str,
+        args: Dict,
+        graph: HeavyGraph,
+        annotations: Optional[Dict] = None
+    ) -> None:
         assert obj_type == "noise"
-        HeavyLangObject.__init__(self, "noise", args, graph,
-                                 num_inlets=1,
-                                 num_outlets=1,
-                                 annotations=annotations)
+        super().__init__("noise", args, graph, num_inlets=1, num_outlets=1, annotations=annotations)
 
-    def reduce(self):
+    def reduce(self) -> tuple:
         seed = int(random.uniform(1, 2147483647))  # assign a random 32-bit seed
         noise_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "./hvlib/noise.hv.json")
         x = HeavyParser.graph_from_file(noise_path, graph_args={"seed": seed})

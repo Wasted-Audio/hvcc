@@ -17,10 +17,15 @@ import decimal
 import json
 import os
 import random
-from struct import unpack, pack
 import string
 
+from struct import unpack, pack
+from typing import Optional, List, Dict, Any, TYPE_CHECKING
+
 from hvcc.core.hv2ir.HeavyException import HeavyException
+
+if TYPE_CHECKING:
+    from .HeavyGraph import HeavyGraph
 
 
 class HeavyLangObject:
@@ -34,58 +39,66 @@ class HeavyLangObject:
     with open(os.path.join(os.path.dirname(__file__), "../json/heavy.lang.json"), "r") as f:
         _HEAVY_LANG_DICT = json.load(f)
 
-    def __init__(self, obj_type, args=None, graph=None, num_inlets=-1, num_outlets=-1, annotations=None):
+    def __init__(
+        self,
+        obj_type: str,
+        args: Optional[Dict] = None,
+        graph: Optional['HeavyGraph'] = None,
+        num_inlets: int = -1,
+        num_outlets: int = -1,
+        annotations: Optional[Dict] = None
+    ) -> None:
         # set the object type
         self.type = obj_type
 
         # generate a unique id for this object
-        self.id = "".join(HeavyLangObject.__RANDOM.choice(HeavyLangObject.__ID_CHARS) for _ in range(8))
+        self.id = "".join(self.__RANDOM.choice(self.__ID_CHARS) for _ in range(8))
 
         # assign the parent graph
         self.graph = graph
 
         # set local arguments
-        self.args = args or {}
+        self.args: Dict = args or {}
 
         # set local annotations
-        self.annotations = annotations or {}
+        self.annotations: Dict = annotations or {}
 
         # a list of locally generated warnings and errors (notifications)
-        self.warnings = []
-        self.errors = []
+        self.warnings: List = []
+        self.errors: List = []
 
         # resolve arguments and fill in missing defaults for HeavyLang objects
         self.__resolve_default_lang_args()
 
         # the list of connections at each inlet
         num_inlets = num_inlets if num_inlets >= 0 else len(self._obj_desc["inlets"])
-        self.inlet_connections = [[] for _ in range(num_inlets)]
+        self.inlet_connections: List = [[] for _ in range(num_inlets)]
 
         # the list of connections at each outlet
         num_outlets = num_outlets if num_outlets >= 0 else len(self._obj_desc["outlets"])
-        self.outlet_connections = [[] for _ in range(num_outlets)]
+        self.outlet_connections: List = [[] for _ in range(num_outlets)]
 
     @property
-    def scope(self):
+    def scope(self) -> str:
         """ Returns the scope of this object, private by default.
             Scope may be public, protected, private.
         """
         return self.annotations.get("scope", "private")
 
     @property
-    def static(self):
+    def static(self) -> bool:
         """ Returns true of this object is marked as static. False by default.
         """
         return self.annotations.get("static", False)
 
     @property
-    def const(self):
+    def const(self) -> bool:
         """ Returns true of this object is marked as constant. False by default.
         """
         return self.annotations.get("const", False)
 
     @property
-    def name(self):
+    def name(self) -> Optional[str]:
         """ Returns the name of this object. Returns None if there is no name.
         """
         return self.args.get("name", None)
@@ -94,31 +107,31 @@ class HeavyLangObject:
     def _obj_desc(self):
         """ Returns the HeavyLang object description.
         """
-        return HeavyLangObject._HEAVY_LANG_DICT[self.type]
+        return self._HEAVY_LANG_DICT[self.type]
 
-    def inlet_connection_type(self, index):
+    def inlet_connection_type(self, index: int):
         return self._obj_desc["inlets"][index]
 
-    def outlet_connection_type(self, index):
+    def outlet_connection_type(self, index: int):
         return self._obj_desc["outlets"][index]
 
-    def name_for_arg(self, index=0):
+    def name_for_arg(self, index: int = 0):
         """ Returns the name of the argument at the given index.
         """
         return self._obj_desc["args"][index]["name"]
 
-    def add_warning(self, warning):
+    def add_warning(self, warning: str) -> None:
         """ Add a warning to this object.
         """
         self.warnings.append({"message": warning})
 
-    def add_error(self, error):
+    def add_error(self, error: str) -> None:
         """ Add an error to this object and raise an exception.
         """
         self.errors.append({"message": error})
         raise HeavyException(error)
 
-    def get_notices(self):
+    def get_notices(self) -> Dict:
         """ Returns a dictionary of all warnings and errors at this object.
         """
         return {
@@ -127,7 +140,7 @@ class HeavyLangObject:
         }
 
     @classmethod
-    def force_arg_type(cls, value, value_type, graph=None):
+    def force_arg_type(cls, value: Any, value_type: str, graph=None) -> Any:
         """ Attempts to convert a value to a given value type. Raises an Exception otherwise.
             If the value_type is unknown and a graph is provided, a warning will be registered.
         """

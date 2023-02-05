@@ -13,27 +13,29 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from collections import defaultdict
 import os
+from collections import defaultdict
+from typing import Optional, Union, Dict, List
 
 from .HeavyException import HeavyException
+from .HeavyLangObject import HeavyLangObject
 
 
 class LocalVars:
     """ A set of scoped objects.
     """
 
-    def __init__(self, stdlib_dir="./"):
+    def __init__(self, stdlib_dir: str = "./") -> None:
         # a dictionary of name-registered objects
         # the data structure is a list map
         # key is the name under which the object is registered, value is a
         # list of all objects who are registered with that name
-        self.__REGISTERED_OBJ_DICT = defaultdict(list)
+        self.__REGISTERED_OBJ_DICT: Dict = defaultdict(list)
 
         # the list of globally declared paths
         self.declared_paths = [stdlib_dir]  # initialise with the standard library directory
 
-    def find_path_for_abstraction(self, name):
+    def find_path_for_abstraction(self, name: str) -> Optional[str]:
         # the file name based on the abstraction name
         file_name = f"{name}.hv.json"
 
@@ -44,12 +46,12 @@ class LocalVars:
                 return file_path  # if a matching abstraction is found, return the path
         return None  # otherwise return None
 
-    def add_import_paths(self, path_list):
+    def add_import_paths(self, path_list: List) -> None:
         """ Add import paths. Paths are expanded and made as explicit as possible.
         """
         self.declared_paths.extend([os.path.abspath(os.path.expanduser(p)) for p in path_list])
 
-    def register_object(self, obj, name, static=False, unique=False):
+    def register_object(self, obj: HeavyLangObject, name: str, static: bool = False, unique: bool = False) -> None:
         """ Registers a named object.
         """
 
@@ -64,20 +66,20 @@ class LocalVars:
         else:
             self.__REGISTERED_OBJ_DICT[name].append(obj)
 
-    def unregister_object(self, obj, name):
+    def unregister_object(self, obj: HeavyLangObject, name: str) -> None:
         """ Unregisters a named object.
         """
 
         self.__REGISTERED_OBJ_DICT[name].remove(obj)
 
-    def get_objects_for_name(self, name, obj_types):
+    def get_objects_for_name(self, name: str, obj_types: Union[str, List]) -> List:
         """ Returns a list of objects registered under a name in this scope.
         """
 
         obj_types = obj_types if isinstance(obj_types, list) else [obj_types]
         return [o for o in self.__REGISTERED_OBJ_DICT[name] if o.type in obj_types]
 
-    def get_registered_objects_for_type(self, obj_type):
+    def get_registered_objects_for_type(self, obj_type: str) -> Dict:
         """ Returns a list-dictionary for all objects of the given type, indexed by name.
         """
 

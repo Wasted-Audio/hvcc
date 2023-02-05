@@ -13,18 +13,28 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from typing import Dict, List, Optional
+
 from .HeavyIrObject import HeavyIrObject
+from .HeavyGraph import HeavyGraph
 
 
 class HIrOutlet(HeavyIrObject):
     """ A specific implementation of the outlet object.
     """
 
-    def __init__(self, obj_type, args=None, graph=None, annotations=None):
-        HeavyIrObject.__init__(self, "__outlet", args=args, graph=graph, annotations=annotations)
+    def __init__(
+        self,
+        obj_type: str,
+        args: Optional[Dict] = None,
+        graph: Optional[HeavyGraph] = None,
+        annotations: Optional[Dict] = None
+    ) -> None:
+        super().__init__("__outlet", args=args, graph=graph, annotations=annotations)
 
-    def get_ir_on_message(self, inlet_index):
+    def get_ir_on_message(self, inlet_index: int = 0) -> List:
         x = []
-        for c in self.graph.outlet_connections[self.args["index"]]:
-            x.extend(c.to_object.get_ir_on_message(c.inlet_index))
+        if self.graph is not None:
+            for c in self.graph.outlet_connections[self.args["index"]]:
+                x.extend(c.to_object.get_ir_on_message(c.inlet_index))
         return x

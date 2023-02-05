@@ -13,13 +13,22 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from typing import Dict, Optional
+
 from .HeavyIrObject import HeavyIrObject
+from .HeavyGraph import HeavyGraph
 
 
 class HIrLorenz(HeavyIrObject):
     """ __lorenz~f
     """
 
-    def __init__(self, obj_type, args=None, graph=None, annotations=None):
+    def __init__(
+        self,
+        obj_type: str,
+        args: Optional[Dict] = None,
+        graph: Optional[HeavyGraph] = None,
+        annotations: Optional[Dict] = None
+    ) -> None:
         assert obj_type == "__lorenz~f"
-        HeavyIrObject.__init__(self, obj_type, args=args, graph=graph, annotations=annotations)
+        super().__init__(obj_type, args=args, graph=graph, annotations=annotations)
