@@ -20,12 +20,14 @@ import random
 import string
 
 from struct import unpack, pack
-from typing import Optional, List, Dict, Any, TYPE_CHECKING
+from typing import Optional, Union, List, Dict, Any, TYPE_CHECKING
 
-from hvcc.core.hv2ir.HeavyException import HeavyException
+from .Connection import Connection
+from .HeavyException import HeavyException
 
 if TYPE_CHECKING:
     from .HeavyGraph import HeavyGraph
+    from .HeavyIrObject import HeavyIrObject
 
 
 class HeavyLangObject:
@@ -140,7 +142,7 @@ class HeavyLangObject:
         }
 
     @classmethod
-    def force_arg_type(cls, value: Any, value_type: str, graph=None) -> Any:
+    def force_arg_type(cls, value: Any, value_type: str, graph: Optional['HeavyGraph'] = None) -> Any:
         """ Attempts to convert a value to a given value type. Raises an Exception otherwise.
             If the value_type is unknown and a graph is provided, a warning will be registered.
         """
@@ -188,7 +190,7 @@ class HeavyLangObject:
             #     graph.add_warning(f"Unknown value type \"{value_type}\" for value: {value}")
             return value
 
-    def __resolve_default_lang_args(self):
+    def __resolve_default_lang_args(self) -> None:
         """ Resolves missing default arguments. Also checks to make sure that all
             required arguments are present. Does nothing if the object is IR.
         """
@@ -209,14 +211,14 @@ class HeavyLangObject:
                         self.graph)
 
     @property
-    def num_inlets(self):
+    def num_inlets(self) -> int:
         return len(self.inlet_connections)
 
     @property
-    def num_outlets(self):
+    def num_outlets(self) -> int:
         return len(self.outlet_connections)
 
-    def add_connection(self, c):
+    def add_connection(self, c: Connection) -> None:
         """ Add a connection to this object.
         """
         try:
@@ -229,7 +231,7 @@ class HeavyLangObject:
         except Exception:
             raise HeavyException(f"Connection {c} connects to out-of-range let.")
 
-    def remove_connection(self, c):
+    def remove_connection(self, c: Connection) -> None:
         """ Remove a connection to this object.
         """
         if c.to_object is self:
@@ -239,7 +241,7 @@ class HeavyLangObject:
         else:
             raise HeavyException(f"Connection {c} does not connect to this object {self}.")
 
-    def replace_connection(self, c, n_list):
+    def replace_connection(self, c: Connection, n_list):
         """ Replaces connection c with connection list n_list, maintaining connection order
         """
         if c.from_object is self:
@@ -256,7 +258,7 @@ class HeavyLangObject:
         else:
             raise HeavyException(f"Connections must have a common endpoint: {c} / {n_list}")
 
-    def get_connection_move_list(self, o, connection_type_filter="-~>"):
+    def get_connection_move_list(self, o: 'HeavyIrObject', connection_type_filter: str = "-~>") -> List:
         """ Create a list of commands to move all connections from this object
             to the given object o.
         """
@@ -267,7 +269,7 @@ class HeavyLangObject:
             m.append((c, [c.copy(from_object=o)]))
         return m
 
-    def _get_connection_format(self, connections_list):
+    def _get_connection_format(self, connections_list: List) -> str:
         fmt = []
         for cc in connections_list:
             s = {c.type for c in cc}
@@ -288,36 +290,36 @@ class HeavyLangObject:
                 fmt.append("m")
         return "".join(fmt)
 
-    def has_inlet_connection_format(self, fmts=None):
+    def has_inlet_connection_format(self, fmts: Optional[Union[str, List]] = None) -> bool:
         """ Returns true if the object has given format at its inlets.
         """
         fmts = fmts if isinstance(fmts, list) else [fmts]
         return self._get_connection_format(self.inlet_connections) in fmts
 
-    def has_outlet_connection_format(self, fmts=None):
+    def has_outlet_connection_format(self, fmts: Optional[Union[str, List]] = None) -> bool:
         """ Returns true if the object has given format at its outlets.
             Take either litteral or list as input.
         """
         fmts = fmts if isinstance(fmts, list) else [fmts]
         return self._get_connection_format(self.outlet_connections) in fmts
 
-    def is_leaf(self):
+    def is_leaf(self) -> bool:
         """ Returns True if this object is a leaf in the graph. False otherwise.
         """
         return all(len(c) == 0 for c in self.outlet_connections)
 
-    def is_root(self):
+    def is_root(self) -> bool:
         """ Returns True if this object is a root in the graph. False otherwise.
         """
         return all(len(c) == 0 for c in self.inlet_connections)
 
-    def _resolved_outlet_type(self, outlet_index=0):
+    def _resolved_outlet_type(self, outlet_index: int = 0) -> Optional[str]:
         """ Returns the connection type expected at the given outlet.
             The result may be influenced by the state of the input connections.
         """
         # get the defined connection type
         connection_type = self._obj_desc["outlets"][outlet_index]["connectionType"]
-        if connection_type == "-~>":
+        if connection_type == "-~>" and self.graph is not None:
             # if the connection type is defined as mixed,
             # use the default approach to resolve it
             connection_type_set = {c.type for c in self.inlet_connections[0]}
@@ -336,30 +338,34 @@ class HeavyLangObject:
         else:
             return connection_type
 
-    def _resolve_connection_types(self, obj_stack):
+        return None
+
+    def _resolve_connection_types(self, obj_stack: Optional[set] = None) -> Optional[None]:
         """ Resolves the type of all connections before reduction to IR object types.
             If connections incident on an object are incompatible, they are either
             resolved, potentially by inserting conversion objects, or pruned.
             If a viable resolution cannot be found, an exception may be raised.
         """
+        obj_stack = obj_stack or set()
         if self in obj_stack:
             return
         else:
             obj_stack.add(self)
 
         # for all outgoing connections
-        for c in [c for cc in self.outlet_connections for c in cc]:
-            if c.is_mixed:
-                connection_type = self._resolved_outlet_type(outlet_index=c.outlet_index)
-                if connection_type == "-~>":
-                    self.graph.add_error("Cannot resolve connection type from -~>.")
-                else:
-                    self.graph.update_connection(c, [c.copy(type=connection_type)])
+        if self.graph is not None:
+            for c in [c for cc in self.outlet_connections for c in cc]:
+                if c.is_mixed:
+                    connection_type = self._resolved_outlet_type(outlet_index=c.outlet_index)
+                    if connection_type == "-~>":
+                        self.graph.add_error("Cannot resolve connection type from -~>.")
+                    else:
+                        self.graph.update_connection(c, [c.copy(type=connection_type)])
 
-            c.to_object._resolve_connection_types(obj_stack)  # turtle all the way down
+                c.to_object._resolve_connection_types(obj_stack)  # turtle all the way down
 
     @classmethod
-    def get_hash(cls, x):
+    def get_hash(cls, x: str) -> int:
         """ Compute the message element hash used by msg_getHash(). Returns a 32-bit integer.
         """
         if isinstance(x, float) or isinstance(x, int):
@@ -402,6 +408,6 @@ class HeavyLangObject:
         else:
             raise Exception("Message element hashes can only be computed for float and string types.")
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         arg_str = " ".join([f"{k}:{o}" for (k, o) in self.args.items()])
         return f"{self.type} {{{arg_str}}}" if len(arg_str) > 0 else self.type

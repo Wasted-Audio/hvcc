@@ -13,11 +13,24 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from typing import Optional, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from .HeavyIrObject import HeavyIrObject
+
+
 class Connection:
     """ A Connection describes a connection between two objects.
     """
 
-    def __init__(self, from_object, outlet_index, to_object, inlet_index, conn_type):
+    def __init__(
+        self,
+        from_object: 'HeavyIrObject',
+        outlet_index: int,
+        to_object: 'HeavyIrObject',
+        inlet_index: int,
+        conn_type: str
+    ) -> None:
         self.from_object = from_object
         self.outlet_index = outlet_index
         self.to_object = to_object
@@ -30,7 +43,14 @@ class Connection:
             self.to_object, self.inlet_index,
             self.type))
 
-    def copy(self, from_object=None, outlet_index=None, to_object=None, inlet_index=None, type=None):
+    def copy(
+        self,
+        from_object: Optional['HeavyIrObject'] = None,
+        outlet_index: Optional[int] = None,
+        to_object: Optional['HeavyIrObject'] = None,
+        inlet_index: Optional[int] = None,
+        type: Optional[str] = None
+    ) -> 'Connection':
         """ Create a new connection based on the existing one, changing the given values.
         """
         return Connection(from_object=self.from_object if from_object is None else from_object,
@@ -60,7 +80,7 @@ class Connection:
         return self.type == "-~>"
 
     @classmethod
-    def is_signal_type(cls, type: str) -> bool:
+    def is_signal_type(cls, type: Optional[str]) -> bool:
         return type in {"~i>", "~f>"}
 
     def __eq__(self, other) -> bool:

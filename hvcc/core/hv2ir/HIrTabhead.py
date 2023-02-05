@@ -14,6 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from typing import Dict, Optional
+
 from .HeavyIrObject import HeavyIrObject
 
 

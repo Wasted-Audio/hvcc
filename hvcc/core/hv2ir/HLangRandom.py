@@ -14,21 +14,29 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import random
+from typing import Optional, Dict
 
 from .HeavyLangObject import HeavyLangObject
 from .HeavyIrObject import HeavyIrObject
+from .HeavyGraph import HeavyGraph
 
 
 class HLangRandom(HeavyLangObject):
     """ Handles the HeavyLang "print" object.
     """
 
-    def __init__(self, obj_type, args, graph, annotations=None):
+    def __init__(
+        self,
+        obj_type: str,
+        args: Dict,
+        graph: 'HeavyGraph',
+        annotations: Optional[Dict] = None
+    ) -> None:
         assert obj_type == "random"
-        HeavyLangObject.__init__(self, obj_type, args, graph,
-                                 num_inlets=2,
-                                 num_outlets=1,
-                                 annotations=annotations)
+        super().__init__(obj_type, args, graph,
+                         num_inlets=2,
+                         num_outlets=1,
+                         annotations=annotations)
 
     def reduce(self):
         self.args["seed"] = int(random.uniform(-2147483647, 2147483648))

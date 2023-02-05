@@ -64,7 +64,7 @@ class HeavyIrObject(HeavyLangObject):
         # True if this object has already been ordered in the signal chain
         self.__is_ordered = False
 
-    def __resolve_default_ir_args(self):
+    def __resolve_default_ir_args(self) -> None:
         """ Resolves missing default arguments. Also checks to make sure that all
             required arguments are present.
         """
@@ -104,12 +104,12 @@ class HeavyIrObject(HeavyLangObject):
         """
         return HeavyIrObject.__HEAVY_OBJS_IR_DICT[self.type]
 
-    def inlet_requires_signal(self, inlet_index=0):
+    def inlet_requires_signal(self, inlet_index: int = 0):
         """ Returns True if the indexed inlet requires a signal connection. False otherwise.
         """
         return self.__obj_desc["inlets"][inlet_index] in {"~i>", "~f>"}
 
-    def outlet_requires_signal(self, inlet_index=0):
+    def outlet_requires_signal(self, inlet_index: int = 0):
         """ Returns True if the indexed outlet requires a signal connection. False otherwise.
         """
         return self.__obj_desc["outlets"][inlet_index] in {"~i>", "~f>"}
@@ -165,7 +165,8 @@ class HeavyIrObject(HeavyLangObject):
                 # then we skip this set
 
                 connection_type = self._resolved_outlet_type(outlet_index=i)
-                if Connection.is_signal_type(connection_type) and self.outlet_buffers[i][0] == "zero":
+                if Connection.is_signal_type(connection_type) and self.outlet_buffers[i][0] == "zero" \
+                        and connection_type is not None:
                     b = buffer_pool.get_buffer(
                         connection_type,
                         len(self.outlet_connections[i]),
@@ -177,7 +178,7 @@ class HeavyIrObject(HeavyLangObject):
                     if len(self.outlet_connections[i]) == 0:
                         exclude_set.add(b)
 
-    def _resolved_outlet_type(self, outlet_index=0):
+    def _resolved_outlet_type(self, outlet_index: int = 0) -> Optional[str]:
         """ Returns the connection type at the given outlet.
             This information is always well-defined for IR objects.
         """

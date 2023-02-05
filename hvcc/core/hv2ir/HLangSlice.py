@@ -13,21 +13,30 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from typing import Optional, Dict
+
 from .HeavyLangObject import HeavyLangObject
 from .HeavyIrObject import HeavyIrObject
+from .HeavyGraph import HeavyGraph
 
 
 class HLangSlice(HeavyLangObject):
     """ Handles the HeavyLang "slice" object.
     """
 
-    def __init__(self, obj_type, args, graph, annotations=None):
+    def __init__(
+        self,
+        obj_type: str,
+        args: Dict,
+        graph: 'HeavyGraph',
+        annotations: Optional[Dict] = None
+    ) -> None:
         assert obj_type == "slice"
-        HeavyLangObject.__init__(self, obj_type, args, graph,
-                                 num_inlets=3,
-                                 num_outlets=2,
-                                 annotations=annotations)
+        super().__init__(obj_type, args, graph,
+                         num_inlets=3,
+                         num_outlets=2,
+                         annotations=annotations)
 
-    def reduce(self):
+    def reduce(self) -> tuple:
         x = HeavyIrObject("__slice", self.args)
         return ({x}, self.get_connection_move_list(x))

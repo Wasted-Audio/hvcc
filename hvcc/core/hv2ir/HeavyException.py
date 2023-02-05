@@ -13,11 +13,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from typing import Dict
+
+
 class HeavyException(Exception):
     """ This exception is raised if anything goes wrong during the hv2ir compilation process.
     """
 
-    def __init__(self, message=""):
+    def __init__(self, message: str = "") -> None:
         super(Exception, self).__init__(message)
         self.message = message
-        self.notes = None
+        self.notes: Dict = {}

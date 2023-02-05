@@ -13,18 +13,28 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from typing import Optional, Dict
+
 from .HeavyIrObject import HeavyIrObject
 from .HeavyLangObject import HeavyLangObject
+from .HeavyGraph import HeavyGraph
 
 
 class HLangPhasor(HeavyLangObject):
     """ Translates HeavyLang object [phasor] to HeavyIR [phasor~].
     """
 
-    def __init__(self, obj_type, args, graph, annotations=None):
-        HeavyLangObject.__init__(self, "phasor", args, graph, annotations=annotations)
+    def __init__(
+        self,
+        obj_type: str,
+        args: Dict,
+        graph: 'HeavyGraph',
+        annotations: Optional[Dict] = None
+    ) -> None:
+        assert obj_type == "phasor"
+        super().__init__(obj_type, args, graph, annotations=annotations)
 
-    def reduce(self):
+    def reduce(self) -> tuple:
         if self.has_inlet_connection_format(["f_", "fc"]):
             x = HeavyIrObject("__phasor~f", self.args)
             return ({x}, self.get_connection_move_list(x))

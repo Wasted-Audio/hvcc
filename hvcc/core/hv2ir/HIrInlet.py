@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from typing import Dict, List, Optional, Union
+from typing import Dict, Optional
 
 from .HeavyException import HeavyException
 from .HeavyIrObject import HeavyIrObject
@@ -33,7 +33,7 @@ class HIrInlet(HeavyIrObject):
     ) -> None:
         super().__init__("__inlet", args=args, graph=graph, annotations=annotations)
 
-    def _resolved_outlet_type(self, outlet_index: int = 0) -> Optional[Union[str, List]]:
+    def _resolved_outlet_type(self, outlet_index: int = 0) -> Optional[str]:
         if self.graph is not None:
             connections = self.graph.inlet_connections[self.args["index"]]
             connection_type_set = {c.type for c in connections}

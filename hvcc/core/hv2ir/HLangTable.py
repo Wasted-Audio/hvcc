@@ -14,17 +14,26 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import re
+from typing import Optional, Dict
+
 from .HeavyLangObject import HeavyLangObject
 from .HeavyIrObject import HeavyIrObject
+from .HeavyGraph import HeavyGraph
 
 
 class HLangTable(HeavyLangObject):
     """ Handles the HeavyLang "table" object.
     """
 
-    def __init__(self, obj_type, args, graph, annotations=None):
+    def __init__(
+        self,
+        obj_type: str,
+        args: Dict,
+        graph: 'HeavyGraph',
+        annotations: Optional[Dict] = None
+    ) -> None:
         assert obj_type == "table"
-        HeavyLangObject.__init__(self, obj_type, args, graph, annotations=annotations)
+        super().__init__(obj_type, args, graph, annotations=annotations)
 
         # the values argument overrides the size argument
         if len(self.args.get("values", [])) > 0:
@@ -37,7 +46,7 @@ class HLangTable(HeavyLangObject):
                 self.add_error("Table names may only contain alphanumeric characters"
                                f"or underscore: '{args['name']}'")
 
-    def reduce(self):
+    def reduce(self) -> tuple:
         x = HeavyIrObject("__table", self.args)
         # ensure that __table object maintains the same id as the original
         # table object. The latter is referenced by id from other objects.

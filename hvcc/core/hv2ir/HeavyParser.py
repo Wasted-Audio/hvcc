@@ -229,6 +229,7 @@ class HLangIf(HeavyLangObject):
         graph: HeavyGraph,
         annotations: Optional[Dict] = None
     ) -> None:
+        assert obj_type == "if"
         super().__init__("if", args, graph, num_inlets=2, num_outlets=2, annotations=annotations)
 
     def reduce(self) -> tuple:

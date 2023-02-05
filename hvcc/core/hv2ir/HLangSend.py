@@ -13,8 +13,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from typing import Optional, Dict
+
 from .HeavyLangObject import HeavyLangObject
 from .HIrSend import HIrSend
+from .HeavyGraph import HeavyGraph
 
 
 class HLangSend(HeavyLangObject):
@@ -23,10 +26,17 @@ class HLangSend(HeavyLangObject):
         and reorder the graph.
     """
 
-    def __init__(self, obj_type, args, graph, annotations=None):
-        HeavyLangObject.__init__(self, "send", args, graph, annotations=annotations)
+    def __init__(
+        self,
+        obj_type: str,
+        args: Dict,
+        graph: 'HeavyGraph',
+        annotations: Optional[Dict] = None
+    ) -> None:
+        assert obj_type == "send"
+        super().__init__(obj_type, args, graph, annotations=annotations)
 
-    def reduce(self):
+    def reduce(self) -> Optional[tuple]:
         if self.has_inlet_connection_format("c"):
             ir_args = dict(self.args)
             ir_args["hash"] = f"0x{HeavyLangObject.get_hash(ir_args['name']):X}"
@@ -46,7 +56,9 @@ class HLangSend(HeavyLangObject):
             self.add_error(
                 "Inlet can support either control or signal connections, "
                 "but not both at the same time.")
+            return None
 
         else:
             fmt = self._get_connection_format(self.inlet_connections)
             self.add_error(f"Unknown inlet configuration: {fmt}")
+            return None

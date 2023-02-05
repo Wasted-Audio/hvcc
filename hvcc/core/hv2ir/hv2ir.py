@@ -20,8 +20,8 @@ import time
 
 from typing import Optional, Dict
 
-from hvcc.core.hv2ir.HeavyException import HeavyException
-from hvcc.core.hv2ir.HeavyParser import HeavyParser
+from .HeavyException import HeavyException
+from .HeavyParser import HeavyParser
 
 
 class hv2ir:

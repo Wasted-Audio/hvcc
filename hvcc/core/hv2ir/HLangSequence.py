@@ -13,23 +13,33 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from typing import Optional, Dict, List
+
 from .Connection import Connection
 from .HeavyException import HeavyException
 from .HeavyIrObject import HeavyIrObject
 from .HeavyLangObject import HeavyLangObject
+from .HeavyGraph import HeavyGraph
 
 
 class HLangSequence(HeavyLangObject):
-    def __init__(self, obj_type, args, graph, annotations=None):
+
+    def __init__(
+        self,
+        obj_type: str,
+        args: Dict,
+        graph: 'HeavyGraph',
+        annotations: Optional[Dict] = None
+    ) -> None:
         # get the number of outlets that this object has
         num_outlets = len(args[HeavyLangObject._HEAVY_LANG_DICT[obj_type]["args"][0]["name"]])
-        HeavyLangObject.__init__(self, obj_type, args, graph,
-                                 num_inlets=1,
-                                 num_outlets=num_outlets,
-                                 annotations=annotations)
+        super().__init__(obj_type, args, graph,
+                         num_inlets=1,
+                         num_outlets=num_outlets,
+                         annotations=annotations)
 
-    def reduce(self):
-        cast_objs = []
+    def reduce(self) -> tuple:
+        cast_objs: List = []
         for a in self.args[self.name_for_arg()]:
             if a in {"a", "anything", "l", "list"}:
                 cast_objs.append(None)  # pass through
