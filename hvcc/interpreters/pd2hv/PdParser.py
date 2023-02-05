@@ -371,7 +371,7 @@ class PdParser:
 
                             # mapping of pd/lib abstraction objects to classes
                             # for checking connection validity
-                            cls = {
+                            pd_class = {
                                 "abs~": PdLibSignalGraph,
                                 "clip~": PdLibSignalGraph,
                                 "cos~": PdLibSignalGraph,
@@ -396,7 +396,7 @@ class PdParser:
                                 obj_args=obj_args,
                                 pos_x=int(line[2]), pos_y=int(line[3]),
                                 is_root=False,
-                                pd_graph_class=cls)
+                                pd_graph_class=pd_class)
 
                             # register any object-specific warnings or errors
                             if obj_type in {"rzero~", "rzero_rev~", "czero~", "czero_rev~"}:
