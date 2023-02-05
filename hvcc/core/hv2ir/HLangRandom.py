@@ -38,7 +38,7 @@ class HLangRandom(HeavyLangObject):
                          num_outlets=1,
                          annotations=annotations)
 
-    def reduce(self):
+    def reduce(self) -> tuple:
         self.args["seed"] = int(random.uniform(-2147483647, 2147483648))
         x = HeavyIrObject("__random", self.args)
         return ({x}, self.get_connection_move_list(x))

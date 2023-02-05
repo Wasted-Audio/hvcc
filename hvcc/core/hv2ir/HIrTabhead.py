@@ -15,7 +15,9 @@
 
 from typing import Dict, Optional
 
+
 from .HeavyIrObject import HeavyIrObject
+from .HeavyGraph import HeavyGraph
 
 
 class HIrTabhead(HeavyIrObject):
@@ -26,7 +28,7 @@ class HIrTabhead(HeavyIrObject):
         self,
         obj_type: str,
         args: Optional[Dict] = None,
-        graph=None,
+        graph: Optional[HeavyGraph] = None,
         annotations: Optional[Dict] = None
     ) -> None:
         assert obj_type in {"__tabhead~f", "__tabhead"}

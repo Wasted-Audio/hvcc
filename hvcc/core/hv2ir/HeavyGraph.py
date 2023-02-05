@@ -133,7 +133,7 @@ class HeavyGraph(HeavyIrObject):
         # remove the connection to the child from the parent
         c.to_object.remove_connection(c)
 
-    def update_connection(self, c: Connection, n_list: List):
+    def update_connection(self, c: Connection, n_list: List) -> None:
         """ Update the old connection (c) with the new connections (n_list).
             Connection order is maintained. If c is None, this method acts
             as connect_objects(). If n is empty, this method acts as disconnect_objects().
@@ -288,7 +288,7 @@ class HeavyGraph(HeavyIrObject):
         name: str,
         obj_types: Union[List, str],
         local_graph: Optional['HeavyGraph'] = None
-    ):
+    ) -> Optional[HeavyIrObject]:
         """ Returns the first object with the given name and type that is visible
             from this graph. Returns None if no objects are available.
             This is a convenience method.
@@ -964,5 +964,5 @@ class HeavyGraph(HeavyIrObject):
             "ids": [v[0].id]
         } for k, v in self.local_vars.get_registered_objects_for_type("__receive").items()}
 
-    def get_ir_signal_list(self):
+    def get_ir_signal_list(self) -> List:
         return [x for o in self.signal_order for x in o.get_ir_signal_list()]

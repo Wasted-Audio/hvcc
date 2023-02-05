@@ -67,7 +67,7 @@ class HeavyParser:
         graph: Optional[HeavyGraph] = None,
         graph_args: Optional[Dict] = None,
         path_stack: Optional[set] = None,
-        xname=None
+        xname: Optional[str] = None
     ) -> HeavyGraph:
         """ Read a graph object from a file.
 
@@ -91,16 +91,16 @@ class HeavyParser:
         with open(hv_file, "r") as f:
             json_heavy = json.load(f)
 
-        return cls.graph_from_object(json_heavy, graph, graph_args, hv_file, path_stack, xname)
+        return cls.graph_from_object(hv_file, json_heavy, path_stack, graph, graph_args, xname)
 
     @classmethod
     def graph_from_object(
         cls,
+        hv_file: str,
         json_heavy: Dict,
+        path_stack: set,
         graph: Optional[HeavyGraph] = None,
         graph_args: Optional[Dict] = None,
-        hv_file=None,
-        path_stack=None,
         xname: Optional[str] = None
     ) -> HeavyGraph:
 
@@ -143,7 +143,7 @@ class HeavyParser:
                 elif o["type"] == "graph":
                     # inline HeavyGraph objects (i.e. subgraphs)
                     # require a different set of initialisation arguments
-                    x: Any = cls.graph_from_object(o, g, g.args, hv_file, path_stack, xname)
+                    x: Any = cls.graph_from_object(hv_file, o, path_stack, g, g.args, xname)
 
                 else:
                     # resolve the arguments dictionary based on the graph args

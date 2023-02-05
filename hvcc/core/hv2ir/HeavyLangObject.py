@@ -106,18 +106,18 @@ class HeavyLangObject:
         return self.args.get("name", None)
 
     @property
-    def _obj_desc(self):
+    def _obj_desc(self) -> Dict:
         """ Returns the HeavyLang object description.
         """
         return self._HEAVY_LANG_DICT[self.type]
 
-    def inlet_connection_type(self, index: int):
+    def inlet_connection_type(self, index: int) -> Dict:
         return self._obj_desc["inlets"][index]
 
-    def outlet_connection_type(self, index: int):
+    def outlet_connection_type(self, index: int) -> Dict:
         return self._obj_desc["outlets"][index]
 
-    def name_for_arg(self, index: int = 0):
+    def name_for_arg(self, index: int = 0) -> str:
         """ Returns the name of the argument at the given index.
         """
         return self._obj_desc["args"][index]["name"]
@@ -241,7 +241,7 @@ class HeavyLangObject:
         else:
             raise HeavyException(f"Connection {c} does not connect to this object {self}.")
 
-    def replace_connection(self, c: Connection, n_list):
+    def replace_connection(self, c: Connection, n_list: list) -> None:
         """ Replaces connection c with connection list n_list, maintaining connection order
         """
         if c.from_object is self:

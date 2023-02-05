@@ -93,23 +93,23 @@ class HeavyIrObject(HeavyLangObject):
         return obj_type in HeavyIrObject.__HEAVY_OBJS_IR_DICT
 
     @property
-    def does_process_signal(self):
+    def does_process_signal(self) -> bool:
         """Returns True if this object processes a signal. False otherwise.
         """
         return self.__obj_desc["ir"]["signal"]
 
     @property
-    def __obj_desc(self):
+    def __obj_desc(self) -> Dict:
         """ Returns the original HeavyIR object description.
         """
         return HeavyIrObject.__HEAVY_OBJS_IR_DICT[self.type]
 
-    def inlet_requires_signal(self, inlet_index: int = 0):
+    def inlet_requires_signal(self, inlet_index: int = 0) -> bool:
         """ Returns True if the indexed inlet requires a signal connection. False otherwise.
         """
         return self.__obj_desc["inlets"][inlet_index] in {"~i>", "~f>"}
 
-    def outlet_requires_signal(self, inlet_index: int = 0):
+    def outlet_requires_signal(self, inlet_index: int = 0) -> bool:
         """ Returns True if the indexed outlet requires a signal connection. False otherwise.
         """
         return self.__obj_desc["outlets"][inlet_index] in {"~i>", "~f>"}

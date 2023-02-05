@@ -133,7 +133,7 @@ class hv2ir:
         }
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(
         description="A C-language compiler for the Heavy audio programming language.")
     parser.add_argument(
