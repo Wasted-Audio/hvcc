@@ -16,6 +16,7 @@
 from collections import defaultdict
 import json
 import os
+from typing import Dict, List, Optional
 
 # generate build configuration files for use with https://github.com/enzienaudio/courtesan
 # Example arguments:
@@ -25,10 +26,17 @@ import os
 #                 "/t:Rebuild", "Hv_{0}_Unity.sln".format(patch_name), "/m"]
 
 
-def generate_json(out_dir, android_armv7a_args=None, ios_armv7a_args=None,
-                  linux_armv7a_args=None, linux_x64_args=None, macos_x64_args=None,
-                  win_x64_args=None, win_x86_args=None):
-    build_json = defaultdict(dict)
+def generate_json(
+    out_dir: str,
+    android_armv7a_args: Optional[List] = None,
+    ios_armv7a_args: Optional[List] = None,
+    linux_armv7a_args: Optional[List] = None,
+    linux_x64_args: Optional[List] = None,
+    macos_x64_args: Optional[List] = None,
+    win_x64_args: Optional[List] = None,
+    win_x86_args: Optional[List] = None
+) -> None:
+    build_json: Dict = defaultdict(dict)
 
     if android_armv7a_args:
         build_json["android"]["armv7a"] = {

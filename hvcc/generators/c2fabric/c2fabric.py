@@ -49,7 +49,7 @@ class c2fabric:
         return s.hexdigest().upper()[0:24]
 
     @classmethod
-    def filter_templates(cls, template_name):
+    def filter_templates(cls, template_name: str) -> bool:
         return False if os.path.basename(template_name) in [".DS_Store"] else True
 
     @classmethod
@@ -80,9 +80,9 @@ class c2fabric:
 
         # initialise the jinja template environment
         env = jinja2.Environment()
-        env.filters["xcode_build"] = c2fabric.filter_xcode_build
-        env.filters["xcode_fileref"] = c2fabric.filter_xcode_fileref
-        env.filters["xcode_copy"] = c2fabric.filter_xcode_copy
+        env.filters["xcode_build"] = cls.filter_xcode_build
+        env.filters["xcode_fileref"] = cls.filter_xcode_fileref
+        env.filters["xcode_copy"] = cls.filter_xcode_copy
         env.loader = jinja2.FileSystemLoader(
             encoding="utf-8-sig",
             searchpath=[os.path.join(os.path.dirname(os.path.abspath(__file__)), "templates")])
@@ -102,7 +102,7 @@ class c2fabric:
             files_to_copy = [f"Hv_{patch_name}_FabricDSP.cs", f"Hv_{patch_name}_FabricDSPEditor.cs"]
 
             # generate files from templates
-            for f in env.list_templates(filter_func=c2fabric.filter_templates):
+            for f in env.list_templates(filter_func=cls.filter_templates):
                 file_path = os.path.join(out_dir, f)
                 file_path = file_path.replace("{{name}}", patch_name)
 

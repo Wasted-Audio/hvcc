@@ -46,13 +46,13 @@ class c2unity:
         return s
 
     @classmethod
-    def filter_string_cap(cls, s, li):
+    def filter_string_cap(cls, s: str, li: int) -> str:
         """Returns a truncated string with ellipsis if it exceeds a certain length.
         """
         return s if (len(s) <= li) else f"{s[0:li - 3]}..."
 
     @classmethod
-    def filter_templates(cls, template_name):
+    def filter_templates(cls, template_name: str) -> bool:
         return False if os.path.basename(template_name) in [".DS_Store"] else True
 
     @classmethod
@@ -82,9 +82,9 @@ class c2unity:
 
         # initialise the jinja template environment
         env = jinja2.Environment()
-        env.filters["xcode_build"] = c2unity.filter_xcode_build
-        env.filters["xcode_fileref"] = c2unity.filter_xcode_fileref
-        env.filters["cap"] = c2unity.filter_string_cap
+        env.filters["xcode_build"] = cls.filter_xcode_build
+        env.filters["xcode_fileref"] = cls.filter_xcode_fileref
+        env.filters["cap"] = cls.filter_string_cap
         env.loader = jinja2.FileSystemLoader(
             encoding="utf-8-sig",
             searchpath=[os.path.join(os.path.dirname(os.path.abspath(__file__)), "templates")])
@@ -106,7 +106,7 @@ class c2unity:
             shutil.copytree(c_src_dir, src_out_dir)
 
             # generate files from templates
-            for f in env.list_templates(filter_func=c2unity.filter_templates):
+            for f in env.list_templates(filter_func=cls.filter_templates):
                 file_path = os.path.join(out_dir, f)
                 file_path = file_path.replace("{{name}}", patch_name)
 

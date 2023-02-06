@@ -14,7 +14,7 @@ class c2dpf:
     """
 
     @classmethod
-    def filter_uniqueid(cls, s):
+    def filter_uniqueid(cls, s) -> str:
         """ Return a unique id (in hexadecimal) for the Plugin interface.
         """
         s = hashlib.md5(s.encode('utf-8'))
@@ -72,7 +72,7 @@ class c2dpf:
 
             # initialize the jinja template environment
             env = jinja2.Environment()
-            env.filters["uniqueid"] = c2dpf.filter_uniqueid
+            env.filters["uniqueid"] = cls.filter_uniqueid
 
             env.loader = jinja2.FileSystemLoader(
                 os.path.join(os.path.dirname(os.path.abspath(__file__)), "templates"))

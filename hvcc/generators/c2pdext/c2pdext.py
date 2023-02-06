@@ -91,14 +91,14 @@ class c2pdext:
         try:
             # initialise the jinja template environment
             env = jinja2.Environment()
-            env.filters["max"] = c2pdext.filter_max
-            env.filters["xcode_build"] = c2pdext.filter_xcode_build
-            env.filters["xcode_fileref"] = c2pdext.filter_xcode_fileref
+            env.filters["max"] = cls.filter_max
+            env.filters["xcode_build"] = cls.filter_xcode_build
+            env.filters["xcode_fileref"] = cls.filter_xcode_fileref
             env.loader = jinja2.FileSystemLoader(
                 os.path.join(os.path.dirname(os.path.abspath(__file__)), "templates"))
 
             # generate Pd external wrapper from template
-            pdext_path = os.path.join(out_dir, "{0}.c".format(struct_name))
+            pdext_path = os.path.join(out_dir, f"{struct_name}.c")
             with open(pdext_path, "w") as f:
                 f.write(env.get_template("pd_external.c").render(
                     name=patch_name,
@@ -110,7 +110,7 @@ class c2pdext:
                     copyright=copyright))
 
             # generate Xcode project
-            xcode_path = os.path.join(out_dir, "{0}.xcodeproj".format(struct_name))
+            xcode_path = os.path.join(out_dir, f"{struct_name}.xcodeproj")
             os.mkdir(xcode_path)  # create the xcode project bundle
             pbxproj_path = os.path.join(xcode_path, "project.pbxproj")
 
