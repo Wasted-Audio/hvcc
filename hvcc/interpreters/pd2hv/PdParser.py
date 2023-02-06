@@ -71,7 +71,7 @@ class PdParser:
         """ Returns a set of all pd objects names supported by the parser.
         """
         pd_objects = [os.path.splitext(f)[0] for f in os.listdir(cls.__PDLIB_DIR) if f.endswith(".pd")]
-        pd_objects.extend(PdParser.__PD_CLASSES.keys())
+        pd_objects.extend(cls.__PD_CLASSES.keys())
         return pd_objects
 
     @classmethod
@@ -163,8 +163,8 @@ class PdParser:
         if is_root:
             self.__search_paths.append(os.path.dirname(file_path))
 
-        file_hv_arg_dict = PdParser.__get_hv_args(file_path)
-        file_iterator = PdParser.__get_pd_line(file_path)
+        file_hv_arg_dict = self.__get_hv_args(file_path)
+        file_iterator = self.__get_pd_line(file_path)
         canvas_line = file_iterator.__next__()
 
         self.__DOLLAR_ZERO += 1  # increment $0
@@ -234,7 +234,7 @@ class PdParser:
         try:  # this try will capture any critical errors
             for li in file_iterator:
                 # remove width parameter
-                line = PdParser.__RE_WIDTH.sub("", li).split()
+                line = self.__RE_WIDTH.sub("", li).split()
 
                 if line[0] == "#N":
                     if line[1] == "canvas":
@@ -251,7 +251,7 @@ class PdParser:
                 elif line[0] == "#X":
                     if line[1] == "restore":
                         if len(line) > 5 and line[5] == "@hv_obj":
-                            obj_args = PdParser.__resolve_object_args(
+                            obj_args = self.__resolve_object_args(
                                 obj_type=line[6],
                                 obj_args=line[7:],
                                 graph=g,
@@ -314,12 +314,12 @@ class PdParser:
                         if len(line) > 4:
                             obj_type = line[4]
                             # sometimes objects have $ arguments in them as well
-                            obj_type = PdParser.__resolve_object_args(
+                            obj_type = self.__resolve_object_args(
                                 obj_type=obj_type,
                                 obj_args=[obj_type],
                                 graph=g,
                                 is_root=is_root)[0]
-                            obj_args = PdParser.__resolve_object_args(
+                            obj_args = self.__resolve_object_args(
                                 obj_type=obj_type,
                                 obj_args=line[5:],
                                 graph=g,
@@ -347,27 +347,27 @@ class PdParser:
                                 is_root=False)
 
                         # is this object in lib/pd_converted?
-                        elif os.path.isfile(os.path.join(PdParser.__PDLIB_CONVERTED_DIR, f"{obj_type}.hv.json")):
+                        elif os.path.isfile(os.path.join(self.__PDLIB_CONVERTED_DIR, f"{obj_type}.hv.json")):
                             self.obj_counter[obj_type] += 1
-                            hv_path = os.path.join(PdParser.__PDLIB_CONVERTED_DIR, f"{obj_type}.hv.json")
+                            hv_path = os.path.join(self.__PDLIB_CONVERTED_DIR, f"{obj_type}.hv.json")
                             x = HeavyGraph(
                                 hv_path=hv_path,
                                 obj_args=obj_args,
                                 pos_x=int(line[2]), pos_y=int(line[3]))
 
                         # is this object in lib/heavy_converted?
-                        elif os.path.isfile(os.path.join(PdParser.__HVLIB_CONVERTED_DIR, f"{obj_type}.hv.json")):
+                        elif os.path.isfile(os.path.join(self.__HVLIB_CONVERTED_DIR, f"{obj_type}.hv.json")):
                             self.obj_counter[obj_type] += 1
-                            hv_path = os.path.join(PdParser.__HVLIB_CONVERTED_DIR, f"{obj_type}.hv.json")
+                            hv_path = os.path.join(self.__HVLIB_CONVERTED_DIR, f"{obj_type}.hv.json")
                             x = HeavyGraph(
                                 hv_path=hv_path,
                                 obj_args=obj_args,
                                 pos_x=int(line[2]), pos_y=int(line[3]))
 
                         # is this object in lib/pd?
-                        elif os.path.isfile(os.path.join(PdParser.__PDLIB_DIR, f"{obj_type}.pd")):
+                        elif os.path.isfile(os.path.join(self.__PDLIB_DIR, f"{obj_type}.pd")):
                             self.obj_counter[obj_type] += 1
-                            pdlib_path = os.path.join(PdParser.__PDLIB_DIR, f"{obj_type}.pd")
+                            pdlib_path = os.path.join(self.__PDLIB_DIR, f"{obj_type}.pd")
 
                             # mapping of pd/lib abstraction objects to classes
                             # for checking connection validity
@@ -405,9 +405,9 @@ class PdParser:
                                     "Arguments and control connections are ignored.")
 
                         # is this object in lib/heavy?
-                        elif os.path.isfile(os.path.join(PdParser.__HVLIB_DIR, f"{obj_type}.pd")):
+                        elif os.path.isfile(os.path.join(self.__HVLIB_DIR, f"{obj_type}.pd")):
                             self.obj_counter[obj_type] += 1
-                            hvlib_path = os.path.join(PdParser.__HVLIB_DIR, f"{obj_type}.pd")
+                            hvlib_path = os.path.join(self.__HVLIB_DIR, f"{obj_type}.pd")
                             x = self.graph_from_file(
                                 file_path=hvlib_path,
                                 obj_args=obj_args,
@@ -415,15 +415,15 @@ class PdParser:
                                 is_root=False)
 
                         # is this an object that must be programatically parsed?
-                        elif obj_type in PdParser.__PD_CLASSES:
+                        elif obj_type in self.__PD_CLASSES:
                             self.obj_counter[obj_type] += 1
-                            obj_class = PdParser.__PD_CLASSES[obj_type]
+                            obj_class = self.__PD_CLASSES[obj_type]
                             x = obj_class(
                                 obj_type,
                                 obj_args,
                                 pos_x=int(line[2]), pos_y=int(line[3]))
 
-                        elif PdParser.__is_float(obj_type):
+                        elif self.__is_float(obj_type):
                             # parse float literals
                             self.obj_counter["float"] += 1
                             x = HeavyObject(
@@ -446,7 +446,7 @@ class PdParser:
                     elif line[1] in {"floatatom", "symbolatom"}:
                         self.obj_counter[line[1]] += 1
                         x = self.graph_from_file(
-                            file_path=os.path.join(PdParser.__PDLIB_DIR, f"{line[1]}.pd"),
+                            file_path=os.path.join(self.__PDLIB_DIR, f"{line[1]}.pd"),
                             obj_args=[],
                             pos_x=int(line[2]), pos_y=int(line[3]),
                             is_root=False)
@@ -456,7 +456,7 @@ class PdParser:
                         assert obj_array is None, "#X array object is already being parsed."
                         # array names can have dollar arguments in them.
                         # ensure that they are resolved
-                        table_name = PdParser.__resolve_object_args(
+                        table_name = self.__resolve_object_args(
                             obj_type="array",
                             obj_args=[line[2]],
                             graph=g)[0]
@@ -548,7 +548,7 @@ class PdParser:
         # TODO(mhroth): can this be done more elegantly?
         resolved_obj_args = list(obj_args)  # make a copy of the original obj_args
         for i, a in enumerate(obj_args):
-            for m in set(PdParser.__RE_DOLLAR.findall(a)):
+            for m in set(cls.__RE_DOLLAR.findall(a)):
                 x = int(m)  # the dollar index (i.e. $x)
                 if len(graph.obj_args) > x:
                     a = a.replace(fr"\${m}", str(graph.obj_args[x]))

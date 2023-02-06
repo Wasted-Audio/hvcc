@@ -43,7 +43,7 @@ class PdObject:
         self.obj_args = obj_args or []
         self.obj_id = "{0}_{1}".format(
             obj_type,
-            "".join(PdObject.__RANDOM.choice(PdObject.__ID_CHARS) for _ in range(8)))
+            "".join(self.__RANDOM.choice(self.__ID_CHARS) for _ in range(8)))
         self.pos_x = pos_x
         self.pos_y = pos_y
 

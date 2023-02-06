@@ -43,7 +43,7 @@ class PdMessageObject(PdObject):
         # heavy does not support messages such as "$1-$2"
         for li in self.obj_dict["local"]:
             for m in li:
-                x = PdMessageObject.__RE_DOLLAR.search(m)
+                x = self.__RE_DOLLAR.search(m)
                 if x and len(x.group(0)) < len(m):
                     self.add_error(
                         "Heavy does not yet support message concatenation. "
