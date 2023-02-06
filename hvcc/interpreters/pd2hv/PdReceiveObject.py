@@ -95,7 +95,7 @@ class PdReceiveObject(PdObject):
                 self.__attributes.update(pd_raw_args)
                 self.__extern_type = "param"  # make sure output code is generated
             except PdRawException as e:
-                self.add_error(e)
+                self.add_error(str(e))
 
     def validate_configuration(self) -> None:
         if self.obj_type in {"r~", "receive~"}:

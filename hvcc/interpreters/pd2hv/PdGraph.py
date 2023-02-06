@@ -54,7 +54,7 @@ class PdGraph(PdObject):
         self.subpatch_name: Optional[str] = None
 
     @property
-    def dollar_zero(self):
+    def dollar_zero(self) -> str:
         return self.obj_args[0]
 
     @property
@@ -186,12 +186,18 @@ class PdGraph(PdObject):
             return self.parent_graph.get_graph_heirarchy() + [str(self)]
         else:
             # NOTE(dromer): we should never get here
-            raise Exception
+            raise Exception("parent_graph argument is None")
 
-    def get_depth(self):
+    def get_depth(self) -> int:
         """ Returns the depth of this graph, with the root being at 1.
         """
-        return 1 if self.is_root else (1 + self.parent_graph.get_depth())
+        if self.is_root:
+            return 1
+        elif self.parent_graph is not None:
+            return 1 + self.parent_graph.get_depth()
+        else:
+            # NOTE(dromer): we should never get here
+            raise Exception("parent_graph argument is None")
 
     def to_hv(self, export_args: bool = False) -> Dict:
         # NOTE(mhroth): hv_args are not returned. Because all arguments have

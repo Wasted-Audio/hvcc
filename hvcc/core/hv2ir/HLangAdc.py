@@ -37,7 +37,7 @@ class HLangAdc(HeavyLangObject):
                          num_outlets=len(args[HeavyLangObject._HEAVY_LANG_DICT[obj_type]["args"][0]["name"]]),
                          annotations=annotations)
 
-    def _resolved_outlet_type(self, outlet_index=0) -> str:
+    def _resolved_outlet_type(self, outlet_index: int = 0) -> str:
         return "~f>"
 
     def reduce(self) -> tuple:

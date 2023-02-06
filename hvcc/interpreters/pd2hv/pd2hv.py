@@ -111,7 +111,7 @@ class pd2hv:
         }
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(
         description="Converts a Pd patch into the Heavy language format.")
     parser.add_argument(

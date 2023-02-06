@@ -56,12 +56,12 @@ class PdObject:
         self._warnings: List = []
         self._errors: List = []
 
-    def add_warning(self, warning, enum=NotificationEnum.WARNING_GENERIC) -> None:
+    def add_warning(self, warning: str, enum: NotificationEnum = NotificationEnum.WARNING_GENERIC) -> None:
         """ Add a warning regarding this object.
         """
         self._warnings.append({"enum": enum, "message": warning})
 
-    def add_error(self, error, enum=NotificationEnum.ERROR_GENERIC) -> None:
+    def add_error(self, error: str, enum: NotificationEnum = NotificationEnum.ERROR_GENERIC) -> None:
         """ Add an error regarding this object.
         """
         self._errors.append({"enum": enum, "message": error})
