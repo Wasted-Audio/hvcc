@@ -14,6 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import re
+from typing import Callable, Dict, List
 
 from .HeavyObject import HeavyObject
 
@@ -23,11 +24,18 @@ class ControlMessage(HeavyObject):
     preamble = "cMsg"
 
     @classmethod
-    def get_C_onMessage(cls, obj_type, obj_id, inlet_index, args):
+    def get_C_onMessage(cls, obj_type: str, obj_id: int, inlet_index: int, args: Dict) -> List[str]:
         return [f"cMsg_{obj_id}_sendMessage(_c, 0, m);"]
 
     @classmethod
-    def get_C_impl(cls, obj_type, obj_id, on_message_list, get_obj_class, objects):
+    def get_C_impl(
+        cls,
+        obj_type: str,
+        obj_id: int,
+        on_message_list: List,
+        get_obj_class: Callable,
+        objects: Dict
+    ) -> List[str]:
         send_message_list = [
             f"cMsg_{obj_id}_sendMessage(HeavyContextInterface *_c, int letIn, const HvMessage *const n) {{"
         ]

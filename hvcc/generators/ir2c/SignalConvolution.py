@@ -13,6 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from typing import Dict, List
+
 from .HeavyObject import HeavyObject
 
 
@@ -22,15 +24,15 @@ class SignalConvolution(HeavyObject):
     preamble = "sConv"
 
     @classmethod
-    def get_C_header_set(cls):
+    def get_C_header_set(cls) -> set:
         return {"HvSignalConvolution.h"}
 
     @classmethod
-    def get_C_file_set(cls):
+    def get_C_file_set(cls) -> set:
         return {"HvSignalConvolution.h", "HvSignalConvolution.c"}
 
     @classmethod
-    def get_C_init(cls, obj_type, obj_id, args):
+    def get_C_init(cls, obj_type: str, obj_id: int, args: Dict) -> List[str]:
         return [
             "sConv_init(&sConv_{0}, &hTable_{1}, {2});".format(
                 obj_id,
@@ -39,7 +41,7 @@ class SignalConvolution(HeavyObject):
         ]
 
     @classmethod
-    def get_C_onMessage(cls, obj_type, obj_id, inlet_index, args):
+    def get_C_onMessage(cls, obj_type: str, obj_id: int, inlet_index: int, args: Dict) -> List[str]:
         return [
             "sConv_onMessage(_c, &Context(_c)->sConv_{0}, {1}, m, NULL);".format(
                 obj_id,
@@ -47,11 +49,11 @@ class SignalConvolution(HeavyObject):
         ]
 
     @classmethod
-    def get_C_process(cls, process_dict, obj_type, obj_id, args):
+    def get_C_process(cls, process_dict: Dict, obj_type: str, obj_id: int, args: Dict) -> List[str]:
         return [
             "__hv_conv_f(&sConv_{0}, VIf({1}), VOf({2}));".format(
                 process_dict["id"],
-                HeavyObject._c_buffer(process_dict["inputBuffers"][0]),
-                HeavyObject._c_buffer(process_dict["outputBuffers"][0])
+                cls._c_buffer(process_dict["inputBuffers"][0]),
+                cls._c_buffer(process_dict["outputBuffers"][0])
             )
         ]

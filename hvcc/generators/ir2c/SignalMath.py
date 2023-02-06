@@ -13,6 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from typing import Dict, List
+
 from .HeavyObject import HeavyObject
 
 
@@ -77,24 +79,24 @@ class SignalMath(HeavyObject):
     }
 
     @classmethod
-    def handles_type(cls, obj_type):
+    def handles_type(cls, obj_type: str) -> bool:
         """Returns true if the object type can be handled by this class
         """
-        return obj_type in SignalMath.__OPERATION_DICT
+        return obj_type in cls.__OPERATION_DICT
 
     @classmethod
-    def get_C_header_set(cls):
+    def get_C_header_set(cls) -> set:
         return {"HvMath.h"}
 
     @classmethod
-    def get_C_process(cls, process_dict, obj_type, obj_id, args):
+    def get_C_process(cls, process_dict: Dict, obj_type: str, obj_id: int, args: Dict) -> List[str]:
         return [
             "{0}({1}, {2});".format(
-                SignalMath.__OPERATION_DICT[obj_type],
+                cls.__OPERATION_DICT[obj_type],
                 ", ".join(["VI{0}({1})".format(
                     "i" if b["type"] == "~i>" else "f",
-                    HeavyObject._c_buffer(b)) for b in process_dict["inputBuffers"]]),
+                    cls._c_buffer(b)) for b in process_dict["inputBuffers"]]),
                 ", ".join(["VO{0}({1})".format(
                     "i" if b["type"] == "~i>" else "f",
-                    HeavyObject._c_buffer(b)) for b in process_dict["outputBuffers"]])
+                    cls._c_buffer(b)) for b in process_dict["outputBuffers"]])
             )]

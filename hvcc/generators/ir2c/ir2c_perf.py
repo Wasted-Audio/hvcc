@@ -14,23 +14,24 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import argparse
-from collections import Counter
-from collections import defaultdict
 import json
 import os
+from collections import Counter
+from collections import defaultdict
+from typing import Dict
 
 
 class ir2c_perf:
 
     @classmethod
-    def perf(cls, ir, blocksize=512, mhz=1000, verbose=False):
+    def perf(cls, ir: Dict, blocksize: int = 512, mhz: int = 1000, verbose: bool = False) -> Dict:
         # read the hv.ir.json file
         with open(os.path.join(os.path.dirname(__file__), "../../core/json/heavy.ir.json"), "r") as f:
             HEAVY_IR_JSON = json.load(f)
 
-        objects = Counter()
-        perf = Counter()
-        per_object_perf = defaultdict(Counter)
+        objects: Counter = Counter()
+        perf: Counter = Counter()
+        per_object_perf: Dict = defaultdict(Counter)
         for o in ir["signal"]["processOrder"]:
             obj_id = o["id"]
             obj_type = ir["objects"][obj_id]["type"]
@@ -74,7 +75,7 @@ class ir2c_perf:
         return per_object_perf
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(
         description="A Heavy.IR to C-language translator.")
     parser.add_argument(

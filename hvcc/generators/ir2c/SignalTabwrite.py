@@ -13,6 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from typing import Dict, List
+
 from .HeavyObject import HeavyObject
 
 
@@ -24,45 +26,38 @@ class SignalTabwrite(HeavyObject):
     preamble = "sTabwrite"
 
     @classmethod
-    def get_C_header_set(cls):
+    def get_C_header_set(cls) -> set:
         return {"HvSignalTabwrite.h"}
 
     @classmethod
-    def get_C_file_set(cls):
+    def get_C_file_set(cls) -> set:
         return {"HvSignalTabwrite.h", "HvSignalTabwrite.c"}
 
     @classmethod
-    def get_C_free(cls, obj_type, obj_id, args):
+    def get_C_free(cls, obj_type: str, obj_id: int, args: Dict) -> List[str]:
         return []
 
     @classmethod
-    def get_C_init(cls, obj_type, obj_id, args):
-        return [
-            "sTabwrite_init(&sTabwrite_{0}, &hTable_{1});".format(
-                obj_id,
-                args["table_id"])]
+    def get_C_init(cls, obj_type: str, obj_id: int, args: Dict) -> List[str]:
+        return [f"sTabwrite_init(&sTabwrite_{obj_id}, &hTable_{args['table_id']});"]
 
     @classmethod
-    def get_C_onMessage(cls, obj_type, obj_id, inlet_index, args):
-        return [
-            "sTabwrite_onMessage(_c, &Context(_c)->sTabwrite_{0}, {1}, m, NULL);".format(
-                obj_id,
-                inlet_index)
-        ]
+    def get_C_onMessage(cls, obj_type: str, obj_id: int, inlet_index: int, args: Dict) -> List[str]:
+        return [f"sTabwrite_onMessage(_c, &Context(_c)->sTabwrite_{obj_id}, {inlet_index}, m, NULL);"]
 
     @classmethod
-    def get_C_process(cls, process_dict, obj_type, obj_id, args):
+    def get_C_process(cls, process_dict: Dict, obj_type: str, obj_id: int, args: Dict) -> List[str]:
         if obj_type == "__tabwrite~f":
             return [
                 "__hv_tabwrite_f(&sTabwrite_{0}, {1});".format(
                     process_dict["id"],
-                    ", ".join(["VIf({0})".format(HeavyObject._c_buffer(b)) for b in process_dict["inputBuffers"]])
+                    ", ".join([f"VIf({cls._c_buffer(b)})" for b in process_dict["inputBuffers"]])
                 )]
         elif obj_type == "__tabwrite_stoppable~f":
             return [
                 "__hv_tabwrite_stoppable_f(&sTabwrite_{0}, {1});".format(
                     process_dict["id"],
-                    ", ".join(["VIf({0})".format(HeavyObject._c_buffer(b)) for b in process_dict["inputBuffers"]])
+                    ", ".join([f"VIf({cls._c_buffer(b)})" for b in process_dict["inputBuffers"]])
                 )]
         else:
             raise Exception()

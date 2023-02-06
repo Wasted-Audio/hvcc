@@ -13,6 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from typing import Dict, List
+
 from .HeavyObject import HeavyObject
 
 
@@ -26,15 +28,15 @@ class ControlVar(HeavyObject):
     preamble = "cVar"
 
     @classmethod
-    def get_C_header_set(cls):
+    def get_C_header_set(cls) -> set:
         return {"HvControlVar.h"}
 
     @classmethod
-    def get_C_file_set(cls):
+    def get_C_file_set(cls) -> set:
         return {"HvControlVar.h", "HvControlVar.c"}
 
     @classmethod
-    def get_C_init(cls, obj_type, obj_id, args):
+    def get_C_init(cls, obj_type: str, obj_id: int, args: Dict) -> List[str]:
         if isinstance(args["k"], str):
             return [
                 "cVar_init_s(&cVar_{0}, \"{1}\");".format(
@@ -47,11 +49,11 @@ class ControlVar(HeavyObject):
                     float(args["k"]))]
 
     @classmethod
-    def get_C_free(cls, obj_type, obj_id, args):
+    def get_C_free(cls, obj_type: str, obj_id: int, args: Dict) -> List[str]:
         return []
 
     @classmethod
-    def get_C_onMessage(cls, obj_type, obj_id, inlet_index, args):
+    def get_C_onMessage(cls, obj_type: str, obj_id: int, inlet_index: int, args: Dict) -> List[str]:
         return [
             "cVar_onMessage(_c, &Context(_c)->cVar_{0}, {1}, m, &cVar_{0}_sendMessage);".format(
                 obj_id,

@@ -13,6 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from typing import Dict, List
+
 from .HeavyObject import HeavyObject
 
 
@@ -22,15 +24,15 @@ class ControlSlice(HeavyObject):
     preamble = "cSlice"
 
     @classmethod
-    def get_C_header_set(cls):
+    def get_C_header_set(cls) -> set:
         return {"HvControlSlice.h"}
 
     @classmethod
-    def get_C_file_set(cls):
+    def get_C_file_set(cls) -> set:
         return {"HvControlSlice.h", "HvControlSlice.c"}
 
     @classmethod
-    def get_C_init(cls, obj_type, obj_id, args):
+    def get_C_init(cls, obj_type: str, obj_id: int, args: Dict) -> List[str]:
         return [
             "cSlice_init(&cSlice_{0}, {1}, {2});".format(
                 obj_id,
@@ -38,13 +40,11 @@ class ControlSlice(HeavyObject):
                 int(args["length"]))]
 
     @classmethod
-    def get_C_free(cls, obj_type, obj_id, args):
+    def get_C_free(cls, obj_type: str, obj_id: int, args: Dict) -> List[str]:
         return []  # nothing to free
 
     @classmethod
-    def get_C_onMessage(cls, obj_type, obj_id, inlet_index, args):
+    def get_C_onMessage(cls, obj_type: str, obj_id: int, inlet_index: int, args: Dict) -> List[str]:
         return [
-            "cSlice_onMessage(_c, &Context(_c)->cSlice_{0}, {1}, m, &cSlice_{0}_sendMessage);".format(
-                obj_id,
-                inlet_index)
+            f"cSlice_onMessage(_c, &Context(_c)->cSlice_{obj_id}, {inlet_index}, m, &cSlice_{obj_id}_sendMessage);"
         ]

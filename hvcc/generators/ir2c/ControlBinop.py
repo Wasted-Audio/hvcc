@@ -13,6 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from typing import Dict, List
 from .HeavyObject import HeavyObject
 
 
@@ -74,21 +75,21 @@ class ControlBinop(HeavyObject):
     preamble = "cBinop"
 
     @classmethod
-    def handles_type(cls, obj_type):
+    def handles_type(cls, obj_type: str) -> bool:
         """Returns true if the object type can be handled by this class
         """
-        return obj_type in ControlBinop.__OPERATION_DICT
+        return obj_type in cls.__OPERATION_DICT
 
     @classmethod
-    def get_C_header_set(cls):
+    def get_C_header_set(cls) -> set:
         return {"HvControlBinop.h"}
 
     @classmethod
-    def get_C_file_set(cls):
+    def get_C_file_set(cls) -> set:
         return {"HvControlBinop.h", "HvControlBinop.c"}
 
     @classmethod
-    def get_C_init(cls, obj_type, obj_id, args):
+    def get_C_init(cls, obj_type: str, obj_id: int, args: Dict) -> List[str]:
         if obj_type.endswith("_k"):
             return []
         else:
@@ -96,15 +97,15 @@ class ControlBinop(HeavyObject):
             return [f"cBinop_init(&cBinop_{obj_id}, {obj_arg}f); // {obj_type}"]
 
     @classmethod
-    def get_C_free(cls, obj_type, obj_id, args):
+    def get_C_free(cls, obj_type: str, obj_id: int, args: Dict) -> List[str]:
         return []  # no need to free any control binop objects
 
     @classmethod
-    def get_C_onMessage(cls, obj_type, obj_id, inlet_index, args):
+    def get_C_onMessage(cls, obj_type: str, obj_id: int, inlet_index: int, args: Dict) -> List[str]:
         if obj_type.endswith("_k"):
             return [
                 "cBinop_k_onMessage(_c, NULL, {0}, {1}f, {2}, m, &cBinop_{3}_sendMessage);".format(
-                    ControlBinop.__OPERATION_DICT[obj_type[:-2]],
+                    cls.__OPERATION_DICT[obj_type[:-2]],
                     float(args["k"]),
                     inlet_index,
                     obj_id)
@@ -113,6 +114,6 @@ class ControlBinop(HeavyObject):
             return [
                 "cBinop_onMessage(_c, &Context(_c)->cBinop_{0}, {1}, {2}, m, &cBinop_{0}_sendMessage);".format(
                     obj_id,
-                    ControlBinop.__OPERATION_DICT[obj_type],
+                    cls.__OPERATION_DICT[obj_type],
                     inlet_index)
             ]

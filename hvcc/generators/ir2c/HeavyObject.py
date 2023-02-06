@@ -14,6 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from struct import unpack, pack
+from typing import Callable, Dict, List, Union
 
 
 class HeavyObject:
@@ -30,42 +31,49 @@ class HeavyObject:
     }
 
     @classmethod
-    def get_c_struct(cls, obj_type=""):
+    def get_C_struct(cls, obj_type: str = "") -> str:
         return cls.c_struct
 
     @classmethod
-    def get_preamble(cls, obj_type):
+    def get_preamble(cls, obj_type: str) -> str:
         return cls.preamble
 
     @classmethod
-    def get_C_header_set(self):
+    def get_C_header_set(self) -> set:
         return set()
 
     @classmethod
-    def get_C_file_set(self):
+    def get_C_file_set(self) -> set:
         return set()
 
     @classmethod
-    def get_C_def(cls, obj_type, obj_id):
+    def get_C_def(cls, obj_type: str, obj_id: int) -> List[str]:
         return ["{0} {1}_{2};".format(
-            cls.get_c_struct(obj_type),
+            cls.get_C_struct(obj_type),
             cls.get_preamble(obj_type),
             obj_id)]
 
     @classmethod
-    def get_C_free(cls, obj_type, obj_id, args):
+    def get_C_free(cls, obj_type: str, obj_id: int, args: Dict) -> List[str]:
         return ["{0}_free(&{0}_{1});".format(
             cls.get_preamble(obj_type),
             obj_id)]
 
     @classmethod
-    def get_C_decl(cls, obj_type, obj_id, args):
+    def get_C_decl(cls, obj_type: str, obj_id: int, args: Dict) -> List[str]:
         return ["{0}_{1}_sendMessage(HeavyContextInterface *, int, const HvMessage *);".format(
                 cls.get_preamble(obj_type),
                 obj_id)]
 
     @classmethod
-    def get_C_impl(cls, obj_type, obj_id, on_message_list, get_obj_class, objects):
+    def get_C_impl(
+        cls,
+        obj_type: str,
+        obj_id: int,
+        on_message_list: List,
+        get_obj_class: Callable,
+        objects: Dict
+    ) -> List[str]:
         send_message_list = [
             "{0}_{1}_sendMessage(HeavyContextInterface *_c, int letIn, const HvMessage *m) {{".format(
                 cls.get_preamble(obj_type),
@@ -73,13 +81,13 @@ class HeavyObject:
         if len(on_message_list) == 1:
             # if there is only one outlet, skip the switch-case template
             send_message_list.extend(
-                HeavyObject._get_on_message_list(on_message_list[0], get_obj_class, objects))
+                cls._get_on_message_list(on_message_list[0], get_obj_class, objects))
         else:
             send_message_list.append("switch (letIn) {")
             for i in range(len(on_message_list)):
                 send_message_list.append(f"case {i}: {{")
                 send_message_list.extend(
-                    HeavyObject._get_on_message_list(on_message_list[i], get_obj_class, objects))
+                    cls._get_on_message_list(on_message_list[i], get_obj_class, objects))
                 send_message_list.append("break;")
                 send_message_list.append("}")  # end case
             send_message_list.append("default: return;")
@@ -88,15 +96,23 @@ class HeavyObject:
         return send_message_list
 
     @classmethod
-    def get_C_process(cls, process_dict, obj_type, obj_id, args):
-        raise NotImplementedError("method get_C_process not implemented")
+    def get_C_init(cls, obj_type: str, obj_id: int, args: Dict) -> List[str]:
+        raise NotImplementedError("method get_C_init not implemented")
 
     @classmethod
-    def get_C_onMessage(cls, obj_type, obj_id, inlet_index, args):
+    def get_C_onMessage(cls, obj_type: str, obj_id: int, inlet_index: int, args: Dict) -> List[str]:
         raise NotImplementedError("method get_C_onMessage not implemented")
 
     @classmethod
-    def _get_on_message_list(cls, on_message_list, get_obj_class, objects):
+    def get_C_process(cls, process_dict: Dict, obj_type: str, obj_id: int, args: Dict) -> List[str]:
+        raise NotImplementedError("method get_C_process not implemented")
+
+    @classmethod
+    def get_table_data_decl(cls, obj_type: str, obj_id: int, args: Dict) -> List[str]:
+        raise NotImplementedError("method get_table_data_decl not implemented")
+
+    @classmethod
+    def _get_on_message_list(cls, on_message_list: List, get_obj_class: Callable, objects: Dict) -> List:
         out_list = []
         for om in on_message_list:
             out_list.extend(
@@ -108,18 +124,18 @@ class HeavyObject:
         return out_list
 
     @classmethod
-    def _c_buffer(cls, buffer_dict):
+    def _c_buffer(cls, buffer_dict: Dict) -> str:
         """ Returns the C represenation of the given buffer.
         """
         if buffer_dict["type"] == "zero":
-            return HeavyObject.__C_BUFFER_DICT[buffer_dict["type"]]
+            return cls.__C_BUFFER_DICT[buffer_dict["type"]]
         else:
             return "{0}{1}".format(
-                HeavyObject.__C_BUFFER_DICT[buffer_dict["type"]],
+                cls.__C_BUFFER_DICT[buffer_dict["type"]],
                 buffer_dict["index"])
 
     @classmethod
-    def get_hash(cls, x):
+    def get_hash(cls, x: Union[float, str]) -> int:
         """ Compute the message element hash used by msg_getHash().
         Returns a 32-bit integer.
         """
@@ -164,7 +180,7 @@ class HeavyObject:
             raise Exception("Message element hashes can only be computed for float and string types.")
 
     @classmethod
-    def get_hash_string(cls, x):
+    def get_hash_string(cls, x: Union[float, str]) -> str:
         """ Returns the hash as a hex string.
         """
-        return f"0x{HeavyObject.get_hash(x):X}"
+        return f"0x{cls.get_hash(x):X}"

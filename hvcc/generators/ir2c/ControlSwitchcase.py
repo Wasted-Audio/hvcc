@@ -13,6 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from typing import Callable, Dict, List
 from .HeavyObject import HeavyObject
 
 
@@ -22,26 +23,33 @@ class ControlSwitchcase(HeavyObject):
     preamble = "cSwichcase"
 
     @classmethod
-    def get_C_def(cls, obj_type, obj_id):
+    def get_C_def(cls, obj_type: str, obj_id: int) -> List[str]:
         return []
 
     @classmethod
-    def get_C_free(cls, obj_type, obj_id, args):
+    def get_C_free(cls, obj_type: str, obj_id: int, args: Dict) -> List[str]:
         return []
 
     @classmethod
-    def get_C_decl(cls, obj_type, obj_id, args):
+    def get_C_decl(cls, obj_type: str, obj_id: int, args: Dict) -> List[str]:
         return [
             f"cSwitchcase_{obj_id}_onMessage(HeavyContextInterface *, void *, int letIn, "
             "const HvMessage *const, void *);"
         ]
 
     @classmethod
-    def get_C_onMessage(cls, obj_type, obj_id, inlet_index, args):
+    def get_C_onMessage(cls, obj_type: str, obj_id: int, inlet_index: int, args: Dict) -> List[str]:
         return [f"cSwitchcase_{obj_id}_onMessage(_c, NULL, {inlet_index}, m, NULL);"]
 
     @classmethod
-    def get_C_impl(cls, obj_type, obj_id, on_message_list, obj_class_dict, objects):
+    def get_C_impl(
+        cls,
+        obj_type: str,
+        obj_id: int,
+        on_message_list: List,
+        get_obj_class: Callable,
+        objects: Dict
+    ) -> List[str]:
         # generate the onMessage implementation
         out_list = [
             f"cSwitchcase_{obj_id}_onMessage(HeavyContextInterface *_c, void *o, int letIn, "
@@ -50,15 +58,15 @@ class ControlSwitchcase(HeavyObject):
         out_list.append("switch (msg_getHash(m, 0)) {")
         cases = objects[obj_id]["args"]["cases"]
         for i, c in enumerate(cases):
-            hv_hash = HeavyObject.get_hash_string(c)
+            hv_hash = cls.get_hash_string(c)
             out_list.append(f"case {hv_hash}: {{ // \"{c}\"")
             out_list.extend(
-                HeavyObject._get_on_message_list(on_message_list[i], obj_class_dict, objects))
+                cls._get_on_message_list(on_message_list[i], get_obj_class, objects))
             out_list.append("break;")
             out_list.append("}")
         out_list.append("default: {")
         out_list.extend(
-            HeavyObject._get_on_message_list(on_message_list[-1], obj_class_dict, objects))
+            cls._get_on_message_list(on_message_list[-1], get_obj_class, objects))
         out_list.append("break;")
         out_list.append("}")  # end default
         out_list.append("}")  # end switch

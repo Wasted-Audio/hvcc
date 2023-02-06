@@ -13,6 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from typing import Callable, Dict, List
+
 from .HeavyObject import HeavyObject
 
 
@@ -22,11 +24,18 @@ class ControlSend(HeavyObject):
     preamble = "cSend"
 
     @classmethod
-    def get_C_onMessage(cls, obj_type, obj_id, inlet_index, args):
+    def get_C_onMessage(cls, obj_type: str, obj_id: int, inlet_index: int, args: Dict) -> List[str]:
         return [f"cSend_{obj_id}_sendMessage(_c, 0, m);"]
 
     @classmethod
-    def get_C_impl(cls, obj_type, obj_id, on_message_list, get_obj_class, objects):
+    def get_C_impl(
+        cls,
+        obj_type: str,
+        obj_id: int,
+        on_message_list: List,
+        get_obj_class: Callable,
+        objects: Dict
+    ) -> List[str]:
         # Note(joe): if no corresponding receivers exist and there's no extern indicator
         # then there is not much need to generate code stub
         send_message_list = [
@@ -39,11 +48,11 @@ class ControlSend(HeavyObject):
             send_name = objects[obj_id]["args"]["name"]
             send_message_list.append("if (_c->getSendHook() != nullptr) _c->getSendHook()(_c, \"{0}\", {1}, m);".format(
                 send_name,
-                HeavyObject.get_hash_string(send_name)))
+                cls.get_hash_string(send_name)))
 
         # a send has only one (implicit!) outlet
         send_message_list.extend(
-            HeavyObject._get_on_message_list(on_message_list[0], get_obj_class, objects))
+            cls._get_on_message_list(on_message_list[0], get_obj_class, objects))
 
         send_message_list.append("}")  # end function
 

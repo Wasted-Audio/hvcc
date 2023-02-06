@@ -13,6 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from typing import Dict, List
+
 from .HeavyObject import HeavyObject
 
 
@@ -24,21 +26,15 @@ class HeavyTable(HeavyObject):
     preamble = "hTable"
 
     @classmethod
-    def get_C_header_set(self):
+    def get_C_header_set(self) -> set:
         return {"HvTable.h"}
 
     @classmethod
-    def get_C_file_set(self):
+    def get_C_file_set(self) -> set:
         return {"HvTable.h", "HvTable.c"}
 
     @classmethod
-    def get_C_decl(cls, obj_type, obj_id, args):
-        return [
-            f"{cls.preamble}_{obj_id}_sendMessage(HeavyContextInterface *, int, const HvMessage *);"
-        ]
-
-    @classmethod
-    def get_table_data_decl(cls, obj_type, obj_id, args):
+    def get_table_data_decl(cls, obj_type: str, obj_id: int, args: Dict) -> List[str]:
         if len(args.get("values", [])) > 0:
             return [
                 "float hTable_{0}_data[{1}] = {{{2}}};".format(
@@ -49,7 +45,7 @@ class HeavyTable(HeavyObject):
             return []
 
     @classmethod
-    def get_C_init(cls, obj_type, obj_id, args):
+    def get_C_init(cls, obj_type: str, obj_id: int, args: Dict) -> List[str]:
         if len(args.get("values", [])) > 0:
             return [
                 "hTable_initWithData(&hTable_{0}, {1}, hTable_{0}_data);".format(
@@ -62,15 +58,13 @@ class HeavyTable(HeavyObject):
                     int(args.get("size", 256)))]  # 1KB default memory allocation
 
     @classmethod
-    def get_C_free(cls, obj_type, obj_id, args):
+    def get_C_free(cls, obj_type: str, obj_id: int, args: Dict) -> List[str]:
         return ["{0}_free(&{0}_{1});".format(
             cls.preamble,
             obj_id)]
 
     @classmethod
-    def get_C_onMessage(cls, obj_type, obj_id, inlet_index, args):
+    def get_C_onMessage(cls, obj_type: str, obj_id: int, inlet_index: int, args: Dict) -> List[str]:
         return [
-            "hTable_onMessage(_c, &Context(_c)->hTable_{0}, {1}, m, &hTable_{0}_sendMessage);".format(
-                obj_id,
-                inlet_index)
+            f"hTable_onMessage(_c, &Context(_c)->hTable_{obj_id}, {inlet_index}, m, &hTable_{obj_id}_sendMessage);"
         ]

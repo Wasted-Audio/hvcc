@@ -13,6 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from typing import Dict, List
+
 from .HeavyObject import HeavyObject
 
 
@@ -27,17 +29,17 @@ class ControlCast(HeavyObject):
     preamble = "cCast"
 
     @classmethod
-    def get_C_header_set(cls):
+    def get_C_header_set(cls) -> set:
         return {"HvControlCast.h"}
 
     @classmethod
-    def get_C_file_set(cls):
+    def get_C_file_set(cls) -> set:
         return {"HvControlCast.h", "HvControlCast.c"}
 
     @classmethod
-    def get_C_onMessage(cls, obj_type, obj_id, inlet_index, args):
+    def get_C_onMessage(cls, obj_type: str, obj_id: int, inlet_index: int, args: Dict) -> List[str]:
         return [
             "cCast_onMessage(_c, {1}, 0, m, &cCast_{0}_sendMessage);".format(
                 obj_id,
-                ControlCast.__OPERATION_DICT[obj_type])
+                cls.__OPERATION_DICT[obj_type])
         ]

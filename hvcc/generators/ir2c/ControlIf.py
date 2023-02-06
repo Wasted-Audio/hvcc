@@ -13,6 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from typing import Dict, List
+
 from .HeavyObject import HeavyObject
 
 
@@ -22,15 +24,15 @@ class ControlIf(HeavyObject):
     preamble = "cIf"
 
     @classmethod
-    def get_C_header_set(cls):
+    def get_C_header_set(cls) -> set:
         return {"HvControlIf.h"}
 
     @classmethod
-    def get_C_file_set(cls):
+    def get_C_file_set(cls) -> set:
         return {"HvControlIf.h", "HvControlIf.c"}
 
     @classmethod
-    def get_C_init(cls, obj_type, obj_id, args):
+    def get_C_init(cls, obj_type: str, obj_id: int, args: Dict) -> List[str]:
         return [
             "{0}_init(&{0}_{1}, {2});".format(
                 cls.preamble,
@@ -39,11 +41,11 @@ class ControlIf(HeavyObject):
             )]
 
     @classmethod
-    def get_C_free(cls, obj_type, obj_id, args):
+    def get_C_free(cls, obj_type: str, obj_id: int, args: Dict) -> List[str]:
         return []  # no need to free any control binop objects
 
     @classmethod
-    def get_C_onMessage(cls, obj_type, obj_id, inlet_index, args):
+    def get_C_onMessage(cls, obj_type: str, obj_id: int, inlet_index: int, args: Dict) -> List[str]:
         return [
             "{0}_onMessage(_c, &Context(_c)->{0}_{1}, {2}, m, "
             "&{0}_{1}_sendMessage);".format(cls.preamble, obj_id, inlet_index)

@@ -13,6 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from typing import Dict, List
+
 from .HeavyObject import HeavyObject
 
 
@@ -22,15 +24,15 @@ class SignalEnvelope(HeavyObject):
     preamble = "sEnv"
 
     @classmethod
-    def get_C_header_set(cls):
+    def get_C_header_set(cls) -> set:
         return {"HvSignalEnvelope.h"}
 
     @classmethod
-    def get_C_file_set(cls):
+    def get_C_file_set(cls) -> set:
         return {"HvSignalEnvelope.h", "HvSignalEnvelope.c"}
 
     @classmethod
-    def get_C_init(cls, obj_type, obj_id, args):
+    def get_C_init(cls, obj_type: str, obj_id: int, args: Dict) -> List[str]:
         return [
             "sEnv_init(&sEnv_{0}, {1}, {2});".format(
                 obj_id,
@@ -39,10 +41,10 @@ class SignalEnvelope(HeavyObject):
         ]
 
     @classmethod
-    def get_C_process(cls, process_dict, obj_type, obj_id, args):
+    def get_C_process(cls, process_dict: Dict, obj_type: str, obj_id: int, args: Dict) -> List[str]:
         return [
             "sEnv_process(this, &sEnv_{0}, VIf({1}), &sEnv_{0}_sendMessage);".format(
                 process_dict["id"],
-                HeavyObject._c_buffer(process_dict["inputBuffers"][0])
+                cls._c_buffer(process_dict["inputBuffers"][0])
             )
         ]
