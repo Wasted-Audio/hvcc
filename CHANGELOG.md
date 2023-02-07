@@ -4,6 +4,7 @@ CHANGELOG
 Next Release
 -----
 
+* improvements: add type annotations to all methods; run mypy over the whole library
 * abstractions: use duplicate of delread4~.pd for vd~.pd
 * deprecated: internal Bela implementation (use downstream instead)
 * docs: add notes
