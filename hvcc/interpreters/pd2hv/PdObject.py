@@ -166,12 +166,12 @@ class PdObject:
         pass
 
     @classmethod
-    def get_supported_objects(cls):
+    def get_supported_objects(cls) -> set:
         """ Returns a list of Pd objects that this class can parse.
         """
         raise NotImplementedError()
 
-    def to_hv(self):
+    def to_hv(self) -> Dict:
         """ Returns the HeavyLang JSON representation of this object.
         """
         raise NotImplementedError()

@@ -23,7 +23,6 @@ from .PdObject import PdObject
 
 class PdGraph(PdObject):
 
-    # def __init__(self, obj_args, pd_path, pos_x=0, pos_y=0):
     def __init__(
         self,
         obj_args: List,
@@ -128,10 +127,10 @@ class PdGraph(PdObject):
             "required": required
         }
 
-    def get_inlet_connection_type(self, inlet_index: int):
+    def get_inlet_connection_type(self, inlet_index: int) -> str:
         return self.__inlet_objects[inlet_index].get_inlet_connection_type(inlet_index)
 
-    def get_outlet_connection_type(self, outlet_index: int):
+    def get_outlet_connection_type(self, outlet_index: int) -> str:
         return self.__outlet_objects[outlet_index].get_outlet_connection_type(outlet_index)
 
     def validate_configuration(self) -> None:

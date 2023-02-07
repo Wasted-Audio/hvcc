@@ -35,7 +35,7 @@ class Connection:
 
         self.__from_obj = from_obj
         self.__to_obj = to_obj
-        self.__hv_json = {
+        self.__hv_json: Dict = {
             "from": {
                 "id": from_obj.obj_id,
                 "outlet": outlet_index
@@ -52,11 +52,11 @@ class Connection:
         return self.__from_obj
 
     @property
-    def from_id(self):
+    def from_id(self) -> str:
         return self.__hv_json["from"]["id"]
 
     @property
-    def outlet_index(self):
+    def outlet_index(self) -> int:
         return self.__hv_json["from"]["outlet"]
 
     @property
@@ -64,15 +64,15 @@ class Connection:
         return self.__to_obj
 
     @property
-    def to_id(self):
+    def to_id(self) -> str:
         return self.__hv_json["to"]["id"]
 
     @property
-    def inlet_index(self):
+    def inlet_index(self) -> int:
         return self.__hv_json["to"]["inlet"]
 
     @property
-    def conn_type(self):
+    def conn_type(self) -> str:
         return self.__hv_json["type"]
 
     def to_hv(self) -> Dict:

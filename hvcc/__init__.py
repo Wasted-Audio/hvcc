@@ -65,7 +65,7 @@ def add_error(results: OrderedDict, error: str) -> OrderedDict:
     return results
 
 
-def check_extern_name_conflicts(extern_type: str, extern_list: List, results: OrderedDict):
+def check_extern_name_conflicts(extern_type: str, extern_list: List, results: OrderedDict) -> None:
     """ In most of the generator code extern names become capitalised when used
         as enums. This method makes sure that there are no cases where two unique
         keys become the same after being capitalised.
@@ -300,7 +300,7 @@ def compile_dataflow(
     return results
 
 
-def main():
+def main() -> bool:
     tick = time.time()
 
     parser = argparse.ArgumentParser(
