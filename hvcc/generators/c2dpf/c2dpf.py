@@ -1,26 +1,32 @@
-# import datetime
-import hashlib
+# Copyright (C) 2021-2023 Wasted Audio
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 import os
 import shutil
 import time
 import jinja2
 from typing import Dict, Optional
+
 from ..buildjson import buildjson
 from ..copyright import copyright_manager
+from ..filters import filter_uniqueid
 
 
 class c2dpf:
     """ Generates a DPF wrapper for a given patch.
     """
-
-    @classmethod
-    def filter_uniqueid(cls, s) -> str:
-        """ Return a unique id (in hexadecimal) for the Plugin interface.
-        """
-        s = hashlib.md5(s.encode('utf-8'))
-        s = s.hexdigest().upper()[0:8]
-        s = f"0x{s}"
-        return s
 
     @classmethod
     def compile(
@@ -72,7 +78,7 @@ class c2dpf:
 
             # initialize the jinja template environment
             env = jinja2.Environment()
-            env.filters["uniqueid"] = cls.filter_uniqueid
+            env.filters["uniqueid"] = filter_uniqueid
 
             env.loader = jinja2.FileSystemLoader(
                 os.path.join(os.path.dirname(os.path.abspath(__file__)), "templates"))

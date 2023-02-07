@@ -13,47 +13,20 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import hashlib
 import jinja2
 import os
 import shutil
 import time
 from typing import Dict, Optional
+
 from ..copyright import copyright_manager
 from ..buildjson import buildjson
+from ..filters import filter_string_cap, filter_templates, filter_xcode_build, filter_xcode_fileref
 
 
 class c2unity:
     """Generates a Audio Native Plugin wrapper for Unity 5.
     """
-
-    @classmethod
-    def filter_xcode_build(cls, s):
-        """Return a build hash suitable for use in an Xcode project file.
-        """
-        s = f"{s}_build"
-        s = hashlib.md5(s.encode('utf-8'))
-        s = s.hexdigest().upper()[0:24]
-        return s
-
-    @classmethod
-    def filter_xcode_fileref(cls, s):
-        """Return a fileref hash suitable for use in an Xcode project file.
-        """
-        f"{s}_fileref"
-        s = hashlib.md5(s.encode('utf-8'))
-        s = s.hexdigest().upper()[0:24]
-        return s
-
-    @classmethod
-    def filter_string_cap(cls, s: str, li: int) -> str:
-        """Returns a truncated string with ellipsis if it exceeds a certain length.
-        """
-        return s if (len(s) <= li) else f"{s[0:li - 3]}..."
-
-    @classmethod
-    def filter_templates(cls, template_name: str) -> bool:
-        return False if os.path.basename(template_name) in [".DS_Store"] else True
 
     @classmethod
     def compile(
@@ -82,9 +55,9 @@ class c2unity:
 
         # initialise the jinja template environment
         env = jinja2.Environment()
-        env.filters["xcode_build"] = cls.filter_xcode_build
-        env.filters["xcode_fileref"] = cls.filter_xcode_fileref
-        env.filters["cap"] = cls.filter_string_cap
+        env.filters["xcode_build"] = filter_xcode_build
+        env.filters["xcode_fileref"] = filter_xcode_fileref
+        env.filters["cap"] = filter_string_cap
         env.loader = jinja2.FileSystemLoader(
             encoding="utf-8-sig",
             searchpath=[os.path.join(os.path.dirname(os.path.abspath(__file__)), "templates")])
@@ -106,7 +79,7 @@ class c2unity:
             shutil.copytree(c_src_dir, src_out_dir)
 
             # generate files from templates
-            for f in env.list_templates(filter_func=cls.filter_templates):
+            for f in env.list_templates(filter_func=filter_templates):
                 file_path = os.path.join(out_dir, f)
                 file_path = file_path.replace("{{name}}", patch_name)
 

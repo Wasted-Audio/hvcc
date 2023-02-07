@@ -13,42 +13,19 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import hashlib
 import os
 import shutil
 import time
 import jinja2
 from typing import Dict, Optional
+
 from ..copyright import copyright_manager
+from ..filters import filter_max, filter_xcode_build, filter_xcode_fileref
 
 
 class c2pdext:
     """Generates a Pure Data external wrapper for a given patch.
     """
-
-    @classmethod
-    def filter_max(cls, i, j):
-        """Calculate the maximum of two integers.
-        """
-        return max(int(i), int(j))
-
-    @classmethod
-    def filter_xcode_build(cls, s):
-        """Return a build hash suitable for use in an Xcode project file.
-        """
-        s = f"{s}_build"
-        s = hashlib.md5(s.encode('utf-8'))
-        s = s.hexdigest().upper()[0:24]
-        return s
-
-    @classmethod
-    def filter_xcode_fileref(cls, s):
-        """Return a fileref hash suitable for use in an Xcode project file.
-        """
-        s = f"{s}_fileref"
-        s = hashlib.md5(s.encode('utf-8'))
-        s = s.hexdigest().upper()[0:24]
-        return s
 
     @classmethod
     def compile(
@@ -91,9 +68,9 @@ class c2pdext:
         try:
             # initialise the jinja template environment
             env = jinja2.Environment()
-            env.filters["max"] = cls.filter_max
-            env.filters["xcode_build"] = cls.filter_xcode_build
-            env.filters["xcode_fileref"] = cls.filter_xcode_fileref
+            env.filters["max"] = filter_max
+            env.filters["xcode_build"] = filter_xcode_build
+            env.filters["xcode_fileref"] = filter_xcode_fileref
             env.loader = jinja2.FileSystemLoader(
                 os.path.join(os.path.dirname(os.path.abspath(__file__)), "templates"))
 
