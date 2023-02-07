@@ -1,4 +1,5 @@
 # Copyright (C) 2014-2018 Enzien Audio, Ltd.
+# Copyright (C) 2023 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -13,11 +14,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from collections import Counter
-from collections import OrderedDict
 import decimal
 import os
 import re
+from collections import Counter
+from collections import OrderedDict
 from typing import List, Dict, Optional, Type, Any, Generator
 
 from .HeavyObject import HeavyObject
