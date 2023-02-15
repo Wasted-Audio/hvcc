@@ -1,13 +1,9 @@
 /*
- * ImGui plugin example
- * Copyright (C) 2021 Jean Pierre Cimalando <jp-dev@inbox.ru>
- * Copyright (C) 2021-2022 Filipe Coelho <falktx@falktx.com>
- * SPDX-License-Identifier: ISC
+ * Copyright (c) Wasted Audio 2023 - GPL-3.0-or-later
  */
 
 #include "DistrhoUI.hpp"
 #include "ResizeHandle.hpp"
-// #include "PluginFont.cpp"
 
 START_NAMESPACE_DISTRHO
 
@@ -70,7 +66,7 @@ protected:
    /**
       ImGui specific onDisplay function.
     */
-    void onImGuiDisplay() override  
+    void onImGuiDisplay() override
     {
         const float width = getWidth();
         const float height = getHeight();
@@ -87,7 +83,7 @@ protected:
             // if (ImGuiKnobs::Knob("Gain (dB)", &fGain, -90.0f, 30.0f, 1.0f, "%.1fdB", ImGuiKnobVariant_SteppedTick, 0, ImGuiKnobFlags_ValueTooltip + ImGuiKnobFlags_DoubleClickReset + ImGuiKnobFlags_Logarithmic, 13))
             // if (ImGuiKnobs::Knob("Gain (Hz)", &fGain, 322.0f, 5551.5f, 100.0f, "%.1fHz", ImGuiKnobVariant_SteppedTick, 0, ImGuiKnobFlags_ValueTooltip + ImGuiKnobFlags_DoubleClickReset + ImGuiKnobFlags_Logarithmic, 13))
             // if (ImGui::SliderFloat("Mid Freq (Hz)", &fGain, 322.0f, 5551.0f, "%.1fHz", ImGuiSliderFlags_Logarithmic))
-            
+
 
     {% for k, v in receivers -%}
         {%- if v.attributes.type == 'db': %}
@@ -109,7 +105,9 @@ protected:
     {% endfor %}
             if (ImGui::IsItemDeactivated())
             {
-                editParameter(0, false);
+            {% for k, v in receivers -%}
+                editParameter(k, false);
+            {% endfor %}
             }
         }
         ImGui::End();

@@ -1,4 +1,7 @@
 NAME = {{name}}
+{%- if meta.enable_modgui is defined %}
+MODGUI_CLASS_NAME = hv_{{name}}
+{%- endif %}
 {%- if meta.enable_ui is defined %}
 FILES_DSP = $(filter-out HeavyDPF_{{name}}_UI.cpp, $(wildcard *.cpp))
 {%- else %}

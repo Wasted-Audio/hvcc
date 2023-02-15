@@ -42,3 +42,10 @@
 #define DISTRHO_UI_DEFAULT_WIDTH            400
 #define DISTRHO_UI_DEFAULT_HEIGHT           600
 {%- endif %}
+
+{%- if meta.enable_modgui is defined %}
+#ifdef __MOD_DEVICES__
+#undef DISTRHO_PLUGIN_USES_MODGUI
+#define DISTRHO_PLUGIN_USES_MODGUI 1
+#endif
+{%- endif %}
