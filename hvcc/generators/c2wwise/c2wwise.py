@@ -1,4 +1,5 @@
 # Copyright (C) 2014-2018 Enzien Audio, Ltd.
+# Copyright (C) 2021-2023 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -13,14 +14,15 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import hashlib
 import os
 import shutil
 import time
 import jinja2
 from typing import Dict, Optional
+
 from ..buildjson import buildjson
 from ..copyright import copyright_manager
+from ..filters import filter_plugin_id, filter_xcode_build, filter_xcode_fileref
 
 
 class c2wwise:
@@ -29,36 +31,8 @@ class c2wwise:
     """
 
     @classmethod
-    def filter_xcode_build(clazz, s):
-        """Return a build hash suitable for use in an Xcode project file.
-        """
-        s = f"{s}_build"
-        s = hashlib.md5(s.encode('utf-8'))
-        s = s.hexdigest().upper()[0:24]
-        return s
-
-    @classmethod
-    def filter_xcode_fileref(clazz, s):
-        """Return a fileref hash suitable for use in an Xcode project file.
-        """
-        s = f"{s}_fileref"
-        s = hashlib.md5(s.encode('utf-8'))
-        s = s.hexdigest().upper()[0:24]
-        return s
-
-    @classmethod
-    def filter_plugin_id(clazz, s):
-        """ Return a unique id from patch name
-            [0...32767
-        """
-        s = hashlib.md5(s.encode('utf-8'))
-        s = s.hexdigest()[:4]
-        s = int(s, 16) & 0x7FFF
-        return s
-
-    @classmethod
     def compile(
-        clazz,
+        cls,
         c_src_dir: str,
         out_dir: str,
         externs: Dict,
@@ -90,11 +64,11 @@ class c2wwise:
 
         templates_dir = os.path.join(os.path.dirname(__file__), "templates")
         plugin_type = "Source" if num_input_channels == 0 else "FX"
-        plugin_id = c2wwise.filter_plugin_id(patch_name)
+        plugin_id = filter_plugin_id(patch_name)
 
         env = jinja2.Environment()
-        env.filters["xcode_build"] = c2wwise.filter_xcode_build
-        env.filters["xcode_fileref"] = c2wwise.filter_xcode_fileref
+        env.filters["xcode_build"] = filter_xcode_build
+        env.filters["xcode_fileref"] = filter_xcode_fileref
         env.loader = jinja2.FileSystemLoader(
             encoding="utf-8-sig",
             searchpath=[templates_dir])

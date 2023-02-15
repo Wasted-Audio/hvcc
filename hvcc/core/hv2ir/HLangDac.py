@@ -13,25 +13,31 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from typing import Optional, Dict
+
 from .HeavyIrObject import HeavyIrObject
 from .HeavyLangObject import HeavyLangObject
+from .HeavyGraph import HeavyGraph
 
 
 class HLangDac(HeavyLangObject):
     """ Translates HeavyLang [dac] to HeavyIR [__add~f].
     """
 
-    def __init__(self, obj_type, args, graph, annotations=None):
+    def __init__(
+        self,
+        obj_type: str,
+        args: Dict,
+        graph: 'HeavyGraph',
+        annotations: Optional[Dict] = None
+    ) -> None:
         assert obj_type == "dac"
-        HeavyLangObject.__init__(
-            self,
-            obj_type,
-            args, graph,
-            num_inlets=len(args[HeavyLangObject._HEAVY_LANG_DICT["dac"]["args"][0]["name"]]),
-            num_outlets=0,
-            annotations=annotations)
+        super().__init__(obj_type, args, graph,
+                         num_inlets=len(args[HeavyLangObject._HEAVY_LANG_DICT["dac"]["args"][0]["name"]]),
+                         num_outlets=0,
+                         annotations=annotations)
 
-    def reduce(self):
+    def reduce(self) -> tuple:
         objects = set()
         connections = []
 

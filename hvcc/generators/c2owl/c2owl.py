@@ -4,9 +4,10 @@ import shutil
 import time
 import jinja2
 import json
-from typing import Dict, Optional
+from typing import Dict, List, Optional
 from ..buildjson import buildjson
 from ..copyright import copyright_manager
+
 import hvcc.core.hv2ir.HeavyLangObject as HeavyLangObject
 
 
@@ -19,7 +20,7 @@ class c2owl:
     """
 
     @classmethod
-    def make_jdata(clazz, patch_ir):
+    def make_jdata(cls, patch_ir: str) -> List:
         jdata = list()
 
         with open(patch_ir, mode="r") as f:
@@ -66,7 +67,7 @@ class c2owl:
 
     @classmethod
     def compile(
-        clazz,
+        cls,
         c_src_dir: str,
         out_dir: str,
         externs: Dict,
@@ -105,7 +106,7 @@ class c2owl:
             # construct jdata from ir
             ir_dir = os.path.join(c_src_dir, "../ir")
             patch_ir = os.path.join(ir_dir, f"{patch_name}.heavy.ir.json")
-            jdata = c2owl.make_jdata(patch_ir)
+            jdata = cls.make_jdata(patch_ir)
 
             # generate OWL wrapper from template
             owl_hpp_path = os.path.join(out_dir, f"HeavyOWL_{patch_name}.hpp")

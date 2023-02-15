@@ -1,4 +1,5 @@
 # Copyright (C) 2014-2018 Enzien Audio, Ltd.
+# Copyright (C) 2023 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -13,6 +14,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from typing import Optional, List, Dict
+
 from .PdObject import PdObject
 from .PdRaw import parse_pd_raw_args, PdRawException
 
@@ -21,13 +24,19 @@ class PdReceiveObject(PdObject):
 
     __INSTANCE_COUNTER = 0
 
-    def __init__(self, obj_type, obj_args=None, pos_x=0, pos_y=0):
+    def __init__(
+        self,
+        obj_type: str,
+        obj_args: Optional[List] = None,
+        pos_x: int = 0,
+        pos_y: int = 0
+    ) -> None:
         assert obj_type in {"r", "r~", "receive", "receive~", "catch~"}
-        PdObject.__init__(self, obj_type, obj_args, pos_x, pos_y)
+        super().__init__(obj_type, obj_args, pos_x, pos_y)
 
         self.__receiver_name = ""
         self.__extern_type = None
-        self.__attributes = {}
+        self.__attributes: Dict = {}
         self.__priority = None  # priority is not set
 
         PdReceiveObject.__INSTANCE_COUNTER += 1
@@ -87,14 +96,14 @@ class PdReceiveObject(PdObject):
                 self.__attributes.update(pd_raw_args)
                 self.__extern_type = "param"  # make sure output code is generated
             except PdRawException as e:
-                self.add_error(e)
+                self.add_error(str(e))
 
-    def validate_configuration(self):
+    def validate_configuration(self) -> None:
         if self.obj_type in {"r~", "receive~"}:
             if len(self._inlet_connections.get("0", [])) > 0:
                 self.add_error("[receive~] inlet connections are not supported.")
 
-    def to_hv(self):
+    def to_hv(self) -> Dict:
         # note: control rate send objects should not modify their name argument
         names = {
             "r": "",
@@ -106,7 +115,8 @@ class PdReceiveObject(PdObject):
 
         # NOTE(mhroth): we follow Pd's execution rule: deeper receivers fire first.
         # Receivers on the same level fire in the order of instantiation.
-        if (self.__priority is None) or (self.__receiver_name == "__hv_init" and self.__priority == 0):
+        if self.parent_graph is not None and \
+                ((self.__priority is None) or (self.__receiver_name == "__hv_init" and self.__priority == 0)):
             self.__priority = (self.parent_graph.get_depth() * 1000) - self.__instance
 
         return {

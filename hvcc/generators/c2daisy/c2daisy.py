@@ -1,12 +1,13 @@
-# import datetime
 import jinja2
 import os
 import shutil
 import time
+import json2daisy  # type: ignore
+
 from typing import Dict, Optional
+
 from ..buildjson import buildjson
 from ..copyright import copyright_manager
-import json2daisy  # type: ignore
 from . import parameters
 
 
@@ -16,7 +17,7 @@ class c2daisy:
 
     @classmethod
     def compile(
-        clazz,
+        cls,
         c_src_dir: str,
         out_dir: str,
         externs: Dict,

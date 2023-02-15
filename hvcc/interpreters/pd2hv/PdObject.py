@@ -1,4 +1,5 @@
 # Copyright (C) 2014-2018 Enzien Audio, Ltd.
+# Copyright (C) 2023 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,7 +18,13 @@ from collections import defaultdict
 import random
 import string
 
-from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
+from typing import Optional, List, Dict, TYPE_CHECKING
+
+from .Connection import Connection
+from .NotificationEnum import NotificationEnum
+
+if TYPE_CHECKING:
+    from .PdGraph import PdGraph
 
 
 class PdObject:
@@ -25,36 +32,42 @@ class PdObject:
     __RANDOM = random.Random()
     __ID_CHARS = string.ascii_letters + string.digits
 
-    def __init__(self, obj_type, obj_args=None, pos_x=0, pos_y=0):
+    def __init__(
+        self,
+        obj_type: str,
+        obj_args: Optional[List] = None,
+        pos_x: int = 0,
+        pos_y: int = 0
+    ) -> None:
         self.obj_type = obj_type
         # all arguments should be resolved when passed to a PdObject
         self.obj_args = obj_args or []
         self.obj_id = "{0}_{1}".format(
             obj_type,
-            "".join(PdObject.__RANDOM.choice(PdObject.__ID_CHARS) for _ in range(8)))
+            "".join(self.__RANDOM.choice(self.__ID_CHARS) for _ in range(8)))
         self.pos_x = pos_x
         self.pos_y = pos_y
 
         # this is set when the object is added to a graph
-        self.parent_graph = None
+        self.parent_graph: Optional['PdGraph'] = None
 
-        self._inlet_connections = defaultdict(list)
-        self._outlet_connections = defaultdict(list)
+        self._inlet_connections: Dict = defaultdict(list)
+        self._outlet_connections: Dict = defaultdict(list)
 
-        self._warnings = []
-        self._errors = []
+        self._warnings: List = []
+        self._errors: List = []
 
-    def add_warning(self, warning, enum=NotificationEnum.WARNING_GENERIC):
+    def add_warning(self, warning: str, enum: NotificationEnum = NotificationEnum.WARNING_GENERIC) -> None:
         """ Add a warning regarding this object.
         """
         self._warnings.append({"enum": enum, "message": warning})
 
-    def add_error(self, error, enum=NotificationEnum.ERROR_GENERIC):
+    def add_error(self, error: str, enum: NotificationEnum = NotificationEnum.ERROR_GENERIC) -> None:
         """ Add an error regarding this object.
         """
         self._errors.append({"enum": enum, "message": error})
 
-    def get_notices(self):
+    def get_notices(self) -> Dict:
         """ Returns a dictionary of all warnings and errors at this object.
         """
         # TODO(mhroth): we might want to consider moving to a more expressive format.
@@ -99,21 +112,21 @@ class PdObject:
             ]
         }
 
-    def get_inlet_connection_type(self, inlet_index=0):
+    def get_inlet_connection_type(self, inlet_index: int) -> Optional[str]:
         """ Returns the inlet connection type of this Pd object.
             For the sake of convenience, the connection type is reported in
             Heavy's format.
         """
         return "~f>" if self.obj_type.endswith("~") else "-->"
 
-    def get_outlet_connection_type(self, outlet_index=0):
+    def get_outlet_connection_type(self, outlet_index: int) -> Optional[str]:
         """ Returns the outlet connection type of this Pd object.
             For the sake of convenience, the connection type is reported in
             Heavy's format.
         """
         return "~f>" if self.obj_type.endswith("~") else "-->"
 
-    def add_connection(self, c):
+    def add_connection(self, c: Connection) -> None:
         """ Adds a connection, either inlet or outlet, to this object.
         """
         if c.from_id == self.obj_id:
@@ -123,7 +136,7 @@ class PdObject:
         else:
             raise Exception("Adding a connection to the wrong object!")
 
-    def remove_connection(self, c):
+    def remove_connection(self, c: Connection) -> None:
         """ Remove a connection to this object.
         """
         if c.to_obj is self:
@@ -133,7 +146,7 @@ class PdObject:
         else:
             raise Exception(f"Connection {c} does not connect to this object {self}.")
 
-    def get_graph_heirarchy(self):
+    def get_graph_heirarchy(self) -> List:
         """ Returns an indication of the graph "path" of this object.
         It only includes unique graphs (not subpatches) E.g. _main/tabosc4~
         The check for None is in case the object is somehow not yet attached.
@@ -141,7 +154,7 @@ class PdObject:
         return self.parent_graph.get_graph_heirarchy() \
             if self.parent_graph is not None else ["unattached"]
 
-    def validate_configuration(self):
+    def validate_configuration(self) -> None:
         """ Called when all graphs are finished parsing, from the root.
             Gives each object the chance to validate it's configuration,
             including connections.
@@ -154,17 +167,17 @@ class PdObject:
         pass
 
     @classmethod
-    def get_supported_objects(clazz):
+    def get_supported_objects(cls) -> set:
         """ Returns a list of Pd objects that this class can parse.
         """
         raise NotImplementedError()
 
-    def to_hv(self):
+    def to_hv(self) -> Dict:
         """ Returns the HeavyLang JSON representation of this object.
         """
         raise NotImplementedError()
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         if len(self.obj_args) == 0:
             return f"[{self.obj_type}]"
         else:

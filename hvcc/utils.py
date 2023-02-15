@@ -17,11 +17,11 @@ import sys
 import argparse
 import json
 
-import hvcc.core.hv2ir.HeavyLangObject as HeavyLangObject
-import hvcc.interpreters.pd2hv.PdParser as PdParser
+from hvcc.core.hv2ir.HeavyLangObject import HeavyLangObject
+from hvcc.interpreters.pd2hv.PdParser import PdParser
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(
         description="Some separate heavy utilities, wrapped into a single app")
     subparsers = parser.add_subparsers(dest="command")
@@ -34,7 +34,7 @@ def main():
 
     command = args.pop("command")
     if command == "pdobjects":
-        obj_list = PdParser.PdParser.get_supported_objects()
+        obj_list = PdParser.get_supported_objects()
         obj_list.sort()
 
         obj_dict = {
@@ -43,7 +43,7 @@ def main():
         }
         print(json.dumps(obj_dict, indent=4))
     elif command == "hvhash":
-        print("0x{0:X}".format(HeavyLangObject.HeavyLangObject.get_hash(args.get('string'))))
+        print("0x{0:X}".format(HeavyLangObject.get_hash(args['string'])))
     else:
         pass
 
