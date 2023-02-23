@@ -5,10 +5,13 @@
 #define DISTRHO_PLUGIN_NAME                 "{{name}}"
 {%- if meta.plugin_uri is defined %}
 #define DISTRHO_PLUGIN_URI                  "{{meta.plugin_uri}}"
-#define DISTRHO_PLUGIN_CLAP_ID              "{{meta.plugin_uri}}"
 {% else %}
-#define DISTRHO_PLUGIN_URI                  "http://wasted.audio/lv2/plugin/{{name}}"
-#define DISTRHO_PLUGIN_CLAP_ID              "http://wasted.audio/lv2/plugin/{{name}}"
+#define DISTRHO_PLUGIN_URI                  "urn:hvcc:{{name}}"
+{%- endif %}
+{%- if meta.plugin_clap_id is defined %}
+#define DISTRHO_PLUGIN_CLAP_ID              "{{meta.plugin_clap_id}}"
+{% else %}
+#define DISTRHO_PLUGIN_CLAP_ID              "urn.hvcc.{{name}}"
 {%- endif %}
 #define DISTRHO_PLUGIN_NUM_INPUTS           {{num_input_channels}}
 #define DISTRHO_PLUGIN_NUM_OUTPUTS          {{num_output_channels}}
