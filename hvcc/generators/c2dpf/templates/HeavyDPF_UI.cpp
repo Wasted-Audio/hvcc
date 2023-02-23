@@ -105,8 +105,8 @@ protected:
     {% endfor %}
             if (ImGui::IsItemDeactivated())
             {
-            {% for k, v in receivers -%}
-                editParameter(k, false);
+            {% for i in range(0, receivers|length) -%}
+                editParameter({{i}}, false);
             {% endfor %}
             }
         }
