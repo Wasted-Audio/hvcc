@@ -9,7 +9,7 @@ Next Release
 * deprecated: internal Bela implementation (use downstream instead)
 * docs: add notes
 * docs: fix markdown syntax
-* bugfixes: issues #87 and #86 
+* bugfixes: issues #86, #87 and #93 
 
 0.6.3
 -----
