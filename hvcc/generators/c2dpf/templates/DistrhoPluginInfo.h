@@ -44,7 +44,7 @@
 #define DISTRHO_UI_DEFAULT_HEIGHT           {{meta.ui_size.height}}
     {% else %}
 #define DISTRHO_UI_DEFAULT_WIDTH            400
-#define DISTRHO_UI_DEFAULT_HEIGHT           600
+#define DISTRHO_UI_DEFAULT_HEIGHT           400
     {%- endif %}
 {%- endif %}
 
