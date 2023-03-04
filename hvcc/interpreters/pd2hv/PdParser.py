@@ -506,6 +506,11 @@ class PdParser:
 
                     elif line[1] == "coords":
                         pass  # don't do anything with this command
+                    elif line[1] == "f":
+                        # A line such as "#X f 123"
+                        # is found after a "#X restore" when the [pd afasdfasd]
+                        # object's box has been resized
+                        pass  # don't do anything with this command
 
                     else:
                         g.add_error(f"Don't know how to parse line: {' '.join(line)}")
