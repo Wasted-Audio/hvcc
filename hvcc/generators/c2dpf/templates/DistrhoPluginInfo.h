@@ -39,8 +39,13 @@
 #define DISTRHO_UI_USE_CUSTOM               1
 #define DISTRHO_UI_CUSTOM_INCLUDE_PATH      "DearImGui.hpp"
 #define DISTRHO_UI_CUSTOM_WIDGET_TYPE       DGL_NAMESPACE::ImGuiTopLevelWidget
+    {%- if meta.ui_size is defined %}
+#define DISTRHO_UI_DEFAULT_WIDTH            {{meta.ui_size.width}}
+#define DISTRHO_UI_DEFAULT_HEIGHT           {{meta.ui_size.height}}
+    {% else %}
 #define DISTRHO_UI_DEFAULT_WIDTH            400
 #define DISTRHO_UI_DEFAULT_HEIGHT           600
+    {%- endif %}
 {%- endif %}
 
 {%- if meta.enable_modgui is defined %}
