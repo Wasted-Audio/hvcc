@@ -47,10 +47,9 @@ protected:
     {%- if receivers|length > 0 %}
         switch (index) {
             {% for k, v  in receivers -%}
-            case {{loop.index-1}}: {
+            case {{loop.index-1}}:
                 f{{v.display|lower}} = value;
                 break;
-            }
             {% endfor %}
             default: return;
         }
