@@ -47,10 +47,9 @@ protected:
     {%- if receivers|length > 0 %}
         switch (index) {
             {% for k, v  in receivers -%}
-            case {{loop.index-1}}: {
+            case {{loop.index-1}}:
                 f{{v.display|lower}} = value;
                 break;
-            }
             {% endfor %}
             default: return;
         }
@@ -75,23 +74,10 @@ protected:
         ImGui::SetNextWindowPos(ImVec2(margin, margin));
         ImGui::SetNextWindowSize(ImVec2(width - 2 * margin, height - 2 * margin));
 
-        if (ImGui::Begin("{{name}}", nullptr, ImGuiWindowFlags_NoResize + ImGuiWindowFlags_NoCollapse))
+        if (ImGui::Begin("{{name.replace('_', ' ')}}", nullptr, ImGuiWindowFlags_NoResize + ImGuiWindowFlags_NoCollapse))
         {
-
-            // if (ImGui::SliderFloat("Gain (dB)", &fGain, -90.0f, 30.0f))
-            // if (ImGuiKnobs::Knob("Gain (dB)", &fGain, -90.0f, 30.0f, 1.0f, "%.1fdB", ImGuiKnobVariant_Tick))
-            // if (ImGuiKnobs::Knob("Gain (dB)", &fGain, -90.0f, 30.0f, 1.0f, "%.1fdB", ImGuiKnobVariant_SteppedTick, 0, ImGuiKnobFlags_ValueTooltip + ImGuiKnobFlags_DoubleClickReset + ImGuiKnobFlags_Logarithmic, 13))
-            // if (ImGuiKnobs::Knob("Gain (Hz)", &fGain, 322.0f, 5551.5f, 100.0f, "%.1fHz", ImGuiKnobVariant_SteppedTick, 0, ImGuiKnobFlags_ValueTooltip + ImGuiKnobFlags_DoubleClickReset + ImGuiKnobFlags_Logarithmic, 13))
-            // if (ImGui::SliderFloat("Mid Freq (Hz)", &fGain, 322.0f, 5551.0f, "%.1fHz", ImGuiSliderFlags_Logarithmic))
-
-
-    {% for k, v in receivers -%}
-        {%- if v.attributes.type == 'db': %}
-            if (ImGuiKnobs::Knob("{{v.display.replace('_', ' ')}}", &f{{v.display|lower}}, {{v.attributes.min}}f, {{v.attributes.max}}, 0.2f, "%.1fdB", ImGuiKnobVariant_SteppedTick, 100, ImGuiKnobFlags_DoubleClickReset + ImGuiKnobFlags_ValueTooltip + ImGuiKnobFlags_NoInput + ImGuiKnobFlags_dB, 5))
-        {%- elif v.attributes.type == 'log_hz': %}
-            auto ImGuiKnob_Flags = ImGuiKnobFlags_ValueTooltip + ImGuiKnobFlags_DoubleClickReset + ImGuiKnobFlags_Logarithmic + ImGuiKnobFlags_NoInput;
-            if (ImGuiKnobs::Knob("{{v.display.replace('_', ' ')}}", &f{{v.display|lower}}, {{v.attributes.min}}f, {{v.attributes.max}}f, 50.0f, "%.1fHz", ImGuiKnobVariant_SteppedTick, 100, ImGuiKnob_Flags, 7))
-        {%- endif %}
+    {% for k, v in receivers %}
+            if (ImGui::SliderFloat("{{v.display.replace('_', ' ')}}", &f{{v.display|lower}}, {{v.attributes.min}}f, {{v.attributes.max}}f))
             {
                 if (ImGui::IsItemActivated())
                 {
