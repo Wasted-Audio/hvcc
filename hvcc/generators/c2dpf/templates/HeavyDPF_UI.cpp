@@ -1,6 +1,4 @@
-/*
- * Copyright (c) Wasted Audio 2023 - GPL-3.0-or-later
- */
+{{copyright}}
 
 #include "DistrhoUI.hpp"
 #include "ResizeHandle.hpp"
