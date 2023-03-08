@@ -67,6 +67,7 @@ class SignalMath(HeavyObject):
         "__lt~i": "__hv_lt_i",
         "__lte~f": "__hv_lte_f",
         "__lte~i": "__hv_lte_i",
+        "__eq~f": "__hv_eq_f",
         "__neq~f": "__hv_neq_f",
         "__fma~f": "__hv_fma_f",
         "__fms~f": "__hv_fms_f",
