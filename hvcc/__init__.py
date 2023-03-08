@@ -136,7 +136,7 @@ def generate_extern_info(hvir: Dict, results: OrderedDict) -> Dict:
 def compile_dataflow(
     in_path: str,
     out_dir: str,
-    patch_name: Optional[str] = None,
+    patch_name: str = "heavy",
     patch_meta_file: Optional[str] = None,
     search_paths: Optional[List] = None,
     generators: Optional[List] = None,
@@ -166,7 +166,7 @@ def compile_dataflow(
                 except Exception as e:
                     return add_error(results, f"Unable to open json_file: {e}")
 
-    patch_name = patch_name or "heavy"
+    patch_name = patch_meta.get("name", patch_name)
     generators = ["c"] if generators is None else [x.lower() for x in generators]
 
     if in_path.endswith((".pd")):
@@ -322,7 +322,6 @@ def main() -> bool:
     parser.add_argument(
         "-n",
         "--name",
-        default="heavy",
         help="Provides a name for the generated Heavy context.")
     parser.add_argument(
         "-m",
