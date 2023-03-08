@@ -2,7 +2,7 @@
 
 #pragma once
 
-#define DISTRHO_PLUGIN_NAME                 "{{name}}"
+#define DISTRHO_PLUGIN_NAME                 "{{name.replace('_', ' ')}}"
 {%- if meta.plugin_uri is defined %}
 #define DISTRHO_PLUGIN_URI                  "{{meta.plugin_uri}}"
 {% else %}
