@@ -176,7 +176,7 @@ void {{class_name}}::initParameter(uint32_t index, Parameter& parameter)
         parameter.symbol = "{{v.display|lower}}";
       {%- if v.attributes.type == 'db': %}
         parameter.unit = "dB";
-      {%- elif v.attributes.type == 'log_hz': %}
+      {%- elif v.attributes.type in ['hz', 'log_hz']: %}
         parameter.unit = "Hz";
       {%- endif %}
         parameter.hints = kParameterIsAutomatable
