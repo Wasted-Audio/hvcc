@@ -1,15 +1,22 @@
 
 from copy import deepcopy
+from typing import Any, Dict, Optional
 
 
-def filter_match(set, key, match, key_exclude=None, match_exclude=None):
+def filter_match(
+    set: Dict,
+    key: str,
+    match: str,
+    key_exclude: Optional[str] = None,
+    match_exclude: Optional[str] = None
+) -> filter:
     if (key_exclude is not None and match_exclude is not None):
         return filter(lambda x: x.get(key, '') == match and x.get(key_exclude, '') != match_exclude, set)
     else:
         return filter(lambda x: x.get(key, '') == match, set)
 
 
-def verify_param_exists(name, original_name, components, input=True):
+def verify_param_exists(name: str, original_name: str, components: Dict, input: bool = True) -> Any:
     for comp in components:
 
         # Dealing with the cvouts the way we have it set up is really annoying
@@ -32,7 +39,7 @@ def verify_param_exists(name, original_name, components, input=True):
     raise NameError(f'Unknown parameter "{original_name}"')
 
 
-def verify_param_direction(name, components):
+def verify_param_direction(name: str, components: Dict) -> bool:
     for comp in components:
         if comp['component'] == 'CVOuts':
             if name == comp['name']:
@@ -42,9 +49,10 @@ def verify_param_direction(name, components):
                 {'name': comp['name']}) for mapping in comp['mapping']]
             if name in variants:
                 return True
+    return False
 
 
-def get_root_component(variant, original_name, components):
+def get_root_component(variant: str, original_name: str, components: Dict) -> str:
     for comp in components:
         if comp['component'] == 'CVOuts':
             if variant == comp['name']:
@@ -57,7 +65,12 @@ def get_root_component(variant, original_name, components):
     raise NameError(f'Unknown parameter "{original_name}"')
 
 
-def get_component_mapping(component_variant, original_name, component, components):
+def get_component_mapping(
+    component_variant: str,
+    original_name: str,
+    component: Dict,
+    components: Dict
+) -> Dict:
     for variant in component['mapping']:
         if component['component'] == 'CVOuts':
             stripped = variant['name'].format_map({'name': ''})
@@ -68,7 +81,14 @@ def get_component_mapping(component_variant, original_name, component, component
     raise NameError(f'Unknown parameter "{original_name}"')
 
 
-def verify_param_used(component, params_in, params_out, params_in_original_name, params_out_original_name, components):
+def verify_param_used(
+    component: Dict,
+    params_in: Dict,
+    params_out: Dict,
+    params_in_original_name: Dict,
+    params_out_original_name: Dict,
+    components: Dict
+) -> bool:
     # Exclude parents, since they don't have 1-1 i/o mapping
     if component.get('is_parent', False):
         return True
@@ -80,7 +100,11 @@ def verify_param_used(component, params_in, params_out, params_in_original_name,
     return False
 
 
-def de_alias(name, aliases, components):
+def de_alias(
+    name: str,
+    aliases: Dict,
+    components: Dict
+) -> str:
     low = name.lower()
     # simple case
     if low in aliases:
@@ -103,7 +127,12 @@ def de_alias(name, aliases, components):
     return low
 
 
-def parse_parameters(parameters, components, aliases, object_name):
+def parse_parameters(
+    parameters: Dict,
+    components: Dict,
+    aliases: Dict,
+    object_name: str
+) -> Dict:
     """
     Parses the `parameters` passed from hvcc and generates getters and setters
     according to the info in `components`. The `aliases` help disambiguate parameters
@@ -112,9 +141,9 @@ def parse_parameters(parameters, components, aliases, object_name):
     """
 
     # Verify that the params are valid and remove unused components
-    replacements = {}
-    params_in = {}
-    params_in_original_names = {}
+    replacements: Dict = {}
+    params_in: Dict = {}
+    params_in_original_names: Dict = {}
     for key, item in parameters['in']:
         de_aliased = de_alias(key, aliases, components)
         params_in[de_aliased] = item

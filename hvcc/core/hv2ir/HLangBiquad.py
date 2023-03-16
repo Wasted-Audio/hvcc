@@ -1,4 +1,5 @@
 # Copyright (C) 2014-2018 Enzien Audio, Ltd.
+# Copyright (C) 2023 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,10 +15,12 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import re
+from typing import Optional, Dict
 
 from .HeavyException import HeavyException
 from .HeavyIrObject import HeavyIrObject
 from .HeavyLangObject import HeavyLangObject
+from .HeavyGraph import HeavyGraph
 
 
 class HLangBiquad(HeavyLangObject):
@@ -28,16 +31,26 @@ class HLangBiquad(HeavyLangObject):
     __re_fmt_k = re.compile("[f_][c_]+")
     __re_fmt_f = re.compile("[f_]+")
 
-    def __init__(self, obj_type, args, graph, annotations=None):
-        HeavyLangObject.__init__(self, "biquad", args, graph, num_inlets=6, num_outlets=1, annotations=annotations)
+    def __init__(
+        self,
+        obj_type: str,
+        args: Dict,
+        graph: 'HeavyGraph',
+        annotations: Optional[Dict] = None
+    ) -> None:
+        assert obj_type == "biquad"
+        super().__init__(obj_type, args, graph,
+                         num_inlets=6,
+                         num_outlets=1,
+                         annotations=annotations)
 
-    def reduce(self):
+    def reduce(self) -> tuple:
         fmt = self._get_connection_format(self.inlet_connections)
-        if HLangBiquad.__re_fmt_k.search(fmt):
+        if self.__re_fmt_k.search(fmt):
             x = HeavyIrObject("__biquad_k~f", self.args)
             return {x}, self.get_connection_move_list(x)
 
-        elif HLangBiquad.__re_fmt_f.search(fmt):
+        elif self.__re_fmt_f.search(fmt):
             x = HeavyIrObject("__biquad~f", self.args)
             return {x}, self.get_connection_move_list(x)
 

@@ -1,4 +1,5 @@
 # Copyright (C) 2014-2018 Enzien Audio, Ltd.
+# Copyright (C) 2023 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -13,6 +14,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from typing import Callable, Dict, List
+
 from .HeavyObject import HeavyObject
 
 
@@ -22,43 +25,51 @@ class ControlDelay(HeavyObject):
     preamble = "cDelay"
 
     @classmethod
-    def get_C_header_set(clazz):
+    def get_C_header_set(cls) -> set:
         return {"HvControlDelay.h"}
 
     @classmethod
-    def get_C_file_set(clazz):
+    def get_C_file_set(cls) -> set:
         return {"HvControlDelay.h", "HvControlDelay.c"}
 
     @classmethod
-    def get_C_init(clazz, obj_type, obj_id, args):
+    def get_C_init(cls, obj_type: str, obj_id: int, args: Dict) -> List[str]:
         return [
             "{0}_init(this, &{0}_{1}, {2}f);".format(
-                clazz.preamble,
+                cls.preamble,
                 obj_id,
                 float(args["delay"]))
         ]
 
     @classmethod
-    def get_C_free(clazz, obj_type, obj_id, args):
+    def get_C_free(cls, obj_type: str, obj_id: int, args: Dict) -> List[str]:
         return []  # no need to free any control binop objects
 
     @classmethod
-    def get_C_onMessage(clazz, obj_type, obj_id, inlet_index, args):
+    def get_C_onMessage(cls, obj_type: str, obj_id: int, inlet_index: int, args: Dict) -> List[str]:
         return [
             "{0}_onMessage(_c, &Context(_c)->{0}_{1}, {2}, m, "
             "&{0}_{1}_sendMessage);".format(
-                clazz.preamble,
+                cls.preamble,
                 obj_id,
                 inlet_index)
         ]
 
     @classmethod
-    def get_C_impl(clazz, obj_type, obj_id, on_message_list, get_obj_class, objects, args):
+    def get_C_impl(
+        cls,
+        obj_type: str,
+        obj_id: int,
+        on_message_list: List,
+        get_obj_class: Callable,
+        objects: Dict,
+        args: Dict
+    ) -> List[str]:
         send_message_list = [
             f"cDelay_{obj_id}_sendMessage(HeavyContextInterface *_c, int letIn, const HvMessage *const m) {{"
         ]
         send_message_list.append(f"cDelay_clearExecutingMessage(&Context(_c)->cDelay_{obj_id}, m);")
         send_message_list.extend(
-            HeavyObject._get_on_message_list(on_message_list[0], get_obj_class, objects))
+            cls._get_on_message_list(on_message_list[0], get_obj_class, objects))
         send_message_list.append("}")  # end function
         return send_message_list

@@ -1,6 +1,40 @@
 CHANGELOG
 =====
 
+Next Release
+-----
+
+* improvements: add type annotations to all methods; run mypy over the whole library
+* DPF: basic UI generation using dpf-widgets (imgui + modgui)
+* DPF: basic port groups support
+* abstractions: use duplicate of delread4~.pd for vd~.pd
+* deprecated: internal Bela implementation (use downstream instead)
+* docs: add notes
+* docs: fix markdown syntax
+* bugfixes: issues #86, #87 and #93 
+
+0.6.3
+-----
+
+* add polytouchin and polytouchout
+* add tests for midi input objects
+* bugfixes for midi objects bendin, ctlin, notein, pgmin, pgmout, touchin
+
+0.6.2
+-----
+
+* dpf: add CLAP to docs; cleanup templates
+* dpf: bugfix -> wrong frame count used for sendMessageToReceiverV()
+* general: style fixes
+* general: py311 support
+* general: un/supported objects
+
+0.6.1
+-----
+
+* bugfix: missing parameter in named arguments
+* update: json2daisy
+
 0.6.0
 -----
 

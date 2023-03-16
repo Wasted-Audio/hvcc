@@ -1,4 +1,5 @@
 # Copyright (C) 2014-2018 Enzien Audio, Ltd.
+# Copyright (C) 2023 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,6 +18,7 @@ import argparse
 import json
 import os
 import time
+from typing import Dict, List, Optional
 
 from hvcc.interpreters.pd2hv.PdParser import PdParser
 
@@ -37,11 +39,19 @@ class Colours:
 class pd2hv:
 
     @classmethod
-    def get_supported_objects(clazz):
+    def get_supported_objects(cls) -> List:
         return PdParser.get_supported_objects()
 
     @classmethod
-    def compile(clazz, pd_path, hv_dir, search_paths=None, verbose=False, export_args=False):
+    def compile(
+        cls,
+        pd_path: str,
+        hv_dir: str,
+        search_paths: Optional[List] = None,
+        verbose: bool = False,
+        export_args: bool = False
+    ) -> Dict:
+
         tick = time.time()
 
         parser = PdParser()  # create parser state
@@ -102,7 +112,7 @@ class pd2hv:
         }
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(
         description="Converts a Pd patch into the Heavy language format.")
     parser.add_argument(

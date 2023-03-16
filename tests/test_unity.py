@@ -28,7 +28,7 @@ import zipfile
 raise unittest.SkipTest()
 
 sys.path.append("../../../royal/tools")
-import uploader
+import uploader  # noqa
 
 
 SCRIPT_DIR = os.path.dirname(__file__)

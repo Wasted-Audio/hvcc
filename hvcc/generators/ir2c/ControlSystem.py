@@ -1,4 +1,5 @@
 # Copyright (C) 2014-2018 Enzien Audio, Ltd.
+# Copyright (C) 2023 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -13,6 +14,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from typing import Dict, List
+
 from .HeavyObject import HeavyObject
 
 
@@ -22,17 +25,13 @@ class ControlSystem(HeavyObject):
     preamble = "cSystem"
 
     @classmethod
-    def get_C_header_set(clazz):
+    def get_C_header_set(cls) -> set:
         return {"HvControlSystem.h"}
 
     @classmethod
-    def get_C_file_set(clazz):
+    def get_C_file_set(cls) -> set:
         return {"HvControlSystem.h", "HvControlSystem.c"}
 
     @classmethod
-    def get_C_onMessage(clazz, obj_type, obj_id, inlet_index, args):
-        return [
-            "cSystem_onMessage(_c, NULL, {1}, m, &cSystem_{0}_sendMessage);".format(
-                obj_id,
-                inlet_index)
-        ]
+    def get_C_onMessage(cls, obj_type: str, obj_id: int, inlet_index: int, args: Dict) -> List[str]:
+        return [f"cSystem_onMessage(_c, NULL, {inlet_index}, m, &cSystem_{obj_id}_sendMessage);"]

@@ -14,6 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import re
+from typing import Callable, Dict, List, Union
 
 from .HeavyObject import HeavyObject
 
@@ -25,28 +26,28 @@ class ControlExpr(HeavyObject):
     preamble = "cExpr"
 
     @classmethod
-    def get_C_header_set(clazz):
+    def get_C_header_set(self) -> set:
         return {"HvControlExpr.h"}
 
     @classmethod
-    def get_C_file_set(clazz):
+    def get_C_file_set(self) -> set:
         return {"HvControlExpr.h", "HvControlExpr.c"}
 
     @classmethod
-    def get_C_init(clazz, obj_type, obj_id, args):
-        eval_f = f"&Heavy_heavy::{clazz.preamble}_{obj_id}_evaluate"
+    def get_C_init(cls, obj_type: str, obj_id: int, args: Dict) -> List[str]:
+        eval_f = f"&Heavy_heavy::{cls.preamble}_{obj_id}_evaluate"
         return [f"cExpr_init(&cExpr_{obj_id}, {eval_f});"]
     """
     """
 
     @classmethod
-    def get_C_def(clazz, obj_type, obj_id):
+    def get_C_def(cls, obj_type: str, obj_id: int) -> List[str]:
         lines = ["{0} {1}_{2};".format(
-            clazz.get_c_struct(obj_type),
-            clazz.get_preamble(obj_type),
+            cls.get_C_struct(obj_type),
+            cls.get_preamble(obj_type),
             obj_id)]
         lines.append("// --------------- big ol' comment ------------")
-        lines.append(f"static float {clazz.preamble}_{obj_id}_evaluate(float* args);")
+        lines.append(f"static float {cls.preamble}_{obj_id}_evaluate(float* args);")
         return lines
     """
     The get_C_def method creates the object definitions that go into the .hpp file.
@@ -54,7 +55,7 @@ class ControlExpr(HeavyObject):
     """
 
     @classmethod
-    def get_C_onMessage(clazz, obj_type, obj_id, inlet_index, args):
+    def get_C_onMessage(cls, obj_type, obj_id, inlet_index, args):
         return [
             "cExpr_onMessage(_c, &Context(_c)->cExpr_{0}, {1}, m, &cExpr_{0}_sendMessage);".format(
                 obj_id,
@@ -66,7 +67,7 @@ class ControlExpr(HeavyObject):
     """
 
     # @classmethod
-    # def get_C_process(clazz, obj_type, process_dict, objects):
+    # def get_C_process(cls, process_dict: Dict, obj_type: str, obj_id: int, args: Dict) -> List[str]:
     #     return [
     #         "printf(\"hello world\")"
     #     ]
@@ -76,13 +77,21 @@ class ControlExpr(HeavyObject):
     """
 
     @classmethod
-    def get_C_impl(clazz, obj_type, obj_id, on_message_list, get_obj_class, objects, args):
+    def get_C_impl(
+        cls,
+        obj_type: str,
+        obj_id: int,
+        on_message_list: List,
+        get_obj_class: Callable,
+        objects: Dict,
+        args: Dict
+    ) -> List[str]:
         lines = super().get_C_impl(obj_type, obj_id, on_message_list, get_obj_class, objects, args)
         expr = args["expressions"][0]
         bound_expr = bind_expr(expr, "args")
         lines.extend([
             "",
-            f"float Heavy_heavy::{clazz.preamble}_{obj_id}_evaluate(float* args) {{",
+            f"float Heavy_heavy::{cls.preamble}_{obj_id}_evaluate(float* args) {{",
             f"\treturn {bound_expr};",
             "}",
         ])
