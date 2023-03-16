@@ -13,6 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from typing import Dict, List
+
 from .expr_c_writer import ExprCWriter
 from .HeavyObject import HeavyObject
 
@@ -23,40 +25,40 @@ class SignalExpr(HeavyObject):
 
     preamble = "cExprSig"
 
-    obj_eval_functions = {}
+    obj_eval_functions: Dict = {}
 
     @classmethod
-    def handles_type(clazz, obj_type):
+    def handles_type(cls, obj_type: str) -> bool:
         """Returns true if the object type can be handled by this class
         """
         return obj_type == "_expr~"
 
     @classmethod
-    def get_C_header_set(clazz):
+    def get_C_header_set(self) -> set:
         return {"HvMath.h"}
 
     @classmethod
-    def get_C_class_header_code(clazz, obj_type, args):
-        eval_funcs = ", ".join(clazz.obj_eval_functions.values())
-        fptr_type = f"{clazz.preamble}_evaluator"
+    def get_C_class_header_code(cls, obj_type: str, args: Dict) -> List[str]:
+        eval_funcs = ", ".join(cls.obj_eval_functions.values())
+        fptr_type = f"{cls.preamble}_evaluator"
         lines = [
             f"typedef void(*{fptr_type})(hv_bInf_t*, hv_bOutf_t);",
-            f"{fptr_type} {clazz.preamble}_evaluators[{len(clazz.obj_eval_functions)}] = {{{eval_funcs}}};",
+            f"{fptr_type} {cls.preamble}_evaluators[{len(cls.obj_eval_functions)}] = {{{eval_funcs}}};",
         ]
         return lines
 
     @classmethod
-    def get_C_obj_header_code(clazz, obj_type, obj_id, args):
+    def get_C_obj_header_code(cls, obj_type: str, obj_id: int, args: Dict) -> List[str]:
         lines = super().get_C_obj_header_code(obj_type, obj_id, args)
-        func_name = f"{clazz.preamble}_{obj_id}_evaluate"
-        clazz.obj_eval_functions[obj_id] = func_name
+        func_name = f"{cls.preamble}_{obj_id}_evaluate"
+        cls.obj_eval_functions[obj_id] = func_name
         lines.extend([
             f"static inline void {func_name}(hv_bInf_t* bIns, hv_bOutf_t bOut);",
         ])
         return lines
 
     @classmethod
-    def get_C_obj_impl_code(clazz, obj_type, obj_id, args):
+    def get_C_obj_impl_code(cls, obj_type: str, obj_id: int, args: Dict) -> List[str]:
         """
         (Per object) this creates the _sendMessage function that other objects use to
         send messages to this object.
@@ -76,7 +78,7 @@ class SignalExpr(HeavyObject):
             buffers = ", ".join([f"Bf{i}" for i in range(0, num_buffers)])
             buffer_declaration = f"\thv_bufferf_t {buffers};"
 
-        func_name = f"Heavy_heavy::{clazz.preamble}_{obj_id}_evaluate"
+        func_name = f"Heavy_heavy::{cls.preamble}_{obj_id}_evaluate"
         lines.extend([
             "",
             f"void {func_name}(hv_bInf_t* bIns, hv_bOutf_t bOut) {{",
@@ -89,7 +91,7 @@ class SignalExpr(HeavyObject):
         return lines
 
     @classmethod
-    def get_C_process(clazz, process_dict, obj_type, obj_id, args):
+    def get_C_process(cls, process_dict: Dict, obj_type: str, obj_id: int, args: Dict) -> List[str]:
         input_args = []
         for b in process_dict["inputBuffers"]:
             buf = HeavyObject._c_buffer(b)
@@ -101,7 +103,7 @@ class SignalExpr(HeavyObject):
             "",
             "\t// !!! declare this buffer once outside the loop",
             f"\thv_bInf_t input_args_{obj_id}[{args['num_inlets']}] = {{{', '.join(input_args)}}};",
-            f"\t{clazz.preamble}_evaluators[{len(clazz.obj_eval_functions)}](input_args_{obj_id}, {out_buf});"
+            f"\t{cls.preamble}_evaluators[{len(cls.obj_eval_functions)}](input_args_{obj_id}, {out_buf});"
             "",
         ]
 

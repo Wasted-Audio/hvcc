@@ -40,7 +40,7 @@ class PdExprObject(PdObject):
 
         print("In Pd expr Obj")
         assert obj_type in ["expr", "expr~"]
-        PdObject.__init__(self, obj_type, obj_args, pos_x, pos_y)
+        super().__init__(self, obj_type, obj_args, pos_x, pos_y)
 
         # turn the arguments into a list of expressions, but only one for now
         if len(self.obj_args) == 0:

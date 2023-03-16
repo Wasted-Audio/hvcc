@@ -15,7 +15,7 @@
 
 from .HeavyObject import HeavyObject
 import re
-from typing import Callable, Dict, List, Union
+from typing import Callable, Dict, List
 
 
 class ControlExpr(HeavyObject):

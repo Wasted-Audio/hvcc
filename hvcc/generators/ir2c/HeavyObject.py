@@ -102,10 +102,6 @@ class HeavyObject:
         return send_message_list
 
     @classmethod
-    def get_C_init(cls, obj_type: str, obj_id: int, args: Dict) -> List[str]:
-        raise NotImplementedError("method get_C_init not implemented")
-
-    @classmethod
     def get_C_onMessage(cls, obj_type: str, obj_id: int, inlet_index: int, args: Dict) -> List[str]:
         raise NotImplementedError("method get_C_onMessage not implemented", cls, obj_type)
 

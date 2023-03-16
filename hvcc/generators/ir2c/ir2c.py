@@ -241,33 +241,33 @@ class ir2c:
         # generate the list of functions to process
         process_list: List = []
         # print("--------------- for each signal in order")
-        classes = set()
+        process_classes = set()
         for x in ir["signal"]["processOrder"]:
             # print("--- signal", x["id"], o["type"], ir2c.get_class(o["type"]))
             obj_id = x["id"]
             o = ir["objects"][obj_id]
             print("process objects:", o["type"])
-            cls = ir2c.get_class(o["type"])
-            classes.add(cls)
-            process_list.extend(cls.get_C_process(
+            obj_cls = ir2c.get_class(o["type"])
+            process_classes.add(obj_cls)
+            process_list.extend(obj_cls.get_C_process(
                 x,
                 o["type"],
                 obj_id,
                 o["args"]))
 
             # begin experiment for expr~
-            obj_header_lines.extend(cls.get_C_obj_header_code(
+            obj_header_lines.extend(obj_cls.get_C_obj_header_code(
                 o["type"], obj_id, o["args"]
             ))
-            obj_impl_lines.extend(cls.get_C_obj_impl_code(
+            obj_impl_lines.extend(obj_cls.get_C_obj_impl_code(
                 o["type"], obj_id, o["args"]
             ))
         # once for each class
-        for cls in classes:
-            class_header_lines.extend(cls.get_C_class_header_code(
+        for prc_cls in process_classes:
+            class_header_lines.extend(prc_cls.get_C_class_header_code(
                 o["type"], o["args"]
             ))
-            class_impl_lines.extend(cls.get_C_class_impl_code(
+            class_impl_lines.extend(prc_cls.get_C_class_impl_code(
                 o["type"], o["args"]
             ))
         #

@@ -1,4 +1,1 @@
-Arpeggio>=2.0.0
-importlib_resources>=5.1
-Jinja2>=2.11
-json2daisy>=0.3.13
+.
