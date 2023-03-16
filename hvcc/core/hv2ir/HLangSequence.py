@@ -1,4 +1,5 @@
 # Copyright (C) 2014-2018 Enzien Audio, Ltd.
+# Copyright (C) 2023 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -13,31 +14,41 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from typing import Optional, Dict, List
+
 from .Connection import Connection
 from .HeavyException import HeavyException
 from .HeavyIrObject import HeavyIrObject
 from .HeavyLangObject import HeavyLangObject
+from .HeavyGraph import HeavyGraph
 
 
 class HLangSequence(HeavyLangObject):
-    def __init__(self, obj_type, args, graph, annotations=None):
+
+    def __init__(
+        self,
+        obj_type: str,
+        args: Dict,
+        graph: 'HeavyGraph',
+        annotations: Optional[Dict] = None
+    ) -> None:
         # get the number of outlets that this object has
         num_outlets = len(args[HeavyLangObject._HEAVY_LANG_DICT[obj_type]["args"][0]["name"]])
-        HeavyLangObject.__init__(self, obj_type, args, graph,
-                                 num_inlets=1,
-                                 num_outlets=num_outlets,
-                                 annotations=annotations)
+        super().__init__(obj_type, args, graph,
+                         num_inlets=1,
+                         num_outlets=num_outlets,
+                         annotations=annotations)
 
-    def reduce(self):
-        cast_objs = []
+    def reduce(self) -> tuple:
+        cast_objs: List = []
         for a in self.args[self.name_for_arg()]:
-            if a in ["a", "anything", "l", "list"]:
+            if a in {"a", "anything", "l", "list"}:
                 cast_objs.append(None)  # pass through
-            elif a in ["b", "bang"]:
+            elif a in {"b", "bang"}:
                 cast_objs.append(HeavyIrObject("__cast_b", {}))
-            elif a in ["f", "float"]:
+            elif a in {"f", "float"}:
                 cast_objs.append(HeavyIrObject("__cast_f", {}))
-            elif a in ["s", "symbol"]:
+            elif a in {"s", "symbol"}:
                 cast_objs.append(HeavyIrObject("__cast_s", {}))
             else:
                 raise HeavyException(f"Unsupported cast type '{a}'.")

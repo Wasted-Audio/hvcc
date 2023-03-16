@@ -1,4 +1,5 @@
 # Copyright (C) 2014-2018 Enzien Audio, Ltd.
+# Copyright (C) 2023 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -18,14 +19,22 @@ import json
 import os
 import time
 
-from hvcc.core.hv2ir.HeavyException import HeavyException
-from hvcc.core.hv2ir.HeavyParser import HeavyParser
+from typing import Optional, Dict
+
+from .HeavyException import HeavyException
+from .HeavyParser import HeavyParser
 
 
 class hv2ir:
 
     @classmethod
-    def compile(clazz, hv_file, ir_file, patch_name=None, verbose=False):
+    def compile(
+        cls,
+        hv_file: str,
+        ir_file: str,
+        patch_name: Optional[str] = None,
+        verbose: bool = False
+    ) -> Dict:
         """ Compiles a HeavyLang file into a HeavyIR file.
             Returns a tuple of compile time in seconds, a notification dictionary,
             and a heavy object counter.
@@ -99,7 +108,7 @@ class hv2ir:
             else:
                 json.dump(ir, f)
 
-        if verbose:
+        if verbose and ir is not None:
             if len(ir["signal"]["processOrder"]) > 0:
                 print("")
                 print("=== Signal Order ===")
@@ -125,7 +134,7 @@ class hv2ir:
         }
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(
         description="A C-language compiler for the Heavy audio programming language.")
     parser.add_argument(

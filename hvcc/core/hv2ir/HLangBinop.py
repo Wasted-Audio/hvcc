@@ -1,4 +1,5 @@
 # Copyright (C) 2014-2018 Enzien Audio, Ltd.
+# Copyright (C) 2023 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -13,9 +14,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from typing import Optional, Dict
+
 from .Connection import Connection
 from .HeavyLangObject import HeavyLangObject
 from .HeavyIrObject import HeavyIrObject
+from .HeavyGraph import HeavyGraph
 
 
 class HLangBinop(HeavyLangObject):
@@ -46,16 +50,25 @@ class HLangBinop(HeavyLangObject):
         "<<": ["__shiftleft", "__shiftleft_k"]  # binary left shift
     }
 
-    def __init__(self, obj_type, args, graph, annotations=None):
-        HeavyLangObject.__init__(self, obj_type, args, graph, num_inlets=2, num_outlets=1, annotations=annotations)
+    def __init__(
+        self,
+        obj_type: str,
+        args: Optional[Dict] = None,
+        graph: Optional['HeavyGraph'] = None,
+        annotations: Optional[Dict] = None
+    ) -> None:
+        super().__init__(obj_type, args, graph,
+                         num_inlets=2,
+                         num_outlets=1,
+                         annotations=annotations)
 
     @classmethod
-    def handles_type(clazz, obj_type):
+    def handles_type(cls, obj_type: str) -> bool:
         """Returns True if this class handles the given object type. False otherwise.
         """
         return obj_type in HLangBinop.__HEAVY_DICT
 
-    def reduce(self):
+    def reduce(self) -> Optional[tuple]:
         if self.has_inlet_connection_format("__") or \
                 self.has_inlet_connection_format("_c") or \
                 self.has_inlet_connection_format("_f") or \
@@ -207,3 +220,5 @@ class HLangBinop(HeavyLangObject):
                     f"connection to the same inlet: {fmt}")
             else:
                 self.add_error(f"Unknown inlet configuration: {fmt}")
+
+        return None

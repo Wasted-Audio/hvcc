@@ -1,4 +1,5 @@
 # Copyright (C) 2014-2018 Enzien Audio, Ltd.
+# Copyright (C) 2023 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -13,11 +14,24 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from typing import Optional, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from .HeavyIrObject import HeavyIrObject
+
+
 class Connection:
     """ A Connection describes a connection between two objects.
     """
 
-    def __init__(self, from_object, outlet_index, to_object, inlet_index, conn_type):
+    def __init__(
+        self,
+        from_object: 'HeavyIrObject',
+        outlet_index: int,
+        to_object: 'HeavyIrObject',
+        inlet_index: int,
+        conn_type: str
+    ) -> None:
         self.from_object = from_object
         self.outlet_index = outlet_index
         self.to_object = to_object
@@ -30,7 +44,14 @@ class Connection:
             self.to_object, self.inlet_index,
             self.type))
 
-    def copy(self, from_object=None, outlet_index=None, to_object=None, inlet_index=None, type=None):
+    def copy(
+        self,
+        from_object: Optional['HeavyIrObject'] = None,
+        outlet_index: Optional[int] = None,
+        to_object: Optional['HeavyIrObject'] = None,
+        inlet_index: Optional[int] = None,
+        type: Optional[str] = None
+    ) -> 'Connection':
         """ Create a new connection based on the existing one, changing the given values.
         """
         return Connection(from_object=self.from_object if from_object is None else from_object,
@@ -40,34 +61,34 @@ class Connection:
                           conn_type=self.type if type is None else type)
 
     @property
-    def is_signal(self):
-        return Connection.is_signal_type(self.type)
+    def is_signal(self) -> bool:
+        return self.is_signal_type(self.type)
 
     @property
-    def is_control(self):
+    def is_control(self) -> bool:
         return self.type == "-->"
 
     @property
-    def is_float_signal(self):
+    def is_float_signal(self) -> bool:
         return self.type == "~f>"
 
     @property
-    def is_integer_signal(self):
+    def is_integer_signal(self) -> bool:
         return self.type == "~i>"
 
     @property
-    def is_mixed(self):
+    def is_mixed(self) -> bool:
         return self.type == "-~>"
 
     @classmethod
-    def is_signal_type(clazz, type):
-        return type in ["~i>", "~f>"]
+    def is_signal_type(cls, type: Optional[str]) -> bool:
+        return type in {"~i>", "~f>"}
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
         return self.__hash == other.__hash__() if isinstance(other, Connection) else False
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return self.__hash
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"[{self.from_object}:{self.outlet_index}] {self.type} [{self.to_object}:{self.inlet_index}]"

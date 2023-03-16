@@ -15,6 +15,7 @@
 
 from .HeavyObject import HeavyObject
 import re
+from typing import Callable, Dict, List, Union
 
 
 class ControlExpr(HeavyObject):
@@ -24,35 +25,35 @@ class ControlExpr(HeavyObject):
     preamble = "cExpr"
 
     @classmethod
-    def get_C_header_set(clazz):
+    def get_C_header_set(self) -> set:
         return {"HvControlExpr.h"}
 
     @classmethod
-    def get_C_file_set(clazz):
+    def get_C_file_set(self) -> set:
         return {"HvControlExpr.h", "HvControlExpr.c"}
 
     @classmethod
-    def get_C_init(clazz, obj_type, obj_id, args):
+    def get_C_init(cls, obj_type: str, obj_id: int, args: Dict) -> List[str]:
         """(Per object) code that gets inserted into from the Heavy_heavy ctor.
             Only if "ir[init]" == true
         """
 
-        eval_f = f"&Heavy_heavy::{clazz.preamble}_{obj_id}_evaluate"
+        eval_f = f"&Heavy_heavy::{cls.preamble}_{obj_id}_evaluate"
         return [f"cExpr_init(&cExpr_{obj_id}, {eval_f});"]
 
     @classmethod
-    def get_C_def(clazz, obj_type, obj_id):
+    def get_C_def(cls, obj_type: str, obj_id: int) -> List[str]:
         """(Per object) code that gets inserted into the header file
             Only if "ir[init]" == true
         """
 
         lines = super().get_C_def(obj_type, obj_id)
         lines.append("// --------------- big ol' comment ------------")
-        lines.append(f"static float {clazz.preamble}_{obj_id}_evaluate(float* args);")
+        lines.append(f"static float {cls.preamble}_{obj_id}_evaluate(float* args);")
         return lines
 
     @classmethod
-    def get_C_onMessage(clazz, obj_type, obj_id, inlet_index, args):
+    def get_C_onMessage(cls, obj_type: str, obj_id: int, inlet_index: int, args: Dict) -> List[str]:
         """
         (Per object) code that gets inserted into the c<PREAMBLE>_<OBJID>_sendMessage
         method in the .cpp file
@@ -63,9 +64,31 @@ class ControlExpr(HeavyObject):
                 obj_id,
                 inlet_index)
         ]
+    """
+    The get_C_onMessage method returns the code that will get inserted into
+    the cReceive_<UID>_sendMessage method
+    """
+
+    # @classmethod
+    # def get_C_process(cls, process_dict: Dict, obj_type: str, obj_id: int, args: Dict) -> List[str]:
+    #     return [
+    #         "printf(\"hello world\")"
+    #     ]
+    """
+    The get_C_process method seems to only get called by Signal IR objects, it does
+    not get called for Control IR objects
+    """
 
     @classmethod
-    def get_C_impl(clazz, obj_type, obj_id, on_message_list, get_obj_class, objects, args):
+    def get_C_impl(
+        cls,
+        obj_type: str,
+        obj_id: int,
+        on_message_list: List,
+        get_obj_class: Callable,
+        objects: Dict,
+        args: Dict
+    ) -> List[str]:
         """
         (Per object) this creates the _sendMessage function that other objects use to
         send messages to this object.
@@ -76,7 +99,7 @@ class ControlExpr(HeavyObject):
         bound_expr = bind_expr(expr, "args")
         lines.extend([
             "",
-            f"float Heavy_heavy::{clazz.preamble}_{obj_id}_evaluate(float* args) {{",
+            f"float Heavy_heavy::{cls.preamble}_{obj_id}_evaluate(float* args) {{",
             f"\treturn {bound_expr};",
             "}",
         ])

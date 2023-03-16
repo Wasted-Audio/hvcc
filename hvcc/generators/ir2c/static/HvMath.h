@@ -615,6 +615,18 @@ static inline void __hv_lte_f(hv_bInf_t bIn0, hv_bInf_t bIn1, hv_bOutf_t bOut) {
 #endif
 }
 
+static inline void __hv_eq_f(hv_bInf_t bIn0, hv_bInf_t bIn1, hv_bOutf_t bOut) {
+#if HV_SIMD_AVX
+  *bOut = _mm256_cmp_ps(bIn0, bIn1, _CMP_EQ_OQ);
+#elif HV_SIMD_SSE
+  *bOut = _mm_cmpeq_ps(bIn0, bIn1);
+#elif HV_SIMD_NEON
+  *bOut = vreinterpretq_f32_u32(vceqq_f32(bIn0, bIn1));
+#else // HV_SIMD_NONE
+  *bOut = (bIn0 == bIn1) ? 1.0f : 0.0f;
+#endif
+}
+
 static inline void __hv_neq_f(hv_bInf_t bIn0, hv_bInf_t bIn1, hv_bOutf_t bOut) {
 #if HV_SIMD_AVX
   *bOut = _mm256_cmp_ps(bIn0, bIn1, _CMP_NEQ_OQ);

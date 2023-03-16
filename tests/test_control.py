@@ -242,6 +242,9 @@ class TestPdControlPatches(TestPdControlBase):
     def test_sqrt(self):
         self._test_control_patch("test-sqrt.pd")
 
+    def test_subpatch(self):
+        self._test_control_patch("test-subpatch.pd")
+
     def test_subtract(self):
         self._test_control_patch("test-subtract.pd")
 

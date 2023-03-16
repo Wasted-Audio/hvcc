@@ -1,4 +1,5 @@
 # Copyright (C) 2014-2018 Enzien Audio, Ltd.
+# Copyright (C) 2023 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -13,22 +14,31 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from typing import Optional, Dict
+
 from .HeavyIrObject import HeavyIrObject
 from .HeavyLangObject import HeavyLangObject
+from .HeavyGraph import HeavyGraph
 
 
 class HLangLine(HeavyLangObject):
     """ Translates HeavyLang object [line] to HeavyIR [__line] or [__line~f].
     """
 
-    def __init__(self, obj_type, args, graph, annotations=None):
+    def __init__(
+        self,
+        obj_type: str,
+        args: Dict,
+        graph: 'HeavyGraph',
+        annotations: Optional[Dict] = None
+    ) -> None:
         assert obj_type == "line"
-        HeavyLangObject.__init__(self, "line", args, graph,
-                                 num_inlets=2,
-                                 num_outlets=1,
-                                 annotations=annotations)
+        super().__init__("line", args, graph,
+                         num_inlets=2,
+                         num_outlets=1,
+                         annotations=annotations)
 
-    def reduce(self):
+    def reduce(self) -> tuple:
         if self.has_outlet_connection_format("f"):
             x = HeavyIrObject("__line~f", self.args)
         elif self.has_outlet_connection_format("c"):
