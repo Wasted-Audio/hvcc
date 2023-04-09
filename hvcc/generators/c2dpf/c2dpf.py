@@ -53,7 +53,6 @@ class c2dpf:
         else:
             dpf_meta = {}
 
-        dpf_project = dpf_meta.get('project')
         dpf_path = dpf_meta.get('dpf_path', '')
 
         copyright_c = copyright_manager.get_copyright_for_c(copyright)
@@ -68,9 +67,7 @@ class c2dpf:
 
             # copy over static files
             shutil.copytree(os.path.join(os.path.dirname(__file__), "static"), out_dir)
-
-            if dpf_project:
-                shutil.copy(os.path.join(os.path.dirname(__file__), "static/README.md"), f'{out_dir}/../')
+            shutil.copy(os.path.join(os.path.dirname(__file__), "static/README.md"), f'{out_dir}/../')
 
             # copy over generated C source files
             source_dir = os.path.join(out_dir, "source")
@@ -136,18 +133,17 @@ class c2dpf:
 
             # plugin makefile
             with open(os.path.join(source_dir, "Makefile"), "w") as f:
-                f.write(env.get_template("Makefile").render(
+                f.write(env.get_template("Makefile_plugin").render(
                     name=patch_name,
                     meta=dpf_meta,
                     dpf_path=dpf_path))
 
             # project makefile
-            if dpf_project:
-                with open(os.path.join(source_dir, "../../Makefile"), "w") as f:
-                    f.write(env.get_template("Makefile.project").render(
-                        name=patch_name,
-                        meta=dpf_meta,
-                        dpf_path=dpf_path))
+            with open(os.path.join(source_dir, "../../Makefile"), "w") as f:
+                f.write(env.get_template("Makefile_project").render(
+                    name=patch_name,
+                    meta=dpf_meta,
+                    dpf_path=dpf_path))
 
             buildjson.generate_json(
                 out_dir,
