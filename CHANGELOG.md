@@ -1,6 +1,18 @@
 CHANGELOG
 =====
 
+0.7.0
+-----
+
+* improvements: add type annotations to all methods; run mypy over the whole library
+* DPF: basic UI generation using dpf-widgets (imgui + modgui)
+* DPF: basic port groups support
+* abstractions: use duplicate of delread4~.pd for vd~.pd
+* deprecated: internal Bela implementation (use downstream instead)
+* docs: add notes
+* docs: fix markdown syntax
+* bugfixes: issues #86, #87 and #93 
+
 0.6.3
 -----
 

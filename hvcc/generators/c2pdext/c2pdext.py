@@ -1,4 +1,5 @@
 # Copyright (C) 2014-2018 Enzien Audio, Ltd.
+# Copyright (C) 2021-2023 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -13,12 +14,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import hashlib
 import os
 import shutil
 import time
 import jinja2
+from typing import Dict, Optional
+
 from ..copyright import copyright_manager
+from ..filters import filter_max, filter_xcode_build, filter_xcode_fileref
 
 
 class c2pdext:
@@ -26,32 +29,18 @@ class c2pdext:
     """
 
     @classmethod
-    def filter_max(clazz, i, j):
-        """Calculate the maximum of two integers.
-        """
-        return max(int(i), int(j))
-
-    @classmethod
-    def filter_xcode_build(clazz, s):
-        """Return a build hash suitable for use in an Xcode project file.
-        """
-        s = f"{s}_build"
-        s = hashlib.md5(s.encode('utf-8'))
-        s = s.hexdigest().upper()[0:24]
-        return s
-
-    @classmethod
-    def filter_xcode_fileref(clazz, s):
-        """Return a fileref hash suitable for use in an Xcode project file.
-        """
-        s = f"{s}_fileref"
-        s = hashlib.md5(s.encode('utf-8'))
-        s = s.hexdigest().upper()[0:24]
-        return s
-
-    @classmethod
-    def compile(clazz, c_src_dir, out_dir, externs, patch_name=None, patch_meta: dict = None,
-                num_input_channels=0, num_output_channels=0, copyright=None, verbose=False):
+    def compile(
+        cls,
+        c_src_dir: str,
+        out_dir: str,
+        externs: Dict,
+        patch_name: Optional[str] = None,
+        patch_meta: Optional[Dict] = None,
+        num_input_channels: int = 0,
+        num_output_channels: int = 0,
+        copyright: Optional[str] = None,
+        verbose: Optional[bool] = False
+    ) -> Dict:
 
         tick = time.time()
 
@@ -80,14 +69,14 @@ class c2pdext:
         try:
             # initialise the jinja template environment
             env = jinja2.Environment()
-            env.filters["max"] = c2pdext.filter_max
-            env.filters["xcode_build"] = c2pdext.filter_xcode_build
-            env.filters["xcode_fileref"] = c2pdext.filter_xcode_fileref
+            env.filters["max"] = filter_max
+            env.filters["xcode_build"] = filter_xcode_build
+            env.filters["xcode_fileref"] = filter_xcode_fileref
             env.loader = jinja2.FileSystemLoader(
                 os.path.join(os.path.dirname(os.path.abspath(__file__)), "templates"))
 
             # generate Pd external wrapper from template
-            pdext_path = os.path.join(out_dir, "{0}.c".format(struct_name))
+            pdext_path = os.path.join(out_dir, f"{struct_name}.c")
             with open(pdext_path, "w") as f:
                 f.write(env.get_template("pd_external.c").render(
                     name=patch_name,
@@ -99,7 +88,7 @@ class c2pdext:
                     copyright=copyright))
 
             # generate Xcode project
-            xcode_path = os.path.join(out_dir, "{0}.xcodeproj".format(struct_name))
+            xcode_path = os.path.join(out_dir, f"{struct_name}.xcodeproj")
             os.mkdir(xcode_path)  # create the xcode project bundle
             pbxproj_path = os.path.join(xcode_path, "project.pbxproj")
 

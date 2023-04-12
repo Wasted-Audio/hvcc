@@ -1,4 +1,5 @@
 # Copyright (C) 2014-2018 Enzien Audio, Ltd.
+# Copyright (C) 2023 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,18 +15,29 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from collections import Counter
+from typing import Optional, List, Dict
+
 from .NotificationEnum import NotificationEnum
 from .PdObject import PdObject
 
 
 class PdSelectObject(PdObject):
-    def __init__(self, obj_type, obj_args=None, pos_x=0, pos_y=0):
+    def __init__(
+        self,
+        obj_type: str,
+        obj_args: Optional[List] = None,
+        pos_x: int = 0,
+        pos_y: int = 0
+    ) -> None:
         assert obj_type in {"select", "sel"}
-        PdObject.__init__(self, obj_type, obj_args, pos_x, pos_y)
+        super().__init__(obj_type, obj_args, pos_x, pos_y)
 
-        if len(obj_args) == 0:
+        if not obj_args:
+            obj_args = []
+
+        if len(self.obj_args) == 0:
             self.add_error("At least one argument is required.")
-        if len(set(obj_args)) != len(obj_args):
+        if len(set(self.obj_args)) != len(obj_args):
             c = Counter(obj_args).most_common(1)
             self.add_error(
                 f"All arguments to [select] must be unique. Argument \"{c[0][0]}\" is repeated {c[0][1]} times.",
@@ -39,11 +51,11 @@ class PdSelectObject(PdObject):
             except Exception:
                 pass
 
-    def validate_configuration(self):
+    def validate_configuration(self) -> None:
         if len(self._inlet_connections.get("1", [])) > 0:
             self.add_warning("The right inlet of select is not supported. It will not do anything.")
 
-    def to_hv(self):
+    def to_hv(self) -> Dict:
         """ Creates a graph dynamically based on the number of arguments.
             An unconnected right inlet is added.
 
@@ -56,7 +68,7 @@ class PdSelectObject(PdObject):
             [outlet_0]                    [outlet_N-1]            [outlet_right]
         """
 
-        route_graph = {
+        route_graph: Dict = {
             "type": "graph",
             "imports": [],
             "args": [],

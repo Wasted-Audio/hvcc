@@ -1,4 +1,5 @@
 # Copyright (C) 2014-2018 Enzien Audio, Ltd.
+# Copyright (C) 2021-2023 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,12 +21,12 @@ import os
 import re
 import time
 import sys
+from typing import List, Dict, Optional
 
 from hvcc.interpreters.pd2hv import pd2hv
 from hvcc.core.hv2ir import hv2ir
 from hvcc.generators.ir2c import ir2c
 from hvcc.generators.ir2c import ir2c_perf
-from hvcc.generators.c2bela import c2bela
 from hvcc.generators.c2fabric import c2fabric
 from hvcc.generators.c2js import c2js
 from hvcc.generators.c2daisy import c2daisy
@@ -49,7 +50,7 @@ class Colours:
     end = "\033[0m"
 
 
-def add_error(results, error):
+def add_error(results: OrderedDict, error: str) -> OrderedDict:
     if "hvcc" in results:
         results["hvcc"]["notifs"]["errors"].append({"message": error})
     else:
@@ -65,7 +66,7 @@ def add_error(results, error):
     return results
 
 
-def check_extern_name_conflicts(extern_type, extern_list, results):
+def check_extern_name_conflicts(extern_type: str, extern_list: List, results: OrderedDict) -> None:
     """ In most of the generator code extern names become capitalised when used
         as enums. This method makes sure that there are no cases where two unique
         keys become the same after being capitalised.
@@ -80,7 +81,7 @@ def check_extern_name_conflicts(extern_type, extern_list, results):
                           "capital letters are not the only difference.")
 
 
-def generate_extern_info(hvir, results):
+def generate_extern_info(hvir: Dict, results: OrderedDict) -> Dict:
     """ Simplifies the receiver/send and table lists by only containing values
         externed with @hv_param, @hv_event or @hv_table
     """
@@ -132,16 +133,24 @@ def generate_extern_info(hvir, results):
     }
 
 
-def compile_dataflow(in_path, out_dir, patch_name=None, patch_meta_file=None,
-                     search_paths=None, generators=None, verbose=False,
-                     copyright=None, hvir=None):
+def compile_dataflow(
+    in_path: str,
+    out_dir: str,
+    patch_name: str = "heavy",
+    patch_meta_file: Optional[str] = None,
+    search_paths: Optional[List] = None,
+    generators: Optional[List] = None,
+    verbose: bool = False,
+    copyright: Optional[str] = None
+) -> OrderedDict:
 
-    results = OrderedDict()  # default value, empty dictionary
+    results: OrderedDict = OrderedDict()  # default value, empty dictionary
+    patch_meta = {}
 
     # basic error checking on input
     if os.path.isfile(in_path):
-        if not in_path.endswith((".pd", ".maxpat")):
-            return add_error(results, "Can only process Pd or Max files.")
+        if not in_path.endswith((".pd")):
+            return add_error(results, "Can only process Pd files.")
     elif os.path.isdir(in_path):
         if not os.path.basename("c"):
             return add_error(results, "Can only process c directories.")
@@ -156,11 +165,9 @@ def compile_dataflow(in_path, out_dir, patch_name=None, patch_meta_file=None,
                     patch_meta = json.load(json_file)
                 except Exception as e:
                     return add_error(results, f"Unable to open json_file: {e}")
-    else:
-        patch_meta = {}
 
-    patch_name = patch_name or "heavy"
-    generators = generators or {"c"}
+    patch_name = patch_meta.get("name", patch_name)
+    generators = ["c"] if generators is None else [x.lower() for x in generators]
 
     if in_path.endswith((".pd")):
         if verbose:
@@ -251,11 +258,6 @@ def compile_dataflow(in_path, out_dir, patch_name=None, patch_meta_file=None,
         'verbose': verbose
     }
 
-    if "bela" in generators:
-        if verbose:
-            print("--> Generating Bela plugin")
-        results["c2bela"] = c2bela.c2bela.compile(**gen_args)
-
     if "fabric" in generators:
         if verbose:
             print("--> Generating Fabric plugin")
@@ -299,7 +301,7 @@ def compile_dataflow(in_path, out_dir, patch_name=None, patch_meta_file=None,
     return results
 
 
-def main():
+def main() -> bool:
     tick = time.time()
 
     parser = argparse.ArgumentParser(
@@ -320,7 +322,6 @@ def main():
     parser.add_argument(
         "-n",
         "--name",
-        default="heavy",
         help="Provides a name for the generated Heavy context.")
     parser.add_argument(
         "-m",
@@ -331,7 +332,7 @@ def main():
         "--gen",
         nargs="+",
         default=["c"],
-        help="List of generator outputs: c, unity, wwise, js, pdext, daisy, dpf, fabric")
+        help="List of generator outputs: c, unity, wwise, js, pdext, daisy, dpf, fabric, owl")
     parser.add_argument(
         "--results_path",
         help="Write results dictionary to the given path as a JSON-formatted string."

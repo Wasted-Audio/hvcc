@@ -1,4 +1,5 @@
 # Copyright (C) 2014-2018 Enzien Audio, Ltd.
+# Copyright (C) 2023 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,41 +15,51 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from collections import Counter
+from typing import Optional, List, Dict
+
 from .NotificationEnum import NotificationEnum
 from .PdObject import PdObject
 
 
 class PdRouteObject(PdObject):
-    def __init__(self, obj_type, obj_args=None, pos_x=0, pos_y=0):
+    def __init__(
+        self,
+        obj_type: str,
+        obj_args: Optional[List] = None,
+        pos_x: int = 0,
+        pos_y: int = 0
+    ) -> None:
         assert obj_type == "route"
-        PdObject.__init__(self, obj_type, obj_args, pos_x, pos_y)
-        if len(obj_args) == 0:
-            self.add_error("At least one argument is required.")
-        # NOTE(joe): disabling this warning as it can be quite annoying.
-        # if len(set(obj_args) & set(["bang", "list", "float", "symbol"])) > 0:
-        #     self.add_warning(
-        #         "Heavy interprets route arguments such as \"bang\", \"list\", \"float\", "
-        #         "and \"symbol\" literally. They cannot be used to filter generic "
-        #         "messages as in Pd.")
-        if len(set(obj_args)) != len(obj_args):
-            c = Counter(obj_args).most_common(1)
-            self.add_error(
-                f"All arguments to [route] must be unique. Argument \"{c[0][0]}\" is repeated {c[0][1]} times.",
-                NotificationEnum.ERROR_UNIQUE_ARGUMENTS_REQUIRED)
+        super().__init__(obj_type, obj_args, pos_x, pos_y)
 
-        # convert to obj_args to mixedarray, such that correct switchcase hash
-        # is generated
-        for i, a in enumerate(self.obj_args):
-            try:
-                self.obj_args[i] = float(a)
-            except Exception:
-                pass
+        if obj_args is not None:
+            if len(obj_args) == 0:
+                self.add_error("At least one argument is required.")
+            # NOTE(joe): disabling this warning as it can be quite annoying.
+            # if len(set(obj_args) & set(["bang", "list", "float", "symbol"])) > 0:
+            #     self.add_warning(
+            #         "Heavy interprets route arguments such as \"bang\", \"list\", \"float\", "
+            #         "and \"symbol\" literally. They cannot be used to filter generic "
+            #         "messages as in Pd.")
+            if len(set(obj_args)) != len(obj_args):
+                c = Counter(obj_args).most_common(1)
+                self.add_error(
+                    f"All arguments to [route] must be unique. Argument \"{c[0][0]}\" is repeated {c[0][1]} times.",
+                    NotificationEnum.ERROR_UNIQUE_ARGUMENTS_REQUIRED)
 
-    def validate_configuration(self):
+            # convert to obj_args to mixedarray, such that correct switchcase hash
+            # is generated
+            for i, a in enumerate(self.obj_args):
+                try:
+                    self.obj_args[i] = float(a)
+                except Exception:
+                    pass
+
+    def validate_configuration(self) -> None:
         if len(self._inlet_connections.get("1", [])) > 0:
             self.add_warning("The right inlet of route is not supported. It will not do anything.")
 
-    def to_hv(self):
+    def to_hv(self) -> Dict:
         """Creates a graph dynamically based on the number of arguments.
             An unconnected right inlet is added.
 
@@ -61,7 +72,7 @@ class PdRouteObject(PdObject):
             [outlet_0]                    [outlet_N-1]            [outlet_right]
         """
 
-        route_graph = {
+        route_graph: Dict = {
             "type": "graph",
             "imports": [],
             "args": [],

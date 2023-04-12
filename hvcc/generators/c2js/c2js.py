@@ -1,4 +1,5 @@
 # Copyright (C) 2014-2018 Enzien Audio, Ltd.
+# Copyright (C) 2021-2023 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,6 +20,7 @@ import time
 import jinja2
 
 from shutil import which
+from typing import Dict, Optional
 
 from hvcc.core.hv2ir.HeavyException import HeavyException
 from ..copyright import copyright_manager
@@ -57,14 +59,24 @@ class c2js:
     ]
 
     @classmethod
-    def run_emscripten(clazz, c_src_dir, out_dir, patch_name, output_name, post_js_path, should_modularize,
-                       environment, pre_js_path="", binaryen_async=1):
+    def run_emscripten(
+        cls,
+        c_src_dir: str,
+        out_dir: str,
+        patch_name: str,
+        output_name: str,
+        post_js_path: str,
+        should_modularize: int,
+        environment: str,
+        pre_js_path: str = "",
+        binaryen_async: int = 1
+    ) -> str:
         """Run the emcc command to compile C source files to a javascript library.
         """
 
         emcc_path = which("emcc")
 
-        if not emcc_path:
+        if emcc_path is None:
             raise HeavyException("emcc is not in the PATH")
 
         c_flags = [
@@ -83,19 +95,19 @@ class c2js:
         # compile C files
         for c in c_src_paths:
             obj_path = f"{os.path.splitext(c)[0]}.o"
-            cmd = [emcc_path] + c_flags + ["-c", "-o", obj_path, c]
+            cmd = [emcc_path] + c_flags + ["-c", "-o", obj_path, c]  # type: ignore
             subprocess.check_output(cmd)  # run emscripten
             obj_paths += [obj_path]
 
         # compile C++ files
         for cpp in cpp_src_paths:
             obj_path = f"{os.path.splitext(cpp)[0]}.o"
-            cmd = [emcc_path] + c_flags + ["-std=c++11"] + ["-c", "-o", obj_path, cpp]
+            cmd = [emcc_path] + c_flags + ["-std=c++11"] + ["-c", "-o", obj_path, cpp]  # type: ignore
             subprocess.check_output(cmd)  # run emscripten
             obj_paths += [obj_path]
 
         # exported heavy api methods
-        hv_api_defs = ", ".join([f"\"{x.format(patch_name)}\"" for x in c2js.__HV_API])
+        hv_api_defs = ", ".join([f"\"{x.format(patch_name)}\"" for x in cls.__HV_API])
 
         # output path
         wasm_js_path = os.path.join(out_dir, f"{output_name}.js")
@@ -122,9 +134,9 @@ class c2js:
             ]
 
         # include C/C++ obj files in js library
-        cmd = [emcc_path] + obj_paths + linker_flags
+        cmd = [emcc_path] + obj_paths + linker_flags  # type: ignore
         subprocess.check_output(  # WASM
-            cmd + [
+            cmd + [  # type: ignore
                 "-s", "WASM=1",
                 "-s", f"EXPORT_NAME='{output_name}_Module'",
                 "-o", wasm_js_path
@@ -137,8 +149,18 @@ class c2js:
         return wasm_js_path
 
     @classmethod
-    def compile(clazz, c_src_dir, out_dir, externs, patch_name=None, patch_meta: dict = None,
-                num_input_channels=0, num_output_channels=0, copyright=None, verbose=False):
+    def compile(
+        cls,
+        c_src_dir: str,
+        out_dir: str,
+        externs: Dict,
+        patch_name: Optional[str] = None,
+        patch_meta: Optional[Dict] = None,
+        num_input_channels: int = 0,
+        num_output_channels: int = 0,
+        copyright: Optional[str] = None,
+        verbose: Optional[bool] = False
+    ) -> Dict:
 
         tick = time.time()
 
@@ -173,13 +195,13 @@ class c2js:
                     externs=externs,
                     pool_sizes_kb=externs["memoryPoolSizesKb"]))
 
-            js_path = c2js.run_emscripten(c_src_dir=c_src_dir,
-                                          out_dir=out_dir,
-                                          patch_name=patch_name,
-                                          output_name=patch_name,
-                                          post_js_path=post_js_path,
-                                          should_modularize=1,
-                                          environment="web")
+            js_path = cls.run_emscripten(c_src_dir=c_src_dir,
+                                         out_dir=out_dir,
+                                         patch_name=patch_name,
+                                         output_name=patch_name,
+                                         post_js_path=post_js_path,
+                                         should_modularize=1,
+                                         environment="web")
 
             # delete temporary files
             os.remove(post_js_path)
@@ -214,15 +236,15 @@ class c2js:
                     externs=externs,
                     pool_sizes_kb=externs["memoryPoolSizesKb"]))
 
-            js_path = c2js.run_emscripten(c_src_dir=c_src_dir,
-                                          out_dir=out_dir,
-                                          patch_name=patch_name,
-                                          output_name=f"{patch_name}_AudioLibWorklet",
-                                          post_js_path=post_js_path,
-                                          should_modularize=0,
-                                          environment="worker",
-                                          pre_js_path=pre_js_path,
-                                          binaryen_async=0)
+            js_path = cls.run_emscripten(c_src_dir=c_src_dir,
+                                         out_dir=out_dir,
+                                         patch_name=patch_name,
+                                         output_name=f"{patch_name}_AudioLibWorklet",
+                                         post_js_path=post_js_path,
+                                         should_modularize=0,
+                                         environment="worker",
+                                         pre_js_path=pre_js_path,
+                                         binaryen_async=0)
 
             # delete temporary files
             os.remove(post_js_path)

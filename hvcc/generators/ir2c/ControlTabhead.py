@@ -1,4 +1,5 @@
 # Copyright (C) 2014-2018 Enzien Audio, Ltd.
+# Copyright (C) 2023 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -13,6 +14,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from typing import Dict, List
+
 from .HeavyObject import HeavyObject
 
 
@@ -24,26 +27,21 @@ class ControlTabhead(HeavyObject):
     preamble = "cTabhead"
 
     @classmethod
-    def get_C_header_set(clazz):
+    def get_C_header_set(cls) -> set:
         return {"HvControlTabhead.h"}
 
     @classmethod
-    def get_C_file_set(clazz):
+    def get_C_file_set(cls) -> set:
         return {"HvControlTabhead.h", "HvControlTabhead.c"}
 
     @classmethod
-    def get_C_free(clazz, obj_type, obj_id, args):
+    def get_C_free(cls, obj_type: str, obj_id: int, args: Dict) -> List[str]:
         return []
 
     @classmethod
-    def get_C_init(clazz, obj_type, obj_id, args):
-        return [
-            "cTabhead_init(&cTabhead_{0}, &hTable_{1});".format(
-                obj_id,
-                args["table_id"])]
+    def get_C_init(cls, obj_type: str, obj_id: int, args: Dict) -> List[str]:
+        return [f"cTabhead_init(&cTabhead_{obj_id}, &hTable_{args['table_id']});"]
 
     @classmethod
-    def get_C_onMessage(clazz, obj_type, obj_id, inlet_index, args):
-        return [
-            "cTabhead_onMessage(_c, &Context(_c)->cTabhead_{0}, 0, m, &cTabhead_{0}_sendMessage);".format(
-                obj_id)]
+    def get_C_onMessage(cls, obj_type: str, obj_id: int, inlet_index: int, args: Dict) -> List[str]:
+        return [f"cTabhead_onMessage(_c, &Context(_c)->cTabhead_{obj_id}, 0, m, &cTabhead_{obj_id}_sendMessage);"]

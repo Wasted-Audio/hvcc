@@ -1,4 +1,5 @@
 # Copyright (C) 2014-2018 Enzien Audio, Ltd.
+# Copyright (C) 2023 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -13,9 +14,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from collections import Counter
 import os
 import re
+from collections import Counter
+from typing import Optional, Union, Dict, List
 
 from .BufferPool import BufferPool
 from .Connection import Connection
@@ -32,41 +34,50 @@ class HeavyGraph(HeavyIrObject):
         and should not appear in any IR output.
     """
 
-    def __init__(self, graph=None, graph_args=None, file=None, xname=None):
+    def __init__(
+        self,
+        graph: Optional['HeavyGraph'] = None,
+        graph_args: Optional[Dict] = None,
+        file: str = "",
+        xname: str = "heavy"
+    ) -> None:
         # zero inlets and outlets until inlet/outlet objects are declared
-        HeavyIrObject.__init__(self, "__graph", graph_args, graph, 0, 0)
+        super().__init__("__graph", graph_args, graph, 0, 0)
 
         # the heavy file which defines this graph
         self.file = file
 
         # a user-defined name of this graph
-        self.xname = xname or "heavy"
+        self.xname = xname
 
         # the dictionary of all objects in the graph
-        self.objs = {}
+        self.objs: Dict = {}
 
         # set the local arguments
-        self.args = graph_args or {}
+        if graph_args is not None:
+            self.args = graph_args
+        else:
+            self.args = {}
 
         # initialise the local variables
         self.local_vars = LocalVars()
 
         # the list of all constituent inlet and outlet objects
         # graphs always start with no inlet/outlets
-        self.inlet_objs = []
-        self.outlet_objs = []
+        self.inlet_objs: List = []
+        self.outlet_objs: List = []
 
         # the set of input/output channels that this graph writes to
-        self.input_channel_set = set()
-        self.output_channel_set = set()
+        self.input_channel_set: set = set()
+        self.output_channel_set: set = set()
 
         # an ordered list of signal objects to process
-        self.signal_order = []
+        self.signal_order: List = []
 
         # a pool of signal buffers for use during signal ordering and buffer assignment
-        self.buffer_pool = None
+        self.buffer_pool: Optional[BufferPool] = None
 
-    def resolve_arguments(self, obj_args):
+    def resolve_arguments(self, obj_args: Dict) -> Dict:
         """ Resolves the object arguments based on values from the local graph.
         """
         args = dict(obj_args)  # make a copy of the input arguments
@@ -99,7 +110,7 @@ class HeavyGraph(HeavyIrObject):
                         args[key] = value
         return args
 
-    def connect_objects(self, c, require_intra_graph_connection=True):
+    def connect_objects(self, c: Connection, require_intra_graph_connection: bool = True) -> None:
         """ Establish a connection from one object to another.
             Typically a connection must be made within a single graph, though
             this requirement may be subpressed.
@@ -114,7 +125,7 @@ class HeavyGraph(HeavyIrObject):
         # add the connection to the child from the parent
         c.to_object.add_connection(c)
 
-    def disconnect_objects(self, c):
+    def disconnect_objects(self, c: Connection) -> None:
         """ Remove a connection from one object to another.
         """
         # remove the connection from the parent to the child
@@ -123,7 +134,7 @@ class HeavyGraph(HeavyIrObject):
         # remove the connection to the child from the parent
         c.to_object.remove_connection(c)
 
-    def update_connection(self, c, n_list):
+    def update_connection(self, c: Connection, n_list: List) -> None:
         """ Update the old connection (c) with the new connections (n_list).
             Connection order is maintained. If c is None, this method acts
             as connect_objects(). If n is empty, this method acts as disconnect_objects().
@@ -149,7 +160,11 @@ class HeavyGraph(HeavyIrObject):
             for n in n_list:
                 self.connect_objects(n)  # add connection n
 
-    def add_object(self, obj, obj_id=None):
+    def add_object(
+        self,
+        obj: HeavyIrObject,
+        obj_id: Optional[Union[int, str]] = None
+    ) -> None:
         """ Add an object to the graph based on the given id.
             Per-object bookkeeping is performed.
         """
@@ -194,40 +209,63 @@ class HeavyGraph(HeavyIrObject):
         else:
             self.add_error(f"Duplicate object id {obj_id} found in graph.")
 
-    def __register_named_object(self, obj, name=None, static=False, unique=False):
+    def __register_named_object(
+        self,
+        obj: HeavyIrObject,
+        name: Optional[str] = None,
+        static: bool = False,
+        unique: bool = False
+    ) -> None:
         """ Register a named object at the appropriate graph level.
         """
 
         name = name or obj.name
-        if obj.scope == "private" and not static:
-            # stay at this level
-            self.local_vars.register_object(obj, name, static, unique)
-        elif obj.scope == "protected":
-            # go up one level
-            g = self.graph if self.graph is not None else self
-            g.local_vars.register_object(obj, name, static, unique)
-        elif obj.scope == "public" or static:
-            self.get_root_graph().local_vars.register_object(obj, name, static, unique)
+        if name is not None:
+            if obj.scope == "private" and not static:
+                # stay at this level
+                self.local_vars.register_object(obj, name, static, unique)
+            elif obj.scope == "protected":
+                # go up one level
+                g = self.graph if self.graph is not None else self
+                g.local_vars.register_object(obj, name, static, unique)
+            elif obj.scope == "public" or static:
+                self.get_root_graph().local_vars.register_object(obj, name, static, unique)
+            else:
+                raise HeavyException(f"Unknown scope \"{obj.scope}\" for object {obj}.")
         else:
             raise HeavyException(f"Unknown scope \"{obj.scope}\" for object {obj}.")
 
-    def __unregister_named_object(self, obj, name=None, static=False, unique=False):
+    def __unregister_named_object(
+        self,
+        obj: HeavyIrObject,
+        name: Optional[str] = None,
+        static: bool = False,
+        unique: bool = False
+    ) -> None:
         """ Unregister a named object at the appropriate graph level.
         """
 
         name = name or obj.name
-        if obj.scope == "private" and not static:
-            self.local_vars.unregister_object(obj, name)
-        elif obj.scope == "protected":
-            # go up one level
-            g = self.graph if self.graph is not None else self
-            g.local_vars.unregister_object(obj, name)
-        elif obj.scope == "public" or static:
-            self.get_root_graph().local_vars.unregister_object(obj, name)
+        if name is not None:
+            if obj.scope == "private" and not static:
+                self.local_vars.unregister_object(obj, name)
+            elif obj.scope == "protected":
+                # go up one level
+                g = self.graph if self.graph is not None else self
+                g.local_vars.unregister_object(obj, name)
+            elif obj.scope == "public" or static:
+                self.get_root_graph().local_vars.unregister_object(obj, name)
+            else:
+                raise HeavyException(f"Unknown scope \"{obj.scope}\" for object {obj}.")
         else:
             raise HeavyException(f"Unknown scope \"{obj.scope}\" for object {obj}.")
 
-    def resolve_objects_for_name(self, name, obj_types, local_graph=None):
+    def resolve_objects_for_name(
+        self,
+        name: str,
+        obj_types: Union[List, str],
+        local_graph: Optional['HeavyGraph'] = None
+    ) -> List:
         """ Returns all objects with the given name and type that are visible
             from this graph. Returns an empty list if no objects could be found.
             The results are otherwise ordered from most local/private first,
@@ -246,7 +284,12 @@ class HeavyGraph(HeavyIrObject):
 
         return obj_list
 
-    def resolve_object_for_name(self, name, obj_types, local_graph=None):
+    def resolve_object_for_name(
+        self,
+        name: str,
+        obj_types: Union[List, str],
+        local_graph: Optional['HeavyGraph'] = None
+    ) -> Optional[HeavyIrObject]:
         """ Returns the first object with the given name and type that is visible
             from this graph. Returns None if no objects are available.
             This is a convenience method.
@@ -255,17 +298,23 @@ class HeavyGraph(HeavyIrObject):
         objs = self.resolve_objects_for_name(name, obj_types, local_graph)
         return objs[0] if len(objs) > 0 else None
 
-    def is_root_graph(self):
+    def is_root_graph(self) -> bool:
         """ Returns true if this is the top-level (i.e. root) graph. False otherwise.
         """
         return self.graph is None
 
-    def get_root_graph(self):
+    def get_root_graph(self) -> 'HeavyGraph':
         """Returns the top-level graph.
         """
-        return self if self.is_root_graph() else self.graph.get_root_graph()
+        if self.is_root_graph():
+            return self
+        elif self.graph is not None:
+            return self.graph.get_root_graph()
+        else:
+            # NOTE(dromer): we should never get here
+            raise Exception
 
-    def find_path_for_abstraction(self, obj_type):
+    def find_path_for_abstraction(self, obj_type: str) -> Optional[str]:
         """ Travels up the graph heirarchy looking for a file path to an abstraction.
             Returns None if no abstraction is found.
         """
@@ -275,7 +324,7 @@ class HeavyGraph(HeavyIrObject):
         else:
             return self.graph.find_path_for_abstraction(obj_type) if self.graph is not None else None
 
-    def remove_object(self, o, obj_id=None):
+    def remove_object(self, o: HeavyIrObject, obj_id: Optional[str] = None) -> None:
         """ Removes an object and all of its connections from the graph.
             A custom id for the object to be removed can be given.
         """
@@ -294,17 +343,17 @@ class HeavyGraph(HeavyIrObject):
         if o.type in {"receive", "__receive", "send", "__send"}:
             self.__unregister_named_object(o, o.name)
 
-    def get_inlet_object(self, index):
+    def get_inlet_object(self, index: int) -> HeavyIrObject:
         """ Returns the indexed inlet object of this graph.
         """
         return self.inlet_objs[index]
 
-    def get_outlet_object(self, index):
+    def get_outlet_object(self, index: int) -> HeavyIrObject:
         """ Returns the indexed outlet object of this graph.
         """
         return self.outlet_objs[index]
 
-    def get_input_channel_set(self, recursive=False):
+    def get_input_channel_set(self, recursive: bool = False) -> set:
         """ Returns the set of input channels that this graph writes to.
             Optionally includes all subgraphs as well.
         """
@@ -316,7 +365,7 @@ class HeavyGraph(HeavyIrObject):
         else:
             return self.input_channel_set
 
-    def get_output_channel_set(self, recursive=False):
+    def get_output_channel_set(self, recursive: bool = False) -> set:
         """ Returns the set of output channels that this graph writes to.
             Optionally includes all subgraphs as well.
         """
@@ -328,7 +377,7 @@ class HeavyGraph(HeavyIrObject):
         else:
             return self.output_channel_set
 
-    def get_notices(self):
+    def get_notices(self) -> Dict:
         notices = HeavyLangObject.get_notices(self)
         for o in self.objs.values():
             n = o.get_notices()
@@ -336,7 +385,7 @@ class HeavyGraph(HeavyIrObject):
             notices["errors"].extend(n["errors"])
         return notices
 
-    def get_objects_for_type(self, obj_type, recursive=False):
+    def get_objects_for_type(self, obj_type: str, recursive: bool = False) -> List:
         """ Returns a list of all objects of a given type in this graph.
             The optional parameter "recursive" also includes all objects from subgraphs.
         """
@@ -348,13 +397,13 @@ class HeavyGraph(HeavyIrObject):
                 obj_list.append(o)
         return obj_list
 
-    def get_object_counter(self, recursive=False):
+    def get_object_counter(self, recursive: bool = False) -> Counter:
         """ Returns a counter of all object types in this graph.
             Graph objects are explicitly removed. "__inlet" and "__outlet"
             objects are renamed to "inlet" and "outlet", for clarity.
             An optional recursive argument includes all subgraphs.
         """
-        c = Counter()
+        c: Counter = Counter()
         for o in self.objs.values():
             if o.type == "__graph" and recursive:
                 c += o.get_object_counter(recursive=True)
@@ -364,7 +413,7 @@ class HeavyGraph(HeavyIrObject):
                 c[o.type] += 1
         return c
 
-    def prepare(self):
+    def prepare(self) -> None:
         """ Prepares a graph to be exported. Must be called from a root graph.
         """
         assert self.is_root_graph()
@@ -415,7 +464,7 @@ class HeavyGraph(HeavyIrObject):
             e.notes["exception"] = e
             raise e
 
-    def _remove_unused_inlet_connections(self):
+    def _remove_unused_inlet_connections(self) -> None:
         """ Remove connections from inlet object, if there are no incoming
             connections to it. This is a basic approach to pruning unused or
             unnecessary connections, which allow further optimisation later
@@ -431,7 +480,7 @@ class HeavyGraph(HeavyIrObject):
         for o in [o for o in self.objs.values() if (o.type == "__graph")]:
             o._remove_unused_inlet_connections()
 
-    def _resolved_outlet_type(self, outlet_index=0):
+    def _resolved_outlet_type(self, outlet_index: int = 0) -> str:
         # a graph's outlet type depends on the connections incident on the
         # corresponding outlet object
         connection_type_set = {c.type for c in self.outlet_objs[outlet_index].inlet_connections[0]}
@@ -443,7 +492,7 @@ class HeavyGraph(HeavyIrObject):
             raise HeavyException(f"{self} has multiple incident connections of differing type.\
                                   The outlet type cannot be explicitly resolved.")
 
-    def _resolve_connection_types(self, obj_stack=None):
+    def _resolve_connection_types(self, obj_stack: Optional[set] = None) -> Optional[None]:
         """ Resolves the type of all connections before reduction to IR object types.
             If connections incident on an object are incompatible, they are either
             resolved, potentially by inserting conversion objects, or pruned.
@@ -468,7 +517,7 @@ class HeavyGraph(HeavyIrObject):
                 self.update_connection(c, [c.copy(type=connection_type)])
             c.to_object._resolve_connection_types(obj_stack)  # turtle on down
 
-    def remap_send_receive(self):
+    def remap_send_receive(self) -> None:
         """ Recursively finds all signal send/receive objects and for each unique
             send name, get all of the sends, and all of the corresponding receives.
             Reconnect all incoming connections to a __add~f, and fan out the results
@@ -546,7 +595,7 @@ class HeavyGraph(HeavyIrObject):
             for o in r_list:
                 o.graph.remove_object(o)
 
-    def reduce(self):
+    def reduce(self) -> tuple:
         """ Breaks this object into low-level objects. This method returns either
             the object that it is called on, or a graph. In case of a graph, it contains
             only low-level objects. Unnecessary connections are pruned. Because
@@ -586,7 +635,7 @@ class HeavyGraph(HeavyIrObject):
         # a graph is reduced in-place and does not change any connections
         return ({self}, [])
 
-    def cascade_expansion(self):
+    def cascade_expansion(self) -> None:
         """ Turns implicit +~ into explicit cascading +~ trees.
             It is assumed that this simplification operation is run on a reduced graph.
         """
@@ -633,7 +682,7 @@ class HeavyGraph(HeavyIrObject):
             if o.type == "__graph":
                 o.cascade_expansion()
 
-    def fma_replacement(self):
+    def fma_replacement(self) -> None:
         """ Replace:
             [__mul~f] ~f> [__add~f] with [__fma~f] or
             [__mul~f] ~f> [__sub~f] with [__fms~f]
@@ -683,7 +732,7 @@ class HeavyGraph(HeavyIrObject):
             elif o.type == "__graph":
                 o.fma_replacement()  # recurse through all subgraphs
 
-    def group_control_receivers(self):
+    def group_control_receivers(self) -> None:
         """ Group all control receivers with the same name under one receiver
             with that name. This way only one message must be scheduled to hit
             all receivers.
@@ -729,13 +778,13 @@ class HeavyGraph(HeavyIrObject):
                 r.graph.remove_object(r)
 
     @property
-    def does_process_signal(self):
+    def does_process_signal(self) -> bool:
         # this graph processes a signal if it contains any adc~ (__inlet
         # objects with index > 127)
         return any(o.does_process_signal for o in self.objs.values()) or \
             any(o.args["index"] > 127 for o in self.inlet_objs)
 
-    def order_signal_objects(self):
+    def order_signal_objects(self) -> None:
         """ Places the signal objects in the correct order to be processed.
             Only the objects in this graph are ordered, stopping at the inlet objects.
         """
@@ -747,8 +796,12 @@ class HeavyGraph(HeavyIrObject):
         # retain only objects that process a signal
         self.signal_order = [o for o in self.signal_order if o.does_process_signal]
 
-    def assign_signal_buffers(self, buffer_pool=None):
-        self.buffer_pool = buffer_pool or BufferPool()  # the top-level graph owns the buffer pool
+    def assign_signal_buffers(self, buffer_pool: Optional[BufferPool] = None) -> None:
+        # the top-level graph owns the buffer pool
+        if buffer_pool is not None:
+            self.buffer_pool = buffer_pool
+        else:
+            self.buffer_pool = BufferPool()
 
         # before signal buffers can be assigned, the objects must be ordered
         self.order_signal_objects()
@@ -794,7 +847,7 @@ class HeavyGraph(HeavyIrObject):
                 raise HeavyException(
                     f"Object {outlet_obj} in graph {outlet_obj.graph.file} has {len(c_list)} (> 1) signal inputs.")
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         if self.xname is not None:
             # TODO(mhroth): does not handle nested subgraph
             return f"__graph.{self.id}({os.path.basename(self.file)}/{self.xname})"
@@ -805,7 +858,7 @@ class HeavyGraph(HeavyIrObject):
     # Intermediate Representation generators
     #
 
-    def to_ir(self):
+    def to_ir(self) -> Optional[Dict]:
         """ Returns Heavy intermediate representation.
         """
 
@@ -813,32 +866,36 @@ class HeavyGraph(HeavyIrObject):
         input_channel_set = self.get_input_channel_set(recursive=True)
         output_channel_set = self.get_output_channel_set(recursive=True)
 
-        return {
-            "name": {
-                "escaped": re.sub(r"\W", "_", self.xname),
-                "display": self.xname
-            },
-            "objects": self.get_object_dict(),
-            "init": {
-                "order": self.get_ir_init_list()
-            },
-            "tables": self.get_ir_table_dict(),
-            "control": {
-                "receivers": self.get_ir_receiver_dict(),
-                "sendMessage": self.get_ir_control_list()
-            },
-            "signal": {
-                "numInputBuffers": max(input_channel_set) if len(input_channel_set) > 0 else 0,
-                "numOutputBuffers": max(output_channel_set) if len(output_channel_set) > 0 else 0,
-                "numTemporaryBuffers": {
-                    "float": self.buffer_pool.num_buffers("~f>"),
-                    "integer": self.buffer_pool.num_buffers("~i>")
+        if self.buffer_pool is not None:
+            return {
+                "name": {
+                    "escaped": re.sub(r"\W", "_", self.xname),
+                    "display": self.xname
                 },
-                "processOrder": self.get_ir_signal_list()
+                "objects": self.get_object_dict(),
+                "init": {
+                    "order": self.get_ir_init_list()
+                },
+                "tables": self.get_ir_table_dict(),
+                "control": {
+                    "receivers": self.get_ir_receiver_dict(),
+                    "sendMessage": self.get_ir_control_list()
+                },
+                "signal": {
+                    "numInputBuffers": max(input_channel_set) if len(input_channel_set) > 0 else 0,
+                    "numOutputBuffers": max(output_channel_set) if len(output_channel_set) > 0 else 0,
+                    "numTemporaryBuffers": {
+                        "float": self.buffer_pool.num_buffers("~f>"),
+                        "integer": self.buffer_pool.num_buffers("~i>")
+                    },
+                    "processOrder": self.get_ir_signal_list()
+                }
             }
-        }
+        else:
+            # we should never get here
+            raise Exception
 
-    def get_object_dict(self):
+    def get_object_dict(self) -> Dict:
         # d = {o.id: o.get_object_dict() for o in self.objs.values() if o.type not in
         # ["inlet", "__inlet", "outlet", "__outlet"]}
         d = {}
@@ -848,7 +905,7 @@ class HeavyGraph(HeavyIrObject):
                 d.update(o.get_object_dict())
         return d
 
-    def get_ir_init_list(self):
+    def get_ir_init_list(self) -> List:
         """ Init list is returned with all signal objects at the front,
             in the order that they are processed. This is to reduce cache misses
             on the signal object state as the process function is executed.
@@ -861,7 +918,7 @@ class HeavyGraph(HeavyIrObject):
         # ordered_init_list = list(OrderedDict.fromkeys(s_init_list + i_init_list))
         return ordered_init_list
 
-    def get_ir_on_message(self, inlet_index):
+    def get_ir_on_message(self, inlet_index: int = 0) -> List:
         # pass the method through the inlet object, but only follow control connections
         x = []
         for c in self.inlet_objs[inlet_index].outlet_connections[0]:
@@ -869,7 +926,7 @@ class HeavyGraph(HeavyIrObject):
                 x.extend(c.to_object.get_ir_on_message(c.inlet_index))
         return x
 
-    def get_ir_table_dict(self):
+    def get_ir_table_dict(self) -> Dict:
         """ Returns a dictionary of all publicly visible tables at the root graph
             and their ids.
         """
@@ -892,10 +949,10 @@ class HeavyGraph(HeavyIrObject):
                 }
         return e
 
-    def get_ir_control_list(self):
+    def get_ir_control_list(self) -> List:
         return [x for o in self.objs.values() for x in o.get_ir_control_list()]
 
-    def get_ir_receiver_dict(self):
+    def get_ir_receiver_dict(self) -> Dict:
         # NOTE(mhroth): this code assumes that v is always an array of length 1,
         # as the grouping of control receivers should have grouped all same-named
         # receivers into one logical receiver.
@@ -908,5 +965,5 @@ class HeavyGraph(HeavyIrObject):
             "ids": [v[0].id]
         } for k, v in self.local_vars.get_registered_objects_for_type("__receive").items()}
 
-    def get_ir_signal_list(self):
+    def get_ir_signal_list(self) -> List:
         return [x for o in self.signal_order for x in o.get_ir_signal_list()]
