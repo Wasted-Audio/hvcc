@@ -1,7 +1,7 @@
 CHANGELOG
 =====
 
-Next Release
+0.7.0
 -----
 
 * improvements: add type annotations to all methods; run mypy over the whole library
