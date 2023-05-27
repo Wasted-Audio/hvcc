@@ -1,4 +1,5 @@
 # Copyright (C) 2014-2018 Enzien Audio, Ltd.
+# Copyright (C) 2023 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -13,8 +14,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from typing import Optional, Dict
+
 from .HeavyLangObject import HeavyLangObject
 from .HeavyIrObject import HeavyIrObject
+from .HeavyGraph import HeavyGraph
 
 
 class HLangUnop(HeavyLangObject):
@@ -44,20 +48,26 @@ class HLangUnop(HeavyLangObject):
         "cast_if": ["__cast~if"]
     }
 
-    def __init__(self, obj_type, args, graph, annotations=None):
-        assert HLangUnop.handles_type(obj_type)
-        HeavyLangObject.__init__(self, obj_type, args, graph,
-                                 num_inlets=1,
-                                 num_outlets=1,
-                                 annotations=annotations)
+    def __init__(
+        self,
+        obj_type: str,
+        args: Dict,
+        graph: 'HeavyGraph',
+        annotations: Optional[Dict] = None
+    ) -> None:
+        assert self.handles_type(obj_type)
+        super().__init__(obj_type, args, graph,
+                         num_inlets=1,
+                         num_outlets=1,
+                         annotations=annotations)
 
     @classmethod
-    def handles_type(clazz, obj_type):
+    def handles_type(cls, obj_type: str) -> bool:
         """ Returns True if this class handles the given object type. False otherwise.
         """
         return obj_type in HLangUnop.__HEAVY_DICT
 
-    def reduce(self):
+    def reduce(self) -> Optional[tuple]:
         if len(self.inlet_connections[0]) == 0:
             self.add_error("Unary operator objects must have an input.")
 
@@ -88,3 +98,4 @@ class HLangUnop(HeavyLangObject):
             return ({x}, self.get_connection_move_list(x, "-->"))
         else:
             self.add_error("Unknown inlet configuration.")
+            return None

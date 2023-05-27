@@ -1,4 +1,5 @@
 # Copyright (C) 2014-2018 Enzien Audio, Ltd.
+# Copyright (C) 2023 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,12 +15,20 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
+from typing import List
 
 
 class PrettyfyC:
 
     @classmethod
-    def prettyfy_file(clazz, file_in, file_out, indent=0, step=2, delete_input_on_finish=False):
+    def prettyfy_file(
+        cls,
+        file_in: str,
+        file_out: str,
+        indent: int = 0,
+        step: int = 2,
+        delete_input_on_finish: bool = False
+    ) -> None:
         with open(file_in, "r") as f:
             with open(file_out, "w") as g:
                 for line in f:
@@ -29,10 +38,15 @@ class PrettyfyC:
                     indent += line.count("{")
 
         if delete_input_on_finish:
-            os.path.delete(file_in)
+            os.remove(file_in)
 
     @classmethod
-    def prettyfy_list(clazz, list_in, indent=0, step=2):
+    def prettyfy_list(
+        cls,
+        list_in: List,
+        indent: int = 0,
+        step: int = 2
+    ) -> List:
         g = []
         for line in list_in:
             indent -= line.count("}")

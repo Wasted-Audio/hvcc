@@ -1,4 +1,5 @@
 # Copyright (C) 2014-2018 Enzien Audio, Ltd.
+# Copyright (C) 2023 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -13,13 +14,27 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from typing import Dict, Optional
+
 from .HeavyIrObject import HeavyIrObject
+from .HeavyGraph import HeavyGraph
 
 
 class HIrPack(HeavyIrObject):
 
-    def __init__(self, obj_type, args=None, graph=None, annotations=None):
-        HeavyIrObject.__init__(self, "__pack", args=args, graph=graph,
-                               num_inlets=len(args["values"]),
-                               num_outlets=1,
-                               annotations=annotations)
+    def __init__(
+        self,
+        obj_type: str,
+        args: Optional[Dict] = None,
+        graph: Optional[HeavyGraph] = None,
+        annotations: Optional[Dict] = None
+    ) -> None:
+        if args is not None:
+            num_inlets = len(args["values"])
+        else:
+            num_inlets = 0
+
+        super().__init__("__pack", args=args, graph=graph,
+                         num_inlets=num_inlets,
+                         num_outlets=1,
+                         annotations=annotations)

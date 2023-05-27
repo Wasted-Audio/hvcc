@@ -1,4 +1,5 @@
 # Copyright (C) 2014-2018 Enzien Audio, Ltd.
+# Copyright (C) 2023 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -12,6 +13,8 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+from typing import Dict, List
 
 from .HeavyObject import HeavyObject
 
@@ -64,6 +67,7 @@ class SignalMath(HeavyObject):
         "__lt~i": "__hv_lt_i",
         "__lte~f": "__hv_lte_f",
         "__lte~i": "__hv_lte_i",
+        "__eq~f": "__hv_eq_f",
         "__neq~f": "__hv_neq_f",
         "__fma~f": "__hv_fma_f",
         "__fms~f": "__hv_fms_f",
@@ -77,24 +81,24 @@ class SignalMath(HeavyObject):
     }
 
     @classmethod
-    def handles_type(clazz, obj_type):
+    def handles_type(cls, obj_type: str) -> bool:
         """Returns true if the object type can be handled by this class
         """
-        return obj_type in SignalMath.__OPERATION_DICT
+        return obj_type in cls.__OPERATION_DICT
 
     @classmethod
-    def get_C_header_set(clazz):
+    def get_C_header_set(cls) -> set:
         return {"HvMath.h"}
 
     @classmethod
-    def get_C_process(clazz, process_dict, obj_type, obj_id, args):
+    def get_C_process(cls, process_dict: Dict, obj_type: str, obj_id: int, args: Dict) -> List[str]:
         return [
             "{0}({1}, {2});".format(
-                SignalMath.__OPERATION_DICT[obj_type],
+                cls.__OPERATION_DICT[obj_type],
                 ", ".join(["VI{0}({1})".format(
                     "i" if b["type"] == "~i>" else "f",
-                    HeavyObject._c_buffer(b)) for b in process_dict["inputBuffers"]]),
+                    cls._c_buffer(b)) for b in process_dict["inputBuffers"]]),
                 ", ".join(["VO{0}({1})".format(
                     "i" if b["type"] == "~i>" else "f",
-                    HeavyObject._c_buffer(b)) for b in process_dict["outputBuffers"]])
+                    cls._c_buffer(b)) for b in process_dict["outputBuffers"]])
             )]

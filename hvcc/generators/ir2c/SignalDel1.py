@@ -1,4 +1,5 @@
 # Copyright (C) 2014-2018 Enzien Audio, Ltd.
+# Copyright (C) 2023 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -13,6 +14,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from typing import Dict, List
+
 from .HeavyObject import HeavyObject
 
 
@@ -24,29 +27,29 @@ class SignalDel1(HeavyObject):
     preamble = "sDel1"
 
     @classmethod
-    def get_C_header_set(clazz):
+    def get_C_header_set(cls) -> set:
         return {"HvSignalDel1.h"}
 
     @classmethod
-    def get_C_file_set(clazz):
+    def get_C_file_set(cls) -> set:
         return {"HvSignalDel1.h", "HvSignalDel1.c"}
 
     @classmethod
-    def get_C_def(clazz, obj_type, obj_id):
-        return ["SignalDel1 sDel1_{0};".format(obj_id)]
+    def get_C_def(cls, obj_type: str, obj_id: int) -> List[str]:
+        return [f"SignalDel1 sDel1_{obj_id};"]
 
     @classmethod
-    def get_C_init(clazz, obj_type, obj_id, args):
-        return ["sDel1_init(&sDel1_{0});".format(obj_id)]
+    def get_C_init(cls, obj_type: str, obj_id: int, args: Dict) -> List[str]:
+        return [f"sDel1_init(&sDel1_{obj_id});"]
 
     @classmethod
-    def get_C_free(clazz, obj_type, obj_id, args):
+    def get_C_free(cls, obj_type: str, obj_id: int, args: Dict) -> List[str]:
         return []
 
     @classmethod
-    def get_C_process(clazz, process_dict, obj_type, obj_id, args):
+    def get_C_process(cls, process_dict: Dict, obj_type: str, obj_id: int, args: Dict) -> List[str]:
         return [
             "__hv_del1_f(&sDel1_{0}, VIf({1}), VOf({2}));".format(
                 process_dict["id"],
-                HeavyObject._c_buffer(process_dict["inputBuffers"][0]),
-                HeavyObject._c_buffer(process_dict["outputBuffers"][0]))]
+                cls._c_buffer(process_dict["inputBuffers"][0]),
+                cls._c_buffer(process_dict["outputBuffers"][0]))]

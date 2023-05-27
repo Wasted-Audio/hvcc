@@ -1,4 +1,5 @@
 # Copyright (C) 2014-2018 Enzien Audio, Ltd.
+# Copyright (C) 2023 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -13,8 +14,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from typing import Optional, Dict
+
 from .HeavyLangObject import HeavyLangObject
 from .HIrReceive import HIrReceive
+from .HeavyGraph import HeavyGraph
 
 
 class HLangReceive(HeavyLangObject):
@@ -23,10 +27,17 @@ class HLangReceive(HeavyLangObject):
         and reorder the graph.
     """
 
-    def __init__(self, obj_type, args, graph, annotations=None):
-        HeavyLangObject.__init__(self, "receive", args, graph, annotations=annotations)
+    def __init__(
+        self,
+        obj_type: str,
+        args: Dict,
+        graph: 'HeavyGraph',
+        annotations: Optional[Dict] = None
+    ) -> None:
+        assert obj_type == "receive"
+        super().__init__(obj_type, args, graph, annotations=annotations)
 
-    def reduce(self):
+    def reduce(self) -> Optional[tuple]:
         if self.has_outlet_connection_format(["c"]):
             x = HIrReceive("__receive", self.args, annotations=self.annotations)
             return ({x}, self.get_connection_move_list(x))
@@ -43,3 +54,4 @@ class HLangReceive(HeavyLangObject):
         else:
             fmt = self._get_connection_format(self.outlet_connections)
             self.add_error(f"Unknown outlet configuration: {fmt}")
+            return None
