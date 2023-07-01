@@ -57,12 +57,8 @@ class ControlSwitchcase(HeavyObject):
             f"const HvMessage *const m, void *sendMessage) {{"
         ]
         out_list.append("int msgIndex = 0;")
-        out_list.append("switch (msg_getType(m, 0)) {")
-        out_list.append("case HV_MSG_BANG:")
-        out_list.append("case HV_MSG_FLOAT:")
-        out_list.append("case HV_MSG_HASH:")
-        out_list.append("break;")
-        out_list.append("case HV_MSG_SYMBOL: {")
+        out_list.append("switch (msg_getHash(m, msgIndex)) {")
+        out_list.append(f"case {cls.get_hash_string('symbol')}: {{ // \"symbol\"")
         out_list.append("msgIndex = 1;")
         out_list.append("break;")
         out_list.append("}")  # end symbol case
