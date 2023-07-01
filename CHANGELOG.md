@@ -1,6 +1,11 @@
 CHANGELOG
 =====
 
+Next Release
+-----
+
+* bugfix: issue #50
+
 0.7.0
 -----
 
