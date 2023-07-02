@@ -206,7 +206,7 @@ void {{class_name}}::setParameterValue(uint32_t index, float value)
 
 // }
 
-{%- if meta.midi_input is defined and meta.midi_input == 1%}
+{%- if meta.midi_input is defined and meta.midi_input == 1 %}
 #if DISTRHO_PLUGIN_WANT_MIDI_INPUT
 {% include 'HeavyDPF_MIDI_Input.cpp' %}
 #endif
