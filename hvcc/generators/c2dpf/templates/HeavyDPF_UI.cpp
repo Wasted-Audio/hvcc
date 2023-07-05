@@ -7,6 +7,15 @@ START_NAMESPACE_DISTRHO
 
 // --------------------------------------------------------------------------------------------------------------------
 
+{%- if meta.enumerators is defined %}
+struct EnumParam
+{
+    const char* label;
+    float value;
+};
+{%- endif %}
+
+
 class ImGuiPluginUI : public UI
 {
     {% for k, v in receivers -%}
@@ -83,52 +92,53 @@ protected:
         if (ImGui::Begin("{{name.replace('_', ' ')}}", nullptr, ImGuiWindowFlags_NoResize + ImGuiWindowFlags_NoCollapse))
         {
     {%- for k, v in receivers %}
+        {%- set v_display = v.display|lower %}
         {%- if meta.enumerators is defined and meta.enumerators[v.display] is defined -%}
             {%- set enums = meta.enumerators[v.display] -%}
             {%- set enumlen = enums|length %}
-            const char* items[] = {
+            {%- set enum_list = v_display + "_list" %}
+
+            EnumParam {{enum_list}}[] = {
                 {%- for i in enums %}
-                "{{i}}",
+                { "{{i}}", {{enums[i]}}f },
                 {%- endfor %}
             };
 
-            float item_values[] = {
-                {%- for i in enums %}
-                {{enums[i]}}f,
-                {%- endfor %}
-            };
-
-            int default_item = std::distance(item_values, std::find(item_values, item_values + {{enumlen}}, {{v.attributes.default}}f));
-            static const char* current_item = items[default_item];
+            {%- for i in enums %}
+               {%- if enums[i] == v.attributes.default %}
+            int default_item = {{loop.index-1}};
+               {%- endif %}
+            {%- endfor %}
+            static const char* current_item = {{enum_list}}[default_item].label;
 
             if (ImGui::BeginCombo("{{v.display.replace('_', ' ')}}", current_item))
             {
                 for (int n = 0; n < {{enumlen}}; n++)
                 {
-                    bool is_selected = (current_item == items[n]); // You can store your selection however you want, outside or inside your objects
-                    if (ImGui::Selectable(items[n], is_selected))
+                    bool is_selected = (current_item == {{enum_list}}[n].label);
+                    if (ImGui::Selectable({{enum_list}}[n].label, is_selected))
                     {
-                        current_item = items[n];
-                        f{{v.display|lower}} = item_values[n];
+                        current_item = {{enum_list}}[n].label;
+                        f{{v_display}} = {{enum_list}}[n].value;
                         editParameter({{loop.index-1}}, true);
-                        setParameterValue({{loop.index-1}}, f{{v.display|lower}});
+                        setParameterValue({{loop.index-1}}, f{{v_display}});
                     }
                     if (is_selected)
-                        ImGui::SetItemDefaultFocus();   // You may set the initial focus when opening the combo (scrolling + for keyboard navigation support)
+                        ImGui::SetItemDefaultFocus();
                 }
                 ImGui::EndCombo();
             }
         {%- else %}
             {%- if v.attributes.type == 'bool': %}
-            if (ImGui::Toggle("{{v.display.replace('_', ' ')}}", &f{{v.display|lower}}))
+            if (ImGui::Toggle("{{v.display.replace('_', ' ')}}", &f{{v_display}}))
             {%- else %}
-            if (ImGui::SliderFloat("{{v.display.replace('_', ' ')}}", &f{{v.display|lower}}, {{v.attributes.min}}f, {{v.attributes.max}}f))
+            if (ImGui::SliderFloat("{{v.display.replace('_', ' ')}}", &f{{v_display}}, {{v.attributes.min}}f, {{v.attributes.max}}f))
             {%- endif %}
             {
                 if (ImGui::IsItemActivated())
                 {
                     editParameter({{loop.index-1}}, true);
-                    setParameterValue({{loop.index-1}}, f{{v.display|lower}});
+                    setParameterValue({{loop.index-1}}, f{{v_display}});
                 }
             }
         {%- endif %}
