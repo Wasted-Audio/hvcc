@@ -6,7 +6,7 @@ Next Release
 
 * DPF: enumerated parameters
 * DPF: special `__hv_dpf_bpm` receiver of transport BPM value
-* bugfix: issue #50
+* bugfix: issues #50, #106
 
 0.7.0
 -----
