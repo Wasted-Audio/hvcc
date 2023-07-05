@@ -4,7 +4,9 @@ CHANGELOG
 Next Release
 -----
 
-* bugfix: issue #50
+* DPF: enumerated parameters
+* DPF: special `__hv_dpf_bpm` receiver of transport BPM value
+* bugfix: issues #50, #106
 
 0.7.0
 -----
@@ -16,7 +18,7 @@ Next Release
 * deprecated: internal Bela implementation (use downstream instead)
 * docs: add notes
 * docs: fix markdown syntax
-* bugfixes: issues #86, #87 and #93 
+* bugfixes: issues #86, #87 and #93
 
 0.6.3
 -----
