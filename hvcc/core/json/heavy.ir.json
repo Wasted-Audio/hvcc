@@ -2223,6 +2223,60 @@
       "-->"
     ]
   },
+  "__rfft~f": {
+    "inlets": [
+      "~f>",
+      "-->",
+      "-->"
+    ],
+    "ir": {
+      "control": false,
+      "signal": true,
+      "init": true
+    },
+    "outlets": [
+      "~f>",
+      "~f>"
+    ],
+    "args": [{
+      "name": "table_id",
+      "value_type": "string",
+      "description": "",
+      "default": "",
+      "required": true
+    }],
+    "perf": {
+      "avx": 0,
+      "sse": 0
+    }
+  },
+  "__rifft~f": {
+    "inlets": [
+      "~f>",
+      "~f>",
+      "-->",
+      "-->"
+    ],
+    "ir": {
+      "control": false,
+      "signal": true,
+      "init": true
+    },
+    "outlets": [
+      "~f>"
+    ],
+    "args": [{
+      "name": "table_id",
+      "value_type": "string",
+      "description": "",
+      "default": "",
+      "required": true
+    }],
+    "perf": {
+      "avx": 0,
+      "sse": 0
+    }
+  },
   "__rpole~f": {
     "inlets": [
       "~f>",

@@ -172,6 +172,8 @@ int Heavy_{{name}}::process(float **inputBuffers, float **outputBuffers, int n) 
   {%- if signal.numInputBuffers > 0 or signal.numOutputBuffers > 0 %}
   const int n4 = n & ~HV_N_SIMD_MASK; // ensure that the block size is a multiple of HV_N_SIMD
 
+  sendFloatToReceiver(0xB5B01859, static_cast<float>(n4)); // send to __hv_blocksize
+
   // temporary signal vars
   {%- if signal.numTemporaryBuffers.float > 0 %}
   hv_bufferf_t {% for i in range(signal.numTemporaryBuffers.float) %}Bf{{i}}{% if not loop.last %}, {%endif%}{% endfor %};
