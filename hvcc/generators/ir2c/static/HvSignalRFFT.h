@@ -34,7 +34,7 @@ typedef struct SignalRFFT {
   struct PFFFT_Setup *setup;
 } SignalRFFT;
 
-hv_size_t sRFFT_init(SignalRFFT *o, struct HvTable *coeffs, const int size);
+hv_size_t sRFFT_init(SignalRFFT *o, struct HvTable *table, const int size);
 
 void sRFFT_free(SignalRFFT *o);
 
