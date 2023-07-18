@@ -2239,7 +2239,7 @@
       "~f>"
     ],
     "args": [{
-      "name": "table_id",
+      "name": "table",
       "value_type": "string",
       "description": "",
       "default": "",
@@ -2266,7 +2266,7 @@
       "~f>"
     ],
     "args": [{
-      "name": "table_id",
+      "name": "table",
       "value_type": "string",
       "description": "",
       "default": "",

@@ -25,6 +25,7 @@ from .HIrInlet import HIrInlet
 from .HIrLorenz import HIrLorenz
 from .HIrOutlet import HIrOutlet
 from .HIrPack import HIrPack
+from .HIrRFFT import HIrRFFT
 from .HIrSwitchcase import HIrSwitchcase
 from .HIrTabhead import HIrTabhead
 from .HIrTabread import HIrTabread
@@ -305,6 +306,8 @@ LANG_CLASS_DICT = {
     "__tabwrite~f": HIrTabwrite,
     "__tabwrite_stoppable~f": HIrTabwrite,
     "__tabwrite": HIrTabwrite,
+    "__rfft~f": HIrRFFT,
+    "__rifft~f": HIrRFFT,
     "receive": HLangReceive,
     "send": HLangSend,
     "__switchcase": HIrSwitchcase,
