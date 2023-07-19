@@ -16,6 +16,8 @@ import re
 
 from .PdObject import PdObject
 
+from typing import Optional, List
+
 
 class PdExprObject(PdObject):
     """
@@ -31,7 +33,13 @@ class PdExprObject(PdObject):
     - skipped variables cause crash, like "$f1 + $f3"
     """
 
-    def __init__(self, obj_type, obj_args=None, pos_x=0, pos_y=0):
+    def __init__(
+        self,
+        obj_type: str,
+        obj_args: Optional[List] = None,
+        pos_x: int = 0,
+        pos_y: int = 0
+    ) -> None:
         """
             Validate the expr object and any heavy restrictions, then
             convert it directly into a HeavyIR object.
@@ -40,7 +48,7 @@ class PdExprObject(PdObject):
 
         print("In Pd expr Obj")
         assert obj_type in ["expr", "expr~"]
-        super().__init__(self, obj_type, obj_args, pos_x, pos_y)
+        super().__init__(obj_type, obj_args, pos_x, pos_y)
 
         # turn the arguments into a list of expressions, but only one for now
         if len(self.obj_args) == 0:
