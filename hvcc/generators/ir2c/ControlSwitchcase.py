@@ -57,7 +57,15 @@ class ControlSwitchcase(HeavyObject):
             f"cSwitchcase_{obj_id}_onMessage(HeavyContextInterface *_c, void *o, int letIn, "
             f"const HvMessage *const m, void *sendMessage) {{"
         ]
-        out_list.append("switch (msg_getHash(m, 0)) {")
+        out_list.append("int msgIndex = 0;")
+        out_list.append("switch (msg_getHash(m, msgIndex)) {")
+        out_list.append(f"case {cls.get_hash_string('symbol')}: {{ // \"symbol\"")
+        out_list.append("msgIndex = 1;")
+        out_list.append("break;")
+        out_list.append("}")  # end symbol case
+        out_list.append("}")  # end type switch
+
+        out_list.append("switch (msg_getHash(m, msgIndex)) {")
         cases = objects[obj_id]["args"]["cases"]
         for i, c in enumerate(cases):
             hv_hash = cls.get_hash_string(c)

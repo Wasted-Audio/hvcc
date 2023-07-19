@@ -25,6 +25,12 @@ BUILD_CXX_FLAGS += -I ../../{{dpf_path}}dpf-widgets/generic
 BUILD_CXX_FLAGS += -I ../../{{dpf_path}}dpf-widgets/opengl
 {%- endif %}
 
+{%- if meta.makefile_dep is defined %}
+	{%- for dependency in meta.makefile_dep %}
+BUILD_CXX_FLAGS += -I ../../{{dpf_path}}{{dependency}}
+	{%- endfor %}
+{%- endif %}
+
 LINK_FLAGS += -lpthread
 CFLAGS += -Wno-unused-parameter
 CXXFLAGS += -Wno-unused-parameter
