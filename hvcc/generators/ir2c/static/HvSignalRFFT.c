@@ -27,6 +27,7 @@ hv_size_t sRFFT_init(SignalRFFT *o, struct HvTable *table, const int size) {
 void sRFFT_free(SignalRFFT *o) {
   o->table = NULL;
   hTable_free(&o->inputs);
+  pffft_destroy_setup(o->setup);
 }
 
 void sRFFT_onMessage(HeavyContextInterface *_c, SignalRFFT *o, int letIndex,
@@ -77,7 +78,8 @@ void __hv_rfft_f(SignalRFFT *o, hv_bInf_t bIn, hv_bOutf_t bOut0, hv_bOutf_t bOut
   hv_assert(m >= n);
   const int h_orig = hTable_getHead(&o->inputs);
 
-  float *const bOut = (float *)(hv_alloca(2*n*sizeof(float)));
+  // float *const bOut = (float *)(hv_alloca(2*n*sizeof(float)));
+  float *const bOut = (float *)(hv_alloca(sizeof(bIn)));
 
   pffft_transform_ordered(o->setup, &bIn, bOut, work, PFFFT_FORWARD);
 
@@ -122,13 +124,16 @@ void __hv_rifft_f(SignalRFFT *o, hv_bInf_t bIn0, hv_bInf_t bIn1, hv_bOutf_t bOut
   hv_assert(m >= n);
   const int h_orig = hTable_getHead(&o->inputs);
 
-  float *const bIn = (float *)(hv_alloca(2*n*sizeof(float)));
+  float *bIn00 = &bIn0;
+  float *bIn10 = &bIn1;
+  // float *const bIn = (float *)(hv_alloca(2*n*sizeof(float)));
+  float *const bIn = (float *)(hv_alloca(sizeof(bOut)));
 
   // interleave the input buffers into the transform buffer
   #if HV_SIMD_AVX
   for (int i = 0, j = 0; j < n; j += 8, i += 16) {
-    __m256 x = _mm256_load_ps(bIn0);    // LLLLLLLL
-    __m256 y = _mm256_load_ps(bIn1); // RRRRRRRR
+    __m256 x = _mm256_load_ps(bIn00);     // LLLLLLLL
+    __m256 y = _mm256_load_ps(bIn10);     // RRRRRRRR
     __m256 a = _mm256_unpacklo_ps(x, y);  // LRLRLRLR
     __m256 b = _mm256_unpackhi_ps(x, y);  // LRLRLRLR
     _mm256_store_ps(bIn+i, a);
@@ -136,8 +141,8 @@ void __hv_rifft_f(SignalRFFT *o, hv_bInf_t bIn0, hv_bInf_t bIn1, hv_bOutf_t bOut
   }
   #elif HV_SIMD_SSE
   for (int i = 0, j = 0; j < n4; j += 4, i += 8) {
-    __m128 x = _mm_load_ps(bIn0);    // LLLL
-    __m128 y = _mm_load_ps(bIn1); // RRRR
+    __m128 x = _mm_load_ps(bIn00);     // LLLL
+    __m128 y = _mm_load_ps(bIn10);     // RRRR
     __m128 a = _mm_unpacklo_ps(x, y);  // LRLR
     __m128 b = _mm_unpackhi_ps(x, y);  // LRLR
     _mm_store_ps(bIn+i, a);
@@ -146,21 +151,21 @@ void __hv_rifft_f(SignalRFFT *o, hv_bInf_t bIn0, hv_bInf_t bIn1, hv_bOutf_t bOut
   #elif HV_SIMD_NEON
   // https://community.arm.com/groups/processors/blog/2012/03/13/coding-for-neon--part-5-rearranging-vectors
   for (int i = 0, j = 0; j < n4; j += 4, i += 8) {
-    float32x4_t x = vld1q_f32(bIn0);
-    float32x4_t y = vld1q_f32(bIn1);
+    float32x4_t x = vld1q_f32(bIn00);
+    float32x4_t y = vld1q_f32(bIn10);
     float32x4x2_t z = {x, y};
     vst2q_f32(bIn+i, z); // interleave and store
   }
   #else // HV_SIMD_NONE
   for (int i = 0; i < 2; ++i) {
     for (int j = 0; j < n; ++j) {
-      bIn[0+2*j] = bIn0[n+j];
-      bIn[1+2*j] = bIn1[n+j];
+      bIn[0+2*j] = bIn00[n+j];
+      bIn[1+2*j] = bIn10[n+j];
     }
   }
   #endif
 
-  pffft_transform_ordered(o->setup, bIn, &bOut, work, PFFFT_BACKWARD);
+  pffft_transform_ordered(o->setup, bIn, bOut, work, PFFFT_BACKWARD);
 
   // __hv_store_f(inputs+h_orig, bIn); // store the new input to the inputs buffer
   hTable_setHead(&o->inputs, wrap(h_orig+HV_N_SIMD, m));
