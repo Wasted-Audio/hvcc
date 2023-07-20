@@ -1,0 +1,4 @@
+#N canvas 813 354 503 302 12;
+#X obj 98 103 print;
+#X obj 98 61 bendin 2;
+#X connect 1 0 0 0;

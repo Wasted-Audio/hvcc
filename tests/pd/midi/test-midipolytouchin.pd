@@ -1,0 +1,8 @@
+#N canvas 572 166 503 302 12;
+#X obj 97 131 print;
+#X obj 97 95 pack f f f;
+#X obj 97 61 polytouchin;
+#X connect 1 0 0 0;
+#X connect 2 0 1 0;
+#X connect 2 1 1 1;
+#X connect 2 2 1 2;

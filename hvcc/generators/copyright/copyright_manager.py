@@ -15,41 +15,42 @@
 
 import datetime
 import os
+from typing import Optional
 
 
-def get_default_copyright_text():
+def get_default_copyright_text() -> str:
     with open(os.path.join(os.path.dirname(__file__), "default_template.txt"), "r") as f:
         copyright = f.read().format(datetime.datetime.now().year)
     return copyright
 
 
-def get_copyright_for_c(copyright_text=None):
+def get_copyright_for_c(copyright_text: Optional[str] = None) -> str:
     """ Returns an input string as a C-formatted comment, otherwise a default
         copyright statement if the input is None.
     """
     return comment_for_c(copyright_text or get_default_copyright_text())
 
 
-def get_copyright_for_xml(copyright_text=None):
+def get_copyright_for_xml(copyright_text: Optional[str] = None) -> str:
     """ Returns an input string as an xml comment, otherwise a default
         copyright statement if the input is None.
     """
     return comment_for_xml(copyright_text or get_default_copyright_text())
 
 
-def comment_for_c(comment):
+def comment_for_c(comment: str) -> str:
     """ Returns the input string as a C-formatted comment, suitable for copyright statements.
     """
     if "\n" in comment:
         return "/**\n * {0}\n */".format("\n * ".join(comment.split("\n")))
     else:
-        return "/** {0} */".format(comment)
+        return f"/** {comment} */"
 
 
-def comment_for_xml(comment):
+def comment_for_xml(comment: str) -> str:
     """ Returns the input string as a XML comment, suitable for copyright statements.
     """
     if "\n" in comment:
-        return "<!--\n{0}\n-->".format(comment)
+        return f"<!--\n{comment}\n-->"
     else:
-        return "<!-- {0} -->".format(comment)
+        return f"<!-- {comment} -->"

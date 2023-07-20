@@ -1,4 +1,4 @@
-#N canvas 611 441 232 295 10;
+#N canvas 611 471 232 295 10;
 #X obj 52 248 s __hv_pgmout @hv_param;
 #X obj 52 216 pack f f;
 #X obj 97 74 inlet channel;
@@ -7,10 +7,14 @@
 #X obj 52 40 inlet program;
 #X obj 97 168 - 1;
 #X obj 97 191 max;
+#X obj 52 168 - 1;
+#X obj 52 191 max;
 #X connect 1 0 0 0;
 #X connect 2 0 3 0;
 #X connect 3 0 6 0;
 #X connect 4 0 3 0;
-#X connect 5 0 1 0;
+#X connect 5 0 8 0;
 #X connect 6 0 7 0;
 #X connect 7 0 1 1;
+#X connect 8 0 9 0;
+#X connect 9 0 1 0;

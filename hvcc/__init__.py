@@ -1,4 +1,5 @@
 # Copyright (C) 2014-2018 Enzien Audio, Ltd.
+# Copyright (C) 2021-2023 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,13 +20,13 @@ import json
 import os
 import re
 import time
+import sys
+from typing import List, Dict, Optional
 
 from hvcc.interpreters.pd2hv import pd2hv
-from hvcc.interpreters.max2hv import max2hv
 from hvcc.core.hv2ir import hv2ir
 from hvcc.generators.ir2c import ir2c
 from hvcc.generators.ir2c import ir2c_perf
-from hvcc.generators.c2bela import c2bela
 from hvcc.generators.c2fabric import c2fabric
 from hvcc.generators.c2js import c2js
 from hvcc.generators.c2daisy import c2daisy
@@ -49,7 +50,7 @@ class Colours:
     end = "\033[0m"
 
 
-def add_error(results, error):
+def add_error(results: OrderedDict, error: str) -> OrderedDict:
     if "hvcc" in results:
         results["hvcc"]["notifs"]["errors"].append({"message": error})
     else:
@@ -65,7 +66,7 @@ def add_error(results, error):
     return results
 
 
-def check_extern_name_conflicts(extern_type, extern_list, results):
+def check_extern_name_conflicts(extern_type: str, extern_list: List, results: OrderedDict) -> None:
     """ In most of the generator code extern names become capitalised when used
         as enums. This method makes sure that there are no cases where two unique
         keys become the same after being capitalised.
@@ -80,7 +81,7 @@ def check_extern_name_conflicts(extern_type, extern_list, results):
                           "capital letters are not the only difference.")
 
 
-def generate_extern_info(hvir, results):
+def generate_extern_info(hvir: Dict, results: OrderedDict) -> Dict:
     """ Simplifies the receiver/send and table lists by only containing values
         externed with @hv_param, @hv_event or @hv_table
     """
@@ -132,16 +133,24 @@ def generate_extern_info(hvir, results):
     }
 
 
-def compile_dataflow(in_path, out_dir, patch_name=None, patch_meta_file=None,
-                     search_paths=None, generators=None, verbose=False,
-                     copyright=None, hvir=None):
+def compile_dataflow(
+    in_path: str,
+    out_dir: str,
+    patch_name: str = "heavy",
+    patch_meta_file: Optional[str] = None,
+    search_paths: Optional[List] = None,
+    generators: Optional[List] = None,
+    verbose: bool = False,
+    copyright: Optional[str] = None
+) -> OrderedDict:
 
-    results = OrderedDict()  # default value, empty dictionary
+    results: OrderedDict = OrderedDict()  # default value, empty dictionary
+    patch_meta = {}
 
     # basic error checking on input
     if os.path.isfile(in_path):
-        if not in_path.endswith((".pd", ".maxpat")):
-            return add_error(results, "Can only process Pd or Max files.")
+        if not in_path.endswith((".pd")):
+            return add_error(results, "Can only process Pd files.")
     elif os.path.isdir(in_path):
         if not os.path.basename("c"):
             return add_error(results, "Can only process c directories.")
@@ -156,27 +165,18 @@ def compile_dataflow(in_path, out_dir, patch_name=None, patch_meta_file=None,
                     patch_meta = json.load(json_file)
                 except Exception as e:
                     return add_error(results, f"Unable to open json_file: {e}")
-    else:
-        patch_meta = {}
 
-    patch_name = patch_name or "heavy"
-    generators = generators or {"c"}
+    patch_name = patch_meta.get("name", patch_name)
+    generators = ["c"] if generators is None else [x.lower() for x in generators]
 
-    if in_path.endswith((".pd", ".maxpat")):
+    if in_path.endswith((".pd")):
         if verbose:
             print("--> Generating C")
-        if in_path.endswith(".pd"):
-            results["pd2hv"] = pd2hv.pd2hv.compile(
-                pd_path=in_path,
-                hv_dir=os.path.join(out_dir, "hv"),
-                search_paths=search_paths,
-                verbose=verbose)
-        elif in_path.endswith(".maxpat"):
-            results["max2hv"] = max2hv.max2hv.compile(
-                max_path=in_path,
-                hv_dir=os.path.join(out_dir, "hv"),
-                search_paths=search_paths,
-                verbose=verbose)
+        results["pd2hv"] = pd2hv.pd2hv.compile(
+            pd_path=in_path,
+            hv_dir=os.path.join(out_dir, "hv"),
+            search_paths=search_paths,
+            verbose=verbose)
 
         # check for errors
         if list(results.values())[0]["notifs"].get("has_error", False):
@@ -246,125 +246,62 @@ def compile_dataflow(in_path, out_dir, patch_name=None, patch_meta_file=None,
     num_input_channels = hvir["signal"]["numInputBuffers"]
     num_output_channels = hvir["signal"]["numOutputBuffers"]
 
-    if "bela" in generators:
-        if verbose:
-            print("--> Generating Bela plugin")
-        results["c2bela"] = c2bela.c2bela.compile(
-            c_src_dir=c_src_dir,
-            out_dir=os.path.join(out_dir, "bela"),
-            patch_name=patch_name,
-            num_input_channels=num_input_channels,
-            num_output_channels=num_output_channels,
-            externs=externs,
-            verbose=verbose)
+    gen_args = {
+        'c_src_dir': c_src_dir,
+        'out_dir': out_dir,
+        'patch_name': patch_name,
+        'patch_meta': patch_meta,
+        'num_input_channels': num_input_channels,
+        'num_output_channels': num_output_channels,
+        'externs': externs,
+        'copyright': copyright,
+        'verbose': verbose
+    }
 
     if "fabric" in generators:
         if verbose:
             print("--> Generating Fabric plugin")
-        results["c2fabric"] = c2fabric.c2fabric.compile(
-            c_src_dir=c_src_dir,
-            out_dir=os.path.join(out_dir, "fabric"),
-            patch_name=patch_name,
-            num_input_channels=num_input_channels,
-            num_output_channels=num_output_channels,
-            externs=externs,
-            copyright=copyright,
-            verbose=verbose)
+        results["c2fabric"] = c2fabric.c2fabric.compile(**gen_args)
 
     if "js" in generators:
         if verbose:
             print("--> Generating Javascript")
-        results["c2js"] = c2js.c2js.compile(
-            c_src_dir=c_src_dir,
-            out_dir=os.path.join(out_dir, "js"),
-            patch_name=patch_name,
-            num_input_channels=num_input_channels,
-            num_output_channels=num_output_channels,
-            externs=externs,
-            copyright=copyright,
-            verbose=verbose)
+        results["c2js"] = c2js.c2js.compile(**gen_args)
 
     if "daisy" in generators:
         if verbose:
             print("--> Generating Daisy module")
-        results["c2daisy"] = c2daisy.c2daisy.compile(
-            c_src_dir=c_src_dir,
-            out_dir=os.path.join(out_dir, "daisy"),
-            patch_name=patch_name,
-            patch_meta=patch_meta,
-            num_input_channels=num_input_channels,
-            num_output_channels=num_output_channels,
-            externs=externs,
-            copyright=copyright,
-            verbose=verbose)
+        results["c2daisy"] = c2daisy.c2daisy.compile(**gen_args)
 
     if "dpf" in generators:
         if verbose:
             print("--> Generating DPF plugin")
-        results["c2dpf"] = c2dpf.c2dpf.compile(
-            c_src_dir=c_src_dir,
-            out_dir=os.path.join(out_dir, "plugin"),
-            patch_name=patch_name,
-            patch_meta=patch_meta,
-            num_input_channels=num_input_channels,
-            num_output_channels=num_output_channels,
-            externs=externs,
-            copyright=copyright,
-            verbose=verbose)
+        results["c2dpf"] = c2dpf.c2dpf.compile(**gen_args)
 
     if "owl" in generators:
         if verbose:
             print("--> Generating OWL plugin")
-        results["c2owl"] = c2owl.c2owl.compile(
-            c_src_dir=c_src_dir,
-            out_dir=os.path.join(out_dir, "Source"),
-            patch_name=patch_name,
-            copyright=copyright,
-            verbose=verbose)
+        results["c2owl"] = c2owl.c2owl.compile(**gen_args)
 
     if "pdext" in generators:
         if verbose:
             print("--> Generating Pd external")
-        results["c2pdext"] = c2pdext.c2pdext.compile(
-            c_src_dir=c_src_dir,
-            out_dir=os.path.join(out_dir, "pdext"),
-            patch_name=patch_name,
-            ext_name=patch_name + "~",
-            num_input_channels=num_input_channels,
-            num_output_channels=num_output_channels,
-            externs=externs,
-            copyright=copyright,
-            verbose=verbose)
+        results["c2pdext"] = c2pdext.c2pdext.compile(**gen_args)
 
     if "unity" in generators:
         if verbose:
             print("--> Generating Unity plugin")
-        results["c2unity"] = c2unity.c2unity.compile(
-            c_src_dir=c_src_dir,
-            out_dir=os.path.join(out_dir, "unity"),
-            patch_name=patch_name,
-            num_input_channels=num_input_channels,
-            num_output_channels=num_output_channels,
-            externs=externs,
-            copyright=copyright,
-            verbose=verbose)
+        results["c2unity"] = c2unity.c2unity.compile(**gen_args)
 
     if "wwise" in generators:
         if verbose:
             print("--> Generating Wwise plugin")
-        results["c2wwise"] = c2wwise.c2wwise.compile(
-            c_src_dir=c_src_dir,
-            out_dir=os.path.join(out_dir, "wwise"),
-            patch_name=patch_name,
-            num_input_channels=num_input_channels,
-            num_output_channels=num_output_channels,
-            externs=externs,
-            verbose=verbose)
+        results["c2wwise"] = c2wwise.c2wwise.compile(**gen_args)
 
     return results
 
 
-def main():
+def main() -> bool:
     tick = time.time()
 
     parser = argparse.ArgumentParser(
@@ -385,7 +322,6 @@ def main():
     parser.add_argument(
         "-n",
         "--name",
-        default="heavy",
         help="Provides a name for the generated Heavy context.")
     parser.add_argument(
         "-m",
@@ -396,7 +332,7 @@ def main():
         "--gen",
         nargs="+",
         default=["c"],
-        help="List of generator outputs: c, unity, wwise, js, pdext, daisy, dpf, fabric")
+        help="List of generator outputs: c, unity, wwise, js, pdext, daisy, dpf, fabric, owl")
     parser.add_argument(
         "--results_path",
         help="Write results dictionary to the given path as a JSON-formatted string."
@@ -422,15 +358,18 @@ def main():
         verbose=args.verbose,
         copyright=args.copyright)
 
+    errorCount = 0
     for r in list(results.values()):
         # print any errors
         if r["notifs"].get("has_error", False):
             for i, error in enumerate(r["notifs"].get("errors", [])):
+                errorCount += 1
                 print("{4:3d}) {2}Error{3} {0}: {1}".format(
                     r["stage"], error["message"], Colours.red, Colours.end, i + 1))
 
             # only print exception if no errors are indicated
             if len(r["notifs"].get("errors", [])) == 0 and r["notifs"].get("exception", None) is not None:
+                errorCount += 1
                 print("{2}Error{3} {0} exception: {1}".format(
                     r["stage"], r["notifs"]["exception"], Colours.red, Colours.end))
 
@@ -454,7 +393,9 @@ def main():
 
     if args.verbose:
         print("Total compile time: {0:.2f}ms".format(1000 * (time.time() - tick)))
+    return errorCount != 0
 
 
 if __name__ == "__main__":
-    main()
+    ret = main()
+    sys.exit(ret)

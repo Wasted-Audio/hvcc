@@ -1,4 +1,5 @@
 # Copyright (C) 2014-2018 Enzien Audio, Ltd.
+# Copyright (C) 2023 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,22 +15,23 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from collections import defaultdict
+from typing import Dict, List, Optional, Tuple
 
 from .HeavyException import HeavyException
 
 
 class BufferPool:
 
-    def __init__(self):
+    def __init__(self) -> None:
         # the idea is that the same buffer is reused as quickly as possible so that it doesn't need
         # to be moved around in the cache. It does not give substantially different results
         # from a Counter-based implementation, but it is more consistent and predictable.
-        self.pool = {
+        self.pool: Dict = {
             "~f>": defaultdict(list),
             "~i>": defaultdict(list)
         }
 
-    def num_buffers(self, connection_type=None):
+    def num_buffers(self, connection_type: Optional[str] = None) -> int:
         """ Returns the number of buffers with the given retain count. By default returns
             the size of the entire pool. Number of buffers per connection type can also be retrieved.
         """
@@ -40,7 +42,7 @@ class BufferPool:
         else:
             raise HeavyException(f"Unknown connection type: \"{connection_type}\"")
 
-    def get_buffer(self, connection_type, count=1, excludeSet=None):
+    def get_buffer(self, connection_type: str, count: int = 1, excludeSet: Optional[set] = None) -> Tuple[str, int]:
         """ Returns a currently unused buffer. The buffer can be assigned a retain count. An optional
             exclude set can also be supplied, ensuring that the returned buffer is not one of them.
         """
@@ -58,11 +60,11 @@ class BufferPool:
         pool[count].append(b)
         return b
 
-    def retain_buffer(self, b, count=1):
+    def retain_buffer(self, b: List, count: int = 1) -> int:
         """ Increases the retain count of the buffer. Returns the new count.
         """
         # adc~ and ZERO_BUFFER are special. They cannot be retained.
-        if b[0] in ["zero", "input"]:
+        if b[0] in {"zero", "input"}:
             return 0
         else:
             pool = self.pool[b[0]]
@@ -73,13 +75,13 @@ class BufferPool:
                     return k + count  # return the new retain count
             raise HeavyException(f"{b} not found in BufferPool!")
 
-    def release_buffer(self, b, count=1):
+    def release_buffer(self, b: List, count: int = 1) -> int:
         """ Reduces the retain count of the buffer. Returns the new count.
         """
         # adc~, ZERO_BUFFER, send~ buffers are special. They can not be released.
         # if the buffer is otherwise unknown (as may be in the case that objects provide their own),
         # they cannot be released
-        if b[0] in ["zero", "input"]:
+        if b[0] in {"zero", "input"}:
             return 0
         else:
             pool = self.pool[b[0]]
@@ -90,5 +92,5 @@ class BufferPool:
                     return k - count  # return the new retain count
             raise HeavyException(f"{b} not found in BufferPool!")
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return self.pool["~f>"].__repr__() + self.pool["~i>"].__repr__()

@@ -1,4 +1,5 @@
 # Copyright (C) 2014-2018 Enzien Audio, Ltd.
+# Copyright (C) 2023 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -13,9 +14,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from typing import Dict
+
+
 class HeavyException(Exception):
     """ This exception is raised if anything goes wrong during the hv2ir compilation process.
     """
 
-    def __init__(self, message=""):
+    def __init__(self, message: str = "") -> None:
         super(Exception, self).__init__(message)
+        self.message = message
+        self.notes: Dict = {}

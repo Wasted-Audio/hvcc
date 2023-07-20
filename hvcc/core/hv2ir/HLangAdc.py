@@ -1,4 +1,5 @@
 # Copyright (C) 2014-2018 Enzien Audio, Ltd.
+# Copyright (C) 2023 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -13,27 +14,34 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from typing import Optional, Dict
+
 from .HeavyIrObject import HeavyIrObject
 from .HeavyLangObject import HeavyLangObject
+from .HeavyGraph import HeavyGraph
 
 
 class HLangAdc(HeavyLangObject):
     """ adc
     """
 
-    def __init__(self, obj_type, args, graph, annotations=None):
-        HeavyLangObject.__init__(
-            self,
-            obj_type,
-            args, graph,
-            num_inlets=0,
-            num_outlets=len(args[HeavyLangObject._HEAVY_LANG_DICT[obj_type]["args"][0]["name"]]),
-            annotations=annotations)
+    def __init__(
+        self,
+        obj_type: str,
+        args: Dict,
+        graph: 'HeavyGraph',
+        annotations: Optional[Dict] = None
+    ) -> None:
+        assert obj_type == "adc"
+        super().__init__(obj_type, args, graph,
+                         num_inlets=0,
+                         num_outlets=len(args[HeavyLangObject._HEAVY_LANG_DICT[obj_type]["args"][0]["name"]]),
+                         annotations=annotations)
 
-    def _resolved_outlet_type(self, outlet_index=0):
+    def _resolved_outlet_type(self, outlet_index: int = 0) -> str:
         return "~f>"
 
-    def reduce(self):
+    def reduce(self) -> tuple:
         objects = set()
         connections = []
 

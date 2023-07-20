@@ -1,4 +1,5 @@
 # Copyright (C) 2014-2018 Enzien Audio, Ltd.
+# Copyright (C) 2023 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,13 +15,15 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import argparse
-from collections import Counter
-from collections import OrderedDict
 import jinja2
 import json
 import os
 import shutil
 import time
+
+from collections import Counter
+from collections import OrderedDict
+from typing import Dict, List, Optional, Type, Union
 
 from hvcc.generators.ir2c.PrettyfyC import PrettyfyC
 from hvcc.generators.copyright import copyright_manager
@@ -120,19 +123,19 @@ class ir2c:
     }
 
     @classmethod
-    def filter_hvhash(clazz, x):
+    def filter_hvhash(cls, x: Union[float, str]) -> str:
         """ Return the hash string of an object.
         """
         return HeavyObject.get_hash_string(x)
 
     @classmethod
-    def filter_extern(clazz, d):
+    def filter_extern(cls, d: Dict) -> Dict:
         """ Return a dictionary of objects that are externed.
         """
         return {k: v for k, v in d.items() if v["extern"]}
 
     @classmethod
-    def get_class(clazz, obj_type):
+    def get_class(cls, obj_type: str) -> Type[HeavyObject]:
         if SignalMath.handles_type(obj_type):
             return SignalMath
         elif ControlBinop.handles_type(obj_type):
@@ -144,10 +147,17 @@ class ir2c:
         elif obj_type in ir2c.__OBJECT_CLASS_DICT:
             return ir2c.__OBJECT_CLASS_DICT[obj_type]
         else:
-            raise Exception("No class found for object type \"{0}\".".format(obj_type))
+            raise Exception(f"No class found for object type \"{obj_type}\".")
 
     @classmethod
-    def compile(clazz, hv_ir_path, static_dir, output_dir, externs, copyright=None):
+    def compile(
+        cls,
+        hv_ir_path: str,
+        static_dir: str,
+        output_dir: str,
+        externs: Dict,
+        copyright: Optional[str] = None
+    ) -> Dict:
         """ Compiles a HeavyIR file into a C.
             Returns a tuple of compile time in seconds, a notification dictionary,
             and a HeavyIR object counter.
@@ -158,8 +168,8 @@ class ir2c:
 
         # establish the jinja environment
         env = jinja2.Environment()
-        env.filters["hvhash"] = ir2c.filter_hvhash
-        env.filters["extern"] = ir2c.filter_extern
+        env.filters["hvhash"] = cls.filter_hvhash
+        env.filters["extern"] = cls.filter_extern
         env.loader = jinja2.FileSystemLoader(
             os.path.join(os.path.dirname(__file__), "templates"))
 
@@ -182,7 +192,7 @@ class ir2c:
         file_set.update(ir2c.__BASE_FILE_SET)
 
         # generate object definition and initialisation list
-        init_list = []
+        init_list: List = []
         free_list = []
         def_list = []
         decl_list = []
@@ -208,7 +218,7 @@ class ir2c:
             decl_list.extend(obj_class.get_C_decl(o["type"], obj_id, o["args"]))
 
         # generate static table data initialisers
-        table_data_list = []
+        table_data_list: List = []
         for k, v in ir["tables"].items():
             o = ir["objects"][v["id"]]
             obj_class = ir2c.get_class(o["type"])
@@ -218,14 +228,15 @@ class ir2c:
                 o["args"]))
 
         # generate the list of functions to process
-        process_list = []
+        process_list: List = []
         for x in ir["signal"]["processOrder"]:
             obj_id = x["id"]
             o = ir["objects"][obj_id]
             process_list.extend(ir2c.get_class(o["type"]).get_C_process(
-                o["type"],
                 x,
-                ir["objects"][obj_id]["args"]))
+                o["type"],
+                obj_id,
+                o["args"]))
 
         #
         # Load the C-language template files and use the parsed strings to fill them in.
@@ -276,8 +287,8 @@ class ir2c:
         # copy static files to output directory
         for f in file_set:
             shutil.copy2(
-                src=os.path.join(static_dir, f),
-                dst=os.path.join(output_dir, f))
+                src=os.path.join(static_dir, str(f)),
+                dst=os.path.join(output_dir, str(f)))
 
         # generate HeavyIR object counter
         ir_counter = Counter([obj["type"] for obj in ir["objects"].values()])
@@ -298,7 +309,7 @@ class ir2c:
         }
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(
         description="A Heavy.IR to C-language translator.")
     parser.add_argument(

@@ -4,23 +4,7 @@
 
 #include <new>
 
-
 #define Context(_c) static_cast<Heavy_{{name}} *>(_c)
-
-
-/*
- * Cross-platform aligned alloc
- */
-
-inline void* aligned_alloc_16(size_t size) {
-#ifdef _WIN32
-    return _aligned_malloc(size, 16);
-#elif __APPLE__
-    return malloc(size);
-#else
-    return aligned_alloc(16, size);
-#endif
-}
 
 
 /*
@@ -30,7 +14,7 @@ inline void* aligned_alloc_16(size_t size) {
 extern "C" {
   HV_EXPORT HeavyContextInterface *hv_{{name}}_new(double sampleRate) {
     // allocate aligned memory
-    void *ptr = aligned_alloc_16(sizeof(Heavy_{{name}}));
+    void *ptr = hv_malloc(sizeof(Heavy_{{name}}));
     // ensure non-null
     if (!ptr) return nullptr;
     // call constructor
@@ -41,7 +25,7 @@ extern "C" {
   HV_EXPORT HeavyContextInterface *hv_{{name}}_new_with_options(double sampleRate,
       int poolKb, int inQueueKb, int outQueueKb) {
     // allocate aligned memory
-    void *ptr = aligned_alloc_16(sizeof(Heavy_{{name}}));
+    void *ptr = hv_malloc(sizeof(Heavy_{{name}}));
     // ensure non-null
     if (!ptr) return nullptr;
     // call constructor
@@ -53,11 +37,7 @@ extern "C" {
     // call destructor
     Context(instance)->~Heavy_{{name}}();
     // free memory
-#ifdef _WIN32
-    _aligned_free(instance);
-#else
-    free(instance);
-#endif
+    hv_free(instance);
   }
 } // extern "C"
 

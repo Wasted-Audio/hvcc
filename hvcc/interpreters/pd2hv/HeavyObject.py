@@ -1,4 +1,5 @@
 # Copyright (C) 2014-2018 Enzien Audio, Ltd.
+# Copyright (C) 2023 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,7 +17,9 @@
 import decimal
 import json
 import importlib_resources
+from typing import Optional, List, Dict, Any
 
+from .Connection import Connection
 from .NotificationEnum import NotificationEnum
 from .PdObject import PdObject
 
@@ -31,45 +34,44 @@ class HeavyObject(PdObject):
     with open(heavy_ir_json, "r") as f:
         __HEAVY_IR_OBJS = json.load(f)
 
-    def __init__(self, obj_type, obj_args=None, pos_x=0, pos_y=0):
-        PdObject.__init__(self, obj_type, obj_args, pos_x, pos_y)
+    def __init__(
+        self,
+        obj_type: str,
+        obj_args: Optional[List] = None,
+        pos_x: int = 0,
+        pos_y: int = 0
+    ) -> None:
+        super().__init__(obj_type, obj_args, pos_x, pos_y)
 
         # get the object dictionary (note that it is NOT a copy)
         if self.is_hvlang:
-            self.__obj_dict = HeavyObject.__HEAVY_LANG_OBJS[obj_type]
+            self.__obj_dict = self.__HEAVY_LANG_OBJS[obj_type]
         elif self.is_hvir:
-            self.__obj_dict = HeavyObject.__HEAVY_IR_OBJS[obj_type]
+            self.__obj_dict = self.__HEAVY_IR_OBJS[obj_type]
         else:
-            assert False, "{0} is not a Heavy Lang or IR object.".format(obj_type)
+            assert False, f"{obj_type} is not a Heavy Lang or IR object."
 
         # resolve arguments
         obj_args = obj_args or []
-        self.obj_args = {}
+        self.obj_dict = {}
         for i, a in enumerate(self.__obj_dict["args"]):
             # if the argument exists (and has been correctly resolved)
             if i < len(obj_args) and obj_args[i] is not None:
                 # force the Heavy argument type
                 # Catch type errors as early as possible
                 try:
-                    self.obj_args[a["name"]] = HeavyObject.force_arg_type(
+                    self.obj_dict[a["name"]] = self.force_arg_type(
                         obj_args[i],
                         a["value_type"])
                 except Exception as e:
                     self.add_error(
-                        "Heavy {0} cannot convert argument \"{1}\" with value \"{2}\" to type {3}: {4}".format(
-                            obj_type,
-                            a["name"],
-                            obj_args[i],
-                            a["value_type"],
-                            str(e)))
+                        f"Heavy {obj_type} cannot convert argument \"{a['name']}\""
+                        f" with value \"{obj_args[i]}\" to type {a['value_type']}: {e}")
             else:
                 # the default argument is required
                 if a["required"]:
                     self.add_error(
-                        "Required argument \"{0}\" to object {1} not present: {2}".format(
-                            a["name"],
-                            obj_type,
-                            obj_args))
+                        f"Required argument \"{a['name']}\" to object {obj_type} not present: {obj_args}")
                 else:
                     # don't worry about supplying a default,
                     # let hv2ir take care of it. pd2hv only passes on the
@@ -85,7 +87,7 @@ class HeavyObject(PdObject):
             self.__annotations["scope"] = "public"
 
     @classmethod
-    def force_arg_type(clazz, value, value_type):
+    def force_arg_type(cls, value: str, value_type: str) -> Any:
         # TODO(mhroth): add support for mixedarray?
         if value_type == "auto":
             try:
@@ -100,7 +102,7 @@ class HeavyObject(PdObject):
             return str(value)
         elif value_type == "boolean":
             if isinstance(value, str):
-                return value.strip().lower() not in ["false", "f", "0"]
+                return value.strip().lower() not in {"false", "f", "0"}
             else:
                 return bool(value)
         elif value_type == "floatarray":
@@ -132,14 +134,14 @@ class HeavyObject(PdObject):
             return value
 
     @property
-    def is_hvlang(self):
-        return self.obj_type in HeavyObject.__HEAVY_LANG_OBJS
+    def is_hvlang(self) -> bool:
+        return self.obj_type in self.__HEAVY_LANG_OBJS
 
     @property
-    def is_hvir(self):
-        return self.obj_type in HeavyObject.__HEAVY_IR_OBJS
+    def is_hvir(self) -> bool:
+        return self.obj_type in self.__HEAVY_IR_OBJS
 
-    def get_inlet_connection_type(self, inlet_index):
+    def get_inlet_connection_type(self, inlet_index: int) -> Optional[str]:
         """ Returns the inlet connection type, None if the inlet does not exist.
         """
         # TODO(mhroth): it's stupid that hvlang and hvir json have different data formats here
@@ -156,7 +158,7 @@ class HeavyObject(PdObject):
         else:
             return None
 
-    def get_outlet_connection_type(self, outlet_index):
+    def get_outlet_connection_type(self, outlet_index: int) -> Optional[str]:
         """ Returns the outlet connection type, None if the inlet does not exist.
         """
         # TODO(mhroth): it's stupid that hvlang and hvir json have different data formats here
@@ -173,7 +175,7 @@ class HeavyObject(PdObject):
         else:
             return None
 
-    def add_connection(self, c):
+    def add_connection(self, c: Connection) -> None:
         """ Adds a connection, either inlet or outlet, to this object.
         """
         if c.from_id == self.obj_id:
@@ -188,15 +190,15 @@ class HeavyObject(PdObject):
                 self._inlet_connections[str(c.inlet_index)].append(c)
             else:
                 self.add_error(
-                    f"Connection made to non-existent inlet at [{self.obj_type} {self.obj_args}]:{c.inlet_index}.",
+                    f"Connection made to non-existent inlet at [{self.obj_type} {self.obj_dict}]:{c.inlet_index}.",
                     enum=NotificationEnum.ERROR_UNABLE_TO_CONNECT_OBJECTS)
         else:
             raise Exception("Adding a connection to the wrong object!")
 
-    def to_hv(self):
+    def to_hv(self) -> Dict:
         return {
             "type": self.obj_type,
-            "args": self.obj_args,
+            "args": self.obj_dict,
             "properties": {
                 "x": self.pos_x,
                 "y": self.pos_y

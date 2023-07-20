@@ -137,13 +137,13 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>.;$(WwiseSDKPath)\include;$(SolutionDir)..\source\include;$(SolutionDir)..\source\heavy</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_DEBUG;WIN32;AUDIOKINETIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;WIN32;AUDIOKINETIC;_XKEYCHECK_H;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions</EnableEnhancedInstructionSet>
       <PrecompiledHeader />
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>_DEBUG;WIN32;AUDIOKINETIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;WIN32;AUDIOKINETIC;_XKEYCHECK_H;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>.;..;$(WwiseSDKPath)\include;$(SolutionDir)..\source\heavy;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Lib>
@@ -163,12 +163,12 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>.;$(WwiseSDKPath)\include;$(SolutionDir)..\source\include;$(SolutionDir)..\source\heavy</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_DEBUG;WIN64;HV_SIMD_SSE;AUDIOKINETIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;WIN64;HV_SIMD_SSE;AUDIOKINETIC;_XKEYCHECK_H;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader />
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>_DEBUG;WIN64;HV_SIMD_SSE;AUDIOKINETIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;WIN64;HV_SIMD_SSE;AUDIOKINETIC;_XKEYCHECK_H;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>.;..;$(WwiseSDKPath)\include;$(SolutionDir)..\source\heavy;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Lib>
@@ -185,13 +185,13 @@
     <ClCompile>
       <Optimization>MaxSpeed</Optimization>
       <AdditionalIncludeDirectories>.;$(WwiseSDKPath)\include;$(SolutionDir)..\source\include;$(SolutionDir)..\source\heavy</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>NDEBUG;WIN32;AUDIOKINETIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;WIN32;AUDIOKINETIC;_XKEYCHECK_H;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions</EnableEnhancedInstructionSet>
       <PrecompiledHeader />
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>NDEBUG;WIN32;AUDIOKINETIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;WIN32;AUDIOKINETIC;_XKEYCHECK_H;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>.;..;$(WwiseSDKPath)\include;$(SolutionDir)..\source\heavy;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Lib>
@@ -211,12 +211,12 @@
     <ClCompile>
       <Optimization>MaxSpeed</Optimization>
       <AdditionalIncludeDirectories>.;$(WwiseSDKPath)\include;$(SolutionDir)..\source\include;$(SolutionDir)..\source\heavy</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>NDEBUG;WIN64;HV_SIMD_SSE;AUDIOKINETIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;WIN64;HV_SIMD_SSE;AUDIOKINETIC;_XKEYCHECK_H;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader />
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>NDEBUG;WIN64;HV_SIMD_SSE;AUDIOKINETIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;WIN64;HV_SIMD_SSE;AUDIOKINETIC;_XKEYCHECK_H;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>.;..;$(WwiseSDKPath)\include;$(SolutionDir)..\source\heavy;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Lib>
@@ -233,14 +233,14 @@
     <ClCompile>
       <Optimization>MaxSpeed</Optimization>
       <AdditionalIncludeDirectories>.;$(WwiseSDKPath)\include;$(SolutionDir)..\source\include;$(SolutionDir)..\source\heavy</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>NDEBUG;AK_OPTIMIZED;WIN32;AUDIOKINETIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;AK_OPTIMIZED;WIN32;AUDIOKINETIC;_XKEYCHECK_H;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions</EnableEnhancedInstructionSet>
       <PrecompiledHeader />
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <DebugInformationFormat>None</DebugInformationFormat>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>NDEBUG;AK_OPTIMIZED;WIN32;AUDIOKINETIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;AK_OPTIMIZED;WIN32;AUDIOKINETIC;_XKEYCHECK_H;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>.;..;$(WwiseSDKPath)\include;$(SolutionDir)..\source\heavy;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Lib>
@@ -260,13 +260,13 @@
     <ClCompile>
       <Optimization>MaxSpeed</Optimization>
       <AdditionalIncludeDirectories>.;$(WwiseSDKPath)\include;$(SolutionDir)..\source\include;$(SolutionDir)..\source\heavy</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>NDEBUG;AK_OPTIMIZED;WIN64;HV_SIMD_SSE;AUDIOKINETIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;AK_OPTIMIZED;WIN64;HV_SIMD_SSE;AUDIOKINETIC;_XKEYCHECK_H;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader />
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <DebugInformationFormat>None</DebugInformationFormat>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>NDEBUG;AK_OPTIMIZED;WIN64;HV_SIMD_SSE;AUDIOKINETIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;AK_OPTIMIZED;WIN64;HV_SIMD_SSE;AUDIOKINETIC;_XKEYCHECK_H;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>.;..;$(WwiseSDKPath)\include;$(SolutionDir)..\source\heavy;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Lib>

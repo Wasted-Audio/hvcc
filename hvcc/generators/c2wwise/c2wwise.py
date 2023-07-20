@@ -1,4 +1,5 @@
 # Copyright (C) 2014-2018 Enzien Audio, Ltd.
+# Copyright (C) 2021-2023 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -13,13 +14,15 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import hashlib
 import os
 import shutil
 import time
 import jinja2
+from typing import Dict, Optional
+
 from ..buildjson import buildjson
 from ..copyright import copyright_manager
+from ..filters import filter_plugin_id, filter_xcode_build, filter_xcode_fileref
 
 
 class c2wwise:
@@ -28,21 +31,18 @@ class c2wwise:
     """
 
     @classmethod
-    def filter_xcode_build(clazz, s):
-        """Return a build hash suitable for use in an Xcode project file.
-        """
-        return hashlib.md5(s + "_build").hexdigest().upper()[0:24]
-
-    @classmethod
-    def filter_xcode_fileref(clazz, s):
-        """Return a fileref hash suitable for use in an Xcode project file.
-        """
-        return hashlib.md5(s + "_fileref").hexdigest().upper()[0:24]
-
-    @classmethod
-    def compile(clazz, c_src_dir, out_dir, externs,
-                patch_name=None, num_input_channels=0, num_output_channels=0,
-                copyright=None, verbose=False):
+    def compile(
+        cls,
+        c_src_dir: str,
+        out_dir: str,
+        externs: Dict,
+        patch_name: Optional[str] = None,
+        patch_meta: Optional[Dict] = None,
+        num_input_channels: int = 0,
+        num_output_channels: int = 0,
+        copyright: Optional[str] = None,
+        verbose: Optional[bool] = False
+    ) -> Dict:
 
         tick = time.time()
 
@@ -51,6 +51,7 @@ class c2wwise:
         event_list = externs["events"]["in"]
         table_list = externs["tables"]
 
+        out_dir = os.path.join(out_dir, "wwise")
         patch_name = patch_name or "heavy"
 
         copyright_c = copyright_manager.get_copyright_for_c(copyright)
@@ -63,11 +64,11 @@ class c2wwise:
 
         templates_dir = os.path.join(os.path.dirname(__file__), "templates")
         plugin_type = "Source" if num_input_channels == 0 else "FX"
-        plugin_id = int(hashlib.md5(patch_name).hexdigest()[:4], 16) & 0x7FFF  # unique id from patch name [0...32767]
+        plugin_id = filter_plugin_id(patch_name)
 
         env = jinja2.Environment()
-        env.filters["xcode_build"] = c2wwise.filter_xcode_build
-        env.filters["xcode_fileref"] = c2wwise.filter_xcode_fileref
+        env.filters["xcode_build"] = filter_xcode_build
+        env.filters["xcode_fileref"] = filter_xcode_fileref
         env.loader = jinja2.FileSystemLoader(
             encoding="utf-8-sig",
             searchpath=[templates_dir])
@@ -179,29 +180,29 @@ class c2wwise:
                     files=files,
                     wwise_version=wwise_sdk_version))
 
-            proj_name = "Hv_{0}_Wwise{1}Plugin".format(patch_name, plugin_type)
+            proj_name = f"Hv_{patch_name}_Wwise{plugin_type}Plugin"
 
             buildjson.generate_json(
                 out_dir,
                 ios_armv7a_args=[
                     "-arch", "armv7s",
-                    "-target", "{0}_iOS".format(proj_name),
-                    "-project", "{0}.xcodeproj".format(proj_name)],
+                    "-target", f"{proj_name}_iOS",
+                    "-project", f"{proj_name}.xcodeproj"],
                 linux_x64_args=["-j"],
                 macos_x64_args=[
                     "-arch", "x86_64",
-                    "-target", "{0}".format(proj_name),
-                    "-project", "{0}.xcodeproj".format(proj_name)],
+                    "-target", f"{proj_name}",
+                    "-project", f"{proj_name}.xcodeproj"],
                 win_x64_args=[
                     "/property:Configuration=Release",
                     "/property:Platform=x64",
                     "/t:Rebuild", "/m",
-                    "{0}.sln".format(proj_name)],
+                    f"{proj_name}.sln"],
                 win_x86_args=[
                     "/property:Configuration=Release",
                     "/property:Platform=x86",
                     "/t:Rebuild", "/m",
-                    "{0}.sln".format(proj_name)])
+                    f"{proj_name}.sln"])
 
             return {
                 "stage": "c2wwise",

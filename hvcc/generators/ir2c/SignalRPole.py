@@ -1,4 +1,5 @@
 # Copyright (C) 2014-2018 Enzien Audio, Ltd.
+# Copyright (C) 2023 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -13,6 +14,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from typing import Dict, List
+
 from .HeavyObject import HeavyObject
 
 
@@ -24,11 +27,11 @@ class SignalRPole(HeavyObject):
     preamble = "sRPole"
 
     @classmethod
-    def get_C_header_set(clazz):
+    def get_C_header_set(cls) -> set:
         return {"HvSignalRPole.h", "HvSignalDel1.h", "HvMath.h"}
 
     @classmethod
-    def get_C_file_set(clazz):
+    def get_C_file_set(cls) -> set:
         return {
             "HvSignalRPole.h", "HvSignalRPole.c",
             "HvSignalDel1.h", "HvSignalDel1.c",
@@ -36,22 +39,22 @@ class SignalRPole(HeavyObject):
         }
 
     @classmethod
-    def get_C_def(clazz, obj_type, obj_id):
-        return ["SignalRPole sRPole_{0};".format(obj_id)]
+    def get_C_def(cls, obj_type: str, obj_id: int) -> List[str]:
+        return [f"SignalRPole sRPole_{obj_id};"]
 
     @classmethod
-    def get_C_init(clazz, obj_type, obj_id, args):
-        return ["sRPole_init(&sRPole_{0});".format(obj_id)]
+    def get_C_init(cls, obj_type: str, obj_id: int, args: Dict) -> List[str]:
+        return [f"sRPole_init(&sRPole_{obj_id});"]
 
     @classmethod
-    def get_C_free(clazz, obj_type, obj_id, args):
+    def get_C_free(cls, obj_type: str, obj_id: int, args: Dict) -> List[str]:
         return []
 
     @classmethod
-    def get_C_process(clazz, obj_type, process_dict, objects):
+    def get_C_process(cls, process_dict: Dict, obj_type: str, obj_id: int, args: Dict) -> List[str]:
         return [
             "__hv_rpole_f(&sRPole_{0}, VIf({1}), VIf({2}), VOf({3}));".format(
                 process_dict["id"],
-                HeavyObject._c_buffer(process_dict["inputBuffers"][0]),
-                HeavyObject._c_buffer(process_dict["inputBuffers"][1]),
-                HeavyObject._c_buffer(process_dict["outputBuffers"][0]))]
+                cls._c_buffer(process_dict["inputBuffers"][0]),
+                cls._c_buffer(process_dict["inputBuffers"][1]),
+                cls._c_buffer(process_dict["outputBuffers"][0]))]

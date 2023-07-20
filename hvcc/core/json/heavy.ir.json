@@ -1000,6 +1000,27 @@
       "required": false
     }]
   },
+  "__eq~f": {
+    "inlets": [
+      "~f>",
+      "~f>"
+    ],
+    "ir": {
+      "control": false,
+      "signal": true,
+      "init": false
+    },
+    "outlets": [
+      "~f>"
+    ],
+    "args": [
+
+    ],
+    "perf": {
+      "avx": 3,
+      "sse": 3
+    }
+  },
   "__exp": {
     "inlets": [
       "-->"
