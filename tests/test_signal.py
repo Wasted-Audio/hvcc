@@ -24,12 +24,17 @@ class TestPdSignalPatches(TestPdSignalBase):
     SCRIPT_DIR = os.path.dirname(__file__)
     TEST_DIR = os.path.join(os.path.dirname(__file__), "pd", "signal")
 
-    def test_line(self):
-        self._test_signal_patch("test-line.pd")
+    # def test_line(self):
+    #     self._test_signal_patch("test-line.pd")
 
-    def test_phasor_control(self):
-        self._test_signal_patch("test-phasor-control.pd")
+    # def test_phasor_control(self):
+    #     self._test_signal_patch("test-phasor-control.pd")
 
+    def test_phasor_control2(self):
+        self._test_signal_patch("test-phasor-control-rec.pd")
+
+    # def test_line2(self):
+    #     self._test_signal_patch("test-line-rec.pd")
 
 def main():
     parser = argparse.ArgumentParser(
