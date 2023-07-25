@@ -15,8 +15,8 @@
 {%- endif %}
 #define DISTRHO_PLUGIN_NUM_INPUTS           {{num_input_channels}}
 #define DISTRHO_PLUGIN_NUM_OUTPUTS          {{num_output_channels}}
-#define DISTRHO_PLUGIN_IS_SYNTH             {{1 if num_output_channels > 0 and meta.midi_input else 0}}
-#define DISTRHO_PLUGIN_HAS_UI               {{1 if meta.enable_ui else 0}}
+#define DISTRHO_PLUGIN_IS_SYNTH             {{1 if num_output_channels > 0 and meta.midi_input is defined and meta.midi_input > 0 else 0}}
+#define DISTRHO_PLUGIN_HAS_UI               {{1 if meta.enable_ui is defined and meta.enable_ui is sameas true else 0}}
 #define DISTRHO_PLUGIN_IS_RT_SAFE           1
 #define DISTRHO_PLUGIN_WANT_PROGRAMS        0
 #define DISTRHO_PLUGIN_WANT_STATE           0

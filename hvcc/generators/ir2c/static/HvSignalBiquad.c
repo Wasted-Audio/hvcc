@@ -17,7 +17,7 @@
 #include "HvSignalBiquad.h"
 
 // http://reanimator-web.appspot.com/articles/simdiir
-// http://musicdsp.org/files/Audio-EQ-Cookbook.txt
+// https://webaudio.github.io/Audio-EQ-Cookbook/audio-eq-cookbook.html
 
 hv_size_t sBiquad_init(SignalBiquad *o) {
 #if HV_SIMD_AVX
