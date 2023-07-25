@@ -19,7 +19,9 @@
 hv_size_t sTabread_init(SignalTabread *o, HvTable *table, bool forceAlignedLoads) {
   o->table = table;
   o->head = 0;
+  o->end = hTable_getAllocated(table);
   o->forceAlignedLoads = forceAlignedLoads;
+  o->playing = false;
   return 0;
 }
 
@@ -29,20 +31,37 @@ void sTabread_onMessage(HeavyContextInterface *_c, SignalTabread *o, int letIn, 
     case 0: {
       if (o->table != NULL) {
         switch (msg_getType(m,0)) {
-          case HV_MSG_BANG: o->head = 0; break;
+          case HV_MSG_BANG: {
+            printf("now playing\n");
+            o->head = 0;
+            o->playing = true;
+            break;
+          }
           case HV_MSG_FLOAT: {
             hv_uint32_t h = (hv_uint32_t) hv_abs_f(msg_getFloat(m,0));
+            printf("now floating: %i\n", h);
             if (msg_getFloat(m,0) < 0.0f) {
               // if input is negative, wrap around the end of the table
               h = hTable_getSize(o->table) - h;
             }
             o->head = o->forceAlignedLoads ? (h & ~HV_N_SIMD_MASK) : h;
+            o->playing = true;
 
             // output new head
             HvMessage *n = HV_MESSAGE_ON_STACK(1);
             msg_initWithFloat(n, msg_getTimestamp(m), (float) o->head);
             sendMessage(_c, 1, n);
             break;
+          }
+          case HV_MSG_SYMBOL: {
+            switch (msg_getHash(m,0)) {
+              case 0x7A5B032D: { // "stop"
+                printf("now stopping\n");
+                o->head = 0;
+                o->playing = false;
+                break;
+              }
+            }
           }
           default: break;
         }
@@ -52,6 +71,20 @@ void sTabread_onMessage(HeavyContextInterface *_c, SignalTabread *o, int letIn, 
     case 1: {
       if (msg_isHashLike(m,0)) {
         o->table = hv_table_get(_c, msg_getHash(m,0));
+        o->end = o->head + hTable_getAllocated(o->table);
+      }
+      break;
+    }
+    case 2: {
+      if (o->table != NULL) {
+        switch (msg_getType(m,0)) {
+          case HV_MSG_FLOAT: {
+            hv_uint32_t e = (hv_uint32_t) hv_abs_f(msg_getFloat(m,0));
+            o->end = o->head + e;
+            break;
+          }
+          default: break;
+        }
       }
       break;
     }

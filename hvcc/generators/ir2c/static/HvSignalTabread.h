@@ -26,7 +26,9 @@ extern "C" {
 typedef struct SignalTabread {
   HvTable *table; // the table to read
   hv_uint32_t head;
+  hv_uint32_t end;
   bool forceAlignedLoads; // false by default, true if using __hv_tabread_f
+  bool playing; // false by default, only __hv_tabread_stoppable_f may set it to true
 } SignalTabread;
 
 // random access to a table
@@ -116,6 +118,13 @@ static inline void __hv_tabreadu_f(SignalTabread *o, hv_bOutf_t bOut) {
 
 // this tabread can be instructed to stop. It is mainly intended for linear reads that only process a portion of a buffer.
 static inline void __hv_tabread_stoppable_f(SignalTabread *o, hv_bOutf_t bOut) {
+  // hv_assert((o->head + HV_N_SIMD) <= hTable_getAllocated(o->table)); // assert that we always read within the table bounds
+  hv_uint32_t head = o->head;
+  if ((head + HV_N_SIMD) == hTable_getAllocated(o->table)) {
+    o->playing = false;
+  }
+  // printf("head: %i\n", head);
+  // printf("end: %i\n", o->end);
 #if HV_SIMD_AVX
   if (o->head == ~0x0) {
     *bOut = _mm256_setzero_ps();
@@ -138,11 +147,11 @@ static inline void __hv_tabread_stoppable_f(SignalTabread *o, hv_bOutf_t bOut) {
     o->head += HV_N_SIMD;
   }
 #else // HV_SIMD_NONE
-  if (o->head == ~0x0) {
-    *bOut = 0.0f;
+  if (!o->playing) {
+    __hv_zero_f(bOut);
   } else {
-    *bOut = *(hTable_getBuffer(o->table) + o->head);
-    o->head += HV_N_SIMD;
+    *bOut = *(hTable_getBuffer(o->table) + head);
+    o->head = head + HV_N_SIMD;
   }
 #endif
 }
