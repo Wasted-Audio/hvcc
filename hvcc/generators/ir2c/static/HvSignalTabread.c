@@ -53,13 +53,11 @@ void sTabread_onMessage(HeavyContextInterface *_c, SignalTabread *o, int letIn, 
             break;
           }
           case HV_MSG_SYMBOL: {
-            switch (msg_getHash(m,0)) {
-              case 0x7A5B032D: { // "stop"
-                o->head = 0;
-                o->playing = false;
-                break;
-              }
+            if (msg_compareSymbol(m, 0, "stop")) {
+              o->head = 0;
+              o->playing = false;
             }
+            break;
           }
           default: break;
         }

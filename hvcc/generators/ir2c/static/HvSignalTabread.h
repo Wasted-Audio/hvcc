@@ -28,7 +28,7 @@ typedef struct SignalTabread {
   hv_uint32_t head;
   hv_uint32_t end;
   bool forceAlignedLoads; // false by default, true if using __hv_tabread_f
-  bool playing; // false by default, only __hv_tabread_stoppable_f may set it to true
+  bool playing; // false by default, only __hv_tabread_stoppable_f may respond to it
 } SignalTabread;
 
 // random access to a table

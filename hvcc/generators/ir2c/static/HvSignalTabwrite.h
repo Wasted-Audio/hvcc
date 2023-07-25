@@ -70,7 +70,7 @@ static inline void __hv_tabwriteu_f(SignalTabwrite *o, hv_bInf_t bIn) {
   hTable_setHead(o->table, head); // update remote write head
 }
 
-// this tabread can be instructed to stop. It is mainly intended for linear reads that only process a portion of a buffer.
+// this tabwrite can be instructed to stop. It is mainly intended for linear reads that only process a portion of a buffer.
 // Stores are unaligned, which can be slow but allows any indicies to be written to.
 // TODO(mhroth): this is not stopping!
 static inline void __hv_tabwrite_stoppable_f(SignalTabwrite *o, hv_bInf_t bIn) {
