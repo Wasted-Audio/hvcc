@@ -118,42 +118,29 @@ static inline void __hv_tabreadu_f(SignalTabread *o, hv_bOutf_t bOut) {
 
 // this tabread can be instructed to stop. It is mainly intended for linear reads that only process a portion of a buffer.
 static inline void __hv_tabread_stoppable_f(SignalTabread *o, hv_bOutf_t bOut) {
-  // hv_assert((o->head + HV_N_SIMD) <= hTable_getAllocated(o->table)); // assert that we always read within the table bounds
   hv_uint32_t head = o->head;
   if ((head + HV_N_SIMD) == hTable_getAllocated(o->table)) {
     o->playing = false;
   }
-  // printf("head: %i\n", head);
-  // printf("end: %i\n", o->end);
-#if HV_SIMD_AVX
-  if (o->head == ~0x0) {
-    *bOut = _mm256_setzero_ps();
-  } else {
-    *bOut = _mm256_load_ps(hTable_getBuffer(o->table) + o->head);
-    o->head += HV_N_SIMD;
-  }
-#elif HV_SIMD_SSE
-  if (o->head == ~0x0) {
-    *bOut = _mm_setzero_ps();
-  } else {
-    *bOut = _mm_load_ps(hTable_getBuffer(o->table) + o->head);
-    o->head += HV_N_SIMD;
-  }
-#elif HV_SIMD_NEON
-  if (o->head == ~0x0) {
-    *bOut = vdupq_n_f32(0.0f);
-  } else {
-    *bOut = vld1q_f32(hTable_getBuffer(o->table) + o->head);
-    o->head += HV_N_SIMD;
-  }
-#else // HV_SIMD_NONE
   if (!o->playing) {
     __hv_zero_f(bOut);
   } else {
-    *bOut = *(hTable_getBuffer(o->table) + head);
-    o->head = head + HV_N_SIMD;
-  }
+    if (o->end > o->head) {
+#if HV_SIMD_AVX
+    *bOut = _mm256_load_ps(hTable_getBuffer(o->table) + head);
+#elif HV_SIMD_SSE
+    *bOut = _mm_load_ps(hTable_getBuffer(o->table) + head);
+#elif HV_SIMD_NEON
+    *bOut = vld1q_f32(hTable_getBuffer(o->table) + head);
+#else // HV_SIMD_NONE
+      *bOut = *(hTable_getBuffer(o->table) + head);
 #endif
+      o->head = head + HV_N_SIMD;
+    } else {
+      o->playing = false;
+      __hv_zero_f(bOut);
+    }
+  }
 }
 
 void sTabread_onMessage(HeavyContextInterface *_c, SignalTabread *o, int letIn, const HvMessage *m,
