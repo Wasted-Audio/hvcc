@@ -32,7 +32,7 @@ BUILD_CXX_FLAGS += -I ../../{{dpf_path}}{{dependency}}
 {%- endif %}
 
 LINK_FLAGS += -lpthread
-CFLAGS += -Wno-unused-parameter
+CFLAGS += -Wno-unused-parameter -std=c11
 CXXFLAGS += -Wno-unused-parameter
 
 {% if meta.plugin_formats is defined %}
