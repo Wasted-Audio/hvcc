@@ -45,30 +45,30 @@ static inline void __hv_tabread_if(SignalTabread *o, hv_bIni_t bIn, hv_bOutf_t b
 #if HV_SIMD_AVX
   const hv_int32_t *const i = (hv_int32_t *) &bIn;
 
-  hv_assert(i[0] >= 0 && i[0] < hTable_getAllocated(o->table));
-  hv_assert(i[1] >= 0 && i[1] < hTable_getAllocated(o->table));
-  hv_assert(i[2] >= 0 && i[2] < hTable_getAllocated(o->table));
-  hv_assert(i[3] >= 0 && i[3] < hTable_getAllocated(o->table));
-  hv_assert(i[4] >= 0 && i[4] < hTable_getAllocated(o->table));
-  hv_assert(i[5] >= 0 && i[5] < hTable_getAllocated(o->table));
-  hv_assert(i[6] >= 0 && i[6] < hTable_getAllocated(o->table));
-  hv_assert(i[7] >= 0 && i[7] < hTable_getAllocated(o->table));
+  hv_assert(i[0] >= 0 && (hv_uint32_t) i[0] < hTable_getAllocated(o->table));
+  hv_assert(i[1] >= 0 && (hv_uint32_t) i[1] < hTable_getAllocated(o->table));
+  hv_assert(i[2] >= 0 && (hv_uint32_t) i[2] < hTable_getAllocated(o->table));
+  hv_assert(i[3] >= 0 && (hv_uint32_t) i[3] < hTable_getAllocated(o->table));
+  hv_assert(i[4] >= 0 && (hv_uint32_t) i[4] < hTable_getAllocated(o->table));
+  hv_assert(i[5] >= 0 && (hv_uint32_t) i[5] < hTable_getAllocated(o->table));
+  hv_assert(i[6] >= 0 && (hv_uint32_t) i[6] < hTable_getAllocated(o->table));
+  hv_assert(i[7] >= 0 && (hv_uint32_t) i[7] < hTable_getAllocated(o->table));
 
   *bOut = _mm256_set_ps(b[i[7]], b[i[6]], b[i[5]], b[i[4]], b[i[3]], b[i[2]], b[i[1]], b[i[0]]);
 #elif HV_SIMD_SSE
   const hv_int32_t *const i = (hv_int32_t *) &bIn;
 
-  hv_assert(i[0] >= 0 && ((hv_uint32_t) i[0]) < hTable_getAllocated(o->table));
-  hv_assert(i[1] >= 0 && ((hv_uint32_t) i[1]) < hTable_getAllocated(o->table));
-  hv_assert(i[2] >= 0 && ((hv_uint32_t) i[2]) < hTable_getAllocated(o->table));
-  hv_assert(i[3] >= 0 && ((hv_uint32_t) i[3]) < hTable_getAllocated(o->table));
+  hv_assert(i[0] >= 0 && (hv_uint32_t) i[0] < hTable_getAllocated(o->table));
+  hv_assert(i[1] >= 0 && (hv_uint32_t) i[1] < hTable_getAllocated(o->table));
+  hv_assert(i[2] >= 0 && (hv_uint32_t) i[2] < hTable_getAllocated(o->table));
+  hv_assert(i[3] >= 0 && (hv_uint32_t) i[3] < hTable_getAllocated(o->table));
 
   *bOut = _mm_set_ps(b[i[3]], b[i[2]], b[i[1]], b[i[0]]);
 #elif HV_SIMD_NEON
-  hv_assert((bIn[0] >= 0) && (bIn[0] < hTable_getAllocated(o->table)));
-  hv_assert((bIn[1] >= 0) && (bIn[1] < hTable_getAllocated(o->table)));
-  hv_assert((bIn[2] >= 0) && (bIn[2] < hTable_getAllocated(o->table)));
-  hv_assert((bIn[3] >= 0) && (bIn[3] < hTable_getAllocated(o->table)));
+  hv_assert((bIn[0] >= 0) && (hv_uint32_t) (bIn[0] < hTable_getAllocated(o->table)));
+  hv_assert((bIn[1] >= 0) && (hv_uint32_t) (bIn[1] < hTable_getAllocated(o->table)));
+  hv_assert((bIn[2] >= 0) && (hv_uint32_t) (bIn[2] < hTable_getAllocated(o->table)));
+  hv_assert((bIn[3] >= 0) && (hv_uint32_t) (bIn[3] < hTable_getAllocated(o->table)));
 
   *bOut = (float32x4_t) {b[bIn[0]], b[bIn[1]], b[bIn[2]], b[bIn[3]]};
 #else // HV_SIMD_NONE
@@ -119,15 +119,15 @@ static inline void __hv_tabreadu_f(SignalTabread *o, hv_bOutf_t bOut) {
 // this tabread can be instructed to stop. It is mainly intended for linear reads that only process a portion of a buffer.
 static inline void __hv_tabread_stoppable_f(SignalTabread *o, hv_bOutf_t bOut) {
   hv_uint32_t head = o->head;
-  if ((head + HV_N_SIMD) == hTable_getAllocated(o->table)) {
+  if ((head + HV_N_SIMD) == hTable_getAllocated(o->table)) { // stop when we reach the table bounds
     o->playing = false;
   }
   if (!o->playing) {
-    __hv_zero_f(bOut);
+    __hv_zero_f(bOut); // output silence when not playing
   } else {
-    if (o->end > o->head) {
+    if (o->end > o->head) { // only play when end is further than play head
 #if HV_SIMD_AVX
-    *bOut = _mm256_load_ps(hTable_getBuffer(o->table) + head);
+    *bOut = _mm256_loadu_ps(hTable_getBuffer(o->table) + head);
 #elif HV_SIMD_SSE
     *bOut = _mm_load_ps(hTable_getBuffer(o->table) + head);
 #elif HV_SIMD_NEON

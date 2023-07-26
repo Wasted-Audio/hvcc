@@ -44,7 +44,7 @@ class SignalTabread(HeavyObject):
             "sTabread_init(&sTabread_{0}, &hTable_{1}, {2});".format(
                 obj_id,
                 args["table_id"],
-                "true" if obj_type == "__tabread~f" else "false")]
+                "true" if obj_type in {"__tabread~f", "__tabread_stoppable~f"} else "false")]
 
     @classmethod
     def get_C_onMessage(cls, obj_type: str, obj_id: int, inlet_index: int, args: Dict) -> List[str]:
