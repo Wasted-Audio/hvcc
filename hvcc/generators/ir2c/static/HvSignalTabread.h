@@ -65,10 +65,10 @@ static inline void __hv_tabread_if(SignalTabread *o, hv_bIni_t bIn, hv_bOutf_t b
 
   *bOut = _mm_set_ps(b[i[3]], b[i[2]], b[i[1]], b[i[0]]);
 #elif HV_SIMD_NEON
-  hv_assert((bIn[0] >= 0) && (hv_uint32_t) (bIn[0] < hTable_getAllocated(o->table)));
-  hv_assert((bIn[1] >= 0) && (hv_uint32_t) (bIn[1] < hTable_getAllocated(o->table)));
-  hv_assert((bIn[2] >= 0) && (hv_uint32_t) (bIn[2] < hTable_getAllocated(o->table)));
-  hv_assert((bIn[3] >= 0) && (hv_uint32_t) (bIn[3] < hTable_getAllocated(o->table)));
+  hv_assert((bIn[0] >= 0) && (hv_uint32_t) bIn[0] < hTable_getAllocated(o->table));
+  hv_assert((bIn[1] >= 0) && (hv_uint32_t) bIn[1] < hTable_getAllocated(o->table));
+  hv_assert((bIn[2] >= 0) && (hv_uint32_t) bIn[2] < hTable_getAllocated(o->table));
+  hv_assert((bIn[3] >= 0) && (hv_uint32_t) bIn[3] < hTable_getAllocated(o->table));
 
   *bOut = (float32x4_t) {b[bIn[0]], b[bIn[1]], b[bIn[2]], b[bIn[3]]};
 #else // HV_SIMD_NONE
