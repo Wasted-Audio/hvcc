@@ -34,7 +34,9 @@ BUILD_CXX_FLAGS += -I ../../{{dpf_path}}{{dependency}}
 LINK_FLAGS += -lpthread
 CFLAGS += -Wno-unused-parameter -std=c11
 CXXFLAGS += -Wno-unused-parameter
+ifeq ($(CPU_X86_64), true)
 BUILD_CXX_FLAGS += -msse4
+endif
 
 {% if meta.plugin_formats is defined %}
 	{%- for format in meta.plugin_formats %}
