@@ -73,9 +73,10 @@ class SignalTabread(HeavyObject):
                 )]
         elif obj_type == "__tabread_stoppable~f":
             return [
-                "__hv_tabread_stoppable_f(&sTabread_{0}, {1});".format(
+                "__hv_tabread_stoppable_f(this, &sTabread_{0}, {1}, &{2}_{0}_sendMessage);".format(
                     process_dict["id"],
-                    ", ".join([f"VOf({cls._c_buffer(b)})" for b in process_dict["outputBuffers"]])
+                    ", ".join([f"VOf({cls._c_buffer(b)})" for b in process_dict["outputBuffers"]]),
+                    cls.preamble
                 )]
         elif obj_type == "__tabreadu~f":
             return [
