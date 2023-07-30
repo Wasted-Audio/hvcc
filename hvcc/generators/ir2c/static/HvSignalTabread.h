@@ -143,7 +143,7 @@ static inline void __hv_tabread_stoppable_f(HeavyContextInterface *_c, SignalTab
       __hv_zero_f(bOut); // output silence when not playing
       HvMessage *n = HV_MESSAGE_ON_STACK(1);
       msg_initWithBang(n, 0);
-      hv_scheduleMessageForObject(_c, n, sendMessage, 2);
+      sendMessage(_c, 2, n);
     }
   }
 }
