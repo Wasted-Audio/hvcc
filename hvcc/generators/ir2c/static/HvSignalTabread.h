@@ -121,7 +121,7 @@ static inline void __hv_tabread_stoppable_f(HeavyContextInterface *_c, SignalTab
   void (*sendMessage)(HeavyContextInterface *, int, const HvMessage *))
 {
   hv_uint32_t head = o->head;
-  if ((head + HV_N_SIMD) >= hTable_getAllocated(o->table)) { // stop when we reach the table bounds
+  if (head >= hTable_getAllocated(o->table)) { // stop when we reach the table bounds
     o->playing = false;
   }
   if (!o->playing) {
