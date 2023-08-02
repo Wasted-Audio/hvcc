@@ -51,7 +51,7 @@ class c2pdext:
 
         patch_name = patch_name or "heavy"
         ext_name = f"{patch_name}~"
-        struct_name = patch_name + "_tilde"
+        struct_name = f"{patch_name}_tilde"
 
         # ensure that the output directory does not exist
         out_dir = os.path.abspath(out_dir)
@@ -77,7 +77,7 @@ class c2pdext:
                 os.path.join(os.path.dirname(os.path.abspath(__file__)), "templates"))
 
             # generate Pd external wrapper from template
-            pdext_path = os.path.join(out_dir, f"{struct_name}.c")
+            pdext_path = os.path.join(out_dir, f"{ext_name}.c")
             with open(pdext_path, "w") as f:
                 f.write(env.get_template("pd_external.c").render(
                     name=patch_name,
@@ -87,6 +87,12 @@ class c2pdext:
                     num_output_channels=num_output_channels,
                     receivers=receiver_list,
                     copyright=copyright))
+
+            # generate Makefile from template
+            pdext_path = os.path.join(out_dir, "../Makefile")
+            with open(pdext_path, "w") as f:
+                f.write(env.get_template("Makefile").render(
+                    name=patch_name))
 
             # generate Xcode project
             xcode_path = os.path.join(out_dir, f"{struct_name}.xcodeproj")
