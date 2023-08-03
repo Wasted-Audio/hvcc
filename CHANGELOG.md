@@ -6,6 +6,7 @@ Next Release
 
 * DPF: enumerated parameters
 * DPF: special `__hv_dpf_bpm` receiver of transport BPM value
+* deprecated: Fabric generator - no longer supported
 * docs: updates on missing objects and limitations
 * bugfix: issues #50, #106
 
