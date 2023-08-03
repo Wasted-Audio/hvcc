@@ -28,7 +28,7 @@ static void printHook(HeavyContextInterface *c, const char *receiverName, const 
 }
 
 static void sendHook(HeavyContextInterface *c, const char *receiverName, unsigned int receiverHash, const HvMessage * m) {
-  if (!strcmp(receiverName, "#HV_TO_PD")) {
+  if (!strcmp(receiverName, "HV_TO_PD")) {
     t_outlet *const outlet = ((t_{{struct_name}} *) hv_getUserData(c))->msgOutlet;
     if (hv_msg_getNumElements(m) == 1) {
       if (hv_msg_isFloat(m, 0)) {

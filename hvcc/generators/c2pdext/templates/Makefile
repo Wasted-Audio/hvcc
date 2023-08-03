@@ -5,9 +5,6 @@
 # library name
 lib.name = {{name}}
 
-cflags = -Ishared -DHAVE_STRUCT_TIMESPEC
-cxx.flags = -std=c++17
-
 # input source file (class name == source file basename)
 class.sources = pdext/{{name}}~.c
 common.sources = $(filter-out pdext/{{name}}~.c, $(wildcard pdext/*.c))
