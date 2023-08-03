@@ -5,6 +5,8 @@
 # library name
 lib.name = {{name}}
 
+ldlibs += -lstdc++
+
 # input source file (class name == source file basename)
 class.sources = pdext/{{name}}~.c
 common.sources = $(filter-out pdext/{{name}}~.c, $(wildcard pdext/*.c))

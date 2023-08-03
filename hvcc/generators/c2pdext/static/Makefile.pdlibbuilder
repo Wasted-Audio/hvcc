@@ -511,7 +511,7 @@ ifeq ($(system), Linux)
   cpp.flags := -DUNIX
   c.flags := -fPIC
   c.ldflags := -rdynamic -shared -fPIC -Wl,-rpath,"\$$ORIGIN",--enable-new-dtags
-  c.ldlibs := -lc -lm -lstdc++
+  c.ldlibs := -lc -lm
   cxx.flags := -fPIC -fcheck-new
   cxx.ldflags := -rdynamic -shared -fPIC -Wl,-rpath,"\$$ORIGIN",--enable-new-dtags
   cxx.ldlibs := -lc -lm -lstdc++
