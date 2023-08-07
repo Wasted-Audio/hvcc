@@ -20,7 +20,7 @@ from .HeavyObject import HeavyObject
 
 
 class SignalTabread(HeavyObject):
-    """Handles __tabread~if, __tabread~f, __tabreadu~f
+    """Handles __tabread~if, __tabread~f, __tabreadu~f, __tabread_stoppable~f
     """
 
     c_struct = "SignalTabread"
@@ -44,11 +44,11 @@ class SignalTabread(HeavyObject):
             "sTabread_init(&sTabread_{0}, &hTable_{1}, {2});".format(
                 obj_id,
                 args["table_id"],
-                "true" if obj_type == "__tabread~f" else "false")]
+                "true" if obj_type in {"__tabread~f", "__tabread_stoppable~f"} else "false")]
 
     @classmethod
     def get_C_onMessage(cls, obj_type: str, obj_id: int, inlet_index: int, args: Dict) -> List[str]:
-        if obj_type in ["__tabread~f", "__tabreadu~f"]:
+        if obj_type in ["__tabread~f", "__tabreadu~f", "__tabread_stoppable~f"]:
             return [
                 "sTabread_onMessage(_c, &Context(_c)->sTabread_{0}, {1}, m, &sTabread_{0}_sendMessage);".format(
                     obj_id,
@@ -70,6 +70,13 @@ class SignalTabread(HeavyObject):
                 "__hv_tabread_f(&sTabread_{0}, {1});".format(
                     process_dict["id"],
                     ", ".join([f"VOf({cls._c_buffer(b)})" for b in process_dict["outputBuffers"]])
+                )]
+        elif obj_type == "__tabread_stoppable~f":
+            return [
+                "__hv_tabread_stoppable_f(this, &sTabread_{0}, {1}, &{2}_{0}_sendMessage);".format(
+                    process_dict["id"],
+                    ", ".join([f"VOf({cls._c_buffer(b)})" for b in process_dict["outputBuffers"]]),
+                    cls.preamble
                 )]
         elif obj_type == "__tabreadu~f":
             return [
