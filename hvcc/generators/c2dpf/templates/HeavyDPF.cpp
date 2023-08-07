@@ -32,6 +32,8 @@
 #define MIDI_RT_ACTIVESENSE     0xFE
 #define MIDI_RT_RESET           0xFF
 
+#define HV_HASH_DPF_BPM         0xDF8C2721
+
 // midi realtime messages
 std::set<int> mrtSet {
   MIDI_RT_CLOCK,
@@ -121,19 +123,35 @@ void {{class_name}}::initParameter(uint32_t index, Parameter& parameter)
         | kParameterIsBoolean
       {%- elif v.attributes.type == 'trig': -%}
         | kParameterIsTrigger
+      {%- elif v.attributes.type == 'int': -%}
+        | kParameterIsInteger
       {%- elif v.attributes.type in ['log', 'log_hz']: -%}
         | kParameterIsLogarithmic
       {%- endif %};
         parameter.ranges.min = {{v.attributes.min}}f;
         parameter.ranges.max = {{v.attributes.max}}f;
         parameter.ranges.def = {{v.attributes.default}}f;
-      {%- if v.attributes.type == 'db': %}
+      {%- if v.attributes.type == 'db' and not (meta.enumerators is defined and meta.enumerators[v.display] is defined): %}
         {
-          ParameterEnumerationValue* const enumValues =  new ParameterEnumerationValue[1];
+          ParameterEnumerationValue* const enumValues = new ParameterEnumerationValue[1];
           enumValues[0].value = {{v.attributes.min}}f;
           enumValues[0].label = "-inf";
           parameter.enumValues.count = 1;
           parameter.enumValues.values = enumValues;
+        }
+      {%- endif %}
+      {%- if meta.enumerators is defined and meta.enumerators[v.display] is defined %}
+        {% set enums = meta.enumerators[v.display] %}
+        {% set enumlen = enums|length %}
+        if (ParameterEnumerationValue *values = new ParameterEnumerationValue[{{enumlen}}])
+        {
+          parameter.enumValues.restrictedMode = true;
+          {% for i in enums -%}
+          values[{{loop.index - 1}}].value = {{loop.index - 1}}.0f;
+          values[{{loop.index - 1}}].label = "{{i}}";
+          {% endfor -%}
+          parameter.enumValues.count = {{enumlen}};
+          parameter.enumValues.values = values;
         }
       {%- endif %}
         break;
@@ -188,7 +206,7 @@ void {{class_name}}::setParameterValue(uint32_t index, float value)
 
 // }
 
-{%- if meta.midi_input is defined and meta.midi_input == 1%}
+{%- if meta.midi_input is defined and meta.midi_input == 1 %}
 #if DISTRHO_PLUGIN_WANT_MIDI_INPUT
 {% include 'HeavyDPF_MIDI_Input.cpp' %}
 #endif
@@ -213,6 +231,10 @@ void {{class_name}}::run(const float** inputs, float** outputs, uint32_t frames,
 void {{class_name}}::run(const float** inputs, float** outputs, uint32_t frames)
 {
 #endif
+  const TimePosition& timePos(getTimePosition());
+  if (timePos.playing && timePos.bbt.valid)
+    _context->sendMessageToReceiverV(HV_HASH_DPF_BPM, 0, "f", timePos.bbt.beatsPerMinute);
+
   _context->process((float**)inputs, outputs, frames);
 }
 

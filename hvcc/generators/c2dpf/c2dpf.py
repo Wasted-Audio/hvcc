@@ -19,7 +19,6 @@ import time
 import jinja2
 from typing import Dict, Optional
 
-from ..buildjson import buildjson
 from ..copyright import copyright_manager
 from ..filters import filter_uniqueid
 
@@ -56,8 +55,6 @@ class c2dpf:
         dpf_path = dpf_meta.get('dpf_path', '')
 
         copyright_c = copyright_manager.get_copyright_for_c(copyright)
-        # copyright_plist = copyright or u"Copyright {0} Enzien Audio, Ltd." \
-        #     " All Rights Reserved.".format(datetime.datetime.now().year)
 
         try:
             # ensure that the output directory does not exist
@@ -125,12 +122,6 @@ class c2dpf:
                     pool_sizes_kb=externs["memoryPoolSizesKb"],
                     copyright=copyright_c))
 
-            # generate list of Heavy source files
-            # files = os.listdir(source_dir)
-
-            # ======================================================================================
-            # Linux
-
             # plugin makefile
             with open(os.path.join(source_dir, "Makefile"), "w") as f:
                 f.write(env.get_template("Makefile_plugin").render(
@@ -144,16 +135,6 @@ class c2dpf:
                     name=patch_name,
                     meta=dpf_meta,
                     dpf_path=dpf_path))
-
-            buildjson.generate_json(
-                out_dir,
-                linux_x64_args=["-j"])
-            # macos_x64_args=["-project", "{0}.xcodeproj".format(patch_name), "-arch",
-            #                 "x86_64", "-alltargets"],
-            # win_x64_args=["/property:Configuration=Release", "/property:Platform=x64",
-            #               "/t:Rebuild", "{0}.sln".format(patch_name), "/m"],
-            # win_x86_args=["/property:Configuration=Release", "/property:Platform=x86",
-            #               "/t:Rebuild", "{0}.sln".format(patch_name), "/m"])
 
             return {
                 "stage": "c2dpf",

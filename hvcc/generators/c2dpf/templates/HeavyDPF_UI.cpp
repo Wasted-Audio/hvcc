@@ -6,12 +6,18 @@
 START_NAMESPACE_DISTRHO
 
 // --------------------------------------------------------------------------------------------------------------------
-
 class ImGuiPluginUI : public UI
 {
     {% for k, v in receivers -%}
-        float f{{v.display|lower}} = {{v.attributes.default}}f;
-    {% endfor %}
+        {%- if v.attributes.type == 'bool': %}
+    bool f{{v.display|lower}} = {{v.attributes.default}}f != 0.0f;
+        {%- elif v.attributes.type == 'int': %}
+    int f{{v.display|lower}} = {{v.attributes.default}};
+        {%- else %}
+    float f{{v.display|lower}} = {{v.attributes.default}}f;
+        {%- endif %}
+    {%- endfor %}
+
     ResizeHandle fResizeHandle;
 
     // ----------------------------------------------------------------------------------------------------------------
@@ -46,7 +52,11 @@ protected:
         switch (index) {
             {% for k, v  in receivers -%}
             case {{loop.index-1}}:
+                {%- if v.attributes.type == 'bool': %}
+                f{{v.display|lower}} = value != 0.0f;
+                {%- else %}
                 f{{v.display|lower}} = value;
+                {%- endif %}
                 break;
             {% endfor %}
             default: return;
@@ -74,24 +84,55 @@ protected:
 
         if (ImGui::Begin("{{name.replace('_', ' ')}}", nullptr, ImGuiWindowFlags_NoResize + ImGuiWindowFlags_NoCollapse))
         {
-    {% for k, v in receivers %}
-            if (ImGui::SliderFloat("{{v.display.replace('_', ' ')}}", &f{{v.display|lower}}, {{v.attributes.min}}f, {{v.attributes.max}}f))
+    {%- for k, v in receivers %}
+        {%- set v_display = v.display|lower %}
+        {%- if meta.enumerators is defined and meta.enumerators[v.display] is defined -%}
+            {%- set enums = meta.enumerators[v.display] -%}
+            {%- set enumlen = enums|length %}
+            {%- set enum_list = v_display + "_list" %}
+
+            const char* {{enum_list}}[{{enumlen}}] = {
+                {%- for i in enums %}
+                "{{i}}",
+                {%- endfor %}
+            };
+
+            if (ImGui::BeginCombo("{{v.display.replace('_', ' ')}}", {{enum_list}}[f{{v_display}}]))
+            {
+                for (int n = 0; n < {{enumlen}}; n++)
+                {
+                    bool is_selected = (f{{v_display}} == n);
+                    if (ImGui::Selectable({{enum_list}}[n], is_selected))
+                    {
+                        f{{v_display}} = n;
+                        editParameter({{loop.index-1}}, true);
+                        setParameterValue({{loop.index-1}}, f{{v_display}});
+                    }
+                    if (is_selected)
+                        ImGui::SetItemDefaultFocus();
+                }
+                ImGui::EndCombo();
+            }
+        {%- else %}
+            {%- if v.attributes.type == 'bool': %}
+            if (ImGui::Toggle("{{v.display.replace('_', ' ')}}", &f{{v_display}}))
+            {%- else %}
+            if (ImGui::SliderFloat("{{v.display.replace('_', ' ')}}", &f{{v_display}}, {{v.attributes.min}}f, {{v.attributes.max}}f))
+            {%- endif %}
             {
                 if (ImGui::IsItemActivated())
                 {
                     editParameter({{loop.index-1}}, true);
-                    if (ImGui::IsMouseDoubleClicked(0))
-                        f{{v.display|lower}} = {{v.attributes.default}}f;
-
-                    setParameterValue({{loop.index-1}}, f{{v.display|lower}});
+                    setParameterValue({{loop.index-1}}, f{{v_display}});
                 }
             }
+        {%- endif %}
     {% endfor %}
             if (ImGui::IsItemDeactivated())
             {
-            {% for i in range(0, receivers|length) -%}
+            {%- for i in range(0, receivers|length) %}
                 editParameter({{i}}, false);
-            {% endfor %}
+            {%- endfor %}
             }
         }
         ImGui::End();
