@@ -147,7 +147,7 @@ void {{class_name}}::initParameter(uint32_t index, Parameter& parameter)
         {
           parameter.enumValues.restrictedMode = true;
           {% for i in enums -%}
-          values[{{loop.index - 1}}].value = {{enums[i]}}f;
+          values[{{loop.index - 1}}].value = {{loop.index - 1}}.0f;
           values[{{loop.index - 1}}].label = "{{i}}";
           {% endfor -%}
           parameter.enumValues.count = {{enumlen}};

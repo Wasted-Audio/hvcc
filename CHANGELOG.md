@@ -7,6 +7,7 @@ Next Release
 * DPF: enumerated parameters
 * DPF: special `__hv_dpf_bpm` receiver of transport BPM value
 * Pdext: migrate to `pd-lib-builder` and newer `m_pd.h` and add some initial documentation.
+* deprecated: Fabric generator - no longer supported
 * docs: updates on missing objects and limitations
 * bugfix: issues #50, #106
 
