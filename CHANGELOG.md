@@ -9,7 +9,7 @@ CHANGELOG
 * Pdext: migrate to `pd-lib-builder` and newer `m_pd.h` and add some initial documentation.
 * deprecated: Fabric generator - no longer supported
 * docs: updates on missing objects and limitations
-* bugfix: issues #24, #50, #106
+* bugfix: issues #24, #50, #100, #106
 
 0.7.0
 -----
