@@ -1,7 +1,7 @@
 CHANGELOG
 =====
 
-Next Release
+0.8.0
 -----
 
 * DPF: enumerated parameters
