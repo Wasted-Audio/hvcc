@@ -223,9 +223,12 @@ class TestPdControlPatches(TestPdControlBase):
     def test_route(self):
         self._test_control_patch("test-route.pd")
 
-    @unittest.skip("symbol messages don't seem to be recognized")
+    @unittest.skip("currently does not support right inlet")
     def test_select(self):
         self._test_control_patch("test-select.pd")
+
+    def test_select_min(self):
+        self._test_control_patch("test-select-min.pd")
 
     def test_send_receive(self):
         self._test_control_patch("test-send_receive.pd")

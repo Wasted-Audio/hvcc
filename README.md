@@ -19,6 +19,8 @@ It has since then been expanded to provide further support for many different pl
   * `importlib_resources` (for reading static resources)
   * `json2daisy` (for daisy integration)
   * `tox` (for tests, optional)
+  * `numpy/scipy` (for tests, optional)
+  * `midifile` (for tests, optional)
   * `clang/clang++` (for building tests, optional)
 
 ## Installation

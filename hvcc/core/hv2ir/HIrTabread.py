@@ -31,7 +31,7 @@ class HIrTabread(HeavyIrObject):
         graph: Optional[HeavyGraph] = None,
         annotations: Optional[Dict] = None
     ) -> None:
-        assert obj_type in {"__tabread~if", "__tabread~f", "__tabreadu~f", "__tabread"}
+        assert obj_type in {"__tabread~if", "__tabread~f", "__tabread_stoppable~f", "__tabreadu~f", "__tabread"}
         super().__init__(obj_type, args=args, graph=graph, annotations=annotations)
 
     def reduce(self) -> Optional[tuple]:

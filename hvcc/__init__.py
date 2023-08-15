@@ -27,7 +27,6 @@ from hvcc.interpreters.pd2hv import pd2hv
 from hvcc.core.hv2ir import hv2ir
 from hvcc.generators.ir2c import ir2c
 from hvcc.generators.ir2c import ir2c_perf
-from hvcc.generators.c2fabric import c2fabric
 from hvcc.generators.c2js import c2js
 from hvcc.generators.c2daisy import c2daisy
 from hvcc.generators.c2dpf import c2dpf
@@ -257,11 +256,6 @@ def compile_dataflow(
         'copyright': copyright,
         'verbose': verbose
     }
-
-    if "fabric" in generators:
-        if verbose:
-            print("--> Generating Fabric plugin")
-        results["c2fabric"] = c2fabric.c2fabric.compile(**gen_args)
 
     if "js" in generators:
         if verbose:
