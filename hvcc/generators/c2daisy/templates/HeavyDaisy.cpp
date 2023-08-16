@@ -64,7 +64,7 @@ int main(void)
 {
   hardware.Init(true);
   hardware.StartAudio(audiocallback);
-  hardware.StartLog();
+  hardware.som.StartLog();
 
   hv.setSendHook(sendHook);
   hv.setPrintHook(printHook);
@@ -133,7 +133,7 @@ static void printHook(HeavyContextInterface *c, const char *printLabel, const ch
   dst = stpncpy(dst, printLabel, len);
   dst = stpncpy(dst, " ", 1);
   dst = stpncpy(dst, msgString, 63-len);
-  hardware.PrintLine(buf);
+  hardware.som.PrintLine(buf);
 }
 
 /** Sends signals from the Daisy hardware to the PD patch via the receive objects during the main loop
