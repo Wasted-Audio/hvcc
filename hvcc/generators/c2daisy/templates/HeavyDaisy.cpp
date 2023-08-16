@@ -1,8 +1,8 @@
 {{copyright}}
 
 #include "Heavy_{{patch_name}}.h"
-#include "Heavy_{{patch_name}}.hpp" 
-#include "HeavyDaisy_{{patch_name}}.hpp"                                                                 
+#include "Heavy_{{patch_name}}.hpp"
+#include "HeavyDaisy_{{patch_name}}.hpp"
 
 #define SAMPLE_RATE 48000.f
 
@@ -14,6 +14,7 @@ Heavy_{{patch_name}} hv(SAMPLE_RATE);
 
 void audiocallback(daisy::AudioHandle::InputBuffer in, daisy::AudioHandle::OutputBuffer out, size_t size);
 static void sendHook(HeavyContextInterface *c, const char *receiverName, uint32_t receiverHash, const HvMessage * m);
+static void printHook(HeavyContextInterface *c, const char *printLabel, const char *msgString, const HvMessage *m);
 void CallbackWriteIn(Heavy_{{patch_name}}& hv);
 void LoopWriteIn(Heavy_{{patch_name}}& hv);
 void CallbackWriteOut();
@@ -63,8 +64,10 @@ int main(void)
 {
   hardware.Init(true);
   hardware.StartAudio(audiocallback);
+  hardware.StartLog();
 
   hv.setSendHook(sendHook);
+  hv.setPrintHook(printHook);
 
   for(;;)
   {
@@ -103,10 +106,10 @@ void audiocallback(daisy::AudioHandle::InputBuffer in, daisy::AudioHandle::Outpu
   hardware.PostProcess();
 }
 
-/** Receives messages from PD and writes them to the appropriate 
+/** Receives messages from PD and writes them to the appropriate
  *  index in the `output_data` array, to be written later.
  */
-static void sendHook(HeavyContextInterface *c, const char *receiverName, uint32_t receiverHash, const HvMessage * m) 
+static void sendHook(HeavyContextInterface *c, const char *receiverName, uint32_t receiverHash, const HvMessage * m)
 {
   {% if  output_parameters|length > 0 %}
   for (int i = 0; i < DaisyNumOutputParameters; i++)
@@ -119,42 +122,56 @@ static void sendHook(HeavyContextInterface *c, const char *receiverName, uint32_
   {% endif %}
 }
 
+/** Receives messages from the PD [print] object and writes them to the serial console.
+ *
+ */
+static void printHook(HeavyContextInterface *c, const char *printLabel, const char *msgString, const HvMessage *m)
+{
+  char buf[64];
+  char *dst = buf;
+  int len = strnlen(printLabel, 48);
+  dst = stpncpy(dst, printLabel, len);
+  dst = stpncpy(dst, " ", 1);
+  dst = stpncpy(dst, msgString, 63-len);
+  hardware.PrintLine(buf);
+}
+
 /** Sends signals from the Daisy hardware to the PD patch via the receive objects during the main loop
- * 
+ *
  */
 void LoopWriteIn(Heavy_{{patch_name}}& hv)
 {
   {% for param in loop_write_in %}
-  {% if param.bool %} 
+  {% if param.bool %}
   if ({{param.process}})
-    hv.sendBangToReceiver((uint32_t) HV_{{patch_name|upper}}_PARAM_IN_{{param.hash_enum|upper}}); 
+    hv.sendBangToReceiver((uint32_t) HV_{{patch_name|upper}}_PARAM_IN_{{param.hash_enum|upper}});
   {% else %}
-  hv.sendFloatToReceiver((uint32_t) HV_{{patch_name|upper}}_PARAM_IN_{{param.hash_enum|upper}}, {{param.process}}); 
+  hv.sendFloatToReceiver((uint32_t) HV_{{patch_name|upper}}_PARAM_IN_{{param.hash_enum|upper}}, {{param.process}});
   {% endif %}
   {% endfor %}
 }
 
 /** Sends signals from the Daisy hardware to the PD patch via the receive objects during the audio callback
- * 
+ *
  */
 void CallbackWriteIn(Heavy_{{patch_name}}& hv)
 {
   {% for param in callback_write_in %}
-  {% if param.bool %} 
+  {% if param.bool %}
   if ({{param.process}})
-    hv.sendBangToReceiver((uint32_t) HV_{{patch_name|upper}}_PARAM_IN_{{param.hash_enum|upper}}); 
+    hv.sendBangToReceiver((uint32_t) HV_{{patch_name|upper}}_PARAM_IN_{{param.hash_enum|upper}});
   {% else %}
-  hv.sendFloatToReceiver((uint32_t) HV_{{patch_name|upper}}_PARAM_IN_{{param.hash_enum|upper}}, {{param.process}}); 
+  hv.sendFloatToReceiver((uint32_t) HV_{{patch_name|upper}}_PARAM_IN_{{param.hash_enum|upper}}, {{param.process}});
   {% endif %}
   {% endfor %}
 }
 
 /** Writes the values sent to PD's receive objects to the Daisy hardware during the main loop
- * 
+ *
  */
 void LoopWriteOut() {
   {% for param in loop_write_out %}
-  {% if param.bool %} 
+  {% if param.bool %}
   if ({{param.value}})
     {{param.process}}
   {% else %}
@@ -164,11 +181,11 @@ void LoopWriteOut() {
 }
 
 /** Writes the values sent to PD's receive objects to the Daisy hardware during the audio callback
- * 
+ *
  */
 void CallbackWriteOut() {
   {% for param in callback_write_out %}
-  {% if param.bool %} 
+  {% if param.bool %}
   if ({{param.value}})
     {{param.process}}
   {% else %}
@@ -178,7 +195,7 @@ void CallbackWriteOut() {
 }
 
 /** Handles the display code if the hardware defines a display
- * 
+ *
  */
 void Display() {
   {{displayprocess}}
