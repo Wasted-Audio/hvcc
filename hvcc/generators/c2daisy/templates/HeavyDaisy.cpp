@@ -64,10 +64,11 @@ int main(void)
 {
   hardware.Init(true);
   hardware.StartAudio(audiocallback);
+  {% if debug_printing %}
   hardware.som.StartLog();
-
-  hv.setSendHook(sendHook);
   hv.setPrintHook(printHook);
+  {% endif %}
+  hv.setSendHook(sendHook);
 
   for(;;)
   {
@@ -131,7 +132,7 @@ static void printHook(HeavyContextInterface *c, const char *printLabel, const ch
   char *dst = buf;
   int len = strnlen(printLabel, 48);
   dst = stpncpy(dst, printLabel, len);
-  dst = stpncpy(dst, " ", 1);
+  dst = stpcpy(dst, " ");
   dst = stpncpy(dst, msgString, 63-len);
   hardware.som.PrintLine(buf);
 }

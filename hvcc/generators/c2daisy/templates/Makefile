@@ -9,7 +9,11 @@ LDSCRIPT = {{linker_script}}
 {% endif %}
 
 {% if bootloader %}
-C_DEFS += -DBOOT_APP
+APP_TYPE = BOOT_SRAM
+{% endif %}
+
+{% if debug_printing %}
+LDFLAGS += -u _printf_float
 {% endif %}
 
 # Project Source
