@@ -8,8 +8,8 @@ LIBDAISY_DIR = {{libdaisy_path}}
 LDSCRIPT = {{linker_script}}
 {% endif %}
 
-{% if bootloader %}
-APP_TYPE = BOOT_SRAM
+{% if bootloader != '' %}
+APP_TYPE = {{bootloader}}
 {% endif %}
 
 {% if debug_printing %}

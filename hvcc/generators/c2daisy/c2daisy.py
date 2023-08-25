@@ -92,7 +92,7 @@ class c2daisy:
                 makefile_replacements['linker_script'] = daisy_meta["linker_script"]
             depth = daisy_meta.get('libdaisy_depth', 2)
             makefile_replacements['libdaisy_path'] = f'{"../" * depth}libdaisy'
-            makefile_replacements['bootloader'] = daisy_meta.get('bootloader', False)
+            makefile_replacements['bootloader'] = daisy_meta.get('bootloader', '')
             makefile_replacements['debug_printing'] = daisy_meta.get('debug_printing', False)
 
             rendered_makefile = env.get_template('Makefile').render(makefile_replacements)
