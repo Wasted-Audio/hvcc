@@ -55,9 +55,11 @@ static void hvSendHookFunc(HeavyContextInterface *c, const char *sendName, uint3
   {{class_name}}* plugin = ({{class_name}}*)c->getUserData();
   if (plugin != nullptr)
   {
+{%- if meta.midi_output is defined and meta.midi_output == 1 %}
 #if DISTRHO_PLUGIN_WANT_MIDI_OUTPUT
     plugin->handleMidiSend(sendHash, m);
 #endif
+{% endif %}
   }
 }
 
@@ -214,7 +216,7 @@ void {{class_name}}::setParameterValue(uint32_t index, float value)
 
 {%- if meta.midi_output is defined and meta.midi_output == 1 %}
 #if DISTRHO_PLUGIN_WANT_MIDI_OUTPUT
-{% include 'HeavyDPF_MIDI_Input.cpp' %}
+{% include 'HeavyDPF_MIDI_Output.cpp' %}
 #endif
 {% endif %}
 
