@@ -317,7 +317,7 @@ void HandleMidiSend(uint32_t sendHash, const HvMessage *m)
       }
       else
       {
-        printf("> we do not support sysex yet \n");
+        // we do not support sysex yet
         break;
       }
 
