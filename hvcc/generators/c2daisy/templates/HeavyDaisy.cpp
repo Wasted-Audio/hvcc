@@ -38,6 +38,7 @@ Heavy_{{patch_name}} hv(SAMPLE_RATE);
 
 void audiocallback(daisy::AudioHandle::InputBuffer in, daisy::AudioHandle::OutputBuffer out, size_t size);
 static void sendHook(HeavyContextInterface *c, const char *receiverName, uint32_t receiverHash, const HvMessage * m);
+static void printHook(HeavyContextInterface *c, const char *printLabel, const char *msgString, const HvMessage *m);
 void CallbackWriteIn(Heavy_{{patch_name}}& hv);
 void LoopWriteIn(Heavy_{{patch_name}}& hv);
 void CallbackWriteOut();
@@ -152,7 +153,10 @@ int main(void)
   hardware.midiusb.StartReceive();
 
   hardware.StartAudio(audiocallback);
-
+  {% if debug_printing %}
+  hardware.som.StartLog();
+  hv.setPrintHook(printHook);
+  {% endif %}
   hv.setSendHook(sendHook);
 
   for(;;)
@@ -337,6 +341,22 @@ static void sendHook(HeavyContextInterface *c, const char *receiverName, uint32_
 
   HandleMidiSend(receiverHash, m);
 }
+
+{% if debug_printing %}
+/** Receives messages from the PD [print] object and writes them to the serial console.
+ *
+ */
+static void printHook(HeavyContextInterface *c, const char *printLabel, const char *msgString, const HvMessage *m)
+{
+  char buf[64];
+  char *dst = buf;
+  int len = strnlen(printLabel, 48);
+  dst = stpncpy(dst, printLabel, len);
+  dst = stpcpy(dst, " ");
+  dst = stpncpy(dst, msgString, 63-len);
+  hardware.som.PrintLine(buf);
+}
+{% endif %}
 
 /** Sends signals from the Daisy hardware to the PD patch via the receive objects during the main loop
  *
