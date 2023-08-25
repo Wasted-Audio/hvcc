@@ -6,6 +6,7 @@ CHANGELOG
 
 * DPF: enumerated parameters
 * DPF: special `__hv_dpf_bpm` receiver of transport BPM value
+* DPF bugfixes: broken midi template include; MIDI_RT_CLOCK fails under certain conditions
 * Pdext: migrate to `pd-lib-builder` and newer `m_pd.h` and add some initial documentation.
 * deprecated: Fabric generator - no longer supported
 * docs: updates on missing objects and limitations
