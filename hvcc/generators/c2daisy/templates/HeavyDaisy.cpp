@@ -6,6 +6,7 @@
 
 #define SAMPLE_RATE 48000.f
 
+{% if has_midi %}
 #define HV_HASH_NOTEIN          0x67E37CA3
 #define HV_HASH_CTLIN           0x41BE0f9C
 #define HV_HASH_PGMIN           0x2E1EA03D
@@ -28,7 +29,7 @@
 #define MIDI_RT_STOP            0xFC
 #define MIDI_RT_ACTIVESENSE     0xFE
 #define MIDI_RT_RESET           0xFF
-
+{% endif %}
 
 using namespace daisy;
 
@@ -84,6 +85,7 @@ DaisyHvParamOut DaisyOutputParameters[DaisyNumOutputParameters] = {
 };
 {% endif %}
 
+{% if has_midi %}
 // Typical Switch case for Message Type.
 void HandleMidiMessage(MidiEvent m)
 {
@@ -140,10 +142,12 @@ void HandleMidiMessage(MidiEvent m)
     default: break;
   }
 }
+{% endif %}
 
 int main(void)
 {
   hardware.Init(true);
+  {% if has_midi %}
   MidiUartHandler::Config midi_config;
   hardware.midi.Init(midi_config);
   hardware.midi.StartReceive();
@@ -151,6 +155,7 @@ int main(void)
   MidiUsbHandler::Config midiusb_config;
   hardware.midiusb.Init(midiusb_config);
   hardware.midiusb.StartReceive();
+  {% endif %}
 
   hardware.StartAudio(audiocallback);
   {% if debug_printing %}
@@ -162,6 +167,7 @@ int main(void)
   for(;;)
   {
     hardware.LoopProcess();
+    {% if has_midi %}
     hardware.midi.Listen();
     hardware.midiusb.Listen();
     while(hardware.midi.HasEvents())
@@ -172,6 +178,7 @@ int main(void)
     {
       HandleMidiMessage(hardware.midiusb.PopEvent());
     }
+    {% endif %}
     Display();
     {% if loop_write_in|length > 0 %}
     LoopWriteIn(hv);
@@ -206,7 +213,7 @@ void audiocallback(daisy::AudioHandle::InputBuffer in, daisy::AudioHandle::Outpu
   hardware.PostProcess();
 }
 
-
+{% if has_midi %}
 void HandleMidiSend(uint32_t sendHash, const HvMessage *m)
 {
   switch(sendHash){
@@ -322,6 +329,7 @@ void HandleMidiSend(uint32_t sendHash, const HvMessage *m)
       break;
   }
 }
+{% endif %}
 
 
 /** Receives messages from PD and writes them to the appropriate
@@ -338,8 +346,9 @@ static void sendHook(HeavyContextInterface *c, const char *receiverName, uint32_
     }
   }
   {% endif %}
-
+  {% if has_midi %}
   HandleMidiSend(receiverHash, m);
+  {% endif %}
 }
 
 {% if debug_printing %}
