@@ -123,6 +123,7 @@ static void sendHook(HeavyContextInterface *c, const char *receiverName, uint32_
   {% endif %}
 }
 
+{% if debug_printing %}
 /** Receives messages from the PD [print] object and writes them to the serial console.
  *
  */
@@ -136,6 +137,7 @@ static void printHook(HeavyContextInterface *c, const char *printLabel, const ch
   dst = stpncpy(dst, msgString, 63-len);
   hardware.som.PrintLine(buf);
 }
+{% endif %}
 
 /** Sends signals from the Daisy hardware to the PD patch via the receive objects during the main loop
  *
