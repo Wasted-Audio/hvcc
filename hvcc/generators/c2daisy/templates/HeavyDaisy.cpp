@@ -151,10 +151,11 @@ int main(void)
   MidiUartHandler::Config midi_config;
   hardware.midi.Init(midi_config);
   hardware.midi.StartReceive();
-
+    {% if not debug_printing %}
   MidiUsbHandler::Config midiusb_config;
   hardware.midiusb.Init(midiusb_config);
   hardware.midiusb.StartReceive();
+    {% endif %}
   {% endif %}
 
   hardware.StartAudio(audiocallback);
@@ -169,15 +170,17 @@ int main(void)
     hardware.LoopProcess();
     {% if has_midi %}
     hardware.midi.Listen();
-    hardware.midiusb.Listen();
     while(hardware.midi.HasEvents())
     {
       HandleMidiMessage(hardware.midi.PopEvent());
     }
+      {% if not debug_printing %}
+    hardware.midiusb.Listen();
     while(hardware.midiusb.HasEvents())
     {
       HandleMidiMessage(hardware.midiusb.PopEvent());
     }
+      {% endif %}
     {% endif %}
     Display();
     {% if loop_write_in|length > 0 %}
