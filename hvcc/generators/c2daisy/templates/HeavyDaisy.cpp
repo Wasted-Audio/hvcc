@@ -6,7 +6,7 @@
 
 #define SAMPLE_RATE 48000.f
 
-{% if has_midi %}
+{% if has_midi or usb_midi %}
 #define HV_HASH_NOTEIN          0x67E37CA3
 #define HV_HASH_CTLIN           0x41BE0f9C
 #define HV_HASH_PGMIN           0x2E1EA03D
@@ -39,7 +39,13 @@ Heavy_{{patch_name}} hv(SAMPLE_RATE);
 
 void audiocallback(daisy::AudioHandle::InputBuffer in, daisy::AudioHandle::OutputBuffer out, size_t size);
 static void sendHook(HeavyContextInterface *c, const char *receiverName, uint32_t receiverHash, const HvMessage * m);
+{% if debug_printing %}
 static void printHook(HeavyContextInterface *c, const char *printLabel, const char *msgString, const HvMessage *m);
+/** FIFO to hold messages as we're ready to print them */
+FIFO<FixedCapStr<64>, 64> event_log;
+{% elif usb_midi %}
+daisy::MidiUsbHandler midiusb;
+{% endif %}
 void CallbackWriteIn(Heavy_{{patch_name}}& hv);
 void LoopWriteIn(Heavy_{{patch_name}}& hv);
 void CallbackWriteOut();
@@ -85,7 +91,7 @@ DaisyHvParamOut DaisyOutputParameters[DaisyNumOutputParameters] = {
 };
 {% endif %}
 
-{% if has_midi %}
+{% if has_midi or usb_midi %}
 // Typical Switch case for Message Type.
 void HandleMidiMessage(MidiEvent m)
 {
@@ -151,32 +157,42 @@ int main(void)
   MidiUartHandler::Config midi_config;
   hardware.midi.Init(midi_config);
   hardware.midi.StartReceive();
-
+  {% endif %}
+  {% if not debug_printing and usb_midi %}
   MidiUsbHandler::Config midiusb_config;
-  hardware.midiusb.Init(midiusb_config);
-  hardware.midiusb.StartReceive();
+  midiusb.Init(midiusb_config);
+  midiusb.StartReceive();
   {% endif %}
 
   hardware.StartAudio(audiocallback);
   {% if debug_printing %}
   hardware.som.StartLog();
   hv.setPrintHook(printHook);
+
+  uint32_t now      = System::GetNow();
+  uint32_t log_time = System::GetNow();
   {% endif %}
   hv.setSendHook(sendHook);
 
   for(;;)
   {
+    {% if debug_printing %}
+    now = System::GetNow();
+    {% endif %}
+
     hardware.LoopProcess();
     {% if has_midi %}
     hardware.midi.Listen();
-    hardware.midiusb.Listen();
     while(hardware.midi.HasEvents())
     {
       HandleMidiMessage(hardware.midi.PopEvent());
     }
-    while(hardware.midiusb.HasEvents())
+    {% endif %}
+    {% if not debug_printing and usb_midi %}
+    midiusb.Listen();
+    while(midiusb.HasEvents())
     {
-      HandleMidiMessage(hardware.midiusb.PopEvent());
+      HandleMidiMessage(midiusb.PopEvent());
     }
     {% endif %}
     Display();
@@ -185,6 +201,19 @@ int main(void)
     {% endif %}
     {% if  output_parameters|length > 0 %}
     LoopWriteOut();
+    {% endif %}
+
+    {% if debug_printing %}
+    /** Now separately, every 5ms we'll print the top message in our queue if there is one */
+    if(now - log_time > 5)
+    {
+      log_time = now;
+      if(!event_log.IsEmpty())
+      {
+        auto msg = event_log.PopFront();
+        hardware.som.PrintLine(msg);
+      }
+    }
     {% endif %}
   }
 }
@@ -213,7 +242,17 @@ void audiocallback(daisy::AudioHandle::InputBuffer in, daisy::AudioHandle::Outpu
   hardware.PostProcess();
 }
 
-{% if has_midi %}
+{% if has_midi or usb_midi %}
+void HandleMidiOut(uint8_t *midiData, const uint8_t numElements)
+{
+  {% if has_midi %}
+  hardware.midi.SendMessage(midiData, numElements);
+  {% endif %}
+  {% if not debug_printing and usb_midi %}
+  midiusb.SendMessage(midiData, numElements);
+  {% endif %}
+}
+
 void HandleMidiSend(uint32_t sendHash, const HvMessage *m)
 {
   switch(sendHash){
@@ -235,8 +274,7 @@ void HandleMidiSend(uint32_t sendHash, const HvMessage *m)
       midiData[1] = note;
       midiData[2] = velocity;
 
-      hardware.midi.SendMessage(midiData, numElements);
-      hardware.midiusb.SendMessage(midiData, numElements);
+      HandleMidiOut(midiData, numElements);
       break;
     }
     case HV_HASH_CTLOUT:
@@ -252,8 +290,7 @@ void HandleMidiSend(uint32_t sendHash, const HvMessage *m)
       midiData[1] = cc;
       midiData[2] = value;
 
-      hardware.midi.SendMessage(midiData, numElements);
-      hardware.midiusb.SendMessage(midiData, numElements);
+      HandleMidiOut(midiData, numElements);
       break;
     }
     case HV_HASH_PGMOUT:
@@ -267,8 +304,7 @@ void HandleMidiSend(uint32_t sendHash, const HvMessage *m)
       midiData[0] = 0xC0 | ch; // send Program Change
       midiData[1] = pgm;
 
-      hardware.midi.SendMessage(midiData, numElements);
-      hardware.midiusb.SendMessage(midiData, numElements);
+      HandleMidiOut(midiData, numElements);
       break;
     }
     case HV_HASH_TOUCHOUT:
@@ -282,8 +318,7 @@ void HandleMidiSend(uint32_t sendHash, const HvMessage *m)
       midiData[0] = 0xD0 | ch; // send Touch
       midiData[1] = value;
 
-      hardware.midi.SendMessage(midiData, numElements);
-      hardware.midiusb.SendMessage(midiData, numElements);
+      HandleMidiOut(midiData, numElements);
       break;
     }
     case HV_HASH_BENDOUT:
@@ -300,8 +335,7 @@ void HandleMidiSend(uint32_t sendHash, const HvMessage *m)
       midiData[1] = lsb;
       midiData[2] = msb;
 
-      hardware.midi.SendMessage(midiData, numElements);
-      hardware.midiusb.SendMessage(midiData, numElements);
+      HandleMidiOut(midiData, numElements);
       break;
     }
     case HV_HASH_MIDIOUT: // __hv_midiout
@@ -321,8 +355,7 @@ void HandleMidiSend(uint32_t sendHash, const HvMessage *m)
         break;
       }
 
-      hardware.midi.SendMessage(midiData, numElements);
-      hardware.midiusb.SendMessage(midiData, numElements);
+      HandleMidiOut(midiData, numElements);
       break;
     }
     default:
@@ -346,7 +379,7 @@ static void sendHook(HeavyContextInterface *c, const char *receiverName, uint32_
     }
   }
   {% endif %}
-  {% if has_midi %}
+  {% if has_midi or usb_midi %}
   HandleMidiSend(receiverHash, m);
   {% endif %}
 }
@@ -363,7 +396,9 @@ static void printHook(HeavyContextInterface *c, const char *printLabel, const ch
   dst = stpncpy(dst, printLabel, len);
   dst = stpcpy(dst, " ");
   dst = stpncpy(dst, msgString, 63-len);
-  hardware.som.PrintLine(buf);
+
+  /** Regardless of message, let's add the message data to our queue to output */
+  event_log.PushBack(buf);
 }
 {% endif %}
 
