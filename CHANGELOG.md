@@ -4,8 +4,10 @@ CHANGELOG
 Next Release
 -----
 
-* Daisy: allow for debug printing (off by default, increases program size due to formatting)
 * Daisy: set bootloader type in Makefile
+* Daisy: MIDI i/o for NoteOn/Off, ControlChange, ProgramChange, ChannelPressure, and PitchBend
+* Daisy: USB MIDI toggle (disabled by debug printing)
+* Daisy: allow for debug printing (off by default, increases program size due to formatting)
 * DPF bugfixes: broken midi template include; MIDI_RT_CLOCK fails under certain conditions
 
 0.8.0

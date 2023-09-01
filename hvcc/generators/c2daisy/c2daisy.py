@@ -11,6 +11,16 @@ from ..copyright import copyright_manager
 from . import parameters
 
 
+hv_midi_messages = {
+    "__hv_noteout",
+    "__hv_ctlout",
+    "__hv_pgmout",
+    "__hv_touchout",
+    "__hv_bendout",
+    "__hv_midiout"
+}
+
+
 class c2daisy:
     """ Generates a Daisy wrapper for a given patch.
     """
@@ -63,6 +73,10 @@ class c2daisy:
             else:
                 header, board_info = json2daisy.generate_header_from_name(board)
 
+            # remove heavy out params from externs
+            externs['parameters']['out'] = [
+                t for t in externs['parameters']['out'] if not any(x == y for x in hv_midi_messages for y in t)]
+
             component_glue = parameters.parse_parameters(
                 externs['parameters'], board_info['components'], board_info['aliases'], 'hardware')
             component_glue['class_name'] = board_info['name']
@@ -71,6 +85,8 @@ class c2daisy:
             component_glue['max_channels'] = board_info['channels']
             component_glue['num_output_channels'] = num_output_channels
             component_glue['debug_printing'] = daisy_meta.get('debug_printing', False)
+            component_glue['usb_midi'] = daisy_meta.get('usb_midi', False)
+            component_glue['has_midi'] = board_info['has_midi']
 
             component_glue['copyright'] = copyright_c
 
