@@ -1,6 +1,11 @@
 {{copyright}}
 
+#if _MSC_VER || _WIN32 || _WIN64
+#include <malloc.h>
+#else
 #include <alloca.h>
+#endif
+
 #include <string.h>
 #include "m_pd.h"
 #include "Heavy_{{name}}.h"
