@@ -1,6 +1,6 @@
 {{copyright}}
 
-#if _MSC_VER || __MINGW32__
+#if _MSC_VER || _WIN32 || _WIN64
 #include <malloc.h>
 #else
 #include <alloca.h>
