@@ -1,6 +1,11 @@
 {{copyright}}
 
+#if _MSC_VER || __MINGW32__
+#include <malloc.h>
+#else
 #include <alloca.h>
+#endif
+
 #include <string.h>
 #include "m_pd.h"
 #include "Heavy_{{name}}.h"
