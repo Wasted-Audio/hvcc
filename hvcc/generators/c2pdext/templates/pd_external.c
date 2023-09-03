@@ -2,8 +2,10 @@
 
 #if _MSC_VER || _WIN32 || _WIN64
 #include <malloc.h>
+#define EXPORT __declspec(dllexport) extern
 #else
 #include <alloca.h>
+#define EXPORT extern
 #endif
 
 #include <string.h>
@@ -145,7 +147,7 @@ static void {{struct_name}}_onMessage(t_{{struct_name}} *x, t_symbol *s0, int ar
   hv_sendMessageToReceiver(x->hv, hv_stringToHash(s0->s_name), 0.0, msg);
 }
 
-void {{struct_name}}_setup() {
+EXPORT void {{struct_name}}_setup() {
   {{struct_name}}_class = class_new(gensym("{{display_name}}"),
       (t_newmethod) {{struct_name}}_new,
       (t_method) {{struct_name}}_free,
