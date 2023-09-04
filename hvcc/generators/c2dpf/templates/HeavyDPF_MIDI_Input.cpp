@@ -48,10 +48,15 @@ void {{class_name}}::handleMidiInput(uint32_t frames, const MidiEvent* midiEvent
     double sampleAtCycleStart = this->sampleAtCycleStart;
     double sampleAtCycleEnd = sampleAtCycleStart + frames;
 
-    while (nextClockTick < sampleAtCycleEnd) {
-      _context->sendMessageToReceiverV(HV_HASH_MIDIREALTIMEIN, 1000*(nextClockTick - sampleAtCycleStart)/getSampleRate(),
-        "ff", (float) MIDI_RT_CLOCK);
-      nextClockTick += samplesPerTick;
+    if (nextClockTick >= 0 && sampleAtCycleStart >= 0 && sampleAtCycleEnd > sampleAtCycleStart) {
+      while (nextClockTick < sampleAtCycleEnd) {
+        double delayMs = 1000*(nextClockTick - sampleAtCycleStart)/getSampleRate();
+        if (delayMs >= 0.0) {
+          _context->sendMessageToReceiverV(HV_HASH_MIDIREALTIMEIN, delayMs,
+            "ff", (float) MIDI_RT_CLOCK);
+        }
+        nextClockTick += samplesPerTick;
+      }
     }
 
     /* save variables for next cycle */

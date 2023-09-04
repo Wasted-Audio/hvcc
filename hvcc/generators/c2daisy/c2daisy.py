@@ -11,6 +11,16 @@ from ..copyright import copyright_manager
 from . import parameters
 
 
+hv_midi_messages = {
+    "__hv_noteout",
+    "__hv_ctlout",
+    "__hv_pgmout",
+    "__hv_touchout",
+    "__hv_bendout",
+    "__hv_midiout"
+}
+
+
 class c2daisy:
     """ Generates a Daisy wrapper for a given patch.
     """
@@ -63,6 +73,10 @@ class c2daisy:
             else:
                 header, board_info = json2daisy.generate_header_from_name(board)
 
+            # remove heavy out params from externs
+            externs['parameters']['out'] = [
+                t for t in externs['parameters']['out'] if not any(x == y for x in hv_midi_messages for y in t)]
+
             component_glue = parameters.parse_parameters(
                 externs['parameters'], board_info['components'], board_info['aliases'], 'hardware')
             component_glue['class_name'] = board_info['name']
@@ -70,6 +84,9 @@ class c2daisy:
             component_glue['header'] = f"HeavyDaisy_{patch_name}.hpp"
             component_glue['max_channels'] = board_info['channels']
             component_glue['num_output_channels'] = num_output_channels
+            component_glue['debug_printing'] = daisy_meta.get('debug_printing', False)
+            component_glue['usb_midi'] = daisy_meta.get('usb_midi', False)
+            component_glue['has_midi'] = board_info['has_midi']
 
             component_glue['copyright'] = copyright_c
 
@@ -82,16 +99,17 @@ class c2daisy:
             daisy_cpp_path = os.path.join(source_dir, f"HeavyDaisy_{patch_name}.cpp")
 
             rendered_cpp = env.get_template('HeavyDaisy.cpp').render(component_glue)
-            with open(daisy_cpp_path, 'w') as file:
-                file.write(rendered_cpp)
+            with open(daisy_cpp_path, 'w') as f:
+                f.write(rendered_cpp)
 
             makefile_replacements = {'name': patch_name}
             makefile_replacements['linker_script'] = daisy_meta.get('linker_script', '')
             if makefile_replacements['linker_script'] != '':
-                makefile_replacements['linker_script'] = f'../{daisy_meta["linker_script"]}'
+                makefile_replacements['linker_script'] = daisy_meta["linker_script"]
             depth = daisy_meta.get('libdaisy_depth', 2)
             makefile_replacements['libdaisy_path'] = f'{"../" * depth}libdaisy'
-            makefile_replacements['bootloader'] = daisy_meta.get('bootloader', False)
+            makefile_replacements['bootloader'] = daisy_meta.get('bootloader', '')
+            makefile_replacements['debug_printing'] = daisy_meta.get('debug_printing', False)
 
             rendered_makefile = env.get_template('Makefile').render(makefile_replacements)
             with open(os.path.join(source_dir, "Makefile"), "w") as f:
