@@ -9,6 +9,7 @@ Next Release
 * Daisy: USB MIDI toggle (disabled by debug printing)
 * Daisy: allow for debug printing (off by default, increases program size due to formatting)
 * DPF bugfixes: broken midi template include; MIDI_RT_CLOCK fails under certain conditions
+* Pdext bugfixes: Windows library linking
 
 0.8.0
 -----
