@@ -1,7 +1,7 @@
 CHANGELOG
 =====
 
-Next Release
+0.9.0
 -----
 
 * Daisy: set bootloader type in Makefile
