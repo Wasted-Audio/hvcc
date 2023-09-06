@@ -1,0 +1,6 @@
+#N canvas 502 0 450 300 12;
+#X obj 99 115 r __hv_bang~;
+#X obj 99 140 outlet;
+#X obj 99 71 inlet;
+#X text 151 69 inlet is inactive;
+#X connect 0 0 1 0;

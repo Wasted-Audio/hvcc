@@ -161,6 +161,8 @@ void Heavy_{{name}}::{{x}}
  */
 
 int Heavy_{{name}}::process(float **inputBuffers, float **outputBuffers, int n) {
+  sendBangToReceiver(0xDD21C0EB); // send to __hv_bang~
+
   while (hLp_hasData(&inQueue)) {
     hv_uint32_t numBytes = 0;
     ReceiverMessagePair *p = reinterpret_cast<ReceiverMessagePair *>(hLp_getReadBuffer(&inQueue, &numBytes));
