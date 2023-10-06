@@ -21,7 +21,7 @@ from typing import Dict, Optional
 
 from ..copyright import copyright_manager
 from ..filters import filter_uniqueid
-
+from ..types.meta import Meta, DPF
 
 class c2dpf:
     """ Generates a DPF wrapper for a given patch.
@@ -34,7 +34,7 @@ class c2dpf:
         out_dir: str,
         externs: Dict,
         patch_name: Optional[str] = None,
-        patch_meta: Optional[Dict] = None,
+        patch_meta: Meta = Meta(name=None, dpf=None),
         num_input_channels: int = 0,
         num_output_channels: int = 0,
         copyright: Optional[str] = None,
@@ -46,13 +46,8 @@ class c2dpf:
         out_dir = os.path.join(out_dir, "plugin")
         receiver_list = externs['parameters']['in']
 
-        if patch_meta:
-            patch_name = patch_meta.get("name", patch_name)
-            dpf_meta = patch_meta.get("dpf", {})
-        else:
-            dpf_meta = {}
-
-        dpf_path = dpf_meta.get('dpf_path', '')
+        dpf_meta = patch_meta.dpf
+        dpf_path = dpf_meta.dpf_path  # type: ignore
 
         copyright_c = copyright_manager.get_copyright_for_c(copyright)
 
@@ -99,7 +94,7 @@ class c2dpf:
                     receivers=receiver_list,
                     pool_sizes_kb=externs["memoryPoolSizesKb"],
                     copyright=copyright_c))
-            if dpf_meta.get("enable_ui"):
+            if dpf_meta.enable_ui:
                 dpf_ui_path = os.path.join(source_dir, f"HeavyDPF_{patch_name}_UI.cpp")
                 with open(dpf_ui_path, "w") as f:
                     f.write(env.get_template("HeavyDPF_UI.cpp").render(
