@@ -10,8 +10,8 @@ void {{class_name}}::initAudioPort(bool input, uint32_t index, AudioPort& port)
   {%- for group, gConfig in meta.port_groups.input.items() %}
     {%- for port, value in gConfig.items() %}
       case {{value}}:
-        port.name    = "Output {{port}} ({{group}})";
-        port.symbol  = "out_{{port|lower}}_{{group|lower}}";
+        port.name    = "Input {{port}} ({{group}})";
+        port.symbol  = "in_{{port|lower}}_{{group|lower}}";
         port.groupId = kPortGroup{{group}};
         break;
     {%- endfor %}
