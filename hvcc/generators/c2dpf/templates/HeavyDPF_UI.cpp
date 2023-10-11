@@ -116,6 +116,8 @@ protected:
         {%- else %}
             {%- if v.attributes.type == 'bool': %}
             if (ImGui::Toggle("{{v.display.replace('_', ' ')}}", &f{{v_display}}))
+            {%- elif v.attributes.type == 'int' %}
+            if (ImGui::SliderInt("{{v.display.replace('_', ' ')}}", &f{{v_display}}, {{v.attributes.min}}f, {{v.attributes.max}}f))
             {%- else %}
             if (ImGui::SliderFloat("{{v.display.replace('_', ' ')}}", &f{{v_display}}, {{v.attributes.min}}f, {{v.attributes.max}}f))
             {%- endif %}
