@@ -42,8 +42,12 @@ public:
   {{class_name}}();
   ~{{class_name}}() override;
 
+{%- if meta.midi_input is defined and meta.midi_input == 1 %}
   void handleMidiInput(uint32_t frames, const MidiEvent* midiEvents, uint32_t midiEventCount);
+{% endif %}
+{%- if meta.midi_output is defined and meta.midi_output == 1 %}
   void handleMidiSend(uint32_t sendHash, const HvMessage *m);
+{% endif %}
 
 protected:
   // -------------------------------------------------------------------
@@ -104,8 +108,10 @@ protected:
   // Init
 
   void initParameter(uint32_t index, Parameter& parameter) override;
-  {% if meta.port_groups is defined %}
+  {% if meta.port_groups is defined or meta.cv is defined %}
   void initAudioPort(bool input, uint32_t index, AudioPort& port) override;
+  {%- endif %}
+  {% if meta.port_groups is defined %}
   void initPortGroup(uint32_t groupId, PortGroup& portGroup) override;
   {%- endif %}
 
