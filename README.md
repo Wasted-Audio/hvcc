@@ -14,7 +14,7 @@ It has since then been expanded to provide further support for many different pl
 
 ## Requirements
 
-* python 3.7 or higher
+* python 3.8 or higher
   * `jinja2` (for generator templating)
   * `importlib_resources` (for reading static resources)
   * `json2daisy` (for daisy integration)
