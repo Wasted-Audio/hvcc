@@ -201,7 +201,10 @@
 // Export and Inline
 #if HV_WIN
 #define HV_EXPORT __declspec(dllexport)
+#if !defined(__cplusplus)
+// ech: MSVC raises C1189 with the following message - the C++ Standard Library forbids macroizing the keyword "inline".
 #define inline __inline
+#endif
 #define HV_FORCE_INLINE __forceinline
 #else
 #define HV_EXPORT
