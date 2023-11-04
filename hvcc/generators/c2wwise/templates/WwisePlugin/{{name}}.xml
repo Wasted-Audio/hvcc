@@ -2,7 +2,7 @@
 {{copyright}}
 <PluginModule>
 {%- if plugin_type == "Source" %}
-  <SourcePlugin Name="{{name}}" CompanyID="64" PluginID="{{plugin_id}}" EngineDllName="Hv_{{name}}_Wwise{{plugin_type}}Plugin">
+  <SourcePlugin Name="{{name}}" CompanyID="64" PluginID="{{plugin_id}}" EngineDllName="{{name}}">
     <PluginInfo CanUnlink="true">
       <PlatformSupport>
         {% if tables|length > 0 -%}
@@ -59,7 +59,7 @@
     {%- endif %}
   </SourcePlugin>
 {%- elif plugin_type == "FX" %}
-  <EffectPlugin Name="{{name}}" CompanyID="64" PluginID="{{plugin_id}}" EngineDllName="HV_{{name}}_Wwise{{plugin_type}}Plugin">
+  <EffectPlugin Name="{{name}}" CompanyID="64" PluginID="{{plugin_id}}" EngineDllName="{{name}}">
     <PluginInfo>
       <PlatformSupport>
         <Platform Name="iOS">
