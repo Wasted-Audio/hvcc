@@ -1,4 +1,4 @@
-{%- set register_send_hook = sends|length > 0 or out_events|length > 0 -%}
+{%- set register_send_hook = out_params|length > 0 or out_events|length > 0 -%}
 {{copyright}}
 
 #include "{{name}}{{plugin_type}}.h"
@@ -80,12 +80,14 @@ namespace {{name}}_Private
         in_pCtx->GlobalContext()->SetRTPCValue(RtpcID, in_fValue, ObjectID, 0, AkCurveInterpolation_Linear, false);
     }
 
+{% if out_events|length > 0 %}
     static void PostOutEvent({{name}}{{plugin_type}}* in_pPlugin, const char* in_szEventName, const uint32_t& in_uNameLen)
     {
         AK::FNVHash32 HashFunc;
         const uint32_t EventID = HashFunc.Compute(in_szEventName, sizeof(char) * in_uNameLen);
         in_pPlugin->m_EventQueue.Enqueue(EventID);
     }
+{% endif %}
 
     static void OnHeavyPrint(HeavyContextInterface* in_pHeavyCtx, const char* in_szPrintName, const char* in_szMessage, const HvMessage* in_pHvMessage)
     {
@@ -100,7 +102,7 @@ namespace {{name}}_Private
         {
             switch (in_uSendHash)
             {
-            {%- for k, v in sends %}
+            {%- for k, v in out_params %}
             case {{v.hash}}: SetOutRTPC(pPlugin->m_pWwiseCtx, "{{k|lower}}", {{k|length}}, hv_msg_getFloat(in_pHvMessage, 0)); break;
             {%- endfor %}
             {%- for k, v in out_events %}
@@ -206,8 +208,8 @@ AKRESULT {{name}}{{plugin_type}}::Term(AK::IAkPluginMemAlloc* in_pAllocator)
         // the queue must be empty before termination
     }
     m_EventQueue.Term();
-{% endif %}
     m_pWwiseCtx->GlobalContext()->UnregisterGlobalCallback(OnGlobalCallback, AkGlobalCallbackLocation_BeginRender);
+{% endif %}
     AK_PLUGIN_DELETE(in_pAllocator, m_pHeavyCtx);
     AK_PLUGIN_DELETE(in_pAllocator, this);
     return AK_Success;
@@ -249,6 +251,7 @@ void {{name}}{{plugin_type}}::Execute(AkAudioBuffer* io_pBuffer)
     float *pBuffer = (float *) io_pBuffer->GetChannel(0);
 {% if is_source %}
     m_pHeavyCtx->processInline(nullptr, pBuffer, numFramesToProcess);
+    io_pBuffer->eState = AK_DataReady;
 {% else %}
     // Check for channel configuration mismatch
     if (io_pBuffer->NumChannels() == 1 &&
@@ -262,10 +265,12 @@ void {{name}}{{plugin_type}}::Execute(AkAudioBuffer* io_pBuffer)
         m_pHeavyCtx->processInline(pBuffer, pBuffer, numFramesToProcess);
     }
 {% endif %}
+{% if has_audio_output %}
     io_pBuffer->uValidFrames = numFramesToProcess;
-{% if is_source -%}
-    io_pBuffer->eState = AK_DataReady;
-{%- endif %}
+{% else %}
+    // Edge case - a control-only plugin was built, outputting silence
+    io_pBuffer->ZeroPadToMaxFrames();
+{% endif %}
     AK_PERF_RECORDING_STOP("{{name}}{{plugin_type}}", 25, 30);
 }
 

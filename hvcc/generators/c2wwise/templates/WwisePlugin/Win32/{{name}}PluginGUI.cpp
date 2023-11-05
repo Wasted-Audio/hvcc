@@ -26,12 +26,14 @@ namespace {{name}}_Private
     };
 }
 
-{{name}}PluginGUI::{{name}}PluginGUI() :
-    m_hwndPropView(nullptr),
-    m_hwndObjPane(nullptr),
-    m_uiBigDialogID(IDD_HV_{{name|upper}}_PLUGIN_BIG),
-    m_uiSmallDialogID(IDD_HV_{{name|upper}}_PLUGIN_SMALL),
-    m_iScrollPos(0)
+{{name}}PluginGUI::{{name}}PluginGUI()
+    : m_hwndPropView(nullptr)
+    , m_hwndObjPane(nullptr)
+    , m_uiBigDialogID(IDD_HV_{{name|upper}}_PLUGIN_BIG)
+    , m_uiSmallDialogID(IDD_HV_{{name|upper}}_PLUGIN_SMALL)
+{%- if (parameters|length + sends|length + tables|length) > 10 %}
+    , m_iScrollPos(0)
+{% endif -%}
 {
 }
 

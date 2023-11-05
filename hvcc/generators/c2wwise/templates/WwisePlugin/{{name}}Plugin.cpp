@@ -20,12 +20,12 @@ bool {{name}}Plugin::GetBankParameters(const GUID & in_guidPlatform, AK::Wwise::
     return true;
 }
 
-void AmazingPatchPlugin::NotifyPluginMediaChanged()
+void {{name}}Plugin::NotifyPluginMediaChanged()
 {
     m_host.NotifyInternalDataChanged(AK::IAkPluginParam::ALL_PLUGIN_DATA_ID, true);
 }
 
-AK::Wwise::Plugin::ConversionResult AmazingPatchPlugin::ConvertFile(
+AK::Wwise::Plugin::ConversionResult {{name}}Plugin::ConvertFile(
     const GUID& in_guidPlatform,
     const BasePlatformID& in_basePlatform,
     const AkOSChar* in_szSourceFile,
@@ -56,7 +56,7 @@ AK::Wwise::Plugin::ConversionResult AmazingPatchPlugin::ConvertFile(
     return AK::Wwise::Plugin::ConversionSuccess;
 }
 
-uint32_t AmazingPatchPlugin::GetCurrentConversionSettingsHash(
+uint32_t {{name}}Plugin::GetCurrentConversionSettingsHash(
     const GUID& in_guidPlatform,
     AkUInt32 in_uSampleRate,
     AkUInt32 in_uBlockLength) const

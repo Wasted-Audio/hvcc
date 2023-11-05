@@ -96,12 +96,13 @@ class c2wwise:
                     g.write(env.get_template(f).render(
                         name=patch_name,
                         parameters=in_parameter_list,
-                        sends=out_parameter_list,
+                        out_params=out_parameter_list,
                         out_events=out_event_list,
                         events=event_list,
                         tables=table_list,
                         pool_sizes_kb=externs["memoryPoolSizesKb"],
                         is_source=is_source_plugin,
+                        has_audio_outputs=num_output_channels > 0,
                         plugin_type=plugin_type,
                         plugin_id=plugin_id,
                         copyright=copyright_xml if file_name.endswith(".xml") else copyright_c))

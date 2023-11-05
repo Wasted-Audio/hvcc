@@ -6,8 +6,10 @@
 
 {{name}}{{plugin_type}}Params::{{name}}{{plugin_type}}Params(const {{name}}{{plugin_type}}Params& in_rParams)
 {
+{% if parameters|length > 0 %}
     RTPC = in_rParams.RTPC;
     m_paramChangeHandler.SetAllParamChanges();
+{% endif %}
 }
 
 AK::IAkPluginParam* {{name}}{{plugin_type}}Params::Clone(AK::IAkPluginMemAlloc* in_pAllocator)
@@ -19,10 +21,12 @@ AKRESULT {{name}}{{plugin_type}}Params::Init(AK::IAkPluginMemAlloc* in_pAllocato
 {
     if (in_ulBlockSize == 0)
     {
-        {%- for k, v in parameters %}
+{%- for k, v in parameters %}
         RTPC.{{k}} = {{v.attributes.default}};
-        {%- endfor %}
+{%- endfor %}
+{% if parameters|length > 0 %}
         m_paramChangeHandler.SetAllParamChanges();
+{% endif %}
         return AK_Success;
     }
 
@@ -40,11 +44,13 @@ AKRESULT {{name}}{{plugin_type}}Params::SetParamsBlock(const void* in_pParamsBlo
     AKRESULT eResult = AK_Success;
     AkUInt8* pParamsBlock = (AkUInt8*)in_pParamsBlock;
 
-    {%- for k, v in parameters %}
+{%- for k, v in parameters %}
     RTPC.{{k}} = READBANKDATA(AkReal32, pParamsBlock, in_ulBlockSize);
-    {%- endfor %}
+{%- endfor %}
     CHECKBANKDATASIZE(in_ulBlockSize, eResult);
+{% if parameters|length > 0 %}
     m_paramChangeHandler.SetAllParamChanges();
+{%- endif %}
 
     return eResult;
 }
@@ -53,9 +59,10 @@ AKRESULT {{name}}{{plugin_type}}Params::SetParam(AkPluginParamID in_paramID, con
 {
     AKRESULT eResult = AK_Success;
 
+{% if parameters|length > 0 %}
     switch (in_paramID)
     {
-    {%- for k, v in parameters %}
+{%- for k, v in parameters %}
     case {{loop.index-1}}:
         {
             const float fNewValue = *((AkReal32*)in_pValue);
@@ -64,11 +71,12 @@ AKRESULT {{name}}{{plugin_type}}Params::SetParam(AkPluginParamID in_paramID, con
             if (bChanged)
                 m_paramChangeHandler.SetParamChange({{loop.index-1}});
         } break;
-    {%- endfor %}
+{%- endfor %}
     default:
         eResult = AK_InvalidParameter;
         break;
     }
+{% endif %}
 
     return eResult;
 }

@@ -10,10 +10,7 @@ Plugin.sdk.static = {}
 Plugin.sdk.shared = {}
 Plugin.authoring = {}
 
-Plugin.sdk.static.includedirs =
-{
-    "../ThirdParty"
-}
+Plugin.sdk.static.includedirs = {}
 Plugin.sdk.static.files =
 {
     "**.cpp",
@@ -51,7 +48,7 @@ end
 
 Plugin.authoring.includedirs =
 {
-    "../ThirdParty",
+    "../Includes",
     path.join(_AK_SDK_ROOT, "samples/Common/")
 }
 Plugin.authoring.files =
