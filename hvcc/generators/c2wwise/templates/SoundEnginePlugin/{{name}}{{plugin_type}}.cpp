@@ -165,14 +165,32 @@ AKRESULT {{name}}{{plugin_type}}::Init(AK::IAkPluginMemAlloc* in_pAllocator, Con
     m_pHeavyCtx->setUserData(this);
 {%- if register_send_hook %}
     m_pHeavyCtx->setSendHook(&OnSendMessageCallback);
-{% endif -%}
+{% endif %}
 #ifndef AK_OPTIMIZED
     m_pHeavyCtx->setPrintHook(&OnHeavyPrint);
 #endif
 {% if is_source %}
     // Notify pipeline of chosen output format change.
-    AkChannelMask channelMask = (hv_getNumOutputChannels(m_pHeavyCtx) > 1) ? AK_SPEAKER_SETUP_2_0 : AK_SPEAKER_SETUP_MONO;
-    in_rFormat.channelConfig.SetStandard(channelMask);
+    in_rFormat.channelConfig.SetStandard({{channel_config}});
+    if (in_rFormat.GetNumChannels() != hv_getNumOutputChannels(m_pHeavyCtx))
+    {
+        return AK_UnsupportedChannelConfig;
+    }
+{% else  %}
+  {% if num_output_channels > 2 %}
+    // Multi-channel plugins have string channel configuration requirementkk
+    if (in_rFormat.channelConfig.uChannelMask != {{channel_config}})
+    {
+        m_pWwiseCtx->PostMonitorMessage("{{name}} only supports the following channel configuration {{channel_config}}", AK::Monitor::ErrorLevel_Error);
+        return AK_UnsupportedChannelConfig;
+    }
+  {% else  %}
+    if (in_rFormat.GetNumChannels() > 2)
+    {
+        m_pWwiseCtx->PostMonitorMessage("{{name}} only supports one and two channel bus configurations", AK::Monitor::ErrorLevel_Error);
+        return AK_UnsupportedChannelConfig;
+    }
+  {% endif %}
 {% endif %}
 {%- for k, v in parameters %}
     hv_sendFloatToReceiver(m_pHeavyCtx, Heavy_{{name}}::Parameter::In::{{k|upper}}, m_pParams->RTPC.{{k}});
@@ -265,7 +283,7 @@ void {{name}}{{plugin_type}}::Execute(AkAudioBuffer* io_pBuffer)
         m_pHeavyCtx->processInline(pBuffer, pBuffer, numFramesToProcess);
     }
 {% endif %}
-{% if has_audio_output %}
+{% if num_output_channels > 0 %}
     io_pBuffer->uValidFrames = numFramesToProcess;
 {% else %}
     // Edge case - a control-only plugin was built, outputting silence

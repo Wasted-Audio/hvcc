@@ -48,7 +48,7 @@ public:
     virtual AkReal32 GetEnvelope() const override { return 1.f; }
     virtual AKRESULT StopLooping() override { return AK_Success; }
 {%- else %}
-    AKRESULT TimeSkip(AkUInt32 in_uFrames) override;
+    AKRESULT TimeSkip(AkUInt32 in_uFrames) override { return AK_Success; }
 {%- endif %}
 
 {% if out_events|length > 0 %}

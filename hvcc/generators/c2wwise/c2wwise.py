@@ -20,9 +20,8 @@ import time
 import jinja2
 from typing import Dict, Optional
 
-from ..buildjson import buildjson
 from ..copyright import copyright_manager
-from ..filters import filter_plugin_id, filter_xcode_build, filter_xcode_fileref
+from ..filters import filter_plugin_id
 
 
 class c2wwise:
@@ -68,9 +67,22 @@ class c2wwise:
             encoding="utf-8-sig",
             searchpath=[templates_dir])
         try:
+            channel_config = None
+            if num_output_channels == 1:
+                channel_config = 'AK_SPEAKER_SETUP_MONO'
+            elif num_output_channels == 2:
+                channel_config = 'AK_SPEAKER_SETUP_STEREO'
+            elif num_output_channels == 6:
+                channel_config = 'AK_SPEAKER_SETUP_5POINT1'
+            elif num_output_channels == 8:
+                channel_config = 'AK_SPEAKER_SETUP_7POINT1'
+            elif num_output_channels == 12:
+                channel_config = 'AK_SPEAKER_SETUP_DOLBY_7_1_4'
+            else:
+                raise Exception('Wwise plugins support only mono, stereo, 5.1, 7.1, '
+                                'and 7.1.4 (Atmos) configurations, number of [dac~] channels should be appropriate')
+
             if plugin_type == "FX":
-                if num_input_channels > 2:
-                    raise Exception("Wwise FX plugins support a maximum of 2 channels (i.e. [adc~ 1] or [adc~ 1 2]).")
                 if num_input_channels != num_output_channels:
                     raise Exception("Wwise FX plugins require the same input/output channel"
                                     "configuration (i.e. [adc~ 1] -> [dac~ 1]).")
@@ -102,7 +114,9 @@ class c2wwise:
                         tables=table_list,
                         pool_sizes_kb=externs["memoryPoolSizesKb"],
                         is_source=is_source_plugin,
-                        has_audio_outputs=num_output_channels > 0,
+                        num_input_channels=num_input_channels,
+                        num_output_channels=num_output_channels,
+                        channel_config=channel_config,
                         plugin_type=plugin_type,
                         plugin_id=plugin_id,
                         copyright=copyright_xml if file_name.endswith(".xml") else copyright_c))
