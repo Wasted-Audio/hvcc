@@ -172,10 +172,12 @@ AKRESULT {{name}}{{plugin_type}}::Init(AK::IAkPluginMemAlloc* in_pAllocator, Con
 {% if is_source %}
     // Notify pipeline of chosen output format change.
     in_rFormat.channelConfig.SetStandard({{channel_config}});
+  {% if num_output_channels > 0 %}
     if (in_rFormat.GetNumChannels() != hv_getNumOutputChannels(m_pHeavyCtx))
     {
         return AK_UnsupportedChannelConfig;
     }
+  {% endif %}
 {% else  %}
   {% if num_output_channels > 2 %}
     // Multi-channel plugins have string channel configuration requirementkk

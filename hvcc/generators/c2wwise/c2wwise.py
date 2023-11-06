@@ -68,7 +68,11 @@ class c2wwise:
             searchpath=[templates_dir])
         try:
             channel_config = None
-            if num_output_channels == 1:
+            if num_output_channels == 0:
+                # Workaround to support patches that don't have any outputs,
+                # e.g. that only ever set RTPCs or post events
+                channel_config = 'AK_SPEAKER_SETUP_MONO'
+            elif num_output_channels == 1:
                 channel_config = 'AK_SPEAKER_SETUP_MONO'
             elif num_output_channels == 2:
                 channel_config = 'AK_SPEAKER_SETUP_STEREO'
