@@ -246,6 +246,8 @@ int Heavy_{{name}}::process(float **inputBuffers, float **outputBuffers, int n) 
   blockStartTimestamp = nextBlock;
   return n;
   {%- endif %}
+
+  sendBangToReceiver(0xDD21C0EB); // send to __hv_bang~
 }
 
 int Heavy_{{name}}::processInline(float *inputBuffers, float *outputBuffers, int n4) {

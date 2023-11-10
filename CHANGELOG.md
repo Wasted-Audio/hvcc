@@ -4,6 +4,7 @@ CHANGELOG
 Next Release
 -----
 
+* Objects: `[bang~]`
 * Documentation fixes/additions
 * DPF: enum for UI parameter IDs
 * DPF bugfixes: correct input PortGroup names
