@@ -1,6 +1,13 @@
 CHANGELOG
 =====
 
+Next Release
+-----
+
+* Documentation fixes/additions
+* DPF: enum for UI parameter IDs
+* DPF bugfixes: correct input PortGroup names
+
 0.9.0
 -----
 
