@@ -86,6 +86,8 @@ class c2daisy:
             component_glue['num_output_channels'] = num_output_channels
             component_glue['debug_printing'] = daisy_meta.get('debug_printing', False)
             component_glue['usb_midi'] = daisy_meta.get('usb_midi', False)
+            component_glue['samplerate'] = daisy_meta.get('samplerate')
+            component_glue['blocksize'] = daisy_meta.get('blocksize')
             component_glue['has_midi'] = board_info['has_midi']
 
             component_glue['copyright'] = copyright_c
