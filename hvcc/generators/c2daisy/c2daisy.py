@@ -6,7 +6,6 @@ import json2daisy  # type: ignore
 
 from typing import Dict, Optional
 
-from ..buildjson import buildjson
 from ..copyright import copyright_manager
 from . import parameters
 
@@ -124,10 +123,6 @@ class c2daisy:
                 f.write(rendered_makefile)
 
             # ======================================================================================
-
-            buildjson.generate_json(
-                out_dir,
-                linux_x64_args=["-j"])
 
             return {
                 "stage": "c2daisy",

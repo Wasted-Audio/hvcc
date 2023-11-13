@@ -5,10 +5,10 @@ import time
 import jinja2
 import json
 from typing import Dict, List, Optional
-from ..buildjson import buildjson
-from ..copyright import copyright_manager
 
 import hvcc.core.hv2ir.HeavyLangObject as HeavyLangObject
+from ..copyright import copyright_manager
+
 
 
 heavy_hash = HeavyLangObject.HeavyLangObject.get_hash
@@ -121,29 +121,7 @@ class c2owl:
                     jdata=jdata,
                     copyright=copyright_c))
 
-            # generate list of Heavy source files
-            # files = os.listdir(out_dir)
-
             # ======================================================================================
-            # Linux
-            #
-            # linux_path = os.path.join(out_dir, "linux")
-            # os.makedirs(linux_path)
-
-            # with open(os.path.join(out_dir, "Makefile"), "w") as f:
-            #     f.write(env.get_template("Makefile").render(
-            #         name=patch_name,
-            #         class_name=f"HeavyOWL_{patch_name}"))
-
-            buildjson.generate_json(
-                out_dir,
-                linux_x64_args=["-j"])
-            # macos_x64_args=["-project", "{0}.xcodeproj".format(patch_name), "-arch",
-            #                 "x86_64", "-alltargets"],
-            # win_x64_args=["/property:Configuration=Release", "/property:Platform=x64",
-            #               "/t:Rebuild", "{0}.sln".format(patch_name), "/m"],
-            # win_x86_args=["/property:Configuration=Release", "/property:Platform=x86",
-            #               "/t:Rebuild", "{0}.sln".format(patch_name), "/m"])
 
             return {
                 "stage": "c2owl",
