@@ -71,20 +71,20 @@ class c2wwise:
             if num_output_channels == 0:
                 # Workaround to support patches that don't have any outputs,
                 # e.g. that only ever set RTPCs or post events
-                channel_config = 'AK_SPEAKER_SETUP_MONO'
+                channel_config = "AK_SPEAKER_SETUP_MONO"
             elif num_output_channels == 1:
-                channel_config = 'AK_SPEAKER_SETUP_MONO'
+                channel_config = "AK_SPEAKER_SETUP_MONO"
             elif num_output_channels == 2:
-                channel_config = 'AK_SPEAKER_SETUP_STEREO'
+                channel_config = "AK_SPEAKER_SETUP_STEREO"
             elif num_output_channels == 6:
-                channel_config = 'AK_SPEAKER_SETUP_5POINT1'
+                channel_config = "AK_SPEAKER_SETUP_5POINT1"
             elif num_output_channels == 8:
-                channel_config = 'AK_SPEAKER_SETUP_7POINT1'
+                channel_config = "AK_SPEAKER_SETUP_7POINT1"
             elif num_output_channels == 12:
-                channel_config = 'AK_SPEAKER_SETUP_DOLBY_7_1_4'
+                channel_config = "AK_SPEAKER_SETUP_DOLBY_7_1_4"
             else:
-                raise Exception('Wwise plugins support only mono, stereo, 5.1, 7.1, '
-                                'and 7.1.4 (Atmos) configurations, number of [dac~] channels should be appropriate')
+                raise Exception("Wwise plugins support only mono, stereo, 5.1, 7.1, "
+                                "and 7.1.4 (Atmos) configurations, number of [dac~] channels should be appropriate")
 
             if plugin_type == "FX":
                 if num_input_channels != num_output_channels:
