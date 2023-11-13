@@ -10,7 +10,6 @@ import hvcc.core.hv2ir.HeavyLangObject as HeavyLangObject
 from ..copyright import copyright_manager
 
 
-
 heavy_hash = HeavyLangObject.HeavyLangObject.get_hash
 OWL_BUTTONS = ['Push', 'B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8']
 
