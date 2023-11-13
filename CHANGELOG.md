@@ -6,6 +6,7 @@ Next Release
 
 * Objects: `[bang~]`
 * Documentation fixes/additions
+* Daisy: ability to set samplerate and blocksize
 * DPF: enum for UI parameter IDs
 * DPF bugfixes: correct input PortGroup names
 

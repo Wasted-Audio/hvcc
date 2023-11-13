@@ -84,9 +84,17 @@ class c2daisy:
             component_glue['header'] = f"HeavyDaisy_{patch_name}.hpp"
             component_glue['max_channels'] = board_info['channels']
             component_glue['num_output_channels'] = num_output_channels
+            component_glue['has_midi'] = board_info['has_midi']
             component_glue['debug_printing'] = daisy_meta.get('debug_printing', False)
             component_glue['usb_midi'] = daisy_meta.get('usb_midi', False)
-            component_glue['has_midi'] = board_info['has_midi']
+            component_glue['samplerate'] = daisy_meta.get('samplerate')
+
+            blocksize = daisy_meta.get('blocksize')
+
+            if blocksize:
+                component_glue['blocksize'] = max(min(256, blocksize), 1)
+            else:
+                component_glue['blocksize'] = None
 
             component_glue['copyright'] = copyright_c
 
