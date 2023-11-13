@@ -31,16 +31,16 @@ class c2wwise:
 
     @classmethod
     def compile(
-        cls,
-        c_src_dir: str,
-        out_dir: str,
-        externs: Dict,
-        patch_name: Optional[str] = None,
-        patch_meta: Optional[Dict] = None,
-        num_input_channels: int = 0,
-        num_output_channels: int = 0,
-        copyright: Optional[str] = None,
-        verbose: Optional[bool] = False
+            cls,
+            c_src_dir: str,
+            out_dir: str,
+            externs: Dict,
+            patch_name: Optional[str] = None,
+            patch_meta: Optional[Dict] = None,
+            num_input_channels: int = 0,
+            num_output_channels: int = 0,
+            copyright: Optional[str] = None,
+            verbose: Optional[bool] = False
     ) -> Dict:
         tick = time.time()
 

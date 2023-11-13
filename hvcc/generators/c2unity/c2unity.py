@@ -21,7 +21,6 @@ import time
 from typing import Dict, Optional
 
 from ..copyright import copyright_manager
-from ..buildjson import buildjson
 from ..filters import filter_string_cap, filter_templates, filter_xcode_build, filter_xcode_fileref
 
 
@@ -99,17 +98,6 @@ class c2unity:
                         pool_sizes_kb=externs["memoryPoolSizesKb"],
                         compile_files=os.listdir(src_out_dir),
                         copyright=copyright))
-
-            buildjson.generate_json(
-                out_dir,
-                android_armv7a_args=["APP_ABI=armeabi-v7a", "-j"],
-                linux_x64_args=["-j"],
-                macos_x64_args=["-project", f"Hv_{patch_name}_Unity.xcodeproj",
-                                "-arch", "x86_64", "-alltargets"],
-                win_x64_args=["/property:Configuration=Release", "/property:Platform=x64",
-                              "/t:Rebuild", f"Hv_{patch_name}_Unity.sln", "/m"],
-                win_x86_args=["/property:Configuration=Release", "/property:Platform=x86",
-                              "/t:Rebuild", f"Hv_{patch_name}_Unity.sln", "/m"])
 
             return {
                 "stage": "c2unity",
