@@ -153,6 +153,12 @@ void HandleMidiMessage(MidiEvent m)
 int main(void)
 {
   hardware.Init(true);
+  {% if samplerate is not none %}
+  hardware.SetAudioSampleRate({{samplerate}});
+  {% endif %}
+  {% if blocksize is not none %}
+  hardware.SetAudioBlockSize({{blocksize}});
+  {% endif %}
   {% if has_midi %}
   MidiUartHandler::Config midi_config;
   hardware.midi.Init(midi_config);
