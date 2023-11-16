@@ -153,10 +153,10 @@ void HandleMidiMessage(MidiEvent m)
 int main(void)
 {
   hardware.Init(true);
-  {% if samplerate is not none %}
+  {% if samplerate %}
   hardware.SetAudioSampleRate({{samplerate}});
   {% endif %}
-  {% if blocksize is not none %}
+  {% if blocksize %}
   hardware.SetAudioBlockSize({{blocksize}});
   {% endif %}
   {% if has_midi %}
