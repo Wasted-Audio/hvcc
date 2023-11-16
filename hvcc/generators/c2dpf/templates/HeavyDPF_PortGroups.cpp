@@ -10,29 +10,29 @@ void {{class_name}}::initAudioPort(bool input, uint32_t index, AudioPort& port)
   {%- if meta.port_groups.input|length %}
     {%- for group, gConfig in meta.port_groups.input.items() %}
       {%- for port, value in gConfig.items() %}
-      case {{value}}:
-        port.name    = "Input {{port}} ({{group}})";
-        port.symbol  = "in_{{port|lower}}_{{group|lower}}";
-        port.groupId = kPortGroup{{group}};
+            case {{value}}:
+                port.name    = "Input {{port}} ({{group}})";
+                port.symbol  = "in_{{port|lower}}_{{group|lower}}";
+                port.groupId = kPortGroup{{group}};
         {%- if meta.cv is defined %}
           {%- if meta.cv.input is defined and value in meta.cv.input %}
-        port.hints   = kAudioPortIsCV | kCVPortHasPositiveUnipolarRange | kCVPortHasScaledRange | kCVPortIsOptional;
+                port.hints   = kAudioPortIsCV | kCVPortHasPositiveUnipolarRange | kCVPortHasScaledRange | kCVPortIsOptional;
           {%- endif %}
         {%- endif %}
-        break;
+                break;
       {%- endfor %}
     {%- endfor %}
   {%- else %}
     {%- if num_input_channels == 2 %}
-      case 0:
-        port.name   = "Input Left";
-        port.symbol = "in_left";
-        break;
-      case 1:
-        port.name   = "Input Right";
-        port.symbol = "in_right";
-        break;
-      port.groupId = kPortGroupStereo;
+            case 0:
+                port.name   = "Input Left";
+                port.symbol = "in_left";
+                break;
+            case 1:
+                port.name   = "Input Right";
+                port.symbol = "in_right";
+                break;
+            port.groupId = kPortGroupStereo;
     {%- endif %}
   {%- endif %}
 {%- endif %}
@@ -46,29 +46,29 @@ void {{class_name}}::initAudioPort(bool input, uint32_t index, AudioPort& port)
   {%- if meta.port_groups.output|length %}
    {%- for group, gConfig in meta.port_groups.output.items() %}
       {%- for port, value in gConfig.items() %}
-      case {{value}}:
-        port.name    = "Output {{port}} ({{group}})";
-        port.symbol  = "out_{{port|lower}}_{{group|lower}}";
-        port.groupId = kPortGroup{{group}};
+            case {{value}}:
+                port.name    = "Output {{port}} ({{group}})";
+                port.symbol  = "out_{{port|lower}}_{{group|lower}}";
+                port.groupId = kPortGroup{{group}};
         {%- if meta.cv is defined %}
           {%- if meta.cv.output is defined and value in meta.cv.output %}
-        port.hints   = kAudioPortIsCV | kCVPortHasPositiveUnipolarRange | kCVPortHasScaledRange | kCVPortIsOptional;
+                port.hints   = kAudioPortIsCV | kCVPortHasPositiveUnipolarRange | kCVPortHasScaledRange | kCVPortIsOptional;
           {%- endif %}
         {%- endif %}
-        break;
+                break;
       {%- endfor %}
     {%- endfor %}
   {% else %}
    {%- if num_output_channels == 2 %}
-      case 0:
-        port.name   = "Output Left";
-        port.symbol = "out_left";
-        break;
-      case 1:
-        port.name   = "Output Right";
-        port.symbol = "out_right";
-        break;
-      port.groupId = kPortGroupStereo;
+            case 0:
+                port.name   = "Output Left";
+                port.symbol = "out_left";
+                break;
+            case 1:
+                port.name   = "Output Right";
+                port.symbol = "out_right";
+                break;
+            port.groupId = kPortGroupStereo;
     {%- endif %}
   {%- endif %}
 {%- endif %}
@@ -85,17 +85,17 @@ void {{class_name}}::initPortGroup(uint32_t groupId, PortGroup& portGroup)
   {%- if meta.port_groups.input|length %}
     {%- for group, value in meta.port_groups.input.items() %}
       case kPortGroup{{group}}:
-        portGroup.name   = "{{group}}";
-        portGroup.symbol = "{{group|lower}}";
-        break;
+          portGroup.name   = "{{group}}";
+          portGroup.symbol = "{{group|lower}}";
+          break;
     {%- endfor %}
   {%- endif %}
   {%- if meta.port_groups.output|length %}
     {%- for group, value in meta.port_groups.output.items() %}
       case kPortGroup{{group}}:
-        portGroup.name   = "{{group}}";
-        portGroup.symbol = "{{group|lower}}";
-        break;
+          portGroup.name   = "{{group}}";
+          portGroup.symbol = "{{group|lower}}";
+          break;
     {%- endfor %}
   {%- endif %}
   }
