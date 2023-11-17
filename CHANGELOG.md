@@ -8,7 +8,7 @@ Next Release
 * Documentation fixes/additions
 * Daisy: ability to set samplerate and blocksize
 * DPF: enum for UI parameter IDs
-* DPF bugfixes: correct input PortGroup names
+* DPF bugfixes: correct input PortGroup names; correct UI slider updates
 * Cleanup: remove deprecated build.json
 
 0.9.0
