@@ -6,25 +6,26 @@
 START_NAMESPACE_DISTRHO
 
 // --------------------------------------------------------------------------------------------------------------------
-
-{%- if meta.enumerators is defined %}
-struct EnumParam
-{
-    const char* label;
-    float value;
+{%- if receivers|length > 0 %}
+enum HeavyParams {
+    {%- for k, v in receivers %}
+    {{v.display|upper}},
+    {%- endfor %}
 };
 {%- endif %}
-
 
 class ImGuiPluginUI : public UI
 {
     {% for k, v in receivers -%}
         {%- if v.attributes.type == 'bool': %}
-        bool f{{v.display|lower}} = {{v.attributes.default}}f != 0.0f;
+    bool f{{v.display|lower}} = {{v.attributes.default}}f != 0.0f;
+        {%- elif v.attributes.type == 'int': %}
+    int f{{v.display|lower}} = {{v.attributes.default}};
         {%- else %}
-        float f{{v.display|lower}} = {{v.attributes.default}}f;
+    float f{{v.display|lower}} = {{v.attributes.default}}f;
         {%- endif %}
-    {% endfor %}
+    {%- endfor %}
+
     ResizeHandle fResizeHandle;
 
     // ----------------------------------------------------------------------------------------------------------------
@@ -58,7 +59,7 @@ protected:
     {%- if receivers|length > 0 %}
         switch (index) {
             {% for k, v  in receivers -%}
-            case {{loop.index-1}}:
+            case {{v.display|upper}}:
                 {%- if v.attributes.type == 'bool': %}
                 f{{v.display|lower}} = value != 0.0f;
                 {%- else %}
@@ -98,30 +99,22 @@ protected:
             {%- set enumlen = enums|length %}
             {%- set enum_list = v_display + "_list" %}
 
-            EnumParam {{enum_list}}[] = {
+            const char* {{enum_list}}[{{enumlen}}] = {
                 {%- for i in enums %}
-                { "{{i}}", {{enums[i]}}f },
+                "{{i}}",
                 {%- endfor %}
             };
 
-            {%- for i in enums %}
-               {%- if enums[i] == v.attributes.default %}
-            int default_item = {{loop.index-1}};
-               {%- endif %}
-            {%- endfor %}
-            static const char* current_item = {{enum_list}}[default_item].label;
-
-            if (ImGui::BeginCombo("{{v.display.replace('_', ' ')}}", current_item))
+            if (ImGui::BeginCombo("{{v.display.replace('_', ' ')}}", {{enum_list}}[f{{v_display}}]))
             {
                 for (int n = 0; n < {{enumlen}}; n++)
                 {
-                    bool is_selected = (current_item == {{enum_list}}[n].label);
-                    if (ImGui::Selectable({{enum_list}}[n].label, is_selected))
+                    bool is_selected = (f{{v_display}} == n);
+                    if (ImGui::Selectable({{enum_list}}[n], is_selected))
                     {
-                        current_item = {{enum_list}}[n].label;
-                        f{{v_display}} = {{enum_list}}[n].value;
-                        editParameter({{loop.index-1}}, true);
-                        setParameterValue({{loop.index-1}}, f{{v_display}});
+                        f{{v_display}} = n;
+                        editParameter({{v.display|upper}}, true);
+                        setParameterValue({{v.display|upper}}, f{{v_display}});
                     }
                     if (is_selected)
                         ImGui::SetItemDefaultFocus();
@@ -131,23 +124,25 @@ protected:
         {%- else %}
             {%- if v.attributes.type == 'bool': %}
             if (ImGui::Toggle("{{v.display.replace('_', ' ')}}", &f{{v_display}}))
+            {%- elif v.attributes.type == 'int' %}
+            if (ImGui::SliderInt("{{v.display.replace('_', ' ')}}", &f{{v_display}}, {{v.attributes.min}}f, {{v.attributes.max}}f))
             {%- else %}
             if (ImGui::SliderFloat("{{v.display.replace('_', ' ')}}", &f{{v_display}}, {{v.attributes.min}}f, {{v.attributes.max}}f))
             {%- endif %}
             {
                 if (ImGui::IsItemActivated())
                 {
-                    editParameter({{loop.index-1}}, true);
-                    setParameterValue({{loop.index-1}}, f{{v_display}});
+                    editParameter({{v.display|upper}}, true);
+                    setParameterValue({{v.display|upper}}, f{{v_display}});
                 }
             }
         {%- endif %}
     {% endfor %}
             if (ImGui::IsItemDeactivated())
             {
-            {%- for i in range(0, receivers|length) %}
-                editParameter({{i}}, false);
-            {%- endfor %}
+            {%- for k, v  in receivers -%}
+                editParameter({{v.display|upper}}, false);
+            {% endfor -%}
             }
         }
         ImGui::End();

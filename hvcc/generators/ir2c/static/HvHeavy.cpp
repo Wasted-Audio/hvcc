@@ -20,7 +20,7 @@
 extern "C" {
 #endif
 
-#if !HV_WIN
+#if HV_APPLE
 #pragma mark - Heavy Table
 #endif
 
@@ -41,7 +41,7 @@ HV_EXPORT hv_uint32_t hv_table_getLength(HeavyContextInterface *c, hv_uint32_t t
 
 
 
-#if !HV_WIN
+#if HV_APPLE
 #pragma mark - Heavy Message
 #endif
 
@@ -123,7 +123,7 @@ HV_EXPORT void hv_msg_free(HvMessage *m) {
 
 
 
-#if !HV_WIN
+#if HV_APPLE
 #pragma mark - Heavy Common
 #endif
 
@@ -290,7 +290,7 @@ HV_EXPORT bool hv_getNextSentMessage(HeavyContextInterface *c, hv_uint32_t *dest
 }
 
 
-#if !HV_WIN
+#if HV_APPLE
 #pragma mark - Heavy Common
 #endif
 
