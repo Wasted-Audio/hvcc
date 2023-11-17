@@ -1,4 +1,4 @@
-#N canvas 879 333 486 278 12;
+#N canvas 1038 308 486 278 12;
 #X obj 24 59 inlet~;
 #X text 22 24 measured after initialisation;
 #X text 22 14 NOTE(mhroth): ensure that the table size is;

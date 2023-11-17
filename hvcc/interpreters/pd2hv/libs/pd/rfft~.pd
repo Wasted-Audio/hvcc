@@ -5,7 +5,6 @@
 #X obj 147 120 outlet;
 #X restore 211 129 pd @hv_obj system;
 #X text 80 22 measured after initialisation;
-#X text 80 11 NOTE(mhroth): ensure that the table size is;
 #X obj 25 184 outlet~;
 #X obj 211 48 loadbang;
 #X obj 65 111 r __hv_blocksize;
@@ -20,11 +19,12 @@
 #X obj 122 78 inlet;
 #X obj 167 137 outlet~;
 #X restore 25 155 pd @hv_obj __rfft~f rfft_\$0;
-#X connect 0 0 11 0;
-#X connect 1 0 11 2;
-#X connect 5 0 10 0;
-#X connect 6 0 11 1;
-#X connect 8 0 1 0;
-#X connect 10 0 8 0;
-#X connect 11 0 4 0;
-#X connect 11 1 7 0;
+#X text 80 11 NOTE(dreamer): ensure that the table size is;
+#X connect 0 0 10 0;
+#X connect 1 0 10 2;
+#X connect 4 0 9 0;
+#X connect 5 0 10 1;
+#X connect 7 0 1 0;
+#X connect 9 0 7 0;
+#X connect 10 0 3 0;
+#X connect 10 1 6 0;
