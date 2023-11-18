@@ -42,7 +42,7 @@ hvcc has been integrated into several projects and services. This allows to easi
 
 ## Requirements
 
-python 3.7 or higher
+python 3.7 until 3.11
 
   * `jinja2` (for generator templating)
   * `importlib_resources` (for reading static resources)

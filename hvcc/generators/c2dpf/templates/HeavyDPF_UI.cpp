@@ -133,8 +133,8 @@ protected:
                 if (ImGui::IsItemActivated())
                 {
                     editParameter({{v.display|upper}}, true);
-                    setParameterValue({{v.display|upper}}, f{{v_display}});
                 }
+                setParameterValue({{v.display|upper}}, f{{v_display}});
             }
         {%- endif %}
     {% endfor %}
