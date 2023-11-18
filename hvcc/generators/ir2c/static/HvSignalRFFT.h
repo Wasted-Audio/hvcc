@@ -24,9 +24,6 @@
 extern "C" {
 #endif
 
-#ifdef HV_SIMD_NONE
-#define PFFFT_SIMD_DISABLE
-#endif
 
 typedef struct SignalRFFT {
   struct HvTable *table;
