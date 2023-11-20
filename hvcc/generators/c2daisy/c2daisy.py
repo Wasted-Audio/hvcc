@@ -13,6 +13,7 @@ from . import parameters
 hv_midi_messages = {
     "__hv_noteout",
     "__hv_ctlout",
+    "__hv_polytouchout",
     "__hv_pgmout",
     "__hv_touchout",
     "__hv_bendout",
