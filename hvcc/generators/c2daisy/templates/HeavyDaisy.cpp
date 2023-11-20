@@ -97,6 +97,35 @@ void HandleMidiMessage(MidiEvent m)
 {
   switch(m.type)
   {
+    case SystemRealTime: {
+      float srtType;
+
+      switch(m.srt_type)
+      {
+        case TimingClock:
+          srtType = MIDI_RT_CLOCK;
+          break;
+        case Start:
+          srtType = MIDI_RT_START;
+          break;
+        case Continue:
+          srtType = MIDI_RT_CONTINUE;
+          break;
+        case Stop:
+          srtType = MIDI_RT_STOP;
+          break;
+        case ActiveSensing:
+          srtType = MIDI_RT_ACTIVESENSE;
+          break;
+        case Reset:
+          srtType = MIDI_RT_RESET;
+          break;
+      }
+
+      hv.sendMessageToReceiverV(HV_HASH_MIDIREALTIMEIN, 0, "ff",
+        (float) srtType);
+      break;
+    }
     case NoteOff: {
       NoteOnEvent p = m.AsNoteOn();
       hv.sendMessageToReceiverV(HV_HASH_NOTEIN, 0, "fff",

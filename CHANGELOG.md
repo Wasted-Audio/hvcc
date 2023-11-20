@@ -7,6 +7,7 @@ Next Release
 * Objects: `[bang~]`
 * Documentation fixes/additions
 * Daisy: ability to set samplerate and blocksize
+* Daisy: midirealtimein support
 * DPF: enum for UI parameter IDs
 * DPF bugfixes: correct input PortGroup names; correct UI slider updates
 * Cleanup: remove deprecated build.json
