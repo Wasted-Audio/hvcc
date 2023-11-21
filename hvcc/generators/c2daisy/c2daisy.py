@@ -17,7 +17,8 @@ hv_midi_messages = {
     "__hv_pgmout",
     "__hv_touchout",
     "__hv_bendout",
-    "__hv_midiout"
+    "__hv_midiout",
+    "__hv_midioutport"
 }
 
 

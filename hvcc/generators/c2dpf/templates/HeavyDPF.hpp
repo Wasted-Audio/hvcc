@@ -146,6 +146,10 @@ private:
   double nextClockTick;
   double sampleAtCycleStart;
 
+  // midi out buffer
+  int midiOutCount;
+  MidiEvent midiOutEvent;
+
   // heavy context
   HeavyContextInterface *_context;
 

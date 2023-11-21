@@ -48,6 +48,8 @@ FIFO<FixedCapStr<64>, 64> event_log;
 {% elif usb_midi %}
 daisy::MidiUsbHandler midiusb;
 {% endif %}
+// int midiOutCount;
+// uint8_t* midiOutData;
 void CallbackWriteIn(Heavy_{{patch_name}}& hv);
 void LoopWriteIn(Heavy_{{patch_name}}& hv);
 void CallbackWriteOut();
@@ -97,6 +99,12 @@ DaisyHvParamOut DaisyOutputParameters[DaisyNumOutputParameters] = {
 // Typical Switch case for Message Type.
 void HandleMidiMessage(MidiEvent m)
 {
+  for (int i = 0; i <= 2; ++i) {
+    hv.sendMessageToReceiverV(HV_HASH_MIDIIN, 0, "ff",
+    (float) m.data[i],
+    (float) m.channel);
+  }
+
   switch(m.type)
   {
     case SystemRealTime: {
@@ -399,26 +407,24 @@ void HandleMidiSend(uint32_t sendHash, const HvMessage *m)
       HandleMidiOut(midiData, numElements);
       break;
     }
-    case HV_HASH_MIDIOUT: // __hv_midiout
-    {
-      const uint8_t numElements = m->numElements;
-      uint8_t midiData[numElements];
-      if (numElements <=4 )
-      {
-        for (int i = 0; i < numElements; ++i)
-        {
-          midiData[i] = hv_msg_getFloat(m, i);
-        }
-      }
-      else
-      {
-        // we do not support sysex yet
-        break;
-      }
+    // not functional yet
+    // case HV_HASH_MIDIOUT: // __hv_midiout
+    // {
+    //   if (midiOutCount == 0 ) {
+    //     uint8_t midiOutData[3];
+    //   }
 
-      HandleMidiOut(midiData, numElements);
-      break;
-    }
+    //   midiOutData[midiOutCount] = hv_msg_getFloat(m, 0);
+
+    //   if (midiOutCount < 2) {
+    //     midiOutCount++;
+    //     break;
+    //   }
+
+    //   HandleMidiOut(midiOutData, 3);
+    //   midiOutCount = 0;
+    //   break;
+    // }
     default:
       break;
   }

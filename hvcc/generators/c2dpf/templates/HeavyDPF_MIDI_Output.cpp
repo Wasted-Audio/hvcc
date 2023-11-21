@@ -100,30 +100,22 @@ void {{class_name}}::handleMidiSend(uint32_t sendHash, const HvMessage *m)
     }
     case HV_HASH_MIDIOUT: // __hv_midiout
     {
-      const uint8_t numElements = m->numElements;
-      if (numElements <=4 )
-      {
-        for (int i = 0; i < numElements; ++i)
-        {
-          midiSendEvent.data[i] = hv_msg_getFloat(m, i);
-        }
+      if (midiOutCount == 0) {
+        midiOutEvent.frame = 0;
+        midiOutEvent.dataExt = nullptr;
+        // we don't support sysex
+        midiOutEvent.size = 4;
       }
-      else
-      {
-        printf("> we do not support sysex yet \n");
+
+      midiOutEvent.data[midiOutCount] = hv_msg_getFloat(m, 0);
+
+      if (midiOutCount < 3) {
+        midiOutCount++;
         break;
       }
 
-      // unsigned char* rawData = new unsigned char;
-      // for (int i = 0; i < numElements; ++i) {
-      //   rawData[i] = (uint8_t) hv_msg_getFloat(m, i);
-      //   printf("> data: %d \n", rawData[i]);
-      // }
-
-      midiSendEvent.size = numElements;
-      // midiSendEvent.dataExt = (const uint8_t *) rawData;
-
-      writeMidiEvent(midiSendEvent);
+      writeMidiEvent(midiOutEvent);
+      midiOutCount = 0;
       break;
     }
     default:
