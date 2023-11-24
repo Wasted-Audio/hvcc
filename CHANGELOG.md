@@ -5,6 +5,7 @@ Next Release
 -----
 
 * Objects: `[bang~]`
+* Object improvements: support `[clear(` message for `[delwrite~]`
 * Documentation fixes/additions
 * Daisy: ability to set samplerate and blocksize
 * Daisy: adding midirealtimein, polytouchin/out, midiin (midiout WIP)
