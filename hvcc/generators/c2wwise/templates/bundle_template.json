@@ -1,0 +1,25 @@
+{
+    "id": "Heavy.{{name}}.${year}_${major}_${minor}_${build}",
+    "name": "{{name}}",
+    "tag": "{{name}}",
+    "description": "",
+    "vendor": "Heavy",
+    "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=",
+    "type": "plugin",
+    "productDependentData": {
+        "targetWwiseVersion": {
+            "year": ${year},
+            "major": ${major}
+        }
+    },
+    "version": {
+        "year": ${year},
+        "major": ${major},
+        "minor": ${minor},
+        "build": ${build}
+    },
+    "eulas": [],
+    "labels": [],
+    "links": [],
+    "documentation": []
+}

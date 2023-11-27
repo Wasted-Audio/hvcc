@@ -201,7 +201,9 @@
 // Export and Inline
 #if HV_WIN
 #define HV_EXPORT __declspec(dllexport)
+#ifndef __cplusplus // MSVC doesn't like redefining "inline" keyword
 #define inline __inline
+#endif
 #define HV_FORCE_INLINE __forceinline
 #else
 #define HV_EXPORT
