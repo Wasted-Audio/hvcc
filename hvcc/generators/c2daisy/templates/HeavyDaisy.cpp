@@ -9,6 +9,7 @@
 {% if has_midi or usb_midi %}
 #define HV_HASH_NOTEIN          0x67E37CA3
 #define HV_HASH_CTLIN           0x41BE0f9C
+#define HV_HASH_POLYTOUCHIN     0xBC530F59
 #define HV_HASH_PGMIN           0x2E1EA03D
 #define HV_HASH_TOUCHIN         0x553925BD
 #define HV_HASH_BENDIN          0x3083F0F7
@@ -17,6 +18,7 @@
 
 #define HV_HASH_NOTEOUT         0xD1D4AC2
 #define HV_HASH_CTLOUT          0xE5e2A040
+#define HV_HASH_POLYTOUCHOUT    0xD5ACA9D1
 #define HV_HASH_PGMOUT          0x8753E39E
 #define HV_HASH_TOUCHOUT        0x476D4387
 #define HV_HASH_BENDOUT         0xE8458013
@@ -46,6 +48,8 @@ FIFO<FixedCapStr<64>, 64> event_log;
 {% elif usb_midi %}
 daisy::MidiUsbHandler midiusb;
 {% endif %}
+// int midiOutCount;
+// uint8_t* midiOutData;
 void CallbackWriteIn(Heavy_{{patch_name}}& hv);
 void LoopWriteIn(Heavy_{{patch_name}}& hv);
 void CallbackWriteOut();
@@ -95,8 +99,43 @@ DaisyHvParamOut DaisyOutputParameters[DaisyNumOutputParameters] = {
 // Typical Switch case for Message Type.
 void HandleMidiMessage(MidiEvent m)
 {
+  for (int i = 0; i <= 2; ++i) {
+    hv.sendMessageToReceiverV(HV_HASH_MIDIIN, 0, "ff",
+    (float) m.data[i],
+    (float) m.channel);
+  }
+
   switch(m.type)
   {
+    case SystemRealTime: {
+      float srtType;
+
+      switch(m.srt_type)
+      {
+        case TimingClock:
+          srtType = MIDI_RT_CLOCK;
+          break;
+        case Start:
+          srtType = MIDI_RT_START;
+          break;
+        case Continue:
+          srtType = MIDI_RT_CONTINUE;
+          break;
+        case Stop:
+          srtType = MIDI_RT_STOP;
+          break;
+        case ActiveSensing:
+          srtType = MIDI_RT_ACTIVESENSE;
+          break;
+        case Reset:
+          srtType = MIDI_RT_RESET;
+          break;
+      }
+
+      hv.sendMessageToReceiverV(HV_HASH_MIDIREALTIMEIN, 0, "ff",
+        (float) srtType);
+      break;
+    }
     case NoteOff: {
       NoteOnEvent p = m.AsNoteOn();
       hv.sendMessageToReceiverV(HV_HASH_NOTEIN, 0, "fff",
@@ -110,6 +149,14 @@ void HandleMidiMessage(MidiEvent m)
       hv.sendMessageToReceiverV(HV_HASH_NOTEIN, 0, "fff",
         (float) p.note, // pitch
         (float) p.velocity, // velocity
+        (float) p.channel);
+      break;
+    }
+    case PolyphonicKeyPressure: { // polyphonic aftertouch
+      PolyphonicKeyPressureEvent p = m.AsPolyphonicKeyPressure();
+      hv.sendMessageToReceiverV(HV_HASH_POLYTOUCHIN, 0, "fff",
+        (float) p.pressure, // pressure
+        (float) p.note, // note
         (float) p.channel);
       break;
     }
@@ -153,6 +200,12 @@ void HandleMidiMessage(MidiEvent m)
 int main(void)
 {
   hardware.Init(true);
+  {% if samplerate %}
+  hardware.SetAudioSampleRate({{samplerate}});
+  {% endif %}
+  {% if blocksize %}
+  hardware.SetAudioBlockSize({{blocksize}});
+  {% endif %}
   {% if has_midi %}
   MidiUartHandler::Config midi_config;
   hardware.midi.Init(midi_config);
@@ -277,6 +330,22 @@ void HandleMidiSend(uint32_t sendHash, const HvMessage *m)
       HandleMidiOut(midiData, numElements);
       break;
     }
+    case HV_HASH_POLYTOUCHOUT:
+    {
+      uint8_t value = hv_msg_getFloat(m, 0);
+      uint8_t note = hv_msg_getFloat(m, 1);
+      uint8_t ch = hv_msg_getFloat(m, 2);
+      ch %= 16; // drop any pd "ports"
+
+      const uint8_t numElements = 3;
+      uint8_t midiData[numElements];
+      midiData[0] = 0xA0 | ch; // send Poly Aftertouch
+      midiData[1] = note;
+      midiData[2] = value;
+
+      HandleMidiOut(midiData, numElements);
+      break;
+    }
     case HV_HASH_CTLOUT:
     {
       uint8_t value = hv_msg_getFloat(m, 0);
@@ -338,26 +407,24 @@ void HandleMidiSend(uint32_t sendHash, const HvMessage *m)
       HandleMidiOut(midiData, numElements);
       break;
     }
-    case HV_HASH_MIDIOUT: // __hv_midiout
-    {
-      const uint8_t numElements = m->numElements;
-      uint8_t midiData[numElements];
-      if (numElements <=4 )
-      {
-        for (int i = 0; i < numElements; ++i)
-        {
-          midiData[i] = hv_msg_getFloat(m, i);
-        }
-      }
-      else
-      {
-        // we do not support sysex yet
-        break;
-      }
+    // not functional yet
+    // case HV_HASH_MIDIOUT: // __hv_midiout
+    // {
+    //   if (midiOutCount == 0 ) {
+    //     uint8_t midiOutData[3];
+    //   }
 
-      HandleMidiOut(midiData, numElements);
-      break;
-    }
+    //   midiOutData[midiOutCount] = hv_msg_getFloat(m, 0);
+
+    //   if (midiOutCount < 2) {
+    //     midiOutCount++;
+    //     break;
+    //   }
+
+    //   HandleMidiOut(midiOutData, 3);
+    //   midiOutCount = 0;
+    //   break;
+    // }
     default:
       break;
   }

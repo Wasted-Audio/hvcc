@@ -1,6 +1,18 @@
 CHANGELOG
 =====
 
+Next Release
+-----
+
+* Objects: `[bang~]`
+* Object improvements: support `[clear(` message for `[delwrite~]`
+* Documentation fixes/additions
+* Daisy: ability to set samplerate and blocksize
+* Daisy: adding midirealtimein, polytouchin/out, midiin (midiout WIP)
+* DPF: enum for UI parameter IDs
+* DPF bugfixes: correct input PortGroup names; correct UI slider updates; midiout reimplementation
+* Cleanup: remove deprecated build.json
+
 0.9.0
 -----
 

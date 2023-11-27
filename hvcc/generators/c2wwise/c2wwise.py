@@ -20,7 +20,6 @@ import time
 import jinja2
 from typing import Dict, Optional
 
-from ..buildjson import buildjson
 from ..copyright import copyright_manager
 from ..filters import filter_plugin_id, filter_xcode_build, filter_xcode_fileref
 
@@ -179,30 +178,6 @@ class c2wwise:
                     plugin_id=plugin_id,
                     files=files,
                     wwise_version=wwise_sdk_version))
-
-            proj_name = f"Hv_{patch_name}_Wwise{plugin_type}Plugin"
-
-            buildjson.generate_json(
-                out_dir,
-                ios_armv7a_args=[
-                    "-arch", "armv7s",
-                    "-target", f"{proj_name}_iOS",
-                    "-project", f"{proj_name}.xcodeproj"],
-                linux_x64_args=["-j"],
-                macos_x64_args=[
-                    "-arch", "x86_64",
-                    "-target", f"{proj_name}",
-                    "-project", f"{proj_name}.xcodeproj"],
-                win_x64_args=[
-                    "/property:Configuration=Release",
-                    "/property:Platform=x64",
-                    "/t:Rebuild", "/m",
-                    f"{proj_name}.sln"],
-                win_x86_args=[
-                    "/property:Configuration=Release",
-                    "/property:Platform=x86",
-                    "/t:Rebuild", "/m",
-                    f"{proj_name}.sln"])
 
             return {
                 "stage": "c2wwise",
