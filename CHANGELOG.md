@@ -12,6 +12,7 @@ Next Release
 * DPF: enum for UI parameter IDs
 * DPF bugfixes: correct input PortGroup names; correct UI slider updates; midiout reimplementation
 * Cleanup: remove deprecated build.json
+* Deprecate py37, enable py312
 
 0.9.0
 -----
