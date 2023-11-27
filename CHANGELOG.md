@@ -11,6 +11,7 @@ Next Release
 * Daisy: adding midirealtimein, polytouchin/out, midiin (midiout WIP)
 * DPF: enum for UI parameter IDs
 * DPF bugfixes: correct input PortGroup names; correct UI slider updates; midiout reimplementation
+* Wwise: complete rewrite/refactor - now uses SDK build tools - thanks to @eu-ch !!
 * Cleanup: remove deprecated build.json
 * Deprecate py37, enable py312
 
