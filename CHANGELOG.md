@@ -12,6 +12,7 @@ Next Release
 * DPF: enum for UI parameter IDs
 * DPF bugfixes: correct input PortGroup names; correct UI slider updates; midiout reimplementation
 * Wwise: complete rewrite/refactor - now uses SDK build tools - thanks to @eu-ch !!
+* Bugfix: correct alignment in AVX pow~ implementation
 * Cleanup: remove deprecated build.json
 * Deprecate py37, enable py312
 
