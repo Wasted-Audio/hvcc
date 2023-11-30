@@ -49,7 +49,7 @@ int main(int argc, const char *argv[]) {
       (int32_t) hv_getSampleRate(context),
       TW_FLOAT32, TW_INLINE, outputPath);
 
-  float *outBuffers = (float *) malloc(
+  float *outBuffers = (float *) hv_malloc(
       hv_getNumOutputChannels(context) * blockSize * sizeof(float));
 
   for (int i = 0; i < numIterations; ++i) {

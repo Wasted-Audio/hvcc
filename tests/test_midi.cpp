@@ -79,7 +79,7 @@ int main(int argc, const char *argv[]) {
 
   MidiEvent* mev;
 
-  float *outBuffers = (float *) malloc(numOutputChannels * BLOCK_SIZE * sizeof(float));
+  float *outBuffers = (float *) hv_malloc(numOutputChannels * BLOCK_SIZE * sizeof(float));
 
   for (int i = 0; i < numIterations; ++i) {
     for (int event=0; event < midifile[0].size(); event++) {
