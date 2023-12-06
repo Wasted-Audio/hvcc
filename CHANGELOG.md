@@ -1,7 +1,7 @@
 CHANGELOG
 =====
 
-Next Release
+0.10.0
 -----
 
 * Objects: `[bang~]`
