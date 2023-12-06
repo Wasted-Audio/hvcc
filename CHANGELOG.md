@@ -1,6 +1,22 @@
 CHANGELOG
 =====
 
+0.10.0
+-----
+
+* Objects: `[bang~]`
+* Object improvements: support `[clear(` message for `[delwrite~]`
+* Documentation fixes/additions
+* Daisy: ability to set samplerate and blocksize
+* Daisy: adding midirealtimein, polytouchin/out, midiin (midiout WIP)
+* Daisy: use `libdaisy_path` in meta config; both string/path and int/depth possible
+* DPF: enum for UI parameter IDs
+* DPF bugfixes: correct input PortGroup names; correct UI slider updates; midiout reimplementation
+* Wwise: complete rewrite/refactor - now uses SDK build tools - thanks to @eu-ch !!
+* Bugfix: correct alignment in AVX pow~ implementation
+* Cleanup: remove deprecated build.json
+* Deprecate py37, enable py312
+
 0.9.0
 -----
 
