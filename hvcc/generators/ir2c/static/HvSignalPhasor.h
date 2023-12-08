@@ -108,11 +108,28 @@ static inline void __hv_phasor_f(SignalPhasor *o, hv_bInf_t bIn, hv_bOutf_t bOut
 
 static inline void __hv_phasor_k_f(SignalPhasor *o, hv_bOutf_t bOut) {
 #if HV_SIMD_AVX
-  *bOut = _mm256_sub_ps(o->phase, _mm256_set1_ps(1.0f));
-  o->phase = _mm256_or_ps(_mm256_andnot_ps(
-      _mm256_set1_ps(-INFINITY),
-      _mm256_add_ps(o->phase, o->inc)),
-      _mm256_set1_ps(1.0f));
+
+  // o->phase = _mm256_or_ps(_mm256_andnot_ps(
+  //     _mm256_set1_ps(-INFINITY),
+  //     o->phase),
+  //     _mm256_set1_ps(1.0f));
+
+  // *bOut = _mm256_sub_ps(o->phase, _mm256_set1_ps(1.0f));
+
+  *bOut = _mm256_sub_ps(
+    _mm256_or_ps(_mm256_andnot_ps(
+        _mm256_set1_ps(-INFINITY),
+        o->phase),
+        _mm256_set1_ps(1.0f)),
+    _mm256_set1_ps(1.0f));
+
+  // o->phase = _mm256_or_ps(_mm256_andnot_ps(
+  //     _mm256_set1_ps(-INFINITY),
+  //     _mm256_add_ps(o->phase, o->inc)),
+  //     _mm256_set1_ps(1.0f));
+
+
+  o->phase = _mm256_add_ps(o->phase, o->inc);
 #elif HV_SIMD_SSE
   *bOut = _mm_sub_ps(_mm_castsi128_ps(
       _mm_or_si128(_mm_srli_epi32(o->phase, 9),

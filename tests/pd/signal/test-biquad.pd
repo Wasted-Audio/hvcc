@@ -1,4 +1,6 @@
 #N canvas 172 405 209 125 10;
 #X obj 38 29 sig~ 1;
-#X obj 38 59 biquad 5, f 11;
+#X obj 38 59 biquad~ 5, f 11;
+#X obj 38 82 dac~ 1;
 #X connect 0 0 1 0;
+#X connect 1 0 2 0;

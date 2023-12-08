@@ -30,6 +30,24 @@ class TestPdSignalPatches(TestPdSignalBase):
     def test_phasor_control(self):
         self._test_signal_patch("test-phasor-control.pd")
 
+    def test_wrap(self):
+        self._test_signal_patch("test-wrap.pd")
+
+    def test_osc(self):
+        self._test_signal_patch("test-osc.pd")
+
+    # def test_bp(self):
+    #     self._test_signal_patch("test-bp.pd")
+
+    # def test_biquad(self):
+    #     self._test_signal_patch("test-biquad.pd")
+
+    def test_vd(self):
+        self._test_signal_patch("test-vd.pd")
+
+    def test_send_receive(self):
+        self._test_signal_patch("test-send_receive.pd")
+
 
 def main():
     parser = argparse.ArgumentParser(

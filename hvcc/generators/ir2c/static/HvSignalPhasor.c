@@ -60,7 +60,7 @@ static void sPhasor_k_updatePhase(SignalPhasor *o, hv_uint32_t p) {
 static void sPhasor_k_updateFrequency(SignalPhasor *o, float f, double r) {
 #if HV_SIMD_AVX
   o->step.f2sc = (float) (f/r);
-  o->inc = _mm256_set1_ps((float) (8.0f*f/r));
+  o->inc = _mm256_set1_ps(8.0f*o->step.f2sc);
   sPhasor_k_updatePhase(o, o->phase[0]);
 #elif HV_SIMD_SSE
   o->step.s = (hv_int32_t) (f*(HV_PHASOR_2_32/r));
