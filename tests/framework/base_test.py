@@ -16,6 +16,7 @@
 
 import jinja2
 import os
+import platform
 import shutil
 import subprocess
 import unittest
@@ -97,19 +98,23 @@ class HvBaseTest(unittest.TestCase):
         out_dir,
         flag=None
     ):
+        makefile_name = "build.bat" if platform.system() == "Windows" else "Makefile"
         exe_path = os.path.join(out_dir, "heavy")
 
         # template Makefile
         # NOTE(mhroth): assertions are NOT turned off (help to catch errors)
-        makefile_path = os.path.join(out_dir, "c", "Makefile")
+        makefile_path = os.path.join(out_dir, "c", makefile_name)
         with open(makefile_path, "w") as f:
-            f.write(self.env.get_template("Makefile").render(
+            f.write(self.env.get_template(makefile_name).render(
                 simd_flags=simd_flags[flag or "HV_SIMD_NONE"],
                 source_files=source_files,
                 out_path=exe_path))
 
         # run the compile command
-        subprocess.check_output(["make", "-C", os.path.dirname(makefile_path), "-j"])
+        if platform.system() == "Windows":
+            subprocess.check_output(["build.bat"], cwd=os.path.dirname(makefile_path), shell=True)
+        else:
+            subprocess.check_output(["make", "-C", os.path.dirname(makefile_path), "-j"])
 
         return exe_path
 

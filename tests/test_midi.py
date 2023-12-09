@@ -14,6 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
+import platform
 import unittest
 import subprocess
 
@@ -26,13 +27,17 @@ class TestPdMIDIPatches(TestPdMIDIBase):
 
     @classmethod
     def setUpClass(cls):
-        command = "cd tests/src/; " \
-            "clang++ create_test_midi.cpp midifile/src/MidiFile.cpp midifile/src/MidiEventList.cpp " \
-            "midifile/src/MidiMessage.cpp midifile/src/MidiEvent.cpp midifile/src/Binasc.cpp -I midifile/include/ " \
-            "-o create_test_midi ; " \
-            "./create_test_midi"
+        out_file_name = "create_test_midi.exe" if platform.system() == "Windows" else "create_test_midi"
+        compile_cmd = [
+            "clang++", "create_test_midi.cpp", "midifile/src/MidiFile.cpp", "midifile/src/MidiEventList.cpp",
+            "midifile/src/MidiMessage.cpp", "midifile/src/MidiEvent.cpp", "midifile/src/Binasc.cpp",
+            "-I", "midifile/include/",
+            "-o", out_file_name
+        ]
 
-        subprocess.run(command, capture_output=True, shell=True)
+        tests_src_dir = os.path.join(os.path.dirname(__file__), "src")
+        subprocess.check_output(compile_cmd, cwd=tests_src_dir, shell=True)
+        subprocess.check_output([out_file_name], cwd=tests_src_dir, shell=True)
 
     def test_midinotein(self):
         self._test_midi_patch("test-midinotein.pd")
