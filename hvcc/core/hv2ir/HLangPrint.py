@@ -1,4 +1,5 @@
 # Copyright (C) 2014-2018 Enzien Audio, Ltd.
+# Copyright (C) 2023 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -13,21 +14,30 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from typing import Optional, Dict
+
 from .HeavyLangObject import HeavyLangObject
 from .HeavyIrObject import HeavyIrObject
+from .HeavyGraph import HeavyGraph
 
 
 class HLangPrint(HeavyLangObject):
     """ Handles the HeavyLang "print" object.
     """
 
-    def __init__(self, obj_type, args, graph, annotations=None):
+    def __init__(
+        self,
+        obj_type: str,
+        args: Dict,
+        graph: 'HeavyGraph',
+        annotations: Optional[Dict] = None
+    ) -> None:
         assert obj_type == "print"
-        HeavyLangObject.__init__(self, obj_type, args, graph,
-                                 num_inlets=1,
-                                 num_outlets=0,
-                                 annotations=annotations)
+        super().__init__(obj_type, args, graph,
+                         num_inlets=1,
+                         num_outlets=0,
+                         annotations=annotations)
 
-    def reduce(self):
+    def reduce(self) -> tuple:
         x = HeavyIrObject("__print", self.args)
         return ({x}, self.get_connection_move_list(x))

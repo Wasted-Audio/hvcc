@@ -1,31 +1,59 @@
-[![Build Status](https://github.com/Wasted-Audio/hvcc/actions/workflows/build.yml/badge.svg)](https://github.com/Wasted-Audio/hvcc/actions)
-
-This is an attempt to modernize `hvcc` to work with `python3` and add some additional targets.
-
-Not all functionality is being tested. Bugreports and feedback are appreciated.
-
 # Heavy Compiler Collection (hvcc)
+
+[![Build Status](https://github.com/Wasted-Audio/hvcc/actions/workflows/build.yml/badge.svg)](https://github.com/Wasted-Audio/hvcc/actions)
+[![pypi](https://img.shields.io/pypi/v/hvcc.svg)](https://pypi.python.org/pypi/hvcc)
+[![python](https://img.shields.io/pypi/pyversions/hvcc.svg)](https://pypi.python.org/pypi/hvcc)
 
 `hvcc` is a python-based dataflow audio programming language compiler that generates C/C++ code and a variety of specific framework wrappers.
 
 ## Background
 
-The original need for `hvcc` arose from running against performance limitations while creating interactive music and sound products for the iPhone. [Pure Data](https://puredata.info) (libpd) was the only real choice for a design tool as it was embeddable and provided a high enough abstraction level that musicians or sound designers could be creative.
+Originaly created by Enzien Audio, the need for `hvcc` arose from running against performance limitations while creating interactive music and sound products for the iPhone. [Pure Data](https://puredata.info) (libpd) was the only real choice for a design tool as it was embeddable and provided a high enough abstraction level that musicians or sound designers could be creative.
 
 The goal was to leverage Pure Data as a design interface and statically interpret the resultant patches to generate a low-level, portable and optimised C/C++ program that would be structured to take advantage of modern hardware whilst still generating the same behaviour and audio output as Pure Data.
 
-It has since then been expanded to provide further support for many different platforms and frameworks, targeting game audio design, daw plugins and embedded production tools.
+It has since then been expanded to provide further support for many different platforms and frameworks, targeting game audio design, daw plugins and embedded production tools. In 2021 Wasted Audio took over maintenance of the project.
+
+## Documentation
+
+* [Introduction](/docs/01.introduction.md)
+  * [What is heavy?](/docs/01.introduction.md#what-is-heavy)
+  * [Supported patch formats](/docs/01.introduction.md#supported-patch-formats)
+  * [Supported platforms](/docs/01.introduction.md#supported-platforms)
+  * [Supported frameworks](/docs/01.introduction.md#supported-frameworks)
+  * [Licensing](/docs/01.introduction.md#licensing)
+* [Getting Started](/docs/02.getting_started.md)
+* [Generators](/docs/03.generators.md)
+* [MIDI](/docs/04.midi.md)
+* [C API](/docs/05.c.md)
+* [C++ API](/docs/06.cpp.md)
+* [Heavy Lang Info](/docs/07.heavy_lang.md)
+* [Heavy IR Info](/docs/08.heavy_ir_lang.md)
+* [Supported vanilla objects](/docs/09.supported_vanilla_objects.md)
+* [Unsupported vanilla objects](/docs/10.unsupported_vanilla_objects.md)
+
+## Integrations
+
+hvcc has been integrated into several projects and services. This allows to easily compile patches without having to install hvcc manually.
+
+* [plugdata](https://plugdata.org/) - a new way to use Pure Data. Includes a full toolchain and targets Daisy, DPF and pd externals.
+* [mod-cloud-builder](https://github.com/moddevices/mod-cloud-builder) - An online service for building LV2 plugins for the MOD platform.
+* [OWL Patch Library](https://www.rebeltech.org/patch-library) - An online service for building OWL plugins (uses an old fork).
 
 ## Requirements
 
-* python 3.7 or higher
-    - `jinja2` (for generator templating)
-    - `importlib_resources` (for reading static resources)
-    - `json2daisy` (for daisy integration)
-    - `tox` (for tests, optional)
-    - `clang/clang++` (for building tests, optional)
+python 3.8 until 3.12
+
+  * `jinja2` (for generator templating)
+  * `importlib_resources` (for reading static resources)
+  * `json2daisy` (for daisy integration)
+  * `tox` (for tests, optional)
+  * `numpy/scipy` (for tests, optional)
+  * `midifile` (for tests, optional)
+  * `clang/clang++` (for building tests, optional)
 
 ## Installation
+
 hvcc is available from pypi.org and can be installed using python3 pip:
 
 `$ pip3 install hvcc`
@@ -90,13 +118,14 @@ A list of available generator options can be found [here](/docs/03.generators.md
 
 `hvcc` will iterate through various directories when resolving patch objects and abstractions. The `-p` or `--search_paths` argument can be used to add additional folders for `hvcc` to look in. Note that this argument is not needed for abstractions in the same folder as the top-level patch.
 
-This can be handy when using a third-party patch library for example https://github.com/Wasted-Audio/heavylib.
+This can be handy when using a third-party patch library like [heavylib](https://github.com/Wasted-Audio/heavylib) for example.
 
 Simply append any folder paths after the `-p` flag like so:
 
 `$ hvcc ~/myProject/_main.pd -o ~/Desktop/somewhere/else/ -n mySynth -p ~/Workspace/Projects/Enzien/heavylib/ ~/Desktop/myLib/`
 
 ### `-m` Meta Data
+
 `hvcc` can take extra meta-data via a supplied json file. It depends on the generator which fields are supported.
 
 ### `--copyright` User Copyright
@@ -113,32 +142,16 @@ This can be changed with `--copyright` parameter
 
 Displays all the available parameters and options for hvcc.
 
-## Documentation
-
-* [Introduction](/docs/01.introduction.md)
-  - [What is heavy?](/docs/01.introduction.md#what-is-heavy)
-  - [Supported patch formats](/docs/01.introduction.md#supported-patch-formats)
-  - [Supported platforms](/docs/01.introduction.md#supported-platforms)
-  - [Supported frameworks](/docs/01.introduction.md#supported-frameworks)
-  - [Licensing](/docs/01.introduction.md#licensing)
-* [Getting Started](/docs/02.getting_started.md)
-* [Generators](/docs/03.generators.md)
-* [MIDI](/docs/04.midi.md)
-* [C API](/docs/05.c.md)
-* [C++ API](/docs/06.cpp.md)
-* [Heavy Lang Info](/docs/07.heavy_lang.md)
-* [Heavy IR Info](/docs/08.heavy_ir_lang.md)
-* [Supported vanilla objects](/docs/09.supported_vanilla_objects.md)
-* [Unsupported vanilla objects](/docs/10.unsupported_vanilla_objects.md)
-
 ## Contact
+
 There are several places where heavy/hvcc conversation is happening:
+
 * [Discord](https://discord.gg/fmxJveg)
 * [IRC](https://web.libera.chat/#hvcc)
 * A number of forums:
   * [Bela](https://forum.bela.io/?q=hvcc)
   * [Rebel Technology](https://community.rebeltech.org/tags/puredata)
-  * [Daisy](https://forum.electro-smith.com/t/pure-data/110)
+  * [Daisy](https://forum.electro-smith.com/c/integrations/pure-data/32)
   * [MOD](https://forum.moddevices.com/c/developers/pure-data/56)
 
 Or you can use the [discussions](https://github.com/Wasted-Audio/hvcc/discussions) tab of this repository

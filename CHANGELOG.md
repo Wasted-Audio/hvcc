@@ -1,7 +1,55 @@
 CHANGELOG
 =====
 
-Next Release
+0.10.0
+-----
+
+* Objects: `[bang~]`
+* Object improvements: support `[clear(` message for `[delwrite~]`
+* Documentation fixes/additions
+* Daisy: ability to set samplerate and blocksize
+* Daisy: adding midirealtimein, polytouchin/out, midiin (midiout WIP)
+* Daisy: use `libdaisy_path` in meta config; both string/path and int/depth possible
+* DPF: enum for UI parameter IDs
+* DPF bugfixes: correct input PortGroup names; correct UI slider updates; midiout reimplementation
+* Wwise: complete rewrite/refactor - now uses SDK build tools - thanks to @eu-ch !!
+* Bugfix: correct alignment in AVX pow~ implementation
+* Cleanup: remove deprecated build.json
+* Deprecate py37, enable py312
+
+0.9.0
+-----
+
+* Daisy: set bootloader type in Makefile
+* Daisy: MIDI i/o for NoteOn/Off, ControlChange, ProgramChange, ChannelPressure, and PitchBend
+* Daisy: USB MIDI toggle (disabled by debug printing)
+* Daisy: allow for debug printing (off by default, increases program size due to formatting)
+* DPF bugfixes: broken midi template include; MIDI_RT_CLOCK fails under certain conditions
+* Pdext bugfixes: Windows library linking
+
+0.8.0
+-----
+
+* DPF: enumerated parameters
+* DPF: special `__hv_dpf_bpm` receiver of transport BPM value
+* Pdext: migrate to `pd-lib-builder` and newer `m_pd.h` and add some initial documentation.
+* deprecated: Fabric generator - no longer supported
+* docs: updates on missing objects and limitations
+* bugfix: issues #24, #50, #100, #106
+
+0.7.0
+-----
+
+* improvements: add type annotations to all methods; run mypy over the whole library
+* DPF: basic UI generation using dpf-widgets (imgui + modgui)
+* DPF: basic port groups support
+* abstractions: use duplicate of delread4~.pd for vd~.pd
+* deprecated: internal Bela implementation (use downstream instead)
+* docs: add notes
+* docs: fix markdown syntax
+* bugfixes: issues #86, #87 and #93
+
+0.6.3
 -----
 
 * add polytouchin and polytouchout

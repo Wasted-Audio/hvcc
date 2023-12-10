@@ -539,14 +539,14 @@ static inline void __hv_pow_f(hv_bInf_t bIn0, hv_bInf_t bIn1, hv_bOutf_t bOut) {
   _mm256_store_ps(b, bIn0);
   _mm256_store_ps(b+8, bIn1);
   *bOut = _mm256_set_ps(
-      hv_pow_f(b[7], b[7]),
-      hv_pow_f(b[6], b[6]),
-      hv_pow_f(b[5], b[5]),
-      hv_pow_f(b[4], b[4]),
-      hv_pow_f(b[3], b[3]),
-      hv_pow_f(b[2], b[2]),
-      hv_pow_f(b[1], b[1]),
-      hv_pow_f(b[0], b[0]));
+      hv_pow_f(b[7], b[15]),
+      hv_pow_f(b[6], b[14]),
+      hv_pow_f(b[5], b[13]),
+      hv_pow_f(b[4], b[12]),
+      hv_pow_f(b[3], b[11]),
+      hv_pow_f(b[2], b[10]),
+      hv_pow_f(b[1], b[9]),
+      hv_pow_f(b[0], b[8]));
 #elif HV_SIMD_SSE
   float *b = (float *) hv_alloca(8*sizeof(float));
   _mm_store_ps(b, bIn0);
@@ -612,6 +612,18 @@ static inline void __hv_lte_f(hv_bInf_t bIn0, hv_bInf_t bIn1, hv_bOutf_t bOut) {
   *bOut = vreinterpretq_f32_u32(vcleq_f32(bIn0, bIn1));
 #else // HV_SIMD_NONE
   *bOut = (bIn0 <= bIn1) ? 1.0f : 0.0f;
+#endif
+}
+
+static inline void __hv_eq_f(hv_bInf_t bIn0, hv_bInf_t bIn1, hv_bOutf_t bOut) {
+#if HV_SIMD_AVX
+  *bOut = _mm256_cmp_ps(bIn0, bIn1, _CMP_EQ_OQ);
+#elif HV_SIMD_SSE
+  *bOut = _mm_cmpeq_ps(bIn0, bIn1);
+#elif HV_SIMD_NEON
+  *bOut = vreinterpretq_f32_u32(vceqq_f32(bIn0, bIn1));
+#else // HV_SIMD_NONE
+  *bOut = (bIn0 == bIn1) ? 1.0f : 0.0f;
 #endif
 }
 

@@ -1,4 +1,5 @@
 # Copyright (C) 2014-2018 Enzien Audio, Ltd.
+# Copyright (C) 2021-2023 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -13,13 +14,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import hashlib
 import jinja2
 import os
 import shutil
 import time
+from typing import Dict, Optional
+
 from ..copyright import copyright_manager
-from ..buildjson import buildjson
+from ..filters import filter_string_cap, filter_templates, filter_xcode_build, filter_xcode_fileref
 
 
 class c2unity:
@@ -27,36 +29,18 @@ class c2unity:
     """
 
     @classmethod
-    def filter_xcode_build(clazz, s):
-        """Return a build hash suitable for use in an Xcode project file.
-        """
-        s = f"{s}_build"
-        s = hashlib.md5(s.encode('utf-8'))
-        s = s.hexdigest().upper()[0:24]
-        return s
-
-    @classmethod
-    def filter_xcode_fileref(clazz, s):
-        """Return a fileref hash suitable for use in an Xcode project file.
-        """
-        f"{s}_fileref"
-        s = hashlib.md5(s.encode('utf-8'))
-        s = s.hexdigest().upper()[0:24]
-        return s
-
-    @classmethod
-    def filter_string_cap(clazz, s, li):
-        """Returns a truncated string with ellipsis if it exceeds a certain length.
-        """
-        return s if (len(s) <= li) else f"{s[0:li - 3]}..."
-
-    @classmethod
-    def filter_templates(clazz, template_name):
-        return False if os.path.basename(template_name) in [".DS_Store"] else True
-
-    @classmethod
-    def compile(clazz, c_src_dir, out_dir, externs, patch_name=None, patch_meta: dict = None,
-                num_input_channels=0, num_output_channels=0, copyright=None, verbose=False):
+    def compile(
+        cls,
+        c_src_dir: str,
+        out_dir: str,
+        externs: Dict,
+        patch_name: Optional[str] = None,
+        patch_meta: Optional[Dict] = None,
+        num_input_channels: int = 0,
+        num_output_channels: int = 0,
+        copyright: Optional[str] = None,
+        verbose: Optional[bool] = False
+    ) -> Dict:
 
         tick = time.time()
 
@@ -71,9 +55,9 @@ class c2unity:
 
         # initialise the jinja template environment
         env = jinja2.Environment()
-        env.filters["xcode_build"] = c2unity.filter_xcode_build
-        env.filters["xcode_fileref"] = c2unity.filter_xcode_fileref
-        env.filters["cap"] = c2unity.filter_string_cap
+        env.filters["xcode_build"] = filter_xcode_build
+        env.filters["xcode_fileref"] = filter_xcode_fileref
+        env.filters["cap"] = filter_string_cap
         env.loader = jinja2.FileSystemLoader(
             encoding="utf-8-sig",
             searchpath=[os.path.join(os.path.dirname(os.path.abspath(__file__)), "templates")])
@@ -95,7 +79,7 @@ class c2unity:
             shutil.copytree(c_src_dir, src_out_dir)
 
             # generate files from templates
-            for f in env.list_templates(filter_func=c2unity.filter_templates):
+            for f in env.list_templates(filter_func=filter_templates):
                 file_path = os.path.join(out_dir, f)
                 file_path = file_path.replace("{{name}}", patch_name)
 
@@ -114,17 +98,6 @@ class c2unity:
                         pool_sizes_kb=externs["memoryPoolSizesKb"],
                         compile_files=os.listdir(src_out_dir),
                         copyright=copyright))
-
-            buildjson.generate_json(
-                out_dir,
-                android_armv7a_args=["APP_ABI=armeabi-v7a", "-j"],
-                linux_x64_args=["-j"],
-                macos_x64_args=["-project", f"Hv_{patch_name}_Unity.xcodeproj",
-                                "-arch", "x86_64", "-alltargets"],
-                win_x64_args=["/property:Configuration=Release", "/property:Platform=x64",
-                              "/t:Rebuild", f"Hv_{patch_name}_Unity.sln", "/m"],
-                win_x86_args=["/property:Configuration=Release", "/property:Platform=x86",
-                              "/t:Rebuild", f"Hv_{patch_name}_Unity.sln", "/m"])
 
             return {
                 "stage": "c2unity",

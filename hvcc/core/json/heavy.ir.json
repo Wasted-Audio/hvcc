@@ -1000,6 +1000,27 @@
       "required": false
     }]
   },
+  "__eq~f": {
+    "inlets": [
+      "~f>",
+      "~f>"
+    ],
+    "ir": {
+      "control": false,
+      "signal": true,
+      "init": false
+    },
+    "outlets": [
+      "~f>"
+    ],
+    "args": [
+
+    ],
+    "perf": {
+      "avx": 3,
+      "sse": 3
+    }
+  },
   "__exp": {
     "inlets": [
       "-->"
@@ -2757,6 +2778,34 @@
     },
     "outlets": [
       "~f>",
+      "-->"
+    ],
+    "args": [{
+      "default": null,
+      "value_type": "string",
+      "name": "table",
+      "description": "The name of the table to reference.",
+      "required": true
+    }],
+    "perf": {
+      "avx": 1,
+      "sse": 1
+    }
+  },
+  "__tabread_stoppable~f": {
+    "inlets": [
+      "-->",
+      "-->",
+      "-->"
+    ],
+    "ir": {
+      "control": true,
+      "signal": true,
+      "init": true
+    },
+    "outlets": [
+      "~f>",
+      "-->",
       "-->"
     ],
     "args": [{

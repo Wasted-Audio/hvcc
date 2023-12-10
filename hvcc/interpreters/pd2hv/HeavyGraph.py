@@ -1,4 +1,5 @@
 # Copyright (C) 2014-2018 Enzien Audio, Ltd.
+# Copyright (C) 2023 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,18 +16,21 @@
 
 import json
 import os
+from typing import Optional, List, Dict
 
 from .PdObject import PdObject
 from .HeavyObject import HeavyObject
 
 
 class HeavyGraph(PdObject):
-    def __init__(self, hv_path, obj_args=None, pos_x=0, pos_y=0):
-        PdObject.__init__(
-            self,
-            os.path.basename(hv_path).split(".")[0],
-            obj_args,
-            pos_x, pos_y)
+    def __init__(
+        self,
+        hv_path: str,
+        obj_args: Optional[List] = None,
+        pos_x: int = 0,
+        pos_y: int = 0
+    ) -> None:
+        super().__init__(os.path.basename(hv_path).split(".")[0], obj_args, pos_x, pos_y)
 
         # read the heavy graph
         with open(hv_path, "r") as f:
@@ -66,8 +70,8 @@ class HeavyGraph(PdObject):
         # be supplied (because they are resolved)
         self.hv_json["args"] = []
 
-    def get_outlet_connection_type(self, outlet_index):
+    def get_outlet_connection_type(self, outlet_index: int) -> str:
         return self.__outlet_connection_types[outlet_index]
 
-    def to_hv(self):
+    def to_hv(self) -> Dict:
         return self.hv_json

@@ -22,6 +22,23 @@ public:
     {% endfor %}
   };
 
+{% if meta.port_groups is defined %}
+  enum PortGroups
+  {
+{%- if meta.port_groups.input|length %}
+  {%- for group, value in meta.port_groups.input.items() %}
+    kPortGroup{{group}},
+  {%- endfor %}
+{%- endif %}
+{%- if meta.port_groups.output|length %}
+  {%- for group, value in meta.port_groups.output.items() %}
+    kPortGroup{{group}},
+  {%- endfor %}
+{%- endif %}
+    kPortGroupCount
+  };
+{%- endif %}
+
   {{class_name}}();
   ~{{class_name}}() override;
 
@@ -87,6 +104,10 @@ protected:
   // Init
 
   void initParameter(uint32_t index, Parameter& parameter) override;
+  {% if meta.port_groups is defined %}
+  void initAudioPort(bool input, uint32_t index, AudioPort& port) override;
+  void initPortGroup(uint32_t groupId, PortGroup& portGroup) override;
+  {%- endif %}
 
   // -------------------------------------------------------------------
   // Internal data
@@ -124,6 +145,10 @@ private:
   float samplesProcessed;
   double nextClockTick;
   double sampleAtCycleStart;
+
+  // midi out buffer
+  int midiOutCount;
+  MidiEvent midiOutEvent;
 
   // heavy context
   HeavyContextInterface *_context;
