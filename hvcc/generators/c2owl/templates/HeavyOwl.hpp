@@ -105,6 +105,7 @@ public:
       uint8_t note = hv_msg_getFloat(m, 0);
       uint8_t velocity = hv_msg_getFloat(m, 1);
       uint8_t ch = hv_msg_getFloat(m, 2);
+      ch %= 16;  // drop any pd "ports"
       // debugMessage("noteout", note, velocity, ch);
       sendMidi(MidiMessage::note(ch, note, velocity));
       }
@@ -114,6 +115,7 @@ public:
       uint8_t value = hv_msg_getFloat(m, 0);
       uint8_t cc = hv_msg_getFloat(m, 1);
       uint8_t ch = hv_msg_getFloat(m, 2);
+      ch %= 16;
       // debugMessage("ctlout", value, cc, ch);
       sendMidi(MidiMessage::cc(ch, cc, value));
       }
@@ -122,15 +124,29 @@ public:
       {
       uint16_t value = hv_msg_getFloat(m, 0);
       uint8_t ch = hv_msg_getFloat(m, 1);
+      ch %= 16;
       // debugMessage("bendout", value, ch);
       sendMidi(MidiMessage::pb(ch, value));
       }
       break;
+    // case HV_HASH_POLYTOUCHOUT:
+    //   uint8_t value = hv_msg_getFloat(m, 0);
+    //   uint8_t note = hv_msg_getFloat(m, 1);
+    //   uint8_t ch = hv_msg_getFloat(m, 2);
+    //   ch %= 16;
+    //   sendMidi(MidiMessage::kp(ch, note, value));
+    //   break;
     case HV_HASH_TOUCHOUT:
-      sendMidi(MidiMessage::cp((uint8_t)hv_msg_getFloat(m, 1), (uint8_t)hv_msg_getFloat(m, 0)));
+      uint8_t value = hv_msg_getFloat(m, 0);
+      uint8_t ch = hv_msg_getFloat(m, 1);
+      ch %= 16;
+      sendMidi(MidiMessage::cp(ch, value));
       break;
     case HV_HASH_PGMOUT:
-      sendMidi(MidiMessage::pc((uint8_t)hv_msg_getFloat(m, 1), (uint8_t)hv_msg_getFloat(m, 0)));
+      uint8_t value = hv_msg_getFloat(m, 0);
+      uint8_t ch = hv_msg_getFloat(m, 1);
+      ch %= 16;
+      sendMidi(MidiMessage::pc(ch, value));
       break;
       {% for param, name, typ, namehash, minvalue, maxvalue, defvalue, button in jdata if typ == 'SEND'%}
       {% if button == True %}
@@ -178,8 +194,8 @@ public:
     case POLY_KEY_PRESSURE:
       context->sendMessageToReceiverV
   (HV_HASH_POLYTOUCHIN, 0, "fff"
-   (float)msg.getChannelPressure(),
-   (float)msg.getStatus(),
+   (float)msg.getPolyKeyPressure(),
+   (float)msg.getNote(),
    (float)msg.getChannel());
       break
     case CHANNEL_PRESSURE:
