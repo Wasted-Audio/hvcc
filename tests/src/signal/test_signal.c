@@ -51,7 +51,7 @@ int main(int argc, const char *argv[]) {
   }
 
   tinywav_close(&tw);
-  hv_delete(context);
+  hv_heavy_free(context);
   free(outBuffers);
   return 0;
 }
