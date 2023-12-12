@@ -65,12 +65,20 @@ AudioLibLoader.prototype.init = function(options) {
 }
 
 AudioLibLoader.prototype.start = function() {
-  this.webAudioContext.resume();
+  if (this.audiolib) {
+    this.webAudioProcessor.connect(this.webAudioContext.destination);
+  } else {
+    this.webAudioContext.resume();
+  }
   this.isPlaying = true;
 }
 
 AudioLibLoader.prototype.stop = function() {
-  this.webAudioContext.suspend();
+  if (this.audiolib) {
+    this.webAudioProcessor.disconnect(this.webAudioContext.destination);
+  } else {
+    this.webAudioContext.suspend();
+  }
   this.isPlaying = false;
 }
 
