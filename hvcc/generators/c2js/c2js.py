@@ -242,7 +242,7 @@ class c2js:
                                          output_name=f"{patch_name}_AudioLibWorklet",
                                          post_js_path=post_js_path,
                                          should_modularize=0,
-                                         environment="web,worker",
+                                         environment="shell,worker",
                                          pre_js_path=pre_js_path,
                                          binaryen_async=0)
 
