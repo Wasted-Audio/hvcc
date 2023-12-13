@@ -36,12 +36,16 @@ AudioLibLoader.prototype.init = function(options) {
           processorOptions: {
             sampleRate: this.webAudioContext.sampleRate,
             blockSize,
-            printHook: options.printHook && options.printHook.toString(),
-            sendHook: options.sendHook && options.sendHook.toString()
           }
         });
         this.webAudioWorklet.port.onmessage = (event) => {
-          console.log('Message from {{name}}_AudioLibWorklet:', event.data);
+          if (event.data.type === 'printHook') {
+            options.printHook(event.data.payload);
+          } else if (event.data.type === 'sendHook') {
+            options.sendHook(event.data.payload[0], event.data.payload[1])
+          } else {
+            console.log('Unhandled message from {{name}}_AudioLibWorklet:', event.data);
+          }
         };
         this.webAudioWorklet.connect(this.webAudioContext.destination);
       } else {
