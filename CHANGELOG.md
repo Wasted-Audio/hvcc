@@ -1,6 +1,11 @@
 CHANGELOG
 =====
 
+Next Release
+-----
+
+* JS Bugfix: printHook and sendHook for AudioWorklet; mention emsdk limitations in docs
+
 0.10.0
 -----
 
