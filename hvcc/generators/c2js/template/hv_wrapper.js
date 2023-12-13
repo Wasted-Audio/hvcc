@@ -39,10 +39,10 @@ AudioLibLoader.prototype.init = function(options) {
           }
         });
         this.webAudioWorklet.port.onmessage = (event) => {
-          if (event.data.type === 'printHook') {
+          if (event.data.type === 'printHook' && options.printHook) {
             options.printHook(event.data.payload);
-          } else if (event.data.type === 'sendHook') {
-            options.sendHook(event.data.payload[0], event.data.payload[1])
+          } else if (event.data.type === 'sendHook' && options.sendHook) {
+            options.sendHook(event.data.payload[0], event.data.payload[1]);
           } else {
             console.log('Unhandled message from {{name}}_AudioLibWorklet:', event.data);
           }
