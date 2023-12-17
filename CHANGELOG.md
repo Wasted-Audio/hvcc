@@ -5,6 +5,7 @@ Next Release
 -----
 
 * JS Bugfix: printHook and sendHook for AudioWorklet; mention emsdk limitations in docs
+* Bugfix: stripnote missing right inlet
 
 0.10.0
 -----
