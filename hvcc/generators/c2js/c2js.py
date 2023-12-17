@@ -75,6 +75,8 @@ class c2js:
         """
 
         emcc_path = which("emcc")
+        if os.name == 'nt' and not emcc_path.lower().endswith(".bat"):
+            emcc_path = emcc_path + '.bat'
 
         if emcc_path is None:
             raise HeavyException("emcc is not in the PATH")
