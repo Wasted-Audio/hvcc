@@ -87,8 +87,9 @@ class TestPdSignalBase(HvBaseTest):
 
         # copy over additional C assets
         c_src_dir = os.path.join(out_dir, "c")
-        for c in os.listdir(os.path.join(self.SCRIPT_DIR, "src", "signal")):
-            shutil.copy2(os.path.join(self.SCRIPT_DIR, "src", "signal", c), c_src_dir)
+        shutil.copy2(os.path.join(self.SCRIPT_DIR, "src/test_signal.c"), c_src_dir)
+        shutil.copy2(os.path.join(self.SCRIPT_DIR, "src/tinywav/tinywav.h"), c_src_dir)
+        shutil.copy2(os.path.join(self.SCRIPT_DIR, "src/tinywav/tinywav.c"), c_src_dir)
 
         # prepare the clang command
         source_files = os.listdir(c_src_dir)

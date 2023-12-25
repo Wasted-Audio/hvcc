@@ -63,7 +63,7 @@ class TestPdSpeedBase(HvBaseTest):
         c_src_dir = os.path.join(out_dir, "c")
 
         # copy additional source
-        shutil.copy2(os.path.join(self.SCRIPT_DIR, "test_speed.c"), c_src_dir)
+        shutil.copy2(os.path.join(self.SCRIPT_DIR, "src/test_speed.c"), c_src_dir)
 
         c_sources = [os.path.join(c_src_dir, c) for c in os.listdir(c_src_dir) if c.endswith(".c")]
 
