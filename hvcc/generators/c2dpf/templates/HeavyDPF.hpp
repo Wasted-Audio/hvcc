@@ -20,6 +20,9 @@ public:
     {% for k, v in receivers -%}
       param{{v.display}},
     {% endfor %}
+    {% for k, v in senders -%}
+      param{{v.display}},
+    {% endfor %}
   };
 
 {% if meta.port_groups is defined %}
@@ -44,6 +47,7 @@ public:
 
   void handleMidiInput(uint32_t frames, const MidiEvent* midiEvents, uint32_t midiEventCount);
   void handleMidiSend(uint32_t sendHash, const HvMessage *m);
+  void setOutputParameter(const char *sendName, const HvMessage *m);
 
 protected:
   // -------------------------------------------------------------------
@@ -135,9 +139,9 @@ protected:
   // -------------------------------------------------------------------
 
 private:
-  {%- if receivers|length > 0 %}
+  {%- if (receivers|length > 0) or senders|length > 0 %}
   // parameters
-  float _parameters[{{receivers|length}}]; // in range of [0,1]
+  float _parameters[{{receivers|length + senders|length}}]; // in range of [0,1]
   {%- endif %}
 
   // transport values

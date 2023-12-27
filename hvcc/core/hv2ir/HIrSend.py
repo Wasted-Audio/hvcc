@@ -48,6 +48,7 @@ class HIrSend(HeavyIrObject):
                 "id": self.id,
                 "onMessage": [on_message_list],
                 "extern": self.args["extern"],
+                "attributes": self.args["attributes"],
                 "hash": self.args["hash"],
                 "display": self.args["name"],
                 "name": ((f"_{self.args['name']}") if re.match(r"\d", self.args["name"]) else self.args["name"])

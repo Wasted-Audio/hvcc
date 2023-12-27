@@ -49,6 +49,37 @@ class PdSendObject(PdObject):
         except Exception:
             pass
 
+        if self.__extern_type == "param":
+            try:
+                self.__attributes = {
+                    "min": 0.0,
+                    "max": 1.0,
+                    "default": 0.5,
+                    "type": "float"
+                }
+                self.__attributes["min"] = float(self.obj_args[2])
+                self.__attributes["max"] = float(self.obj_args[3])
+                self.__attributes["default"] = float(self.obj_args[4])
+                self.__attributes["type"] = str(self.obj_args[5])
+            except ValueError:
+                self.add_warning(
+                    f"Minimum, maximum, and default values for Parameter {self.__receiver_name}  must be numbers.")
+            except Exception:
+                pass
+
+            if not (self.__attributes["min"] <= self.__attributes["default"]):
+                self.add_error("Default parameter value is less than the minimum. "
+                               "Receiver will not be exported: {0:g} < {1:g}".format(
+                                   self.__attributes["default"],
+                                   self.__attributes["min"]))
+                self.__extern_type = None
+            if not (self.__attributes["default"] <= self.__attributes["max"]):
+                self.add_error("Default parameter value is greater than the maximum. "
+                               "Receiver will not be exported: {0:g} > {1:g}".format(
+                                   self.__attributes["default"],
+                                   self.__attributes["max"]))
+                self.__extern_type = None
+
         if '@raw' in self.obj_args or '@owl' in self.obj_args:  # TODO(dromer): deprecate @owl on next stable release
             try:
                 pd_raw_args = parse_pd_raw_args(self.obj_args)

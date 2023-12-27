@@ -5,7 +5,7 @@
 #include <set>
 
 
-#define HV_LV2_NUM_PARAMETERS {{receivers|length}}
+#define HV_LV2_NUM_PARAMETERS {{receivers|length + senders|length}}
 
 #define HV_HASH_NOTEIN          0x67E37CA3
 #define HV_HASH_CTLIN           0x41BE0f9C
@@ -55,6 +55,7 @@ static void hvSendHookFunc(HeavyContextInterface *c, const char *sendName, uint3
   {{class_name}}* plugin = ({{class_name}}*)c->getUserData();
   if (plugin != nullptr)
   {
+    plugin->setOutputParameter(sendName, m);
 {%- if meta.midi_output is defined and meta.midi_output == 1 %}
 #if DISTRHO_PLUGIN_WANT_MIDI_OUTPUT
     plugin->handleMidiSend(sendHash, m);
@@ -80,8 +81,13 @@ static void hvPrintHookFunc(HeavyContextInterface *c, const char *printLabel, co
 {{class_name}}::{{class_name}}()
  : Plugin(HV_LV2_NUM_PARAMETERS, 0, 0)
 {
-  {% for k, v in receivers -%}
+  {% if receivers|length > 0 -%}
+    {% for k, v in receivers -%}
   _parameters[{{loop.index-1}}] = {{v.attributes.default}}f;
+    {% endfor -%}
+  {% endif %}
+  {% for k, v in senders -%}
+  _parameters[{{receivers|length + loop.index-1}}] = {{v.attributes.default}}f;
   {% endfor %}
 
   _context = hv_{{name}}_new_with_options(getSampleRate(), {{pool_sizes_kb.internal}}, {{pool_sizes_kb.inputQueue}}, {{pool_sizes_kb.outputQueue}});
@@ -107,56 +113,16 @@ static void hvPrintHookFunc(HeavyContextInterface *c, const char *printLabel, co
 
 void {{class_name}}::initParameter(uint32_t index, Parameter& parameter)
 {
-  {%- if receivers|length > 0 -%}
+  {%- if (receivers|length > 0) or (senders|length > 0) -%}
   // initialise parameters with defaults
   switch (index)
   {
-    {% for k, v in receivers -%}
-      case param{{v.display}}:
-        parameter.name = "{{v.display.replace('_', ' ')}}";
-        parameter.symbol = "{{v.display|lower}}";
-      {%- if v.attributes.type == 'db': %}
-        parameter.unit = "dB";
-      {%- elif v.attributes.type in ['hz', 'log_hz']: %}
-        parameter.unit = "Hz";
-      {%- endif %}
-        parameter.hints = kParameterIsAutomatable
-      {%- if v.attributes.type == 'bool': %}
-        | kParameterIsBoolean
-      {%- elif v.attributes.type == 'trig': -%}
-        | kParameterIsTrigger
-      {%- elif v.attributes.type == 'int': -%}
-        | kParameterIsInteger
-      {%- elif v.attributes.type in ['log', 'log_hz']: -%}
-        | kParameterIsLogarithmic
-      {%- endif %};
-        parameter.ranges.min = {{v.attributes.min}}f;
-        parameter.ranges.max = {{v.attributes.max}}f;
-        parameter.ranges.def = {{v.attributes.default}}f;
-      {%- if v.attributes.type == 'db' and not (meta.enumerators is defined and meta.enumerators[v.display] is defined): %}
-        {
-          ParameterEnumerationValue* const enumValues = new ParameterEnumerationValue[1];
-          enumValues[0].value = {{v.attributes.min}}f;
-          enumValues[0].label = "-inf";
-          parameter.enumValues.count = 1;
-          parameter.enumValues.values = enumValues;
-        }
-      {%- endif %}
-      {%- if meta.enumerators is defined and meta.enumerators[v.display] is defined %}
-        {% set enums = meta.enumerators[v.display] %}
-        {% set enumlen = enums|length %}
-        if (ParameterEnumerationValue *values = new ParameterEnumerationValue[{{enumlen}}])
-        {
-          parameter.enumValues.restrictedMode = true;
-          {% for i in enums -%}
-          values[{{loop.index - 1}}].value = {{loop.index - 1}}.0f;
-          values[{{loop.index - 1}}].label = "{{i}}";
-          {% endfor -%}
-          parameter.enumValues.count = {{enumlen}};
-          parameter.enumValues.values = values;
-        }
-      {%- endif %}
-        break;
+    {% for k, v in receivers %}
+{% include 'parameter.cpp' %}
+    {% endfor -%}
+    {% for k, v in senders -%}
+    {% set param_out = true %}
+{% include 'parameter.cpp' %}
     {% endfor %}
   }
   {% endif %}
@@ -191,6 +157,18 @@ void {{class_name}}::setParameterValue(uint32_t index, float value)
   _parameters[index] = value;
   {% else %}
   // nothing to do
+  {%- endif %}
+}
+
+void {{class_name}}::setOutputParameter(const char *sendName, const HvMessage *m)
+{
+  {%- if senders|length > 0 %}
+    {% for k, v in senders -%}
+    if (sendName == "{{v.display}}")
+    {
+      _parameters[param{{v.display}}] = hv_msg_getFloat(m, 0);;
+    }
+    {% endfor %}
   {%- endif %}
 }
 
