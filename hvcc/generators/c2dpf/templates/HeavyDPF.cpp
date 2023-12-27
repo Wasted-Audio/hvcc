@@ -81,13 +81,8 @@ static void hvPrintHookFunc(HeavyContextInterface *c, const char *printLabel, co
 {{class_name}}::{{class_name}}()
  : Plugin(HV_LV2_NUM_PARAMETERS, 0, 0)
 {
-  {% if receivers|length > 0 -%}
-    {% for k, v in receivers -%}
+  {% for k, v in receivers + senders -%}
   _parameters[{{loop.index-1}}] = {{v.attributes.default}}f;
-    {% endfor -%}
-  {% endif %}
-  {% for k, v in senders -%}
-  _parameters[{{receivers|length + loop.index-1}}] = {{v.attributes.default}}f;
   {% endfor %}
 
   _context = hv_{{name}}_new_with_options(getSampleRate(), {{pool_sizes_kb.internal}}, {{pool_sizes_kb.inputQueue}}, {{pool_sizes_kb.outputQueue}});
@@ -108,7 +103,7 @@ static void hvPrintHookFunc(HeavyContextInterface *c, const char *printLabel, co
 }
 
 {%- if meta.port_groups is defined %}
-{% include 'HeavyDPF_PortGroups.cpp' %}
+{% include 'portGroups.cpp' %}
 {%- endif %}
 
 void {{class_name}}::initParameter(uint32_t index, Parameter& parameter)
@@ -118,11 +113,11 @@ void {{class_name}}::initParameter(uint32_t index, Parameter& parameter)
   switch (index)
   {
     {% for k, v in receivers %}
-{% include 'parameter.cpp' %}
+{% include 'initParameter.cpp' %}
     {% endfor -%}
     {% for k, v in senders -%}
     {% set param_out = true %}
-{% include 'parameter.cpp' %}
+{% include 'initParameter.cpp' %}
     {% endfor %}
   }
   {% endif %}
@@ -188,13 +183,13 @@ void {{class_name}}::setOutputParameter(const char *sendName, const HvMessage *m
 
 {%- if meta.midi_input is defined and meta.midi_input == 1 %}
 #if DISTRHO_PLUGIN_WANT_MIDI_INPUT
-{% include 'HeavyDPF_MIDI_Input.cpp' %}
+{% include 'midiInput.cpp' %}
 #endif
 {% endif %}
 
 {%- if meta.midi_output is defined and meta.midi_output == 1 %}
 #if DISTRHO_PLUGIN_WANT_MIDI_OUTPUT
-{% include 'HeavyDPF_MIDI_Output.cpp' %}
+{% include 'midiOutput.cpp' %}
 #endif
 {% endif %}
 
