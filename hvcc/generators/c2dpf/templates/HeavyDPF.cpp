@@ -5,7 +5,7 @@
 #include <set>
 
 
-#define HV_LV2_NUM_PARAMETERS {{receivers|length + senders|length}}
+#define HV_DPF_NUM_PARAMETER {{receivers|length + senders|length}}
 
 #define HV_HASH_NOTEIN          0x67E37CA3
 #define HV_HASH_CTLIN           0x41BE0f9C
@@ -55,7 +55,7 @@ static void hvSendHookFunc(HeavyContextInterface *c, const char *sendName, uint3
   {{class_name}}* plugin = ({{class_name}}*)c->getUserData();
   if (plugin != nullptr)
   {
-    plugin->setOutputParameter(sendName, m);
+    plugin->setOutputParameter(sendHash, m);
 {%- if meta.midi_output is defined and meta.midi_output == 1 %}
 #if DISTRHO_PLUGIN_WANT_MIDI_OUTPUT
     plugin->handleMidiSend(sendHash, m);
@@ -79,7 +79,7 @@ static void hvPrintHookFunc(HeavyContextInterface *c, const char *printLabel, co
 // Main DPF plugin class
 
 {{class_name}}::{{class_name}}()
- : Plugin(HV_LV2_NUM_PARAMETERS, 0, 0)
+ : Plugin(HV_DPF_NUM_PARAMETER, 0, 0)
 {
   {% for k, v in receivers + senders -%}
   _parameters[{{loop.index-1}}] = {{v.attributes.default}}f;
@@ -92,7 +92,7 @@ static void hvPrintHookFunc(HeavyContextInterface *c, const char *printLabel, co
 
   {% if receivers|length > 0 %}
   // ensure that the new context has the current parameters
-  for (int i = 0; i < HV_LV2_NUM_PARAMETERS; ++i) {
+  for (int i = 0; i < HV_DPF_NUM_PARAMETER; ++i) {
     setParameterValue(i, _parameters[i]);
   }
   {%- endif %}
@@ -128,7 +128,7 @@ void {{class_name}}::initParameter(uint32_t index, Parameter& parameter)
 
 float {{class_name}}::getParameterValue(uint32_t index) const
 {
-  {%- if receivers|length > 0 %}
+  {%- if (receivers|length > 0) or (senders|length > 0) %}
   return _parameters[index];
   {% else %}
   return 0.0f;
@@ -155,15 +155,16 @@ void {{class_name}}::setParameterValue(uint32_t index, float value)
   {%- endif %}
 }
 
-void {{class_name}}::setOutputParameter(const char *sendName, const HvMessage *m)
+void {{class_name}}::setOutputParameter(uint32_t sendHash, const HvMessage *m)
 {
   {%- if senders|length > 0 %}
+  switch (sendHash) {
     {% for k, v in senders -%}
-    if (sendName == "{{v.display}}")
-    {
-      _parameters[param{{v.display}}] = hv_msg_getFloat(m, 0);;
-    }
+    case {{v.hash}}:
+      _parameters[param{{v.display}}] = hv_msg_getFloat(m, 0);
+      break;
     {% endfor %}
+  }
   {%- endif %}
 }
 
@@ -227,7 +228,7 @@ void {{class_name}}::sampleRateChanged(double newSampleRate)
 
   {% if receivers|length > 0 -%}
   // ensure that the new context has the current parameters
-  for (int i = 0; i < HV_LV2_NUM_PARAMETERS; ++i) {
+  for (int i = 0; i < HV_DPF_NUM_PARAMETER; ++i) {
     setParameterValue(i, _parameters[i]);
   }
   {%- endif %}
