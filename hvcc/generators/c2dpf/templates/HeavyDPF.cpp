@@ -112,13 +112,9 @@ void {{class_name}}::initParameter(uint32_t index, Parameter& parameter)
   // initialise parameters with defaults
   switch (index)
   {
-    {% for k, v in receivers %}
+    {% for k, v in receivers + senders %}
 {% include 'initParameter.cpp' %}
     {% endfor -%}
-    {% for k, v in senders -%}
-    {% set param_out = true %}
-{% include 'initParameter.cpp' %}
-    {% endfor %}
   }
   {% endif %}
 }
@@ -160,7 +156,7 @@ void {{class_name}}::setOutputParameter(uint32_t sendHash, const HvMessage *m)
   {%- if senders|length > 0 %}
   switch (sendHash) {
     {% for k, v in senders -%}
-    case {{v.hash}}:
+    case {{v.hash}}: // {{v.display}}
       _parameters[param{{v.display}}] = hv_msg_getFloat(m, 0);
       break;
     {% endfor %}

@@ -8,10 +8,7 @@ START_NAMESPACE_DISTRHO
 // --------------------------------------------------------------------------------------------------------------------
 {%- if (receivers|length > 0) or (senders|length > 0) %}
 enum HeavyParams {
-    {%- for k, v in receivers %}
-    {{v.display|upper}},
-    {%- endfor %}
-    {%- for k, v in senders %}
+    {%- for k, v in receivers + senders -%}
     {{v.display|upper}},
     {%- endfor %}
 };
@@ -133,17 +130,19 @@ protected:
             if (ImGui::SliderFloat("{{v.display.replace('_', ' ')}}", &f{{v_display}}, {{v.attributes.min}}f, {{v.attributes.max}}f))
             {%- endif %}
             {
+            {%- if not v.type == "send" %}
                 if (ImGui::IsItemActivated())
                 {
                     editParameter({{v.display|upper}}, true);
                 }
                 setParameterValue({{v.display|upper}}, f{{v_display}});
+            {%- endif %}
             }
         {%- endif %}
     {% endfor %}
             if (ImGui::IsItemDeactivated())
             {
-            {%- for k, v  in receivers + senders -%}
+            {% for k, v  in receivers + senders -%}
                 editParameter({{v.display|upper}}, false);
             {% endfor -%}
             }

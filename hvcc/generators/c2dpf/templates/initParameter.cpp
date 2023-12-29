@@ -6,7 +6,7 @@
       {%- elif v.attributes.type in ['hz', 'log_hz']: %}
         parameter.unit = "Hz";
       {%- endif %}
-      {%- if param_out %}
+      {%- if v.type == "send" %}
         parameter.hints = kParameterIsOutput
       {%- else %}
         parameter.hints = kParameterIsAutomatable
