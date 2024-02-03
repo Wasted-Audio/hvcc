@@ -4,7 +4,10 @@ CHANGELOG
 Next Release
 -----
 
+* Core: add attributes and send type to send params
+* DPF: add "read only" outputParameter type based on send params
 * JS Bugfix: printHook and sendHook for AudioWorklet; mention emsdk limitations in docs
+* Bugfix: stripnote missing right inlet
 
 0.10.0
 -----
