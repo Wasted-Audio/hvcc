@@ -6,9 +6,9 @@
 START_NAMESPACE_DISTRHO
 
 // --------------------------------------------------------------------------------------------------------------------
-{%- if receivers|length > 0 %}
+{%- if (receivers|length > 0) or (senders|length > 0) %}
 enum HeavyParams {
-    {%- for k, v in receivers %}
+    {%- for k, v in receivers + senders -%}
     {{v.display|upper}},
     {%- endfor %}
 };
@@ -16,7 +16,7 @@ enum HeavyParams {
 
 class ImGuiPluginUI : public UI
 {
-    {% for k, v in receivers -%}
+    {% for k, v in receivers + senders -%}
         {%- if v.attributes.type == 'bool': %}
     bool f{{v.display|lower}} = {{v.attributes.default}}f != 0.0f;
         {%- elif v.attributes.type == 'int': %}
@@ -56,9 +56,9 @@ protected:
     */
     void parameterChanged(uint32_t index, float value) override
     {
-    {%- if receivers|length > 0 %}
+    {%- if (receivers|length > 0) or (senders|length > 0) %}
         switch (index) {
-            {% for k, v  in receivers -%}
+            {% for k, v  in receivers + senders -%}
             case {{v.display|upper}}:
                 {%- if v.attributes.type == 'bool': %}
                 f{{v.display|lower}} = value != 0.0f;
@@ -92,7 +92,7 @@ protected:
 
         if (ImGui::Begin("{{name.replace('_', ' ')}}", nullptr, ImGuiWindowFlags_NoResize + ImGuiWindowFlags_NoCollapse))
         {
-    {%- for k, v in receivers %}
+    {%- for k, v in receivers + senders %}
         {%- set v_display = v.display|lower %}
         {%- if meta.enumerators is defined and meta.enumerators[v.display] is defined -%}
             {%- set enums = meta.enumerators[v.display] -%}
@@ -130,17 +130,19 @@ protected:
             if (ImGui::SliderFloat("{{v.display.replace('_', ' ')}}", &f{{v_display}}, {{v.attributes.min}}f, {{v.attributes.max}}f))
             {%- endif %}
             {
+            {%- if not v.type == "send" %}
                 if (ImGui::IsItemActivated())
                 {
                     editParameter({{v.display|upper}}, true);
-                    setParameterValue({{v.display|upper}}, f{{v_display}});
                 }
+                setParameterValue({{v.display|upper}}, f{{v_display}});
+            {%- endif %}
             }
         {%- endif %}
     {% endfor %}
             if (ImGui::IsItemDeactivated())
             {
-            {%- for k, v  in receivers -%}
+            {% for k, v  in receivers + senders -%}
                 editParameter({{v.display|upper}}, false);
             {% endfor -%}
             }

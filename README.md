@@ -36,21 +36,25 @@ It has since then been expanded to provide further support for many different pl
 
 hvcc has been integrated into several projects and services. This allows to easily compile patches without having to install hvcc manually.
 
-* [plugdata](https://plugdata.org/) - a new way to use Pure Data. Includes a full toolchain and targets Daisy, DPF and pd externals.
-* [mod-cloud-builder](https://github.com/moddevices/mod-cloud-builder) - An online service for building LV2 plugins for the MOD platform.
-* [OWL Patch Library](https://www.rebeltech.org/patch-library) - An online service for building OWL plugins (uses an old fork).
+* [plugdata](https://plugdata.org/) - Modern interface for Pure Data. Includes a full cross-platform toolchain and targets Daisy, DPF and PD Externals.
+* [mod-cloud-builder](https://github.com/moddevices/mod-cloud-builder) - Online service for building LV2 plugins for the MOD platform.
+* [OWL Patch Library](https://www.rebeltech.org/patch-library) - Online service for building OWL plugins (uses an old fork).
 
 ## Requirements
 
-python 3.7 or higher
+Python 3.8 up to 3.12
 
-  * `jinja2` (for generator templating)
-  * `importlib_resources` (for reading static resources)
-  * `json2daisy` (for daisy integration)
-  * `tox` (for tests, optional)
-  * `numpy/scipy` (for tests, optional)
-  * `midifile` (for tests, optional)
-  * `clang/clang++` (for building tests, optional)
+* `jinja2` (for generator templating)
+* `importlib_resources` (for reading static resources)
+* `json2daisy` (for daisy integration)
+
+For tests:
+
+* `tox` (python install)
+* `numpy/scipy` (requirements-dev)
+* `midifile` (git submodule)
+* `tinywav` (git submodule)
+* `clang/clang++` (system install)
 
 ## Installation
 
