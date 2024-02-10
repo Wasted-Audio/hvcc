@@ -17,13 +17,8 @@ class {{name}}_AudioLibWorklet extends AudioWorkletProcessor {
         // instantiate heavy context
         this.heavyContext = _hv_{{name}}_new_with_options(this.sampleRate, {{pool_sizes_kb.internal}}, {{pool_sizes_kb.inputQueue}}, {{pool_sizes_kb.outputQueue}});
 
-        if (processorOptions.printHook) {
-          this.setPrintHook(new Function(processorOptions.printHook));
-        }
-
-        if(processorOptions.sendHook) {
-          this.setSendHook(new Function(processorOptions.sendHook));
-        }
+        this.setPrintHook();
+        this.setSendHook();
 
         // allocate temporary buffers (pointer size is 4 bytes in javascript)
         var lengthInSamples = this.blockSize * this.getNumOutputChannels();
@@ -77,42 +72,46 @@ class {{name}}_AudioLibWorklet extends AudioWorkletProcessor {
       return (this.heavyContext) ? _hv_getNumOutputChannels(this.heavyContext) : -1;
     }
 
-    setPrintHook(hook) {
+    setPrintHook() {
       if (!this.heavyContext) {
         console.error("heavy: Can't set Print Hook, no Heavy Context instantiated");
         return;
       }
 
-      if (hook) {
-        // typedef void (HvPrintHook_t) (HeavyContextInterface *context, const char *printName, const char *str, const HvMessage *msg);
-        var printHook = addFunction(function(context, printName, str, msg) {
-            // Converts Heavy print callback to a printable message
-            var timeInSecs =_hv_samplesToMilliseconds(context, _hv_msg_getTimestamp(msg)) / 1000.0;
-            var m = UTF8ToString(printName) + " [" + timeInSecs.toFixed(3) + "]: " + UTF8ToString(str);
-            hook(m);
-          },
-          "viiii"
-        );
-        _hv_setPrintHook(this.heavyContext, printHook);
-      }
+      var self = this;
+      // typedef void (HvPrintHook_t) (HeavyContextInterface *context, const char *printName, const char *str, const HvMessage *msg);
+      var printHook = addFunction(function(context, printName, str, msg) {
+          // Converts Heavy print callback to a printable message
+          var timeInSecs =_hv_samplesToMilliseconds(context, _hv_msg_getTimestamp(msg)) / 1000.0;
+          var m = UTF8ToString(printName) + " [" + timeInSecs.toFixed(3) + "]: " + UTF8ToString(str);
+          self.port.postMessage({
+            type: 'printHook',
+            payload: m
+          });
+        },
+        "viiii"
+      );
+      _hv_setPrintHook(this.heavyContext, printHook);
     }
 
-    setSendHook(hook) {
+    setSendHook() {
       if (!this.heavyContext) {
           console.error("heavy: Can't set Send Hook, no Heavy Context instantiated");
           return;
       }
 
-      if (hook) {
-        // typedef void (HvSendHook_t) (HeavyContextInterface *context, const char *sendName, hv_uint32_t sendHash, const HvMessage *msg);
-        var sendHook = addFunction(function(context, sendName, sendHash, msg) {
-            // Converts sendhook callback to (sendName, float) message
-            hook(UTF8ToString(sendName), _hv_msg_getFloat(msg, 0));
-          },
-          "viiii"
-        );
-        _hv_setSendHook(this.heavyContext, sendHook);
-      }
+      var self = this;
+      // typedef void (HvSendHook_t) (HeavyContextInterface *context, const char *sendName, hv_uint32_t sendHash, const HvMessage *msg);
+      var sendHook = addFunction(function(context, sendName, sendHash, msg) {
+          // Converts sendhook callback to (sendName, float) message
+          self.port.postMessage({
+            type: 'sendHook',
+            payload: [UTF8ToString(sendName), _hv_msg_getFloat(msg, 0)]
+          });
+        },
+        "viiii"
+      );
+      _hv_setSendHook(this.heavyContext, sendHook);
     }
 
     sendEvent(name) {

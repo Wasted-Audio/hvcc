@@ -46,8 +46,10 @@ class HIrSend(HeavyIrObject):
             on_message_list = [x for o in receive_objs for x in o.get_ir_on_message(inlet_index=0)]
             return [{
                 "id": self.id,
+                "type": "send",
                 "onMessage": [on_message_list],
                 "extern": self.args["extern"],
+                "attributes": self.args["attributes"],
                 "hash": self.args["hash"],
                 "display": self.args["name"],
                 "name": ((f"_{self.args['name']}") if re.match(r"\d", self.args["name"]) else self.args["name"])

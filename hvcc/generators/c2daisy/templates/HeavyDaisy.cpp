@@ -4,7 +4,7 @@
 #include "Heavy_{{patch_name}}.hpp"
 #include "HeavyDaisy_{{patch_name}}.hpp"
 
-#define SAMPLE_RATE 48000.f
+#define SAMPLE_RATE {{samplerate}}.f
 
 {% if has_midi or usb_midi %}
 #define HV_HASH_NOTEIN          0x67E37CA3
