@@ -6,6 +6,7 @@ Next Release
 
 * Core: add attributes and send type to send params
 * DPF: add "read only" outputParameter type based on send params
+* Daisy: update wstd2daisy and allow for setting `displayprocess` code into the template
 * JS Bugfix: printHook and sendHook for AudioWorklet; mention emsdk limitations in docs
 * Bugfix: stripnote missing right inlet
 
