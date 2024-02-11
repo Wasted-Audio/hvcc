@@ -108,11 +108,30 @@ static inline void __hv_phasor_f(SignalPhasor *o, hv_bInf_t bIn, hv_bOutf_t bOut
 
 static inline void __hv_phasor_k_f(SignalPhasor *o, hv_bOutf_t bOut) {
 #if HV_SIMD_AVX
-  *bOut = _mm256_sub_ps(o->phase, _mm256_set1_ps(1.0f));
-  o->phase = _mm256_or_ps(_mm256_andnot_ps(
-      _mm256_set1_ps(-INFINITY),
-      _mm256_add_ps(o->phase, o->inc)),
-      _mm256_set1_ps(1.0f));
+  // *bOut = _mm256_sub_ps(o->phase, _mm256_set1_ps(1.0f));
+  // o->phase = _mm256_or_ps(_mm256_andnot_ps(
+  //     _mm256_set1_ps(-INFINITY),
+  //     _mm256_add_ps(o->phase, o->inc)),
+  //     _mm256_set1_ps(1.0f));
+
+  __m128 phase_lo = _mm256_extractf128_ps(o->phase, 0);
+  __m128 phase_hi = _mm256_extractf128_ps(o->phase, 1);
+  __m128 inc_lo = _mm256_extractf128_ps(o->inc, 0);
+  __m128 inc_hi = _mm256_extractf128_ps(o->inc, 1);
+
+  for (int i = 0; i < 4; i++) {
+    phase_lo = _mm_add_ps(phase_lo, inc_lo);
+    phase_lo = _mm_sub_ps(phase_lo, _mm_and_ps(_mm_cmpge_ps(phase_lo, _mm_set1_ps(2.0f)), _mm_set1_ps(2.0f)));
+    bOut[i] = _mm256_castps128_ps256(phase_lo);
+
+    phase_hi = _mm_add_ps(phase_hi, inc_hi);
+    phase_hi = _mm_sub_ps(phase_hi, _mm_and_ps(_mm_cmpge_ps(phase_hi, _mm_set1_ps(2.0f)), _mm_set1_ps(2.0f)));
+    bOut[i+4] = _mm256_insertf128_ps(_mm256_castps128_ps256(phase_hi), phase_hi, 1);
+  }
+
+  o->phase = _mm256_set_m128(phase_hi, phase_lo);
+
+
 #elif HV_SIMD_SSE
   *bOut = _mm_sub_ps(_mm_castsi128_ps(
       _mm_or_si128(_mm_srli_epi32(o->phase, 9),
