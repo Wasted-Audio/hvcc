@@ -36,12 +36,16 @@ AudioLibLoader.prototype.init = function(options) {
           processorOptions: {
             sampleRate: this.webAudioContext.sampleRate,
             blockSize,
-            printHook: options.printHook && options.printHook.toString(),
-            sendHook: options.sendHook && options.sendHook.toString()
           }
         });
         this.webAudioWorklet.port.onmessage = (event) => {
-          console.log('Message from {{name}}_AudioLibWorklet:', event.data);
+          if (event.data.type === 'printHook' && options.printHook) {
+            options.printHook(event.data.payload);
+          } else if (event.data.type === 'sendHook' && options.sendHook) {
+            options.sendHook(event.data.payload[0], event.data.payload[1]);
+          } else {
+            console.log('Unhandled message from {{name}}_AudioLibWorklet:', event.data);
+          }
         };
         this.webAudioWorklet.connect(this.webAudioContext.destination);
       } else {
@@ -65,12 +69,20 @@ AudioLibLoader.prototype.init = function(options) {
 }
 
 AudioLibLoader.prototype.start = function() {
-  this.webAudioContext.resume();
+  if (this.audiolib) {
+    this.webAudioProcessor.connect(this.webAudioContext.destination);
+  } else {
+    this.webAudioContext.resume();
+  }
   this.isPlaying = true;
 }
 
 AudioLibLoader.prototype.stop = function() {
-  this.webAudioContext.suspend();
+  if (this.audiolib) {
+    this.webAudioProcessor.disconnect(this.webAudioContext.destination);
+  } else {
+    this.webAudioContext.suspend();
+  }
   this.isPlaying = false;
 }
 

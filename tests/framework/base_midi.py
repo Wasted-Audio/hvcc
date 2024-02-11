@@ -82,7 +82,7 @@ class TestPdMIDIBase(HvBaseTest):
 
         # copy over additional C assets
         c_src_dir = os.path.join(out_dir, "c")
-        shutil.copy2(os.path.join(self.SCRIPT_DIR, "test_midi.cpp"), c_src_dir)
+        shutil.copy2(os.path.join(self.SCRIPT_DIR, "src/test_midi.cpp"), c_src_dir)
         shutil.copy2(os.path.join(self.SCRIPT_DIR, "src/midifile/include/MidiFile.h"), c_src_dir)
         shutil.copy2(os.path.join(self.SCRIPT_DIR, "src/midifile/include/MidiEventList.h"), c_src_dir)
         shutil.copy2(os.path.join(self.SCRIPT_DIR, "src/midifile/include/MidiEvent.h"), c_src_dir)

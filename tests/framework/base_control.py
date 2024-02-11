@@ -81,7 +81,7 @@ class TestPdControlBase(HvBaseTest):
 
         # copy over additional C assets
         c_src_dir = os.path.join(out_dir, "c")
-        shutil.copy2(os.path.join(self.SCRIPT_DIR, "test_control.c"), c_src_dir)
+        shutil.copy2(os.path.join(self.SCRIPT_DIR, "src/test_control.c"), c_src_dir)
 
         # prepare the clang command
         c_sources = os.listdir(c_src_dir)
