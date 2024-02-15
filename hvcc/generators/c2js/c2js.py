@@ -74,7 +74,10 @@ class c2js:
         """Run the emcc command to compile C source files to a javascript library.
         """
 
-        emcc_path = which("emcc")
+        if os.name == 'nt':
+            emcc_path = which("emcc.bat")
+        else:
+            emcc_path = which("emcc")
 
         if emcc_path is None:
             raise HeavyException("emcc is not in the PATH")
