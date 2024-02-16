@@ -35,7 +35,7 @@ int main(int argc, const char *argv[]) {
       hv_getNumOutputChannels(context) == 2);
 
   TinyWav tw;
-  tinywav_new(&tw,
+  tinywav_open_write(&tw,
       hv_getNumOutputChannels(context),
       (int32_t) hv_getSampleRate(context),
       TW_FLOAT32, TW_INLINE, outputPath);
@@ -50,8 +50,8 @@ int main(int argc, const char *argv[]) {
     tinywav_write_f(&tw, outBuffers, blockSize);
   }
 
-  tinywav_close(&tw);
-  hv_delete(context);
+  tinywav_close_write(&tw);
+  hv_heavy_free(context);
   free(outBuffers);
   return 0;
 }
