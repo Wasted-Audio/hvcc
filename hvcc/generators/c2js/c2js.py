@@ -168,7 +168,9 @@ class c2js:
         tick = time.time()
 
         parameter_list = externs["parameters"]["in"]
+        parameter_out_list = externs["parameters"]["out"]
         event_list = externs["events"]["in"]
+        event_out_list = externs["events"]["out"]
 
         out_dir = os.path.join(out_dir, "js")
         patch_name = patch_name or "heavy"
@@ -217,7 +219,9 @@ class c2js:
                     name=patch_name,
                     includes=[f"./{js_out_file}"],
                     parameters=parameter_list,
+                    parameters_out=parameter_out_list,
                     events=event_list,
+                    events_out=event_out_list,
                     copyright=copyright_html))
 
             # generate heavy js worklet from template
