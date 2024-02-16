@@ -1,7 +1,7 @@
 CHANGELOG
 =====
 
-Next Release
+0.11.0
 -----
 
 * Core: add attributes and send type to send params
