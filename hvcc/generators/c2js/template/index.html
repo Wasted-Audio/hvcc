@@ -13,6 +13,7 @@
       .widget { max-width: 900px; margin: auto; }
       .row { width: 100%; margin-bottom: 10px; }
       .col { display: inline-block; }
+      .events { vertical-align: top; margin: 10px; }
       .title { width: 80%; margin: 0 auto; }
       .transport { padding-left: 10px; }
       .parameter-name { width: 35%; text-align: right; }
@@ -74,11 +75,30 @@
       }
 
       function onFloatMessage(sendName, floatValue) {
-        console.log(sendName, floatValue);
+
+        switch (sendName) {
+    {%- if parameters_out | length %}
+      {%- for k, v in parameters_out %}
+          case "{{k}}":
+            document.getElementById("parameter_{{k}}").value = floatValue;
+            document.getElementById("value_{{k}}").textContent = Number(floatValue).toFixed(2);
+            break;
+      {%- endfor %}
+    {%- endif %}
+    {%- if events_out | length %}
+      {%- for k, v in events_out %}
+          case "{{k}}":
+            {{k}}_counter += 1;
+            document.getElementById("{{k}}_counter").innerHTML = {{k}}_counter;
+            break;
+      {%- endfor %}
+    {%- endif %}
+          default:
+            console.log(sendName, floatValue);
+        }
       }
 
       {%- if events | length %}
-
       // Generated Event Update Methods
 {%- for k, v in events %}
       function sendEvent_{{k}}() {
@@ -90,6 +110,13 @@
       }
 {% endfor %}
       {%- endif %}
+
+  {%- if events_out | length %}
+    {%- for k, v in events_out %}
+      var {{k}}_counter = 0;
+    {%- endfor %}
+  {%- endif %}
+
 
       // randomizer
       function randomiseParameters() {
@@ -127,16 +154,31 @@
           <button style="padding: 10px;" type="button" id="randomiseButton" onclick="randomiseParameters();">Randomise</button>
         </div>
       </div>
+
+      <div class="row events" style="text-align: center;">
       {%- if events | length %}
-      <div class="row events">
-      {%- for k, v in events %}
-        <div class="col">
-          <button type="button" id="trigger_{{k}}" onclick="sendEvent_{{k}}();">{{k}}</button>
+        <div class="col events">
+          Input Events:<br>
+        {%- for k, v in events %}
+          <button type="button" id="trigger_{{k}}" onclick="sendEvent_{{k}}();">{{k}}</button><br>
+        {%- endfor %}
         </div>
-      {%- endfor %}
-      </div>
+        {%- endif %}
+
+      {%- if events_out | length %}
+        <div class="col events">
+          Output Events:<br>
+        {%- for k, v in events_out %}
+          {{k}}: <a id="{{k}}_counter">0</a><br>
+        {%- endfor %}
+        </div>
       {%- endif %}
+      </div>
+
       {%- if parameters | length %}
+      <div class="row" style="text-align: center;">
+        Input Parameters:
+      </div>
       {%- for k, v in parameters %}
       <div class="row">
         <div class="col parameter-name">{{k}}</div>
@@ -147,6 +189,22 @@
       </div>
       {%- endfor %}
       {%- endif %}
+
+      {%- if parameters_out | length %}
+      <div class="row" style="text-align: center;">
+        Output Parameters:
+      </div>
+      {%- for k, v in parameters_out %}
+      <div class="row">
+        <div class="col parameter-name">{{k}}</div>
+        <div class="col parameter-slider">
+          <input id="parameter_{{k}}" type="range" min="{{v.attributes.min}}" max="{{v.attributes.max}}" step="0.01" value="{{v.attributes.default}}">
+        </div>
+        <div class="col parameter-value" id="value_{{k}}">{{v.attributes.default}}</div>
+      </div>
+      {%- endfor %}
+      {%- endif %}
+
       <div class="row">
         <span class="link"><em>powered by <a href="https://github.com/Wasted-Audio/hvcc"><strong>heavy</strong></em></a></span>
       </div>
