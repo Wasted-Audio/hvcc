@@ -316,6 +316,7 @@ def main() -> bool:
     parser.add_argument(
         "-n",
         "--name",
+        default="heavy",
         help="Provides a name for the generated Heavy context.")
     parser.add_argument(
         "-m",

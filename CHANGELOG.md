@@ -1,6 +1,22 @@
 CHANGELOG
 =====
 
+0.11.0
+-----
+
+* Core: add attributes and send type to send params
+* DPF: add "read only" outputParameter type based on send params
+* JS: add output Parameter and output Event to generator and html template
+* Daisy: update `wstd2daisy` and allow for setting `displayprocess` code into the template
+* Testing: move `tinywav` to git submodule
+* JS Bugfix: printHook and sendHook for AudioWorklet; mention emsdk limitations in docs
+* Object Bugfix: `[stripnote]` missing right inlet
+* Small Bugfixes:
+  * set default name argument
+  * `emcc` call on Windows - thanks to @vulcu
+  * deallocation in test_signal - thanks to @eu-ch
+  * quotes around WWISE paths - thanks to @eu-ch
+
 0.10.0
 -----
 
