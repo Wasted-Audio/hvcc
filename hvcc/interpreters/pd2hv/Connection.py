@@ -18,6 +18,7 @@ from typing import Dict, Union, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from .HeavyObject import HeavyObject
+    from .PdObject import PdObject
     from .PdBinopObject import PdBinopObject
     from .PdLibSignalGraph import PdLibSignalGraph
 
@@ -25,9 +26,9 @@ if TYPE_CHECKING:
 class Connection:
     def __init__(
         self,
-        from_obj: 'HeavyObject',
+        from_obj: 'PdObject',
         outlet_index: int,
-        to_obj: Union['PdBinopObject', 'PdLibSignalGraph', 'HeavyObject'],
+        to_obj: Union['PdBinopObject', 'PdLibSignalGraph', 'HeavyObject', 'PdObject'],
         inlet_index: int,
         conn_type: str
     ) -> None:

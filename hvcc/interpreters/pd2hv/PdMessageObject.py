@@ -37,6 +37,7 @@ class PdMessageObject(PdObject):
         super().__init__("msg", obj_args, pos_x, pos_y)
 
         self.obj_dict: Dict = {}
+        semi_split: List = []
 
         # parse messages
         # remove prepended slash from $. Heavy does not use that.

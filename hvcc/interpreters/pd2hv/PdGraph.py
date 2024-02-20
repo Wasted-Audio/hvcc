@@ -37,8 +37,8 @@ class PdGraph(PdObject):
         # file location of this graph
         self.__pd_path = pd_path
 
-        self.__objs: List = []
-        self.__connections: List = []
+        self.__objs: List[PdObject] = []
+        self.__connections: List[Connection] = []
 
         self.__inlet_objects: List = []
         self.__outlet_objects: List = []
@@ -72,7 +72,7 @@ class PdGraph(PdObject):
         else:
             return self.parent_graph.__pd_path == self.__pd_path if not self.is_root else False
 
-    def add_object(self, obj: PdObject) -> None:
+    def add_object(self, obj: PdObject) -> int:
         obj.parent_graph = self
         self.__objs.append(obj)
 
@@ -87,6 +87,8 @@ class PdGraph(PdObject):
             self.__outlet_objects.sort(key=lambda o: o.pos_x)
             for i, o in enumerate(self.__outlet_objects):
                 o.let_index = i
+
+        return (len(self.__objs) - 1)
 
     def add_parsed_connection(self, from_index: int, from_outlet: int, to_index: int, to_inlet: int) -> None:
         """ Add a connection to the graph which has been parsed externally.

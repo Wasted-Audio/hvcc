@@ -38,6 +38,7 @@ from .PdTriggerObject import PdTriggerObject    # trigger/t
 from .PdTableObject import PdTableObject        # table
 from .PdUnpackObject import PdUnpackObject      # unpack
 from .PdLibSignalGraph import PdLibSignalGraph  # pd/lib abstraction connection checks
+from .Connection import Connection
 
 from .NotificationEnum import NotificationEnum
 
@@ -217,6 +218,8 @@ class PdParser:
         obj_array: Optional[HeavyObject] = None  # an #A (table) object which is currently being parsed
 
         g = pd_graph_class(graph_args, pd_path, pos_x, pos_y)
+
+        remotes = {}
 
         # parse and add all Heavy arguments to the graph
         for li in file_hv_arg_dict[canvas_line]:
@@ -473,11 +476,19 @@ class PdParser:
 
                     elif line[1] == "msg":
                         self.obj_counter["msg"] += 1
-                        g.add_object(PdMessageObject(
+                        msg = PdMessageObject(
                             obj_type="msg",
                             obj_args=[" ".join(line[4:])],
                             pos_x=int(line[2]),
-                            pos_y=int(line[3])))
+                            pos_y=int(line[3]))
+
+                        index = g.add_object(msg)
+
+                        if len(msg.obj_dict) > 0:
+                            remotes[index] = []
+
+                            for remote in msg.obj_dict['remote']:
+                                remotes[index].append(remote)
 
                     elif line[1] == "connect":
                         g.add_parsed_connection(
@@ -530,6 +541,20 @@ class PdParser:
                 # NOTE(mhroth): should the exception be added as an error?
                 # Sometimes it's all that we have, so perhaps it's a good idea.
                 g.add_error(str(e), NotificationEnum.ERROR_EXCEPTION)
+
+        # parse remote messages
+        for index in remotes.keys():
+            for remote in remotes[index]:
+                self.obj_counter["msg"] += 1
+                msg = PdMessageObject('msg', [remote['message'][0]])
+                msg_index = g.add_object(msg)
+
+                self.obj_counter["send"] += 1
+                send = PdSendObject('send', [remote['receiver']])
+                send_index = g.add_object(send)
+
+                g.add_parsed_connection(index, 0, msg_index, 0)
+                g.add_parsed_connection(msg_index, 0, send_index, 0)
 
         return g
 
