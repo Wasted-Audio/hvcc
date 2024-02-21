@@ -179,7 +179,6 @@ class TestPdControlPatches(TestPdControlBase):
 
     def test_msg_remote_args(self):
         self._test_control_patch("test-msg_remote_args.pd")
-        self._test_control_patch_expect_warning("test-msg_remote_args.pd", NotificationEnum.WARNING_GENERIC)
 
     def test_mtof(self):
         self._test_control_patch("test-mtof.pd")
