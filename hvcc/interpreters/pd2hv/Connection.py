@@ -14,13 +14,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from typing import Dict, Optional, Union, TYPE_CHECKING
+from typing import Dict, Optional, TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from .HeavyObject import HeavyObject
     from .PdObject import PdObject
-    from .PdBinopObject import PdBinopObject
-    from .PdLibSignalGraph import PdLibSignalGraph
 
 
 class Connection:
@@ -28,7 +25,7 @@ class Connection:
         self,
         from_obj: 'PdObject',
         outlet_index: int,
-        to_obj: Union['PdBinopObject', 'PdLibSignalGraph', 'HeavyObject', 'PdObject'],
+        to_obj: 'PdObject',
         inlet_index: int,
         conn_type: Optional[str]
     ) -> None:
