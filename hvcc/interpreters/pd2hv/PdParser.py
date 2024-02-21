@@ -38,7 +38,6 @@ from .PdTriggerObject import PdTriggerObject    # trigger/t
 from .PdTableObject import PdTableObject        # table
 from .PdUnpackObject import PdUnpackObject      # unpack
 from .PdLibSignalGraph import PdLibSignalGraph  # pd/lib abstraction connection checks
-from .Connection import Connection
 
 from .NotificationEnum import NotificationEnum
 
@@ -219,15 +218,14 @@ class PdParser:
 
         g = pd_graph_class(graph_args, pd_path, pos_x, pos_y)
 
-        remotes = {}
+        remotes: Dict = {}
 
         # parse and add all Heavy arguments to the graph
         for li in file_hv_arg_dict[canvas_line]:
             line = li.split()
             assert line[4] == "@hv_arg"
             is_required = (line[9] == "true")
-            default_value = HeavyObject.force_arg_type(line[8], line[7]) \
-                if not is_required else None
+            default_value = HeavyObject.force_arg_type(line[8], line[7]) if not is_required else None
             g.add_hv_arg(
                 arg_index=int(line[5][2:]) - 1,  # strip off the leading "\$" and make index zero-based
                 name=line[6],
