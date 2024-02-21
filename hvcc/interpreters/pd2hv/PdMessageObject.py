@@ -73,11 +73,6 @@ class PdMessageObject(PdObject):
                 "message": l_split[1:]
             })
 
-        if len(self.obj_dict["remote"]) > 0:
-            self.add_warning(
-                "Message boxes don't yet support remote messages. "
-                "These messages will be ignored.")
-
     def to_hv(self) -> Dict:
         return {
             "type": "message",
