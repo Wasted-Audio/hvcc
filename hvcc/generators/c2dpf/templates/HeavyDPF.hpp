@@ -145,10 +145,9 @@ private:
   {%- endif %}
 
   // transport values
-  bool wasPlaying;
-  float samplesProcessed;
-  double nextClockTick;
-  double sampleAtCycleStart;
+  bool wasPlaying = false;
+  double nextClockTick = 0.0;
+  double sampleAtCycleStart = 0.0;
 
   // midi out buffer
   int midiOutCount;
