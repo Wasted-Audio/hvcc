@@ -544,7 +544,7 @@ class PdParser:
         for index in remotes.keys():
             for remote in remotes[index]:
                 self.obj_counter["msg"] += 1
-                msg = PdMessageObject('msg', [remote['message'][0]])
+                msg = PdMessageObject('msg', [' '.join(msg for msg in remote['message'])])
                 msg_index = g.add_object(msg)
 
                 self.obj_counter["send"] += 1
