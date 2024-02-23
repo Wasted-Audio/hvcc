@@ -1,6 +1,11 @@
 CHANGELOG
 =====
 
+Next Release
+-----
+
+* Core: parse remote/send messages
+
 0.11.0
 -----
 
