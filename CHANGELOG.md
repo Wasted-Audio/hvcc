@@ -5,6 +5,7 @@ Next Release
 -----
 
 * Core: parse remote/send messages
+* OWL: add Polytouchin and Polytouchout
 
 0.11.0
 -----
