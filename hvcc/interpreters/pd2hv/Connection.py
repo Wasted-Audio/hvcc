@@ -27,7 +27,7 @@ class Connection:
         outlet_index: int,
         to_obj: 'PdObject',
         inlet_index: int,
-        conn_type: Optional[str]
+        conn_type: Optional[str]  # not actually Optional. This is due to the requirement in HeavyObject.
     ) -> None:
         assert from_obj is not None
         assert to_obj is not None
