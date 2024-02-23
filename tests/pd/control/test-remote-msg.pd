@@ -5,11 +5,11 @@
 #X obj 104 107 r die;
 #X obj 156 108 r blub;
 #X msg 281 72 3 2;
-#X msg 281 108 _ \; bla 1 \; die \$1 2 \; blub 4 \$2 1;
 #X obj 251 38 bng 20 250 50 0 empty empty empty 0 -10 0 12 #fcfcfc #000000 #000000;
+#X msg 281 108 _ \; bla 1 \; die \$1 2 \; blub 4 \, \$2 1;
 #X connect 0 0 5 0;
 #X connect 1 0 2 0;
 #X connect 3 0 2 0;
 #X connect 4 0 2 0;
-#X connect 5 0 6 0;
-#X connect 7 0 5 0;
+#X connect 5 0 7 0;
+#X connect 6 0 5 0;
