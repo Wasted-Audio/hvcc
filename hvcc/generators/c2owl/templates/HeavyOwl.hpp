@@ -52,10 +52,7 @@ extern "C" {
     else
       getProgramVector()->buttons &= ~(1<<bid);
   }
-  static void owlPrintHook(HeavyContextInterface* ctxt,
-			   const char *printLabel,
-			   const char *msgString,
-			   const HvMessage *m) {
+  static void owlPrintHook(HeavyContextInterface* ctxt, const char *printLabel, const char *msgString, const HvMessage *m) {
     char buf[64];
     char* dst = buf;
     int len = strnlen(printLabel, 48);
@@ -64,19 +61,13 @@ extern "C" {
     dst = stpncpy(dst, msgString, 63-len);
     debugMessage(buf);
   }
-  static void owlSendHook(HeavyContextInterface* ctxt,
-			  const char *receiverName,
-			  uint32_t sendHash,
-			  const HvMessage *m);
+  static void owlSendHook(HeavyContextInterface* ctxt, const char *receiverName, uint32_t sendHash, const HvMessage *m);
 }
 
 class HeavyPatch : public Patch {
 public:
   HeavyPatch() {
-    context = new Heavy_owl(getSampleRate(),
-			    HEAVY_MESSAGE_POOL_SIZE,
-			    HEAVY_MESSAGE_IN_QUEUE_SIZE,
-			    HEAVY_MESSAGE_OUT_QUEUE_SIZE);
+    context = new Heavy_owl(getSampleRate(), HEAVY_MESSAGE_POOL_SIZE, HEAVY_MESSAGE_IN_QUEUE_SIZE, HEAVY_MESSAGE_OUT_QUEUE_SIZE);
     context->setUserData(this);
     context->setPrintHook(&owlPrintHook);
     context->setSendHook(&owlSendHook);
@@ -129,13 +120,13 @@ public:
       sendMidi(MidiMessage::pb(ch, value));
       }
       break;
-    // case HV_HASH_POLYTOUCHOUT:
-    //   uint8_t value = hv_msg_getFloat(m, 0);
-    //   uint8_t note = hv_msg_getFloat(m, 1);
-    //   uint8_t ch = hv_msg_getFloat(m, 2);
-    //   ch %= 16;
-    //   sendMidi(MidiMessage::kp(ch, note, value));
-    //   break;
+    case HV_HASH_POLYTOUCHOUT:
+      uint8_t value = hv_msg_getFloat(m, 0);
+      uint8_t note = hv_msg_getFloat(m, 1);
+      uint8_t ch = hv_msg_getFloat(m, 2);
+      ch %= 16;
+      sendMidi(MidiMessage::kp(ch, note, value));
+      break;
     case HV_HASH_TOUCHOUT:
       uint8_t value = hv_msg_getFloat(m, 0);
       uint8_t ch = hv_msg_getFloat(m, 1);
@@ -153,12 +144,12 @@ public:
     // Button {{name}}
     case HV_HASH_{{typ}}_CHANNEL_{{param}}:
       setButton(BUTTON_{{param}}, (hv_msg_getFloat(m, 0)-HV_MIN_CHANNEL_{{param}})/
-		(HV_MAX_CHANNEL_{{param}}-HV_MIN_CHANNEL_{{param}}) > 0.5);
+    (HV_MAX_CHANNEL_{{param}}-HV_MIN_CHANNEL_{{param}}) > 0.5);
       {% else %}
     // Parameter {{name}}
     case HV_HASH_{{typ}}_CHANNEL_{{param}}:
       setParameterValue(PARAMETER_{{param}}, (hv_msg_getFloat(m, 0)-HV_MIN_CHANNEL_{{param}})/
-  		        (HV_MAX_CHANNEL_{{param}}-HV_MIN_CHANNEL_{{param}}));
+              (HV_MAX_CHANNEL_{{param}}-HV_MIN_CHANNEL_{{param}}));
       {% endif %}
       break;
       {% endfor %}
@@ -171,50 +162,43 @@ public:
     // sendMessageToReceiverV parses format and loops over args, see HeavyContext.cpp
     switch(msg.getStatus()){
     case CONTROL_CHANGE:
-      context->sendMessageToReceiverV
-	(HV_HASH_CTLIN, 0, "fff",
-	 (float)msg.getControllerValue(), // value
-	 (float)msg.getControllerNumber(), // controller number
-	 (float)msg.getChannel());
+      context->sendMessageToReceiverV(HV_HASH_CTLIN, 0, "fff",
+        (float)msg.getControllerValue(), // value
+        (float)msg.getControllerNumber(), // controller number
+        (float)msg.getChannel());
       break;
     case NOTE_ON:
-      context->sendMessageToReceiverV
-	(HV_HASH_NOTEIN, 0, "fff",
-	 (float)msg.getNote(), // pitch
-	 (float)msg.getVelocity(), // velocity
-	 (float)msg.getChannel());
+      context->sendMessageToReceiverV(HV_HASH_NOTEIN, 0, "fff",
+        (float)msg.getNote(), // pitch
+        (float)msg.getVelocity(), // velocity
+        (float)msg.getChannel());
       break;
     case NOTE_OFF:
-      context->sendMessageToReceiverV
-	(HV_HASH_NOTEIN, 0, "fff",
-	 (float)msg.getNote(), // pitch
-	 0.0f, // velocity
-	 (float)msg.getChannel());
+      context->sendMessageToReceiverV(HV_HASH_NOTEIN, 0, "fff",
+        (float)msg.getNote(), // pitch
+        0.0f, // velocity
+        (float)msg.getChannel());
       break;
     case POLY_KEY_PRESSURE:
-      context->sendMessageToReceiverV
-  (HV_HASH_POLYTOUCHIN, 0, "fff"
-   (float)msg.getPolyKeyPressure(),
-   (float)msg.getNote(),
-   (float)msg.getChannel());
+      context->sendMessageToReceiverV(HV_HASH_POLYTOUCHIN, 0, "fff"
+        (float)msg.getPolyKeyPressure(),
+        (float)msg.getNote(),
+        (float)msg.getChannel());
       break
     case CHANNEL_PRESSURE:
-      context->sendMessageToReceiverV
-	(HV_HASH_TOUCHIN, 0, "ff",
-	 (float)msg.getChannelPressure(),
-	 (float)msg.getChannel());
+      context->sendMessageToReceiverV(HV_HASH_TOUCHIN, 0, "ff",
+        (float)msg.getChannelPressure(),
+        (float)msg.getChannel());
       break;
     case PITCH_BEND_CHANGE:
-      context->sendMessageToReceiverV
-	(HV_HASH_BENDIN, 0, "ff",
-	 (float)msg.getPitchBend(),
-	 (float)msg.getChannel());
+      context->sendMessageToReceiverV(HV_HASH_BENDIN, 0, "ff",
+        (float)msg.getPitchBend(),
+        (float)msg.getChannel());
       break;
     case PROGRAM_CHANGE:
-      context->sendMessageToReceiverV
-	(HV_HASH_PGMIN, 0, "ff",
-	 (float)msg.getProgramChange(),
-	 (float)msg.getChannel());
+      context->sendMessageToReceiverV(HV_HASH_PGMIN, 0, "ff",
+        (float)msg.getProgramChange(),
+        (float)msg.getChannel());
       break;
     default:
       break;
@@ -229,7 +213,7 @@ public:
     // {{name}}
     case BUTTON_{{param}}:
       context->sendFloatToReceiver(HV_HASH_{{typ}}_CHANNEL_{{param}}, isButtonPressed(BUTTON_{{param}})*
-				 (HV_MAX_CHANNEL_{{param}}-HV_MIN_CHANNEL_{{param}})+HV_MIN_CHANNEL_{{param}});
+         (HV_MAX_CHANNEL_{{param}}-HV_MIN_CHANNEL_{{param}})+HV_MIN_CHANNEL_{{param}});
       break;
     {% endfor %}
     default:
@@ -242,7 +226,7 @@ public:
     {% for param, name, typ, namehash, minvalue, maxvalue, defvalue, button in jdata if typ == 'RECV' and button == False %}
     // {{name}}
       context->sendFloatToReceiver(HV_HASH_{{typ}}_CHANNEL_{{param}}, getParameterValue(PARAMETER_{{param}})*
-				 (HV_MAX_CHANNEL_{{param}}-HV_MIN_CHANNEL_{{param}})+HV_MIN_CHANNEL_{{param}});
+         (HV_MAX_CHANNEL_{{param}}-HV_MIN_CHANNEL_{{param}})+HV_MIN_CHANNEL_{{param}});
     {% endfor %}
 
     _msgLock = false;
@@ -254,12 +238,9 @@ private:
   HeavyContext* context;
 };
 
-static void owlSendHook(HeavyContextInterface* ctxt,
-			const char *receiverName,
-			uint32_t sendHash,
-			const HvMessage *m){
-  HeavyPatch* patch = (HeavyPatch*)ctxt->getUserData();
-  patch->sendCallback(sendHash, m);
+static void owlSendHook(HeavyContextInterface* ctxt, const char *receiverName, uint32_t sendHash, const HvMessage *m){
+    HeavyPatch* patch = (HeavyPatch*)ctxt->getUserData();
+    patch->sendCallback(sendHash, m);
 }
 
 #endif // __HeavyPatch_hpp__
