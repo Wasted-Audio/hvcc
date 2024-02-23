@@ -542,6 +542,9 @@ class PdParser:
 
         # parse remote messages
         for index in remotes.keys():
+            first_msg = g.get_object(index)
+            conns = first_msg.get_inlet_connections()
+
             for remote in remotes[index]:
                 self.obj_counter["msg"] += 1
                 msg = PdMessageObject('msg', [' '.join(msg for msg in remote['message'])])
@@ -551,7 +554,12 @@ class PdParser:
                 send = PdSendObject('send', [remote['receiver']])
                 send_index = g.add_object(send)
 
-                g.add_parsed_connection(index, 0, msg_index, 0)
+                # connect new message to upstream objects of first message
+                for conn in conns['0']:
+                    up_obj = conn.from_obj
+                    up_index = g.get_objects().index(up_obj)
+                    g.add_parsed_connection(up_index, 0, msg_index, 0)
+
                 g.add_parsed_connection(msg_index, 0, send_index, 0)
 
         return g

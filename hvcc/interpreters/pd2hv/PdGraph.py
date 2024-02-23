@@ -134,6 +134,12 @@ class PdGraph(PdObject):
             "required": required
         }
 
+    def get_object(self, obj_index: int) -> PdObject:
+        return self.__objs[obj_index]
+
+    def get_objects(self) -> List[PdObject]:
+        return self.__objs
+
     def get_inlet_connection_type(self, inlet_index: int) -> str:
         return self.__inlet_objects[inlet_index].get_inlet_connection_type(inlet_index)
 
