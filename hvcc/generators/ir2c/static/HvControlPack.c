@@ -22,14 +22,15 @@ hv_size_t cPack_init(ControlPack *o, int nargs, ...) {
   hv_assert(o->msg != NULL);
   msg_init(o->msg, nargs, 0);
 
-  // variable arguments are used as float initialisers for the pack elements
+  // variable arguments are used as float initialisers for the Expr elements
   va_list ap;
   va_start(ap, nargs);
   for (int i = 0; i < nargs; ++i) {
     msg_setFloat(o->msg, i, (float) va_arg(ap, double));
   }
   va_end(ap);
-  return numBytes;
+  return numBytes;  
+
 }
 
 void cPack_free(ControlPack *o) {
