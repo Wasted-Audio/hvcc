@@ -136,19 +136,24 @@ class {{name}}_AudioLibWorklet extends AudioWorkletProcessor {
         var data1 = message[1];
         var data2 = message[2];
 
+        console.log('command: ' + command)
+        console.log('channel: ' + channel)
+        console.log('data1: ' + data1)
+        console.log('data2: ' + data2)
+
         switch(command) {
-          case 0x80: // noteon
-            _hv_sendMessageToReceiverV(this.heavyContext, HV_HASH_NOTEIN, 0, 'fff',
+          case 0x80: // note off
+            _hv_sendMessageToReceiverV(this.heavyContext, HV_HASH_NOTEIN, 0, "fff",
               data1,
               0,
               channel
             );
             break;
-          case 0x90: // noteon
-            _hv_sendMessageToReceiverV(this.heavyContext, HV_HASH_NOTEIN, 0, 'fff',
-            data1,
-            data2,
-            channel
+          case 0x90: // note on
+            _hv_sendMessageToReceiverV(this.heavyContext, HV_HASH_NOTEIN, 0, "fff",
+              data1,
+              data2,
+              channel
             );
             break;
           default:
