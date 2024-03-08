@@ -38,8 +38,7 @@ class {{name}}_AudioLibWorklet extends AudioWorkletProcessor {
               this.sendEvent(e.data.name);
               break;
             case 'sendMidi':
-              console.log('onmessage: ' + e.message);
-              this.sendMidi(e.message);
+              this.sendMidi(e.data.message);
               break;
             default:
               console.error('No handler for message of type: ', e.data.type);
@@ -132,7 +131,29 @@ class {{name}}_AudioLibWorklet extends AudioWorkletProcessor {
 
     sendMidi(message) {
       if (this.heavyContext) {
-        console.log(message);
+        var command = message[0] & 0xF0;
+        var channel = message[0] & 0x0F;
+        var data1 = message[1];
+        var data2 = message[2];
+
+        switch(command) {
+          case 0x80: // noteon
+            _hv_sendMessageToReceiverV(this.heavyContext, HV_HASH_NOTEIN, 0, 'fff',
+              data1,
+              0,
+              channel
+            );
+            break;
+          case 0x90: // noteon
+            _hv_sendMessageToReceiverV(this.heavyContext, HV_HASH_NOTEIN, 0, 'fff',
+            data1,
+            data2,
+            channel
+            );
+            break;
+          default:
+            // console.error('No handler for midi message: ', message);
+        }
       }
     }
 
