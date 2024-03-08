@@ -37,6 +37,10 @@ class {{name}}_AudioLibWorklet extends AudioWorkletProcessor {
             case 'sendEvent':
               this.sendEvent(e.data.name);
               break;
+            case 'sendMidi':
+              console.log('onmessage: ' + e.message);
+              this.sendMidi(e.message);
+              break;
             default:
               console.error('No handler for message of type: ', e.data.type);
           }
@@ -126,6 +130,12 @@ class {{name}}_AudioLibWorklet extends AudioWorkletProcessor {
       }
     }
 
+    sendMidi(message) {
+      if (this.heavyContext) {
+        console.log(message);
+      }
+    }
+
     sendStringToReceiver(name, message) {
       // Note(joe): it's not a good idea to call this frequently it is possible for
       // the stack memory to run out over time.
@@ -188,3 +198,17 @@ var tableHashes = {
 };
 
 registerProcessor("{{name}}_AudioLibWorklet", {{name}}_AudioLibWorklet);
+
+
+/*
+ * MIDI Constants
+ */
+
+const HV_HASH_NOTEIN          = 0x67E37CA3;
+const HV_HASH_CTLIN           = 0x41BE0f9C;
+const HV_HASH_POLYTOUCHIN     = 0xBC530F59;
+const HV_HASH_PGMIN           = 0x2E1EA03D;
+const HV_HASH_TOUCHIN         = 0x553925BD;
+const HV_HASH_BENDIN          = 0x3083F0F7;
+const HV_HASH_MIDIIN          = 0x149631bE;
+const HV_HASH_MIDIREALTIMEIN  = 0x6FFF0BCF;

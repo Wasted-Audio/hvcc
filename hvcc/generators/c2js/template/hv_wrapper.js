@@ -102,6 +102,13 @@ AudioLibLoader.prototype.sendEvent = function(name, value) {
   });
 }
 
+AudioLibLoader.prototype.sendMidi = function(message) {
+  this.webAudioWorklet.port.postMessage({
+    type:'sendMidi',
+    message:message.data
+  });
+}
+
 Module.AudioLibLoader = AudioLibLoader;
 
 

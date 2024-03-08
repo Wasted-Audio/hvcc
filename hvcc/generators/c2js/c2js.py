@@ -117,7 +117,6 @@ class c2js:
 
         linker_flags = [
             "-O3",
-            "--memory-init-file", "0",
             "-s", "RESERVED_FUNCTION_POINTERS=2",
             "-s", "DEFAULT_LIBRARY_FUNCS_TO_INCLUDE=$addFunction",
             "-s", f"EXPORTED_FUNCTIONS=[{hv_api_defs.format(patch_name)}]",

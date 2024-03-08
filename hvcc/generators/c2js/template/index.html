@@ -74,6 +74,31 @@
         console.log(message);
       }
 
+      if (navigator.requestMIDIAccess) {
+        navigator.requestMIDIAccess()
+        .then(onMIDISuccess, onMIDIFailure);
+      }
+
+      function onMIDISuccess(midiAccess) {
+        console.log("MIDI ready!");
+        var inputs = midiAccess.inputs.values();
+
+        for (var input = inputs.next(); input && !input.done; input = inputs.next()) {
+          // each time there is a midi message call the onMIDIMessage function
+          input.value.onmidimessage = onMIDIMessage;
+        }
+      }
+
+      function onMIDIFailure(msg) {
+        console.error(`Failed to get MIDI access - ${msg}`);
+      }
+
+      function onMIDIMessage(message) {
+        if(loader.webAudioWorklet) {
+          loader.sendMidi(message);
+        }
+      }
+
       function onFloatMessage(sendName, floatValue) {
 
         switch (sendName) {
