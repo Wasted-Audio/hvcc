@@ -55,6 +55,8 @@ class c2js:
         "_hv_table_setLength",
         "_hv_table_getBuffer",
         "_hv_sendMessageToReceiverV",
+        "_hv_sendMessageToReceiverFF",
+        "_hv_sendMessageToReceiverFFF",
         "_malloc"  # Rationale: https://github.com/emscripten-core/emscripten/issues/6882#issuecomment-406745898
     ]
 

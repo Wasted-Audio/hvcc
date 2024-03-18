@@ -27,7 +27,6 @@ class {{name}}_AudioLibWorklet extends AudioWorkletProcessor {
             Module._malloc(lengthInSamples * Float32Array.BYTES_PER_ELEMENT),
             lengthInSamples);
 
-
         this.port.onmessage = (e) => {
           console.log(e.data);
           switch(e.data.type){
@@ -136,21 +135,16 @@ class {{name}}_AudioLibWorklet extends AudioWorkletProcessor {
         var data1 = message[1];
         var data2 = message[2];
 
-        console.log('command: ' + command)
-        console.log('channel: ' + channel)
-        console.log('data1: ' + data1)
-        console.log('data2: ' + data2)
-
         switch(command) {
           case 0x80: // note off
-            _hv_sendMessageToReceiverV(this.heavyContext, HV_HASH_NOTEIN, 0, "fff",
+            _hv_sendMessageToReceiverFFF(this.heavyContext, 0x2E84AC35, 0,
               data1,
               0,
               channel
             );
             break;
           case 0x90: // note on
-            _hv_sendMessageToReceiverV(this.heavyContext, HV_HASH_NOTEIN, 0, "fff",
+            _hv_sendMessageToReceiverFFF(this.heavyContext, 0x2E84AC35, 0,
               data1,
               data2,
               channel
