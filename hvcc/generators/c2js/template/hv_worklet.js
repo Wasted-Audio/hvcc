@@ -137,18 +137,45 @@ class {{name}}_AudioLibWorklet extends AudioWorkletProcessor {
 
         switch(command) {
           case 0x80: // note off
-            _hv_sendMessageToReceiverFFF(this.heavyContext, 0x2E84AC35, 0,
+            _hv_sendMessageToReceiverFFF(this.heavyContext, HV_HASH_NOTEIN, 0,
               data1,
               0,
-              channel
-            );
+              channel);
             break;
           case 0x90: // note on
-            _hv_sendMessageToReceiverFFF(this.heavyContext, 0x2E84AC35, 0,
+            _hv_sendMessageToReceiverFFF(this.heavyContext, HV_HASH_NOTEIN, 0,
               data1,
               data2,
-              channel
-            );
+              channel);
+            break;
+          case 0xA0: // polyphonic aftertouch
+            _hv_sendMessageToReceiverFFF(this.heavyContext, HV_HASH_POLYTOUCHIN, 0,
+              data2, // pressure
+              data1, // note
+              channel);
+            break;
+          case 0xB0: // control change
+            _hv_sendMessageToReceiverFFF(this.heavyContext, HV_HASH_CTLIN, 0,
+              data2, // value
+              data1, // cc number
+              channel);
+            break;
+          case 0xC0: // program change
+            _hv_sendMessageToReceiverFF(this.heavyContext, HV_HASH_PGMIN, 0,
+              data1,
+              channel);
+            break;
+          case 0xD0: // aftertouch
+            _hv_sendMessageToReceiverFF(this.heavyContext, HV_HASH_TOUCHIN, 0,
+              data1,
+              channel);
+            break;
+          case 0xE0: // pitch bend
+            // combine 7bit lsb and msb into 32bit int
+            var value = (data2 << 7) | data1;
+            _hv_sendMessageToReceiverFF(this.heavyContext, HV_HASH_BENDIN, 0,
+              value,
+              channel);
             break;
           default:
             // console.error('No handler for midi message: ', message);
