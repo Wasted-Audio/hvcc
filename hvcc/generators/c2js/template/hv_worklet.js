@@ -135,6 +135,21 @@ class {{name}}_AudioLibWorklet extends AudioWorkletProcessor {
         var data1 = message[1];
         var data2 = message[2];
 
+        // all events to [midiin]
+        for (var i = 1; i <= 2; i++) {
+          _hv_sendMessageToReceiverFF(this.heavyContext, HV_HASH_MIDIIN, 0,
+             message[i],
+             channel
+          );
+        }
+
+        // realtime events to [midirealtimein]
+        if (MIDI_REALTIME.includes(message[0])) {
+          _hv_sendMessageToReceiverFF(this.heavyContext, HV_HASH_MIDIREALTIMEIN, 0,
+            message[0]
+          );
+        }
+
         switch(command) {
           case 0x80: // note off
             _hv_sendMessageToReceiverFFF(this.heavyContext, HV_HASH_NOTEIN, 0,
@@ -259,3 +274,5 @@ const HV_HASH_TOUCHIN         = 0x553925BD;
 const HV_HASH_BENDIN          = 0x3083F0F7;
 const HV_HASH_MIDIIN          = 0x149631bE;
 const HV_HASH_MIDIREALTIMEIN  = 0x6FFF0BCF;
+
+const MIDI_REALTIME =  [0xF8, 0xFA, 0xFB, 0xFC, 0xFE, 0xFF];
