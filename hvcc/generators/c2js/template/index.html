@@ -73,7 +73,7 @@
       function onPrint(message) {
         console.log(message);
       }
-
+    {%- if midi | length or midi_out | length %}
       if (navigator.requestMIDIAccess) {
         navigator.requestMIDIAccess()
         .then(onMIDISuccess, onMIDIFailure);
@@ -98,6 +98,7 @@
           loader.sendMidi(message);
         }
       }
+    {%- endif %}
 
       function onFloatMessage(sendName, floatValue) {
 

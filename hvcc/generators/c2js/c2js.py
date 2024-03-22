@@ -173,6 +173,9 @@ class c2js:
         event_list = externs["events"]["in"]
         event_out_list = externs["events"]["out"]
 
+        midi_list = externs["midi"]["in"]
+        midi_out_list = externs["midi"]["out"]
+
         out_dir = os.path.join(out_dir, "js")
         patch_name = patch_name or "heavy"
 
@@ -223,6 +226,8 @@ class c2js:
                     parameters_out=parameter_out_list,
                     events=event_list,
                     events_out=event_out_list,
+                    midi=midi_list,
+                    midi_out=midi_out_list,
                     copyright=copyright_html))
 
             # generate heavy js worklet from template
