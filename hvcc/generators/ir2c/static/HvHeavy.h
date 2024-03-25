@@ -190,6 +190,26 @@ bool hv_sendSymbolToReceiver(HeavyContextInterface *c, hv_uint32_t receiverHash,
 bool hv_sendMessageToReceiverV(HeavyContextInterface *c, hv_uint32_t receiverHash, double delayMs, const char *format, ...);
 
 /**
+ * Sends a fixed formatted message of two floats to a receiver that can be scheduled for the future.
+ * The receiver is addressed with its hash, which can also be determined using hv_stringToHash().
+ * This function is thread-safe.
+ *
+ * @return  True if the message was accepted. False if the message could not fit onto
+ *          the message queue to be processed this block.
+ */
+bool hv_sendMessageToReceiverFF(HeavyContextInterface *c, hv_uint32_t receiverHash, double delayMs, double data1, double data2);
+
+/**
+ * Sends a fixed formatted message of three floats to a receiver that can be scheduled for the future.
+ * The receiver is addressed with its hash, which can also be determined using hv_stringToHash().
+ * This function is thread-safe.
+ *
+ * @return  True if the message was accepted. False if the message could not fit onto
+ *          the message queue to be processed this block.
+ */
+bool hv_sendMessageToReceiverFFF(HeavyContextInterface *c, hv_uint32_t receiverHash, double delayMs, double data1, double data2, double data3);
+
+/**
  * Sends a message to a receiver that can be scheduled for the future.
  * The receiver is addressed with its hash, which can also be determined using hv_stringToHash().
  * This function is thread-safe.

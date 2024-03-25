@@ -27,7 +27,6 @@ class {{name}}_AudioLibWorklet extends AudioWorkletProcessor {
             Module._malloc(lengthInSamples * Float32Array.BYTES_PER_ELEMENT),
             lengthInSamples);
 
-
         this.port.onmessage = (e) => {
           console.log(e.data);
           switch(e.data.type){
@@ -36,6 +35,9 @@ class {{name}}_AudioLibWorklet extends AudioWorkletProcessor {
               break;
             case 'sendEvent':
               this.sendEvent(e.data.name);
+              break;
+            case 'sendMidi':
+              this.sendMidi(e.data.message);
               break;
             default:
               console.error('No handler for message of type: ', e.data.type);
@@ -126,6 +128,76 @@ class {{name}}_AudioLibWorklet extends AudioWorkletProcessor {
       }
     }
 
+    sendMidi(message) {
+      if (this.heavyContext) {
+        var command = message[0] & 0xF0;
+        var channel = message[0] & 0x0F;
+        var data1 = message[1];
+        var data2 = message[2];
+
+        // all events to [midiin]
+        for (var i = 1; i <= 2; i++) {
+          _hv_sendMessageToReceiverFF(this.heavyContext, HV_HASH_MIDIIN, 0,
+             message[i],
+             channel
+          );
+        }
+
+        // realtime events to [midirealtimein]
+        if (MIDI_REALTIME.includes(message[0])) {
+          _hv_sendMessageToReceiverFF(this.heavyContext, HV_HASH_MIDIREALTIMEIN, 0,
+            message[0]
+          );
+        }
+
+        switch(command) {
+          case 0x80: // note off
+            _hv_sendMessageToReceiverFFF(this.heavyContext, HV_HASH_NOTEIN, 0,
+              data1,
+              0,
+              channel);
+            break;
+          case 0x90: // note on
+            _hv_sendMessageToReceiverFFF(this.heavyContext, HV_HASH_NOTEIN, 0,
+              data1,
+              data2,
+              channel);
+            break;
+          case 0xA0: // polyphonic aftertouch
+            _hv_sendMessageToReceiverFFF(this.heavyContext, HV_HASH_POLYTOUCHIN, 0,
+              data2, // pressure
+              data1, // note
+              channel);
+            break;
+          case 0xB0: // control change
+            _hv_sendMessageToReceiverFFF(this.heavyContext, HV_HASH_CTLIN, 0,
+              data2, // value
+              data1, // cc number
+              channel);
+            break;
+          case 0xC0: // program change
+            _hv_sendMessageToReceiverFF(this.heavyContext, HV_HASH_PGMIN, 0,
+              data1,
+              channel);
+            break;
+          case 0xD0: // aftertouch
+            _hv_sendMessageToReceiverFF(this.heavyContext, HV_HASH_TOUCHIN, 0,
+              data1,
+              channel);
+            break;
+          case 0xE0: // pitch bend
+            // combine 7bit lsb and msb into 32bit int
+            var value = (data2 << 7) | data1;
+            _hv_sendMessageToReceiverFF(this.heavyContext, HV_HASH_BENDIN, 0,
+              value,
+              channel);
+            break;
+          default:
+            // console.error('No handler for midi message: ', message);
+        }
+      }
+    }
+
     sendStringToReceiver(name, message) {
       // Note(joe): it's not a good idea to call this frequently it is possible for
       // the stack memory to run out over time.
@@ -188,3 +260,19 @@ var tableHashes = {
 };
 
 registerProcessor("{{name}}_AudioLibWorklet", {{name}}_AudioLibWorklet);
+
+
+/*
+ * MIDI Constants
+ */
+
+const HV_HASH_NOTEIN          = 0x67E37CA3;
+const HV_HASH_CTLIN           = 0x41BE0f9C;
+const HV_HASH_POLYTOUCHIN     = 0xBC530F59;
+const HV_HASH_PGMIN           = 0x2E1EA03D;
+const HV_HASH_TOUCHIN         = 0x553925BD;
+const HV_HASH_BENDIN          = 0x3083F0F7;
+const HV_HASH_MIDIIN          = 0x149631bE;
+const HV_HASH_MIDIREALTIMEIN  = 0x6FFF0BCF;
+
+const MIDI_REALTIME =  [0xF8, 0xFA, 0xFB, 0xFC, 0xFE, 0xFF];
