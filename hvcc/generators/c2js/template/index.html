@@ -95,7 +95,9 @@
 
       function onMIDIMessage(message) {
         if(loader.webAudioWorklet) {
-          loader.sendMidi(message);
+          loader.sendMidi(message.data);
+        } else {
+          loader.audiolib.sendMidi(message.data);
         }
       }
     {%- endif %}

@@ -6,6 +6,7 @@ Next Release
 
 * Core: parse remote/send messages
 * OWL: add Polytouchin and Polytouchout
+* JS: webmidi support
 
 0.11.0
 -----
