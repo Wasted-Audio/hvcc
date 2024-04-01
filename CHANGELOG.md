@@ -5,7 +5,10 @@ Next Release
 -----
 
 * Core: parse remote/send messages
+* Core: MIDI i/o added to memoryPool
 * OWL: add Polytouchin and Polytouchout
+* JS: webmidi input
+* Bugfix: MIDI out objects in output Paremeters
 
 0.11.0
 -----
