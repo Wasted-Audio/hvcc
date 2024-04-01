@@ -187,8 +187,16 @@ def generate_extern_info(hvir: Dict, results: OrderedDict) -> Dict:
         # generate patch heuristics to ensure enough memory allocated for the patch
         "memoryPoolSizesKb": {
             "internal": 10,  # TODO(joe): should this increase if there are a lot of internal connections?
-            "inputQueue": max(2, int(len(in_parameter_list) + len(in_event_list) + len(midi_objects['in']) / 4)),
-            "outputQueue": max(2, int(len(out_parameter_list) + len(out_event_list) + len(midi_objects['out']) / 4)),
+            "inputQueue": max(2, int(
+                                     len(in_parameter_list) +
+                                     (len(in_event_list) / 4) +
+                                     len(midi_objects['in'])  # TODO(dreamer): should this depend on the MIDI type?
+                                    )),
+            "outputQueue": max(2, int(
+                                     len(out_parameter_list) +
+                                     (len(out_event_list) / 4) +
+                                     len(midi_objects['out'])
+                                    )),
         }
     }
 
