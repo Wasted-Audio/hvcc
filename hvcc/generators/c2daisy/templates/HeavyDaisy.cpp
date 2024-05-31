@@ -37,7 +37,7 @@ using namespace daisy;
 
 json2daisy::Daisy{{ class_name|capitalize }} hardware;
 
-Heavy_{{patch_name}} hv(SAMPLE_RATE);
+Heavy_{{patch_name}} hv(SAMPLE_RATE, {{pool_sizes_kb.internal}}, {{pool_sizes_kb.inputQueue}}, {{pool_sizes_kb.outputQueue}});
 
 void audiocallback(daisy::AudioHandle::InputBuffer in, daisy::AudioHandle::OutputBuffer out, size_t size);
 static void sendHook(HeavyContextInterface *c, const char *receiverName, uint32_t receiverHash, const HvMessage * m);

@@ -55,6 +55,8 @@ class c2js:
         "_hv_table_setLength",
         "_hv_table_getBuffer",
         "_hv_sendMessageToReceiverV",
+        "_hv_sendMessageToReceiverFF",
+        "_hv_sendMessageToReceiverFFF",
         "_malloc"  # Rationale: https://github.com/emscripten-core/emscripten/issues/6882#issuecomment-406745898
     ]
 
@@ -74,7 +76,10 @@ class c2js:
         """Run the emcc command to compile C source files to a javascript library.
         """
 
-        emcc_path = which("emcc")
+        if os.name == 'nt':
+            emcc_path = which("emcc.bat")
+        else:
+            emcc_path = which("emcc")
 
         if emcc_path is None:
             raise HeavyException("emcc is not in the PATH")
@@ -114,7 +119,6 @@ class c2js:
 
         linker_flags = [
             "-O3",
-            "--memory-init-file", "0",
             "-s", "RESERVED_FUNCTION_POINTERS=2",
             "-s", "DEFAULT_LIBRARY_FUNCS_TO_INCLUDE=$addFunction",
             "-s", f"EXPORTED_FUNCTIONS=[{hv_api_defs.format(patch_name)}]",
@@ -165,7 +169,12 @@ class c2js:
         tick = time.time()
 
         parameter_list = externs["parameters"]["in"]
+        parameter_out_list = externs["parameters"]["out"]
         event_list = externs["events"]["in"]
+        event_out_list = externs["events"]["out"]
+
+        midi_list = externs["midi"]["in"]
+        midi_out_list = externs["midi"]["out"]
 
         out_dir = os.path.join(out_dir, "js")
         patch_name = patch_name or "heavy"
@@ -214,7 +223,11 @@ class c2js:
                     name=patch_name,
                     includes=[f"./{js_out_file}"],
                     parameters=parameter_list,
+                    parameters_out=parameter_out_list,
                     events=event_list,
+                    events_out=event_out_list,
+                    midi=midi_list,
+                    midi_out=midi_out_list,
                     copyright=copyright_html))
 
             # generate heavy js worklet from template

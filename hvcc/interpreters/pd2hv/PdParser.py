@@ -218,13 +218,14 @@ class PdParser:
 
         g = pd_graph_class(graph_args, pd_path, pos_x, pos_y)
 
+        remotes: Dict = {}
+
         # parse and add all Heavy arguments to the graph
         for li in file_hv_arg_dict[canvas_line]:
             line = li.split()
             assert line[4] == "@hv_arg"
             is_required = (line[9] == "true")
-            default_value = HeavyObject.force_arg_type(line[8], line[7]) \
-                if not is_required else None
+            default_value = HeavyObject.force_arg_type(line[8], line[7]) if not is_required else None
             g.add_hv_arg(
                 arg_index=int(line[5][2:]) - 1,  # strip off the leading "\$" and make index zero-based
                 name=line[6],
@@ -473,11 +474,19 @@ class PdParser:
 
                     elif line[1] == "msg":
                         self.obj_counter["msg"] += 1
-                        g.add_object(PdMessageObject(
+                        msg = PdMessageObject(
                             obj_type="msg",
                             obj_args=[" ".join(line[4:])],
                             pos_x=int(line[2]),
-                            pos_y=int(line[3])))
+                            pos_y=int(line[3]))
+
+                        index = g.add_object(msg)
+
+                        if len(msg.obj_dict) > 0:
+                            remotes[index] = []
+
+                            for remote in msg.obj_dict['remote']:
+                                remotes[index].append(remote)
 
                     elif line[1] == "connect":
                         g.add_parsed_connection(
@@ -530,6 +539,28 @@ class PdParser:
                 # NOTE(mhroth): should the exception be added as an error?
                 # Sometimes it's all that we have, so perhaps it's a good idea.
                 g.add_error(str(e), NotificationEnum.ERROR_EXCEPTION)
+
+        # parse remote messages
+        for index in remotes.keys():
+            first_msg = g.get_object(index)
+            conns = first_msg.get_inlet_connections()
+
+            for remote in remotes[index]:
+                self.obj_counter["msg"] += 1
+                msg = PdMessageObject('msg', [' '.join(msg for msg in remote['message'])])
+                msg_index = g.add_object(msg)
+
+                self.obj_counter["send"] += 1
+                send = PdSendObject('send', [remote['receiver']])
+                send_index = g.add_object(send)
+
+                # connect new message to upstream objects of first message
+                for conn in conns['0']:
+                    up_obj = conn.from_obj
+                    up_index = g.get_objects().index(up_obj)
+                    g.add_parsed_connection(up_index, 0, msg_index, 0)
+
+                g.add_parsed_connection(msg_index, 0, send_index, 0)
 
         return g
 
