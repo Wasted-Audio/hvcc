@@ -109,6 +109,14 @@ AudioLibLoader.prototype.sendMidi = function(message) {
   });
 }
 
+AudioLibLoader.prototype.fillTableWithFloatBuffer = function(name, buffer) {
+  this.webAudioWorklet.port.postMessage({
+    type:'fillTableWithFloatBuffer',
+    name,
+    buffer
+  });
+}
+
 Module.AudioLibLoader = AudioLibLoader;
 
 

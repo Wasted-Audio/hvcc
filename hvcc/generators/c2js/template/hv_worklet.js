@@ -39,6 +39,9 @@ class {{name}}_AudioLibWorklet extends AudioWorkletProcessor {
             case 'sendMidi':
               this.sendMidi(e.data.message);
               break;
+            case 'fillTableWithFloatBuffer':
+              this.fillTableWithFloatBuffer(e.data.name, e.data.buffer);
+              break;
             default:
               console.error('No handler for message of type: ', e.data.type);
           }
