@@ -87,34 +87,50 @@ AudioLibLoader.prototype.stop = function() {
 }
 
 AudioLibLoader.prototype.sendFloatParameterToWorklet = function(name, value) {
-  this.webAudioWorklet.port.postMessage({
-    type:'setFloatParameter',
-    name,
-    value
-  });
+  if (this.audiolib) {
+    this.audiolib.sendEvent(name, value);
+  } else {
+    this.webAudioWorklet.port.postMessage({
+      type:'setFloatParameter',
+      name,
+      value
+    });
+  }
 }
 
 AudioLibLoader.prototype.sendEvent = function(name, value) {
-  this.webAudioWorklet.port.postMessage({
-    type:'sendEvent',
-    name,
-    value
-  });
+  if (this.audiolib) {
+    this.audiolib.sendEvent(name, value);
+  } else {
+    this.webAudioWorklet.port.postMessage({
+      type:'sendEvent',
+      name,
+      value
+    });
+  }
 }
 
 AudioLibLoader.prototype.sendMidi = function(message) {
-  this.webAudioWorklet.port.postMessage({
-    type:'sendMidi',
-    message:message
-  });
+  if (this.audiolib) {
+    this.audiolib.sendMidi(message);
+  } else {
+    this.webAudioWorklet.port.postMessage({
+      type:'sendMidi',
+      message:message
+    });
+  }
 }
 
 AudioLibLoader.prototype.fillTableWithFloatBuffer = function(name, buffer) {
-  this.webAudioWorklet.port.postMessage({
-    type:'fillTableWithFloatBuffer',
-    name,
-    buffer
-  });
+  if (this.audiolib) {
+    this.audiolib.fillTableWithFloatBuffer(name, buffer);
+  } else {
+    this.webAudioWorklet.port.postMessage({
+      type:'fillTableWithFloatBuffer',
+      name,
+      buffer
+    });
+  }
 }
 
 Module.AudioLibLoader = AudioLibLoader;
