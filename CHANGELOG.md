@@ -8,7 +8,10 @@ Next Release
 * Core: MIDI i/o added to memoryPool
 * OWL: add Polytouchin and Polytouchout
 * JS: webmidi input
-* Bugfix: MIDI out objects in output Paremeters
+* Docs: add instructions for loading custom samples in JS
+* Small Bugfixes:
+  * MIDI out objects in output Paremeters
+  * JS: AudioWorklet fillTableWithFloatBuffer
 
 0.11.0
 -----
