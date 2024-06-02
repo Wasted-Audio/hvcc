@@ -39,6 +39,9 @@ class {{name}}_AudioLibWorklet extends AudioWorkletProcessor {
             case 'sendMidi':
               this.sendMidi(e.data.message);
               break;
+            case 'fillTableWithFloatBuffer':
+              this.fillTableWithFloatBuffer(e.data.name, e.data.buffer);
+              break;
             default:
               console.error('No handler for message of type: ', e.data.type);
           }
@@ -216,7 +219,7 @@ class {{name}}_AudioLibWorklet extends AudioWorkletProcessor {
         _hv_table_setLength(this.heavyContext, tableHash, buffer.length);
 
         // access internal float buffer from table
-        tableBuffer = new Float32Array(
+        let tableBuffer = new Float32Array(
           Module.HEAPF32.buffer,
           _hv_table_getBuffer(this.heavyContext, tableHash),
           buffer.length);
