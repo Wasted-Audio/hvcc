@@ -50,8 +50,8 @@ daisy::MidiUsbHandler midiusb;
 {% endif %}
 // int midiOutCount;
 // uint8_t* midiOutData;
-void CallbackWriteIn(HeavyContext& hv);
-void LoopWriteIn(HeavyContext& hv);
+void CallbackWriteIn(Heavy_{{patch_name}}* hv);
+void LoopWriteIn(Heavy_{{patch_name}}* hv);
 void CallbackWriteOut();
 void LoopWriteOut();
 void PostProcess();
@@ -252,7 +252,7 @@ int main(void)
     {% endif %}
     Display();
     {% if loop_write_in|length > 0 %}
-    LoopWriteIn(*hv);
+    LoopWriteIn(hv);
     {% endif %}
     {% if  output_parameters|length > 0 %}
     LoopWriteOut();
@@ -288,7 +288,7 @@ void audiocallback(daisy::AudioHandle::InputBuffer in, daisy::AudioHandle::Outpu
   {% endif %}
   {% if  parameters|length > 0 %}
   hardware.ProcessAllControls();
-  CallbackWriteIn(*hv);
+  CallbackWriteIn(hv);
   {% endif %}
   hv->process((float**)in, (float**)out, size);
   {% if  output_parameters|length > 0 %}
@@ -474,14 +474,14 @@ static void printHook(HeavyContextInterface *c, const char *printLabel, const ch
 /** Sends signals from the Daisy hardware to the PD patch via the receive objects during the main loop
  *
  */
-void LoopWriteIn(HeavyContext& hv)
+void LoopWriteIn(Heavy_{{patch_name}}* hv)
 {
   {% for param in loop_write_in %}
   {% if param.bool %}
   if ({{param.process}})
-    hv.sendBangToReceiver((uint32_t) HV_{{patch_name|upper}}_PARAM_IN_{{param.hash_enum|upper}});
+    hv->sendBangToReceiver((uint32_t) HV_{{patch_name|upper}}_PARAM_IN_{{param.hash_enum|upper}});
   {% else %}
-  hv.sendFloatToReceiver((uint32_t) HV_{{patch_name|upper}}_PARAM_IN_{{param.hash_enum|upper}}, {{param.process}});
+  hv->sendFloatToReceiver((uint32_t) HV_{{patch_name|upper}}_PARAM_IN_{{param.hash_enum|upper}}, {{param.process}});
   {% endif %}
   {% endfor %}
 }
@@ -489,14 +489,14 @@ void LoopWriteIn(HeavyContext& hv)
 /** Sends signals from the Daisy hardware to the PD patch via the receive objects during the audio callback
  *
  */
-void CallbackWriteIn(HeavyContext& hv)
+void CallbackWriteIn(Heavy_{{patch_name}}* hv)
 {
   {% for param in callback_write_in %}
   {% if param.bool %}
   if ({{param.process}})
-    hv.sendBangToReceiver((uint32_t) HV_{{patch_name|upper}}_PARAM_IN_{{param.hash_enum|upper}});
+    hv->sendBangToReceiver((uint32_t) HV_{{patch_name|upper}}_PARAM_IN_{{param.hash_enum|upper}});
   {% else %}
-  hv.sendFloatToReceiver((uint32_t) HV_{{patch_name|upper}}_PARAM_IN_{{param.hash_enum|upper}}, {{param.process}});
+  hv->sendFloatToReceiver((uint32_t) HV_{{patch_name|upper}}_PARAM_IN_{{param.hash_enum|upper}}, {{param.process}});
   {% endif %}
   {% endfor %}
 }
