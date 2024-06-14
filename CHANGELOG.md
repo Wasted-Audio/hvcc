@@ -6,6 +6,7 @@ Next Release
 
 * Core: parse remote/send messages
 * Core: MIDI i/o added to memoryPool
+* Daisy: set heavy context after hw.init()
 * OWL: add Polytouchin and Polytouchout
 * JS: webmidi input
 * Docs: add instructions for loading custom samples in JS
