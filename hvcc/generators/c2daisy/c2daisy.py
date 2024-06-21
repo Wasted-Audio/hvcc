@@ -89,6 +89,7 @@ class c2daisy:
             component_glue['displayprocess'] = board_info['displayprocess']
             component_glue['debug_printing'] = daisy_meta.get('debug_printing', False)
             component_glue['usb_midi'] = daisy_meta.get('usb_midi', False)
+            component_glue['pool_sizes_kb'] = externs["memoryPoolSizesKb"]
 
             # samplerate
             samplerate = daisy_meta.get('samplerate', 48000)
