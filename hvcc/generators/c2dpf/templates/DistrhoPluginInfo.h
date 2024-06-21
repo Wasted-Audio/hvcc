@@ -2,6 +2,11 @@
 
 #pragma once
 
+#define HVCC_NUM_AUDIO_INPUTS               {{num_input_channels - meta.cv.input|length if meta.cv is defined and meta.cv.input|length > 0 else num_input_channels }}
+#define HVCC_NUM_AUDIO_OUTPUTS              {{num_output_channels - meta.cv.output|length if meta.cv is defined and meta.cv.output|length > 0 else num_output_channels }}
+#define HVCC_NUM_CV_INPUTS                  {{meta.cv.input|length if meta.cv is defined and meta.cv.input|length > 0 else 0 }}
+#define HVCC_NUM_CV_OUTPUTS                 {{meta.cv.output|length if meta.cv is defined and meta.cv.output|length > 0 else 0 }}
+
 #define DISTRHO_PLUGIN_NAME                 "{{name.replace('_', ' ')}}"
 {%- if meta.plugin_uri is defined %}
 #define DISTRHO_PLUGIN_URI                  "{{meta.plugin_uri}}"
@@ -13,8 +18,8 @@
 {% else %}
 #define DISTRHO_PLUGIN_CLAP_ID              "urn.hvcc.{{name}}"
 {%- endif %}
-#define DISTRHO_PLUGIN_NUM_INPUTS           {{num_input_channels}}
-#define DISTRHO_PLUGIN_NUM_OUTPUTS          {{num_output_channels}}
+#define DISTRHO_PLUGIN_NUM_INPUTS           HVCC_NUM_AUDIO_INPUTS + HVCC_NUM_CV_INPUTS
+#define DISTRHO_PLUGIN_NUM_OUTPUTS          HVCC_NUM_AUDIO_OUTPUTS + HVCC_NUM_CV_OUTPUTS
 #define DISTRHO_PLUGIN_IS_SYNTH             {{1 if num_output_channels > 0 and meta.midi_input is defined and meta.midi_input > 0 else 0}}
 #define DISTRHO_PLUGIN_HAS_UI               {{1 if meta.enable_ui is defined and meta.enable_ui is sameas true else 0}}
 #define DISTRHO_PLUGIN_IS_RT_SAFE           1
@@ -22,8 +27,8 @@
 #define DISTRHO_PLUGIN_WANT_STATE           0
 #define DISTRHO_PLUGIN_WANT_TIMEPOS         1
 #define DISTRHO_PLUGIN_WANT_FULL_STATE      0
-#define DISTRHO_PLUGIN_WANT_MIDI_INPUT      {{meta.midi_input if meta.midi_input is defined else 1}}
-#define DISTRHO_PLUGIN_WANT_MIDI_OUTPUT     {{meta.midi_output if meta.midi_output is defined else 1}}
+#define DISTRHO_PLUGIN_WANT_MIDI_INPUT      {{meta.midi_input if meta.midi_input is defined and meta.midi_input > 0 else 0}}
+#define DISTRHO_PLUGIN_WANT_MIDI_OUTPUT     {{meta.midi_output if meta.midi_output is defined and meta.midi_output > 0 else 0}}
 {%- if meta.lv2_info is defined %}
 #define DISTRHO_PLUGIN_LV2_CATEGORY         "{{meta.lv2_info}}"
 {%- endif %}

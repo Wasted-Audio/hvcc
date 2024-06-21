@@ -102,9 +102,11 @@ static void hvPrintHookFunc(HeavyContextInterface *c, const char *printLabel, co
   hv_{{name}}_free(_context);
 }
 
-{%- if meta.port_groups is defined %}
+
+{%- if meta.port_groups is defined or meta.cv is defined %}
 {% include 'portGroups.cpp' %}
 {%- endif %}
+
 
 void {{class_name}}::initParameter(uint32_t index, Parameter& parameter)
 {
@@ -195,14 +197,14 @@ void {{class_name}}::setOutputParameter(uint32_t sendHash, const HvMessage *m)
 // -------------------------------------------------------------------
 // DPF Plugin run() loop
 
-#if DISTRHO_PLUGIN_WANT_MIDI_INPUT
+{%- if meta.midi_input is defined and meta.midi_input == 1 %}
 void {{class_name}}::run(const float** inputs, float** outputs, uint32_t frames, const MidiEvent* midiEvents, uint32_t midiEventCount)
 {
   handleMidiInput(frames, midiEvents, midiEventCount);
-#else
+{% else %}
 void {{class_name}}::run(const float** inputs, float** outputs, uint32_t frames)
 {
-#endif
+{% endif %}
   const TimePosition& timePos(getTimePosition());
   if (timePos.playing && timePos.bbt.valid)
     _context->sendMessageToReceiverV(HV_HASH_DPF_BPM, 0, "f", timePos.bbt.beatsPerMinute);
