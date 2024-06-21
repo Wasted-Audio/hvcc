@@ -45,6 +45,7 @@ from .NotificationEnum import NotificationEnum
 class PdParser:
 
     # library search paths
+    __LIB_DIR = os.path.join(os.path.dirname(__file__), "libs")
     __HVLIB_DIR = os.path.join(os.path.dirname(__file__), "libs", "heavy")
     __HVLIB_CONVERTED_DIR = os.path.join(os.path.dirname(__file__), "libs", "heavy_converted")
     __PDLIB_DIR = os.path.join(os.path.dirname(__file__), "libs", "pd")
@@ -422,6 +423,16 @@ class PdParser:
                         elif os.path.isfile(os.path.join(self.__ELSELIB_DIR, f"{obj_type}.pd")):
                             self.obj_counter[obj_type] += 1
                             hvlib_path = os.path.join(self.__ELSELIB_DIR, f"{obj_type}.pd")
+                            x = self.graph_from_file(
+                                file_path=hvlib_path,
+                                obj_args=obj_args,
+                                pos_x=int(line[2]), pos_y=int(line[3]),
+                                is_root=False)
+
+                        # is this object in lib? (sub-directory)
+                        elif os.path.isfile(os.path.join(self.__LIB_DIR, f"{obj_type}.pd")):
+                            self.obj_counter[obj_type] += 1
+                            hvlib_path = os.path.join(self.__LIB_DIR, f"{obj_type}.pd")
                             x = self.graph_from_file(
                                 file_path=hvlib_path,
                                 obj_args=obj_args,
