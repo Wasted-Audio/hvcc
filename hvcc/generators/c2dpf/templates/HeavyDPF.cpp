@@ -3,6 +3,9 @@
 #include "Heavy_{{name}}.h"
 #include "{{class_name}}.hpp"
 #include <set>
+{% if num_input_channels > 0 %}
+#include "extra/ScopedDenormalDisable.hpp"
+{% endif %}
 
 
 #define HV_DPF_NUM_PARAMETER {{receivers|length + senders|length}}
@@ -203,6 +206,9 @@ void {{class_name}}::run(const float** inputs, float** outputs, uint32_t frames,
 void {{class_name}}::run(const float** inputs, float** outputs, uint32_t frames)
 {
 #endif
+{% if num_input_channels > 0 %}
+  const ScopedDenormalDisable sdd;
+{% endif %}
   const TimePosition& timePos(getTimePosition());
   if (timePos.playing && timePos.bbt.valid)
     _context->sendMessageToReceiverV(HV_HASH_DPF_BPM, 0, "f", timePos.bbt.beatsPerMinute);
