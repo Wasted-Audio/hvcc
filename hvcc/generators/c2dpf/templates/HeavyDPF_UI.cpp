@@ -6,9 +6,17 @@
 START_NAMESPACE_DISTRHO
 
 // --------------------------------------------------------------------------------------------------------------------
+{%- if (receivers|length > 0) or (senders|length > 0) %}
+enum HeavyParams {
+    {%- for k, v in receivers + senders -%}
+    {{v.display|upper}},
+    {%- endfor %}
+};
+{%- endif %}
+
 class ImGuiPluginUI : public UI
 {
-    {% for k, v in receivers -%}
+    {% for k, v in receivers + senders -%}
         {%- if v.attributes.type == 'bool': %}
     bool f{{v.display|lower}} = {{v.attributes.default}}f != 0.0f;
         {%- elif v.attributes.type == 'int': %}
@@ -48,10 +56,10 @@ protected:
     */
     void parameterChanged(uint32_t index, float value) override
     {
-    {%- if receivers|length > 0 %}
+    {%- if (receivers|length > 0) or (senders|length > 0) %}
         switch (index) {
-            {% for k, v  in receivers -%}
-            case {{loop.index-1}}:
+            {% for k, v  in receivers + senders -%}
+            case {{v.display|upper}}:
                 {%- if v.attributes.type == 'bool': %}
                 f{{v.display|lower}} = value != 0.0f;
                 {%- else %}
@@ -84,7 +92,7 @@ protected:
 
         if (ImGui::Begin("{{name.replace('_', ' ')}}", nullptr, ImGuiWindowFlags_NoResize + ImGuiWindowFlags_NoCollapse))
         {
-    {%- for k, v in receivers %}
+    {%- for k, v in receivers + senders %}
         {%- set v_display = v.display|lower %}
         {%- if meta.enumerators is defined and meta.enumerators[v.display] is defined -%}
             {%- set enums = meta.enumerators[v.display] -%}
@@ -105,8 +113,8 @@ protected:
                     if (ImGui::Selectable({{enum_list}}[n], is_selected))
                     {
                         f{{v_display}} = n;
-                        editParameter({{loop.index-1}}, true);
-                        setParameterValue({{loop.index-1}}, f{{v_display}});
+                        editParameter({{v.display|upper}}, true);
+                        setParameterValue({{v.display|upper}}, f{{v_display}});
                     }
                     if (is_selected)
                         ImGui::SetItemDefaultFocus();
@@ -116,23 +124,27 @@ protected:
         {%- else %}
             {%- if v.attributes.type == 'bool': %}
             if (ImGui::Toggle("{{v.display.replace('_', ' ')}}", &f{{v_display}}))
+            {%- elif v.attributes.type == 'int' %}
+            if (ImGui::SliderInt("{{v.display.replace('_', ' ')}}", &f{{v_display}}, {{v.attributes.min}}f, {{v.attributes.max}}f))
             {%- else %}
             if (ImGui::SliderFloat("{{v.display.replace('_', ' ')}}", &f{{v_display}}, {{v.attributes.min}}f, {{v.attributes.max}}f))
             {%- endif %}
             {
+            {%- if not v.type == "send" %}
                 if (ImGui::IsItemActivated())
                 {
-                    editParameter({{loop.index-1}}, true);
-                    setParameterValue({{loop.index-1}}, f{{v_display}});
+                    editParameter({{v.display|upper}}, true);
                 }
+                setParameterValue({{v.display|upper}}, f{{v_display}});
+            {%- endif %}
             }
         {%- endif %}
     {% endfor %}
             if (ImGui::IsItemDeactivated())
             {
-            {%- for i in range(0, receivers|length) %}
-                editParameter({{i}}, false);
-            {%- endfor %}
+            {% for k, v  in receivers + senders -%}
+                editParameter({{v.display|upper}}, false);
+            {% endfor -%}
             }
         }
         ImGui::End();

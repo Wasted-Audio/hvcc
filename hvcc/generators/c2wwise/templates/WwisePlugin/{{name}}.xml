@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+{{copyright}}
+<PluginModule>
+{%- if plugin_type == "Source" %}
+  <SourcePlugin Name="{{name}}" CompanyID="64" PluginID="{{plugin_id}}" EngineDllName="{{name}}">
+    <PluginInfo CanUnlink="true">
+      <PlatformSupport>
+        {% if tables|length > 0 -%}
+        <Platform Name="Android">
+          <CanReferenceDataFile>true</CanReferenceDataFile>
+        </Platform>
+        <Platform Name="iOS">
+          <CanReferenceDataFile>true</CanReferenceDataFile>
+        </Platform>
+        <Platform Name="PS4">
+          <CanReferenceDataFile>true</CanReferenceDataFile>
+        </Platform>
+        <Platform Name="Linux">
+          <CanReferenceDataFile>true</CanReferenceDataFile>
+        </Platform>
+        <Platform Name="Mac">
+          <CanReferenceDataFile>true</CanReferenceDataFile>
+        </Platform>
+        <Platform Name="Windows">
+          <CanReferenceDataFile>true</CanReferenceDataFile>
+        </Platform>
+        <Platform Name="XboxOne">
+          <CanReferenceDataFile>true</CanReferenceDataFile>
+        </Platform>
+        {% else -%}
+        <Platform Name="Android"></Platform>
+        <Platform Name="iOS"></Platform>
+        <Platform Name="PS4"></Platform>
+        <Platform Name="Linux"></Platform>
+        <Platform Name="Mac"></Platform>
+        <Platform Name="Windows"></Platform>
+        <Platform Name="XboxOne"></Platform>
+        {% endif -%}
+      </PlatformSupport>
+    </PluginInfo>
+    {%- if parameters|length > 0 %}
+    <Properties>
+      {%- for k, v in parameters %}
+      <Property Name="{{k}}" Type="Real32" SupportRTPCType="Exclusive">
+        <UserInterface DisplayName="{{v.display}}" Step="0.01" Fine="0.001" Decimals="2" />
+        <DefaultValue>{{v.attributes.default}}</DefaultValue>
+        <AudioEnginePropertyID>{{loop.index-1}}</AudioEnginePropertyID>
+        <Restrictions>
+          <ValueRestriction>
+            <Range Type="Real32">
+              <Min>{{v.attributes.min}}</Min>
+              <Max>{{v.attributes.max}}</Max>
+            </Range>
+          </ValueRestriction>
+        </Restrictions>
+      </Property>
+      {%- endfor %}
+    </Properties>
+    {%- endif %}
+  </SourcePlugin>
+{%- elif plugin_type == "FX" %}
+  <EffectPlugin Name="{{name}}" CompanyID="64" PluginID="{{plugin_id}}" EngineDllName="{{name}}">
+    <PluginInfo>
+      <PlatformSupport>
+        <Platform Name="iOS">
+          <CanBeInsertOnBusses>true</CanBeInsertOnBusses>
+          <CanBeInsertOnAudioObjects>true</CanBeInsertOnAudioObjects>
+          <CanBeRendered>true</CanBeRendered>
+        </Platform>
+        <Platform Name="PS4">
+          <CanBeInsertOnBusses>true</CanBeInsertOnBusses>
+          <CanBeInsertOnAudioObjects>true</CanBeInsertOnAudioObjects>
+          <CanBeRendered>true</CanBeRendered>
+        </Platform>
+        <Platform Name="Linux">
+          <CanBeInsertOnBusses>true</CanBeInsertOnBusses>
+          <CanBeInsertOnAudioObjects>true</CanBeInsertOnAudioObjects>
+          <CanBeRendered>true</CanBeRendered>
+        </Platform>
+        <Platform Name="Mac">
+          <CanBeInsertOnBusses>true</CanBeInsertOnBusses>
+          <CanBeInsertOnAudioObjects>true</CanBeInsertOnAudioObjects>
+          <CanBeRendered>true</CanBeRendered>
+        </Platform>
+        <Platform Name="Windows">
+          <CanBeInsertOnBusses>true</CanBeInsertOnBusses>
+          <CanBeInsertOnAudioObjects>true</CanBeInsertOnAudioObjects>
+          <CanBeRendered>true</CanBeRendered>
+        </Platform>
+        <Platform Name="XboxOne">
+          <CanBeInsertOnBusses>true</CanBeInsertOnBusses>
+          <CanBeInsertOnAudioObjects>true</CanBeInsertOnAudioObjects>
+          <CanBeRendered>true</CanBeRendered>
+        </Platform>
+      </PlatformSupport>
+    </PluginInfo>
+    {%- if parameters|length > 0 %}
+    <Properties>
+      {%- for k, v in parameters %}
+      <Property Name="{{k}}" Type="Real32" SupportRTPCType="Exclusive">
+        <UserInterface DisplayName="{{v.display}}" Step="0.01" Fine="0.001" Decimals="2" />
+        <DefaultValue>{{v.attributes.default}}</DefaultValue>
+        <AudioEnginePropertyID>{{loop.index-1}}</AudioEnginePropertyID>
+        <Restrictions>
+          <ValueRestriction>
+            <Range Type="Real32">
+              <Min>{{v.attributes.min}}</Min>
+              <Max>{{v.attributes.max}}</Max>
+            </Range>
+          </ValueRestriction>
+        </Restrictions>
+      </Property>
+      {%- endfor %}
+    </Properties>
+    {%- endif %}
+  </EffectPlugin>
+{%- endif %}
+</PluginModule>
+{# force new line #}

@@ -1,6 +1,52 @@
 CHANGELOG
 =====
 
+0.12.0
+-----
+
+* Core: parse remote/send messages
+* Core: MIDI i/o added to memoryPool
+* Core: support `[else/knob]` as `[float]`
+* Daisy: set heavy context after hw.init()
+* OWL: add Polytouchin and Polytouchout
+* JS: webmidi input
+* Docs: add instructions for loading custom samples in JS
+* Small Bugfixes:
+  * MIDI out objects in output Paremeters
+  * JS: AudioWorklet fillTableWithFloatBuffer
+
+0.11.0
+-----
+
+* Core: add attributes and send type to send params
+* DPF: add "read only" outputParameter type based on send params
+* JS: add output Parameter and output Event to generator and html template
+* Daisy: update `wstd2daisy` and allow for setting `displayprocess` code into the template
+* Testing: move `tinywav` to git submodule
+* JS Bugfix: printHook and sendHook for AudioWorklet; mention emsdk limitations in docs
+* Object Bugfix: `[stripnote]` missing right inlet
+* Small Bugfixes:
+  * set default name argument
+  * `emcc` call on Windows - thanks to @vulcu
+  * deallocation in test_signal - thanks to @eu-ch
+  * quotes around WWISE paths - thanks to @eu-ch
+
+0.10.0
+-----
+
+* Objects: `[bang~]`
+* Object improvements: support `[clear(` message for `[delwrite~]`
+* Documentation fixes/additions
+* Daisy: ability to set samplerate and blocksize
+* Daisy: adding midirealtimein, polytouchin/out, midiin (midiout WIP)
+* Daisy: use `libdaisy_path` in meta config; both string/path and int/depth possible
+* DPF: enum for UI parameter IDs
+* DPF bugfixes: correct input PortGroup names; correct UI slider updates; midiout reimplementation
+* Wwise: complete rewrite/refactor - now uses SDK build tools - thanks to @eu-ch !!
+* Bugfix: correct alignment in AVX pow~ implementation
+* Cleanup: remove deprecated build.json
+* Deprecate py37, enable py312
+
 0.9.0
 -----
 

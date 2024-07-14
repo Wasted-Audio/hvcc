@@ -45,6 +45,7 @@ class c2dpf:
 
         out_dir = os.path.join(out_dir, "plugin")
         receiver_list = externs['parameters']['in']
+        sender_list = externs["parameters"]["out"]
 
         dpf_meta = patch_meta.dpf
         dpf_path = dpf_meta.dpf_path  # type: ignore
@@ -82,6 +83,7 @@ class c2dpf:
                     num_input_channels=num_input_channels,
                     num_output_channels=num_output_channels,
                     receivers=receiver_list,
+                    senders=sender_list,
                     copyright=copyright_c))
             dpf_cpp_path = os.path.join(source_dir, f"HeavyDPF_{patch_name}.cpp")
             with open(dpf_cpp_path, "w") as f:
@@ -92,6 +94,7 @@ class c2dpf:
                     num_input_channels=num_input_channels,
                     num_output_channels=num_output_channels,
                     receivers=receiver_list,
+                    senders=sender_list,
                     pool_sizes_kb=externs["memoryPoolSizesKb"],
                     copyright=copyright_c))
             if dpf_meta.enable_ui:
@@ -101,9 +104,8 @@ class c2dpf:
                         name=patch_name,
                         meta=dpf_meta,
                         class_name=f"HeavyDPF_{patch_name}",
-                        num_input_channels=num_input_channels,
-                        num_output_channels=num_output_channels,
                         receivers=receiver_list,
+                        senders=sender_list,
                         copyright=copyright_c))
             dpf_h_path = os.path.join(source_dir, "DistrhoPluginInfo.h")
             with open(dpf_h_path, "w") as f:
@@ -113,7 +115,6 @@ class c2dpf:
                     class_name=f"HeavyDPF_{patch_name}",
                     num_input_channels=num_input_channels,
                     num_output_channels=num_output_channels,
-                    receivers=receiver_list,
                     pool_sizes_kb=externs["memoryPoolSizesKb"],
                     copyright=copyright_c))
 

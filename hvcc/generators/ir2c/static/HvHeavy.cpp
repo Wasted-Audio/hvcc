@@ -206,6 +206,35 @@ HV_EXPORT bool hv_sendMessageToReceiverV(
   return c->sendMessageToReceiver(receiverHash, delayMs, m);
 }
 
+HV_EXPORT bool hv_sendMessageToReceiverFF(
+    HeavyContextInterface *c, hv_uint32_t receiverHash, double delayMs, double data1, double data2) {
+  hv_assert(c != nullptr);
+  hv_assert(delayMs >= 0.0);
+
+  const int numElem = (int) 2;
+  HvMessage *m = HV_MESSAGE_ON_STACK(numElem);
+  msg_init(m, numElem, c->getCurrentSample() + (hv_uint32_t) (hv_max_d(0.0, delayMs)*c->getSampleRate()/1000.0));
+  msg_setFloat(m, 0, (float) data1);
+  msg_setFloat(m, 1, (float) data2);
+
+  return c->sendMessageToReceiver(receiverHash, delayMs, m);
+}
+
+HV_EXPORT bool hv_sendMessageToReceiverFFF(
+    HeavyContextInterface *c, hv_uint32_t receiverHash, double delayMs, double data1, double data2, double data3) {
+  hv_assert(c != nullptr);
+  hv_assert(delayMs >= 0.0);
+
+  const int numElem = (int) 3;
+  HvMessage *m = HV_MESSAGE_ON_STACK(numElem);
+  msg_init(m, numElem, c->getCurrentSample() + (hv_uint32_t) (hv_max_d(0.0, delayMs)*c->getSampleRate()/1000.0));
+  msg_setFloat(m, 0, (float) data1);
+  msg_setFloat(m, 1, (float) data2);
+  msg_setFloat(m, 2, (float) data3);
+
+  return c->sendMessageToReceiver(receiverHash, delayMs, m);
+}
+
 HV_EXPORT bool hv_sendMessageToReceiver(
     HeavyContextInterface *c, hv_uint32_t receiverHash, double delayMs, HvMessage *m) {
   hv_assert(c != nullptr);
