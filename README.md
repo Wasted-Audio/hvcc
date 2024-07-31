@@ -1,6 +1,8 @@
 # Heavy Compiler Collection (hvcc)
 
 [![Build Status](https://github.com/Wasted-Audio/hvcc/actions/workflows/build.yml/badge.svg)](https://github.com/Wasted-Audio/hvcc/actions)
+[![pypi](https://img.shields.io/pypi/v/hvcc.svg)](https://pypi.python.org/pypi/hvcc)
+[![python](https://img.shields.io/pypi/pyversions/hvcc.svg)](https://pypi.python.org/pypi/hvcc)
 
 `hvcc` is a python-based dataflow audio programming language compiler that generates C/C++ code and a variety of specific framework wrappers.
 
@@ -12,14 +14,47 @@ The goal was to leverage Pure Data as a design interface and statically interpre
 
 It has since then been expanded to provide further support for many different platforms and frameworks, targeting game audio design, daw plugins and embedded production tools. In 2021 Wasted Audio took over maintenance of the project.
 
+## Documentation
+
+* [Introduction](/docs/01.introduction.md)
+  * [What is heavy?](/docs/01.introduction.md#what-is-heavy)
+  * [Supported patch formats](/docs/01.introduction.md#supported-patch-formats)
+  * [Supported platforms](/docs/01.introduction.md#supported-platforms)
+  * [Supported frameworks](/docs/01.introduction.md#supported-frameworks)
+  * [Licensing](/docs/01.introduction.md#licensing)
+* [Getting Started](/docs/02.getting_started.md)
+* [Generators](/docs/03.generators.md)
+* [MIDI](/docs/04.midi.md)
+* [C API](/docs/05.c.md)
+* [C++ API](/docs/06.cpp.md)
+* [Heavy Lang Info](/docs/07.heavy_lang.md)
+* [Heavy IR Info](/docs/08.heavy_ir_lang.md)
+* [Supported vanilla objects](/docs/09.supported_vanilla_objects.md)
+* [Unsupported vanilla objects](/docs/10.unsupported_vanilla_objects.md)
+
+## Integrations
+
+hvcc has been integrated into several projects and services. This allows to easily compile patches without having to install hvcc manually.
+
+* [plugdata](https://plugdata.org/) - Modern interface for Pure Data. Includes a full cross-platform toolchain and targets Daisy, DPF and PD Externals.
+* [mod-cloud-builder](https://github.com/moddevices/mod-cloud-builder) - Online service for building LV2 plugins for the MOD platform.
+* [OWL Patch Library](https://www.rebeltech.org/patch-library) - Online service for building OWL plugins (uses an old fork).
+
 ## Requirements
 
-* python 3.7 or higher
-  * `jinja2` (for generator templating)
-  * `importlib_resources` (for reading static resources)
-  * `json2daisy` (for daisy integration)
-  * `tox` (for tests, optional)
-  * `clang/clang++` (for building tests, optional)
+Python 3.8 up to 3.12
+
+* `jinja2` (for generator templating)
+* `importlib_resources` (for reading static resources)
+* `json2daisy` (for daisy integration)
+
+For tests:
+
+* `tox` (python install)
+* `numpy/scipy` (requirements-dev)
+* `midifile` (git submodule)
+* `tinywav` (git submodule)
+* `clang/clang++` (system install)
 
 ## Installation
 
@@ -110,24 +145,6 @@ This can be changed with `--copyright` parameter
 ### `--help`
 
 Displays all the available parameters and options for hvcc.
-
-## Documentation
-
-* [Introduction](/docs/01.introduction.md)
-  * [What is heavy?](/docs/01.introduction.md#what-is-heavy)
-  * [Supported patch formats](/docs/01.introduction.md#supported-patch-formats)
-  * [Supported platforms](/docs/01.introduction.md#supported-platforms)
-  * [Supported frameworks](/docs/01.introduction.md#supported-frameworks)
-  * [Licensing](/docs/01.introduction.md#licensing)
-* [Getting Started](/docs/02.getting_started.md)
-* [Generators](/docs/03.generators.md)
-* [MIDI](/docs/04.midi.md)
-* [C API](/docs/05.c.md)
-* [C++ API](/docs/06.cpp.md)
-* [Heavy Lang Info](/docs/07.heavy_lang.md)
-* [Heavy IR Info](/docs/08.heavy_ir_lang.md)
-* [Supported vanilla objects](/docs/09.supported_vanilla_objects.md)
-* [Unsupported vanilla objects](/docs/10.unsupported_vanilla_objects.md)
 
 ## Contact
 

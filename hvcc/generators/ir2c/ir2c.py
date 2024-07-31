@@ -96,6 +96,7 @@ class ir2c:
         "__tabread~if": SignalTabread,
         "__tabread~f": SignalTabread,
         "__tabreadu~f": SignalTabread,
+        "__tabread_stoppable~f": SignalTabread,
         "__tabhead~f": SignalTabhead,
         "__tabwrite~f": SignalTabwrite,
         "__tabwrite_stoppable~f": SignalTabwrite,
@@ -366,7 +367,7 @@ def main() -> None:
     parser.add_argument("-v", "--verbose", action="count")
     args = parser.parse_args()
 
-    externs = {
+    externs: Dict = {
         "parameters": {
             "in": {},
             "out": {}

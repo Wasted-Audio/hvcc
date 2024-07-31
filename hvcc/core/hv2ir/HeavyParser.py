@@ -299,6 +299,7 @@ LANG_CLASS_DICT = {
     "slice": HLangSlice,
     "__tabread~if": HIrTabread,
     "__tabread~f": HIrTabread,
+    "__tabread_stoppable~f": HIrTabread,
     "__tabreadu~f": HIrTabread,
     "__tabread": HIrTabread,
     "__tabhead~f": HIrTabhead,

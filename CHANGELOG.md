@@ -1,12 +1,71 @@
 CHANGELOG
 =====
 
-Next Release
+0.12.0
+-----
+
+* Core: parse remote/send messages
+* Core: MIDI i/o added to memoryPool
+* Core: support `[else/knob]` as `[float]`
+* Daisy: set heavy context after hw.init()
+* OWL: add Polytouchin and Polytouchout
+* JS: webmidi input
+* Docs: add instructions for loading custom samples in JS
+* Small Bugfixes:
+  * MIDI out objects in output Paremeters
+  * JS: AudioWorklet fillTableWithFloatBuffer
+
+0.11.0
+-----
+
+* Core: add attributes and send type to send params
+* DPF: add "read only" outputParameter type based on send params
+* JS: add output Parameter and output Event to generator and html template
+* Daisy: update `wstd2daisy` and allow for setting `displayprocess` code into the template
+* Testing: move `tinywav` to git submodule
+* JS Bugfix: printHook and sendHook for AudioWorklet; mention emsdk limitations in docs
+* Object Bugfix: `[stripnote]` missing right inlet
+* Small Bugfixes:
+  * set default name argument
+  * `emcc` call on Windows - thanks to @vulcu
+  * deallocation in test_signal - thanks to @eu-ch
+  * quotes around WWISE paths - thanks to @eu-ch
+
+0.10.0
+-----
+
+* Objects: `[bang~]`
+* Object improvements: support `[clear(` message for `[delwrite~]`
+* Documentation fixes/additions
+* Daisy: ability to set samplerate and blocksize
+* Daisy: adding midirealtimein, polytouchin/out, midiin (midiout WIP)
+* Daisy: use `libdaisy_path` in meta config; both string/path and int/depth possible
+* DPF: enum for UI parameter IDs
+* DPF bugfixes: correct input PortGroup names; correct UI slider updates; midiout reimplementation
+* Wwise: complete rewrite/refactor - now uses SDK build tools - thanks to @eu-ch !!
+* Bugfix: correct alignment in AVX pow~ implementation
+* Cleanup: remove deprecated build.json
+* Deprecate py37, enable py312
+
+0.9.0
+-----
+
+* Daisy: set bootloader type in Makefile
+* Daisy: MIDI i/o for NoteOn/Off, ControlChange, ProgramChange, ChannelPressure, and PitchBend
+* Daisy: USB MIDI toggle (disabled by debug printing)
+* Daisy: allow for debug printing (off by default, increases program size due to formatting)
+* DPF bugfixes: broken midi template include; MIDI_RT_CLOCK fails under certain conditions
+* Pdext bugfixes: Windows library linking
+
+0.8.0
 -----
 
 * DPF: enumerated parameters
 * DPF: special `__hv_dpf_bpm` receiver of transport BPM value
-* bugfix: issues #50, #106
+* Pdext: migrate to `pd-lib-builder` and newer `m_pd.h` and add some initial documentation.
+* deprecated: Fabric generator - no longer supported
+* docs: updates on missing objects and limitations
+* bugfix: issues #24, #50, #100, #106
 
 0.7.0
 -----

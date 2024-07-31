@@ -1,6 +1,13 @@
 {{copyright}}
 
+#if _MSC_VER || _WIN32 || _WIN64
+#include <malloc.h>
+#define DLL_EXPORT __declspec(dllexport) extern
+#else
 #include <alloca.h>
+#define DLL_EXPORT	
+#endif
+
 #include <string.h>
 #include "m_pd.h"
 #include "Heavy_{{name}}.h"
@@ -28,7 +35,7 @@ static void printHook(HeavyContextInterface *c, const char *receiverName, const 
 }
 
 static void sendHook(HeavyContextInterface *c, const char *receiverName, unsigned int receiverHash, const HvMessage * m) {
-  if (!strcmp(receiverName, "#HV_TO_PD")) {
+  if (!strcmp(receiverName, "HV_TO_PD")) {
     t_outlet *const outlet = ((t_{{struct_name}} *) hv_getUserData(c))->msgOutlet;
     if (hv_msg_getNumElements(m) == 1) {
       if (hv_msg_isFloat(m, 0)) {
@@ -140,7 +147,7 @@ static void {{struct_name}}_onMessage(t_{{struct_name}} *x, t_symbol *s0, int ar
   hv_sendMessageToReceiver(x->hv, hv_stringToHash(s0->s_name), 0.0, msg);
 }
 
-void {{struct_name}}_setup() {
+DLL_EXPORT void {{struct_name}}_setup() {
   {{struct_name}}_class = class_new(gensym("{{display_name}}"),
       (t_newmethod) {{struct_name}}_new,
       (t_method) {{struct_name}}_free,

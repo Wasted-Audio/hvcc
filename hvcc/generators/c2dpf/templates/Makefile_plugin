@@ -31,9 +31,9 @@ BUILD_CXX_FLAGS += -I ../../{{dpf_path}}{{dependency}}
 	{%- endfor %}
 {%- endif %}
 
-LINK_FLAGS += -lpthread
-CFLAGS += -Wno-unused-parameter
-CXXFLAGS += -Wno-unused-parameter
+BUILD_C_FLAGS += -Wno-unused-parameter -std=c11 -fno-strict-aliasing -pthread
+BUILD_CXX_FLAGS += -Wno-unused-parameter -fno-strict-aliasing -pthread
+LINK_FLAGS += -pthread
 
 {% if meta.plugin_formats is defined %}
 	{%- for format in meta.plugin_formats %}

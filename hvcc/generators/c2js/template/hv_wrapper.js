@@ -36,12 +36,16 @@ AudioLibLoader.prototype.init = function(options) {
           processorOptions: {
             sampleRate: this.webAudioContext.sampleRate,
             blockSize,
-            printHook: options.printHook && options.printHook.toString(),
-            sendHook: options.sendHook && options.sendHook.toString()
           }
         });
         this.webAudioWorklet.port.onmessage = (event) => {
-          console.log('Message from {{name}}_AudioLibWorklet:', event.data);
+          if (event.data.type === 'printHook' && options.printHook) {
+            options.printHook(event.data.payload);
+          } else if (event.data.type === 'sendHook' && options.sendHook) {
+            options.sendHook(event.data.payload[0], event.data.payload[1]);
+          } else {
+            console.log('Unhandled message from {{name}}_AudioLibWorklet:', event.data);
+          }
         };
         this.webAudioWorklet.connect(this.webAudioContext.destination);
       } else {
@@ -65,29 +69,68 @@ AudioLibLoader.prototype.init = function(options) {
 }
 
 AudioLibLoader.prototype.start = function() {
-  this.webAudioContext.resume();
+  if (this.audiolib) {
+    this.webAudioProcessor.connect(this.webAudioContext.destination);
+  } else {
+    this.webAudioContext.resume();
+  }
   this.isPlaying = true;
 }
 
 AudioLibLoader.prototype.stop = function() {
-  this.webAudioContext.suspend();
+  if (this.audiolib) {
+    this.webAudioProcessor.disconnect(this.webAudioContext.destination);
+  } else {
+    this.webAudioContext.suspend();
+  }
   this.isPlaying = false;
 }
 
 AudioLibLoader.prototype.sendFloatParameterToWorklet = function(name, value) {
-  this.webAudioWorklet.port.postMessage({
-    type:'setFloatParameter',
-    name,
-    value
-  });
+  if (this.audiolib) {
+    this.audiolib.sendEvent(name, value);
+  } else {
+    this.webAudioWorklet.port.postMessage({
+      type:'setFloatParameter',
+      name,
+      value
+    });
+  }
 }
 
 AudioLibLoader.prototype.sendEvent = function(name, value) {
-  this.webAudioWorklet.port.postMessage({
-    type:'sendEvent',
-    name,
-    value
-  });
+  if (this.audiolib) {
+    this.audiolib.sendEvent(name, value);
+  } else {
+    this.webAudioWorklet.port.postMessage({
+      type:'sendEvent',
+      name,
+      value
+    });
+  }
+}
+
+AudioLibLoader.prototype.sendMidi = function(message) {
+  if (this.audiolib) {
+    this.audiolib.sendMidi(message);
+  } else {
+    this.webAudioWorklet.port.postMessage({
+      type:'sendMidi',
+      message:message
+    });
+  }
+}
+
+AudioLibLoader.prototype.fillTableWithFloatBuffer = function(name, buffer) {
+  if (this.audiolib) {
+    this.audiolib.fillTableWithFloatBuffer(name, buffer);
+  } else {
+    this.webAudioWorklet.port.postMessage({
+      type:'fillTableWithFloatBuffer',
+      name,
+      buffer
+    });
+  }
 }
 
 Module.AudioLibLoader = AudioLibLoader;
@@ -216,6 +259,76 @@ var tableHashes = {
   }
 }
 
+{{name}}_AudioLib.prototype.sendMidi = function(message) {
+  if (this.heavyContext) {
+    var command = message[0] & 0xF0;
+    var channel = message[0] & 0x0F;
+    var data1 = message[1];
+    var data2 = message[2];
+
+    // all events to [midiin]
+    for (var i = 1; i <= 2; i++) {
+      _hv_sendMessageToReceiverFF(this.heavyContext, HV_HASH_MIDIIN, 0,
+          message[i],
+          channel
+      );
+    }
+
+    // realtime events to [midirealtimein]
+    if (MIDI_REALTIME.includes(message[0])) {
+      _hv_sendMessageToReceiverFF(this.heavyContext, HV_HASH_MIDIREALTIMEIN, 0,
+        message[0]
+      );
+    }
+
+    switch(command) {
+      case 0x80: // note off
+        _hv_sendMessageToReceiverFFF(this.heavyContext, HV_HASH_NOTEIN, 0,
+          data1,
+          0,
+          channel);
+        break;
+      case 0x90: // note on
+        _hv_sendMessageToReceiverFFF(this.heavyContext, HV_HASH_NOTEIN, 0,
+          data1,
+          data2,
+          channel);
+        break;
+      case 0xA0: // polyphonic aftertouch
+        _hv_sendMessageToReceiverFFF(this.heavyContext, HV_HASH_POLYTOUCHIN, 0,
+          data2, // pressure
+          data1, // note
+          channel);
+        break;
+      case 0xB0: // control change
+        _hv_sendMessageToReceiverFFF(this.heavyContext, HV_HASH_CTLIN, 0,
+          data2, // value
+          data1, // cc number
+          channel);
+        break;
+      case 0xC0: // program change
+        _hv_sendMessageToReceiverFF(this.heavyContext, HV_HASH_PGMIN, 0,
+          data1,
+          channel);
+        break;
+      case 0xD0: // aftertouch
+        _hv_sendMessageToReceiverFF(this.heavyContext, HV_HASH_TOUCHIN, 0,
+          data1,
+          channel);
+        break;
+      case 0xE0: // pitch bend
+        // combine 7bit lsb and msb into 32bit int
+        var value = (data2 << 7) | data1;
+        _hv_sendMessageToReceiverFF(this.heavyContext, HV_HASH_BENDIN, 0,
+          value,
+          channel);
+        break;
+      default:
+        // console.error('No handler for midi message: ', message);
+    }
+  }
+}
+
 {{name}}_AudioLib.prototype.setFloatParameter = function(name, floatValue) {
   if (this.heavyContext) {
     _hv_sendFloatToReceiver(this.heavyContext, parameterInHashes[name], parseFloat(floatValue));
@@ -253,3 +366,19 @@ var tableHashes = {
 }
 
 Module.{{name}}_AudioLib = {{name}}_AudioLib;
+
+
+/*
+ * MIDI Constants
+ */
+
+const HV_HASH_NOTEIN          = 0x67E37CA3;
+const HV_HASH_CTLIN           = 0x41BE0f9C;
+const HV_HASH_POLYTOUCHIN     = 0xBC530F59;
+const HV_HASH_PGMIN           = 0x2E1EA03D;
+const HV_HASH_TOUCHIN         = 0x553925BD;
+const HV_HASH_BENDIN          = 0x3083F0F7;
+const HV_HASH_MIDIIN          = 0x149631bE;
+const HV_HASH_MIDIREALTIMEIN  = 0x6FFF0BCF;
+
+const MIDI_REALTIME =  [0xF8, 0xFA, 0xFB, 0xFC, 0xFE, 0xFF];
