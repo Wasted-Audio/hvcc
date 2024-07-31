@@ -48,6 +48,10 @@ class HeavyObject:
         return set()
 
     @classmethod
+    def get_C_init(cls, obj_type: str, obj_id: int, args: Dict) -> List[str]:
+        return [f"{cls.preamble}_init(&{cls.preamble}_{obj_id})"]
+
+    @classmethod
     def get_C_def(cls, obj_type: str, obj_id: int) -> List[str]:
         return ["{0} {1}_{2};".format(
             cls.get_C_struct(obj_type),
@@ -73,7 +77,8 @@ class HeavyObject:
         obj_id: int,
         on_message_list: List,
         get_obj_class: Callable,
-        objects: Dict
+        objects: Dict,
+        args: Dict
     ) -> List[str]:
         send_message_list = [
             "{0}_{1}_sendMessage(HeavyContextInterface *_c, int letIn, const HvMessage *m) {{".format(
@@ -97,12 +102,24 @@ class HeavyObject:
         return send_message_list
 
     @classmethod
-    def get_C_init(cls, obj_type: str, obj_id: int, args: Dict) -> List[str]:
-        raise NotImplementedError("method get_C_init not implemented")
+    def get_C_onMessage(cls, obj_type: str, obj_id: int, inlet_index: int, args: Dict) -> List[str]:
+        raise NotImplementedError("method get_C_onMessage not implemented", cls, obj_type)
 
     @classmethod
-    def get_C_onMessage(cls, obj_type: str, obj_id: int, inlet_index: int, args: Dict) -> List[str]:
-        raise NotImplementedError("method get_C_onMessage not implemented")
+    def get_C_obj_header_code(cls, obj_type: str, obj_id: int, args: Dict) -> List[str]:
+        return []
+
+    @classmethod
+    def get_C_obj_impl_code(cls, obj_type: str, obj_id: int, args: Dict) -> List[str]:
+        return []
+
+    @classmethod
+    def get_C_class_header_code(cls, obj_type: str, args: Dict) -> List[str]:
+        return []
+
+    @classmethod
+    def get_C_class_impl_code(cls, obj_type: str, args: Dict) -> List[str]:
+        return []
 
     @classmethod
     def get_C_process(cls, process_dict: Dict, obj_type: str, obj_id: int, args: Dict) -> List[str]:

@@ -31,6 +31,7 @@ from hvcc.generators.copyright import copyright_manager
 from hvcc.generators.ir2c.ControlBinop import ControlBinop
 from hvcc.generators.ir2c.ControlCast import ControlCast
 from hvcc.generators.ir2c.ControlDelay import ControlDelay
+from hvcc.generators.ir2c.ControlExpr import ControlExpr
 from hvcc.generators.ir2c.ControlIf import ControlIf
 from hvcc.generators.ir2c.ControlMessage import ControlMessage
 from hvcc.generators.ir2c.ControlPack import ControlPack
@@ -53,6 +54,7 @@ from hvcc.generators.ir2c.SignalBiquad import SignalBiquad
 from hvcc.generators.ir2c.SignalCPole import SignalCPole
 from hvcc.generators.ir2c.SignalDel1 import SignalDel1
 from hvcc.generators.ir2c.SignalEnvelope import SignalEnvelope
+from hvcc.generators.ir2c.SignalExpr import SignalExpr
 from hvcc.generators.ir2c.SignalLine import SignalLine
 from hvcc.generators.ir2c.SignalLorenz import SignalLorenz
 from hvcc.generators.ir2c.SignalMath import SignalMath
@@ -78,6 +80,8 @@ class ir2c:
         "__cast_b": ControlCast,
         "__cast_f": ControlCast,
         "__cast_s": ControlCast,
+        "__expr": ControlExpr,
+        "__expr~": SignalExpr,
         "__message": ControlMessage,
         "__system": ControlSystem,
         "__receive": ControlReceive,
@@ -197,8 +201,13 @@ class ir2c:
         free_list = []
         def_list = []
         decl_list = []
+        obj_header_lines = []
+        obj_impl_lines = []
+        class_header_lines = []
+        class_impl_lines = []
         for obj_id in ir["init"]["order"]:
             o = ir["objects"][obj_id]
+            print("init objects:", o["type"])
             obj_class = ir2c.get_class(o["type"])
             init_list.extend(obj_class.get_C_init(o["type"], obj_id, o["args"]))
             def_list.extend(obj_class.get_C_def(o["type"], obj_id))
@@ -208,13 +217,15 @@ class ir2c:
         for x in ir["control"]["sendMessage"]:
             obj_id = x["id"]
             o = ir["objects"][obj_id]
+            print("control objects:", o["type"])
             obj_class = ir2c.get_class(o["type"])
             impl = obj_class.get_C_impl(
                 o["type"],
                 obj_id,
                 x["onMessage"],
                 ir2c.get_class,
-                ir["objects"])
+                ir["objects"],
+                o["args"])
             impl_list.append("\n".join(PrettyfyC.prettyfy_list(impl)))
             decl_list.extend(obj_class.get_C_decl(o["type"], obj_id, o["args"]))
 
@@ -230,15 +241,36 @@ class ir2c:
 
         # generate the list of functions to process
         process_list: List = []
+        # print("--------------- for each signal in order")
+        process_classes = set()
         for x in ir["signal"]["processOrder"]:
+            # print("--- signal", x["id"], o["type"], ir2c.get_class(o["type"]))
             obj_id = x["id"]
             o = ir["objects"][obj_id]
-            process_list.extend(ir2c.get_class(o["type"]).get_C_process(
+            print("process objects:", o["type"])
+            obj_cls = ir2c.get_class(o["type"])
+            process_classes.add(obj_cls)
+            process_list.extend(obj_cls.get_C_process(
                 x,
                 o["type"],
                 obj_id,
                 o["args"]))
 
+            # begin experiment for expr~
+            obj_header_lines.extend(obj_cls.get_C_obj_header_code(
+                o["type"], obj_id, o["args"]
+            ))
+            obj_impl_lines.extend(obj_cls.get_C_obj_impl_code(
+                o["type"], obj_id, o["args"]
+            ))
+        # once for each class
+        for prc_cls in process_classes:
+            class_header_lines.extend(prc_cls.get_C_class_header_code(
+                o["type"], o["args"]
+            ))
+            class_impl_lines.extend(prc_cls.get_C_class_impl_code(
+                o["type"], o["args"]
+            ))
         #
         # Load the C-language template files and use the parsed strings to fill them in.
         #
@@ -262,7 +294,9 @@ class ir2c:
                 def_list=def_list,
                 signal=ir["signal"],
                 copyright=copyright,
-                externs=externs))
+                externs=externs,
+                class_header_lines=class_header_lines,
+                obj_header_lines=obj_header_lines))
 
         # write C++ implementation
         with open(os.path.join(output_dir, f"Heavy_{name}.cpp"), "w") as f:
@@ -276,7 +310,9 @@ class ir2c:
                 send_table=ir["tables"],
                 process_list=process_list,
                 table_data_list=table_data_list,
-                copyright=copyright))
+                copyright=copyright,
+                class_impl_lines=class_impl_lines,
+                obj_impl_lines=obj_impl_lines))
 
         # write C API, hv_NAME.h
         with open(os.path.join(output_dir, f"Heavy_{name}.h"), "w") as f:

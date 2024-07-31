@@ -62,7 +62,8 @@ class ControlDelay(HeavyObject):
         obj_id: int,
         on_message_list: List,
         get_obj_class: Callable,
-        objects: Dict
+        objects: Dict,
+        args: Dict
     ) -> List[str]:
         send_message_list = [
             f"cDelay_{obj_id}_sendMessage(HeavyContextInterface *_c, int letIn, const HvMessage *const m) {{"

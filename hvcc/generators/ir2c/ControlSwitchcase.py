@@ -49,7 +49,8 @@ class ControlSwitchcase(HeavyObject):
         obj_id: int,
         on_message_list: List,
         get_obj_class: Callable,
-        objects: Dict
+        objects: Dict,
+        args: Dict
     ) -> List[str]:
         # generate the onMessage implementation
         out_list = [
