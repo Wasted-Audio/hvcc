@@ -1,4 +1,4 @@
-#N canvas 1049 344 762 544 10;
+#N canvas 313 155 762 544 10;
 #X obj 448 121 s \$0-shouldSteal;
 #X obj 478 208 + 1;
 #X obj 448 281 s \$0-currentVoiceId;
@@ -512,7 +512,7 @@
 #X connect 87 0 39 0;
 #X restore 260 381 pd NoteOn;
 #X text 447 466 @hv_arg \$1 NumVoices int 1 false;
-#X text 447 486 @hv_arg \$2 VoiceStealing boolean 0 false;
+#X text 447 486 @hv_arg \$2 VoiceStealing int 0 false;
 #X connect 1 0 10 1;
 #X connect 5 0 15 0;
 #X connect 6 0 31 0;

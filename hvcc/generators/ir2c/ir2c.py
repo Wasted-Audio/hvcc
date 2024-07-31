@@ -334,7 +334,7 @@ def main() -> None:
     parser.add_argument("-v", "--verbose", action="count")
     args = parser.parse_args()
 
-    externs = {
+    externs: Dict = {
         "parameters": {
             "in": {},
             "out": {}

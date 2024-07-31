@@ -169,6 +169,8 @@ int Heavy_{{name}}::process(float **inputBuffers, float **outputBuffers, int n) 
     hLp_consume(&inQueue);
   }
 
+  sendBangToReceiver(0xDD21C0EB); // send to __hv_bang~ on next cycle
+
   {%- if signal.numInputBuffers > 0 or signal.numOutputBuffers > 0 %}
   const int n4 = n & ~HV_N_SIMD_MASK; // ensure that the block size is a multiple of HV_N_SIMD
 
@@ -249,7 +251,6 @@ int Heavy_{{name}}::process(float **inputBuffers, float **outputBuffers, int n) 
   return n;
   {%- endif %}
 
-  sendBangToReceiver(0xDD21C0EB); // send to __hv_bang~
 }
 
 int Heavy_{{name}}::processInline(float *inputBuffers, float *outputBuffers, int n4) {

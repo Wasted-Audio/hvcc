@@ -80,6 +80,57 @@ def check_extern_name_conflicts(extern_type: str, extern_list: List, results: Or
                           "capital letters are not the only difference.")
 
 
+def check_midi_objects(hvir: Dict) -> Dict:
+    in_midi = []
+    out_midi = []
+
+    midi_in_objs = [
+        '__hv_bendin',
+        '__hv_ctlin',
+        '__hv_midiin',
+        '__hv_midirealtimein',
+        '__hv_notein',
+        '__hv_pgmin',
+        '__hv_polytouchin',
+        '__hv_touchin',
+    ]
+
+    midi_out_objs = [
+        '__hv_bendout',
+        '__hv_ctlout',
+        '__hv_midiout',
+        '__hv_midioutport',
+        '__hv_noteout',
+        '__hv_pgmout',
+        '__hv_polytouchout',
+        '__hv_touchout',
+    ]
+
+    for key in hvir['control']['receivers'].keys():
+        if key in midi_in_objs:
+            in_midi.append(key)
+
+    for key in hvir['control']['sendMessage']:
+        if key.get('name'):
+            if key['name'] in midi_out_objs:
+                out_midi.append(key['name'])
+
+    return {
+        'in': in_midi,
+        'out': out_midi
+    }
+
+
+def filter_midi_from_out_parameters(output_parameter_list: List, midi_out_objects: List) -> List:
+    new_out_list = []
+
+    for item in output_parameter_list:
+        if not item[0] in midi_out_objects:
+            new_out_list.append(item)
+
+    return new_out_list
+
+
 def generate_extern_info(hvir: Dict, results: OrderedDict) -> Dict:
     """ Simplifies the receiver/send and table lists by only containing values
         externed with @hv_param, @hv_event or @hv_table
@@ -113,6 +164,12 @@ def generate_extern_info(hvir: Dict, results: OrderedDict) -> Dict:
     table_list.sort(key=lambda x: x[0])
     check_extern_name_conflicts("table", table_list, results)
 
+    # Exposed midi objects
+    midi_objects = check_midi_objects(hvir)
+
+    # filter midi objects from the output parameters list
+    out_parameter_list = filter_midi_from_out_parameters(out_parameter_list, midi_objects['out'])
+
     return {
         "parameters": {
             "in": in_parameter_list,
@@ -122,12 +179,24 @@ def generate_extern_info(hvir: Dict, results: OrderedDict) -> Dict:
             "in": in_event_list,
             "out": out_event_list
         },
+        "midi": {
+            "in": midi_objects['in'],
+            "out": midi_objects['out']
+        },
         "tables": table_list,
         # generate patch heuristics to ensure enough memory allocated for the patch
         "memoryPoolSizesKb": {
             "internal": 10,  # TODO(joe): should this increase if there are a lot of internal connections?
-            "inputQueue": max(2, int(len(in_parameter_list) + len(in_event_list) / 4)),
-            "outputQueue": max(2, int(len(out_parameter_list) + len(out_event_list) / 4)),
+            "inputQueue": max(2, int(
+                                     len(in_parameter_list) +
+                                     (len(in_event_list) / 4) +
+                                     len(midi_objects['in'])  # TODO(dreamer): should this depend on the MIDI type?
+                                    )),
+            "outputQueue": max(2, int(
+                                     len(out_parameter_list) +
+                                     (len(out_event_list) / 4) +
+                                     len(midi_objects['out'])
+                                    )),
         }
     }
 
@@ -316,6 +385,7 @@ def main() -> bool:
     parser.add_argument(
         "-n",
         "--name",
+        default="heavy",
         help="Provides a name for the generated Heavy context.")
     parser.add_argument(
         "-m",

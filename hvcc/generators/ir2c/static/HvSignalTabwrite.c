@@ -36,6 +36,9 @@ void sTabwrite_onMessage(HeavyContextInterface *_c, SignalTabwrite *o, int letIn
         case HV_MSG_SYMBOL: {
           if (msg_compareSymbol(m, 0, "stop")) {
             o->head = HV_TABWRITE_STOPPED;
+          } else if (msg_compareSymbol(m, 0, "clear")) {
+            hv_size_t numBytes = o->table->allocated * sizeof(float);
+            hv_memclear(o->table->buffer, numBytes);
           }
           break;
         }

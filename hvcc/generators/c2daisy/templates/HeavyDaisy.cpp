@@ -4,11 +4,12 @@
 #include "Heavy_{{patch_name}}.hpp"
 #include "HeavyDaisy_{{patch_name}}.hpp"
 
-#define SAMPLE_RATE 48000.f
+#define SAMPLE_RATE {{samplerate}}.f
 
 {% if has_midi or usb_midi %}
 #define HV_HASH_NOTEIN          0x67E37CA3
 #define HV_HASH_CTLIN           0x41BE0f9C
+#define HV_HASH_POLYTOUCHIN     0xBC530F59
 #define HV_HASH_PGMIN           0x2E1EA03D
 #define HV_HASH_TOUCHIN         0x553925BD
 #define HV_HASH_BENDIN          0x3083F0F7
@@ -17,6 +18,7 @@
 
 #define HV_HASH_NOTEOUT         0xD1D4AC2
 #define HV_HASH_CTLOUT          0xE5e2A040
+#define HV_HASH_POLYTOUCHOUT    0xD5ACA9D1
 #define HV_HASH_PGMOUT          0x8753E39E
 #define HV_HASH_TOUCHOUT        0x476D4387
 #define HV_HASH_BENDOUT         0xE8458013
@@ -35,7 +37,7 @@ using namespace daisy;
 
 json2daisy::Daisy{{ class_name|capitalize }} hardware;
 
-Heavy_{{patch_name}} hv(SAMPLE_RATE);
+Heavy_{{patch_name}}* hv;
 
 void audiocallback(daisy::AudioHandle::InputBuffer in, daisy::AudioHandle::OutputBuffer out, size_t size);
 static void sendHook(HeavyContextInterface *c, const char *receiverName, uint32_t receiverHash, const HvMessage * m);
@@ -46,8 +48,10 @@ FIFO<FixedCapStr<64>, 64> event_log;
 {% elif usb_midi %}
 daisy::MidiUsbHandler midiusb;
 {% endif %}
-void CallbackWriteIn(Heavy_{{patch_name}}& hv);
-void LoopWriteIn(Heavy_{{patch_name}}& hv);
+// int midiOutCount;
+// uint8_t* midiOutData;
+void CallbackWriteIn(Heavy_{{patch_name}}* hv);
+void LoopWriteIn(Heavy_{{patch_name}}* hv);
 void CallbackWriteOut();
 void LoopWriteOut();
 void PostProcess();
@@ -95,11 +99,46 @@ DaisyHvParamOut DaisyOutputParameters[DaisyNumOutputParameters] = {
 // Typical Switch case for Message Type.
 void HandleMidiMessage(MidiEvent m)
 {
+  for (int i = 0; i <= 2; ++i) {
+    hv->sendMessageToReceiverV(HV_HASH_MIDIIN, 0, "ff",
+    (float) m.data[i],
+    (float) m.channel);
+  }
+
   switch(m.type)
   {
+    case SystemRealTime: {
+      float srtType;
+
+      switch(m.srt_type)
+      {
+        case TimingClock:
+          srtType = MIDI_RT_CLOCK;
+          break;
+        case Start:
+          srtType = MIDI_RT_START;
+          break;
+        case Continue:
+          srtType = MIDI_RT_CONTINUE;
+          break;
+        case Stop:
+          srtType = MIDI_RT_STOP;
+          break;
+        case ActiveSensing:
+          srtType = MIDI_RT_ACTIVESENSE;
+          break;
+        case Reset:
+          srtType = MIDI_RT_RESET;
+          break;
+      }
+
+      hv->sendMessageToReceiverV(HV_HASH_MIDIREALTIMEIN, 0, "ff",
+        (float) srtType);
+      break;
+    }
     case NoteOff: {
       NoteOnEvent p = m.AsNoteOn();
-      hv.sendMessageToReceiverV(HV_HASH_NOTEIN, 0, "fff",
+      hv->sendMessageToReceiverV(HV_HASH_NOTEIN, 0, "fff",
         (float) p.note, // pitch
         (float) 0, // velocity
         (float) p.channel);
@@ -107,15 +146,23 @@ void HandleMidiMessage(MidiEvent m)
     }
     case NoteOn: {
       NoteOnEvent p = m.AsNoteOn();
-      hv.sendMessageToReceiverV(HV_HASH_NOTEIN, 0, "fff",
+      hv->sendMessageToReceiverV(HV_HASH_NOTEIN, 0, "fff",
         (float) p.note, // pitch
         (float) p.velocity, // velocity
         (float) p.channel);
       break;
     }
+    case PolyphonicKeyPressure: { // polyphonic aftertouch
+      PolyphonicKeyPressureEvent p = m.AsPolyphonicKeyPressure();
+      hv->sendMessageToReceiverV(HV_HASH_POLYTOUCHIN, 0, "fff",
+        (float) p.pressure, // pressure
+        (float) p.note, // note
+        (float) p.channel);
+      break;
+    }
     case ControlChange: {
       ControlChangeEvent p = m.AsControlChange();
-      hv.sendMessageToReceiverV(HV_HASH_CTLIN, 0, "fff",
+      hv->sendMessageToReceiverV(HV_HASH_CTLIN, 0, "fff",
         (float) p.value, // value
         (float) p.control_number, // cc number
         (float) p.channel);
@@ -123,14 +170,14 @@ void HandleMidiMessage(MidiEvent m)
     }
     case ProgramChange: {
       ProgramChangeEvent p = m.AsProgramChange();
-      hv.sendMessageToReceiverV(HV_HASH_PGMIN, 0, "ff",
+      hv->sendMessageToReceiverV(HV_HASH_PGMIN, 0, "ff",
         (float) p.program,
         (float) p.channel);
       break;
     }
     case ChannelPressure: {
       ChannelPressureEvent p = m.AsChannelPressure();
-      hv.sendMessageToReceiverV(HV_HASH_TOUCHIN, 0, "ff",
+      hv->sendMessageToReceiverV(HV_HASH_TOUCHIN, 0, "ff",
         (float) p.pressure,
         (float) p.channel);
       break;
@@ -139,7 +186,7 @@ void HandleMidiMessage(MidiEvent m)
       PitchBendEvent p = m.AsPitchBend();
       // combine 7bit lsb and msb into 32bit int
       hv_uint32_t value = (((hv_uint32_t) m.data[1]) << 7) | ((hv_uint32_t) m.data[0]);
-      hv.sendMessageToReceiverV(HV_HASH_BENDIN, 0, "ff",
+      hv->sendMessageToReceiverV(HV_HASH_BENDIN, 0, "ff",
         (float) value,
         (float) p.channel);
       break;
@@ -153,6 +200,8 @@ void HandleMidiMessage(MidiEvent m)
 int main(void)
 {
   hardware.Init(true);
+  hv = new Heavy_{{patch_name}}(SAMPLE_RATE, {{pool_sizes_kb.internal}}, {{pool_sizes_kb.inputQueue}}, {{pool_sizes_kb.outputQueue}});
+
   {% if samplerate %}
   hardware.SetAudioSampleRate({{samplerate}});
   {% endif %}
@@ -173,12 +222,12 @@ int main(void)
   hardware.StartAudio(audiocallback);
   {% if debug_printing %}
   hardware.som.StartLog();
-  hv.setPrintHook(printHook);
+  hv->setPrintHook(printHook);
 
   uint32_t now      = System::GetNow();
   uint32_t log_time = System::GetNow();
   {% endif %}
-  hv.setSendHook(sendHook);
+  hv->setSendHook(sendHook);
 
   for(;;)
   {
@@ -241,7 +290,7 @@ void audiocallback(daisy::AudioHandle::InputBuffer in, daisy::AudioHandle::Outpu
   hardware.ProcessAllControls();
   CallbackWriteIn(hv);
   {% endif %}
-  hv.process((float**)in, (float**)out, size);
+  hv->process((float**)in, (float**)out, size);
   {% if  output_parameters|length > 0 %}
   CallbackWriteOut();
   {% endif %}
@@ -279,6 +328,22 @@ void HandleMidiSend(uint32_t sendHash, const HvMessage *m)
       }
       midiData[1] = note;
       midiData[2] = velocity;
+
+      HandleMidiOut(midiData, numElements);
+      break;
+    }
+    case HV_HASH_POLYTOUCHOUT:
+    {
+      uint8_t value = hv_msg_getFloat(m, 0);
+      uint8_t note = hv_msg_getFloat(m, 1);
+      uint8_t ch = hv_msg_getFloat(m, 2);
+      ch %= 16; // drop any pd "ports"
+
+      const uint8_t numElements = 3;
+      uint8_t midiData[numElements];
+      midiData[0] = 0xA0 | ch; // send Poly Aftertouch
+      midiData[1] = note;
+      midiData[2] = value;
 
       HandleMidiOut(midiData, numElements);
       break;
@@ -344,26 +409,24 @@ void HandleMidiSend(uint32_t sendHash, const HvMessage *m)
       HandleMidiOut(midiData, numElements);
       break;
     }
-    case HV_HASH_MIDIOUT: // __hv_midiout
-    {
-      const uint8_t numElements = m->numElements;
-      uint8_t midiData[numElements];
-      if (numElements <=4 )
-      {
-        for (int i = 0; i < numElements; ++i)
-        {
-          midiData[i] = hv_msg_getFloat(m, i);
-        }
-      }
-      else
-      {
-        // we do not support sysex yet
-        break;
-      }
+    // not functional yet
+    // case HV_HASH_MIDIOUT: // __hv_midiout
+    // {
+    //   if (midiOutCount == 0 ) {
+    //     uint8_t midiOutData[3];
+    //   }
 
-      HandleMidiOut(midiData, numElements);
-      break;
-    }
+    //   midiOutData[midiOutCount] = hv_msg_getFloat(m, 0);
+
+    //   if (midiOutCount < 2) {
+    //     midiOutCount++;
+    //     break;
+    //   }
+
+    //   HandleMidiOut(midiOutData, 3);
+    //   midiOutCount = 0;
+    //   break;
+    // }
     default:
       break;
   }
@@ -411,14 +474,14 @@ static void printHook(HeavyContextInterface *c, const char *printLabel, const ch
 /** Sends signals from the Daisy hardware to the PD patch via the receive objects during the main loop
  *
  */
-void LoopWriteIn(Heavy_{{patch_name}}& hv)
+void LoopWriteIn(Heavy_{{patch_name}}* hv)
 {
   {% for param in loop_write_in %}
   {% if param.bool %}
   if ({{param.process}})
-    hv.sendBangToReceiver((uint32_t) HV_{{patch_name|upper}}_PARAM_IN_{{param.hash_enum|upper}});
+    hv->sendBangToReceiver((uint32_t) HV_{{patch_name|upper}}_PARAM_IN_{{param.hash_enum|upper}});
   {% else %}
-  hv.sendFloatToReceiver((uint32_t) HV_{{patch_name|upper}}_PARAM_IN_{{param.hash_enum|upper}}, {{param.process}});
+  hv->sendFloatToReceiver((uint32_t) HV_{{patch_name|upper}}_PARAM_IN_{{param.hash_enum|upper}}, {{param.process}});
   {% endif %}
   {% endfor %}
 }
@@ -426,14 +489,14 @@ void LoopWriteIn(Heavy_{{patch_name}}& hv)
 /** Sends signals from the Daisy hardware to the PD patch via the receive objects during the audio callback
  *
  */
-void CallbackWriteIn(Heavy_{{patch_name}}& hv)
+void CallbackWriteIn(Heavy_{{patch_name}}* hv)
 {
   {% for param in callback_write_in %}
   {% if param.bool %}
   if ({{param.process}})
-    hv.sendBangToReceiver((uint32_t) HV_{{patch_name|upper}}_PARAM_IN_{{param.hash_enum|upper}});
+    hv->sendBangToReceiver((uint32_t) HV_{{patch_name|upper}}_PARAM_IN_{{param.hash_enum|upper}});
   {% else %}
-  hv.sendFloatToReceiver((uint32_t) HV_{{patch_name|upper}}_PARAM_IN_{{param.hash_enum|upper}}, {{param.process}});
+  hv->sendFloatToReceiver((uint32_t) HV_{{patch_name|upper}}_PARAM_IN_{{param.hash_enum|upper}}, {{param.process}});
   {% endif %}
   {% endfor %}
 }

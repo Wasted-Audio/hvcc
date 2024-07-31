@@ -13,10 +13,12 @@ from . import parameters
 hv_midi_messages = {
     "__hv_noteout",
     "__hv_ctlout",
+    "__hv_polytouchout",
     "__hv_pgmout",
     "__hv_touchout",
     "__hv_bendout",
-    "__hv_midiout"
+    "__hv_midiout",
+    "__hv_midioutport"
 }
 
 
@@ -84,12 +86,26 @@ class c2daisy:
             component_glue['max_channels'] = board_info['channels']
             component_glue['num_output_channels'] = num_output_channels
             component_glue['has_midi'] = board_info['has_midi']
+            component_glue['displayprocess'] = board_info['displayprocess']
             component_glue['debug_printing'] = daisy_meta.get('debug_printing', False)
             component_glue['usb_midi'] = daisy_meta.get('usb_midi', False)
-            component_glue['samplerate'] = daisy_meta.get('samplerate')
+            component_glue['pool_sizes_kb'] = externs["memoryPoolSizesKb"]
 
+            # samplerate
+            samplerate = daisy_meta.get('samplerate', 48000)
+            if samplerate >= 96000:
+                component_glue['samplerate'] = 96000
+            elif samplerate >= 48000:
+                component_glue['samplerate'] = 48000
+            elif samplerate >= 32000:
+                component_glue['samplerate'] = 32000
+            elif samplerate >= 16000:
+                component_glue['samplerate'] = 16000
+            else:
+                component_glue['samplerate'] = 8000
+
+            # blocksize
             blocksize = daisy_meta.get('blocksize')
-
             if blocksize:
                 component_glue['blocksize'] = max(min(256, blocksize), 1)
             else:
@@ -113,8 +129,14 @@ class c2daisy:
             makefile_replacements['linker_script'] = daisy_meta.get('linker_script', '')
             if makefile_replacements['linker_script'] != '':
                 makefile_replacements['linker_script'] = daisy_meta["linker_script"]
-            depth = daisy_meta.get('libdaisy_depth', 2)
-            makefile_replacements['libdaisy_path'] = f'{"../" * depth}libdaisy'
+
+            # libdaisy path
+            path = daisy_meta.get('libdaisy_path', 2)
+            if isinstance(path, int):
+                makefile_replacements['libdaisy_path'] = f'{"../" * path}libdaisy'
+            elif isinstance(path, str):
+                makefile_replacements['libdaisy_path'] = path
+
             makefile_replacements['bootloader'] = daisy_meta.get('bootloader', '')
             makefile_replacements['debug_printing'] = daisy_meta.get('debug_printing', False)
 
