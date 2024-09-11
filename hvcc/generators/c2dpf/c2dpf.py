@@ -34,7 +34,7 @@ class c2dpf:
         out_dir: str,
         externs: Dict,
         patch_name: Optional[str] = None,
-        patch_meta: Meta = Meta(name=None, dpf=None),
+        patch_meta: Meta = Meta(),
         num_input_channels: int = 0,
         num_output_channels: int = 0,
         copyright: Optional[str] = None,
@@ -47,7 +47,7 @@ class c2dpf:
         receiver_list = externs['parameters']['in']
         sender_list = externs["parameters"]["out"]
 
-        dpf_meta = patch_meta.dpf
+        dpf_meta: DPF = patch_meta.dpf
         dpf_path = dpf_meta.dpf_path  # type: ignore
 
         copyright_c = copyright_manager.get_copyright_for_c(copyright)
