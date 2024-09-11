@@ -1,6 +1,13 @@
 CHANGELOG
 =====
 
+Next Release
+-----
+
+Bugfixes
+
+* wwise: allow Bang messages in OnSendMessageCallback()
+
 0.12.0
 -----
 
