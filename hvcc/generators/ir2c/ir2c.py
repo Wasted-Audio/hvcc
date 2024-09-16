@@ -157,7 +157,8 @@ class ir2c:
         static_dir: str,
         output_dir: str,
         externs: Dict,
-        copyright: Optional[str] = None
+        copyright: Optional[str] = None,
+        nodsp: Optional[bool] = False
     ) -> Dict:
         """ Compiles a HeavyIR file into a C.
             Returns a tuple of compile time in seconds, a notification dictionary,
@@ -276,7 +277,8 @@ class ir2c:
                 send_table=ir["tables"],
                 process_list=process_list,
                 table_data_list=table_data_list,
-                copyright=copyright))
+                copyright=copyright,
+                nodsp=nodsp))
 
         # write C API, hv_NAME.h
         with open(os.path.join(output_dir, f"Heavy_{name}.h"), "w") as f:

@@ -209,7 +209,8 @@ def compile_dataflow(
     search_paths: Optional[List] = None,
     generators: Optional[List] = None,
     verbose: bool = False,
-    copyright: Optional[str] = None
+    copyright: Optional[str] = None,
+    nodsp: Optional[bool] = None
 ) -> OrderedDict:
 
     results: OrderedDict = OrderedDict()  # default value, empty dictionary
@@ -273,7 +274,8 @@ def compile_dataflow(
             static_dir=os.path.join(os.path.dirname(__file__), "generators/ir2c/static"),
             output_dir=c_src_dir,
             externs=externs,
-            copyright=copyright)
+            copyright=copyright,
+            nodsp=nodsp)
 
         # check for errors
         if results["ir2c"]["notifs"].get("has_error", False):
@@ -402,6 +404,11 @@ def main() -> bool:
         help="Write results dictionary to the given path as a JSON-formatted string."
              " Target directory will be created if it does not exist.")
     parser.add_argument(
+        "--nodsp",
+        action='store_true',
+        help="Disable DSP. Run as control-only patch."
+    )
+    parser.add_argument(
         "-v",
         "--verbose",
         help="Show debugging information.",
@@ -420,7 +427,9 @@ def main() -> bool:
         search_paths=args.search_paths,
         generators=args.gen,
         verbose=args.verbose,
-        copyright=args.copyright)
+        copyright=args.copyright,
+        nodsp=args.nodsp
+    )
 
     errorCount = 0
     for r in list(results.values()):
