@@ -56,7 +56,7 @@ static void hvSendHookFunc(HeavyContextInterface *c, const char *sendName, uint3
   if (plugin != nullptr)
   {
     plugin->setOutputParameter(sendHash, m);
-{%- if meta.midi_output is defined and meta.midi_output == 1 %}
+{%- if meta.midi_output is sameas true %}
 #if DISTRHO_PLUGIN_WANT_MIDI_OUTPUT
     plugin->handleMidiSend(sendHash, m);
 #endif
@@ -102,7 +102,7 @@ static void hvPrintHookFunc(HeavyContextInterface *c, const char *printLabel, co
   hv_{{name}}_free(_context);
 }
 
-{%- if meta.port_groups is defined %}
+{%- if meta.port_groups != None %}
 {% include 'portGroups.cpp' %}
 {%- endif %}
 
@@ -178,13 +178,13 @@ void {{class_name}}::setOutputParameter(uint32_t sendHash, const HvMessage *m)
 
 // }
 
-{%- if meta.midi_input is defined and meta.midi_input == 1 %}
+{%- if meta.midi_input is sameas true %}
 #if DISTRHO_PLUGIN_WANT_MIDI_INPUT
 {% include 'midiInput.cpp' %}
 #endif
 {% endif %}
 
-{%- if meta.midi_output is defined and meta.midi_output == 1 %}
+{%- if meta.midi_output is sameas true %}
 #if DISTRHO_PLUGIN_WANT_MIDI_OUTPUT
 {% include 'midiOutput.cpp' %}
 #endif

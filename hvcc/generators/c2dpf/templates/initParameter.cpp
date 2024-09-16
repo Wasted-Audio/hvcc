@@ -23,7 +23,7 @@
         parameter.ranges.min = {{v.attributes.min}}f;
         parameter.ranges.max = {{v.attributes.max}}f;
         parameter.ranges.def = {{v.attributes.default}}f;
-      {%- if v.attributes.type == 'db' and not (meta.enumerators is defined and meta.enumerators[v.display] is defined): %}
+      {%- if v.attributes.type == 'db' and not (meta.enumerators != None and meta.enumerators[v.display] is defined): %}
         {
           ParameterEnumerationValue* const enumValues = new ParameterEnumerationValue[1];
           enumValues[0].value = {{v.attributes.min}}f;
@@ -32,7 +32,7 @@
           parameter.enumValues.values = enumValues;
         }
       {%- endif %}
-      {%- if meta.enumerators is defined and meta.enumerators[v.display] is defined %}
+      {%- if meta.enumerators != None and meta.enumerators[v.display] is defined %}
         {% set enums = meta.enumerators[v.display] %}
         {% set enumlen = enums|length %}
         if (ParameterEnumerationValue *values = new ParameterEnumerationValue[{{enumlen}}])
