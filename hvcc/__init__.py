@@ -210,7 +210,7 @@ def compile_dataflow(
     generators: Optional[List] = None,
     verbose: bool = False,
     copyright: Optional[str] = None,
-    nodsp: Optional[bool] = None
+    nodsp: Optional[bool] = False
 ) -> OrderedDict:
 
     results: OrderedDict = OrderedDict()  # default value, empty dictionary
