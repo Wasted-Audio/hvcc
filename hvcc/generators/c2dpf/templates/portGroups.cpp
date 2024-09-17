@@ -9,10 +9,13 @@ void {{class_name}}::initAudioPort(bool input, uint32_t index, AudioPort& port)
 {%- if meta.port_groups.input|length %}
   {%- for group, gConfig in meta.port_groups.input.items() %}
     {%- for port, value in gConfig.items() %}
-      case {{value}}:
+      case {{value[0]}}:
         port.name    = "Input {{port}} ({{group}})";
         port.symbol  = "in_{{port|lower}}_{{group|lower}}";
         port.groupId = kPortGroup{{group}};
+      {%- if value[1] is sameas true %}
+        port.hints   = kAudioPortIsCV | kCVPortHasPositiveUnipolarRange | kCVPortHasScaledRange | kCVPortIsOptional;
+      {%- endif %}
         break;
     {%- endfor %}
   {%- endfor %}
@@ -38,10 +41,13 @@ void {{class_name}}::initAudioPort(bool input, uint32_t index, AudioPort& port)
 {%- if meta.port_groups.output|length %}
   {%- for group, gConfig in meta.port_groups.output.items() %}
     {%- for port, value in gConfig.items() %}
-      case {{value}}:
+      case {{value[0]}}:
         port.name    = "Output {{port}} ({{group}})";
         port.symbol  = "out_{{port|lower}}_{{group|lower}}";
         port.groupId = kPortGroup{{group}};
+      {%- if value[1] is sameas true %}
+        port.hints   = kAudioPortIsCV | kCVPortHasPositiveUnipolarRange | kCVPortHasScaledRange | kCVPortIsOptional;
+      {%- endif %}
         break;
     {%- endfor %}
   {%- endfor %}

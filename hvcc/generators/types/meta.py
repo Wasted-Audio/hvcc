@@ -1,4 +1,4 @@
-from typing import Dict, Literal, List, Optional, Union
+from typing import Dict, Literal, List, Optional, Tuple, Union
 from pydantic import BaseModel, HttpUrl
 
 
@@ -25,8 +25,8 @@ class DPFUISize(BaseModel):
 
 
 class DPFPortGroups(BaseModel):
-    input: Dict[str, Dict[str, int]] = {}
-    output: Dict[str, Dict[str, int]] = {}
+    input: Dict[str, Dict[str, Tuple[int, bool]]] = {}
+    output: Dict[str, Dict[str, Tuple[int, bool]]] = {}
 
 
 class DPF(BaseModel):
