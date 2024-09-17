@@ -1,6 +1,13 @@
 CHANGELOG
 =====
 
+Next Release
+-----
+
+Features:
+
+* Only disable DSP with new `--nodsp` flag
+
 0.12.0
 -----
 
