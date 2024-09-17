@@ -7,6 +7,7 @@ Next Release
 Features:
 
 * Only disable DSP with new `--nodsp` flag
+* Use pydantic types to define metadata objects
 
 0.12.0
 -----
