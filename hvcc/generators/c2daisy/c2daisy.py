@@ -7,8 +7,8 @@ import json2daisy  # type: ignore
 from typing import Any, Dict, Optional
 
 from ..copyright import copyright_manager
-from . import parameters
 from ..types.meta import Meta, Daisy
+from . import parameters
 
 
 hv_midi_messages = {
@@ -44,8 +44,6 @@ class c2daisy:
         tick = time.time()
 
         out_dir = os.path.join(out_dir, "daisy")
-
-        patch_name = patch_meta.name if patch_meta.name is not None else patch_name
 
         daisy_meta: Daisy = patch_meta.daisy
         board = daisy_meta.board

@@ -11,8 +11,8 @@ class Daisy(BaseModel):
     board:          DaisyBoards = 'pod'
     board_file:     Optional[str] = None
     libdaisy_path:  Union[str, int] = 2
-    usb_midi:       Optional[bool] = False
-    debug_printing: Optional[bool] = False
+    usb_midi:       bool = False
+    debug_printing: bool = False
     samplerate:     int = 48000
     blocksize:      Optional[int] = None
     linker_script:  str = ''
@@ -33,8 +33,8 @@ class DPF(BaseModel):
     dpf_path:       str = ""
     description:    Optional[str] = None
     makefile_dep:   List[str] = []
-    enable_ui:      Optional[bool] = False
-    enable_modgui:  Optional[bool] = False
+    enable_ui:      bool = False
+    enable_modgui:  bool = False
     ui_size:        Optional[DPFUISize] = None
     midi_input:     Optional[bool] = None
     midi_output:    Optional[bool] = None

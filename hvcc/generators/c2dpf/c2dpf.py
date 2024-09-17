@@ -49,7 +49,7 @@ class c2dpf:
         sender_list = externs["parameters"]["out"]
 
         dpf_meta: DPF = patch_meta.dpf
-        dpf_path = dpf_meta.dpf_path  # type: ignore
+        dpf_path = dpf_meta.dpf_path
 
         copyright_c = copyright_manager.get_copyright_for_c(copyright)
 
