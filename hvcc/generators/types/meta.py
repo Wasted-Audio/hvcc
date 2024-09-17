@@ -1,8 +1,22 @@
-from typing import Dict, Literal, List, Optional
+from typing import Dict, Literal, List, Optional, Union
 from pydantic import BaseModel, HttpUrl
 
 
+DaisyBoards = Literal['pod', 'petal', 'patch', 'patch_init', 'field']
+DaisyBootloader = Literal['BOOT_NONE', 'BOOT_SRAM', 'BOOT_QSPI']
 DPFFormats = Literal['lv2', 'lv2_sep', 'vst2', 'vst3', 'clap', 'jack', 'dssi', 'ladspa']
+
+
+class Daisy(BaseModel):
+    board:          DaisyBoards = 'pod'
+    board_file:     Optional[str] = None
+    libdaisy_path:  Union[str, int] = 2
+    usb_midi:       Optional[bool] = False
+    debug_printing: Optional[bool] = False
+    samplerate:     int = 48000
+    blocksize:      Optional[int] = None
+    linker_script:  str = ''
+    bootloader:     Optional[DaisyBootloader] = None
 
 
 class DPFUISize(BaseModel):
@@ -16,7 +30,7 @@ class DPFPortGroups(BaseModel):
 
 
 class DPF(BaseModel):
-    dpf_path:       Optional[str] = ""
+    dpf_path:       str = ""
     description:    Optional[str] = None
     makefile_dep:   List[str] = []
     enable_ui:      Optional[bool] = False
@@ -40,4 +54,5 @@ class DPF(BaseModel):
 
 class Meta(BaseModel):
     name: Optional[str] = None
+    daisy: Daisy = Daisy()
     dpf: DPF = DPF()
