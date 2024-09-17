@@ -23,6 +23,7 @@ from ..copyright import copyright_manager
 from ..filters import filter_uniqueid
 from ..types.meta import Meta, DPF
 
+
 class c2dpf:
     """ Generates a DPF wrapper for a given patch.
     """

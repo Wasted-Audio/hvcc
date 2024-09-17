@@ -1,8 +1,9 @@
 from typing import Dict, Literal, List, Optional
-from pydantic import BaseModel, Field, HttpUrl
+from pydantic import BaseModel, HttpUrl
 
 
 DPFFormats = Literal['lv2', 'lv2_sep', 'vst2', 'vst3', 'clap', 'jack', 'dssi', 'ladspa']
+
 
 class DPFUISize(BaseModel):
     width: int
