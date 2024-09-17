@@ -89,17 +89,16 @@ class c2daisy:
 
             # samplerate
             samplerate = daisy_meta.samplerate
-            if samplerate is not None:
-                if samplerate >= 96000:
-                    component_glue['samplerate'] = 96000
-                elif samplerate >= 48000:
-                    component_glue['samplerate'] = 48000
-                elif samplerate >= 32000:
-                    component_glue['samplerate'] = 32000
-                elif samplerate >= 16000:
-                    component_glue['samplerate'] = 16000
-                else:
-                    component_glue['samplerate'] = 8000
+            if samplerate >= 96000:
+                component_glue['samplerate'] = 96000
+            elif samplerate >= 48000:
+                component_glue['samplerate'] = 48000
+            elif samplerate >= 32000:
+                component_glue['samplerate'] = 32000
+            elif samplerate >= 16000:
+                component_glue['samplerate'] = 16000
+            else:
+                component_glue['samplerate'] = 8000
 
             # blocksize
             blocksize = daisy_meta.blocksize
