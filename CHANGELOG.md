@@ -4,7 +4,6 @@ CHANGELOG
 Next Release
 -----
 
-<<<<<<< HEAD
 Features:
 
 * Only disable DSP with new `--nodsp` flag
@@ -12,8 +11,6 @@ Features:
 Bugfixes
 
 * wwise: allow Bang messages in OnSendMessageCallback()
-=======
->>>>>>> develop
 
 0.12.0
 -----
