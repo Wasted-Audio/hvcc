@@ -22,8 +22,8 @@
 #define DISTRHO_PLUGIN_WANT_STATE           0
 #define DISTRHO_PLUGIN_WANT_TIMEPOS         1
 #define DISTRHO_PLUGIN_WANT_FULL_STATE      0
-#define DISTRHO_PLUGIN_WANT_MIDI_INPUT      {{meta.midi_input if meta.midi_input is defined else 0}}
-#define DISTRHO_PLUGIN_WANT_MIDI_OUTPUT     {{meta.midi_output if meta.midi_output is defined else 0}}
+#define DISTRHO_PLUGIN_WANT_MIDI_INPUT      {{1 if meta.midi_input is sameas true else 0}}
+#define DISTRHO_PLUGIN_WANT_MIDI_OUTPUT     {{1 if meta.midi_output is sameas true else 0}}
 {%- if meta.lv2_info != None %}
 #define DISTRHO_PLUGIN_LV2_CATEGORY         "{{meta.lv2_info}}"
 {%- endif %}

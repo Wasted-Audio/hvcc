@@ -36,8 +36,8 @@ class DPF(BaseModel):
     enable_ui:      bool = False
     enable_modgui:  bool = False
     ui_size:        Optional[DPFUISize] = None
-    midi_input:     Optional[bool] = None
-    midi_output:    Optional[bool] = None
+    midi_input:     bool = False
+    midi_output:    bool = False
     port_groups:    Optional[DPFPortGroups] = None
     enumerators:    Optional[Dict[str, List[str]]] = None
     version:        Optional[str] = None
