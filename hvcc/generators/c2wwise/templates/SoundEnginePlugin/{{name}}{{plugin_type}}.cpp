@@ -98,7 +98,7 @@ namespace {{name}}_Private
     static void OnSendMessageCallback(HeavyContextInterface *in_pHeavyCtx, const char *in_szSendName, uint32_t in_uSendHash, const HvMessage *in_pHvMessage)
     {
         auto* pPlugin = reinterpret_cast<{{name}}{{plugin_type}}*>(in_pHeavyCtx->getUserData());
-        if (pPlugin != nullptr && hv_msg_isFloat(in_pHvMessage, 0))
+        if (pPlugin != nullptr && (hv_msg_isFloat(in_pHvMessage, 0) || hv_msg_isBang(in_pHvMessage, 0)))
         {
             switch (in_uSendHash)
             {
@@ -293,4 +293,3 @@ void {{name}}{{plugin_type}}::Execute(AkAudioBuffer* io_pBuffer)
 {% endif %}
     AK_PERF_RECORDING_STOP("{{name}}{{plugin_type}}", 25, 30);
 }
-
