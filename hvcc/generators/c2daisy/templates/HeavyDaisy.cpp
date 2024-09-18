@@ -208,7 +208,7 @@ int main(void)
   {% if blocksize %}
   hardware.SetAudioBlockSize({{blocksize}});
   {% endif %}
-  {% if has_midi is sameas true%}
+  {% if has_midi is sameas true %}
   MidiUartHandler::Config midi_config;
   hardware.midi.Init(midi_config);
   hardware.midi.StartReceive();
