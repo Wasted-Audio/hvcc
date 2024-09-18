@@ -4,15 +4,15 @@ TARGET = HeavyDaisy_{{name}}
 # Library Locations
 LIBDAISY_DIR = {{libdaisy_path}}
 
-{% if linker_script != '' %}
+{%- if linker_script != '' %}
 LDSCRIPT = {{linker_script}}
-{% endif %}
+{%- endif %}
 
-{% if bootloader != '' %}
+{% if bootloader != None %}
 APP_TYPE = {{bootloader}}
 {% endif %}
 
-{% if debug_printing %}
+{% if debug_printing is sameas true %}
 LDFLAGS += -u _printf_float
 {% endif %}
 

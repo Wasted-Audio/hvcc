@@ -34,6 +34,7 @@ from hvcc.generators.c2owl import c2owl
 from hvcc.generators.c2pdext import c2pdext
 from hvcc.generators.c2wwise import c2wwise
 from hvcc.generators.c2unity import c2unity
+from hvcc.generators.types.meta import Meta
 
 
 class Colours:
@@ -214,7 +215,7 @@ def compile_dataflow(
 ) -> OrderedDict:
 
     results: OrderedDict = OrderedDict()  # default value, empty dictionary
-    patch_meta = {}
+    patch_meta = Meta()
 
     # basic error checking on input
     if os.path.isfile(in_path):
@@ -231,11 +232,12 @@ def compile_dataflow(
         if os.path.isfile(patch_meta_file):
             with open(patch_meta_file) as json_file:
                 try:
-                    patch_meta = json.load(json_file)
+                    patch_meta_json = json.load(json_file)
+                    patch_meta = Meta(**patch_meta_json)
                 except Exception as e:
                     return add_error(results, f"Unable to open json_file: {e}")
 
-    patch_name = patch_meta.get("name", patch_name)
+    patch_name = patch_meta.name or patch_name
     generators = ["c"] if generators is None else [x.lower() for x in generators]
 
     if in_path.endswith((".pd")):

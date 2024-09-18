@@ -7,6 +7,8 @@ Next Release
 Features:
 
 * Only disable DSP with new `--nodsp` flag
+* Use pydantic types to define metadata objects
+* DPF: CV flag in portgroups
 
 Bugfixes
 
