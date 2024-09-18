@@ -9,7 +9,7 @@ void {{class_name}}::initAudioPort(bool input, uint32_t index, AudioPort& port)
 {%- if meta.port_groups.input|length %}
   {%- for group, gConfig in meta.port_groups.input.items() %}
     {%- for port, value in gConfig.items() %}
-      case {{value[0]}}:
+      case {{value[0] or value}}:
         port.name    = "Input {{port}} ({{group}})";
         port.symbol  = "in_{{port|lower}}_{{group|lower}}";
         port.groupId = kPortGroup{{group}};
@@ -41,7 +41,7 @@ void {{class_name}}::initAudioPort(bool input, uint32_t index, AudioPort& port)
 {%- if meta.port_groups.output|length %}
   {%- for group, gConfig in meta.port_groups.output.items() %}
     {%- for port, value in gConfig.items() %}
-      case {{value[0]}}:
+      case {{value[0] or value}}:
         port.name    = "Output {{port}} ({{group}})";
         port.symbol  = "out_{{port|lower}}_{{group|lower}}";
         port.groupId = kPortGroup{{group}};

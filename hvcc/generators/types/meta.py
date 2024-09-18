@@ -25,8 +25,8 @@ class DPFUISize(BaseModel):
 
 
 class DPFPortGroups(BaseModel):
-    input: Dict[str, Dict[str, Tuple[int, bool]]] = {}
-    output: Dict[str, Dict[str, Tuple[int, bool]]] = {}
+    input: Dict[str, Dict[str, Union[int, Tuple[int, bool]]]] = {}
+    output: Dict[str, Dict[str, Union[int, Tuple[int, bool]]]] = {}
 
 
 class DPF(BaseModel):
