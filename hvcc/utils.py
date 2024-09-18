@@ -56,7 +56,7 @@ def main() -> None:
     elif command == "metaschema":
         generator = args.get('generator')
         if generator is not None:
-            model = gens[generator.lower()]
+            model = gens[generator.lower()]()
         else:
             model = Meta
         print(json.dumps(model.model_json_schema(), indent=4))
