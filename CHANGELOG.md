@@ -9,6 +9,7 @@ Features:
 * Only disable DSP with new `--nodsp` flag
 * Use pydantic types to define metadata objects
 * DPF: CV flag in portgroups
+* DPF: flag to disable scoped denormals
 
 Bugfixes
 

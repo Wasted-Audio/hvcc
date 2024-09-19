@@ -3,7 +3,7 @@
 #include "Heavy_{{name}}.h"
 #include "{{class_name}}.hpp"
 #include <set>
-{% if num_input_channels > 0 %}
+{% if meta.denormals is sameas false %}
 #include "extra/ScopedDenormalDisable.hpp"
 {% endif %}
 
@@ -206,7 +206,7 @@ void {{class_name}}::run(const float** inputs, float** outputs, uint32_t frames,
 void {{class_name}}::run(const float** inputs, float** outputs, uint32_t frames)
 {
 #endif
-{% if num_input_channels > 0 %}
+{% if meta.denormals is sameas false %}
   const ScopedDenormalDisable sdd;
 {% endif %}
   const TimePosition& timePos(getTimePosition());
