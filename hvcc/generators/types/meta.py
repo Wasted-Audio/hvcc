@@ -40,6 +40,7 @@ class DPF(BaseModel):
     midi_output:    bool = False
     port_groups:    Optional[DPFPortGroups] = None
     enumerators:    Optional[Dict[str, List[str]]] = None
+    denormals:      bool = True
     version:        Optional[str] = None
     license:        Optional[str] = None
     maker:          Optional[str] = None
