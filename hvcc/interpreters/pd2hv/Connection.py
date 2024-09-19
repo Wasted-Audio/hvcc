@@ -14,22 +14,20 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from typing import Dict, Union, TYPE_CHECKING
+from typing import Dict, Optional, TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from .HeavyObject import HeavyObject
-    from .PdBinopObject import PdBinopObject
-    from .PdLibSignalGraph import PdLibSignalGraph
+    from .PdObject import PdObject
 
 
 class Connection:
     def __init__(
         self,
-        from_obj: 'HeavyObject',
+        from_obj: 'PdObject',
         outlet_index: int,
-        to_obj: Union['PdBinopObject', 'PdLibSignalGraph', 'HeavyObject'],
+        to_obj: 'PdObject',
         inlet_index: int,
-        conn_type: str
+        conn_type: Optional[str]  # not actually Optional. This is due to the requirement in HeavyObject.
     ) -> None:
         assert from_obj is not None
         assert to_obj is not None
@@ -50,7 +48,7 @@ class Connection:
         }
 
     @property
-    def from_obj(self) -> 'HeavyObject':
+    def from_obj(self) -> 'PdObject':
         return self.__from_obj
 
     @property
@@ -62,7 +60,7 @@ class Connection:
         return self.__hv_json["from"]["outlet"]
 
     @property
-    def to_obj(self) -> Union['PdBinopObject', 'PdLibSignalGraph', 'HeavyObject']:
+    def to_obj(self) -> 'PdObject':
         return self.__to_obj
 
     @property

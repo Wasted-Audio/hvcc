@@ -34,6 +34,7 @@ from hvcc.generators.c2owl import c2owl
 from hvcc.generators.c2pdext import c2pdext
 from hvcc.generators.c2wwise import c2wwise
 from hvcc.generators.c2unity import c2unity
+from hvcc.generators.types.meta import Meta
 
 
 class Colours:
@@ -80,6 +81,57 @@ def check_extern_name_conflicts(extern_type: str, extern_list: List, results: Or
                           "capital letters are not the only difference.")
 
 
+def check_midi_objects(hvir: Dict) -> Dict:
+    in_midi = []
+    out_midi = []
+
+    midi_in_objs = [
+        '__hv_bendin',
+        '__hv_ctlin',
+        '__hv_midiin',
+        '__hv_midirealtimein',
+        '__hv_notein',
+        '__hv_pgmin',
+        '__hv_polytouchin',
+        '__hv_touchin',
+    ]
+
+    midi_out_objs = [
+        '__hv_bendout',
+        '__hv_ctlout',
+        '__hv_midiout',
+        '__hv_midioutport',
+        '__hv_noteout',
+        '__hv_pgmout',
+        '__hv_polytouchout',
+        '__hv_touchout',
+    ]
+
+    for key in hvir['control']['receivers'].keys():
+        if key in midi_in_objs:
+            in_midi.append(key)
+
+    for key in hvir['control']['sendMessage']:
+        if key.get('name'):
+            if key['name'] in midi_out_objs:
+                out_midi.append(key['name'])
+
+    return {
+        'in': in_midi,
+        'out': out_midi
+    }
+
+
+def filter_midi_from_out_parameters(output_parameter_list: List, midi_out_objects: List) -> List:
+    new_out_list = []
+
+    for item in output_parameter_list:
+        if not item[0] in midi_out_objects:
+            new_out_list.append(item)
+
+    return new_out_list
+
+
 def generate_extern_info(hvir: Dict, results: OrderedDict) -> Dict:
     """ Simplifies the receiver/send and table lists by only containing values
         externed with @hv_param, @hv_event or @hv_table
@@ -113,6 +165,12 @@ def generate_extern_info(hvir: Dict, results: OrderedDict) -> Dict:
     table_list.sort(key=lambda x: x[0])
     check_extern_name_conflicts("table", table_list, results)
 
+    # Exposed midi objects
+    midi_objects = check_midi_objects(hvir)
+
+    # filter midi objects from the output parameters list
+    out_parameter_list = filter_midi_from_out_parameters(out_parameter_list, midi_objects['out'])
+
     return {
         "parameters": {
             "in": in_parameter_list,
@@ -122,12 +180,24 @@ def generate_extern_info(hvir: Dict, results: OrderedDict) -> Dict:
             "in": in_event_list,
             "out": out_event_list
         },
+        "midi": {
+            "in": midi_objects['in'],
+            "out": midi_objects['out']
+        },
         "tables": table_list,
         # generate patch heuristics to ensure enough memory allocated for the patch
         "memoryPoolSizesKb": {
             "internal": 10,  # TODO(joe): should this increase if there are a lot of internal connections?
-            "inputQueue": max(2, int(len(in_parameter_list) + len(in_event_list) / 4)),
-            "outputQueue": max(2, int(len(out_parameter_list) + len(out_event_list) / 4)),
+            "inputQueue": max(2, int(
+                                     len(in_parameter_list) +
+                                     (len(in_event_list) / 4) +
+                                     len(midi_objects['in'])  # TODO(dreamer): should this depend on the MIDI type?
+                                    )),
+            "outputQueue": max(2, int(
+                                     len(out_parameter_list) +
+                                     (len(out_event_list) / 4) +
+                                     len(midi_objects['out'])
+                                    )),
         }
     }
 
@@ -140,11 +210,12 @@ def compile_dataflow(
     search_paths: Optional[List] = None,
     generators: Optional[List] = None,
     verbose: bool = False,
-    copyright: Optional[str] = None
+    copyright: Optional[str] = None,
+    nodsp: Optional[bool] = False
 ) -> OrderedDict:
 
     results: OrderedDict = OrderedDict()  # default value, empty dictionary
-    patch_meta = {}
+    patch_meta = Meta()
 
     # basic error checking on input
     if os.path.isfile(in_path):
@@ -161,11 +232,12 @@ def compile_dataflow(
         if os.path.isfile(patch_meta_file):
             with open(patch_meta_file) as json_file:
                 try:
-                    patch_meta = json.load(json_file)
+                    patch_meta_json = json.load(json_file)
+                    patch_meta = Meta(**patch_meta_json)
                 except Exception as e:
                     return add_error(results, f"Unable to open json_file: {e}")
 
-    patch_name = patch_meta.get("name", patch_name)
+    patch_name = patch_meta.name or patch_name
     generators = ["c"] if generators is None else [x.lower() for x in generators]
 
     if in_path.endswith((".pd")):
@@ -204,7 +276,8 @@ def compile_dataflow(
             static_dir=os.path.join(os.path.dirname(__file__), "generators/ir2c/static"),
             output_dir=c_src_dir,
             externs=externs,
-            copyright=copyright)
+            copyright=copyright,
+            nodsp=nodsp)
 
         # check for errors
         if results["ir2c"]["notifs"].get("has_error", False):
@@ -316,6 +389,7 @@ def main() -> bool:
     parser.add_argument(
         "-n",
         "--name",
+        default="heavy",
         help="Provides a name for the generated Heavy context.")
     parser.add_argument(
         "-m",
@@ -331,6 +405,11 @@ def main() -> bool:
         "--results_path",
         help="Write results dictionary to the given path as a JSON-formatted string."
              " Target directory will be created if it does not exist.")
+    parser.add_argument(
+        "--nodsp",
+        action='store_true',
+        help="Disable DSP. Run as control-only patch."
+    )
     parser.add_argument(
         "-v",
         "--verbose",
@@ -350,7 +429,9 @@ def main() -> bool:
         search_paths=args.search_paths,
         generators=args.gen,
         verbose=args.verbose,
-        copyright=args.copyright)
+        copyright=args.copyright,
+        nodsp=args.nodsp
+    )
 
     errorCount = 0
     for r in list(results.values()):

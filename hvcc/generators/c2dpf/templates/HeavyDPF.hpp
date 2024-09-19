@@ -25,7 +25,7 @@ public:
     {% endfor %}
   };
 
-{% if meta.port_groups is defined %}
+{% if meta.port_groups != None %}
   enum PortGroups
   {
 {%- if meta.port_groups.input|length %}
@@ -58,7 +58,7 @@ protected:
     return "{{name}}";
   }
 
-{%- if meta.description is defined %}
+{%- if meta.description != None %}
   const char* getDescription() const override
   {
     return "{{meta.description}}";
@@ -67,14 +67,14 @@ protected:
 
   const char* getMaker() const noexcept override
   {
-{%- if meta.maker is defined %}
+{%- if meta.maker != None %}
     return "{{meta.maker}}";
 {% else %}
     return "Wasted Audio";
 {%- endif %}
   }
 
-{%- if meta.homepage is defined %}
+{%- if meta.homepage != None %}
   const char* getHomePage() const override
   {
     return "{{meta.homepage}}";
@@ -83,7 +83,7 @@ protected:
 
   const char* getLicense() const noexcept override
   {
-{%- if meta.license is defined %}
+{%- if meta.license != None %}
     return "{{meta.license}}";
 {% else %}
     return "GPL v3+";
@@ -92,7 +92,7 @@ protected:
 
   uint32_t getVersion() const noexcept override
   {
-{%- if meta.version is defined %}
+{%- if meta.version != None %}
     return d_version({{meta.version}});
 {% else %}
     return d_version(0, 0, 1);
@@ -108,7 +108,7 @@ protected:
   // Init
 
   void initParameter(uint32_t index, Parameter& parameter) override;
-  {% if meta.port_groups is defined %}
+  {% if meta.port_groups != None %}
   void initAudioPort(bool input, uint32_t index, AudioPort& port) override;
   void initPortGroup(uint32_t groupId, PortGroup& portGroup) override;
   {%- endif %}
@@ -145,10 +145,9 @@ private:
   {%- endif %}
 
   // transport values
-  bool wasPlaying;
-  float samplesProcessed;
-  double nextClockTick;
-  double sampleAtCycleStart;
+  bool wasPlaying = false;
+  double nextClockTick = 0.0;
+  double sampleAtCycleStart = 0.0;
 
   // midi out buffer
   int midiOutCount;

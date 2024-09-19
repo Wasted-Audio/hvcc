@@ -50,11 +50,11 @@ Python 3.8 up to 3.12
 
 For tests:
 
-* `tox`
-* `numpy/scipy`
-* `midifile`
-* `tiniwav`
-* `clang/clang++`
+* `tox` (python install)
+* `numpy/scipy` (requirements-dev)
+* `midifile` (git submodule)
+* `tinywav` (git submodule)
+* `clang/clang++` (system install)
 
 ## Installation
 
