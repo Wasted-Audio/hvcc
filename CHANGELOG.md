@@ -4,11 +4,30 @@ CHANGELOG
 Next Release
 -----
 
+Features:
+
+* Only disable DSP with new `--nodsp` flag
+* Use pydantic types to define metadata objects
+* DPF: CV flag in portgroups
+* DPF: flag to disable scoped denormals
+
+Bugfixes
+
+* wwise: allow Bang messages in OnSendMessageCallback()
+
+0.12.0
+-----
+
 * Core: parse remote/send messages
 * Core: MIDI i/o added to memoryPool
+* Core: support `[else/knob]` as `[float]`
+* Daisy: set heavy context after hw.init()
 * OWL: add Polytouchin and Polytouchout
 * JS: webmidi input
-* Bugfix: MIDI out objects in output Paremeters
+* Docs: add instructions for loading custom samples in JS
+* Small Bugfixes:
+  * MIDI out objects in output Paremeters
+  * JS: AudioWorklet fillTableWithFloatBuffer
 
 0.11.0
 -----

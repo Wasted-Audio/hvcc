@@ -34,6 +34,7 @@ from hvcc.generators.c2owl import c2owl
 from hvcc.generators.c2pdext import c2pdext
 from hvcc.generators.c2wwise import c2wwise
 from hvcc.generators.c2unity import c2unity
+from hvcc.generators.types.meta import Meta
 
 
 class Colours:
@@ -209,11 +210,12 @@ def compile_dataflow(
     search_paths: Optional[List] = None,
     generators: Optional[List] = None,
     verbose: bool = False,
-    copyright: Optional[str] = None
+    copyright: Optional[str] = None,
+    nodsp: Optional[bool] = False
 ) -> OrderedDict:
 
     results: OrderedDict = OrderedDict()  # default value, empty dictionary
-    patch_meta = {}
+    patch_meta = Meta()
 
     # basic error checking on input
     if os.path.isfile(in_path):
@@ -230,11 +232,12 @@ def compile_dataflow(
         if os.path.isfile(patch_meta_file):
             with open(patch_meta_file) as json_file:
                 try:
-                    patch_meta = json.load(json_file)
+                    patch_meta_json = json.load(json_file)
+                    patch_meta = Meta(**patch_meta_json)
                 except Exception as e:
                     return add_error(results, f"Unable to open json_file: {e}")
 
-    patch_name = patch_meta.get("name", patch_name)
+    patch_name = patch_meta.name or patch_name
     generators = ["c"] if generators is None else [x.lower() for x in generators]
 
     if in_path.endswith((".pd")):
@@ -273,7 +276,8 @@ def compile_dataflow(
             static_dir=os.path.join(os.path.dirname(__file__), "generators/ir2c/static"),
             output_dir=c_src_dir,
             externs=externs,
-            copyright=copyright)
+            copyright=copyright,
+            nodsp=nodsp)
 
         # check for errors
         if results["ir2c"]["notifs"].get("has_error", False):
@@ -402,6 +406,11 @@ def main() -> bool:
         help="Write results dictionary to the given path as a JSON-formatted string."
              " Target directory will be created if it does not exist.")
     parser.add_argument(
+        "--nodsp",
+        action='store_true',
+        help="Disable DSP. Run as control-only patch."
+    )
+    parser.add_argument(
         "-v",
         "--verbose",
         help="Show debugging information.",
@@ -420,7 +429,9 @@ def main() -> bool:
         search_paths=args.search_paths,
         generators=args.gen,
         verbose=args.verbose,
-        copyright=args.copyright)
+        copyright=args.copyright,
+        nodsp=args.nodsp
+    )
 
     errorCount = 0
     for r in list(results.values()):
