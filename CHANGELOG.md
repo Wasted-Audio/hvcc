@@ -1,7 +1,7 @@
 CHANGELOG
 =====
 
-Next Release
+0.12.1
 -----
 
 Features:
