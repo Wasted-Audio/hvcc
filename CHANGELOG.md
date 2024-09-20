@@ -14,6 +14,7 @@ Features:
 Bugfixes
 
 * wwise: allow Bang messages in OnSendMessageCallback()
+* Improve `[cos~]` precision.
 
 0.12.0
 -----
