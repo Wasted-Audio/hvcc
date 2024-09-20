@@ -1,6 +1,21 @@
 CHANGELOG
 =====
 
+0.12.1
+-----
+
+Features:
+
+* Only disable DSP with new `--nodsp` flag
+* Use pydantic types to define metadata objects
+* DPF: CV flag in portgroups
+* DPF: flag to disable scoped denormals
+
+Bugfixes
+
+* wwise: allow Bang messages in OnSendMessageCallback()
+* Improve `[cos~]` precision.
+
 0.12.0
 -----
 

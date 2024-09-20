@@ -10,8 +10,8 @@
         "midi_input": 1,
         "midi_output": 0,
         "plugin_formats": [
-            "lv2_dsp",
-            "vst",
+            "lv2_sep",
+            "vst2",
             "jack"
         ]
     }
