@@ -24,7 +24,7 @@ include = { "hvcc/generators" = "hvcc/generators", "hvcc/core" = "hvcc/core", "h
 
 
 [tool.poetry-pyinstaller-plugin.scripts]
-Heavy = { source = "hvcc/__init__.py", type = "onefile", bundle = true}
+Heavy = { source = "hvcc/__init__.py", type = "onefile", bundle = true, arch = "universal2" }
 
 [build-system]
 requires = ["poetry-core"]
