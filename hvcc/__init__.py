@@ -270,10 +270,16 @@ def compile_dataflow(
         patch_name = hvir["name"]["escaped"]
         externs = generate_extern_info(hvir, results)
 
+        # get application path
+        if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
+            application_path = os.path.join(sys._MEIPASS, 'hvcc')
+        elif __file__:
+            application_path = os.path.dirname(__file__)
+
         c_src_dir = os.path.join(out_dir, "c")
         results["ir2c"] = ir2c.ir2c.compile(
             hv_ir_path=os.path.join(results["hv2ir"]["out_dir"], results["hv2ir"]["out_file"]),
-            static_dir=os.path.join(os.path.dirname(__file__), "generators/ir2c/static"),
+            static_dir=os.path.join(application_path, "generators/ir2c/static"),
             output_dir=c_src_dir,
             externs=externs,
             copyright=copyright,

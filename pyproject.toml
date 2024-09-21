@@ -1,0 +1,32 @@
+[tool.poetry]
+name = "hvcc"
+version = "0.12.1"
+description = "`hvcc` is a python-based dataflow audio programming language compiler that generates C/C++ code and a variety of specific framework wrappers."
+authors = ["Enzien Audio, Wasted Audio"]
+license = "GPLv3"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.8"
+Jinja2 = ">=2.11"
+importlib-resources = ">=5.1"
+wstd2daisy = ">=0.5.3"
+pydantic = ">=2.9.1"
+
+[tool.poetry.group.dev.dependencies]
+numpy = "^1.24.1"
+scipy = "^1.9.1"
+tox = "^4.20.0"
+
+[tool.poetry-pyinstaller-plugin]
+collect = { all = ["json2daisy"], data = ["hvcc"] }
+include = { "hvcc/generators" = "hvcc/generators", "hvcc/core" = "hvcc/core", "hvcc/interpreters" = "hvcc/interpreters" }
+# package = { "hvcc/generators" = "_Heavy_internal/generators" }
+
+
+[tool.poetry-pyinstaller-plugin.scripts]
+Heavy = { source = "hvcc/__init__.py", type = "onefile", bundle = true}
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
