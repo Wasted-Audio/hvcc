@@ -19,9 +19,8 @@ scipy = "^1.9.1"
 tox = "^4.20.0"
 
 [tool.poetry-pyinstaller-plugin]
-collect = { all = ["json2daisy"], data = ["hvcc"] }
+collect = { all = ["json2daisy"] }
 include = { "hvcc/generators" = "hvcc/generators", "hvcc/core" = "hvcc/core", "hvcc/interpreters" = "hvcc/interpreters" }
-# package = { "hvcc/generators" = "_Heavy_internal/generators" }
 
 
 [tool.poetry-pyinstaller-plugin.scripts]
