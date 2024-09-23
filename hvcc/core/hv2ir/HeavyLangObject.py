@@ -242,7 +242,7 @@ class HeavyLangObject:
         else:
             raise HeavyException(f"Connection {c} does not connect to this object {self}.")
 
-    def replace_connection(self, c: Connection, n_list: list) -> None:
+    def replace_connection(self, c: Connection, n_list: List) -> None:
         """ Replaces connection c with connection list n_list, maintaining connection order
         """
         if c.from_object is self:
