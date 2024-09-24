@@ -5,6 +5,23 @@ description = "`hvcc` is a python-based dataflow audio programming language comp
 authors = ["Enzien Audio, Wasted Audio"]
 license = "GPLv3"
 readme = "README.md"
+documentation = "https://wasted-audio.github.io/hvcc/"
+repository = "https://github.com/Wasted-Audio/hvcc"
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Topic :: Software Development :: Compilers",
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12"
+]
+
+[tool.poetry.scripts]
+hvcc = "hvcc:main"
+hvutil = "hvcc.utils:main"
 
 [tool.poetry.dependencies]
 python = "^3.8"
