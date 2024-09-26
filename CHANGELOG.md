@@ -1,6 +1,13 @@
 CHANGELOG
 =====
 
+Next Release
+-----
+
+Features:
+
+* migrating to poetry for project management
+
 0.12.1
 -----
 
