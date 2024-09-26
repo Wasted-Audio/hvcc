@@ -26,14 +26,13 @@ hvutil = "hvcc.utils:main"
 [tool.poetry.dependencies]
 python = "^3.8.1"
 Jinja2 = ">=2.11"
-importlib-resources = { version = ">=5.1", python = "==3.8" }
+importlib-resources = ">=5.1"
 wstd2daisy = ">=0.5.3"
 pydantic = ">=2.9.1"
 
 [tool.poetry.group.dev.dependencies]
 numpy = "^1.24.1"
 scipy = "^1.9.1"
-tox = "^4.20.0"
 pytest-cov = "^5.0.0"
 flake8 = "^7.1.1"
 mypy = "^1.11.2"

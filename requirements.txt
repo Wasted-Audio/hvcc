@@ -1,7 +1,7 @@
 annotated-types==0.7.0 ; python_full_version >= "3.8.1" and python_full_version < "4.0.0" \
     --hash=sha256:1f02e8b43a8fbbc3f3e0d4f0f4bfc8131bcb4eebe8849b8e5c773f3a1c582a53 \
     --hash=sha256:aff07c09a53a08bc8cfccb9c85b05f1aa9a2a6f23728d790723543408344ce89
-importlib-resources==6.4.5 ; python_full_version >= "3.8.1" and python_version == "3.8" \
+importlib-resources==6.4.5 ; python_full_version >= "3.8.1" and python_full_version < "4.0.0" \
     --hash=sha256:980862a1d16c9e147a59603677fa2aa5fd82b87f223b6cb870695bcfce830065 \
     --hash=sha256:ac29d5f956f01d5e4bb63102a5a19957f1b9175e45649977264a1416783bb717
 jinja2==3.1.4 ; python_full_version >= "3.8.1" and python_full_version < "4.0.0" \
@@ -167,6 +167,6 @@ typing-extensions==4.12.2 ; python_full_version >= "3.8.1" and python_full_versi
 wstd2daisy==0.5.3 ; python_full_version >= "3.8.1" and python_full_version < "4.0.0" \
     --hash=sha256:1cf6bbc6d08cf1f4d36c1aac2f1ca0c7a7b393c49308757bb3f91b05f8cf397a \
     --hash=sha256:cd566d89bb36ec9fb245acff166f401a71374f044ec8db421a08eedd52bbe07b
-zipp==3.20.2 ; python_full_version >= "3.8.1" and python_version == "3.8" \
+zipp==3.20.2 ; python_full_version >= "3.8.1" and python_version < "3.10" \
     --hash=sha256:a817ac80d6cf4b23bf7f2828b7cabf326f15a001bea8b1f9b49631780ba28350 \
     --hash=sha256:bc9eb26f4506fda01b81bcde0ca78103b6e62f991b381fec825435c836edbc29
