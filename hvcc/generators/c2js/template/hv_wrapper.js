@@ -43,6 +43,8 @@ AudioLibLoader.prototype.init = function(options) {
             options.printHook(event.data.payload);
           } else if (event.data.type === 'sendHook' && options.sendHook) {
             options.sendHook(event.data.payload[0], event.data.payload[1]);
+          } else if (event.data.type === 'midiOut' && options.midiOutHook) {
+            options.midiOutHook(event.data.payload);
           } else {
             console.log('Unhandled message from {{name}}_AudioLibWorklet:', event.data);
           }
@@ -54,7 +56,8 @@ AudioLibLoader.prototype.init = function(options) {
             sampleRate: this.webAudioContext.sampleRate,
             blockSize: blockSize,
             printHook: options.printHook,
-            sendHook: options.sendHook
+            sendHook: options.sendHook,
+            midiOutHook: options.midiOutHook
         });
         this.audiolib = instance;
         this.webAudioProcessor = this.webAudioContext.createScriptProcessor(blockSize, instance.getNumInputChannels(), Math.max(instance.getNumOutputChannels(), 1));
@@ -155,6 +158,7 @@ var {{name}}_AudioLib = function(options) {
   this.heavyContext = _hv_{{name}}_new_with_options(this.sampleRate, {{pool_sizes_kb.internal}}, {{pool_sizes_kb.inputQueue}}, {{pool_sizes_kb.outputQueue}});
   this.setPrintHook(options.printHook);
   this.setSendHook(options.sendHook);
+  this.setMidiOutHook(options.midiOutHook);
 
   // allocate temporary buffers (pointer size is 4 bytes in javascript)
   var lengthInSamples = this.blockSize * this.getNumOutputChannels();
@@ -250,6 +254,24 @@ var tableHashes = {
       "viiii"
     );
     _hv_setSendHook(this.heavyContext, sendHook);
+  }
+}
+
+{{name}}_AudioLib.prototype.setMidiOutHook = function(hook) {
+  if (!this.heavyContext) {
+    console.error("heavy: Can't set MIDI Out Hook, no Heavy Context instantiated");
+    return;
+  }
+
+  if (hook) {
+    var midiOutHook = addFunction(function(context, message) {
+        // Converts MIDI out callback to a MIDI message
+        var data = new Uint8Array(Module.HEAPU8.buffer, message, 3);
+        hook(data);
+      },
+      "vii"
+    );
+    _hv_setMidiOutHook(this.heavyContext, midiOutHook);
   }
 }
 

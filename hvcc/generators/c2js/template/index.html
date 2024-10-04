@@ -28,6 +28,7 @@
     <script type="text/javascript">
       var heavyModule = null;
       var loader = null;
+      midioutPort = null;
 
       window.onload = function() {
         {{name}}_Module().then(loadedModule => {
@@ -51,6 +52,8 @@
             printHook: onPrint,
             // optional: provide a callback handler for [s {sendName} @hv_param] messages
             sendHook: onFloatMessage,
+            // optional: provide a callback handler for midiout messages
+            midiOutHook: onMidiOutMessage,
             // optional: pass an existing web audio context, otherwise a new one
             // will be constructed.
             webAudioContext: null
@@ -125,12 +128,11 @@
 
           if (midiOutputs.length > 0) {
             midiOutputsSelect.selectedIndex = 0;
-            // TODO: Behavior for the first selected MIDI output here
+            midioutPort = midiOutputs[0];
           }
 
           midiOutputsSelect.onchange = function() {
-            var selectedOutput = midiOutputs[midiOutputsSelect.value];
-            // You can add behavior for selected MIDI output here
+            midioutPort = midiOutputs[midiOutputsSelect.value];
           };
         {%- endif %}
       }
@@ -147,6 +149,17 @@
         }
       }
     {%- endif %}
+      
+      
+
+      function onMidiOutMessage(message) {
+        if (midioutPort !== null) {
+          midioutPort.send(message);
+        }
+        else {
+          console.error("No MIDI output port available.");
+        }
+      }
 
       function onFloatMessage(sendName, floatValue) {
 

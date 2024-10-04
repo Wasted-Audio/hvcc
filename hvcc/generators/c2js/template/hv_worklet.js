@@ -108,11 +108,101 @@ class {{name}}_AudioLibWorklet extends AudioWorkletProcessor {
       var self = this;
       // typedef void (HvSendHook_t) (HeavyContextInterface *context, const char *sendName, hv_uint32_t sendHash, const HvMessage *msg);
       var sendHook = addFunction(function(context, sendName, sendHash, msg) {
-          // Converts sendhook callback to (sendName, float) message
-          self.port.postMessage({
-            type: 'sendHook',
-            payload: [UTF8ToString(sendName), _hv_msg_getFloat(msg, 0)]
-          });
+          // Filter out MIDI messages
+          switch (UTF8ToString(sendName)) {
+            case "__hv_noteout":
+              var note = _hv_msg_getFloat(msg, 0);
+              var velocity = _hv_msg_getFloat(msg, 1);
+              var channel = _hv_msg_getFloat(msg, 2) % 16; // no pd midi ports
+              self.port.postMessage({
+                type: 'midiOut',
+                payload:[
+                  (velocity > 0) ? 144 : 128 | channel,
+                  note,
+                  velocity
+                ]
+              });
+              break;
+            case "__hv_ctlout":
+              var value = _hv_msg_getFloat(msg, 0);
+              var cc = _hv_msg_getFloat(msg, 1);
+              var channel = _hv_msg_getFloat(msg, 2) % 16; // no pd midi ports
+              self.port.postMessage({
+                type: 'midiOut',
+                payload:[
+                  176 | channel,
+                  cc,
+                  value
+                ]
+              });
+              break;
+            case "__hv_pgmout":
+              var program = _hv_msg_getFloat(msg, 0);
+              var channel = _hv_msg_getFloat(msg, 1) % 16; // no pd midi ports
+              self.port.postMessage({
+                type: 'midiOut',
+                payload:[
+                  192 | channel,
+                  program
+                ]
+              });
+              break;
+            case "__hv_touchout":
+              var pressure = _hv_msg_getFloat(msg, 0);
+              var channel = _hv_msg_getFloat(msg, 1) % 16; // no pd midi ports
+              self.port.postMessage({
+                type: 'midiOut',
+                payload:[
+                  208 | channel,
+                  pressure,
+                ]
+              });
+              break;
+            case "__hv_polytouchout":
+              var value = _hv_msg_getFloat(msg, 0);
+              var note = _hv_msg_getFloat(msg, 1);
+              var channel = _hv_msg_getFloat(msg, 2) % 16; // no pd midi ports
+              self.port.postMessage({
+                type: 'midiOut',
+                payload:[
+                  160 | channel,
+                  note,
+                  value
+                ]
+              });
+              break;
+            case "__hv_bendout":
+              var value = _hv_msg_getFloat(msg, 0);
+              let lsb = value & 0x7F;
+              let msb = (value >> 7) & 0x7F;
+              var channel = _hv_msg_getFloat(msg, 2) % 16; // no pd midi ports
+              self.port.postMessage({
+                type: 'midiOut',
+                payload:[
+                  224 | channel,
+                  lsb,
+                  msb
+                ]
+              });
+              break;
+            case "__hv_midiout":
+              var message = [
+                _hv_msg_getFloat(msg, 0),
+                _hv_msg_getFloat(msg, 1),
+                _hv_msg_getFloat(msg, 2)
+              ];
+              self.port.postMessage({
+                type: 'midiOut',
+                payload: message
+              });
+              break;
+            default:
+            // Converts sendhook callback to (sendName, float) message
+            self.port.postMessage({
+              type: 'sendHook',
+              payload: [UTF8ToString(sendName), _hv_msg_getFloat(msg, 0)]
+            });
+          }
         },
         "viiii"
       );
