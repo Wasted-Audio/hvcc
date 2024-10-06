@@ -48,7 +48,7 @@ class TestPdSignalBase(HvBaseTest):
             str(block_size or 480),
             str(num_iterations or 100)])
 
-        return wav_path
+        return exe_path, wav_path
 
     def _compare_wave_output(self, out_dir, c_sources, golden_path, flag=None):
         # http://stackoverflow.com/questions/10580676/comparing-two-numpy-arrays-for-equality-element-wise
