@@ -43,8 +43,8 @@ AudioLibLoader.prototype.init = function(options) {
             options.printHook(event.data.payload);
           } else if (event.data.type === 'sendHook' && options.sendHook) {
             options.sendHook(event.data.payload[0], event.data.payload[1]);
-          } else if (event.data.type === 'midiOut' && options.midiOutHook) {
-            options.midiOutHook(event.data.payload);
+          } else if (event.data.type === 'midiOut' && options.sendHook) {
+            options.sendHook("midiOutMessage", event.data.payload);
           } else {
             console.log('Unhandled message from {{name}}_AudioLibWorklet:', event.data);
           }
@@ -57,7 +57,6 @@ AudioLibLoader.prototype.init = function(options) {
             blockSize: blockSize,
             printHook: options.printHook,
             sendHook: options.sendHook,
-            midiOutHook: options.midiOutHook
         });
         this.audiolib = instance;
         this.webAudioProcessor = this.webAudioContext.createScriptProcessor(blockSize, instance.getNumInputChannels(), Math.max(instance.getNumOutputChannels(), 1));
@@ -158,7 +157,6 @@ var {{name}}_AudioLib = function(options) {
   this.heavyContext = _hv_{{name}}_new_with_options(this.sampleRate, {{pool_sizes_kb.internal}}, {{pool_sizes_kb.inputQueue}}, {{pool_sizes_kb.outputQueue}});
   this.setPrintHook(options.printHook);
   this.setSendHook(options.sendHook);
-  this.setMidiOutHook(options.midiOutHook);
 
   // allocate temporary buffers (pointer size is 4 bytes in javascript)
   var lengthInSamples = this.blockSize * this.getNumOutputChannels();
@@ -248,30 +246,86 @@ var tableHashes = {
   if (hook) {
     // typedef void (HvSendHook_t) (HeavyContextInterface *context, const char *sendName, hv_uint32_t sendHash, const HvMessage *msg);
     var sendHook = addFunction(function(context, sendName, sendHash, msg) {
-        // Converts sendhook callback to (sendName, float) message
-        hook(UTF8ToString(sendName), _hv_msg_getFloat(msg, 0));
+        // Filter out MIDI messages
+        switch (UTF8ToString(sendName)) {
+          case "__hv_noteout":
+            var note = _hv_msg_getFloat(msg, 0);
+            var velocity = _hv_msg_getFloat(msg, 1);
+            var channel = _hv_msg_getFloat(msg, 2) % 16; // no pd midi ports
+            message =[
+              ((velocity > 0) ? 144 : 128) | channel,
+              note,
+              velocity
+            ]
+            hook("midiOutMessage", message);
+            break;
+          case "__hv_ctlout":
+            var value = _hv_msg_getFloat(msg, 0);
+            var cc = _hv_msg_getFloat(msg, 1);
+            var channel = _hv_msg_getFloat(msg, 2) % 16; // no pd midi ports
+            message = [
+              176 | channel,
+              cc,
+              value
+            ]
+            hook("midiOutMessage", message);
+            break;
+          case "__hv_pgmout":
+            var program = _hv_msg_getFloat(msg, 0);
+            var channel = _hv_msg_getFloat(msg, 1) % 16; // no pd midi ports
+            message = [
+              192 | channel,
+              program
+            ]
+            hook("midiOutMessage", message);
+            break;
+          case "__hv_touchout":
+            var pressure = _hv_msg_getFloat(msg, 0);
+            var channel = _hv_msg_getFloat(msg, 1) % 16; // no pd midi ports
+            message = [
+              208 | channel,
+              pressure,
+            ]
+            hook("midiOutMessage", message);
+            break;
+          case "__hv_polytouchout":
+            var value = _hv_msg_getFloat(msg, 0);
+            var note = _hv_msg_getFloat(msg, 1);
+            var channel = _hv_msg_getFloat(msg, 2) % 16; // no pd midiports
+            message =[
+              160 | channel,
+              note,
+              value
+            ]
+            hook("midiOutMessage", message);
+            break;
+          case "__hv_bendout":
+            var value = _hv_msg_getFloat(msg, 0);
+            let lsb = value & 0x7F;
+            let msb = (value >> 7) & 0x7F;
+            var channel = _hv_msg_getFloat(msg, 2) % 16; // no pd midi ports
+            message = [
+              224 | channel,
+              lsb,
+              msb
+            ]
+            hook("midiOutMessage", message);
+            break;
+          case "__hv_midiout":
+            let firstByte = _hv_msg_getFloat(msg, 0);
+            var message = (firstByte === 192 || firstByte === 208) ? 
+              [_hv_msg_getFloat(msg, 0), _hv_msg_getFloat(msg, 1)] :
+              [_hv_msg_getFloat(msg, 0), _hv_msg_getFloat(msg, 1), _hv_msg_getFloat(msg, 2)];
+            hook("midiOutMessage", message);
+            break;
+          default:
+            // Converts sendhook callback to (sendName, float) message
+            hook(UTF8ToString(sendName), _hv_msg_getFloat(msg, 0));
+        }
       },
       "viiii"
     );
     _hv_setSendHook(this.heavyContext, sendHook);
-  }
-}
-
-{{name}}_AudioLib.prototype.setMidiOutHook = function(hook) {
-  if (!this.heavyContext) {
-    console.error("heavy: Can't set MIDI Out Hook, no Heavy Context instantiated");
-    return;
-  }
-
-  if (hook) {
-    var midiOutHook = addFunction(function(context, message) {
-        // Converts MIDI out callback to a MIDI message
-        var data = new Uint8Array(Module.HEAPU8.buffer, message, 3);
-        hook(data);
-      },
-      "vii"
-    );
-    _hv_setMidiOutHook(this.heavyContext, midiOutHook);
   }
 }
 

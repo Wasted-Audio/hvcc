@@ -117,7 +117,7 @@ class {{name}}_AudioLibWorklet extends AudioWorkletProcessor {
               self.port.postMessage({
                 type: 'midiOut',
                 payload:[
-                  (velocity > 0) ? 144 : 128 | channel,
+                  ((velocity > 0) ? 144 : 128) | channel,
                   note,
                   velocity
                 ]
@@ -186,11 +186,10 @@ class {{name}}_AudioLibWorklet extends AudioWorkletProcessor {
               });
               break;
             case "__hv_midiout":
-              var message = [
-                _hv_msg_getFloat(msg, 0),
-                _hv_msg_getFloat(msg, 1),
-                _hv_msg_getFloat(msg, 2)
-              ];
+              let firstByte = _hv_msg_getFloat(msg, 0);
+              var message = (firstByte === 192 || firstByte === 208) ? 
+                [_hv_msg_getFloat(msg, 0), _hv_msg_getFloat(msg, 1)] :
+                [_hv_msg_getFloat(msg, 0), _hv_msg_getFloat(msg, 1), _hv_msg_getFloat(msg, 2)];
               self.port.postMessage({
                 type: 'midiOut',
                 payload: message

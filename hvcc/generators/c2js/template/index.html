@@ -51,9 +51,8 @@
             // optional: provide a callback handler for [print] messages
             printHook: onPrint,
             // optional: provide a callback handler for [s {sendName} @hv_param] messages
-            sendHook: onFloatMessage,
-            // optional: provide a callback handler for midiout messages
-            midiOutHook: onMidiOutMessage,
+            // sendName "midiOutMessage" is reserved for MIDI output messages!
+            sendHook: onSentMessage,
             // optional: pass an existing web audio context, otherwise a new one
             // will be constructed.
             webAudioContext: null
@@ -161,13 +160,13 @@
         }
       }
 
-      function onFloatMessage(sendName, floatValue) {
+      function onSentMessage(sendName, message) {
 
         switch (sendName) {
           {%- if parameters_out | length %}
             {%- for k, v in parameters_out %}
                 case "{{k}}":
-                  document.getElementById("parameter_{{k}}").value = floatValue;
+                  document.getElementById("parameter_{{k}}").value = message;
                   document.getElementById("value_{{k}}").textContent = Number(floatValue).toFixed(2);
                   break;
             {%- endfor %}
@@ -180,8 +179,11 @@
                   break;
             {%- endfor %}
           {%- endif %}
+          case "midiOutMessage":
+            onMidiOutMessage(message);
+            break;
           default:
-            console.log(sendName, floatValue);
+            console.log(sendName, message);
         }
       }
 
