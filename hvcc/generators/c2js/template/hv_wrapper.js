@@ -22,6 +22,7 @@ var AudioLibLoader = function() {
  *   @param options.sendHook (Function) callback that gets triggered for messages sent via @hv_param/@hv_event
  */
 AudioLibLoader.prototype.init = function(options) {
+
   // use provided web audio context or create a new one
   this.webAudioContext = options.webAudioContext ||
       (new (window.AudioContext || window.webkitAudioContext || null));

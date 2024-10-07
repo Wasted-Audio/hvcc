@@ -204,9 +204,9 @@ class c2js:
                     externs=externs,
                     pool_sizes_kb=externs["memoryPoolSizesKb"]))
             
-            pre_js_path = os.path.join(out_dir, "hv_worklet_start.js")
+            pre_js_path = os.path.join(out_dir, "midi_utils.js")
             with open(pre_js_path, "w") as f:
-                f.write(env.get_template("hv_worklet_start.js").render(
+                f.write(env.get_template("midi_utils.js").render(
                     name=patch_name,
                     copyright=copyright_js,
                     externs=externs,
