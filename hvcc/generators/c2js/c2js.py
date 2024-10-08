@@ -203,7 +203,7 @@ class c2js:
                     copyright=copyright_js,
                     externs=externs,
                     pool_sizes_kb=externs["memoryPoolSizesKb"]))
-            
+
             pre_js_path = os.path.join(out_dir, "midi_utils.js")
             with open(pre_js_path, "w") as f:
                 f.write(env.get_template("midi_utils.js").render(
