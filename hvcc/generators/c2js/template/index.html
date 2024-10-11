@@ -52,7 +52,7 @@
             printHook: onPrint,
             // optional: provide a callback handler for [s {sendName} @hv_param] messages
             // sendName "midiOutMessage" is reserved for MIDI output messages!
-            sendHook: onSentMessage,
+            sendHook: onSendMessage,
             // optional: pass an existing web audio context, otherwise a new one
             // will be constructed.
             webAudioContext: null
@@ -160,7 +160,7 @@
         }
       }
 
-      function onSentMessage(sendName, message) {
+      function onSendMessage(sendName, message) {
 
         switch (sendName) {
           {%- if parameters_out | length %}

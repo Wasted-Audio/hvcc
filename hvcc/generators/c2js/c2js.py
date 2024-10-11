@@ -204,20 +204,11 @@ class c2js:
                     externs=externs,
                     pool_sizes_kb=externs["memoryPoolSizesKb"]))
 
-            pre_js_path = os.path.join(out_dir, "midi_utils.js")
-            with open(pre_js_path, "w") as f:
-                f.write(env.get_template("midi_utils.js").render(
-                    name=patch_name,
-                    copyright=copyright_js,
-                    externs=externs,
-                    pool_sizes_kb=externs["memoryPoolSizesKb"]))
-
             js_path = cls.run_emscripten(c_src_dir=c_src_dir,
                                          out_dir=out_dir,
                                          patch_name=patch_name,
                                          output_name=patch_name,
                                          post_js_path=post_js_path,
-                                         pre_js_path=pre_js_path,
                                          should_modularize=1,
                                          environment="web")
 
@@ -245,6 +236,14 @@ class c2js:
             post_js_path = os.path.join(out_dir, "hv_worklet.js")
             with open(post_js_path, "w") as f:
                 f.write(env.get_template("hv_worklet.js").render(
+                    name=patch_name,
+                    copyright=copyright_js,
+                    externs=externs,
+                    pool_sizes_kb=externs["memoryPoolSizesKb"]))
+
+            pre_js_path = os.path.join(out_dir, "hv_worklet_start.js")
+            with open(pre_js_path, "w") as f:
+                f.write(env.get_template("hv_worklet_start.js").render(
                     name=patch_name,
                     copyright=copyright_js,
                     externs=externs,
