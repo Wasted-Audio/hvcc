@@ -296,4 +296,3 @@ class c2js:
                 "out_file": "",
                 "compile_time": time.time() - tick
             }
-        
