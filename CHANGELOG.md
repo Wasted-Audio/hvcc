@@ -7,7 +7,8 @@ Next Release
 Features:
 
 * Migrating to poetry for project management
-* Allow modgui on desktop
+* DPF: Allow modgui on desktop
+* DPF: Allow host transport events without midi input
 
 Bugfixes:
 
