@@ -6,11 +6,12 @@ Next Release
 
 Features:
 
-* migrating to poetry for project management
+* Migrating to poetry for project management
+* Allow modgui on desktop
 
 Bugfixes:
 
-* Daisy template newline.
+* Daisy template newline
 
 0.12.1
 -----

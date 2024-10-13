@@ -52,8 +52,6 @@
 {%- endif %}
 
 {%- if meta.enable_modgui is sameas true %}
-#ifdef __MOD_DEVICES__
 #undef DISTRHO_PLUGIN_USES_MODGUI
 #define DISTRHO_PLUGIN_USES_MODGUI 1
-#endif
 {%- endif %}
