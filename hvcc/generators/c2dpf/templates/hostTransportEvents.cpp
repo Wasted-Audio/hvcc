@@ -12,7 +12,7 @@ void {{class_name}}::hostTransportEvents(uint32_t frames)
     if (timePos.frame == 0)
     {
       _context->sendMessageToReceiverV(HV_HASH_MIDIREALTIMEIN, 0,
-        "ff", (float) MIDI_RT_RESET, 0);
+        "ff", (float) MIDI_RT_RESET, 0.0);
       reset = true;
     }
 
@@ -21,19 +21,19 @@ void {{class_name}}::hostTransportEvents(uint32_t frames)
       if (timePos.frame == 0)
       {
         _context->sendMessageToReceiverV(HV_HASH_MIDIREALTIMEIN, 0,
-          "ff", (float) MIDI_RT_START, 0);
+          "ff", (float) MIDI_RT_START, 0.0);
       }
       if (! reset)
       {
         _context->sendMessageToReceiverV(HV_HASH_MIDIREALTIMEIN, 0,
-          "ff", (float) MIDI_RT_CONTINUE, 0);
+          "ff", (float) MIDI_RT_CONTINUE, 0.0);
       }
     }
   }
   else if (this->wasPlaying)
   {
     _context->sendMessageToReceiverV(HV_HASH_MIDIREALTIMEIN, 0,
-      "ff", (float) MIDI_RT_STOP, 0);
+      "ff", (float) MIDI_RT_STOP, 0.0);
   }
   this->wasPlaying = timePos.playing;
 
@@ -53,7 +53,7 @@ void {{class_name}}::hostTransportEvents(uint32_t frames)
         double delayMs = 1000*(nextClockTick - sampleAtCycleStart)/getSampleRate();
         if (delayMs >= 0.0) {
           _context->sendMessageToReceiverV(HV_HASH_MIDIREALTIMEIN, delayMs,
-            "ff", (float) MIDI_RT_CLOCK, 0);
+            "ff", (float) MIDI_RT_CLOCK, 0.0);
         }
         nextClockTick += samplesPerTick;
       }
