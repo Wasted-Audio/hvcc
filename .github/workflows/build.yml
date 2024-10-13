@@ -54,7 +54,7 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: hvcc-binary
+          name: heavy-binary-linux-x86_64
           path: dist/pyinstaller/manylinux_2_31_x86_64/Heavy
 
   dispatch:
