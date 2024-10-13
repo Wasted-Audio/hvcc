@@ -193,6 +193,7 @@ void {{class_name}}::setOutputParameter(uint32_t sendHash, const HvMessage *m)
 #endif
 {% endif %}
 
+{% include 'hostTransportEvents.cpp' %}
 
 
 // -------------------------------------------------------------------
@@ -206,6 +207,7 @@ void {{class_name}}::run(const float** inputs, float** outputs, uint32_t frames,
 void {{class_name}}::run(const float** inputs, float** outputs, uint32_t frames)
 {
 #endif
+  hostTransportEvents(frames);
 {% if meta.denormals is sameas false %}
   const ScopedDenormalDisable sdd;
 {% endif %}
