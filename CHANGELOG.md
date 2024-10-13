@@ -8,6 +8,10 @@ Features:
 
 * migrating to poetry for project management
 
+Bugfixes:
+
+* Daisy template newline.
+
 0.12.1
 -----
 
@@ -18,7 +22,7 @@ Features:
 * DPF: CV flag in portgroups
 * DPF: flag to disable scoped denormals
 
-Bugfixes
+Bugfixes:
 
 * wwise: allow Bang messages in OnSendMessageCallback()
 * Improve `[cos~]` precision.
