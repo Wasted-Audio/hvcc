@@ -14,6 +14,8 @@ Bugfixes:
 
 * Daisy template newline
 
+* JS: midi out and device select
+
 0.12.1
 -----
 
