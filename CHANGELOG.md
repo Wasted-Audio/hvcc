@@ -8,6 +8,8 @@ Features:
 
 * migrating to poetry for project management
 
+* JS: midi out and device select
+
 0.12.1
 -----
 

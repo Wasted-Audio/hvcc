@@ -388,7 +388,7 @@ function sendMidiOut(sendName, msg) {
           case "__hv_noteout":
             var note = _hv_msg_getFloat(msg, 0);
             var velocity = _hv_msg_getFloat(msg, 1);
-            var channel = (_hv_msg_getFloat(msg, 2) - 1) % 16; // no pd midi ports
+            var channel = _hv_msg_getFloat(msg, 2) % 16; // no pd midi ports
             return [
               ((velocity > 0) ? 144 : 128) | channel,
               note,
