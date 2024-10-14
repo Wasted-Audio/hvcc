@@ -9,12 +9,11 @@ Features:
 * Migrating to poetry for project management
 * DPF: Allow modgui on desktop
 * DPF: Allow host transport events without midi input
+* JS: midi out and device select by @Reinissance
 
 Bugfixes:
 
 * Daisy template newline
-
-* JS: midi out and device select
 
 0.12.1
 -----
