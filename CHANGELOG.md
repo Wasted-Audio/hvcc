@@ -10,6 +10,7 @@ Features:
 * DPF: Allow modgui on desktop
 * DPF: Allow host transport events without midi input
 * JS: midi out and device select by @Reinissance
+* Docs: general updates/corrections and improvements
 
 Bugfixes:
 
