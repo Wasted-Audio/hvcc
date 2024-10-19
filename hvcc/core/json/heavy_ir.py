@@ -1,5 +1,8 @@
 from pydantic import BaseModel, RootModel
-from typing import List, Optional, Union
+from typing import List, Optional, Union, Literal
+
+
+ConnectionType = Literal["-->", "~i>", "~f>", "signal"]
 
 
 class Arg(BaseModel):
@@ -23,9 +26,9 @@ class Perf(BaseModel):
 
 
 class IRNode(BaseModel):
-    inlets: List[str]
+    inlets: List[ConnectionType]
     ir: IR
-    outlets: List[str]
+    outlets: List[ConnectionType]
     args: List[Arg] = []
     perf: Optional[Perf] = Perf()
     # perf: Perf

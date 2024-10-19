@@ -1,25 +1,28 @@
 from pydantic import BaseModel, RootModel
-from typing import List, Optional, Any
+from typing import List, Optional, Dict, Literal, Union
 
 
-class Inlet(BaseModel):
-    name: str
-    connectionType: str
-    description: str
-
-
-class Outlet(BaseModel):
-    name: str
-    connectionType: str
-    description: str
+ConnectionType = Literal["-->", "-~>", "~f>"]
 
 
 class Arg(BaseModel):
     name: str
     value_type: Optional[str]
     description: str
-    default: Any
+    default: Union[float, int, str, Dict, List, None] = None
     required: bool
+
+
+class Inlet(BaseModel):
+    name: str
+    connectionType: ConnectionType
+    description: str
+
+
+class Outlet(BaseModel):
+    name: str
+    connectionType: ConnectionType
+    description: str
 
 
 class LangNode(BaseModel):
