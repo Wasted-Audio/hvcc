@@ -19,6 +19,7 @@ import os
 import re
 from collections import Counter
 from collections import OrderedDict
+from pathlib import Path
 from typing import List, Dict, Optional, Type, Any, Generator
 
 from .HeavyObject import HeavyObject
@@ -524,7 +525,9 @@ class PdParser:
                                 "[declare] objects are not supported in abstractions. "
                                 "They can only be in the root canvas.")
                         elif len(line) >= 4 and line[2] == "-path":
-                            did_add = self.add_relative_search_directory(line[3])
+                            pd_parent = Path(pd_path).parent
+                            pd_search = os.path.join(pd_parent, line[3])
+                            did_add = self.add_relative_search_directory(pd_search)
                             if not did_add:
                                 g.add_warning(
                                     f"\"{line[3]}\" is not a valid relative abstraction "
