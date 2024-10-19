@@ -5,7 +5,13 @@ from typing import List, Optional, Union, Literal
 ConnectionType = Literal["-->", "~i>", "~f>", "signal"]
 
 
-class Arg(BaseModel):
+class IndexableBaseModel(BaseModel):
+    """Allows a BaseModel to return its fields by string variable indexing"""
+    def __getitem__(self, item):
+        return getattr(self, item)
+
+
+class Arg(IndexableBaseModel):
     name: str
     value_type: str
     description: str = ""
@@ -25,7 +31,7 @@ class Perf(BaseModel):
     neon: float = 0
 
 
-class IRNode(BaseModel):
+class IRNode(IndexableBaseModel):
     inlets: List[ConnectionType]
     ir: IR
     outlets: List[ConnectionType]
@@ -38,7 +44,7 @@ class IRNode(BaseModel):
     keywords: List[str] = []
 
 
-class HeavyIR(RootModel):
+class HeavyIRType(RootModel):
     root: dict[str, IRNode]
 
 

@@ -1,3 +1,4 @@
+from ast import Index
 from pydantic import BaseModel, RootModel
 from typing import List, Optional, Dict, Literal, Union
 
@@ -5,7 +6,13 @@ from typing import List, Optional, Dict, Literal, Union
 ConnectionType = Literal["-->", "-~>", "~f>"]
 
 
-class Arg(BaseModel):
+class IndexableBaseModel(BaseModel):
+    """Allows a BaseModel to return its fields by string variable indexing"""
+    def __getitem__(self, item):
+        return getattr(self, item)
+
+
+class Arg(IndexableBaseModel):
     name: str
     value_type: Optional[str]
     description: str
@@ -25,7 +32,7 @@ class Outlet(BaseModel):
     description: str
 
 
-class LangNode(BaseModel):
+class LangNode(IndexableBaseModel):
     description: str
     inlets: List[Inlet]
     outlets: List[Outlet]
@@ -34,7 +41,7 @@ class LangNode(BaseModel):
     tags: List[str]
 
 
-class HeavyLang(RootModel):
+class HeavyLangType(RootModel):
     root: dict[str, LangNode]
 
 

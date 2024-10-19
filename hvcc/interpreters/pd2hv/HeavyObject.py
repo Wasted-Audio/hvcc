@@ -17,8 +17,9 @@
 import decimal
 import json
 import importlib_resources
-from typing import Optional, List, Dict, Any
+from typing import Optional, List, Dict, Any, Union
 
+from hvcc.core.hv2ir.types import HeavyIRType, HeavyLangType, IRNode, LangNode
 from .Connection import Connection
 from .NotificationEnum import NotificationEnum
 from .PdObject import PdObject
@@ -28,11 +29,11 @@ class HeavyObject(PdObject):
 
     heavy_lang_json = importlib_resources.files('hvcc') / 'core/json/heavy.lang.json'
     with open(heavy_lang_json, "r") as f:
-        __HEAVY_LANG_OBJS = json.load(f)
+        __HEAVY_LANG_OBJS = HeavyLangType(json.load(f))
 
     heavy_ir_json = importlib_resources.files('hvcc') / 'core/json/heavy.ir.json'
     with open(heavy_ir_json, "r") as f:
-        __HEAVY_IR_OBJS = json.load(f)
+        __HEAVY_IR_OBJS = HeavyIRType(json.load(f))
 
     def __init__(
         self,
@@ -43,18 +44,20 @@ class HeavyObject(PdObject):
     ) -> None:
         super().__init__(obj_type, obj_args, pos_x, pos_y)
 
+        self.__obj_dict: Union[IRNode, LangNode]
+
         # get the object dictionary (note that it is NOT a copy)
         if self.is_hvlang:
-            self.__obj_dict = self.__HEAVY_LANG_OBJS[obj_type]
+            self.__obj_dict = self.__HEAVY_LANG_OBJS.root[obj_type]
         elif self.is_hvir:
-            self.__obj_dict = self.__HEAVY_IR_OBJS[obj_type]
+            self.__obj_dict = self.__HEAVY_IR_OBJS.root[obj_type]
         else:
             assert False, f"{obj_type} is not a Heavy Lang or IR object."
 
         # resolve arguments
         obj_args = obj_args or []
         self.obj_dict = {}
-        for i, a in enumerate(self.__obj_dict["args"]):
+        for i, a in enumerate(self.__obj_dict.args):
             # if the argument exists (and has been correctly resolved)
             if i < len(obj_args) and obj_args[i] is not None:
                 # force the Heavy argument type
@@ -135,19 +138,19 @@ class HeavyObject(PdObject):
 
     @property
     def is_hvlang(self) -> bool:
-        return self.obj_type in self.__HEAVY_LANG_OBJS
+        return self.obj_type in self.__HEAVY_LANG_OBJS.root.keys()
 
     @property
     def is_hvir(self) -> bool:
-        return self.obj_type in self.__HEAVY_IR_OBJS
+        return self.obj_type in self.__HEAVY_IR_OBJS.root.keys()
 
     def get_inlet_connection_type(self, inlet_index: int) -> Optional[str]:
         """ Returns the inlet connection type, None if the inlet does not exist.
         """
         # TODO(mhroth): it's stupid that hvlang and hvir json have different data formats here
         if self.is_hvlang:
-            if len(self.__obj_dict["inlets"]) > inlet_index:
-                return self.__obj_dict["inlets"][inlet_index]["connectionType"]
+            if len(self.__obj_dict.inlets) > inlet_index:
+                return self.__obj_dict.inlets[inlet_index].connectionType
             else:
                 return None
         elif self.is_hvir:
