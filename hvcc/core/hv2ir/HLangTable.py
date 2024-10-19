@@ -44,8 +44,8 @@ class HLangTable(HeavyLangObject):
             # externed tables must contain only alphanumeric characters or underscores,
             # so that the names can be easily and transparently turned into code
             if re.search(r"\W", args["name"]):
-                self.add_error("Table names may only contain alphanumeric characters"
-                               f"or underscore: '{args['name']}'")
+                self.add_error(f"Table names may only contain alphanumeric characters \
+                                or underscore: '{args['name']}'")
 
     def reduce(self) -> tuple:
         x = HeavyIrObject("__table", self.args)
