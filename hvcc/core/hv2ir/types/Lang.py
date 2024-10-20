@@ -35,7 +35,7 @@ class LangNode(BaseModel):
 
 
 class HeavyLangType(RootModel):
-    root: dict[str, LangNode]
+    root: Dict[str, LangNode]
 
 
 if __name__ == "__main__":

@@ -1,5 +1,5 @@
 from pydantic import BaseModel, RootModel
-from typing import List, Optional, Union, Literal
+from typing import Dict, List, Optional, Union, Literal
 
 
 IRConnectionType = Literal["-->", "~i>", "~f>", "signal"]
@@ -39,7 +39,7 @@ class IRNode(BaseModel):
 
 
 class HeavyIRType(RootModel):
-    root: dict[str, IRNode]
+    root: Dict[str, IRNode]
 
 
 if __name__ == "__main__":
