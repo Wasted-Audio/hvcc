@@ -15,7 +15,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
-from typing import Optional, List, Dict
+from typing import Optional, List, Dict, Any
 
 from .Connection import Connection
 from .NotificationEnum import NotificationEnum
@@ -123,7 +123,7 @@ class PdGraph(PdObject):
         arg_index: int,
         name: str,
         value_type: str,
-        default_value: Optional[str],
+        default_value: Optional[Any],
         required: bool
     ) -> None:
         """ Add a Heavy argument to the graph. Indicies are from zero (not one, like Pd).

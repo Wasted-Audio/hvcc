@@ -92,7 +92,11 @@ class HeavyObject(PdObject):
             self.__annotations["scope"] = "public"
 
     @classmethod
-    def force_arg_type(cls, value: str, value_type: Optional[str] = None) -> Any:
+    def force_arg_type(
+        cls,
+        value: str,
+        value_type: Optional[str] = None
+    ) -> Any:
         # TODO(mhroth): add support for mixedarray?
         if value_type == "auto":
             try:
