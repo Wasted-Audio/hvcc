@@ -2,16 +2,10 @@ from pydantic import BaseModel, RootModel
 from typing import List, Optional, Union, Literal
 
 
-ConnectionType = Literal["-->", "~i>", "~f>", "signal"]
+IRConnectionType = Literal["-->", "~i>", "~f>", "signal"]
 
 
-class IndexableBaseModel(BaseModel):
-    """Allows a BaseModel to return its fields by string variable indexing"""
-    def __getitem__(self, item):
-        return getattr(self, item)
-
-
-class Arg(IndexableBaseModel):
+class IRArg(BaseModel):
     name: str
     value_type: str
     description: str = ""
@@ -31,11 +25,11 @@ class Perf(BaseModel):
     neon: float = 0
 
 
-class IRNode(IndexableBaseModel):
-    inlets: List[ConnectionType]
+class IRNode(BaseModel):
+    inlets: List[IRConnectionType]
     ir: IR
-    outlets: List[ConnectionType]
-    args: List[Arg] = []
+    outlets: List[IRConnectionType]
+    args: List[IRArg] = []
     perf: Optional[Perf] = Perf()
     # perf: Perf
     description: Optional[str] = None
@@ -48,8 +42,9 @@ class HeavyIRType(RootModel):
     root: dict[str, IRNode]
 
 
-# import json
-# with open('heavy.ir.json') as f:
-#     data = json.load(f)
-#     heavy_ir = HeavyIR(root=data)
-#     print(heavy_ir.root.keys())
+if __name__ == "__main__":
+    import json
+    with open('../../json/heavy.ir.json') as f:
+        data = json.load(f)
+        heavy_ir = HeavyIRType(root=data)
+        print(heavy_ir.root.keys())
