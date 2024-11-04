@@ -44,7 +44,10 @@ class HeavyIRType(RootModel):
 
 if __name__ == "__main__":
     import json
-    with open('../../json/heavy.ir.json') as f:
+    import importlib_resources
+
+    heavy_ir_json = importlib_resources.files('hvcc') / 'core/json/heavy.ir.json'
+    with open(heavy_ir_json, "r") as f:
         data = json.load(f)
         heavy_ir = HeavyIRType(root=data)
         print(heavy_ir.root.keys())
