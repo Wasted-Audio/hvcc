@@ -41,7 +41,7 @@ class HeavyLangObject:
 
     # load the Heavy object definitions
     with open(os.path.join(os.path.dirname(__file__), "../json/heavy.lang.json"), "r") as f:
-        _HEAVY_LANG_DICT = HeavyLangType(json.load(f))
+        _HEAVY_LANG_DICT = HeavyLangType(json.load(f)).root
 
     def __init__(
         self,
@@ -111,7 +111,7 @@ class HeavyLangObject:
     def _obj_desc(self) -> LangNode:
         """ Returns the HeavyLang object description.
         """
-        return self._HEAVY_LANG_DICT.root[self.type]
+        return self._HEAVY_LANG_DICT[self.type]
 
     def inlet_connection_type(self, index: int) -> Inlet:
         return self._obj_desc.inlets[index]
@@ -196,7 +196,7 @@ class HeavyLangObject:
         """ Resolves missing default arguments. Also checks to make sure that all
             required arguments are present. Does nothing if the object is IR.
         """
-        if self.type in HeavyLangObject._HEAVY_LANG_DICT.root.keys():
+        if self.type in HeavyLangObject._HEAVY_LANG_DICT.keys():
             for arg in self._obj_desc.args:
                 if arg.name not in self.args:
                     # if a defined argument is not in the argument dictionary

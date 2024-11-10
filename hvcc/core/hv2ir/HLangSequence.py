@@ -33,7 +33,7 @@ class HLangSequence(HeavyLangObject):
         annotations: Optional[Dict] = None
     ) -> None:
         # get the number of outlets that this object has
-        num_outlets = len(args[self._HEAVY_LANG_DICT.root[obj_type].args[0].name])
+        num_outlets = len(args[self._HEAVY_LANG_DICT[obj_type].args[0].name])
         super().__init__(obj_type, args, graph,
                          num_inlets=1,
                          num_outlets=num_outlets,

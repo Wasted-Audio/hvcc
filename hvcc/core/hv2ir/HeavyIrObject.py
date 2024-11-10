@@ -37,7 +37,7 @@ class HeavyIrObject(HeavyLangObject):
 
     # load the HeavyIR object definitions
     with open(os.path.join(os.path.dirname(__file__), "../json/heavy.ir.json"), "r") as f:
-        __HEAVY_OBJS_IR_DICT = HeavyIRType(json.load(f))
+        __HEAVY_OBJS_IR_DICT = HeavyIRType(json.load(f)).root
 
     def __init__(
         self,
@@ -49,11 +49,11 @@ class HeavyIrObject(HeavyLangObject):
         annotations: Optional[Dict] = None
     ) -> None:
         # allow the number of inlets and outlets to be overridden
-        num_inlets = (len(self.__HEAVY_OBJS_IR_DICT.root[obj_type].inlets)
+        num_inlets = (len(self.__HEAVY_OBJS_IR_DICT[obj_type].inlets)
                       if num_inlets < 0
                       else num_inlets)
 
-        num_outlets = (len(self.__HEAVY_OBJS_IR_DICT.root[obj_type].outlets)
+        num_outlets = (len(self.__HEAVY_OBJS_IR_DICT[obj_type].outlets)
                        if num_outlets < 0
                        else num_outlets)
 
@@ -74,7 +74,7 @@ class HeavyIrObject(HeavyLangObject):
         """ Resolves missing default arguments. Also checks to make sure that all
             required arguments are present.
         """
-        if self.type in self.__HEAVY_OBJS_IR_DICT.root.keys():
+        if self.type in self.__HEAVY_OBJS_IR_DICT.keys():
             for arg in self.__obj_desc.args:
                 if arg.name not in self.args:
                     # if a defined argument is not in the argument dictionary
@@ -96,7 +96,7 @@ class HeavyIrObject(HeavyLangObject):
     def is_ir(cls, obj_type: str) -> bool:
         """Returns true if the type is an IR object. False otherwise.
         """
-        return obj_type in cls.__HEAVY_OBJS_IR_DICT.root.keys()
+        return obj_type in cls.__HEAVY_OBJS_IR_DICT.keys()
 
     @property
     def does_process_signal(self) -> bool:
@@ -108,7 +108,7 @@ class HeavyIrObject(HeavyLangObject):
     def __obj_desc(self) -> IRNode:
         """ Returns the original HeavyIR object description.
         """
-        return self.__HEAVY_OBJS_IR_DICT.root[self.type]
+        return self.__HEAVY_OBJS_IR_DICT[self.type]
 
     def inlet_requires_signal(self, inlet_index: int = 0) -> bool:
         """ Returns True if the indexed inlet requires a signal connection. False otherwise.

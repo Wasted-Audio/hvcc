@@ -31,7 +31,7 @@ class ir2c_perf:
     def perf(cls, ir: Dict, blocksize: int = 512, mhz: int = 1000, verbose: bool = False) -> Dict:
         # read the hv.ir.json file
         with open(os.path.join(os.path.dirname(__file__), "../../core/json/heavy.ir.json"), "r") as f:
-            HEAVY_IR_JSON = HeavyIRType(json.load(f))
+            HEAVY_IR_JSON = HeavyIRType(json.load(f)).root
 
         objects: Counter = Counter()
         perf: Counter = Counter()
@@ -39,9 +39,9 @@ class ir2c_perf:
         for o in ir["signal"]["processOrder"]:
             obj_id = o["id"]
             obj_type = ir["objects"][obj_id]["type"]
-            if obj_type in HEAVY_IR_JSON.root.keys():
+            if obj_type in HEAVY_IR_JSON.keys():
                 objects[obj_type] += 1
-                c = Counter(HEAVY_IR_JSON.root[obj_type].perf)
+                c = Counter(HEAVY_IR_JSON[obj_type].perf)
                 perf = perf + c
                 per_object_perf[obj_type] = per_object_perf[obj_type] + c
             else:
