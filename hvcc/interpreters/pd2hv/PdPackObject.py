@@ -14,10 +14,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from typing import Optional, List, Dict
+from typing import Optional, List
 
 from .NotificationEnum import NotificationEnum
 from .PdObject import PdObject
+from .types import HvObject
 
 
 class PdPackObject(PdObject):
@@ -47,8 +48,8 @@ class PdPackObject(PdObject):
                         f"\"{x}\" argument to [pack] object not supported.",
                         NotificationEnum.ERROR_PACK_FLOAT_ARGUMENTS)
 
-    def to_hv(self) -> Dict:
-        return {
+    def to_hv(self) -> HvObject:
+        hv_obj = {
             "type": "__pack",
             "args": {
                 "values": self.values
@@ -58,3 +59,5 @@ class PdPackObject(PdObject):
                 "y": self.pos_y
             }
         }
+
+        return HvObject(**hv_obj)

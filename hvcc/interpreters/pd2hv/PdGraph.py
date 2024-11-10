@@ -20,6 +20,7 @@ from typing import Optional, List, Dict, Any
 from .Connection import Connection
 from .NotificationEnum import NotificationEnum
 from .PdObject import PdObject
+from .types import HvGraph
 
 
 class PdGraph(PdObject):
@@ -218,12 +219,12 @@ class PdGraph(PdObject):
             # NOTE(dromer): we should never get here
             raise Exception("parent_graph argument is None")
 
-    def to_hv(self, export_args: bool = False) -> Dict:
+    def to_hv(self, export_args: bool = False) -> HvGraph:
         # NOTE(mhroth): hv_args are not returned. Because all arguments have
         # been resolved, no arguments are otherwise passed. hv2ir would break
         # on required arguments that are not passed to the graph
         assert all(a is not None for a in self.hv_args), "Graph is missing a @hv_arg."
-        return {
+        hvgraph = {
             "type": "graph",
             "imports": [],
             "args": self.hv_args if export_args else [],
@@ -234,6 +235,8 @@ class PdGraph(PdObject):
                 "y": self.pos_y
             }
         }
+
+        return HvGraph(**hvgraph)
 
     def __repr__(self) -> str:
         return self.subpatch_name or os.path.basename(self.__pd_path)

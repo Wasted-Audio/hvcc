@@ -17,12 +17,13 @@
 import decimal
 import json
 import importlib_resources
-from typing import Optional, List, Dict, Any, Union, cast
+from typing import Optional, List, Any, Union, cast
 
 from hvcc.core.hv2ir.types import HeavyIRType, HeavyLangType, IRNode, LangNode, IRArg, LangArg
 from .Connection import Connection
 from .NotificationEnum import NotificationEnum
 from .PdObject import PdObject
+from .types import HvObject
 
 
 class HeavyObject(PdObject):
@@ -204,8 +205,8 @@ class HeavyObject(PdObject):
         else:
             raise Exception("Adding a connection to the wrong object!")
 
-    def to_hv(self) -> Dict:
-        return {
+    def to_hv(self) -> HvObject:
+        hv_obj = {
             "type": self.obj_type,
             "args": self.obj_dict,
             "properties": {
@@ -214,3 +215,5 @@ class HeavyObject(PdObject):
             },
             "annotations": self.__annotations
         }
+
+        return HvObject(**hv_obj)

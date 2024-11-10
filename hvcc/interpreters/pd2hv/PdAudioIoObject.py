@@ -14,10 +14,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from typing import Optional, List, Dict
+from typing import Optional, List
 
 from .NotificationEnum import NotificationEnum
 from .PdObject import PdObject
+from .types import HvObject
 
 
 class PdAudioIoObject(PdObject):
@@ -39,8 +40,8 @@ class PdAudioIoObject(PdObject):
                     f"{self.obj_type} does not support control connections (inlet {i}). They should be removed.",
                     NotificationEnum.ERROR_UNSUPPORTED_CONNECTION)
 
-    def to_hv(self) -> Dict:
-        return {
+    def to_hv(self) -> HvObject:
+        hv_obj = {
             "type": self.obj_type.strip("~"),
             "args": {
                 "channels": [1, 2] if len(self.obj_args) == 0 else [int(a) for a in self.obj_args]
@@ -50,3 +51,5 @@ class PdAudioIoObject(PdObject):
                 "y": self.pos_y
             }
         }
+
+        return HvObject(**hv_obj)

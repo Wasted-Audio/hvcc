@@ -19,6 +19,7 @@ from typing import Optional, List, Dict
 
 from .NotificationEnum import NotificationEnum
 from .PdObject import PdObject
+from .types import HvGraph
 
 
 class PdRouteObject(PdObject):
@@ -59,7 +60,7 @@ class PdRouteObject(PdObject):
         if len(self._inlet_connections.get("1", [])) > 0:
             self.add_warning("The right inlet of route is not supported. It will not do anything.")
 
-    def to_hv(self) -> Dict:
+    def to_hv(self) -> HvGraph:
         """Creates a graph dynamically based on the number of arguments.
             An unconnected right inlet is added.
 
@@ -165,4 +166,4 @@ class PdRouteObject(PdObject):
                 "type": "-->"
             })
 
-        return route_graph
+        return HvGraph(**route_graph)

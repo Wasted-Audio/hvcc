@@ -19,6 +19,7 @@ from typing import Optional, List, Dict
 from .NotificationEnum import NotificationEnum
 from .PdObject import PdObject
 from .PdRaw import parse_pd_raw_args, PdRawException
+from .types import HvGraph
 
 
 class PdSendObject(PdObject):
@@ -105,7 +106,7 @@ class PdSendObject(PdObject):
                 "are not supported. A name should be given.",
                 NotificationEnum.ERROR_MISSING_REQUIRED_ARGUMENT)
 
-    def to_hv(self) -> Dict:
+    def to_hv(self) -> HvGraph:
         # note: control rate send/receive objects should not modify their name argument
         names = {
             "s": "",
@@ -115,7 +116,7 @@ class PdSendObject(PdObject):
             "throw~": "thrwctch_sig_"
         }
 
-        return {
+        hv_graph = {
             "type": "send",
             "args": {
                 "name": names[self.obj_type] + self.__send_name,
@@ -130,3 +131,5 @@ class PdSendObject(PdObject):
                 "scope": "public"
             }
         }
+
+        return HvGraph(**hv_graph)

@@ -14,10 +14,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from typing import Optional, List, Dict
+from typing import Optional, List
 
 from .NotificationEnum import NotificationEnum
 from .PdObject import PdObject
+from .types import HvGraph
 
 
 class PdTableObject(PdObject):
@@ -53,8 +54,8 @@ class PdTableObject(PdObject):
         except Exception:
             pass
 
-    def to_hv(self) -> Dict:
-        return {
+    def to_hv(self) -> HvGraph:
+        hv_graph = {
             "type": "table",
             "args": {
                 "name": self.__table_name,
@@ -70,3 +71,5 @@ class PdTableObject(PdObject):
                 "scope": "public"
             }
         }
+
+        return HvGraph(**hv_graph)

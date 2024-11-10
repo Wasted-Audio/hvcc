@@ -18,8 +18,9 @@ from collections import defaultdict
 import random
 import string
 
-from typing import Optional, List, Dict, TYPE_CHECKING
+from typing import Optional, List, Dict, TYPE_CHECKING, Union
 
+from .types import HvGraph, HvObject
 from .Connection import Connection
 from .NotificationEnum import NotificationEnum
 
@@ -175,7 +176,7 @@ class PdObject:
         """
         raise NotImplementedError()
 
-    def to_hv(self) -> Dict:
+    def to_hv(self) -> Union[HvGraph, HvObject]:
         """ Returns the HeavyLang JSON representation of this object.
         """
         raise NotImplementedError()

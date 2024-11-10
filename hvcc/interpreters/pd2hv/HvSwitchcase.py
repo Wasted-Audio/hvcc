@@ -14,9 +14,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from typing import Optional, List, Dict
+from typing import Optional, List
 
 from .PdObject import PdObject
+from .types import HvObject
 
 
 class HvSwitchcase(PdObject):
@@ -40,8 +41,8 @@ class HvSwitchcase(PdObject):
     def get_outlet_connection_type(self, outlet_index: int = 0) -> str:
         return "-->"
 
-    def to_hv(self) -> Dict:
-        return {
+    def to_hv(self) -> HvObject:
+        hv_obj = {
             "type": "__switchcase",
             "args": {
                 "cases": self.obj_args
@@ -51,3 +52,5 @@ class HvSwitchcase(PdObject):
                 "y": self.pos_y
             }
         }
+
+        return HvObject(**hv_obj)

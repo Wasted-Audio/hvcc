@@ -19,6 +19,7 @@ from typing import Optional, List, Dict
 
 from .NotificationEnum import NotificationEnum
 from .PdObject import PdObject
+from .types import HvObject
 
 
 class PdMessageObject(PdObject):
@@ -73,8 +74,8 @@ class PdMessageObject(PdObject):
                 "message": l_split[1:]
             })
 
-    def to_hv(self) -> Dict:
-        return {
+    def to_hv(self) -> HvObject:
+        hv_obj = {
             "type": "message",
             "args": self.obj_dict,
             "properties": {
@@ -82,3 +83,5 @@ class PdMessageObject(PdObject):
                 "y": self.pos_y
             }
         }
+
+        return HvObject(**hv_obj)

@@ -18,6 +18,7 @@ from typing import Optional, List, Dict
 
 from .PdObject import PdObject
 from .PdRaw import parse_pd_raw_args, PdRawException
+from .types import HvGraph
 
 
 class PdReceiveObject(PdObject):
@@ -103,7 +104,7 @@ class PdReceiveObject(PdObject):
             if len(self._inlet_connections.get("0", [])) > 0:
                 self.add_error("[receive~] inlet connections are not supported.")
 
-    def to_hv(self) -> Dict:
+    def to_hv(self) -> HvGraph:
         # note: control rate send objects should not modify their name argument
         names = {
             "r": "",
@@ -119,7 +120,7 @@ class PdReceiveObject(PdObject):
                 ((self.__priority is None) or (self.__receiver_name == "__hv_init" and self.__priority == 0)):
             self.__priority = (self.parent_graph.get_depth() * 1000) - self.__instance
 
-        return {
+        hv_graph = {
             "type": "receive",
             "args": {
                 "name": f"{names[self.obj_type]}{self.__receiver_name}",
@@ -135,3 +136,5 @@ class PdReceiveObject(PdObject):
                 "scope": "public"
             }
         }
+
+        return HvGraph(**hv_graph)

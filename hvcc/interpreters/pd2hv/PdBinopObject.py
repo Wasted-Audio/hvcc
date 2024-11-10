@@ -14,11 +14,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from typing import Optional, List, Dict
+from typing import Optional, List
 
 from .Connection import Connection
 from .HeavyObject import HeavyObject
 from .PdObject import PdObject
+from .types import HvObject
 
 
 class PdBinopObject(PdObject):
@@ -145,8 +146,8 @@ class PdBinopObject(PdObject):
                 from_obj.remove_connection(old_conn)
                 self.remove_connection(old_conn)
 
-    def to_hv(self) -> Dict:
-        return {
+    def to_hv(self) -> HvObject:
+        hv_obj = {
             "type": self.__PD_HEAVY_DICT[self.obj_type],
             "args": {
                 "k": self.__k
@@ -156,3 +157,5 @@ class PdBinopObject(PdObject):
                 "y": self.pos_y
             }
         }
+
+        return HvObject(**hv_obj)

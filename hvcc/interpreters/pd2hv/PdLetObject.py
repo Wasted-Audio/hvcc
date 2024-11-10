@@ -14,9 +14,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from typing import Optional, List, Dict
+from typing import Optional, List
 
 from .PdObject import PdObject
+from .types import HvObject
 
 
 class PdLetObject(PdObject):
@@ -37,8 +38,8 @@ class PdLetObject(PdObject):
         else:
             return super().get_outlet_connection_type(outlet_index)
 
-    def to_hv(self) -> Dict:
-        return {
+    def to_hv(self) -> HvObject:
+        hv_obj = {
             "type": self.obj_type.strip("~"),
             "args": {
                 "name": "",  # Pd does not give an inlet name
@@ -50,3 +51,5 @@ class PdLetObject(PdObject):
                 "y": self.pos_y
             }
         }
+
+        return HvObject(**hv_obj)

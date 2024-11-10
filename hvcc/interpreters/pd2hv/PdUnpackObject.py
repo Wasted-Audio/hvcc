@@ -17,6 +17,7 @@
 from typing import Optional, List, Dict
 
 from .PdObject import PdObject
+from .types import HvGraph
 
 
 class PdUnpackObject(PdObject):
@@ -35,7 +36,7 @@ class PdUnpackObject(PdObject):
         if not (set(self.obj_args) <= set(["f", "s"])):
             self.add_warning("Heavy only supports arguments 'f' and 's' to unpack.")
 
-    def to_hv(self) -> Dict:
+    def to_hv(self) -> HvGraph:
         """ Creates a graph dynamically based on the number of arguments.
 
             [inlet                                                ]
@@ -100,4 +101,4 @@ class PdUnpackObject(PdObject):
                 "type": "-->"
             })
 
-        return hv_graph
+        return HvGraph(**hv_graph)
