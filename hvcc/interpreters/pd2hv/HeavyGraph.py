@@ -18,9 +18,9 @@ import json
 import os
 from typing import Optional, List
 
-from .types import HvGraph
+from .types import HvGraph, HvArgs
 from .PdObject import PdObject
-from .HeavyObject import HeavyObject
+# from .HeavyObject import HeavyObject
 
 
 class HeavyGraph(PdObject):
@@ -38,39 +38,41 @@ class HeavyGraph(PdObject):
             self.hv_json = HvGraph(**json.load(f))
 
         # parse the heavy data structure to determine the outlet connection type
-        outlets = [o for o in self.hv_json.objects.values() if o.type == "outlet"]
-        sorted(outlets, key=lambda o: o.args.index)
-        self.__outlet_connection_types = [o.args.type for o in outlets]
+        if self.hv_json.objects:
+            outlets = [o for o in self.hv_json.objects.values() if o.type == "outlet"]
+            sorted(outlets, key=lambda o: o.args.index)
+            self.__outlet_connection_types = [o.args.type for o in outlets]
+        else:
+            self.__outlet_connection_types = []
 
-        # resolve the arguments
-        for i, a in enumerate(self.hv_json.args):
-            if i < len(self.obj_args):
-                arg_value = self.obj_args[i]
-            elif a.required:
-                self.add_error(f"Required argument \"{a.name}\" not found.")
-                continue
-            else:
-                arg_value = a.default
+        # # resolve the arguments
+        # for i, a in enumerate(self.hv_json.args):
+        #     if i < len(self.obj_args):
+        #         arg_value = self.obj_args[i]
+        #     elif a.required:
+        #         self.add_error(f"Required argument \"{a.name}\" not found.")
+        #         continue
+        #     else:
+        #         arg_value = a.default
 
-            try:
-                arg_value = HeavyObject.force_arg_type(arg_value, a.value_type)
-            except Exception as e:
-                self.add_error(
-                    f"Heavy {self.obj_type} cannot convert argument \"{a.name}\""
-                    f" with value \"{arg_value}\" to type {a.value_type}: {e}")
+        #     try:
+        #         arg_value = HeavyObject.force_arg_type(arg_value, a.value_type)
+        #     except Exception as e:
+        #         self.add_error(
+        #             f"Heavy {self.obj_type} cannot convert argument \"{a.name}\""
+        #             f" with value \"{arg_value}\" to type {a.value_type}: {e}")
 
-            # resolve all arguments for each object in the graph
-            for o in self.hv_json.objects.values():
-                for k, v in o.args:
-                    # TODO(mhroth): make resolution more robust
-                    # if v == f"${a.name}":
-                    #     o.args[k] = arg_value
-                    pass
+        #     # resolve all arguments for each object in the graph
+        #     for o in self.hv_json.objects.values():
+        #         for k, v in o.args:
+        #             # TODO(mhroth): make resolution more robust
+        #             if v == f"${a.name}":
+        #                 o.args[k] = arg_value
 
         # reset all arguments, as they have all been resolved
         # any required arguments would break hv2ir as they will no longer
         # be supplied (because they are resolved)
-        self.hv_json.args = []
+        self.hv_json.args = HvArgs()
 
     def get_outlet_connection_type(self, outlet_index: int) -> str:
         return self.__outlet_connection_types[outlet_index]

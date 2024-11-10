@@ -1,1 +1,1 @@
-from .HvGraph import HvGraph, HvObject # noqa
+from .HvGraph import HvGraph, HvObject, HvArgs # noqa

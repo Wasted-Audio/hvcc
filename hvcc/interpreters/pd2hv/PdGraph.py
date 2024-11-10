@@ -227,7 +227,7 @@ class PdGraph(PdObject):
         hvgraph = {
             "type": "graph",
             "imports": [],
-            "args": self.hv_args if export_args else [],
+            "args": self.hv_args if export_args else {},
             "objects": {o.obj_id: o.to_hv() for o in self.__objs},
             "connections": [c.to_hv() for c in self.__connections],
             "properties": {

@@ -30,15 +30,16 @@ class HvProperties(BaseModel):
 
 class HvArgs(BaseModel):
     extern: Optional[ExternType] = None
-    index: int
+    index: int = 0
     name: Optional[str] = None
     priority: Optional[int] = None
     size: Optional[int] = None
     values: Optional[List] = None
-    type: str
-    required: Optional[bool]
-    default: Optional[List]
-    value_type: Optional[str]
+    type: str = ""
+    required: Optional[bool] = None
+    default: Optional[List] = None
+    value_type: Optional[str] = None
+    length: Optional[int] = None
 
 
 class HvObject(BaseModel):
@@ -50,13 +51,13 @@ class HvObject(BaseModel):
 
 class HvGraph(BaseModel):
     type: str
-    args: List[HvArgs]
-    connections: List[Connection]
-    imports: List[str]
-    objects: Dict[str, HvObject]
-    route_Ymaxs: HvObject
+    args: HvArgs
+    connections: Optional[List[Connection]] = []
+    imports: Optional[List[str]] = []
+    objects: Optional[Dict[str, HvObject]] = {}
+    route_Ymaxs: Optional[HvObject] = None
     properties: HvProperties
-    annotations: Optional[Dict[str, str]]
+    annotations: Optional[Dict[str, str]] = None
 
 
 # if __name__ == "__main__":
