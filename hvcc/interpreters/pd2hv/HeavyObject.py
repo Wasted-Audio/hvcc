@@ -29,11 +29,11 @@ class HeavyObject(PdObject):
 
     heavy_lang_json = importlib_resources.files('hvcc') / 'core/json/heavy.lang.json'
     with open(heavy_lang_json, "r") as f:
-        __HEAVY_LANG_OBJS = HeavyLangType(json.load(f))
+        __HEAVY_LANG_OBJS = HeavyLangType(json.load(f)).root
 
     heavy_ir_json = importlib_resources.files('hvcc') / 'core/json/heavy.ir.json'
     with open(heavy_ir_json, "r") as f:
-        __HEAVY_IR_OBJS = HeavyIRType(json.load(f))
+        __HEAVY_IR_OBJS = HeavyIRType(json.load(f)).root
 
     def __init__(
         self,
@@ -48,9 +48,9 @@ class HeavyObject(PdObject):
 
         # get the object dictionary (note that it is NOT a copy)
         if self.is_hvlang:
-            self.__obj_dict = self.__HEAVY_LANG_OBJS.root[obj_type]
+            self.__obj_dict = self.__HEAVY_LANG_OBJS[obj_type]
         elif self.is_hvir:
-            self.__obj_dict = self.__HEAVY_IR_OBJS.root[obj_type]
+            self.__obj_dict = self.__HEAVY_IR_OBJS[obj_type]
         else:
             assert False, f"{obj_type} is not a Heavy Lang or IR object."
 
@@ -144,11 +144,11 @@ class HeavyObject(PdObject):
 
     @property
     def is_hvlang(self) -> bool:
-        return self.obj_type in self.__HEAVY_LANG_OBJS.root.keys()
+        return self.obj_type in self.__HEAVY_LANG_OBJS.keys()
 
     @property
     def is_hvir(self) -> bool:
-        return self.obj_type in self.__HEAVY_IR_OBJS.root.keys()
+        return self.obj_type in self.__HEAVY_IR_OBJS.keys()
 
     def get_inlet_connection_type(self, inlet_index: int) -> Optional[str]:
         """ Returns the inlet connection type, None if the inlet does not exist.

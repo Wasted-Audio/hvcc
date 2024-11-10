@@ -19,6 +19,7 @@ import os
 
 from typing import Dict, List, Optional, TYPE_CHECKING
 
+from hvcc.core.hv2ir.types import HeavyIRType, IRNode
 from .Connection import Connection
 from .HeavyException import HeavyException
 from .HeavyLangObject import HeavyLangObject
@@ -36,7 +37,7 @@ class HeavyIrObject(HeavyLangObject):
 
     # load the HeavyIR object definitions
     with open(os.path.join(os.path.dirname(__file__), "../json/heavy.ir.json"), "r") as f:
-        __HEAVY_OBJS_IR_DICT = json.load(f)
+        __HEAVY_OBJS_IR_DICT = HeavyIRType(json.load(f)).root
 
     def __init__(
         self,
@@ -48,9 +49,13 @@ class HeavyIrObject(HeavyLangObject):
         annotations: Optional[Dict] = None
     ) -> None:
         # allow the number of inlets and outlets to be overridden
-        num_inlets = len(HeavyIrObject.__HEAVY_OBJS_IR_DICT[obj_type]["inlets"]) if num_inlets < 0 else num_inlets
+        num_inlets = (len(self.__HEAVY_OBJS_IR_DICT[obj_type].inlets)
+                      if num_inlets < 0
+                      else num_inlets)
 
-        num_outlets = len(HeavyIrObject.__HEAVY_OBJS_IR_DICT[obj_type]["outlets"]) if num_outlets < 0 else num_outlets
+        num_outlets = (len(self.__HEAVY_OBJS_IR_DICT[obj_type].outlets)
+                       if num_outlets < 0
+                       else num_outlets)
 
         super().__init__(obj_type, args, graph, num_inlets, num_outlets, annotations)
 
@@ -69,51 +74,51 @@ class HeavyIrObject(HeavyLangObject):
         """ Resolves missing default arguments. Also checks to make sure that all
             required arguments are present.
         """
-        if self.type in HeavyIrObject.__HEAVY_OBJS_IR_DICT:
-            for arg in self.__obj_desc.get("args", []):
-                if arg["name"] not in self.args:
+        if self.type in self.__HEAVY_OBJS_IR_DICT.keys():
+            for arg in self.__obj_desc.args:
+                if arg.name not in self.args:
                     # if a defined argument is not in the argument dictionary
-                    if not arg["required"]:
+                    if not arg.required:
                         # if the argument is not required, use the default
-                        self.args[arg["name"]] = arg["default"]
+                        self.args[arg.name] = arg.default
                     else:
-                        self.add_error(f"Required argument \"{arg['name']}\" not present for object {self}.")
+                        self.add_error(f"Required argument \"{arg.name}\" not present for object {self}.")
                 else:
                     # enforce argument types.
                     # if the default argument is null, don't worry about about the arg
-                    if arg["default"] is not None:
-                        self.args[arg["name"]] = HeavyLangObject.force_arg_type(
-                            self.args[arg["name"]],
-                            arg["value_type"],
+                    if arg.default is not None:
+                        self.args[arg.name] = HeavyLangObject.force_arg_type(
+                            self.args[arg.name],
+                            arg.value_type,
                             self.graph)
 
     @classmethod
     def is_ir(cls, obj_type: str) -> bool:
         """Returns true if the type is an IR object. False otherwise.
         """
-        return obj_type in HeavyIrObject.__HEAVY_OBJS_IR_DICT
+        return obj_type in cls.__HEAVY_OBJS_IR_DICT.keys()
 
     @property
     def does_process_signal(self) -> bool:
         """Returns True if this object processes a signal. False otherwise.
         """
-        return self.__obj_desc["ir"]["signal"]
+        return self.__obj_desc.ir.signal
 
     @property
-    def __obj_desc(self) -> Dict:
+    def __obj_desc(self) -> IRNode:
         """ Returns the original HeavyIR object description.
         """
-        return HeavyIrObject.__HEAVY_OBJS_IR_DICT[self.type]
+        return self.__HEAVY_OBJS_IR_DICT[self.type]
 
     def inlet_requires_signal(self, inlet_index: int = 0) -> bool:
         """ Returns True if the indexed inlet requires a signal connection. False otherwise.
         """
-        return self.__obj_desc["inlets"][inlet_index] in {"~i>", "~f>"}
+        return self.__obj_desc.inlets[inlet_index] in {"~i>", "~f>"}
 
     def outlet_requires_signal(self, inlet_index: int = 0) -> bool:
         """ Returns True if the indexed outlet requires a signal connection. False otherwise.
         """
-        return self.__obj_desc["outlets"][inlet_index] in {"~i>", "~f>"}
+        return self.__obj_desc.outlets[inlet_index] in {"~i>", "~f>"}
 
     def reduce(self) -> Optional[tuple]:
         # A Heavy IR object is already reduced. Returns itself and no connection changes.
@@ -183,7 +188,7 @@ class HeavyIrObject(HeavyLangObject):
         """ Returns the connection type at the given outlet.
             This information is always well-defined for IR objects.
         """
-        return self.__obj_desc["outlets"][outlet_index]
+        return self.__obj_desc.outlets[outlet_index]
 
     #
     # Intermediate Representation generators
@@ -203,7 +208,7 @@ class HeavyIrObject(HeavyLangObject):
     def get_ir_init_list(self) -> List:
         """ Returns a list of all object id for obejcts that need initialisation.
         """
-        return [self.id] if self.__obj_desc["ir"]["init"] else []
+        return [self.id] if self.__obj_desc.ir.init else []
 
     def get_ir_on_message(self, inlet_index: int = 0) -> List:
         """ Returns an array of dictionaries containing the information for the
@@ -218,7 +223,7 @@ class HeavyIrObject(HeavyLangObject):
         """ Returns the intermediate representation for object control functions.
             Basically, does sendMessage() need to be written?
         """
-        if self.__obj_desc["ir"]["control"]:
+        if self.__obj_desc.ir.control:
             on_message_list = []
             for connections in self.outlet_connections:
                 on_messages_let = []
@@ -238,7 +243,7 @@ class HeavyIrObject(HeavyLangObject):
             Only outputs buffer information for lets that require a signal.
         """
         # we assume that this method will only be called on signal objects
-        assert self.__obj_desc["ir"]["signal"]
+        assert self.__obj_desc.ir.signal
 
         return [{
             "id": self.id,
