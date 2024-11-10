@@ -17,9 +17,12 @@
 import argparse
 import json
 import os
+
 from collections import Counter
 from collections import defaultdict
 from typing import Dict
+
+from hvcc.core.hv2ir.types import HeavyIRType
 
 
 class ir2c_perf:
@@ -28,7 +31,7 @@ class ir2c_perf:
     def perf(cls, ir: Dict, blocksize: int = 512, mhz: int = 1000, verbose: bool = False) -> Dict:
         # read the hv.ir.json file
         with open(os.path.join(os.path.dirname(__file__), "../../core/json/heavy.ir.json"), "r") as f:
-            HEAVY_IR_JSON = json.load(f)
+            HEAVY_IR_JSON = HeavyIRType(json.load(f))
 
         objects: Counter = Counter()
         perf: Counter = Counter()
@@ -36,14 +39,11 @@ class ir2c_perf:
         for o in ir["signal"]["processOrder"]:
             obj_id = o["id"]
             obj_type = ir["objects"][obj_id]["type"]
-            if obj_type in HEAVY_IR_JSON:
+            if obj_type in HEAVY_IR_JSON.root.keys():
                 objects[obj_type] += 1
-                if "perf" in HEAVY_IR_JSON[obj_type]:
-                    c = Counter(HEAVY_IR_JSON[obj_type]["perf"])
-                    perf = perf + c
-                    per_object_perf[obj_type] = per_object_perf[obj_type] + c
-                else:
-                    print(f"{obj_type} requires perf information.")
+                c = Counter(HEAVY_IR_JSON.root[obj_type].perf)
+                perf = perf + c
+                per_object_perf[obj_type] = per_object_perf[obj_type] + c
             else:
                 print(f"ERROR: Unknown object type {obj_type}")
 

@@ -23,6 +23,7 @@ import string
 from struct import unpack, pack
 from typing import Optional, Union, List, Dict, Any, TYPE_CHECKING
 
+from hvcc.core.hv2ir.types import HeavyLangType, LangNode, Inlet, Outlet
 from .Connection import Connection
 from .HeavyException import HeavyException
 
@@ -40,7 +41,7 @@ class HeavyLangObject:
 
     # load the Heavy object definitions
     with open(os.path.join(os.path.dirname(__file__), "../json/heavy.lang.json"), "r") as f:
-        _HEAVY_LANG_DICT = json.load(f)
+        _HEAVY_LANG_DICT = HeavyLangType(json.load(f))
 
     def __init__(
         self,
@@ -74,11 +75,11 @@ class HeavyLangObject:
         self.__resolve_default_lang_args()
 
         # the list of connections at each inlet
-        num_inlets = num_inlets if num_inlets >= 0 else len(self._obj_desc["inlets"])
+        num_inlets = num_inlets if num_inlets >= 0 else len(self._obj_desc.inlets)
         self.inlet_connections: List = [[] for _ in range(num_inlets)]
 
         # the list of connections at each outlet
-        num_outlets = num_outlets if num_outlets >= 0 else len(self._obj_desc["outlets"])
+        num_outlets = num_outlets if num_outlets >= 0 else len(self._obj_desc.outlets)
         self.outlet_connections: List = [[] for _ in range(num_outlets)]
 
     @property
@@ -107,21 +108,21 @@ class HeavyLangObject:
         return self.args.get("name", None)
 
     @property
-    def _obj_desc(self) -> Dict:
+    def _obj_desc(self) -> LangNode:
         """ Returns the HeavyLang object description.
         """
-        return self._HEAVY_LANG_DICT[self.type]
+        return self._HEAVY_LANG_DICT.root[self.type]
 
-    def inlet_connection_type(self, index: int) -> Dict:
-        return self._obj_desc["inlets"][index]
+    def inlet_connection_type(self, index: int) -> Inlet:
+        return self._obj_desc.inlets[index]
 
-    def outlet_connection_type(self, index: int) -> Dict:
-        return self._obj_desc["outlets"][index]
+    def outlet_connection_type(self, index: int) -> Outlet:
+        return self._obj_desc.outlets[index]
 
     def name_for_arg(self, index: int = 0) -> str:
         """ Returns the name of the argument at the given index.
         """
-        return self._obj_desc["args"][index]["name"]
+        return self._obj_desc.args[index].name
 
     def add_warning(self, warning: str) -> None:
         """ Add a warning to this object.
@@ -143,7 +144,7 @@ class HeavyLangObject:
         }
 
     @classmethod
-    def force_arg_type(cls, value: Any, value_type: str, graph: Optional['HeavyGraph'] = None) -> Any:
+    def force_arg_type(cls, value: Any, value_type: Optional[str] = None, graph: Optional['HeavyGraph'] = None) -> Any:
         """ Attempts to convert a value to a given value type. Raises an Exception otherwise.
             If the value_type is unknown and a graph is provided, a warning will be registered.
         """
@@ -195,20 +196,20 @@ class HeavyLangObject:
         """ Resolves missing default arguments. Also checks to make sure that all
             required arguments are present. Does nothing if the object is IR.
         """
-        if self.type in HeavyLangObject._HEAVY_LANG_DICT:
-            for arg in self._obj_desc["args"]:
-                if arg["name"] not in self.args:
+        if self.type in HeavyLangObject._HEAVY_LANG_DICT.root.keys():
+            for arg in self._obj_desc.args:
+                if arg.name not in self.args:
                     # if a defined argument is not in the argument dictionary
-                    if not arg["required"]:
+                    if not arg.required:
                         # if the argument is not required, use the default
-                        self.args[arg["name"]] = arg["default"]
+                        self.args[arg.name] = arg.default
                     else:
-                        self.add_error(f"Required argument \"{arg['name']}\" not present for object {self}.")
+                        self.add_error(f"Required argument \"{arg.name}\" not present for object {self}.")
                 else:
                     # enforce argument types
-                    self.args[arg["name"]] = HeavyLangObject.force_arg_type(
-                        self.args[arg["name"]],
-                        arg["value_type"],
+                    self.args[arg.name] = HeavyLangObject.force_arg_type(
+                        self.args[arg.name],
+                        arg.value_type,
                         self.graph)
 
     @property
@@ -319,7 +320,7 @@ class HeavyLangObject:
             The result may be influenced by the state of the input connections.
         """
         # get the defined connection type
-        connection_type = self._obj_desc["outlets"][outlet_index]["connectionType"]
+        connection_type = self._obj_desc.outlets[outlet_index].connectionType
         if connection_type == "-~>" and self.graph is not None:
             # if the connection type is defined as mixed,
             # use the default approach to resolve it
