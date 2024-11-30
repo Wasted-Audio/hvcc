@@ -21,7 +21,7 @@ import time
 from typing import Dict, List, Optional
 
 from hvcc.interpreters.pd2hv.PdParser import PdParser
-
+from hvcc.types.compiler import Compiler, CompilerResp, CompilerNotif, CompilerMsg
 
 class Colours:
     purple = "\033[95m"
@@ -36,7 +36,7 @@ class Colours:
     end = "\033[0m"
 
 
-class pd2hv:
+class pd2hv(Compiler):
 
     @classmethod
     def get_supported_objects(cls) -> List:
@@ -50,7 +50,7 @@ class pd2hv:
         search_paths: Optional[List] = None,
         verbose: bool = False,
         export_args: bool = False
-    ) -> Dict:
+    ) -> CompilerResp:
 
         tick = time.time()
 
@@ -60,25 +60,23 @@ class pd2hv:
                 parser.add_absolute_search_directory(p)
 
         pd_graph = parser.graph_from_file(pd_path)
-        notices = pd_graph.get_notices()
+        notices = CompilerNotif(**pd_graph.get_notices())  # TODO: type all get_notices()
 
         # check for errors
-        if len(notices["errors"]) > 0:
-            return {
-                "stage": "pd2hv",
-                "obj_counter": dict(parser.obj_counter),
-                "notifs": {
-                    "has_error": True,
-                    "exception": None,
-                    "errors": notices["errors"],
-                    "warnings": notices["warnings"]
-                },
-                "in_dir": os.path.dirname(pd_path),
-                "in_file": os.path.basename(pd_path),
-                "out_dir": None,
-                "out_file": None,
-                "compile_time": (time.time() - tick)
-            }
+        if len(notices.errors) > 0:
+            return CompilerResp(
+                stage="pd2hv",
+                obj_counter=dict(parser.obj_counter),
+                notifs=CompilerNotif(
+                    has_error=True,
+                    exception=None,
+                    errors=notices.errors,
+                    warnings=notices.warnings
+                ),
+                in_dir=os.path.dirname(pd_path),
+                in_file=os.path.basename(pd_path),
+                compile_time=(time.time() - tick)
+            )
 
         if not os.path.exists(hv_dir):
             os.makedirs(hv_dir)
@@ -95,21 +93,20 @@ class pd2hv:
             else:
                 json.dump(pd_graph.to_hv(export_args=export_args), f)
 
-        return {
-            "stage": "pd2hv",
-            "obj_counter": dict(parser.obj_counter),
-            "notifs": {
-                "has_error": False,
-                "exception": None,
-                "errors": notices["errors"],
-                "warnings": notices["warnings"]
-            },
-            "in_dir": os.path.dirname(pd_path),
-            "in_file": os.path.basename(pd_path),
-            "out_dir": hv_dir,
-            "out_file": hv_file,
-            "compile_time": (time.time() - tick)
-        }
+        return CompilerResp(
+            stage="pd2hv",
+            obj_counter=dict(parser.obj_counter),
+            notifs=CompilerNotif(
+                has_error=False,
+                exception=None,
+                warnings=notices.warnings
+            ),
+            in_dir=os.path.dirname(pd_path),
+            in_file=os.path.basename(pd_path),
+            out_dir=hv_dir,
+            out_file=hv_file,
+            compile_time=(time.time() - tick)
+        )
 
 
 def main() -> None:
