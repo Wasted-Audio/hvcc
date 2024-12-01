@@ -1,5 +1,5 @@
 # Copyright (C) 2014-2018 Enzien Audio, Ltd.
-# Copyright (C) 2021-2023 Wasted Audio
+# Copyright (C) 2021-2024 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@ from typing import Dict, Optional
 from hvcc.core.hv2ir.HeavyException import HeavyException
 from ..copyright import copyright_manager
 
+from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
 from hvcc.generators.types.meta import Meta
 from hvcc.types.compiler import Compiler, CompilerResp, CompilerNotif, CompilerMsg
 
@@ -282,7 +283,7 @@ class c2js(Compiler):
                     exception=e,
                     warnings=[],
                     errors=[CompilerMsg(
-                        enum=-1,
+                        enum=NotificationEnum.ERROR_EXCEPTION,
                         message=str(e)
                     )]
                 ),

@@ -1,4 +1,4 @@
-# Copyright (C) 2021-2023 Wasted Audio
+# Copyright (C) 2021-2024 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -21,7 +21,9 @@ from typing import Dict, Optional
 
 from ..copyright import copyright_manager
 from ..filters import filter_uniqueid
-from ..types.meta import Meta, DPF
+
+from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
+from hvcc.generators.types.meta import Meta, DPF
 from hvcc.types.compiler import Compiler, CompilerResp, CompilerMsg, CompilerNotif
 
 
@@ -150,7 +152,7 @@ class c2dpf(Compiler):
                     exception=e,
                     warnings=[],
                     errors=[CompilerMsg(
-                        enum=-1,
+                        enum=NotificationEnum.ERROR_EXCEPTION,
                         message=str(e)
                     )]
                 ),

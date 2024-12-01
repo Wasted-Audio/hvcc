@@ -9,6 +9,7 @@ from typing import Dict, List, Optional
 import hvcc.core.hv2ir.HeavyLangObject as HeavyLangObject
 from ..copyright import copyright_manager
 
+from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
 from hvcc.generators.types.meta import Meta
 from hvcc.types.compiler import Compiler, CompilerResp, CompilerNotif, CompilerMsg
 
@@ -141,7 +142,7 @@ class c2owl(Compiler):
                     exception=e,
                     warnings=[],
                     errors=[CompilerMsg(
-                        enum=-1,
+                        enum=NotificationEnum.ERROR_EXCEPTION,
                         message=str(e)
                     )]
                 ),

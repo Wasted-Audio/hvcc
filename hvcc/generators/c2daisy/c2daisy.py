@@ -10,6 +10,7 @@ from ..copyright import copyright_manager
 from ..types.meta import Meta, Daisy
 from . import parameters
 
+from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
 from hvcc.types.compiler import Compiler, CompilerResp, CompilerNotif, CompilerMsg
 
 
@@ -156,7 +157,7 @@ class c2daisy(Compiler):
                     exception=e,
                     warnings=[],
                     errors=[CompilerMsg(
-                        enum=-1,
+                        enum=NotificationEnum.ERROR_EXCEPTION,
                         message=str(e)
                     )]
                 ),
