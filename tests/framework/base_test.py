@@ -51,7 +51,7 @@ class HvBaseTest(unittest.TestCase):
         pd_path,
         expect_warning: bool = False,
         expect_fail: bool = False,
-        expected_enum: NotificationEnum = NotificationEnum.WARNING_GENERIC
+        expected_enum: NotificationEnum = NotificationEnum.EMPTY
     ) -> Optional[str]:
         """Run hvcc on a Pd file. Returns the output directory.
         """

@@ -61,7 +61,6 @@ def add_error(
         results["hvcc"] = CompilerResp(stage="hvcc",
                                        notifs=CompilerNotif(
                                           has_error=True,
-                                          exception=None,
                                           errors=[CompilerMsg(message=error)],
                                        ))
     return results

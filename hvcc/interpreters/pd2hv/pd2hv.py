@@ -70,7 +70,6 @@ class pd2hv:
                 obj_counter=parser.obj_counter,
                 notifs=CompilerNotif(
                     has_error=True,
-                    exception=None,
                     errors=notices.errors,
                     warnings=notices.warnings
                 ),
@@ -98,8 +97,6 @@ class pd2hv:
             stage="pd2hv",
             obj_counter=parser.obj_counter,
             notifs=CompilerNotif(
-                has_error=False,
-                exception=None,
                 warnings=notices.warnings
             ),
             in_dir=os.path.dirname(pd_path),
