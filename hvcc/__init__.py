@@ -1,5 +1,5 @@
 # Copyright (C) 2014-2018 Enzien Audio, Ltd.
-# Copyright (C) 2021-2023 Wasted Audio
+# Copyright (C) 2021-2024 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -35,6 +35,7 @@ from hvcc.generators.c2pdext import c2pdext
 from hvcc.generators.c2wwise import c2wwise
 from hvcc.generators.c2unity import c2unity
 from hvcc.generators.types.meta import Meta
+from hvcc.types.compiler import CompilerResp, CompilerNotif, CompilerMsg
 
 
 class Colours:
@@ -50,19 +51,18 @@ class Colours:
     end = "\033[0m"
 
 
-def add_error(results: OrderedDict, error: str) -> OrderedDict:
+def add_error(
+        results: Dict[str, CompilerResp],
+        error: str
+) -> Dict[str, CompilerResp]:
     if "hvcc" in results:
-        results["hvcc"]["notifs"]["errors"].append({"message": error})
+        results["hvcc"].notifs.errors.append(CompilerMsg(message=error))
     else:
-        results["hvcc"] = {
-            "stage": "hvcc",
-            "notifs": {
-                "has_error": True,
-                "exception": None,
-                "errors": [{"message": error}],
-                "warnings": []
-            }
-        }
+        results["hvcc"] = CompilerResp(stage="hvcc",
+                                       notifs=CompilerNotif(
+                                          has_error=True,
+                                          errors=[CompilerMsg(message=error)],
+                                       ))
     return results
 
 
@@ -212,9 +212,9 @@ def compile_dataflow(
     verbose: bool = False,
     copyright: Optional[str] = None,
     nodsp: Optional[bool] = False
-) -> OrderedDict:
+) -> Dict[str, CompilerResp]:
 
-    results: OrderedDict = OrderedDict()  # default value, empty dictionary
+    results: OrderedDict[str, CompilerResp] = OrderedDict()  # default value, empty dictionary
     patch_meta = Meta()
 
     # basic error checking on input
@@ -250,23 +250,26 @@ def compile_dataflow(
             verbose=verbose)
 
         # check for errors
-        if list(results.values())[0]["notifs"].get("has_error", False):
+
+        response: CompilerResp = list(results.values())[0]
+
+        if response.notifs.has_error:
             return results
 
         subst_name = re.sub(r'\W', '_', patch_name)
         results["hv2ir"] = hv2ir.hv2ir.compile(
-            hv_file=os.path.join(list(results.values())[0]["out_dir"], list(results.values())[0]["out_file"]),
+            hv_file=os.path.join(response.out_dir, response.out_file),
             # ensure that the ir filename has no funky characters in it
             ir_file=os.path.join(out_dir, "ir", f"{subst_name}.heavy.ir.json"),
             patch_name=patch_name,
             verbose=verbose)
 
         # check for errors
-        if results["hv2ir"]["notifs"].get("has_error", False):
+        if results["hv2ir"].notifs.has_error:
             return results
 
         # get the hvir data
-        hvir = results["hv2ir"]["ir"]
+        hvir = results["hv2ir"].ir
         patch_name = hvir["name"]["escaped"]
         externs = generate_extern_info(hvir, results)
 
@@ -278,7 +281,7 @@ def compile_dataflow(
 
         c_src_dir = os.path.join(out_dir, "c")
         results["ir2c"] = ir2c.ir2c.compile(
-            hv_ir_path=os.path.join(results["hv2ir"]["out_dir"], results["hv2ir"]["out_file"]),
+            hv_ir_path=os.path.join(results["hv2ir"].out_dir, results["hv2ir"].out_file),
             static_dir=os.path.join(application_path, "generators/ir2c/static"),
             output_dir=c_src_dir,
             externs=externs,
@@ -286,17 +289,16 @@ def compile_dataflow(
             nodsp=nodsp)
 
         # check for errors
-        if results["ir2c"]["notifs"].get("has_error", False):
+        if results["ir2c"].notifs.has_error:
             return results
 
         # ir2c_perf
-        results["ir2c_perf"] = {
-            "stage": "ir2c_perf",
-            "obj_counter": ir2c_perf.ir2c_perf.perf(results["hv2ir"]["ir"], verbose=verbose),
-            "in_dir": results["hv2ir"]["out_dir"],
-            "in_file": results["hv2ir"]["out_file"],
-            "notifs": {}
-        }
+        results["ir2c_perf"] = CompilerResp(
+            stage="ir2c_perf",
+            obj_perf=ir2c_perf.ir2c_perf.perf(results["hv2ir"].ir, verbose=verbose),
+            in_dir=results["hv2ir"].out_dir,
+            in_file=results["hv2ir"].out_file,
+        )
 
         # reconfigure such that next stage is triggered
         in_path = c_src_dir
@@ -442,25 +444,25 @@ def main() -> bool:
     errorCount = 0
     for r in list(results.values()):
         # print any errors
-        if r["notifs"].get("has_error", False):
-            for i, error in enumerate(r["notifs"].get("errors", [])):
+        if r.notifs.has_error:
+            for i, error in enumerate(r.notifs.errors):
                 errorCount += 1
                 print("{4:3d}) {2}Error{3} {0}: {1}".format(
-                    r["stage"], error["message"], Colours.red, Colours.end, i + 1))
+                    r.stage, error.message, Colours.red, Colours.end, i + 1))
 
             # only print exception if no errors are indicated
-            if len(r["notifs"].get("errors", [])) == 0 and r["notifs"].get("exception", None) is not None:
+            if len(r.notifs.errors) == 0 and r.notifs.exception is not None:
                 errorCount += 1
                 print("{2}Error{3} {0} exception: {1}".format(
-                    r["stage"], r["notifs"]["exception"], Colours.red, Colours.end))
+                    r.stage, r.notifs.exception, Colours.red, Colours.end))
 
             # clear any exceptions such that results can be JSONified if necessary
-            r["notifs"]["exception"] = []
+            r.notifs.exception = None
 
         # print any warnings
-        for i, warning in enumerate(r["notifs"].get("warnings", [])):
+        for i, warning in enumerate(r.notifs.warnings):
             print("{4:3d}) {2}Warning{3} {0}: {1}".format(
-                r["stage"], warning["message"], Colours.yellow, Colours.end, i + 1))
+                r.stage, warning.message, Colours.yellow, Colours.end, i + 1))
 
     if args.results_path:
         results_path = os.path.realpath(os.path.abspath(args.results_path))

@@ -1,4 +1,4 @@
-# Copyright (C) 2021-2023 Wasted Audio
+# Copyright (C) 2021-2024 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -21,10 +21,13 @@ from typing import Dict, Optional
 
 from ..copyright import copyright_manager
 from ..filters import filter_uniqueid
-from ..types.meta import Meta, DPF
+
+from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
+from hvcc.generators.types.meta import Meta, DPF
+from hvcc.types.compiler import Compiler, CompilerResp, CompilerMsg, CompilerNotif
 
 
-class c2dpf:
+class c2dpf(Compiler):
     """ Generates a DPF wrapper for a given patch.
     """
 
@@ -40,7 +43,7 @@ class c2dpf:
         num_output_channels: int = 0,
         copyright: Optional[str] = None,
         verbose: Optional[bool] = False
-    ) -> Dict:
+    ) -> CompilerResp:
 
         tick = time.time()
 
@@ -133,36 +136,27 @@ class c2dpf:
                     meta=dpf_meta,
                     dpf_path=dpf_path))
 
-            return {
-                "stage": "c2dpf",
-                "notifs": {
-                    "has_error": False,
-                    "exception": None,
-                    "warnings": [],
-                    "errors": []
-                },
-                "in_dir": c_src_dir,
-                "in_file": "",
-                "out_dir": out_dir,
-                "out_file": os.path.basename(dpf_h_path),
-                "compile_time": time.time() - tick
-            }
+            return CompilerResp(
+                stage="c2dpf",
+                in_dir=c_src_dir,
+                out_dir=out_dir,
+                out_file=os.path.basename(dpf_h_path),
+                compile_time=time.time() - tick
+            )
 
         except Exception as e:
-            return {
-                "stage": "c2dpf",
-                "notifs": {
-                    "has_error": True,
-                    "exception": e,
-                    "warnings": [],
-                    "errors": [{
-                        "enum": -1,
-                        "message": str(e)
-                    }]
-                },
-                "in_dir": c_src_dir,
-                "in_file": "",
-                "out_dir": out_dir,
-                "out_file": "",
-                "compile_time": time.time() - tick
-            }
+            return CompilerResp(
+                stage="c2dpf",
+                notifs=CompilerNotif(
+                    has_error=True,
+                    exception=e,
+                    warnings=[],
+                    errors=[CompilerMsg(
+                        enum=NotificationEnum.ERROR_EXCEPTION,
+                        message=str(e)
+                    )]
+                ),
+                in_dir=c_src_dir,
+                out_dir=out_dir,
+                compile_time=time.time() - tick
+            )

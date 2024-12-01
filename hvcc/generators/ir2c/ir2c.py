@@ -1,5 +1,5 @@
 # Copyright (C) 2014-2018 Enzien Audio, Ltd.
-# Copyright (C) 2023 Wasted Audio
+# Copyright (C) 2023-2024 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -64,6 +64,8 @@ from hvcc.generators.ir2c.SignalTabhead import SignalTabhead
 from hvcc.generators.ir2c.SignalTabread import SignalTabread
 from hvcc.generators.ir2c.SignalTabwrite import SignalTabwrite
 from hvcc.generators.ir2c.SignalVar import SignalVar
+
+from hvcc.types.compiler import CompilerResp
 
 
 class ir2c:
@@ -159,7 +161,7 @@ class ir2c:
         externs: Dict,
         copyright: Optional[str] = None,
         nodsp: Optional[bool] = False
-    ) -> Dict:
+    ) -> CompilerResp:
         """ Compiles a HeavyIR file into a C.
             Returns a tuple of compile time in seconds, a notification dictionary,
             and a HeavyIR object counter.
@@ -296,20 +298,14 @@ class ir2c:
         # generate HeavyIR object counter
         ir_counter = Counter([obj["type"] for obj in ir["objects"].values()])
 
-        return {
-            "stage": "ir2c",
-            "notifs": {
-                "has_error": False,
-                "exception": None,
-                "errors": []
-            },
-            "in_dir": os.path.dirname(hv_ir_path),
-            "in_file": os.path.basename(hv_ir_path),
-            "out_dir": output_dir,
-            "out_file": "",
-            "compile_time": (time.time() - tick),
-            "obj_counter": ir_counter
-        }
+        return CompilerResp(
+            stage="ir2c",
+            in_dir=os.path.dirname(hv_ir_path),
+            in_file=os.path.basename(hv_ir_path),
+            out_dir=output_dir,
+            compile_time=(time.time() - tick),
+            obj_counter=ir_counter
+        )
 
 
 def main() -> None:
@@ -349,7 +345,7 @@ def main() -> None:
         args.copyright)
 
     if args.verbose:
-        print("Total ir2c time: {0:.2f}ms".format(results["compile_time"] * 1000))
+        print("Total ir2c time: {0:.2f}ms".format(results.compile_time * 1000))
 
 
 if __name__ == "__main__":

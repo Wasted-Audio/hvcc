@@ -10,6 +10,9 @@ from ..copyright import copyright_manager
 from ..types.meta import Meta, Daisy
 from . import parameters
 
+from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
+from hvcc.types.compiler import Compiler, CompilerResp, CompilerNotif, CompilerMsg
+
 
 hv_midi_messages = {
     "__hv_noteout",
@@ -23,7 +26,7 @@ hv_midi_messages = {
 }
 
 
-class c2daisy:
+class c2daisy(Compiler):
     """ Generates a Daisy wrapper for a given patch.
     """
 
@@ -39,7 +42,7 @@ class c2daisy:
         num_output_channels: int = 0,
         copyright: Optional[str] = None,
         verbose: Optional[bool] = False
-    ) -> Dict:
+    ) -> CompilerResp:
 
         tick = time.time()
 
@@ -138,36 +141,27 @@ class c2daisy:
 
             # ======================================================================================
 
-            return {
-                "stage": "c2daisy",
-                "notifs": {
-                    "has_error": False,
-                    "exception": None,
-                    "warnings": [],
-                    "errors": []
-                },
-                "in_dir": c_src_dir,
-                "in_file": "",
-                "out_dir": out_dir,
-                "out_file": os.path.basename(daisy_h_path),
-                "compile_time": time.time() - tick
-            }
+            return CompilerResp(
+                stage="c2daisy",
+                in_dir=c_src_dir,
+                out_dir=out_dir,
+                out_file=os.path.basename(daisy_h_path),
+                compile_time=time.time() - tick
+            )
 
         except Exception as e:
-            return {
-                "stage": "c2daisy",
-                "notifs": {
-                    "has_error": True,
-                    "exception": e,
-                    "warnings": [],
-                    "errors": [{
-                        "enum": -1,
-                        "message": str(e)
-                    }]
-                },
-                "in_dir": c_src_dir,
-                "in_file": "",
-                "out_dir": out_dir,
-                "out_file": "",
-                "compile_time": time.time() - tick
-            }
+            return CompilerResp(
+                stage="c2daisy",
+                notifs=CompilerNotif(
+                    has_error=True,
+                    exception=e,
+                    warnings=[],
+                    errors=[CompilerMsg(
+                        enum=NotificationEnum.ERROR_EXCEPTION,
+                        message=str(e)
+                    )]
+                ),
+                in_dir=c_src_dir,
+                out_dir=out_dir,
+                compile_time=time.time() - tick
+            )

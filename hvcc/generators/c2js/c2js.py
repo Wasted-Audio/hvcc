@@ -1,5 +1,5 @@
 # Copyright (C) 2014-2018 Enzien Audio, Ltd.
-# Copyright (C) 2021-2023 Wasted Audio
+# Copyright (C) 2021-2024 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -25,8 +25,12 @@ from typing import Dict, Optional
 from hvcc.core.hv2ir.HeavyException import HeavyException
 from ..copyright import copyright_manager
 
+from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
+from hvcc.generators.types.meta import Meta
+from hvcc.types.compiler import Compiler, CompilerResp, CompilerNotif, CompilerMsg
 
-class c2js:
+
+class c2js(Compiler):
     """Compiles a directory of C source files into javascript. Requires the
     emscripten library to be installed - https://github.com/kripken/emscripten
     """
@@ -159,12 +163,12 @@ class c2js:
         out_dir: str,
         externs: Dict,
         patch_name: Optional[str] = None,
-        patch_meta: Optional[Dict] = None,
+        patch_meta: Meta = Meta(),
         num_input_channels: int = 0,
         num_output_channels: int = 0,
         copyright: Optional[str] = None,
         verbose: Optional[bool] = False
-    ) -> Dict:
+    ) -> CompilerResp:
 
         tick = time.time()
 
@@ -263,36 +267,27 @@ class c2js:
             os.remove(post_js_path)
             os.remove(pre_js_path)
 
-            return {
-                "stage": "c2js",
-                "notifs": {
-                    "has_error": False,
-                    "exception": None,
-                    "warnings": [],
-                    "errors": []
-                },
-                "in_dir": c_src_dir,
-                "in_file": "",
-                "out_dir": out_dir,
-                "out_file": js_out_file,
-                "compile_time": time.time() - tick
-            }
+            return CompilerResp(
+                stage="c2js",
+                in_dir=c_src_dir,
+                out_dir=out_dir,
+                out_file=js_out_file,
+                compile_time=time.time() - tick
+            )
 
         except Exception as e:
-            return {
-                "stage": "c2js",
-                "notifs": {
-                    "has_error": True,
-                    "exception": e,
-                    "warnings": [],
-                    "errors": [{
-                        "enum": -1,
-                        "message": str(e)
-                    }]
-                },
-                "in_dir": c_src_dir,
-                "in_file": "",
-                "out_dir": out_dir,
-                "out_file": "",
-                "compile_time": time.time() - tick
-            }
+            return CompilerResp(
+                stage="c2js",
+                notifs=CompilerNotif(
+                    has_error=True,
+                    exception=e,
+                    warnings=[],
+                    errors=[CompilerMsg(
+                        enum=NotificationEnum.ERROR_EXCEPTION,
+                        message=str(e)
+                    )]
+                ),
+                in_dir=c_src_dir,
+                out_dir=out_dir,
+                compile_time=time.time() - tick
+            )
