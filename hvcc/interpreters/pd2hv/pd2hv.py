@@ -18,10 +18,11 @@ import argparse
 import json
 import os
 import time
-from typing import Dict, List, Optional
+from typing import List, Optional
 
 from hvcc.interpreters.pd2hv.PdParser import PdParser
-from hvcc.types.compiler import Compiler, CompilerResp, CompilerNotif, CompilerMsg
+from hvcc.types.compiler import CompilerResp, CompilerNotif
+
 
 class Colours:
     purple = "\033[95m"
@@ -36,7 +37,7 @@ class Colours:
     end = "\033[0m"
 
 
-class pd2hv(Compiler):
+class pd2hv:
 
     @classmethod
     def get_supported_objects(cls) -> List:
@@ -66,7 +67,7 @@ class pd2hv(Compiler):
         if len(notices.errors) > 0:
             return CompilerResp(
                 stage="pd2hv",
-                obj_counter=dict(parser.obj_counter),
+                obj_counter=parser.obj_counter,
                 notifs=CompilerNotif(
                     has_error=True,
                     exception=None,
@@ -95,7 +96,7 @@ class pd2hv(Compiler):
 
         return CompilerResp(
             stage="pd2hv",
-            obj_counter=dict(parser.obj_counter),
+            obj_counter=parser.obj_counter,
             notifs=CompilerNotif(
                 has_error=False,
                 exception=None,
@@ -139,25 +140,25 @@ def main() -> None:
         verbose=args.verbose,
         export_args=args.export)
 
-    for i, n in enumerate(result["notifs"]["errors"]):
+    for i, n in enumerate(result.notifs.errors):
         print("{0:3d}) {1}Error #{2:4d}:{3} {4}".format(
             i + 1,
             Colours.red,
-            n["enum"],
+            n.enum,
             Colours.end,
-            n["message"]))
-    for i, n in enumerate(result["notifs"]["warnings"]):
+            n.message))
+    for i, n in enumerate(result.notifs.warnings):
         print("{0:3d}) {1}Warning #{2:4d}:{3} {4}".format(
             i + 1,
             Colours.yellow,
-            n["enum"],
+            n.enum,
             Colours.end,
-            n["message"]))
+            n.message))
 
     if args.verbose:
-        if len(result["notifs"]["errors"]) == 0:
-            print("Heavy file written to", os.path.join(result["out_dir"], result["out_file"]))
-        print("Total pd2hv compile time: {0:.2f}ms".format(result["compile_time"] * 1000))
+        if len(result.notifs.errors) == 0:
+            print("Heavy file written to", os.path.join(result.out_dir, result.out_file))
+        print("Total pd2hv compile time: {0:.2f}ms".format(result.compile_time * 1000))
 
 
 if __name__ == "__main__":

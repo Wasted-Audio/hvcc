@@ -19,7 +19,7 @@ import json
 import os
 import time
 
-from typing import Optional, Dict
+from typing import Optional
 
 from .HeavyException import HeavyException
 from .HeavyParser import HeavyParser

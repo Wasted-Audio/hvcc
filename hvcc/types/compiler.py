@@ -4,10 +4,12 @@ from typing import Any, Dict, List, Optional
 
 from pydantic import BaseModel
 
+from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
 from hvcc.generators.types.meta import Meta
 
+
 class CompilerMsg(BaseModel):
-    enum: int = -1
+    enum: NotificationEnum = NotificationEnum.EMPTY
     message: str
 
 
@@ -26,8 +28,9 @@ class CompilerResp(BaseModel):
     out_dir: str = ""
     out_file: str = ""
     compile_time: float = 0.0
-    obj_counter: Counter = {}
-    ir: Optional[Dict[str, Any]] = None  # TODO: improve Any type in Graph objects
+    obj_counter: Counter = Counter()
+    obj_perf: Dict[str, Counter] = {}
+    ir: Dict[str, Any] = {}  # TODO: improve Any type in Graph objects
 
 
 class Compiler(ABC):

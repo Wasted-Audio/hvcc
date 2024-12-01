@@ -23,8 +23,11 @@ from typing import Dict, Optional
 from ..copyright import copyright_manager
 from ..filters import filter_string_cap, filter_templates, filter_xcode_build, filter_xcode_fileref
 
+from hvcc.generators.types.meta import Meta
+from hvcc.types.compiler import Compiler, CompilerResp, CompilerNotif, CompilerMsg
 
-class c2unity:
+
+class c2unity(Compiler):
     """Generates a Audio Native Plugin wrapper for Unity 5.
     """
 
@@ -35,12 +38,12 @@ class c2unity:
         out_dir: str,
         externs: Dict,
         patch_name: Optional[str] = None,
-        patch_meta: Optional[Dict] = None,
+        patch_meta: Meta = Meta(),
         num_input_channels: int = 0,
         num_output_channels: int = 0,
         copyright: Optional[str] = None,
         verbose: Optional[bool] = False
-    ) -> Dict:
+    ) -> CompilerResp:
 
         tick = time.time()
 
@@ -99,36 +102,26 @@ class c2unity:
                         compile_files=os.listdir(src_out_dir),
                         copyright=copyright))
 
-            return {
-                "stage": "c2unity",
-                "notifs": {
-                    "has_error": False,
-                    "exception": None,
-                    "warnings": [],
-                    "errors": []
-                },
-                "in_dir": c_src_dir,
-                "in_file": "",
-                "out_dir": out_dir,
-                "out_file": "",
-                "compile_time": time.time() - tick
-            }
+            return CompilerResp(
+                stage="c2unity",
+                in_dir=c_src_dir,
+                out_dir=out_dir,
+                compile_time=time.time() - tick
+            )
 
         except Exception as e:
-            return {
-                "stage": "c2unity",
-                "notifs": {
-                    "has_error": True,
-                    "exception": e,
-                    "warnings": [],
-                    "errors": [{
-                        "enum": -1,
-                        "message": str(e)
-                    }]
-                },
-                "in_dir": c_src_dir,
-                "in_file": "",
-                "out_dir": out_dir,
-                "out_file": "",
-                "compile_time": time.time() - tick
-            }
+            return CompilerResp(
+                stage="c2unity",
+                notifs=CompilerNotif(
+                    has_error=True,
+                    exception=e,
+                    warnings=[],
+                    errors=[CompilerMsg(
+                        enum=-1,
+                        message=str(e)
+                    )]
+                ),
+                in_dir=c_src_dir,
+                out_dir=out_dir,
+                compile_time=time.time() - tick
+            )

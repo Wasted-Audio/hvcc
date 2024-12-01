@@ -22,6 +22,8 @@ class NotificationEnum(Enum):
     """ These enumerations refer to all possible warnings and errors produced by pd2hv.
     """
 
+    EMPTY = -1
+
     # Warnings
 
     # an unspecified generic warning

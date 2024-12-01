@@ -59,12 +59,11 @@ def add_error(
         results["hvcc"].notifs.errors.append(CompilerMsg(message=error))
     else:
         results["hvcc"] = CompilerResp(stage="hvcc",
-                                      notifs=CompilerNotif(
+                                       notifs=CompilerNotif(
                                           has_error=True,
                                           exception=None,
                                           errors=[CompilerMsg(message=error)],
-                                      )
-                                     )
+                                       ))
     return results
 
 
@@ -297,7 +296,7 @@ def compile_dataflow(
         # ir2c_perf
         results["ir2c_perf"] = CompilerResp(
             stage="ir2c_perf",
-            obj_counter=ir2c_perf.ir2c_perf.perf(results["hv2ir"].ir, verbose=verbose),
+            obj_perf=ir2c_perf.ir2c_perf.perf(results["hv2ir"].ir, verbose=verbose),
             in_dir=results["hv2ir"].out_dir,
             in_file=results["hv2ir"].out_file,
         )

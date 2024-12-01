@@ -23,8 +23,11 @@ from typing import Dict, Optional
 from ..copyright import copyright_manager
 from ..filters import filter_max
 
+from hvcc.generators.types.meta import Meta
+from hvcc.types.compiler import Compiler, CompilerResp, CompilerNotif, CompilerMsg
 
-class c2pdext:
+
+class c2pdext(Compiler):
     """Generates a Pure Data external wrapper for a given patch.
     """
 
@@ -35,12 +38,12 @@ class c2pdext:
         out_dir: str,
         externs: Dict,
         patch_name: Optional[str] = None,
-        patch_meta: Optional[Dict] = None,
+        patch_meta: Meta = Meta(),
         num_input_channels: int = 0,
         num_output_channels: int = 0,
         copyright: Optional[str] = None,
         verbose: Optional[bool] = False
-    ) -> Dict:
+    ) -> CompilerResp:
 
         tick = time.time()
 
@@ -94,36 +97,27 @@ class c2pdext:
                 f.write(env.get_template("Makefile").render(
                     name=patch_name))
 
-            return {
-                "stage": "c2pdext",
-                "notifs": {
-                    "has_error": False,
-                    "exception": None,
-                    "warnings": [],
-                    "errors": []
-                },
-                "in_dir": c_src_dir,
-                "in_file": "",
-                "out_dir": out_dir,
-                "out_file": os.path.basename(pdext_path),
-                "compile_time": time.time() - tick
-            }
+            return CompilerResp(
+                stage="c2pdext",
+                in_dir=c_src_dir,
+                out_dir=out_dir,
+                out_file=os.path.basename(pdext_path),
+                compile_time=time.time() - tick
+            )
 
         except Exception as e:
-            return {
-                "stage": "c2pdext",
-                "notifs": {
-                    "has_error": True,
-                    "exception": e,
-                    "warnings": [],
-                    "errors": [{
-                        "enum": -1,
-                        "message": str(e)
-                    }]
-                },
-                "in_dir": c_src_dir,
-                "in_file": "",
-                "out_dir": out_dir,
-                "out_file": "",
-                "compile_time": time.time() - tick
-            }
+            return CompilerResp(
+                stage="c2pdext",
+                notifs=CompilerNotif(
+                    has_error=True,
+                    exception=e,
+                    warnings=[],
+                    errors=[CompilerMsg(
+                        enum=-1,
+                        message=str(e)
+                    )]
+                ),
+                in_dir=c_src_dir,
+                out_dir=out_dir,
+                compile_time=time.time() - tick
+            )

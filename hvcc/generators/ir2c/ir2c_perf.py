@@ -28,14 +28,20 @@ from hvcc.core.hv2ir.types import HeavyIRType
 class ir2c_perf:
 
     @classmethod
-    def perf(cls, ir: Dict, blocksize: int = 512, mhz: int = 1000, verbose: bool = False) -> Dict:
+    def perf(
+        cls,
+        ir: Dict,
+        blocksize: int = 512,
+        mhz: int = 1000,
+        verbose: bool = False
+    ) -> Dict[str, Counter]:
         # read the hv.ir.json file
         with open(os.path.join(os.path.dirname(__file__), "../../core/json/heavy.ir.json"), "r") as f:
-            HEAVY_IR_JSON = HeavyIRType(json.load(f)).root
+            HEAVY_IR_JSON = HeavyIRType(**json.load(f)).root
 
         objects: Counter = Counter()
         perf: Counter = Counter()
-        per_object_perf: Dict = defaultdict(Counter)
+        per_object_perf: Dict[str, Counter] = defaultdict(Counter)
         for o in ir["signal"]["processOrder"]:
             obj_id = o["id"]
             obj_type = ir["objects"][obj_id]["type"]
@@ -54,7 +60,7 @@ class ir2c_perf:
                 mhz,
                 blocksize * perf["avx"] / 8.0 / mhz))
 
-            print  # new line
+            print()  # new line
 
             print("SSE: {0} cycles / {1} cycles per frame".format(perf["sse"], perf["sse"] / 4.0))
             print("     {0} frames @ {1}MHz >= {2:.2f}us".format(
@@ -62,7 +68,7 @@ class ir2c_perf:
                 mhz,
                 blocksize * perf["sse"] / 4.0 / mhz))
 
-            print  # new line
+            print()  # new line
 
             print("{0:<4} {1:<5} {2:<16} {3}".format("CPU%", "#Objs", "Object Type", "Performance"))
             print("==== ===== ================ ===========")

@@ -20,7 +20,11 @@ import shutil
 import subprocess
 import unittest
 
+from typing import Optional
+
 import hvcc
+
+from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
 
 
 simd_flags = {
@@ -45,10 +49,10 @@ class HvBaseTest(unittest.TestCase):
     def _run_hvcc(
         self,
         pd_path,
-        expect_warning: bool = None,
-        expect_fail: bool = None,
-        expected_enum: int = None
-    ):
+        expect_warning: bool = False,
+        expect_fail: bool = False,
+        expected_enum: NotificationEnum = NotificationEnum.WARNING_GENERIC
+    ) -> Optional[str]:
         """Run hvcc on a Pd file. Returns the output directory.
         """
 
@@ -63,28 +67,28 @@ class HvBaseTest(unittest.TestCase):
             if not expect_fail:
                 # if there are any errors from hvcc, fail immediately
                 # TODO(mhroth): standardise how errors and warnings are returned between stages
-                if r["notifs"].get("has_error", False):
-                    if r["stage"] == "pd2hv":
-                        self.fail(hvcc_results["pd2hv"]["notifs"]["errors"][0])
+                if r.notifs.has_error:
+                    if r.stage == "pd2hv":
+                        self.fail(hvcc_results["pd2hv"].notifs.errors[0])
                     else:
-                        self.fail(str(r["notifs"]))
+                        self.fail(str(r.notifs))
 
             if expect_warning:
                 for r in hvcc_results.values():
-                    if r["stage"] == "pd2hv":
+                    if r.stage == "pd2hv":
                         self.assertTrue(
-                            expected_enum in [w["enum"] for w in hvcc_results["pd2hv"]["notifs"]["warnings"]]
+                            expected_enum in [w.enum for w in hvcc_results["pd2hv"].notifs.warnings]
                         )
                         return
 
                 self.fail(f"Expected warning enum: {expected_enum}")
 
-            if expect_fail and r["notifs"].get("has_error", False):
-                if r["stage"] == "pd2hv":
-                    self.assertTrue(expected_enum in [e["enum"] for e in hvcc_results["pd2hv"]["notifs"]["errors"]])
+            if expect_fail and r.notifs.has_error:
+                if r.stage == "pd2hv":
+                    self.assertTrue(expected_enum in [e.enum for e in hvcc_results["pd2hv"].notifs.errors])
                     return
-                elif r["stage"] == "hvcc":
-                    if len(hvcc_results["hvcc"]["notifs"]["errors"]) > 0:
+                elif r.stage == "hvcc":
+                    if len(hvcc_results["hvcc"].notifs.errors) > 0:
                         return  # hvcc isn't using Notification enums so just pass
 
                 self.fail(f"Expected error enum: {expected_enum}")
