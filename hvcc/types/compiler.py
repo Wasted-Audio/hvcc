@@ -35,6 +35,7 @@ class CompilerResp(BaseModel):
 
 class Compiler(ABC):
 
+    @classmethod
     @abstractmethod
     def compile(
         cls,
