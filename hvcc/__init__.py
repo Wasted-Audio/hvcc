@@ -25,7 +25,6 @@ import sys
 import time
 from typing import List, Dict, Optional
 
-import hvcc.types.compiler
 from hvcc.interpreters.pd2hv import pd2hv
 from hvcc.core.hv2ir import hv2ir
 from hvcc.generators.ir2c import ir2c
