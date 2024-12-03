@@ -23,11 +23,11 @@ from ..copyright import copyright_manager
 from ..filters import filter_uniqueid
 
 from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
-from hvcc.generators.types.meta import Meta, DPF
-from hvcc.types.compiler import Compiler, CompilerResp, CompilerMsg, CompilerNotif
+from hvcc.types.compiler import Generator, CompilerResp, CompilerMsg, CompilerNotif
+from hvcc.types.meta import Meta, DPF
 
 
-class c2dpf(Compiler):
+class c2dpf(Generator):
     """ Generates a DPF wrapper for a given patch.
     """
 

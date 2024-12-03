@@ -34,8 +34,8 @@ from hvcc.generators.c2owl import c2owl
 from hvcc.generators.c2pdext import c2pdext
 from hvcc.generators.c2wwise import c2wwise
 from hvcc.generators.c2unity import c2unity
-from hvcc.generators.types.meta import Meta
 from hvcc.types.compiler import CompilerResp, CompilerNotif, CompilerMsg
+from hvcc.types.meta import Meta
 
 
 class Colours:

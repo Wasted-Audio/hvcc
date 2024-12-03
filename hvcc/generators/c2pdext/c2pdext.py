@@ -24,11 +24,11 @@ from ..copyright import copyright_manager
 from ..filters import filter_max
 
 from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
-from hvcc.generators.types.meta import Meta
-from hvcc.types.compiler import Compiler, CompilerResp, CompilerNotif, CompilerMsg
+from hvcc.types.compiler import Generator, CompilerResp, CompilerNotif, CompilerMsg
+from hvcc.types.meta import Meta
 
 
-class c2pdext(Compiler):
+class c2pdext(Generator):
     """Generates a Pure Data external wrapper for a given patch.
     """
 

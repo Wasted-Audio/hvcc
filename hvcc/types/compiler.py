@@ -5,7 +5,7 @@ from typing import Any, Dict, List, Optional
 from pydantic import BaseModel
 
 from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
-from hvcc.generators.types.meta import Meta
+from hvcc.types.meta import Meta
 
 
 class CompilerMsg(BaseModel):
@@ -33,7 +33,7 @@ class CompilerResp(BaseModel):
     ir: Dict[str, Any] = {}  # TODO: improve Any type in Graph objects
 
 
-class Compiler(ABC):
+class Generator(ABC):
 
     @abstractmethod
     def compile(

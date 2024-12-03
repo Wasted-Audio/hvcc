@@ -19,7 +19,7 @@ import json
 
 from hvcc.core.hv2ir.HeavyLangObject import HeavyLangObject
 from hvcc.interpreters.pd2hv.PdParser import PdParser
-from hvcc.generators.types.meta import Meta, DPF, Daisy
+from hvcc.types.meta import Meta, DPF, Daisy
 
 
 gens = {

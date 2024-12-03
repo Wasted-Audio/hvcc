@@ -7,11 +7,11 @@ import json2daisy  # type: ignore
 from typing import Any, Dict, Optional
 
 from ..copyright import copyright_manager
-from ..types.meta import Meta, Daisy
 from . import parameters
 
 from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
-from hvcc.types.compiler import Compiler, CompilerResp, CompilerNotif, CompilerMsg
+from hvcc.types.compiler import Generator, CompilerResp, CompilerNotif, CompilerMsg
+from hvcc.types.meta import Meta, Daisy
 
 
 hv_midi_messages = {
@@ -26,7 +26,7 @@ hv_midi_messages = {
 }
 
 
-class c2daisy(Compiler):
+class c2daisy(Generator):
     """ Generates a Daisy wrapper for a given patch.
     """
 

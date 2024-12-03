@@ -10,15 +10,15 @@ import hvcc.core.hv2ir.HeavyLangObject as HeavyLangObject
 from ..copyright import copyright_manager
 
 from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
-from hvcc.generators.types.meta import Meta
-from hvcc.types.compiler import Compiler, CompilerResp, CompilerNotif, CompilerMsg
+from hvcc.types.compiler import Generator, CompilerResp, CompilerNotif, CompilerMsg
+from hvcc.types.meta import Meta
 
 
 heavy_hash = HeavyLangObject.HeavyLangObject.get_hash
 OWL_BUTTONS = ['Push', 'B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8']
 
 
-class c2owl(Compiler):
+class c2owl(Generator):
     """ Generates a OWL wrapper for a given patch.
     """
 
