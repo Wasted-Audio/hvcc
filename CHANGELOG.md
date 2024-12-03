@@ -12,6 +12,7 @@ Features:
 * JS: midi out and device select by @Reinissance
 * Docs: general updates/corrections and improvements
 * Use pydantic to validate and access HeavyLang and HeavyIR objects
+* Feature: external generators
 
 Bugfixes:
 

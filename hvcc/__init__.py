@@ -391,7 +391,7 @@ def compile_dataflow(
     if ext_generators:
         for module_name in ext_generators:
             compiler = load_ext_generator(module_name, verbose)
-            if compiler:
+            if compiler is not None:
                 if verbose:
                     print(f"--> Executing custom generator from module {module_name}")
                 results[module_name] = compiler.compile(**gen_args)
