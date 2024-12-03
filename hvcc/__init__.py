@@ -36,8 +36,8 @@ from hvcc.generators.c2owl import c2owl
 from hvcc.generators.c2pdext import c2pdext
 from hvcc.generators.c2wwise import c2wwise
 from hvcc.generators.c2unity import c2unity
-from hvcc.generators.types.meta import Meta
-from hvcc.types.compiler import Compiler, CompilerResp, CompilerNotif, CompilerMsg
+from hvcc.types.compiler import CompilerResp, CompilerNotif, CompilerMsg, Generator
+from hvcc.types.meta import Meta
 
 
 class Colours:
@@ -204,11 +204,11 @@ def generate_extern_info(hvir: Dict, results: OrderedDict) -> Dict:
     }
 
 
-def load_ext_generator(module_name, verbose) -> Optional[Compiler]:
+def load_ext_generator(module_name, verbose) -> Optional[Generator]:
     try:
         module = importlib.import_module(module_name)
         for _, member in inspect.getmembers(module):
-            if inspect.isclass(member) and not inspect.isabstract(member) and issubclass(member, Compiler):
+            if inspect.isclass(member) and not inspect.isabstract(member) and issubclass(member, Generator):
                 return member()
         if verbose:
             print(f"---> Module {module_name} does not contain a class derived from hvcc.types.Compiler")

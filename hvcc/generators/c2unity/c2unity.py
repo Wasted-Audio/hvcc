@@ -24,11 +24,11 @@ from ..copyright import copyright_manager
 from ..filters import filter_string_cap, filter_templates, filter_xcode_build, filter_xcode_fileref
 
 from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
-from hvcc.generators.types.meta import Meta
-from hvcc.types.compiler import Compiler, CompilerResp, CompilerNotif, CompilerMsg
+from hvcc.types.compiler import Generator, CompilerResp, CompilerNotif, CompilerMsg
+from hvcc.types.meta import Meta
 
 
-class c2unity(Compiler):
+class c2unity(Generator):
     """Generates a Audio Native Plugin wrapper for Unity 5.
     """
 

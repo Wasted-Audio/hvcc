@@ -26,11 +26,11 @@ from hvcc.core.hv2ir.HeavyException import HeavyException
 from ..copyright import copyright_manager
 
 from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
-from hvcc.generators.types.meta import Meta
-from hvcc.types.compiler import Compiler, CompilerResp, CompilerNotif, CompilerMsg
+from hvcc.types.compiler import Generator, CompilerResp, CompilerNotif, CompilerMsg
+from hvcc.types.meta import Meta
 
 
-class c2js(Compiler):
+class c2js(Generator):
     """Compiles a directory of C source files into javascript. Requires the
     emscripten library to be installed - https://github.com/kripken/emscripten
     """
