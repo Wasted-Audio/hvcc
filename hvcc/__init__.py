@@ -16,11 +16,13 @@
 
 import argparse
 from collections import OrderedDict
+import importlib
+import inspect
 import json
 import os
 import re
-import time
 import sys
+import time
 from typing import List, Dict, Optional
 
 from hvcc.interpreters.pd2hv import pd2hv
@@ -34,7 +36,7 @@ from hvcc.generators.c2owl import c2owl
 from hvcc.generators.c2pdext import c2pdext
 from hvcc.generators.c2wwise import c2wwise
 from hvcc.generators.c2unity import c2unity
-from hvcc.types.compiler import CompilerResp, CompilerNotif, CompilerMsg
+from hvcc.types.compiler import CompilerResp, CompilerNotif, CompilerMsg, Generator
 from hvcc.types.meta import Meta
 
 
@@ -202,6 +204,19 @@ def generate_extern_info(hvir: Dict, results: OrderedDict) -> Dict:
     }
 
 
+def load_ext_generator(module_name, verbose) -> Optional[Generator]:
+    try:
+        module = importlib.import_module(module_name)
+        for _, member in inspect.getmembers(module):
+            if inspect.isclass(member) and not inspect.isabstract(member) and issubclass(member, Generator):
+                return member()
+        if verbose:
+            print(f"---> Module {module_name} does not contain a class derived from hvcc.types.Compiler")
+        return None
+    except ModuleNotFoundError:
+        return None
+
+
 def compile_dataflow(
     in_path: str,
     out_dir: str,
@@ -209,11 +224,11 @@ def compile_dataflow(
     patch_meta_file: Optional[str] = None,
     search_paths: Optional[List] = None,
     generators: Optional[List] = None,
+    ext_generators: Optional[List] = None,
     verbose: bool = False,
     copyright: Optional[str] = None,
     nodsp: Optional[bool] = False
 ) -> Dict[str, CompilerResp]:
-
     results: OrderedDict[str, CompilerResp] = OrderedDict()  # default value, empty dictionary
     patch_meta = Meta()
 
@@ -373,6 +388,14 @@ def compile_dataflow(
             print("--> Generating Wwise plugin")
         results["c2wwise"] = c2wwise.c2wwise.compile(**gen_args)
 
+    if ext_generators:
+        for module_name in ext_generators:
+            compiler = load_ext_generator(module_name, verbose)
+            if compiler is not None:
+                if verbose:
+                    print(f"--> Executing custom generator from module {module_name}")
+                results[module_name] = compiler.compile(**gen_args)
+
     return results
 
 
@@ -410,6 +433,11 @@ def main() -> bool:
         default=["c"],
         help="List of generator outputs: c, unity, wwise, js, pdext, daisy, dpf, fabric, owl")
     parser.add_argument(
+        "-G",
+        "--ext-gen",
+        nargs="*",
+        help="List of external generator modules, see 'External Generators' docs page.")
+    parser.add_argument(
         "--results_path",
         help="Write results dictionary to the given path as a JSON-formatted string."
              " Target directory will be created if it does not exist.")
@@ -436,6 +464,7 @@ def main() -> bool:
         patch_meta_file=args.meta,
         search_paths=args.search_paths,
         generators=args.gen,
+        ext_generators=args.ext_gen,
         verbose=args.verbose,
         copyright=args.copyright,
         nodsp=args.nodsp

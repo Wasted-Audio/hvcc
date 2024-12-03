@@ -35,6 +35,7 @@ class CompilerResp(BaseModel):
 
 class Generator(ABC):
 
+    @classmethod
     @abstractmethod
     def compile(
         cls,
