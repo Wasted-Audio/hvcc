@@ -194,8 +194,8 @@ class HeavyParser:
             if g.is_root_graph():
                 # add the notification dictionary at the top level
                 e.notes = g.get_notices()
-                e.notes["has_error"] = True
-                e.notes["exception"] = e
+                e.notes.has_error = True
+                e.notes.exception = e
             raise e
 
         if (g.graph is None) or (g.graph.file != g.file):

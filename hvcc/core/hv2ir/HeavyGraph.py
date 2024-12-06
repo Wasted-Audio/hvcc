@@ -27,6 +27,8 @@ from .HeavyIrObject import HeavyIrObject
 from .HIrReceive import HIrReceive
 from .HeavyLangObject import HeavyLangObject
 
+from hvcc.types.compiler import CompilerNotif
+
 
 class HeavyGraph(HeavyIrObject):
     """ Represents a graph. Subclasses HeavyIrObject for functionality.
@@ -377,12 +379,12 @@ class HeavyGraph(HeavyIrObject):
         else:
             return self.output_channel_set
 
-    def get_notices(self) -> Dict:
+    def get_notices(self) -> CompilerNotif:
         notices = HeavyLangObject.get_notices(self)
         for o in self.objs.values():
             n = o.get_notices()
-            notices["warnings"].extend(n["warnings"])
-            notices["errors"].extend(n["errors"])
+            notices.warnings.extend(n.warnings)
+            notices.errors.extend(n.errors)
         return notices
 
     def get_objects_for_type(self, obj_type: str, recursive: bool = False) -> List:
@@ -460,8 +462,8 @@ class HeavyGraph(HeavyIrObject):
             self.assign_signal_buffers()
         except HeavyException as e:
             e.notes = self.get_notices()
-            e.notes["has_error"] = True
-            e.notes["exception"] = e
+            e.notes.has_error = True
+            e.notes.exception = e
             raise e
 
     def _remove_unused_inlet_connections(self) -> None:

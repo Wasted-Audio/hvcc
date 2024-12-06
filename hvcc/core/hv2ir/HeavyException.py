@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from typing import Dict
+from hvcc.types.compiler import CompilerNotif
 
 
 class HeavyException(Exception):
@@ -24,4 +24,4 @@ class HeavyException(Exception):
     def __init__(self, message: str = "") -> None:
         super(Exception, self).__init__(message)
         self.message = message
-        self.notes: Dict = {}
+        self.notes: CompilerNotif = CompilerNotif()

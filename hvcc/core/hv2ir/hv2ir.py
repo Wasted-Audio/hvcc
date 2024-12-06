@@ -125,7 +125,7 @@ class hv2ir:
         return CompilerResp(
             stage="hv2ir",
             compile_time=time.time() - tick,  # record the total compile time
-            notifs=CompilerNotif(**hv_graph.get_notices()),
+            notifs=hv_graph.get_notices(),
             in_file=os.path.basename(hv_file),
             in_dir=os.path.dirname(hv_file),
             out_file=os.path.basename(ir_file),
