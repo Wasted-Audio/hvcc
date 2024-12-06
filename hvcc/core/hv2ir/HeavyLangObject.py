@@ -27,6 +27,8 @@ from hvcc.core.hv2ir.types import HeavyLangType, LangNode, Inlet, Outlet
 from .Connection import Connection
 from .HeavyException import HeavyException
 
+from hvcc.types.compiler import CompilerMsg, CompilerNotif
+
 if TYPE_CHECKING:
     from .HeavyGraph import HeavyGraph
     from .HeavyIrObject import HeavyIrObject
@@ -68,8 +70,8 @@ class HeavyLangObject:
         self.annotations: Dict = annotations or {}
 
         # a list of locally generated warnings and errors (notifications)
-        self.warnings: List = []
-        self.errors: List = []
+        self.warnings: List[CompilerMsg] = []
+        self.errors: List[CompilerMsg] = []
 
         # resolve arguments and fill in missing defaults for HeavyLang objects
         self.__resolve_default_lang_args()
@@ -127,21 +129,22 @@ class HeavyLangObject:
     def add_warning(self, warning: str) -> None:
         """ Add a warning to this object.
         """
-        self.warnings.append({"message": warning})
+        self.warnings.append(CompilerMsg(message=warning))
 
     def add_error(self, error: str) -> None:
         """ Add an error to this object and raise an exception.
         """
-        self.errors.append({"message": error})
+        self.errors.append(CompilerMsg(message=error))
         raise HeavyException(error)
 
-    def get_notices(self) -> Dict:
+    def get_notices(self) -> CompilerNotif:
         """ Returns a dictionary of all warnings and errors at this object.
         """
-        return {
-            "warnings": [{"message": f"{self}: {n['message']}"} for n in self.warnings],
-            "errors": [{"message": f"{self}: {n['message']}"} for n in self.errors],
-        }
+        return CompilerNotif(
+            has_error=len(self.errors) > 0,
+            warnings=[CompilerMsg(message=f"{self}: {n.message}") for n in self.warnings],
+            errors=[CompilerMsg(message=f"{self}: {n.message}") for n in self.errors],
+        )
 
     @classmethod
     def force_arg_type(cls, value: Any, value_type: Optional[str] = None, graph: Optional['HeavyGraph'] = None) -> Any:
