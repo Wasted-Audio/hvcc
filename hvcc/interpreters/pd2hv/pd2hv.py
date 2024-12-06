@@ -61,7 +61,7 @@ class pd2hv:
                 parser.add_absolute_search_directory(p)
 
         pd_graph = parser.graph_from_file(pd_path)
-        notices = CompilerNotif(**pd_graph.get_notices())  # TODO: type all get_notices()
+        notices = pd_graph.get_notices()
 
         # check for errors
         if len(notices.errors) > 0:

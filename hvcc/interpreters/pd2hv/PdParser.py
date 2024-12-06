@@ -191,7 +191,7 @@ class PdParser:
             pd_graph_class)
 
         if is_root:
-            if g.get_notices()["errors"]:
+            if g.get_notices().has_error:
                 # return the graph early here as there are already errors and it is
                 # clearly invalid, avoids triggering unrelated errors in validation
                 return g

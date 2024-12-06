@@ -21,6 +21,8 @@ from .Connection import Connection
 from .NotificationEnum import NotificationEnum
 from .PdObject import PdObject
 
+from hvcc.types.compiler import CompilerNotif
+
 
 class PdGraph(PdObject):
 
@@ -181,17 +183,17 @@ class PdGraph(PdObject):
         else:
             return False
 
-    def get_notices(self) -> Dict:
+    def get_notices(self) -> CompilerNotif:
         notices = PdObject.get_notices(self)
         for o in self.__objs:
             n = o.get_notices()
-            notices["warnings"].extend(n["warnings"])
-            notices["errors"].extend(n["errors"])
+            notices.warnings.extend(n.warnings)
+            notices.errors.extend(n.errors)
 
         # remove ERROR_EXCEPTION if there are already other errors.
         # The exception is always a result of some other error
-        if any((n["enum"] != NotificationEnum.ERROR_EXCEPTION) for n in notices["errors"]):
-            notices["errors"] = [n for n in notices["errors"] if n["enum"] != NotificationEnum.ERROR_EXCEPTION]
+        if any((n.enum != NotificationEnum.ERROR_EXCEPTION) for n in notices.errors):
+            notices.errors = [n for n in notices.errors if n.enum != NotificationEnum.ERROR_EXCEPTION]
 
         return notices
 
