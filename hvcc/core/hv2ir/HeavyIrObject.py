@@ -19,11 +19,13 @@ import os
 
 from typing import Dict, List, Optional, TYPE_CHECKING
 
-from hvcc.core.hv2ir.types import HeavyIRType, IRNode
 from .Connection import Connection
 from .HeavyException import HeavyException
 from .HeavyLangObject import HeavyLangObject
 from .BufferPool import BufferPool
+
+from hvcc.types.IR import HeavyIRType, IRNode
+from hvcc.types.Lang import LangLetType
 
 if TYPE_CHECKING:
     from .HeavyGraph import HeavyGraph
@@ -184,7 +186,7 @@ class HeavyIrObject(HeavyLangObject):
                     if len(self.outlet_connections[i]) == 0:
                         exclude_set.add(b)
 
-    def _resolved_outlet_type(self, outlet_index: int = 0) -> Optional[str]:
+    def _resolved_outlet_type(self, outlet_index: int = 0) -> Optional[LangLetType]:
         """ Returns the connection type at the given outlet.
             This information is always well-defined for IR objects.
         """

@@ -20,6 +20,8 @@ from .HeavyIrObject import HeavyIrObject
 from .HeavyLangObject import HeavyLangObject
 from .HeavyGraph import HeavyGraph
 
+from hvcc.types.Lang import LangLetType
+
 
 class HLangAdc(HeavyLangObject):
     """ adc
@@ -38,7 +40,7 @@ class HLangAdc(HeavyLangObject):
                          num_outlets=len(args[self._HEAVY_LANG_DICT[obj_type].args[0].name]),
                          annotations=annotations)
 
-    def _resolved_outlet_type(self, outlet_index: int = 0) -> str:
+    def _resolved_outlet_type(self, outlet_index: int = 0) -> LangLetType:
         return "~f>"
 
     def reduce(self) -> tuple:

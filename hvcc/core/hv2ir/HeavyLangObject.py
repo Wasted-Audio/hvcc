@@ -23,11 +23,11 @@ import string
 from struct import unpack, pack
 from typing import Optional, Union, List, Dict, Any, TYPE_CHECKING
 
-from hvcc.core.hv2ir.types import HeavyLangType, LangNode, Inlet, Outlet
 from .Connection import Connection
 from .HeavyException import HeavyException
 
 from hvcc.types.compiler import CompilerMsg, CompilerNotif
+from hvcc.types.Lang import HeavyLangType, LangNode, LangLet, LangLetType
 
 if TYPE_CHECKING:
     from .HeavyGraph import HeavyGraph
@@ -115,10 +115,10 @@ class HeavyLangObject:
         """
         return self._HEAVY_LANG_DICT[self.type]
 
-    def inlet_connection_type(self, index: int) -> Inlet:
+    def inlet_connection_type(self, index: int) -> LangLet:
         return self._obj_desc.inlets[index]
 
-    def outlet_connection_type(self, index: int) -> Outlet:
+    def outlet_connection_type(self, index: int) -> LangLet:
         return self._obj_desc.outlets[index]
 
     def name_for_arg(self, index: int = 0) -> str:
@@ -318,7 +318,7 @@ class HeavyLangObject:
         """
         return all(len(c) == 0 for c in self.inlet_connections)
 
-    def _resolved_outlet_type(self, outlet_index: int = 0) -> Optional[str]:
+    def _resolved_outlet_type(self, outlet_index: int = 0) -> Optional[LangLetType]:
         """ Returns the connection type expected at the given outlet.
             The result may be influenced by the state of the input connections.
         """

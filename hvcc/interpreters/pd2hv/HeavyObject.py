@@ -19,10 +19,12 @@ import json
 import importlib_resources
 from typing import Optional, List, Dict, Any, Union, cast
 
-from hvcc.core.hv2ir.types import HeavyIRType, HeavyLangType, IRNode, LangNode, IRArg, LangArg
 from .Connection import Connection
 from .NotificationEnum import NotificationEnum
 from .PdObject import PdObject
+
+from hvcc.types.IR import HeavyIRType, IRNode, IRArg
+from hvcc.types.Lang import HeavyLangType, LangNode, LangArg
 
 
 class HeavyObject(PdObject):

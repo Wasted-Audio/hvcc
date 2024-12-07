@@ -28,6 +28,7 @@ from .HIrReceive import HIrReceive
 from .HeavyLangObject import HeavyLangObject
 
 from hvcc.types.compiler import CompilerNotif
+from hvcc.types.Lang import LangLetType
 
 
 class HeavyGraph(HeavyIrObject):
@@ -482,7 +483,7 @@ class HeavyGraph(HeavyIrObject):
         for o in [o for o in self.objs.values() if (o.type == "__graph")]:
             o._remove_unused_inlet_connections()
 
-    def _resolved_outlet_type(self, outlet_index: int = 0) -> str:
+    def _resolved_outlet_type(self, outlet_index: int = 0) -> LangLetType:
         # a graph's outlet type depends on the connections incident on the
         # corresponding outlet object
         connection_type_set = {c.type for c in self.outlet_objs[outlet_index].inlet_connections[0]}

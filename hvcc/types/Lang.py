@@ -3,6 +3,7 @@ from typing import List, Optional, Dict, Literal, Union
 
 
 LangConnectionType = Literal["-->", "-~>", "~f>"]
+LangLetType = Literal["-->", "-~>", "~i>", "~f>", "signal"]
 
 
 class LangArg(BaseModel):
@@ -13,13 +14,7 @@ class LangArg(BaseModel):
     required: bool
 
 
-class Inlet(BaseModel):
-    name: str
-    connectionType: LangConnectionType
-    description: str
-
-
-class Outlet(BaseModel):
+class LangLet(BaseModel):
     name: str
     connectionType: LangConnectionType
     description: str
@@ -27,8 +22,8 @@ class Outlet(BaseModel):
 
 class LangNode(BaseModel):
     description: str
-    inlets: List[Inlet]
-    outlets: List[Outlet]
+    inlets: List[LangLet]
+    outlets: List[LangLet]
     args: List[LangArg]
     alias: List[str]
     tags: List[str]
