@@ -20,6 +20,8 @@ from typing import Dict, List, Optional
 from .HeavyIrObject import HeavyIrObject
 from .HeavyGraph import HeavyGraph
 
+from hvcc.types.IR import IRSendMessage
+
 
 class HIrSend(HeavyIrObject):
     """ A specific implementation of the __send object.
@@ -40,19 +42,20 @@ class HIrSend(HeavyIrObject):
                 self.add_error(f"Parameter and Event names may only contain \
                                 alphanumeric characters or underscore: '{args['name']}'")
 
-    def get_ir_control_list(self) -> List:
+    def get_ir_control_list(self) -> List[IRSendMessage]:
         if self.graph is not None and self.name is not None:
             receive_objs = self.graph.resolve_objects_for_name(self.name, "__receive")
             on_message_list = [x for o in receive_objs for x in o.get_ir_on_message(inlet_index=0)]
-            return [{
-                "id": self.id,
-                "type": "send",
-                "onMessage": [on_message_list],
-                "extern": self.args["extern"],
-                "attributes": self.args["attributes"],
-                "hash": self.args["hash"],
-                "display": self.args["name"],
-                "name": ((f"_{self.args['name']}") if re.match(r"\d", self.args["name"]) else self.args["name"])
-            }]
+
+            return [IRSendMessage(
+                id=self.id,
+                type="send",
+                onMessage=[on_message_list],
+                extern=self.args["extern"],
+                attributes=self.args["attributes"],
+                hash=self.args["hash"],
+                display=self.args["name"],
+                name=((f"_{self.args['name']}") if re.match(r"\d", self.args["name"]) else self.args["name"])
+            )]
         else:
             return []

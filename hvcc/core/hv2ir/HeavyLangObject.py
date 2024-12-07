@@ -345,7 +345,7 @@ class HeavyLangObject:
 
         return None
 
-    def _resolve_connection_types(self, obj_stack: Optional[set] = None) -> Optional[None]:
+    def _resolve_connection_types(self, obj_stack: Optional[set] = None) -> None:
         """ Resolves the type of all connections before reduction to IR object types.
             If connections incident on an object are incompatible, they are either
             resolved, potentially by inserting conversion objects, or pruned.

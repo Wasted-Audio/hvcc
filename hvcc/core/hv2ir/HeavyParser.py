@@ -18,7 +18,7 @@ import json
 import random
 import os
 
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional, Set, Tuple
 
 from .HIrConvolution import HIrConvolution
 from .HIrInlet import HIrInlet
@@ -233,7 +233,7 @@ class HLangIf(HeavyLangObject):
         assert obj_type == "if"
         super().__init__("if", args, graph, num_inlets=2, num_outlets=2, annotations=annotations)
 
-    def reduce(self) -> tuple:
+    def reduce(self) -> Tuple[Set, List]:
         if self.has_inlet_connection_format(["cc", "_c", "c_", "__"]):
             x = HeavyIrObject("__if", self.args)
         elif self.has_inlet_connection_format("ff"):
@@ -263,7 +263,7 @@ class HLangNoise(HeavyLangObject):
         assert obj_type == "noise"
         super().__init__("noise", args, graph, num_inlets=1, num_outlets=1, annotations=annotations)
 
-    def reduce(self) -> tuple:
+    def reduce(self) -> Tuple[Set, List]:
         seed = int(random.uniform(1, 2147483647))  # assign a random 32-bit seed
         noise_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "./hvlib/noise.hv.json")
         x = HeavyParser.graph_from_file(noise_path, graph_args={"seed": seed})

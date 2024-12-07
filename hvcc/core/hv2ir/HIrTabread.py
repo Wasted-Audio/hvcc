@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from typing import Dict, Optional
+from typing import Dict, Optional, List, Set, Tuple
 
 from .HeavyIrObject import HeavyIrObject
 from .HeavyGraph import HeavyGraph
@@ -34,7 +34,7 @@ class HIrTabread(HeavyIrObject):
         assert obj_type in {"__tabread~if", "__tabread~f", "__tabread_stoppable~f", "__tabreadu~f", "__tabread"}
         super().__init__(obj_type, args=args, graph=graph, annotations=annotations)
 
-    def reduce(self) -> Optional[tuple]:
+    def reduce(self) -> Optional[Tuple[Set, List]]:
         if self.graph is not None:
             table_obj = self.graph.resolve_object_for_name(
                 self.args["table"],

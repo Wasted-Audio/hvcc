@@ -1,11 +1,12 @@
 from abc import ABC, abstractmethod
 from collections import Counter
-from typing import Any, Dict, List, Optional
+from typing import Dict, List, Optional
 
 from pydantic import BaseModel
 
 from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
 from hvcc.types.meta import Meta
+from hvcc.types.IR import IRGraph
 
 
 class CompilerMsg(BaseModel):
@@ -30,7 +31,7 @@ class CompilerResp(BaseModel):
     compile_time: float = 0.0
     obj_counter: Counter = Counter()
     obj_perf: Dict[str, Counter] = {}
-    ir: Dict[str, Any] = {}  # TODO: improve Any type in Graph objects
+    ir: Optional[IRGraph] = None
 
 
 class Generator(ABC):
