@@ -1,8 +1,7 @@
 from pydantic import BaseModel, RootModel
-from typing import Dict, List, Optional, Union, Literal
+from typing import Dict, List, Optional, Union
 
-
-IRConnectionType = Literal["-->", "~i>", "~f>", "signal"]
+from hvcc.types.Lang import LangLetType
 
 
 class IRArg(BaseModel):
@@ -26,9 +25,9 @@ class Perf(BaseModel):
 
 
 class IRNode(BaseModel):
-    inlets: List[IRConnectionType]
+    inlets: List[LangLetType]
     ir: IR
-    outlets: List[IRConnectionType]
+    outlets: List[LangLetType]
     args: List[IRArg] = []
     perf: Optional[Perf] = Perf()
     # perf: Perf

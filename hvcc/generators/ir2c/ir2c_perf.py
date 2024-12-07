@@ -22,7 +22,7 @@ from collections import Counter
 from collections import defaultdict
 from typing import Dict
 
-from hvcc.core.hv2ir.types import HeavyIRType
+from hvcc.types.IR import HeavyIRType
 
 
 class ir2c_perf:
