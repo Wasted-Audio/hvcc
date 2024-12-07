@@ -22,7 +22,7 @@ from collections import Counter
 from collections import defaultdict
 from typing import Dict
 
-from hvcc.types.IR import HeavyIRType
+from hvcc.types.IR import HeavyIRType, IRGraph
 
 
 class ir2c_perf:
@@ -30,7 +30,7 @@ class ir2c_perf:
     @classmethod
     def perf(
         cls,
-        ir: Dict,
+        ir: IRGraph,
         blocksize: int = 512,
         mhz: int = 1000,
         verbose: bool = False
@@ -42,9 +42,9 @@ class ir2c_perf:
         objects: Counter = Counter()
         perf: Counter = Counter()
         per_object_perf: Dict[str, Counter] = defaultdict(Counter)
-        for o in ir["signal"]["processOrder"]:
-            obj_id = o["id"]
-            obj_type = ir["objects"][obj_id]["type"]
+        for o in ir.signal.processOrder:
+            obj_id = o.id
+            obj_type = ir.objects[obj_id].type
             if obj_type in HEAVY_IR_JSON.keys():
                 objects[obj_type] += 1
                 c = Counter(HEAVY_IR_JSON[obj_type].perf)

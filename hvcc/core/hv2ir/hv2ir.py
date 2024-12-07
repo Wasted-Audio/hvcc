@@ -97,30 +97,31 @@ class hv2ir:
                 obj_counter=hv_counter
             )
 
-        # write the hv.ir file
-        with open(ir_file, "w") as f:
-            if verbose:
-                json.dump(
-                    ir,
-                    f,
-                    sort_keys=True,
-                    indent=2,
-                    separators=(",", ": "))
-            else:
-                json.dump(ir, f)
+        if ir is not None:
+            # write the hv.ir file
+            with open(ir_file, "w") as f:
+                if verbose:
+                    json.dump(
+                        ir.model_dump(),
+                        f,
+                        sort_keys=True,
+                        indent=2,
+                        separators=(",", ": "))
+                else:
+                    json.dump(ir.model_dump(), f)
 
-        if verbose and ir is not None:
-            if len(ir["signal"]["processOrder"]) > 0:
-                print("")
-                print("=== Signal Order ===")
-                for so in ir["signal"]["processOrder"]:
-                    o = ir["objects"][so["id"]]
-                    if len(o["args"]) > 0:
-                        print("{0} {{{1}}}".format(
-                            o["type"],
-                            " ".join([f"{k}:{v}" for k, v in o["args"].items()])))
-                    else:
-                        print(o["type"])
+            if verbose and ir is not None:
+                if len(ir.signal.processOrder) > 0:
+                    print("")
+                    print("=== Signal Order ===")
+                    for so in ir.signal.processOrder:
+                        o = ir.objects[so.id]
+                        if len(o.args) > 0:
+                            print("{0} {{{1}}}".format(
+                                o.type,
+                                " ".join([f"{k}:{v}" for k, v in o.args.items()])))
+                        else:
+                            print(o.type)
 
         return CompilerResp(
             stage="hv2ir",

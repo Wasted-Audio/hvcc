@@ -23,7 +23,7 @@ import os
 import re
 import sys
 import time
-from typing import List, Dict, Optional
+from typing import Any, List, Dict, Optional
 
 from hvcc.interpreters.pd2hv import pd2hv
 from hvcc.core.hv2ir import hv2ir
@@ -37,6 +37,7 @@ from hvcc.generators.c2pdext import c2pdext
 from hvcc.generators.c2wwise import c2wwise
 from hvcc.generators.c2unity import c2unity
 from hvcc.types.compiler import CompilerResp, CompilerNotif, CompilerMsg, Generator
+from hvcc.types.IR import IRGraph
 from hvcc.types.meta import Meta
 
 
@@ -83,7 +84,7 @@ def check_extern_name_conflicts(extern_type: str, extern_list: List, results: Or
                           "capital letters are not the only difference.")
 
 
-def check_midi_objects(hvir: Dict) -> Dict:
+def check_midi_objects(hvir: IRGraph) -> Dict:
     in_midi = []
     out_midi = []
 
@@ -109,14 +110,13 @@ def check_midi_objects(hvir: Dict) -> Dict:
         '__hv_touchout',
     ]
 
-    for key in hvir['control']['receivers'].keys():
-        if key in midi_in_objs:
-            in_midi.append(key)
+    for recv in hvir.control.receivers.keys():
+        if recv in midi_in_objs:
+            in_midi.append(recv)
 
-    for key in hvir['control']['sendMessage']:
-        if key.get('name'):
-            if key['name'] in midi_out_objs:
-                out_midi.append(key['name'])
+    for msg in hvir.control.sendMessage:
+        if msg.name in midi_out_objs:
+            out_midi.append(msg.name)
 
     return {
         'in': in_midi,
@@ -134,22 +134,22 @@ def filter_midi_from_out_parameters(output_parameter_list: List, midi_out_object
     return new_out_list
 
 
-def generate_extern_info(hvir: Dict, results: OrderedDict) -> Dict:
+def generate_extern_info(hvir: IRGraph, results: OrderedDict) -> Dict:
     """ Simplifies the receiver/send and table lists by only containing values
         externed with @hv_param, @hv_event or @hv_table
     """
     # Exposed input parameters
-    in_parameter_list = [(k, v) for k, v in hvir["control"]["receivers"].items() if v.get("extern", None) == "param"]
+    in_parameter_list = [(k, v) for k, v in hvir.control.receivers.items() if v.extern == "param"]
     in_parameter_list.sort(key=lambda x: x[0])
     check_extern_name_conflicts("input parameter", in_parameter_list, results)
 
     # Exposed input events
-    in_event_list = [(k, v) for k, v in hvir["control"]["receivers"].items() if v.get("extern", None) == "event"]
+    in_event_list = [(k, v) for k, v in hvir.control.receivers.items() if v.extern == "event"]
     in_event_list.sort(key=lambda x: x[0])
     check_extern_name_conflicts("input event", in_event_list, results)
 
     # Exposed output parameters
-    out_parameter_list = [(v["name"], v) for v in hvir["control"]["sendMessage"] if v.get("extern", None) == "param"]
+    out_parameter_list = [(v.name, v) for v in hvir.control.sendMessage if v.extern == "param"]
     # remove duplicate output parameters/events
     # NOTE(joe): is the id argument important here? We'll only take the first one in this case.
     out_parameter_list = list(dict(out_parameter_list).items())
@@ -157,13 +157,13 @@ def generate_extern_info(hvir: Dict, results: OrderedDict) -> Dict:
     check_extern_name_conflicts("output parameter", out_parameter_list, results)
 
     # Exposed output events
-    out_event_list = [(v["name"], v) for v in hvir["control"]["sendMessage"] if v.get("extern", None) == "event"]
+    out_event_list = [(v.name, v) for v in hvir.control.sendMessage if v.extern == "event"]
     out_event_list = list(dict(out_event_list).items())
     out_event_list.sort(key=lambda x: x[0])
     check_extern_name_conflicts("output event", out_event_list, results)
 
     # Exposed tables
-    table_list = [(k, v) for k, v in hvir["tables"].items() if v.get("extern", None)]
+    table_list = [(k, v) for k, v in hvir.tables.items() if v.extern]
     table_list.sort(key=lambda x: x[0])
     check_extern_name_conflicts("table", table_list, results)
 
@@ -285,7 +285,8 @@ def compile_dataflow(
 
         # get the hvir data
         hvir = results["hv2ir"].ir
-        patch_name = hvir["name"]["escaped"]
+        assert hvir is not None
+        patch_name = hvir.name.escaped
         externs = generate_extern_info(hvir, results)
 
         # get application path
@@ -310,7 +311,7 @@ def compile_dataflow(
         # ir2c_perf
         results["ir2c_perf"] = CompilerResp(
             stage="ir2c_perf",
-            obj_perf=ir2c_perf.ir2c_perf.perf(results["hv2ir"].ir, verbose=verbose),
+            obj_perf=ir2c_perf.ir2c_perf.perf(hvir, verbose=verbose),
             in_dir=results["hv2ir"].out_dir,
             in_file=results["hv2ir"].out_file,
         )
@@ -329,19 +330,20 @@ def compile_dataflow(
                 hvir_path = os.path.join(hvir_dir, os.listdir(hvir_dir)[0])
                 if os.path.isfile(hvir_path):
                     with open(hvir_path, "r") as f:
-                        hvir = json.load(f)
-                        patch_name = hvir["name"]["escaped"]
+                        hvir = IRGraph(**json.load(f))
+                        patch_name = hvir.name.escaped
                         externs = generate_extern_info(hvir, results)
                 else:
                     return add_error(results, "Cannot find hvir file.")
             except Exception as e:
                 return add_error(results, f"ir could not be found or loaded: {e}.")
 
+    assert hvir is not None
     # run the c2x generators, merge the results
-    num_input_channels = hvir["signal"]["numInputBuffers"]
-    num_output_channels = hvir["signal"]["numOutputBuffers"]
+    num_input_channels = hvir.signal.numInputBuffers
+    num_output_channels = hvir.signal.numOutputBuffers
 
-    gen_args = {
+    gen_args: Dict[str, Any] = {
         'c_src_dir': c_src_dir,
         'out_dir': out_dir,
         'patch_name': patch_name,

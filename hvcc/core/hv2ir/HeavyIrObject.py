@@ -24,8 +24,9 @@ from .HeavyException import HeavyException
 from .HeavyLangObject import HeavyLangObject
 from .BufferPool import BufferPool
 
-from hvcc.types.IR import HeavyIRType, IRNode
+from hvcc.types.IR import HeavyIRType, IRNode, IRObjectdict, IRSendMessage, IROnMessage, IRSignalList, IRBuffer
 from hvcc.types.Lang import LangLetType
+
 
 if TYPE_CHECKING:
     from .HeavyGraph import HeavyGraph
@@ -196,32 +197,32 @@ class HeavyIrObject(HeavyLangObject):
     # Intermediate Representation generators
     #
 
-    def get_object_dict(self) -> Dict:
+    def get_object_dict(self) -> Dict[str, IRObjectdict]:
         """ Returns a dictionary of all constituent low-level objects,
             indexed by id, including their arguments and type.
         """
         return {
-            self.id: {
-                "args": self.args,
-                "type": self.type
-            }
+            self.id: IRObjectdict(
+                args=self.args,
+                type=self.type
+            )
         }
 
-    def get_ir_init_list(self) -> List:
+    def get_ir_init_list(self) -> List[str]:
         """ Returns a list of all object id for obejcts that need initialisation.
         """
         return [self.id] if self.__obj_desc.ir.init else []
 
-    def get_ir_on_message(self, inlet_index: int = 0) -> List:
+    def get_ir_on_message(self, inlet_index: int = 0) -> List[IROnMessage]:
         """ Returns an array of dictionaries containing the information for the
             corresponding on_message call.
         """
-        return [{
-            "id": self.id,
-            "inletIndex": inlet_index
-        }]
+        return [IROnMessage(
+            id=self.id,
+            inletIndex=inlet_index
+        )]
 
-    def get_ir_control_list(self) -> List:
+    def get_ir_control_list(self) -> List[IRSendMessage]:
         """ Returns the intermediate representation for object control functions.
             Basically, does sendMessage() need to be written?
         """
@@ -233,26 +234,29 @@ class HeavyIrObject(HeavyLangObject):
                 for c in [c for c in connections if c.is_control]:
                     on_messages_let.extend(c.to_object.get_ir_on_message(c.inlet_index))
                 on_message_list.append(on_messages_let)
-            return [{
-                "id": self.id,
-                "onMessage": on_message_list
-            }]
+
+            return [IRSendMessage(
+                id=self.id,
+                onMessage=on_message_list
+            )]
         else:
             return []
 
-    def get_ir_signal_list(self) -> List:
+    def get_ir_signal_list(self) -> List[IRSignalList]:
         """ Returns the intermediate representation for object process functions.
             Only outputs buffer information for lets that require a signal.
         """
         # we assume that this method will only be called on signal objects
         assert self.__obj_desc.ir.signal
 
-        return [{
-            "id": self.id,
-            "inputBuffers": [
-                {"type": b[0], "index": b[1]} for i, b in enumerate(self.inlet_buffers)
-                if self.inlet_requires_signal(i)],
-            "outputBuffers": [
-                {"type": b[0], "index": b[1]} for i, b in enumerate(self.outlet_buffers)
-                if self.outlet_requires_signal(i)]
-        }]
+        return [IRSignalList(
+            id=self.id,
+            inputBuffers=[
+                IRBuffer(type=b[0], index=b[1]) for i, b in enumerate(self.inlet_buffers)
+                if self.inlet_requires_signal(i)
+            ],
+            outputBuffers=[
+                IRBuffer(type=b[0], index=b[1]) for i, b in enumerate(self.outlet_buffers)
+                if self.outlet_requires_signal(i)
+            ]
+        )]
