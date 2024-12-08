@@ -33,5 +33,5 @@ class ControlSystem(HeavyObject):
         return {"HvControlSystem.h", "HvControlSystem.c"}
 
     @classmethod
-    def get_C_onMessage(cls, obj_type: str, obj_id: int, inlet_index: int, args: Dict) -> List[str]:
+    def get_C_onMessage(cls, obj_type: str, obj_id: str, inlet_index: int, args: Dict) -> List[str]:
         return [f"cSystem_onMessage(_c, NULL, {inlet_index}, m, &cSystem_{obj_id}_sendMessage);"]

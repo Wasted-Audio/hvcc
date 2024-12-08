@@ -18,6 +18,8 @@ from typing import Dict, List
 
 from .HeavyObject import HeavyObject
 
+from hvcc.types.IR import IRSignalList
+
 
 class SignalCPole(HeavyObject):
     """Handles the __cpole~f object.
@@ -39,25 +41,25 @@ class SignalCPole(HeavyObject):
         }
 
     @classmethod
-    def get_C_def(cls, obj_type: str, obj_id: int) -> List[str]:
+    def get_C_def(cls, obj_type: str, obj_id: str) -> List[str]:
         return [f"SignalCPole sCPole_{obj_id};"]
 
     @classmethod
-    def get_C_init(cls, obj_type: str, obj_id: int, args: Dict) -> List[str]:
+    def get_C_init(cls, obj_type: str, obj_id: str, args: Dict) -> List[str]:
         return [f"sCPole_init(&sCPole_{obj_id});"]
 
     @classmethod
-    def get_C_free(cls, obj_type: str, obj_id: int, args: Dict) -> List[str]:
+    def get_C_free(cls, obj_type: str, obj_id: str, args: Dict) -> List[str]:
         return []
 
     @classmethod
-    def get_C_process(cls, process_dict: Dict, obj_type: str, obj_id: int, args: Dict) -> List[str]:
+    def get_C_process(cls, process_dict: IRSignalList, obj_type: str, obj_id: str, args: Dict) -> List[str]:
         return [
             "__hv_cpole_f(&sCPole_{0}, VIf({1}), VIf({2}), VIf({3}), VIf({4}), VOf({5}), VOf({6}));".format(
-                process_dict["id"],
-                cls._c_buffer(process_dict["inputBuffers"][0]),
-                cls._c_buffer(process_dict["inputBuffers"][1]),
-                cls._c_buffer(process_dict["inputBuffers"][2]),
-                cls._c_buffer(process_dict["inputBuffers"][3]),
-                cls._c_buffer(process_dict["outputBuffers"][0]),
-                cls._c_buffer(process_dict["outputBuffers"][1]))]
+                process_dict.id,
+                cls._c_buffer(process_dict.inputBuffers[0]),
+                cls._c_buffer(process_dict.inputBuffers[1]),
+                cls._c_buffer(process_dict.inputBuffers[2]),
+                cls._c_buffer(process_dict.inputBuffers[3]),
+                cls._c_buffer(process_dict.outputBuffers[0]),
+                cls._c_buffer(process_dict.outputBuffers[1]))]

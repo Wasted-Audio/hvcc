@@ -19,34 +19,36 @@ from typing import Callable, Dict, List
 
 from .HeavyObject import HeavyObject
 
+from hvcc.types.IR import IRObjectdict, IROnMessage
+
 
 class ControlMessage(HeavyObject):
 
     preamble = "cMsg"
 
     @classmethod
-    def get_C_onMessage(cls, obj_type: str, obj_id: int, inlet_index: int, args: Dict) -> List[str]:
+    def get_C_onMessage(cls, obj_type: str, obj_id: str, inlet_index: int, args: Dict) -> List[str]:
         return [f"cMsg_{obj_id}_sendMessage(_c, 0, m);"]
 
     @classmethod
     def get_C_impl(
         cls,
         obj_type: str,
-        obj_id: int,
-        on_message_list: List,
+        obj_id: str,
+        on_message_list: List[List[IROnMessage]],
         get_obj_class: Callable,
-        objects: Dict
+        objects: Dict[str, IRObjectdict],
     ) -> List[str]:
         send_message_list = [
             f"cMsg_{obj_id}_sendMessage(HeavyContextInterface *_c, int letIn, const HvMessage *const n) {{"
         ]
 
-        if len(objects[obj_id]["args"]["local"]) > 0:
+        if len(objects[obj_id].args["local"]) > 0:
             # declare the outgoing messages (if there are any)
             send_message_list.append("HvMessage *m = nullptr;")
 
         # for each message
-        for m in objects[obj_id]["args"]["local"]:
+        for m in objects[obj_id].args["local"]:
             # construct the message
             send_message_list.append(f"m = HV_MESSAGE_ON_STACK({len(m)});")
             send_message_list.append(f"msg_init(m, {len(m)}, msg_getTimestamp(n));")
@@ -71,11 +73,11 @@ class ControlMessage(HeavyObject):
             # send the message to all receiving objects
             for om in on_message_list[0]:
                 send_message_list.extend(
-                    get_obj_class(objects[om["id"]]["type"]).get_C_onMessage(
-                        objects[om["id"]]["type"],
-                        om["id"],
-                        om["inletIndex"],
-                        objects[om["id"]]["args"]))
+                    get_obj_class(objects[om.id].type).get_C_onMessage(
+                        objects[om.id].type,
+                        om.id,
+                        om.inletIndex,
+                        objects[om.id].args))
 
         send_message_list.append("}")  # end function
         return send_message_list

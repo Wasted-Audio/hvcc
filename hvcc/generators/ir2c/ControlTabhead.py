@@ -35,13 +35,13 @@ class ControlTabhead(HeavyObject):
         return {"HvControlTabhead.h", "HvControlTabhead.c"}
 
     @classmethod
-    def get_C_free(cls, obj_type: str, obj_id: int, args: Dict) -> List[str]:
+    def get_C_free(cls, obj_type: str, obj_id: str, args: Dict) -> List[str]:
         return []
 
     @classmethod
-    def get_C_init(cls, obj_type: str, obj_id: int, args: Dict) -> List[str]:
+    def get_C_init(cls, obj_type: str, obj_id: str, args: Dict) -> List[str]:
         return [f"cTabhead_init(&cTabhead_{obj_id}, &hTable_{args['table_id']});"]
 
     @classmethod
-    def get_C_onMessage(cls, obj_type: str, obj_id: int, inlet_index: int, args: Dict) -> List[str]:
+    def get_C_onMessage(cls, obj_type: str, obj_id: str, inlet_index: int, args: Dict) -> List[str]:
         return [f"cTabhead_onMessage(_c, &Context(_c)->cTabhead_{obj_id}, 0, m, &cTabhead_{obj_id}_sendMessage);"]

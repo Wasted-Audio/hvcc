@@ -18,6 +18,8 @@ from typing import Callable, Dict, List
 
 from .HeavyObject import HeavyObject
 
+from hvcc.types.IR import IROnMessage, IRObjectdict
+
 
 class ControlDelay(HeavyObject):
 
@@ -33,7 +35,7 @@ class ControlDelay(HeavyObject):
         return {"HvControlDelay.h", "HvControlDelay.c"}
 
     @classmethod
-    def get_C_init(cls, obj_type: str, obj_id: int, args: Dict) -> List[str]:
+    def get_C_init(cls, obj_type: str, obj_id: str, args: Dict) -> List[str]:
         return [
             "{0}_init(this, &{0}_{1}, {2}f);".format(
                 cls.preamble,
@@ -42,11 +44,11 @@ class ControlDelay(HeavyObject):
         ]
 
     @classmethod
-    def get_C_free(cls, obj_type: str, obj_id: int, args: Dict) -> List[str]:
+    def get_C_free(cls, obj_type: str, obj_id: str, args: Dict) -> List[str]:
         return []  # no need to free any control binop objects
 
     @classmethod
-    def get_C_onMessage(cls, obj_type: str, obj_id: int, inlet_index: int, args: Dict) -> List[str]:
+    def get_C_onMessage(cls, obj_type: str, obj_id: str, inlet_index: int, args: Dict) -> List[str]:
         return [
             "{0}_onMessage(_c, &Context(_c)->{0}_{1}, {2}, m, "
             "&{0}_{1}_sendMessage);".format(
@@ -59,10 +61,10 @@ class ControlDelay(HeavyObject):
     def get_C_impl(
         cls,
         obj_type: str,
-        obj_id: int,
-        on_message_list: List,
+        obj_id: str,
+        on_message_list: List[List[IROnMessage]],
         get_obj_class: Callable,
-        objects: Dict
+        objects: Dict[str, IRObjectdict]
     ) -> List[str]:
         send_message_list = [
             f"cDelay_{obj_id}_sendMessage(HeavyContextInterface *_c, int letIn, const HvMessage *const m) {{"

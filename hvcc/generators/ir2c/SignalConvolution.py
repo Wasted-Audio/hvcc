@@ -18,6 +18,8 @@ from typing import Dict, List
 
 from .HeavyObject import HeavyObject
 
+from hvcc.types.IR import IRSignalList
+
 
 class SignalConvolution(HeavyObject):
 
@@ -33,7 +35,7 @@ class SignalConvolution(HeavyObject):
         return {"HvSignalConvolution.h", "HvSignalConvolution.c"}
 
     @classmethod
-    def get_C_init(cls, obj_type: str, obj_id: int, args: Dict) -> List[str]:
+    def get_C_init(cls, obj_type: str, obj_id: str, args: Dict) -> List[str]:
         return [
             "sConv_init(&sConv_{0}, &hTable_{1}, {2});".format(
                 obj_id,
@@ -42,7 +44,7 @@ class SignalConvolution(HeavyObject):
         ]
 
     @classmethod
-    def get_C_onMessage(cls, obj_type: str, obj_id: int, inlet_index: int, args: Dict) -> List[str]:
+    def get_C_onMessage(cls, obj_type: str, obj_id: str, inlet_index: int, args: Dict) -> List[str]:
         return [
             "sConv_onMessage(_c, &Context(_c)->sConv_{0}, {1}, m, NULL);".format(
                 obj_id,
@@ -50,11 +52,11 @@ class SignalConvolution(HeavyObject):
         ]
 
     @classmethod
-    def get_C_process(cls, process_dict: Dict, obj_type: str, obj_id: int, args: Dict) -> List[str]:
+    def get_C_process(cls, process_dict: IRSignalList, obj_type: str, obj_id: str, args: Dict) -> List[str]:
         return [
             "__hv_conv_f(&sConv_{0}, VIf({1}), VOf({2}));".format(
-                process_dict["id"],
-                cls._c_buffer(process_dict["inputBuffers"][0]),
-                cls._c_buffer(process_dict["outputBuffers"][0])
+                process_dict.id,
+                cls._c_buffer(process_dict.inputBuffers[0]),
+                cls._c_buffer(process_dict.outputBuffers[0])
             )
         ]

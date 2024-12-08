@@ -18,6 +18,8 @@ from typing import Callable, Dict, List
 
 from .HeavyObject import HeavyObject
 
+from hvcc.types.IR import IRObjectdict, IROnMessage
+
 
 class ControlPrint(HeavyObject):
     """Prints the first value in a message to the console"""
@@ -33,28 +35,28 @@ class ControlPrint(HeavyObject):
         return {"HvControlPrint.h", "HvControlPrint.c"}
 
     @classmethod
-    def get_C_init(cls, obj_type: str, obj_id: int, args: Dict) -> List[str]:
+    def get_C_init(cls, obj_type: str, obj_id: str, args: Dict) -> List[str]:
         return []
 
     @classmethod
-    def get_C_free(cls, obj_type: str, obj_id: int, args: Dict) -> List[str]:
+    def get_C_free(cls, obj_type: str, obj_id: str, args: Dict) -> List[str]:
         return []
 
     @classmethod
-    def get_C_onMessage(cls, obj_type: str, obj_id: int, inlet_index: int, args: Dict) -> List[str]:
+    def get_C_onMessage(cls, obj_type: str, obj_id: str, inlet_index: int, args: Dict) -> List[str]:
         return [f"cPrint_onMessage(_c, m, \"{args['label']}\");"]
 
     @classmethod
-    def get_C_decl(cls, obj_type: str, obj_id: int, args: Dict) -> List[str]:
+    def get_C_decl(cls, obj_type: str, obj_id: str, args: Dict) -> List[str]:
         return []
 
     @classmethod
     def get_C_impl(
         cls,
         obj_type: str,
-        obj_id: int,
-        on_message_list: List,
+        obj_id: str,
+        on_message_list: List[List[IROnMessage]],
         get_obj_class: Callable,
-        objects: Dict
+        objects: Dict[str, IRObjectdict]
     ) -> List[str]:
         return []
