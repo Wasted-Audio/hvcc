@@ -18,6 +18,8 @@ from typing import Dict, List
 
 from .HeavyObject import HeavyObject
 
+from hvcc.types.IR import IRSignalList
+
 
 class SignalVar(HeavyObject):
 
@@ -60,7 +62,7 @@ class SignalVar(HeavyObject):
         return {"HvSignalVar.h", "HvSignalVar.c"}
 
     @classmethod
-    def get_C_init(cls, obj_type: str, obj_id: int, args: Dict) -> List[str]:
+    def get_C_init(cls, obj_type: str, obj_id: str, args: Dict) -> List[str]:
         assert obj_type in ["__var~f", "__var~i"], obj_type
         return [
             "{0}_init(&{0}_{1}, {2}, {3}, {4});".format(
@@ -71,11 +73,11 @@ class SignalVar(HeavyObject):
                 "true" if args["reverse"] else "false")]
 
     @classmethod
-    def get_C_free(cls, obj_type: str, obj_id: int, args: Dict) -> List[str]:
+    def get_C_free(cls, obj_type: str, obj_id: str, args: Dict) -> List[str]:
         return []
 
     @classmethod
-    def get_C_onMessage(cls, obj_type: str, obj_id: int, inlet_index: int, args: Dict) -> List[str]:
+    def get_C_onMessage(cls, obj_type: str, obj_id: str, inlet_index: int, args: Dict) -> List[str]:
         assert obj_type in ["__var~f", "__var~i"]
         return [
             "{0}_onMessage(_c, &Context(_c)->{0}_{1}, m);".format(
@@ -83,7 +85,7 @@ class SignalVar(HeavyObject):
                 obj_id)]
 
     @classmethod
-    def get_C_process(cls, process_dict: Dict, obj_type: str, obj_id: int, args: Dict) -> List[str]:
+    def get_C_process(cls, process_dict: IRSignalList, obj_type: str, obj_id: str, args: Dict) -> List[str]:
         fmt = obj_type[-1]
         if obj_type in ["__var~f", "__var~i"]:
             # NOTE(mhroth): signal rate variables do not process anything
@@ -93,19 +95,19 @@ class SignalVar(HeavyObject):
                 "__hv_varwrite_{1}(&sVar{1}_{0}, VI{1}({2}));".format(
                     args["var_id"],
                     fmt,
-                    cls._c_buffer(process_dict["inputBuffers"][0])
+                    cls._c_buffer(process_dict.inputBuffers[0])
                 )]
         elif obj_type in ["__var_k~f", "__var_k~i"]:
             if args["k"] == 0.0 and args.get("step", 0.0) == 0.0:
                 return ["__hv_zero_{0}(VO{0}({1}));".format(
                     fmt,
-                    cls._c_buffer(process_dict["outputBuffers"][0]))]
+                    cls._c_buffer(process_dict.outputBuffers[0]))]
             else:
                 c = [float(args["k"] + i * args.get("step", 0.0)) for i in range(8)]
                 cx = ", ".join(["{0}f".format(f) for f in c]) if fmt == "f" else ", ".join([str(int(i)) for i in c])
                 return ["__hv_var_k_{0}{3}(VO{0}({1}), {2});".format(
                     fmt,
-                    cls._c_buffer(process_dict["outputBuffers"][0]),
+                    cls._c_buffer(process_dict.outputBuffers[0]),
                     cx,
                     "_r" if args.get("reverse", False) else "")]
         elif obj_type in ["__varread~f", "__varread~i"]:
@@ -113,7 +115,7 @@ class SignalVar(HeavyObject):
                 "__hv_varread_{1}(&sVar{1}_{0}, VO{1}({2}));".format(
                     args["var_id"],
                     fmt,
-                    cls._c_buffer(process_dict["outputBuffers"][0])
+                    cls._c_buffer(process_dict.outputBuffers[0])
                 )]
         else:
             raise Exception("")

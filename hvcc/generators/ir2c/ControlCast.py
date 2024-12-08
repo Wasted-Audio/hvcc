@@ -38,7 +38,7 @@ class ControlCast(HeavyObject):
         return {"HvControlCast.h", "HvControlCast.c"}
 
     @classmethod
-    def get_C_onMessage(cls, obj_type: str, obj_id: int, inlet_index: int, args: Dict) -> List[str]:
+    def get_C_onMessage(cls, obj_type: str, obj_id: str, inlet_index: int, args: Dict) -> List[str]:
         return [
             "cCast_onMessage(_c, {1}, 0, m, &cCast_{0}_sendMessage);".format(
                 obj_id,

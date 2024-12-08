@@ -124,7 +124,7 @@ class IRGraph(BaseModel):
     name: IRName
     objects: Dict[str, IRObjectdict] = {}
     init: IRInit
-    tables: Dict
+    tables: Dict[str, IRTable] = {}
     control: IRControl
     signal: IRSignal
 

@@ -18,6 +18,8 @@ from typing import Dict, List
 
 from .HeavyObject import HeavyObject
 
+from hvcc.types.IR import IRSignalList
+
 
 class SignalMath(HeavyObject):
     """Handles the math objects.
@@ -91,14 +93,14 @@ class SignalMath(HeavyObject):
         return {"HvMath.h"}
 
     @classmethod
-    def get_C_process(cls, process_dict: Dict, obj_type: str, obj_id: int, args: Dict) -> List[str]:
+    def get_C_process(cls, process_dict: IRSignalList, obj_type: str, obj_id: str, args: Dict) -> List[str]:
         return [
             "{0}({1}, {2});".format(
                 cls.__OPERATION_DICT[obj_type],
                 ", ".join(["VI{0}({1})".format(
-                    "i" if b["type"] == "~i>" else "f",
-                    cls._c_buffer(b)) for b in process_dict["inputBuffers"]]),
+                    "i" if b.type == "~i>" else "f",
+                    cls._c_buffer(b)) for b in process_dict.inputBuffers]),
                 ", ".join(["VO{0}({1})".format(
-                    "i" if b["type"] == "~i>" else "f",
-                    cls._c_buffer(b)) for b in process_dict["outputBuffers"]])
+                    "i" if b.type == "~i>" else "f",
+                    cls._c_buffer(b)) for b in process_dict.outputBuffers])
             )]

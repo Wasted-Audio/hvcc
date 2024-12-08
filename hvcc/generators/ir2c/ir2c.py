@@ -66,6 +66,7 @@ from hvcc.generators.ir2c.SignalTabwrite import SignalTabwrite
 from hvcc.generators.ir2c.SignalVar import SignalVar
 
 from hvcc.types.compiler import CompilerResp
+from hvcc.types.IR import IRGraph
 
 
 class ir2c:
@@ -135,7 +136,7 @@ class ir2c:
     def filter_extern(cls, d: Dict) -> Dict:
         """ Return a dictionary of objects that are externed.
         """
-        return {k: v for k, v in d.items() if v["extern"]}
+        return {k: v for k, v in d.items() if v.extern}
 
     @classmethod
     def get_class(cls, obj_type: str) -> Type[HeavyObject]:
@@ -179,7 +180,7 @@ class ir2c:
 
         # read the hv.ir.json file
         with open(hv_ir_path, "r") as f:
-            ir = json.load(f)
+            ir = IRGraph(**json.load(f))
 
         # generate the copyright
         copyright = copyright_manager.get_copyright_for_c(copyright)
@@ -189,10 +190,10 @@ class ir2c:
         #
 
         # generate set of header files to include
-        include_set = set([x for o in ir["objects"].values() for x in ir2c.get_class(o["type"]).get_C_header_set()])
+        include_set = set([x for o in ir.objects.values() for x in ir2c.get_class(o.type).get_C_header_set()])
 
         # generate set of files to add to project
-        file_set = set([x for o in ir["objects"].values() for x in ir2c.get_class(o["type"]).get_C_file_set()])
+        file_set = set([x for o in ir.objects.values() for x in ir2c.get_class(o.type).get_C_file_set()])
         file_set.update(ir2c.__BASE_FILE_SET)
 
         # generate object definition and initialisation list
@@ -200,47 +201,47 @@ class ir2c:
         free_list = []
         def_list = []
         decl_list = []
-        for obj_id in ir["init"]["order"]:
-            o = ir["objects"][obj_id]
-            obj_class = ir2c.get_class(o["type"])
-            init_list.extend(obj_class.get_C_init(o["type"], obj_id, o["args"]))
-            def_list.extend(obj_class.get_C_def(o["type"], obj_id))
-            free_list.extend(obj_class.get_C_free(o["type"], obj_id, o["args"]))
+        for obj_id in ir.init.order:
+            o = ir.objects[obj_id]
+            obj_class = ir2c.get_class(o.type)
+            init_list.extend(obj_class.get_C_init(o.type, obj_id, o.args))
+            def_list.extend(obj_class.get_C_def(o.type, obj_id))
+            free_list.extend(obj_class.get_C_free(o.type, obj_id, o.args))
 
         impl_list = []
-        for x in ir["control"]["sendMessage"]:
-            obj_id = x["id"]
-            o = ir["objects"][obj_id]
-            obj_class = ir2c.get_class(o["type"])
+        for msg in ir.control.sendMessage:
+            obj_id = msg.id
+            o = ir.objects[obj_id]
+            obj_class = ir2c.get_class(o.type)
             impl = obj_class.get_C_impl(
-                o["type"],
+                o.type,
                 obj_id,
-                x["onMessage"],
+                msg.onMessage,
                 ir2c.get_class,
-                ir["objects"])
+                ir.objects)
             impl_list.append("\n".join(PrettyfyC.prettyfy_list(impl)))
-            decl_list.extend(obj_class.get_C_decl(o["type"], obj_id, o["args"]))
+            decl_list.extend(obj_class.get_C_decl(o.type, obj_id, o.args))
 
         # generate static table data initialisers
         table_data_list: List = []
-        for k, v in ir["tables"].items():
-            o = ir["objects"][v["id"]]
-            obj_class = ir2c.get_class(o["type"])
+        for k, v in ir.tables.items():
+            o = ir.objects[v.id]
+            obj_class = ir2c.get_class(o.type)
             table_data_list.extend(obj_class.get_table_data_decl(
-                o["type"],
-                v["id"],
-                o["args"]))
+                o.type,
+                v.id,
+                o.args))
 
         # generate the list of functions to process
         process_list: List = []
-        for x in ir["signal"]["processOrder"]:
-            obj_id = x["id"]
-            o = ir["objects"][obj_id]
-            process_list.extend(ir2c.get_class(o["type"]).get_C_process(
-                x,
-                o["type"],
+        for sig in ir.signal.processOrder:
+            obj_id = sig.id
+            o = ir.objects[obj_id]
+            process_list.extend(ir2c.get_class(o.type).get_C_process(
+                sig,
+                o.type,
                 obj_id,
-                o["args"]))
+                o.args))
 
         #
         # Load the C-language template files and use the parsed strings to fill them in.
@@ -251,10 +252,10 @@ class ir2c:
             os.makedirs(output_dir)
 
         # the project name to be used as a part of file and function names
-        name = ir["name"]["escaped"]
+        name = ir.name.escaped
 
         # ensure that send_receive dictionary is alphabetised by the receiver key
-        send_receive = OrderedDict(sorted([(k, v) for k, v in ir["control"]["receivers"].items()], key=lambda x: x[0]))
+        send_receive = OrderedDict(sorted([(k, v) for k, v in ir.control.receivers.items()], key=lambda x: x[0]))
 
         # write HeavyContext.h
         with open(os.path.join(output_dir, f"Heavy_{name}.hpp"), "w") as f:
@@ -263,7 +264,7 @@ class ir2c:
                 include_set=include_set,
                 decl_list=decl_list,
                 def_list=def_list,
-                signal=ir["signal"],
+                signal=ir.signal,
                 copyright=copyright,
                 externs=externs))
 
@@ -271,12 +272,12 @@ class ir2c:
         with open(os.path.join(output_dir, f"Heavy_{name}.cpp"), "w") as f:
             f.write(env.get_template("Heavy_NAME.cpp").render(
                 name=name,
-                signal=ir["signal"],
+                signal=ir.signal,
                 init_list=init_list,
                 free_list=free_list,
                 impl_list=impl_list,
                 send_receive=send_receive,
-                send_table=ir["tables"],
+                send_table=ir.tables,
                 process_list=process_list,
                 table_data_list=table_data_list,
                 copyright=copyright,
@@ -296,7 +297,7 @@ class ir2c:
                 dst=os.path.join(output_dir, str(f)))
 
         # generate HeavyIR object counter
-        ir_counter = Counter([obj["type"] for obj in ir["objects"].values()])
+        ir_counter = Counter([obj.type for obj in ir.objects.values()])
 
         return CompilerResp(
             stage="ir2c",

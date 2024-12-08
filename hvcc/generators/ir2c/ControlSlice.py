@@ -33,7 +33,7 @@ class ControlSlice(HeavyObject):
         return {"HvControlSlice.h", "HvControlSlice.c"}
 
     @classmethod
-    def get_C_init(cls, obj_type: str, obj_id: int, args: Dict) -> List[str]:
+    def get_C_init(cls, obj_type: str, obj_id: str, args: Dict) -> List[str]:
         return [
             "cSlice_init(&cSlice_{0}, {1}, {2});".format(
                 obj_id,
@@ -41,11 +41,11 @@ class ControlSlice(HeavyObject):
                 int(args["length"]))]
 
     @classmethod
-    def get_C_free(cls, obj_type: str, obj_id: int, args: Dict) -> List[str]:
+    def get_C_free(cls, obj_type: str, obj_id: str, args: Dict) -> List[str]:
         return []  # nothing to free
 
     @classmethod
-    def get_C_onMessage(cls, obj_type: str, obj_id: int, inlet_index: int, args: Dict) -> List[str]:
+    def get_C_onMessage(cls, obj_type: str, obj_id: str, inlet_index: int, args: Dict) -> List[str]:
         return [
             f"cSlice_onMessage(_c, &Context(_c)->cSlice_{obj_id}, {inlet_index}, m, &cSlice_{obj_id}_sendMessage);"
         ]
