@@ -127,6 +127,7 @@ class c2dpf(Generator):
                 f.write(env.get_template("Makefile_plugin").render(
                     name=patch_name,
                     meta=dpf_meta,
+                    nosimd=patch_meta.nosimd,
                     dpf_path=dpf_path))
 
             # project makefile
