@@ -17,13 +17,13 @@ import os
 import shutil
 import time
 import jinja2
-from typing import Dict, Optional
+from typing import Optional
 
 from ..copyright import copyright_manager
 from ..filters import filter_uniqueid
 
 from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
-from hvcc.types.compiler import Generator, CompilerResp, CompilerMsg, CompilerNotif
+from hvcc.types.compiler import Generator, CompilerResp, CompilerMsg, CompilerNotif, ExternInfo
 from hvcc.types.meta import Meta, DPF
 
 
@@ -36,7 +36,7 @@ class c2dpf(Generator):
         cls,
         c_src_dir: str,
         out_dir: str,
-        externs: Dict,
+        externs: ExternInfo,
         patch_name: Optional[str] = None,
         patch_meta: Meta = Meta(),
         num_input_channels: int = 0,
@@ -48,8 +48,8 @@ class c2dpf(Generator):
         tick = time.time()
 
         out_dir = os.path.join(out_dir, "plugin")
-        receiver_list = externs['parameters']['in']
-        sender_list = externs["parameters"]["out"]
+        receiver_list = externs.parameters.inParam
+        sender_list = externs.parameters.outParam
 
         dpf_meta: DPF = patch_meta.dpf
         dpf_path = dpf_meta.dpf_path
@@ -99,7 +99,7 @@ class c2dpf(Generator):
                     num_output_channels=num_output_channels,
                     receivers=receiver_list,
                     senders=sender_list,
-                    pool_sizes_kb=externs["memoryPoolSizesKb"],
+                    pool_sizes_kb=externs.memoryPoolSizesKb,
                     copyright=copyright_c))
             if dpf_meta.enable_ui:
                 dpf_ui_path = os.path.join(source_dir, f"HeavyDPF_{patch_name}_UI.cpp")
@@ -119,7 +119,7 @@ class c2dpf(Generator):
                     class_name=f"HeavyDPF_{patch_name}",
                     num_input_channels=num_input_channels,
                     num_output_channels=num_output_channels,
-                    pool_sizes_kb=externs["memoryPoolSizesKb"],
+                    pool_sizes_kb=externs.memoryPoolSizesKb,
                     copyright=copyright_c))
 
             # plugin makefile

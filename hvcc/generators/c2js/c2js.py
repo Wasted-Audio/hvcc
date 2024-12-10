@@ -20,13 +20,13 @@ import time
 import jinja2
 
 from shutil import which
-from typing import Dict, Optional
+from typing import Optional
 
 from hvcc.core.hv2ir.HeavyException import HeavyException
 from ..copyright import copyright_manager
 
 from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
-from hvcc.types.compiler import Generator, CompilerResp, CompilerNotif, CompilerMsg
+from hvcc.types.compiler import Generator, CompilerResp, CompilerNotif, CompilerMsg, ExternInfo
 from hvcc.types.meta import Meta
 
 
@@ -161,7 +161,7 @@ class c2js(Generator):
         cls,
         c_src_dir: str,
         out_dir: str,
-        externs: Dict,
+        externs: ExternInfo,
         patch_name: Optional[str] = None,
         patch_meta: Meta = Meta(),
         num_input_channels: int = 0,
@@ -172,13 +172,13 @@ class c2js(Generator):
 
         tick = time.time()
 
-        parameter_list = externs["parameters"]["in"]
-        parameter_out_list = externs["parameters"]["out"]
-        event_list = externs["events"]["in"]
-        event_out_list = externs["events"]["out"]
+        parameter_list = externs.parameters.inParam
+        parameter_out_list = externs.parameters.outParam
+        event_list = externs.events.inEvent
+        event_out_list = externs.events.outEvent
 
-        midi_list = externs["midi"]["in"]
-        midi_out_list = externs["midi"]["out"]
+        midi_list = externs.midi.inMidi
+        midi_out_list = externs.midi.outMidi
 
         out_dir = os.path.join(out_dir, "js")
         patch_name = patch_name or "heavy"
@@ -206,7 +206,7 @@ class c2js(Generator):
                     name=patch_name,
                     copyright=copyright_js,
                     externs=externs,
-                    pool_sizes_kb=externs["memoryPoolSizesKb"]))
+                    pool_sizes_kb=externs.memoryPoolSizesKb))
 
             js_path = cls.run_emscripten(c_src_dir=c_src_dir,
                                          out_dir=out_dir,
@@ -243,7 +243,7 @@ class c2js(Generator):
                     name=patch_name,
                     copyright=copyright_js,
                     externs=externs,
-                    pool_sizes_kb=externs["memoryPoolSizesKb"]))
+                    pool_sizes_kb=externs.memoryPoolSizesKb))
 
             pre_js_path = os.path.join(out_dir, "hv_worklet_start.js")
             with open(pre_js_path, "w") as f:
@@ -251,7 +251,7 @@ class c2js(Generator):
                     name=patch_name,
                     copyright=copyright_js,
                     externs=externs,
-                    pool_sizes_kb=externs["memoryPoolSizesKb"]))
+                    pool_sizes_kb=externs.memoryPoolSizesKb))
 
             js_path = cls.run_emscripten(c_src_dir=c_src_dir,
                                          out_dir=out_dir,
