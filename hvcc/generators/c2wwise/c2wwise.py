@@ -18,13 +18,13 @@ import os
 import shutil
 import time
 import jinja2
-from typing import Dict, Optional
+from typing import Optional
 
 from ..copyright import copyright_manager
 from ..filters import filter_plugin_id
 
 from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
-from hvcc.types.compiler import Generator, CompilerResp, CompilerNotif, CompilerMsg
+from hvcc.types.compiler import Generator, CompilerResp, CompilerNotif, CompilerMsg, ExternInfo
 from hvcc.types.meta import Meta
 
 
@@ -38,7 +38,7 @@ class c2wwise(Generator):
             cls,
             c_src_dir: str,
             out_dir: str,
-            externs: Dict,
+            externs: ExternInfo,
             patch_name: Optional[str] = None,
             patch_meta: Meta = Meta(),
             num_input_channels: int = 0,
@@ -48,11 +48,11 @@ class c2wwise(Generator):
     ) -> CompilerResp:
         tick = time.time()
 
-        in_parameter_list = externs["parameters"]["in"]
-        out_parameter_list = externs["parameters"]["out"]
-        event_list = externs["events"]["in"]
-        out_event_list = externs["events"]["out"]
-        table_list = externs["tables"]
+        in_parameter_list = externs.parameters.inParam
+        out_parameter_list = externs.parameters.outParam
+        event_list = externs.events.inEvent
+        out_event_list = externs.events.outEvent
+        table_list = externs.tables
         patch_name = patch_name or "heavy"
         copyright_c = copyright_manager.get_copyright_for_c(copyright)
         copyright_xml = copyright_manager.get_copyright_for_xml(copyright)
@@ -120,7 +120,7 @@ class c2wwise(Generator):
                         out_events=out_event_list,
                         events=event_list,
                         tables=table_list,
-                        pool_sizes_kb=externs["memoryPoolSizesKb"],
+                        pool_sizes_kb=externs.memoryPoolSizesKb,
                         is_source=is_source_plugin,
                         num_input_channels=num_input_channels,
                         num_output_channels=num_output_channels,

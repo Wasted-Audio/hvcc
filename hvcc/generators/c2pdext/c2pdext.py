@@ -18,13 +18,13 @@ import os
 import shutil
 import time
 import jinja2
-from typing import Dict, Optional
+from typing import Optional
 
 from ..copyright import copyright_manager
 from ..filters import filter_max
 
 from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
-from hvcc.types.compiler import Generator, CompilerResp, CompilerNotif, CompilerMsg
+from hvcc.types.compiler import Generator, CompilerResp, CompilerNotif, CompilerMsg, ExternInfo
 from hvcc.types.meta import Meta
 
 
@@ -37,7 +37,7 @@ class c2pdext(Generator):
         cls,
         c_src_dir: str,
         out_dir: str,
-        externs: Dict,
+        externs: ExternInfo,
         patch_name: Optional[str] = None,
         patch_meta: Meta = Meta(),
         num_input_channels: int = 0,
@@ -49,7 +49,7 @@ class c2pdext(Generator):
         tick = time.time()
 
         out_dir = os.path.join(out_dir, "pdext")
-        receiver_list = externs["parameters"]["in"]
+        receiver_list = externs.parameters.inParam
 
         copyright = copyright_manager.get_copyright_for_c(copyright)
 

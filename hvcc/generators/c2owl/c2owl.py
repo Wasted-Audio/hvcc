@@ -4,13 +4,13 @@ import shutil
 import time
 import jinja2
 import json
-from typing import Dict, List, Optional
+from typing import List, Optional
 
 import hvcc.core.hv2ir.HeavyLangObject as HeavyLangObject
 from ..copyright import copyright_manager
 
 from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
-from hvcc.types.compiler import Generator, CompilerResp, CompilerNotif, CompilerMsg
+from hvcc.types.compiler import Generator, CompilerResp, CompilerNotif, CompilerMsg, ExternInfo
 from hvcc.types.meta import Meta
 
 
@@ -73,7 +73,7 @@ class c2owl(Generator):
         cls,
         c_src_dir: str,
         out_dir: str,
-        externs: Dict,
+        externs: ExternInfo,
         patch_name: Optional[str] = None,
         patch_meta: Meta = Meta(),
         num_input_channels: int = 0,
