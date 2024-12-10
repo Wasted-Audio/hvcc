@@ -55,5 +55,6 @@ class DPF(BaseModel):
 
 class Meta(BaseModel):
     name: Optional[str] = None
+    nosimd: Optional[bool] = False
     daisy: Daisy = Daisy()
     dpf: DPF = DPF()
