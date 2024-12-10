@@ -1,3 +1,8 @@
+# Heavy Compiler Collection
+# Copyright (C) 2021-2024 Wasted Audio
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 from typing import Dict, Literal, List, Optional, Tuple, Union
 from pydantic import BaseModel, HttpUrl
 

@@ -1,3 +1,8 @@
+# Heavy Compiler Collection
+# Copyright (C) 2021-2024 Wasted Audio
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 from abc import ABC, abstractmethod
 from collections import Counter
 from typing import Dict, List, Optional
