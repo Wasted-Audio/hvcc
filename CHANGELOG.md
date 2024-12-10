@@ -12,7 +12,8 @@ Features:
 * JS: midi out and device select by @Reinissance
 * Docs: general updates/corrections and improvements
 * Use pydantic to validate and access HeavyLang and HeavyIR objects
-* Allow loading external generator python module
+* Allow loading external generator python module @eu-ch
+* Meta: additional global setting to automatically set `HV_SIMD_NONE`
 
 Bugfixes:
 

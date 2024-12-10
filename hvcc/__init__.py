@@ -64,11 +64,13 @@ def add_error(
     if "hvcc" in results:
         results["hvcc"].notifs.errors.append(CompilerMsg(message=error))
     else:
-        results["hvcc"] = CompilerResp(stage="hvcc",
-                                       notifs=CompilerNotif(
-                                          has_error=True,
-                                          errors=[CompilerMsg(message=error)],
-                                       ))
+        results["hvcc"] = CompilerResp(
+                                stage="hvcc",
+                                notifs=CompilerNotif(
+                                    has_error=True,
+                                    errors=[CompilerMsg(message=error)]
+                                )
+                            )
     return results
 
 
