@@ -18,13 +18,13 @@ import jinja2
 import os
 import shutil
 import time
-from typing import Dict, Optional
+from typing import Optional
 
 from ..copyright import copyright_manager
 from ..filters import filter_string_cap, filter_templates, filter_xcode_build, filter_xcode_fileref
 
 from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
-from hvcc.types.compiler import Generator, CompilerResp, CompilerNotif, CompilerMsg
+from hvcc.types.compiler import Generator, CompilerResp, CompilerNotif, CompilerMsg, ExternInfo
 from hvcc.types.meta import Meta
 
 
@@ -37,7 +37,7 @@ class c2unity(Generator):
         cls,
         c_src_dir: str,
         out_dir: str,
-        externs: Dict,
+        externs: ExternInfo,
         patch_name: Optional[str] = None,
         patch_meta: Meta = Meta(),
         num_input_channels: int = 0,
@@ -48,9 +48,9 @@ class c2unity(Generator):
 
         tick = time.time()
 
-        parameter_list = externs["parameters"]["in"]
-        event_list = externs["events"]["in"]
-        table_list = externs["tables"]
+        parameter_list = externs.parameters.inParam
+        event_list = externs.events.inEvent
+        table_list = externs.tables
 
         out_dir = os.path.join(out_dir, "unity")
         patch_name = patch_name or "heavy"
@@ -99,7 +99,7 @@ class c2unity(Generator):
                         parameters=parameter_list,
                         events=event_list,
                         tables=table_list,
-                        pool_sizes_kb=externs["memoryPoolSizesKb"],
+                        pool_sizes_kb=externs.memoryPoolSizesKb,
                         compile_files=os.listdir(src_out_dir),
                         copyright=copyright))
 

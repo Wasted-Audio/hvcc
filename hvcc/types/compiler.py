@@ -5,13 +5,13 @@
 
 from abc import ABC, abstractmethod
 from collections import Counter
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Tuple
 
 from pydantic import BaseModel
 
 from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
 from hvcc.types.meta import Meta
-from hvcc.types.IR import IRGraph
+from hvcc.types.IR import IRGraph, IRReceiver, IRSendMessage, IRTable
 
 
 class CompilerMsg(BaseModel):
@@ -39,6 +39,35 @@ class CompilerResp(BaseModel):
     ir: Optional[IRGraph] = None
 
 
+class ExternParams(BaseModel):
+    inParam: List[Tuple[str, IRReceiver]] = []
+    outParam: List[Tuple[str, IRSendMessage]] = []
+
+
+class ExternEvents(BaseModel):
+    inEvent: List[Tuple[str, IRReceiver]] = []
+    outEvent: List[Tuple[str, IRSendMessage]] = []
+
+
+class ExternMidi(BaseModel):
+    inMidi: List[str] = []
+    outMidi: List[str] = []
+
+
+class ExternMemoryPool(BaseModel):
+    internal: int = 0
+    inputQueue: int = 0
+    outputQueue: int = 0
+
+
+class ExternInfo(BaseModel):
+    parameters: ExternParams = ExternParams()
+    events: ExternEvents = ExternEvents()
+    midi: ExternMidi = ExternMidi()
+    tables: List[Tuple[str, IRTable]] = []
+    memoryPoolSizesKb: ExternMemoryPool = ExternMemoryPool()
+
+
 class Generator(ABC):
 
     @classmethod
@@ -47,7 +76,7 @@ class Generator(ABC):
         cls,
         c_src_dir: str,
         out_dir: str,
-        externs: Dict,
+        externs: ExternInfo,
         patch_name: Optional[str] = None,
         patch_meta: Meta = Meta(),
         num_input_channels: int = 0,

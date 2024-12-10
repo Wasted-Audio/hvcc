@@ -65,7 +65,7 @@ from hvcc.generators.ir2c.SignalTabread import SignalTabread
 from hvcc.generators.ir2c.SignalTabwrite import SignalTabwrite
 from hvcc.generators.ir2c.SignalVar import SignalVar
 
-from hvcc.types.compiler import CompilerResp
+from hvcc.types.compiler import CompilerResp, ExternInfo
 from hvcc.types.IR import IRGraph
 
 
@@ -159,7 +159,7 @@ class ir2c:
         hv_ir_path: str,
         static_dir: str,
         output_dir: str,
-        externs: Dict,
+        externs: ExternInfo,
         copyright: Optional[str] = None,
         nodsp: Optional[bool] = False
     ) -> CompilerResp:
@@ -330,13 +330,7 @@ def main() -> None:
     parser.add_argument("-v", "--verbose", action="count")
     args = parser.parse_args()
 
-    externs: Dict = {
-        "parameters": {
-            "in": {},
-            "out": {}
-        },
-        "events": {}
-    }
+    externs = ExternInfo()
 
     results = ir2c.compile(
         args.hv_ir_path,

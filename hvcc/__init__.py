@@ -36,7 +36,10 @@ from hvcc.generators.c2owl import c2owl
 from hvcc.generators.c2pdext import c2pdext
 from hvcc.generators.c2wwise import c2wwise
 from hvcc.generators.c2unity import c2unity
-from hvcc.types.compiler import CompilerResp, CompilerNotif, CompilerMsg, Generator
+from hvcc.types.compiler import (
+    CompilerResp, CompilerNotif, CompilerMsg, Generator,
+    ExternInfo, ExternMemoryPool, ExternMidi, ExternEvents, ExternParams
+)
 from hvcc.types.IR import IRGraph
 from hvcc.types.meta import Meta
 
@@ -86,7 +89,7 @@ def check_extern_name_conflicts(extern_type: str, extern_list: List, results: Or
                           "capital letters are not the only difference.")
 
 
-def check_midi_objects(hvir: IRGraph) -> Dict:
+def check_midi_objects(hvir: IRGraph) -> Dict[str, List[str]]:
     in_midi = []
     out_midi = []
 
@@ -136,7 +139,7 @@ def filter_midi_from_out_parameters(output_parameter_list: List, midi_out_object
     return new_out_list
 
 
-def generate_extern_info(hvir: IRGraph, results: OrderedDict) -> Dict:
+def generate_extern_info(hvir: IRGraph, results: OrderedDict) -> ExternInfo:
     """ Simplifies the receiver/send and table lists by only containing values
         externed with @hv_param, @hv_event or @hv_table
     """
@@ -175,35 +178,35 @@ def generate_extern_info(hvir: IRGraph, results: OrderedDict) -> Dict:
     # filter midi objects from the output parameters list
     out_parameter_list = filter_midi_from_out_parameters(out_parameter_list, midi_objects['out'])
 
-    return {
-        "parameters": {
-            "in": in_parameter_list,
-            "out": out_parameter_list
-        },
-        "events": {
-            "in": in_event_list,
-            "out": out_event_list
-        },
-        "midi": {
-            "in": midi_objects['in'],
-            "out": midi_objects['out']
-        },
-        "tables": table_list,
+    return ExternInfo(
+        parameters=ExternParams(
+            inParam=in_parameter_list,
+            outParam=out_parameter_list
+        ),
+        events=ExternEvents(
+            inEvent=in_event_list,
+            outEvent=out_event_list
+        ),
+        midi=ExternMidi(
+            inMidi=midi_objects['in'],
+            outMidi=midi_objects['out']
+        ),
+        tables=table_list,
         # generate patch heuristics to ensure enough memory allocated for the patch
-        "memoryPoolSizesKb": {
-            "internal": 10,  # TODO(joe): should this increase if there are a lot of internal connections?
-            "inputQueue": max(2, int(
-                                     len(in_parameter_list) +
-                                     (len(in_event_list) / 4) +
-                                     len(midi_objects['in'])  # TODO(dreamer): should this depend on the MIDI type?
-                                    )),
-            "outputQueue": max(2, int(
-                                     len(out_parameter_list) +
-                                     (len(out_event_list) / 4) +
-                                     len(midi_objects['out'])
-                                    )),
-        }
-    }
+        memoryPoolSizesKb=ExternMemoryPool(
+            internal=10,  # TODO(joe): should this increase if there are a lot of internal connections?
+            inputQueue=max(2, int(
+                len(in_parameter_list) +
+                (len(in_event_list) / 4) +
+                len(midi_objects['in'])  # TODO(dreamer): should this depend on the MIDI type?
+            )),
+            outputQueue=max(2, int(
+                len(out_parameter_list) +
+                (len(out_event_list) / 4) +
+                len(midi_objects['out'])
+            ))
+        )
+    )
 
 
 def load_ext_generator(module_name, verbose) -> Optional[Generator]:

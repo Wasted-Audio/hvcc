@@ -10,7 +10,7 @@ from ..copyright import copyright_manager
 from . import parameters
 
 from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
-from hvcc.types.compiler import Generator, CompilerResp, CompilerNotif, CompilerMsg
+from hvcc.types.compiler import Generator, CompilerResp, CompilerNotif, CompilerMsg, ExternInfo
 from hvcc.types.meta import Meta, Daisy
 
 
@@ -35,7 +35,7 @@ class c2daisy(Generator):
         cls,
         c_src_dir: str,
         out_dir: str,
-        externs: Dict,
+        externs: ExternInfo,
         patch_name: Optional[str] = None,
         patch_meta: Meta = Meta(),
         num_input_channels: int = 0,
@@ -72,11 +72,11 @@ class c2daisy(Generator):
                 header, board_info = json2daisy.generate_header_from_name(board)
 
             # remove heavy out params from externs
-            externs['parameters']['out'] = [
-                t for t in externs['parameters']['out'] if not any(x == y for x in hv_midi_messages for y in t)]
+            externs.parameters.outParam = [
+                t for t in externs.parameters.outParam if not any(x == y for x in hv_midi_messages for y in t)]
 
             component_glue = parameters.parse_parameters(
-                externs['parameters'], board_info['components'], board_info['aliases'], 'hardware')
+                externs.parameters, board_info['components'], board_info['aliases'], 'hardware')
             component_glue['class_name'] = board_info['name']
             component_glue['patch_name'] = patch_name
             component_glue['header'] = f"HeavyDaisy_{patch_name}.hpp"
@@ -86,7 +86,7 @@ class c2daisy(Generator):
             component_glue['displayprocess'] = board_info['displayprocess']
             component_glue['debug_printing'] = daisy_meta.debug_printing
             component_glue['usb_midi'] = daisy_meta.usb_midi
-            component_glue['pool_sizes_kb'] = externs["memoryPoolSizesKb"]
+            component_glue['pool_sizes_kb'] = externs.memoryPoolSizesKb
 
             # samplerate
             samplerate = daisy_meta.samplerate
