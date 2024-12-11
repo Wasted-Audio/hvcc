@@ -42,6 +42,7 @@ from hvcc.types.compiler import (
 )
 from hvcc.types.IR import IRGraph
 from hvcc.types.meta import Meta
+from hvcc.version import VERSION
 
 
 class Colours:
@@ -461,6 +462,13 @@ def main() -> bool:
     parser.add_argument(
         "--copyright",
         help="A string indicating the owner of the copyright.")
+    parser.add_argument(
+        "-V",
+        "--version",
+        action='version',
+        help="Print version and exit.",
+        version=VERSION
+    )
     args = parser.parse_args()
 
     in_path = os.path.abspath(args.in_path)

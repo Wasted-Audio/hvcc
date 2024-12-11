@@ -14,6 +14,7 @@ Features:
 * Use pydantic to validate and access HeavyLang and HeavyIR objects
 * Allow loading external generator python module @eu-ch
 * Meta: additional global setting to automatically set `HV_SIMD_NONE`
+* Add version info to cli and IR result.
 
 Bugfixes:
 

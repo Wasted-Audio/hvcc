@@ -7,6 +7,7 @@ from pydantic import BaseModel, RootModel
 from typing import Dict, List, Optional, Union
 
 from hvcc.types.Lang import LangLetType
+from hvcc.version import VERSION
 
 
 # IR Object Definitions
@@ -126,6 +127,7 @@ class IRSignal(BaseModel):
 
 
 class IRGraph(BaseModel):
+    version: str = VERSION
     name: IRName
     objects: Dict[str, IRObjectdict] = {}
     init: IRInit
