@@ -31,11 +31,11 @@ class HeavyObject(PdObject):
 
     heavy_lang_json = importlib_resources.files('hvcc') / 'core/json/heavy.lang.json'
     with open(heavy_lang_json, "r") as f:
-        __HEAVY_LANG_OBJS = HeavyLangType(json.load(f)).root
+        __HEAVY_LANG_OBJS = HeavyLangType(**json.load(f)).root
 
     heavy_ir_json = importlib_resources.files('hvcc') / 'core/json/heavy.ir.json'
     with open(heavy_ir_json, "r") as f:
-        __HEAVY_IR_OBJS = HeavyIRType(json.load(f)).root
+        __HEAVY_IR_OBJS = HeavyIRType(**json.load(f)).root
 
     def __init__(
         self,

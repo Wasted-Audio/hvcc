@@ -1,7 +1,7 @@
 # Heavy Compiler Collection
-# Copyright (C) 2021-2024 Wasted Audio
+# Copyright (C) 2024 Wasted Audio
 #
-# SPDX-License-Identifier: GPL-3.0-or-later
+# SPDX-License-Identifier: GPL-3.0-only
 
 from pydantic import BaseModel, RootModel
 from typing import Dict, List, Optional, Union
@@ -12,11 +12,14 @@ from hvcc.version import VERSION
 
 # IR Object Definitions
 
+IRValue = Union[float, int, str, List[float], List[int]]
+
+
 class IRArg(BaseModel):
     name: str
     value_type: str
     description: str = ""
-    default: Union[float, int, str, List[float], List[int], None] = None
+    default: Optional[IRValue] = None
     required: bool
 
 

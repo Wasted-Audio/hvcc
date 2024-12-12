@@ -1,7 +1,7 @@
 # Heavy Compiler Collection
-# Copyright (C) 2021-2024 Wasted Audio
+# Copyright (C) 2024 Wasted Audio
 #
-# SPDX-License-Identifier: GPL-3.0-or-later
+# SPDX-License-Identifier: GPL-3.0-only
 
 from pydantic import BaseModel, RootModel
 from typing import List, Optional, Dict, Literal, Union
@@ -9,11 +9,12 @@ from typing import List, Optional, Dict, Literal, Union
 
 LangConnectionType = Literal["-->", "-~>", "~f>"]
 LangLetType = Literal["-->", "-~>", "~i>", "~f>", "signal"]
+LangValueType = Literal["float", "int", "string", "bool", "dict", "floatarray", "intarray", "stringarray"]
 
 
 class LangArg(BaseModel):
     name: str
-    value_type: Optional[str]
+    value_type: Optional[LangValueType] = None
     description: str
     default: Union[float, int, str, Dict, List, None] = None
     required: bool

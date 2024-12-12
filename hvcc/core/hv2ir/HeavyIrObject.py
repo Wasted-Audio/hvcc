@@ -40,7 +40,7 @@ class HeavyIrObject(HeavyLangObject):
 
     # load the HeavyIR object definitions
     with open(os.path.join(os.path.dirname(__file__), "../json/heavy.ir.json"), "r") as f:
-        __HEAVY_OBJS_IR_DICT = HeavyIRType(json.load(f)).root
+        __HEAVY_OBJS_IR_DICT = HeavyIRType(**json.load(f)).root
 
     def __init__(
         self,
@@ -90,7 +90,7 @@ class HeavyIrObject(HeavyLangObject):
                     # enforce argument types.
                     # if the default argument is null, don't worry about about the arg
                     if arg.default is not None:
-                        self.args[arg.name] = HeavyLangObject.force_arg_type(
+                        self.args[arg.name] = self.force_arg_type(
                             self.args[arg.name],
                             arg.value_type,
                             self.graph)

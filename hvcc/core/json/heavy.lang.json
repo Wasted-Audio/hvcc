@@ -2122,7 +2122,7 @@
       {
         "name": "extern",
         "value_type": "bool",
-        "description": "Determines if the should table should be publicly exposed in a framework.",
+        "description": "Determines if the table should be publicly exposed in a framework.",
         "default": false,
         "required": false
       }
@@ -2304,7 +2304,7 @@
       },
       {
         "default": false,
-        "value_type": "boolean",
+        "value_type": "bool",
         "name": "reverse",
         "description": "True if the value and step increments should be reversed.",
         "required": false

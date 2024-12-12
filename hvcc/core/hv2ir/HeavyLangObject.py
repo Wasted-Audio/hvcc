@@ -27,7 +27,7 @@ from .Connection import Connection
 from .HeavyException import HeavyException
 
 from hvcc.types.compiler import CompilerMsg, CompilerNotif
-from hvcc.types.Lang import HeavyLangType, LangNode, LangLet, LangLetType
+from hvcc.types.Lang import HeavyLangType, LangNode, LangLet, LangLetType, LangValueType
 
 if TYPE_CHECKING:
     from .HeavyGraph import HeavyGraph
@@ -43,7 +43,7 @@ class HeavyLangObject:
 
     # load the Heavy object definitions
     with open(os.path.join(os.path.dirname(__file__), "../json/heavy.lang.json"), "r") as f:
-        _HEAVY_LANG_DICT = HeavyLangType(json.load(f)).root
+        _HEAVY_LANG_DICT = HeavyLangType(**json.load(f)).root
 
     def __init__(
         self,
@@ -147,7 +147,12 @@ class HeavyLangObject:
         )
 
     @classmethod
-    def force_arg_type(cls, value: Any, value_type: Optional[str] = None, graph: Optional['HeavyGraph'] = None) -> Any:
+    def force_arg_type(
+        cls,
+        value: LangValueType,
+        value_type: Optional[str] = None,
+        graph: Optional['HeavyGraph'] = None
+    ) -> Any:
         """ Attempts to convert a value to a given value type. Raises an Exception otherwise.
             If the value_type is unknown and a graph is provided, a warning will be registered.
         """
@@ -160,7 +165,7 @@ class HeavyLangObject:
             return int(decimal.Decimal(value))
         elif value_type == "string":
             return str(value) if value is not None else None
-        elif value_type == "boolean":
+        elif value_type == "bool":
             if isinstance(value, str):
                 return value.strip().lower() not in ["false", "f", "0"]
             else:
@@ -199,7 +204,7 @@ class HeavyLangObject:
         """ Resolves missing default arguments. Also checks to make sure that all
             required arguments are present. Does nothing if the object is IR.
         """
-        if self.type in HeavyLangObject._HEAVY_LANG_DICT.keys():
+        if self.type in self._HEAVY_LANG_DICT.keys():
             for arg in self._obj_desc.args:
                 if arg.name not in self.args:
                     # if a defined argument is not in the argument dictionary
@@ -210,7 +215,7 @@ class HeavyLangObject:
                         self.add_error(f"Required argument \"{arg.name}\" not present for object {self}.")
                 else:
                     # enforce argument types
-                    self.args[arg.name] = HeavyLangObject.force_arg_type(
+                    self.args[arg.name] = self.force_arg_type(
                         self.args[arg.name],
                         arg.value_type,
                         self.graph)
