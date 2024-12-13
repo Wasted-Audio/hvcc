@@ -7,11 +7,11 @@ Next Release
 Features:
 
 * Migrating to poetry for project management
+* Standalone binary (only Linux for now)
 * DPF: Allow modgui on desktop
-* DPF: Allow host transport events without midi input
+* DPF: Enable host transport events without midi input
 * JS: midi out and device select by @Reinissance
 * Docs: general updates/corrections and improvements
-* Use pydantic to validate and access HeavyLang and HeavyIR objects
 * Allow loading external generator python module @eu-ch
 * Meta: additional global setting to automatically set `HV_SIMD_NONE`
 * Add version info to cli and IR result.
@@ -19,6 +19,13 @@ Features:
 Bugfixes:
 
 * Daisy template newline
+
+Typing:
+
+* HeavyLang and HeavyIR objects
+* Compiler results
+* Extern info
+* Heavy IR Graph
 
 0.12.1
 -----
