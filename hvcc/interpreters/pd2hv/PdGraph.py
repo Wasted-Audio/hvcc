@@ -1,5 +1,5 @@
 # Copyright (C) 2014-2018 Enzien Audio, Ltd.
-# Copyright (C) 2023 Wasted Audio
+# Copyright (C) 2023-2024 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,11 +15,13 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
-from typing import Optional, List, Dict
+from typing import Optional, List, Dict, Any
 
 from .Connection import Connection
 from .NotificationEnum import NotificationEnum
 from .PdObject import PdObject
+
+from hvcc.types.compiler import CompilerNotif
 
 
 class PdGraph(PdObject):
@@ -118,7 +120,14 @@ class PdGraph(PdObject):
                            "Have all inlets and outlets been declared?",
                            NotificationEnum.ERROR_UNABLE_TO_CONNECT_OBJECTS)
 
-    def add_hv_arg(self, arg_index: int, name: str, value_type: str, default_value: str, required: bool) -> None:
+    def add_hv_arg(
+        self,
+        arg_index: int,
+        name: str,
+        value_type: str,
+        default_value: Optional[Any],
+        required: bool
+    ) -> None:
         """ Add a Heavy argument to the graph. Indicies are from zero (not one, like Pd).
         """
         # ensure that self.hv_args is big enough, as heavy arguments are not
@@ -174,17 +183,17 @@ class PdGraph(PdObject):
         else:
             return False
 
-    def get_notices(self) -> Dict:
+    def get_notices(self) -> CompilerNotif:
         notices = PdObject.get_notices(self)
         for o in self.__objs:
             n = o.get_notices()
-            notices["warnings"].extend(n["warnings"])
-            notices["errors"].extend(n["errors"])
+            notices.warnings.extend(n.warnings)
+            notices.errors.extend(n.errors)
 
         # remove ERROR_EXCEPTION if there are already other errors.
         # The exception is always a result of some other error
-        if any((n["enum"] != NotificationEnum.ERROR_EXCEPTION) for n in notices["errors"]):
-            notices["errors"] = [n for n in notices["errors"] if n["enum"] != NotificationEnum.ERROR_EXCEPTION]
+        if any((n.enum != NotificationEnum.ERROR_EXCEPTION) for n in notices.errors):
+            notices.errors = [n for n in notices.errors if n.enum != NotificationEnum.ERROR_EXCEPTION]
 
         return notices
 

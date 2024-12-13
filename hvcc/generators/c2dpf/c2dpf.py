@@ -1,4 +1,4 @@
-# Copyright (C) 2021-2023 Wasted Audio
+# Copyright (C) 2021-2024 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,14 +17,17 @@ import os
 import shutil
 import time
 import jinja2
-from typing import Dict, Optional
+from typing import Optional
 
 from ..copyright import copyright_manager
 from ..filters import filter_uniqueid
-from ..types.meta import Meta, DPF
+
+from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
+from hvcc.types.compiler import Generator, CompilerResp, CompilerMsg, CompilerNotif, ExternInfo
+from hvcc.types.meta import Meta, DPF
 
 
-class c2dpf:
+class c2dpf(Generator):
     """ Generates a DPF wrapper for a given patch.
     """
 
@@ -33,20 +36,20 @@ class c2dpf:
         cls,
         c_src_dir: str,
         out_dir: str,
-        externs: Dict,
+        externs: ExternInfo,
         patch_name: Optional[str] = None,
         patch_meta: Meta = Meta(),
         num_input_channels: int = 0,
         num_output_channels: int = 0,
         copyright: Optional[str] = None,
         verbose: Optional[bool] = False
-    ) -> Dict:
+    ) -> CompilerResp:
 
         tick = time.time()
 
         out_dir = os.path.join(out_dir, "plugin")
-        receiver_list = externs['parameters']['in']
-        sender_list = externs["parameters"]["out"]
+        receiver_list = externs.parameters.inParam
+        sender_list = externs.parameters.outParam
 
         dpf_meta: DPF = patch_meta.dpf
         dpf_path = dpf_meta.dpf_path
@@ -96,7 +99,7 @@ class c2dpf:
                     num_output_channels=num_output_channels,
                     receivers=receiver_list,
                     senders=sender_list,
-                    pool_sizes_kb=externs["memoryPoolSizesKb"],
+                    pool_sizes_kb=externs.memoryPoolSizesKb,
                     copyright=copyright_c))
             if dpf_meta.enable_ui:
                 dpf_ui_path = os.path.join(source_dir, f"HeavyDPF_{patch_name}_UI.cpp")
@@ -116,7 +119,7 @@ class c2dpf:
                     class_name=f"HeavyDPF_{patch_name}",
                     num_input_channels=num_input_channels,
                     num_output_channels=num_output_channels,
-                    pool_sizes_kb=externs["memoryPoolSizesKb"],
+                    pool_sizes_kb=externs.memoryPoolSizesKb,
                     copyright=copyright_c))
 
             # plugin makefile
@@ -124,6 +127,7 @@ class c2dpf:
                 f.write(env.get_template("Makefile_plugin").render(
                     name=patch_name,
                     meta=dpf_meta,
+                    nosimd=patch_meta.nosimd,
                     dpf_path=dpf_path))
 
             # project makefile
@@ -133,36 +137,27 @@ class c2dpf:
                     meta=dpf_meta,
                     dpf_path=dpf_path))
 
-            return {
-                "stage": "c2dpf",
-                "notifs": {
-                    "has_error": False,
-                    "exception": None,
-                    "warnings": [],
-                    "errors": []
-                },
-                "in_dir": c_src_dir,
-                "in_file": "",
-                "out_dir": out_dir,
-                "out_file": os.path.basename(dpf_h_path),
-                "compile_time": time.time() - tick
-            }
+            return CompilerResp(
+                stage="c2dpf",
+                in_dir=c_src_dir,
+                out_dir=out_dir,
+                out_file=os.path.basename(dpf_h_path),
+                compile_time=time.time() - tick
+            )
 
         except Exception as e:
-            return {
-                "stage": "c2dpf",
-                "notifs": {
-                    "has_error": True,
-                    "exception": e,
-                    "warnings": [],
-                    "errors": [{
-                        "enum": -1,
-                        "message": str(e)
-                    }]
-                },
-                "in_dir": c_src_dir,
-                "in_file": "",
-                "out_dir": out_dir,
-                "out_file": "",
-                "compile_time": time.time() - tick
-            }
+            return CompilerResp(
+                stage="c2dpf",
+                notifs=CompilerNotif(
+                    has_error=True,
+                    exception=e,
+                    warnings=[],
+                    errors=[CompilerMsg(
+                        enum=NotificationEnum.ERROR_EXCEPTION,
+                        message=str(e)
+                    )]
+                ),
+                in_dir=c_src_dir,
+                out_dir=out_dir,
+                compile_time=time.time() - tick
+            )

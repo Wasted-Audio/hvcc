@@ -1,5 +1,5 @@
 # Copyright (C) 2014-2018 Enzien Audio, Ltd.
-# Copyright (C) 2021-2023 Wasted Audio
+# Copyright (C) 2021-2024 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,12 +16,14 @@
 
 import argparse
 from collections import OrderedDict
+import importlib
+import inspect
 import json
 import os
 import re
-import time
 import sys
-from typing import List, Dict, Optional
+import time
+from typing import Any, List, Dict, Optional
 
 from hvcc.interpreters.pd2hv import pd2hv
 from hvcc.core.hv2ir import hv2ir
@@ -34,7 +36,13 @@ from hvcc.generators.c2owl import c2owl
 from hvcc.generators.c2pdext import c2pdext
 from hvcc.generators.c2wwise import c2wwise
 from hvcc.generators.c2unity import c2unity
-from hvcc.generators.types.meta import Meta
+from hvcc.types.compiler import (
+    CompilerResp, CompilerNotif, CompilerMsg, Generator,
+    ExternInfo, ExternMemoryPool, ExternMidi, ExternEvents, ExternParams
+)
+from hvcc.types.IR import IRGraph
+from hvcc.types.meta import Meta
+from hvcc.version import VERSION
 
 
 class Colours:
@@ -50,19 +58,20 @@ class Colours:
     end = "\033[0m"
 
 
-def add_error(results: OrderedDict, error: str) -> OrderedDict:
+def add_error(
+        results: Dict[str, CompilerResp],
+        error: str
+) -> Dict[str, CompilerResp]:
     if "hvcc" in results:
-        results["hvcc"]["notifs"]["errors"].append({"message": error})
+        results["hvcc"].notifs.errors.append(CompilerMsg(message=error))
     else:
-        results["hvcc"] = {
-            "stage": "hvcc",
-            "notifs": {
-                "has_error": True,
-                "exception": None,
-                "errors": [{"message": error}],
-                "warnings": []
-            }
-        }
+        results["hvcc"] = CompilerResp(
+                                stage="hvcc",
+                                notifs=CompilerNotif(
+                                    has_error=True,
+                                    errors=[CompilerMsg(message=error)]
+                                )
+                            )
     return results
 
 
@@ -81,7 +90,7 @@ def check_extern_name_conflicts(extern_type: str, extern_list: List, results: Or
                           "capital letters are not the only difference.")
 
 
-def check_midi_objects(hvir: Dict) -> Dict:
+def check_midi_objects(hvir: IRGraph) -> Dict[str, List[str]]:
     in_midi = []
     out_midi = []
 
@@ -107,14 +116,13 @@ def check_midi_objects(hvir: Dict) -> Dict:
         '__hv_touchout',
     ]
 
-    for key in hvir['control']['receivers'].keys():
-        if key in midi_in_objs:
-            in_midi.append(key)
+    for recv in hvir.control.receivers.keys():
+        if recv in midi_in_objs:
+            in_midi.append(recv)
 
-    for key in hvir['control']['sendMessage']:
-        if key.get('name'):
-            if key['name'] in midi_out_objs:
-                out_midi.append(key['name'])
+    for msg in hvir.control.sendMessage:
+        if msg.name in midi_out_objs:
+            out_midi.append(msg.name)
 
     return {
         'in': in_midi,
@@ -132,22 +140,22 @@ def filter_midi_from_out_parameters(output_parameter_list: List, midi_out_object
     return new_out_list
 
 
-def generate_extern_info(hvir: Dict, results: OrderedDict) -> Dict:
+def generate_extern_info(hvir: IRGraph, results: OrderedDict) -> ExternInfo:
     """ Simplifies the receiver/send and table lists by only containing values
         externed with @hv_param, @hv_event or @hv_table
     """
     # Exposed input parameters
-    in_parameter_list = [(k, v) for k, v in hvir["control"]["receivers"].items() if v.get("extern", None) == "param"]
+    in_parameter_list = [(k, v) for k, v in hvir.control.receivers.items() if v.extern == "param"]
     in_parameter_list.sort(key=lambda x: x[0])
     check_extern_name_conflicts("input parameter", in_parameter_list, results)
 
     # Exposed input events
-    in_event_list = [(k, v) for k, v in hvir["control"]["receivers"].items() if v.get("extern", None) == "event"]
+    in_event_list = [(k, v) for k, v in hvir.control.receivers.items() if v.extern == "event"]
     in_event_list.sort(key=lambda x: x[0])
     check_extern_name_conflicts("input event", in_event_list, results)
 
     # Exposed output parameters
-    out_parameter_list = [(v["name"], v) for v in hvir["control"]["sendMessage"] if v.get("extern", None) == "param"]
+    out_parameter_list = [(v.name, v) for v in hvir.control.sendMessage if v.extern == "param"]
     # remove duplicate output parameters/events
     # NOTE(joe): is the id argument important here? We'll only take the first one in this case.
     out_parameter_list = list(dict(out_parameter_list).items())
@@ -155,13 +163,13 @@ def generate_extern_info(hvir: Dict, results: OrderedDict) -> Dict:
     check_extern_name_conflicts("output parameter", out_parameter_list, results)
 
     # Exposed output events
-    out_event_list = [(v["name"], v) for v in hvir["control"]["sendMessage"] if v.get("extern", None) == "event"]
+    out_event_list = [(v.name, v) for v in hvir.control.sendMessage if v.extern == "event"]
     out_event_list = list(dict(out_event_list).items())
     out_event_list.sort(key=lambda x: x[0])
     check_extern_name_conflicts("output event", out_event_list, results)
 
     # Exposed tables
-    table_list = [(k, v) for k, v in hvir["tables"].items() if v.get("extern", None)]
+    table_list = [(k, v) for k, v in hvir.tables.items() if v.extern]
     table_list.sort(key=lambda x: x[0])
     check_extern_name_conflicts("table", table_list, results)
 
@@ -171,35 +179,48 @@ def generate_extern_info(hvir: Dict, results: OrderedDict) -> Dict:
     # filter midi objects from the output parameters list
     out_parameter_list = filter_midi_from_out_parameters(out_parameter_list, midi_objects['out'])
 
-    return {
-        "parameters": {
-            "in": in_parameter_list,
-            "out": out_parameter_list
-        },
-        "events": {
-            "in": in_event_list,
-            "out": out_event_list
-        },
-        "midi": {
-            "in": midi_objects['in'],
-            "out": midi_objects['out']
-        },
-        "tables": table_list,
+    return ExternInfo(
+        parameters=ExternParams(
+            inParam=in_parameter_list,
+            outParam=out_parameter_list
+        ),
+        events=ExternEvents(
+            inEvent=in_event_list,
+            outEvent=out_event_list
+        ),
+        midi=ExternMidi(
+            inMidi=midi_objects['in'],
+            outMidi=midi_objects['out']
+        ),
+        tables=table_list,
         # generate patch heuristics to ensure enough memory allocated for the patch
-        "memoryPoolSizesKb": {
-            "internal": 10,  # TODO(joe): should this increase if there are a lot of internal connections?
-            "inputQueue": max(2, int(
-                                     len(in_parameter_list) +
-                                     (len(in_event_list) / 4) +
-                                     len(midi_objects['in'])  # TODO(dreamer): should this depend on the MIDI type?
-                                    )),
-            "outputQueue": max(2, int(
-                                     len(out_parameter_list) +
-                                     (len(out_event_list) / 4) +
-                                     len(midi_objects['out'])
-                                    )),
-        }
-    }
+        memoryPoolSizesKb=ExternMemoryPool(
+            internal=10,  # TODO(joe): should this increase if there are a lot of internal connections?
+            inputQueue=max(2, int(
+                len(in_parameter_list) +
+                (len(in_event_list) / 4) +
+                len(midi_objects['in'])  # TODO(dreamer): should this depend on the MIDI type?
+            )),
+            outputQueue=max(2, int(
+                len(out_parameter_list) +
+                (len(out_event_list) / 4) +
+                len(midi_objects['out'])
+            ))
+        )
+    )
+
+
+def load_ext_generator(module_name, verbose) -> Optional[Generator]:
+    try:
+        module = importlib.import_module(module_name)
+        for _, member in inspect.getmembers(module):
+            if inspect.isclass(member) and not inspect.isabstract(member) and issubclass(member, Generator):
+                return member()
+        if verbose:
+            print(f"---> Module {module_name} does not contain a class derived from hvcc.types.Compiler")
+        return None
+    except ModuleNotFoundError:
+        return None
 
 
 def compile_dataflow(
@@ -209,12 +230,12 @@ def compile_dataflow(
     patch_meta_file: Optional[str] = None,
     search_paths: Optional[List] = None,
     generators: Optional[List] = None,
+    ext_generators: Optional[List] = None,
     verbose: bool = False,
     copyright: Optional[str] = None,
     nodsp: Optional[bool] = False
-) -> OrderedDict:
-
-    results: OrderedDict = OrderedDict()  # default value, empty dictionary
+) -> Dict[str, CompilerResp]:
+    results: OrderedDict[str, CompilerResp] = OrderedDict()  # default value, empty dictionary
     patch_meta = Meta()
 
     # basic error checking on input
@@ -250,47 +271,56 @@ def compile_dataflow(
             verbose=verbose)
 
         # check for errors
-        if list(results.values())[0]["notifs"].get("has_error", False):
+
+        response: CompilerResp = list(results.values())[0]
+
+        if response.notifs.has_error:
             return results
 
         subst_name = re.sub(r'\W', '_', patch_name)
         results["hv2ir"] = hv2ir.hv2ir.compile(
-            hv_file=os.path.join(list(results.values())[0]["out_dir"], list(results.values())[0]["out_file"]),
+            hv_file=os.path.join(response.out_dir, response.out_file),
             # ensure that the ir filename has no funky characters in it
             ir_file=os.path.join(out_dir, "ir", f"{subst_name}.heavy.ir.json"),
             patch_name=patch_name,
             verbose=verbose)
 
         # check for errors
-        if results["hv2ir"]["notifs"].get("has_error", False):
+        if results["hv2ir"].notifs.has_error:
             return results
 
         # get the hvir data
-        hvir = results["hv2ir"]["ir"]
-        patch_name = hvir["name"]["escaped"]
+        hvir = results["hv2ir"].ir
+        assert hvir is not None
+        patch_name = hvir.name.escaped
         externs = generate_extern_info(hvir, results)
+
+        # get application path
+        if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
+            application_path = os.path.join(sys._MEIPASS, 'hvcc')
+        elif __file__:
+            application_path = os.path.dirname(__file__)
 
         c_src_dir = os.path.join(out_dir, "c")
         results["ir2c"] = ir2c.ir2c.compile(
-            hv_ir_path=os.path.join(results["hv2ir"]["out_dir"], results["hv2ir"]["out_file"]),
-            static_dir=os.path.join(os.path.dirname(__file__), "generators/ir2c/static"),
+            hv_ir_path=os.path.join(results["hv2ir"].out_dir, results["hv2ir"].out_file),
+            static_dir=os.path.join(application_path, "generators/ir2c/static"),
             output_dir=c_src_dir,
             externs=externs,
             copyright=copyright,
             nodsp=nodsp)
 
         # check for errors
-        if results["ir2c"]["notifs"].get("has_error", False):
+        if results["ir2c"].notifs.has_error:
             return results
 
         # ir2c_perf
-        results["ir2c_perf"] = {
-            "stage": "ir2c_perf",
-            "obj_counter": ir2c_perf.ir2c_perf.perf(results["hv2ir"]["ir"], verbose=verbose),
-            "in_dir": results["hv2ir"]["out_dir"],
-            "in_file": results["hv2ir"]["out_file"],
-            "notifs": {}
-        }
+        results["ir2c_perf"] = CompilerResp(
+            stage="ir2c_perf",
+            obj_perf=ir2c_perf.ir2c_perf.perf(hvir, verbose=verbose),
+            in_dir=results["hv2ir"].out_dir,
+            in_file=results["hv2ir"].out_file,
+        )
 
         # reconfigure such that next stage is triggered
         in_path = c_src_dir
@@ -306,19 +336,20 @@ def compile_dataflow(
                 hvir_path = os.path.join(hvir_dir, os.listdir(hvir_dir)[0])
                 if os.path.isfile(hvir_path):
                     with open(hvir_path, "r") as f:
-                        hvir = json.load(f)
-                        patch_name = hvir["name"]["escaped"]
+                        hvir = IRGraph(**json.load(f))
+                        patch_name = hvir.name.escaped
                         externs = generate_extern_info(hvir, results)
                 else:
                     return add_error(results, "Cannot find hvir file.")
             except Exception as e:
                 return add_error(results, f"ir could not be found or loaded: {e}.")
 
+    assert hvir is not None
     # run the c2x generators, merge the results
-    num_input_channels = hvir["signal"]["numInputBuffers"]
-    num_output_channels = hvir["signal"]["numOutputBuffers"]
+    num_input_channels = hvir.signal.numInputBuffers
+    num_output_channels = hvir.signal.numOutputBuffers
 
-    gen_args = {
+    gen_args: Dict[str, Any] = {
         'c_src_dir': c_src_dir,
         'out_dir': out_dir,
         'patch_name': patch_name,
@@ -365,6 +396,14 @@ def compile_dataflow(
             print("--> Generating Wwise plugin")
         results["c2wwise"] = c2wwise.c2wwise.compile(**gen_args)
 
+    if ext_generators:
+        for module_name in ext_generators:
+            generator = load_ext_generator(module_name, verbose)
+            if generator is not None:
+                if verbose:
+                    print(f"--> Executing custom generator from module {module_name}")
+                results[module_name] = generator.compile(**gen_args)
+
     return results
 
 
@@ -402,6 +441,11 @@ def main() -> bool:
         default=["c"],
         help="List of generator outputs: c, unity, wwise, js, pdext, daisy, dpf, fabric, owl")
     parser.add_argument(
+        "-G",
+        "--ext-gen",
+        nargs="*",
+        help="List of external generator modules, see 'External Generators' docs page.")
+    parser.add_argument(
         "--results_path",
         help="Write results dictionary to the given path as a JSON-formatted string."
              " Target directory will be created if it does not exist.")
@@ -418,6 +462,13 @@ def main() -> bool:
     parser.add_argument(
         "--copyright",
         help="A string indicating the owner of the copyright.")
+    parser.add_argument(
+        "-V",
+        "--version",
+        action='version',
+        help="Print version and exit.",
+        version=VERSION
+    )
     args = parser.parse_args()
 
     in_path = os.path.abspath(args.in_path)
@@ -428,6 +479,7 @@ def main() -> bool:
         patch_meta_file=args.meta,
         search_paths=args.search_paths,
         generators=args.gen,
+        ext_generators=args.ext_gen,
         verbose=args.verbose,
         copyright=args.copyright,
         nodsp=args.nodsp
@@ -436,25 +488,25 @@ def main() -> bool:
     errorCount = 0
     for r in list(results.values()):
         # print any errors
-        if r["notifs"].get("has_error", False):
-            for i, error in enumerate(r["notifs"].get("errors", [])):
+        if r.notifs.has_error:
+            for i, error in enumerate(r.notifs.errors):
                 errorCount += 1
                 print("{4:3d}) {2}Error{3} {0}: {1}".format(
-                    r["stage"], error["message"], Colours.red, Colours.end, i + 1))
+                    r.stage, error.message, Colours.red, Colours.end, i + 1))
 
             # only print exception if no errors are indicated
-            if len(r["notifs"].get("errors", [])) == 0 and r["notifs"].get("exception", None) is not None:
+            if len(r.notifs.errors) == 0 and r.notifs.exception is not None:
                 errorCount += 1
                 print("{2}Error{3} {0} exception: {1}".format(
-                    r["stage"], r["notifs"]["exception"], Colours.red, Colours.end))
+                    r.stage, r.notifs.exception, Colours.red, Colours.end))
 
             # clear any exceptions such that results can be JSONified if necessary
-            r["notifs"]["exception"] = []
+            r.notifs.exception = None
 
         # print any warnings
-        for i, warning in enumerate(r["notifs"].get("warnings", [])):
+        for i, warning in enumerate(r.notifs.warnings):
             print("{4:3d}) {2}Warning{3} {0}: {1}".format(
-                r["stage"], warning["message"], Colours.yellow, Colours.end, i + 1))
+                r.stage, warning.message, Colours.yellow, Colours.end, i + 1))
 
     if args.results_path:
         results_path = os.path.realpath(os.path.abspath(args.results_path))

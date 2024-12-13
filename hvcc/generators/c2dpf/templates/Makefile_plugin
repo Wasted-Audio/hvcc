@@ -35,6 +35,11 @@ BUILD_C_FLAGS += -Wno-unused-parameter -std=c11 -fno-strict-aliasing -pthread
 BUILD_CXX_FLAGS += -Wno-unused-parameter -fno-strict-aliasing -pthread
 LINK_FLAGS += -pthread
 
+{%- if nosimd is sameas true %}
+BUILD_C_FLAGS += -DHV_SIMD_NONE
+BUILD_CXX_FLAGS += -DHV_SIMD_NONE
+{%- endif %}
+
 {% if meta.plugin_formats|length > 0 %}
 	{%- for format in meta.plugin_formats %}
 TARGETS += {{format}}

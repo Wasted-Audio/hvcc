@@ -1,5 +1,5 @@
 # Copyright (C) 2014-2018 Enzien Audio, Ltd.
-# Copyright (C) 2023 Wasted Audio
+# Copyright (C) 2023-2024 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -18,6 +18,8 @@ from typing import Dict, List
 
 from .HeavyObject import HeavyObject
 
+from hvcc.types.IR import IRSignalList
+
 
 class SignalEnvelope(HeavyObject):
 
@@ -33,7 +35,7 @@ class SignalEnvelope(HeavyObject):
         return {"HvSignalEnvelope.h", "HvSignalEnvelope.c"}
 
     @classmethod
-    def get_C_init(cls, obj_type: str, obj_id: int, args: Dict) -> List[str]:
+    def get_C_init(cls, obj_type: str, obj_id: str, args: Dict) -> List[str]:
         return [
             "sEnv_init(&sEnv_{0}, {1}, {2});".format(
                 obj_id,
@@ -42,10 +44,10 @@ class SignalEnvelope(HeavyObject):
         ]
 
     @classmethod
-    def get_C_process(cls, process_dict: Dict, obj_type: str, obj_id: int, args: Dict) -> List[str]:
+    def get_C_process(cls, process_dict: IRSignalList, obj_type: str, obj_id: str, args: Dict) -> List[str]:
         return [
             "sEnv_process(this, &sEnv_{0}, VIf({1}), &sEnv_{0}_sendMessage);".format(
-                process_dict["id"],
-                cls._c_buffer(process_dict["inputBuffers"][0])
+                process_dict.id,
+                cls._c_buffer(process_dict.inputBuffers[0])
             )
         ]

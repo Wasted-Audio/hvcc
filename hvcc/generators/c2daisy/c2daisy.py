@@ -7,8 +7,11 @@ import json2daisy  # type: ignore
 from typing import Any, Dict, Optional
 
 from ..copyright import copyright_manager
-from ..types.meta import Meta, Daisy
 from . import parameters
+
+from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
+from hvcc.types.compiler import Generator, CompilerResp, CompilerNotif, CompilerMsg, ExternInfo
+from hvcc.types.meta import Meta, Daisy
 
 
 hv_midi_messages = {
@@ -23,7 +26,7 @@ hv_midi_messages = {
 }
 
 
-class c2daisy:
+class c2daisy(Generator):
     """ Generates a Daisy wrapper for a given patch.
     """
 
@@ -32,14 +35,14 @@ class c2daisy:
         cls,
         c_src_dir: str,
         out_dir: str,
-        externs: Dict,
+        externs: ExternInfo,
         patch_name: Optional[str] = None,
         patch_meta: Meta = Meta(),
         num_input_channels: int = 0,
         num_output_channels: int = 0,
         copyright: Optional[str] = None,
         verbose: Optional[bool] = False
-    ) -> Dict:
+    ) -> CompilerResp:
 
         tick = time.time()
 
@@ -69,11 +72,11 @@ class c2daisy:
                 header, board_info = json2daisy.generate_header_from_name(board)
 
             # remove heavy out params from externs
-            externs['parameters']['out'] = [
-                t for t in externs['parameters']['out'] if not any(x == y for x in hv_midi_messages for y in t)]
+            externs.parameters.outParam = [
+                t for t in externs.parameters.outParam if not any(x == y for x in hv_midi_messages for y in t)]
 
             component_glue = parameters.parse_parameters(
-                externs['parameters'], board_info['components'], board_info['aliases'], 'hardware')
+                externs.parameters, board_info['components'], board_info['aliases'], 'hardware')
             component_glue['class_name'] = board_info['name']
             component_glue['patch_name'] = patch_name
             component_glue['header'] = f"HeavyDaisy_{patch_name}.hpp"
@@ -83,7 +86,7 @@ class c2daisy:
             component_glue['displayprocess'] = board_info['displayprocess']
             component_glue['debug_printing'] = daisy_meta.debug_printing
             component_glue['usb_midi'] = daisy_meta.usb_midi
-            component_glue['pool_sizes_kb'] = externs["memoryPoolSizesKb"]
+            component_glue['pool_sizes_kb'] = externs.memoryPoolSizesKb
 
             # samplerate
             samplerate = daisy_meta.samplerate
@@ -138,36 +141,27 @@ class c2daisy:
 
             # ======================================================================================
 
-            return {
-                "stage": "c2daisy",
-                "notifs": {
-                    "has_error": False,
-                    "exception": None,
-                    "warnings": [],
-                    "errors": []
-                },
-                "in_dir": c_src_dir,
-                "in_file": "",
-                "out_dir": out_dir,
-                "out_file": os.path.basename(daisy_h_path),
-                "compile_time": time.time() - tick
-            }
+            return CompilerResp(
+                stage="c2daisy",
+                in_dir=c_src_dir,
+                out_dir=out_dir,
+                out_file=os.path.basename(daisy_h_path),
+                compile_time=time.time() - tick
+            )
 
         except Exception as e:
-            return {
-                "stage": "c2daisy",
-                "notifs": {
-                    "has_error": True,
-                    "exception": e,
-                    "warnings": [],
-                    "errors": [{
-                        "enum": -1,
-                        "message": str(e)
-                    }]
-                },
-                "in_dir": c_src_dir,
-                "in_file": "",
-                "out_dir": out_dir,
-                "out_file": "",
-                "compile_time": time.time() - tick
-            }
+            return CompilerResp(
+                stage="c2daisy",
+                notifs=CompilerNotif(
+                    has_error=True,
+                    exception=e,
+                    warnings=[],
+                    errors=[CompilerMsg(
+                        enum=NotificationEnum.ERROR_EXCEPTION,
+                        message=str(e)
+                    )]
+                ),
+                in_dir=c_src_dir,
+                out_dir=out_dir,
+                compile_time=time.time() - tick
+            )

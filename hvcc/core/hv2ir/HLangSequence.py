@@ -1,5 +1,5 @@
 # Copyright (C) 2014-2018 Enzien Audio, Ltd.
-# Copyright (C) 2023 Wasted Audio
+# Copyright (C) 2023-2024 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -33,7 +33,7 @@ class HLangSequence(HeavyLangObject):
         annotations: Optional[Dict] = None
     ) -> None:
         # get the number of outlets that this object has
-        num_outlets = len(args[HeavyLangObject._HEAVY_LANG_DICT[obj_type]["args"][0]["name"]])
+        num_outlets = len(args[self._HEAVY_LANG_DICT[obj_type].args[0].name])
         super().__init__(obj_type, args, graph,
                          num_inlets=1,
                          num_outlets=num_outlets,

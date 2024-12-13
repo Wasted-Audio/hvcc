@@ -47,6 +47,7 @@ public:
 
   void handleMidiInput(uint32_t frames, const MidiEvent* midiEvents, uint32_t midiEventCount);
   void handleMidiSend(uint32_t sendHash, const HvMessage *m);
+  void hostTransportEvents(uint32_t frames);
   void setOutputParameter(uint32_t sendHash, const HvMessage *m);
 
 protected:

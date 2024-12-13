@@ -1,5 +1,5 @@
 # Copyright (C) 2014-2018 Enzien Audio, Ltd.
-# Copyright (C) 2021-2023 Wasted Audio
+# Copyright (C) 2021-2024 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -18,13 +18,17 @@ import os
 import shutil
 import time
 import jinja2
-from typing import Dict, Optional
+from typing import Optional
 
 from ..copyright import copyright_manager
 from ..filters import filter_plugin_id
 
+from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
+from hvcc.types.compiler import Generator, CompilerResp, CompilerNotif, CompilerMsg, ExternInfo
+from hvcc.types.meta import Meta
 
-class c2wwise:
+
+class c2wwise(Generator):
     """Generates a plugin wrapper for Audiokinetic's Wwise game audio middleware
     platform.
     """
@@ -34,21 +38,21 @@ class c2wwise:
             cls,
             c_src_dir: str,
             out_dir: str,
-            externs: Dict,
+            externs: ExternInfo,
             patch_name: Optional[str] = None,
-            patch_meta: Optional[Dict] = None,
+            patch_meta: Meta = Meta(),
             num_input_channels: int = 0,
             num_output_channels: int = 0,
             copyright: Optional[str] = None,
             verbose: Optional[bool] = False
-    ) -> Dict:
+    ) -> CompilerResp:
         tick = time.time()
 
-        in_parameter_list = externs["parameters"]["in"]
-        out_parameter_list = externs["parameters"]["out"]
-        event_list = externs["events"]["in"]
-        out_event_list = externs["events"]["out"]
-        table_list = externs["tables"]
+        in_parameter_list = externs.parameters.inParam
+        out_parameter_list = externs.parameters.outParam
+        event_list = externs.events.inEvent
+        out_event_list = externs.events.outEvent
+        table_list = externs.tables
         patch_name = patch_name or "heavy"
         copyright_c = copyright_manager.get_copyright_for_c(copyright)
         copyright_xml = copyright_manager.get_copyright_for_xml(copyright)
@@ -116,7 +120,7 @@ class c2wwise:
                         out_events=out_event_list,
                         events=event_list,
                         tables=table_list,
-                        pool_sizes_kb=externs["memoryPoolSizesKb"],
+                        pool_sizes_kb=externs.memoryPoolSizesKb,
                         is_source=is_source_plugin,
                         num_input_channels=num_input_channels,
                         num_output_channels=num_output_channels,
@@ -125,36 +129,26 @@ class c2wwise:
                         plugin_id=plugin_id,
                         copyright=copyright_xml if file_name.endswith(".xml") else copyright_c))
 
-            return {
-                "stage": "c2wwise",
-                "notifs": {
-                    "has_error": False,
-                    "exception": None,
-                    "warnings": [],
-                    "errors": []
-                },
-                "in_dir": c_src_dir,
-                "in_file": "",
-                "out_dir": out_dir,
-                "out_file": "",
-                "compile_time": time.time() - tick
-            }
+            return CompilerResp(
+                stage="c2wwise",
+                in_dir=c_src_dir,
+                out_dir=out_dir,
+                compile_time=time.time() - tick
+            )
 
         except Exception as e:
-            return {
-                "stage": "c2wwise",
-                "notifs": {
-                    "has_error": True,
-                    "exception": e,
-                    "warnings": [],
-                    "errors": [{
-                        "enum": -1,
-                        "message": str(e)
-                    }]
-                },
-                "in_dir": c_src_dir,
-                "in_file": "",
-                "out_dir": out_dir,
-                "out_file": "",
-                "compile_time": time.time() - tick
-            }
+            return CompilerResp(
+                stage="c2wwise",
+                notifs=CompilerNotif(
+                    has_error=True,
+                    exception=e,
+                    warnings=[],
+                    errors=[CompilerMsg(
+                        enum=NotificationEnum.ERROR_EXCEPTION,
+                        message=str(e)
+                    )]
+                ),
+                in_dir=c_src_dir,
+                out_dir=out_dir,
+                compile_time=time.time() - tick
+            )

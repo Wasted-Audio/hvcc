@@ -1,6 +1,32 @@
 CHANGELOG
 =====
 
+0.13.0
+-----
+
+Features:
+
+* Migrating to poetry for project management
+* Standalone binary (only Linux for now)
+* DPF: Allow modgui on desktop
+* DPF: Enable host transport events without midi input
+* JS: midi out and device select by @Reinissance
+* Docs: general updates/corrections and improvements
+* Allow loading external generator python module @eu-ch
+* Meta: additional global setting to automatically set `HV_SIMD_NONE`
+* Add version info to cli and IR result.
+
+Bugfixes:
+
+* Daisy template newline
+
+Typing:
+
+* HeavyLang and HeavyIR objects
+* Compiler results
+* Extern info
+* Heavy IR Graph
+
 0.12.1
 -----
 
@@ -11,7 +37,7 @@ Features:
 * DPF: CV flag in portgroups
 * DPF: flag to disable scoped denormals
 
-Bugfixes
+Bugfixes:
 
 * wwise: allow Bang messages in OnSendMessageCallback()
 * Improve `[cos~]` precision.

@@ -1,3 +1,8 @@
+# Heavy Compiler Collection
+# Copyright (C) 2024 Wasted Audio
+#
+# SPDX-License-Identifier: GPL-3.0-only
+
 from typing import Dict, Literal, List, Optional, Tuple, Union
 from pydantic import BaseModel, HttpUrl
 
@@ -55,5 +60,6 @@ class DPF(BaseModel):
 
 class Meta(BaseModel):
     name: Optional[str] = None
+    nosimd: Optional[bool] = False
     daisy: Daisy = Daisy()
     dpf: DPF = DPF()

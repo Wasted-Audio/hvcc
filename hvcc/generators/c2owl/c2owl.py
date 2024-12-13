@@ -4,17 +4,22 @@ import shutil
 import time
 import jinja2
 import json
-from typing import Dict, List, Optional
+from typing import List, Optional
 
 import hvcc.core.hv2ir.HeavyLangObject as HeavyLangObject
 from ..copyright import copyright_manager
+
+from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
+from hvcc.types.compiler import Generator, CompilerResp, CompilerNotif, CompilerMsg, ExternInfo
+from hvcc.types.meta import Meta
+from hvcc.types.IR import IRGraph
 
 
 heavy_hash = HeavyLangObject.HeavyLangObject.get_hash
 OWL_BUTTONS = ['Push', 'B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8']
 
 
-class c2owl:
+class c2owl(Generator):
     """ Generates a OWL wrapper for a given patch.
     """
 
@@ -23,20 +28,20 @@ class c2owl:
         jdata = list()
 
         with open(patch_ir, mode="r") as f:
-            ir = json.load(f)
+            ir = IRGraph(**json.load(f))
 
-            for name, v in ir['control']['receivers'].items():
+            for name, recv in ir.control.receivers.items():
                 # skip __hv_init and similar
                 if name.startswith("__"):
                     continue
 
                 # If a name has been specified
-                if v['attributes'].get('raw'):
-                    key = v['attributes']['raw']
+                if recv.attributes.get('raw'):
+                    key = recv.attributes['raw']
                     jdata.append((key, name, 'RECV', f"0x{heavy_hash(name):X}",
-                                  v['attributes']['min'],
-                                  v['attributes']['max'],
-                                  v['attributes']['default'],
+                                  recv.attributes['min'],
+                                  recv.attributes['max'],
+                                  recv.attributes['default'],
                                   key in OWL_BUTTONS))
 
                 elif name.startswith('Channel-'):
@@ -44,16 +49,16 @@ class c2owl:
                     jdata.append((key, name, 'RECV', f"0x{heavy_hash(name):X}",
                                   0, 1, None, key in OWL_BUTTONS))
 
-            for k, v in ir['objects'].items():
+            for _, obj in ir.objects.items():
                 try:
-                    if v['type'] == '__send':
-                        name = v['args']['name']
-                        if v['args']['attributes'].get('raw'):
-                            key = v['args']['attributes']['raw']
+                    if obj.type == '__send':
+                        name = obj.args['name']
+                        if obj.args['attributes'].get('raw'):
+                            key = obj.args['attributes']['raw']
                             jdata.append((key, f'{name}>', 'SEND', f"0x{heavy_hash(name):X}",
-                                          v['args']['attributes']['min'],
-                                          v['args']['attributes']['max'],
-                                          v['args']['attributes']['default'],
+                                          obj.args['attributes']['min'],
+                                          obj.args['attributes']['max'],
+                                          obj.args['attributes']['default'],
                                           key in OWL_BUTTONS))
                         elif name.startswith('Channel-'):
                             key = name.split('Channel-', 1)[1]
@@ -69,14 +74,14 @@ class c2owl:
         cls,
         c_src_dir: str,
         out_dir: str,
-        externs: Dict,
+        externs: ExternInfo,
         patch_name: Optional[str] = None,
-        patch_meta: Optional[Dict] = None,
+        patch_meta: Meta = Meta(),
         num_input_channels: int = 0,
         num_output_channels: int = 0,
         copyright: Optional[str] = None,
         verbose: Optional[bool] = False
-    ) -> Dict:
+    ) -> CompilerResp:
 
         tick = time.time()
 
@@ -122,36 +127,27 @@ class c2owl:
 
             # ======================================================================================
 
-            return {
-                "stage": "c2owl",
-                "notifs": {
-                    "has_error": False,
-                    "exception": None,
-                    "warnings": [],
-                    "errors": []
-                },
-                "in_dir": c_src_dir,
-                "in_file": "",
-                "out_dir": out_dir,
-                "out_file": os.path.basename(owl_h_path),
-                "compile_time": time.time() - tick
-            }
+            return CompilerResp(
+                stage="c2owl",
+                in_dir=c_src_dir,
+                out_dir=out_dir,
+                out_file=os.path.basename(owl_h_path),
+                compile_time=time.time() - tick
+            )
 
         except Exception as e:
-            return {
-                "stage": "c2owl",
-                "notifs": {
-                    "has_error": True,
-                    "exception": e,
-                    "warnings": [],
-                    "errors": [{
-                        "enum": -1,
-                        "message": str(e)
-                    }]
-                },
-                "in_dir": c_src_dir,
-                "in_file": "",
-                "out_dir": out_dir,
-                "out_file": "",
-                "compile_time": time.time() - tick
-            }
+            return CompilerResp(
+                stage="c2owl",
+                notifs=CompilerNotif(
+                    has_error=True,
+                    exception=e,
+                    warnings=[],
+                    errors=[CompilerMsg(
+                        enum=NotificationEnum.ERROR_EXCEPTION,
+                        message=str(e)
+                    )]
+                ),
+                in_dir=c_src_dir,
+                out_dir=out_dir,
+                compile_time=time.time() - tick
+            )

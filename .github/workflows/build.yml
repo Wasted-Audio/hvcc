@@ -21,15 +21,41 @@ jobs:
       - name: Initialize lfs
         run: git lfs pull
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v3
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
+          python -m pip install --upgrade pip setuptools wheel
           pip install tox tox-gh-actions
       - name: Run tox
         run: tox
+
+  binary:
+
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          lfs: true
+          submodules: true
+      - name: Initialize lfs
+        run: git lfs pull
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.12
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip setuptools wheel
+          pip install poetry poetry-pyinstaller-plugin
+      - name: Build binaries
+        run: poetry build
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: heavy-binary-linux-x86_64
+          path: dist/pyinstaller/manylinux_2_31_x86_64/Heavy
 
   dispatch:
     needs: build

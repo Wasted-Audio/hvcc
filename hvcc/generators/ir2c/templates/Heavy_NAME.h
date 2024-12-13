@@ -15,7 +15,7 @@ extern "C" {
 
 {% if externs.parameters.in|length > 0 -%}
 typedef enum {
-  {%- for k,v in externs.parameters.in %}
+  {%- for k,v in externs.parameters.inParam %}
   HV_{{name|upper}}_PARAM_IN_{{k|upper}} = {{v.hash}}, // {{v.display}}
   {%- endfor %}
 } Hv_{{name}}_ParameterIn;
@@ -23,7 +23,7 @@ typedef enum {
 
 {% if externs.parameters.out|length > 0 %}
 typedef enum {
-  {%- for k,v in externs.parameters.out %}
+  {%- for k,v in externs.parameters.outParam %}
   HV_{{name|upper}}_PARAM_OUT_{{k|upper}} = {{v.hash}}, // {{v.display}}
   {%- endfor %}
 } Hv_{{name}}_ParameterOut;
@@ -31,7 +31,7 @@ typedef enum {
 
 {% if externs.events.in|length > 0 %}
 typedef enum {
-  {%- for k,v in externs.events.in %}
+  {%- for k,v in externs.events.inEvent %}
   HV_{{name|upper}}_EVENT_IN_{{k|upper}} = {{v.hash}}, // {{v.display}}
   {%- endfor %}
 } Hv_{{name}}_EventIn;
@@ -39,7 +39,7 @@ typedef enum {
 
 {% if externs.events.out|length > 0 %}
 typedef enum {
-  {%- for k,v in externs.events.out %}
+  {%- for k,v in externs.events.outEvent %}
   HV_{{name|upper}}_EVENT_OUT_{{k|upper}} = {{v.hash}}, // {{v.display}}
   {%- endfor %}
 } Hv_{{name}}_EventOut;
