@@ -41,7 +41,7 @@ def main() -> bool:
     tick = time.time()
 
     parser = argparse.ArgumentParser(
-        description="This is the Enzien Audio Heavy compiler. It compiles supported dataflow languages into C,"
+        description="This is the Wasted Audio Heavy compiler. It compiles supported dataflow languages into C,"
                     " and other supported frameworks.")
     parser.add_argument(
         "in_path",
