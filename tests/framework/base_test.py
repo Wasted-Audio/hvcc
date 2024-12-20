@@ -69,7 +69,7 @@ class HvBaseTest(unittest.TestCase):
                 # TODO(mhroth): standardise how errors and warnings are returned between stages
                 if r.notifs.has_error:
                     if r.stage == "pd2hv":
-                        self.fail(hvcc_results["pd2hv"].notifs.errors[0])
+                        self.fail(hvcc_results.root["pd2hv"].notifs.errors[0])
                     else:
                         self.fail(str(r.notifs))
 
@@ -77,7 +77,7 @@ class HvBaseTest(unittest.TestCase):
                 for r in hvcc_results.root.values():
                     if r.stage == "pd2hv":
                         self.assertTrue(
-                            expected_enum in [w.enum for w in hvcc_results["pd2hv"].notifs.warnings]
+                            expected_enum in [w.enum for w in hvcc_results.root["pd2hv"].notifs.warnings]
                         )
                         return
 
@@ -85,10 +85,10 @@ class HvBaseTest(unittest.TestCase):
 
             if expect_fail and r.notifs.has_error:
                 if r.stage == "pd2hv":
-                    self.assertTrue(expected_enum in [e.enum for e in hvcc_results["pd2hv"].notifs.errors])
+                    self.assertTrue(expected_enum in [e.enum for e in hvcc_results.root["pd2hv"].notifs.errors])
                     return
                 elif r.stage == "hvcc":
-                    if len(hvcc_results["hvcc"].notifs.errors) > 0:
+                    if len(hvcc_results.root["hvcc"].notifs.errors) > 0:
                         return  # hvcc isn't using Notification enums so just pass
 
                 self.fail(f"Expected error enum: {expected_enum}")
