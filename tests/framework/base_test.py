@@ -63,7 +63,7 @@ class HvBaseTest(unittest.TestCase):
 
         hvcc_results = hvcc.compile_dataflow(pd_path, out_dir, verbose=False)
 
-        for r in hvcc_results.values():
+        for r in hvcc_results.root.values():
             if not expect_fail:
                 # if there are any errors from hvcc, fail immediately
                 # TODO(mhroth): standardise how errors and warnings are returned between stages
@@ -74,7 +74,7 @@ class HvBaseTest(unittest.TestCase):
                         self.fail(str(r.notifs))
 
             if expect_warning:
-                for r in hvcc_results.values():
+                for r in hvcc_results.root.values():
                     if r.stage == "pd2hv":
                         self.assertTrue(
                             expected_enum in [w.enum for w in hvcc_results["pd2hv"].notifs.warnings]

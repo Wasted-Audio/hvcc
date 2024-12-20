@@ -18,8 +18,7 @@ import argparse
 import json
 import os
 
-from collections import Counter
-from collections import defaultdict
+from collections import Counter, defaultdict
 from typing import Dict
 
 from hvcc.types.IR import HeavyIRType, IRGraph
@@ -47,7 +46,9 @@ class ir2c_perf:
             obj_type = ir.objects[obj_id].type
             if obj_type in HEAVY_IR_JSON.keys():
                 objects[obj_type] += 1
-                c = Counter(HEAVY_IR_JSON[obj_type].perf)
+                obj_perf = HEAVY_IR_JSON[obj_type].perf
+                assert obj_perf is not None
+                c = Counter(obj_perf.model_dump())
                 perf = perf + c
                 per_object_perf[obj_type] = per_object_perf[obj_type] + c
             else:
@@ -67,6 +68,14 @@ class ir2c_perf:
                 blocksize,
                 mhz,
                 blocksize * perf["sse"] / 4.0 / mhz))
+
+            print()  # new line
+
+            print("NEON: {0} cycles / {1} cycles per frame".format(perf["neon"], perf["neon"] / 4.0))
+            print("     {0} frames @ {1}MHz >= {2:.2f}us".format(
+                blocksize,
+                mhz,
+                blocksize * perf["neon"] / 4.0 / mhz))
 
             print()  # new line
 
