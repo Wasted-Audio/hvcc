@@ -4,10 +4,10 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 from abc import ABC, abstractmethod
-from collections import Counter
+from collections import Counter, defaultdict
 from typing import Dict, List, Optional, Tuple
 
-from pydantic import BaseModel
+from pydantic import BaseModel, RootModel
 
 from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
 from hvcc.types.meta import Meta
@@ -35,8 +35,12 @@ class CompilerResp(BaseModel):
     out_file: str = ""
     compile_time: float = 0.0
     obj_counter: Counter = Counter()
-    obj_perf: Dict[str, Counter] = {}
+    obj_perf: Dict[str, Counter] = defaultdict(Counter)
     ir: Optional[IRGraph] = None
+
+
+class CompilerResults(RootModel):
+    root: Dict[str, CompilerResp]
 
 
 class ExternParams(BaseModel):

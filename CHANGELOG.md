@@ -1,6 +1,17 @@
 CHANGELOG
 =====
 
+Next Release
+-----
+
+Bugfixes:
+
+* Intermediate Result performance counter
+
+Refactor:
+
+* split `__init__.py` in to separate main and compiler sections
+
 0.13.0
 -----
 
