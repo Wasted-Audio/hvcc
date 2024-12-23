@@ -6,8 +6,8 @@ on:
     branches: [ develop ]
 
 jobs:
-  build:
 
+  test:
     runs-on: ubuntu-20.04
     strategy:
       matrix:
@@ -31,8 +31,7 @@ jobs:
       - name: Run tox
         run: tox
 
-  binary:
-
+  build:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
@@ -58,7 +57,7 @@ jobs:
           path: dist/pyinstaller/manylinux_2_31_x86_64/Heavy
 
   dispatch:
-    needs: build
+    needs: test
     strategy:
       matrix:
         repo: ['Wasted-Audio/hvcc-examples-dpf', 'Wasted-Audio/hvcc-examples-js']
