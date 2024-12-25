@@ -121,23 +121,29 @@ public:
       }
       break;
     case HV_HASH_POLYTOUCHOUT:
+      {
       uint8_t value = hv_msg_getFloat(m, 0);
       uint8_t note = hv_msg_getFloat(m, 1);
       uint8_t ch = hv_msg_getFloat(m, 2);
       ch %= 16;
       sendMidi(MidiMessage::kp(ch, note, value));
+      }
       break;
     case HV_HASH_TOUCHOUT:
+      {
       uint8_t value = hv_msg_getFloat(m, 0);
       uint8_t ch = hv_msg_getFloat(m, 1);
       ch %= 16;
       sendMidi(MidiMessage::cp(ch, value));
+      }
       break;
     case HV_HASH_PGMOUT:
+      {
       uint8_t value = hv_msg_getFloat(m, 0);
       uint8_t ch = hv_msg_getFloat(m, 1);
       ch %= 16;
       sendMidi(MidiMessage::pc(ch, value));
+      }
       break;
       {% for param, name, typ, namehash, minvalue, maxvalue, defvalue, button in jdata if typ == 'SEND'%}
       {% if button == True %}
@@ -161,47 +167,47 @@ public:
   void processMidi(MidiMessage msg){
     // sendMessageToReceiverV parses format and loops over args, see HeavyContext.cpp
     switch(msg.getStatus()){
-    case CONTROL_CHANGE:
-      context->sendMessageToReceiverV(HV_HASH_CTLIN, 0, "fff",
-        (float)msg.getControllerValue(), // value
-        (float)msg.getControllerNumber(), // controller number
-        (float)msg.getChannel());
-      break;
-    case NOTE_ON:
-      context->sendMessageToReceiverV(HV_HASH_NOTEIN, 0, "fff",
-        (float)msg.getNote(), // pitch
-        (float)msg.getVelocity(), // velocity
-        (float)msg.getChannel());
-      break;
-    case NOTE_OFF:
-      context->sendMessageToReceiverV(HV_HASH_NOTEIN, 0, "fff",
-        (float)msg.getNote(), // pitch
-        0.0f, // velocity
-        (float)msg.getChannel());
-      break;
-    case POLY_KEY_PRESSURE:
-      context->sendMessageToReceiverV(HV_HASH_POLYTOUCHIN, 0, "fff"
-        (float)msg.getPolyKeyPressure(),
-        (float)msg.getNote(),
-        (float)msg.getChannel());
-      break;
-    case CHANNEL_PRESSURE:
-      context->sendMessageToReceiverV(HV_HASH_TOUCHIN, 0, "ff",
-        (float)msg.getChannelPressure(),
-        (float)msg.getChannel());
-      break;
-    case PITCH_BEND_CHANGE:
-      context->sendMessageToReceiverV(HV_HASH_BENDIN, 0, "ff",
-        (float)msg.getPitchBend(),
-        (float)msg.getChannel());
-      break;
-    case PROGRAM_CHANGE:
-      context->sendMessageToReceiverV(HV_HASH_PGMIN, 0, "ff",
-        (float)msg.getProgramChange(),
-        (float)msg.getChannel());
-      break;
-    default:
-      break;
+      case CONTROL_CHANGE:
+        context->sendMessageToReceiverV(HV_HASH_CTLIN, 0, "fff",
+          (float)msg.getControllerValue(), // value
+          (float)msg.getControllerNumber(), // controller number
+          (float)msg.getChannel());
+        break;
+      case NOTE_ON:
+        context->sendMessageToReceiverV(HV_HASH_NOTEIN, 0, "fff",
+          (float)msg.getNote(), // pitch
+          (float)msg.getVelocity(), // velocity
+          (float)msg.getChannel());
+        break;
+      case NOTE_OFF:
+        context->sendMessageToReceiverV(HV_HASH_NOTEIN, 0, "fff",
+          (float)msg.getNote(), // pitch
+          0.0f, // velocity
+          (float)msg.getChannel());
+        break;
+      case POLY_KEY_PRESSURE:
+        context->sendMessageToReceiverV(HV_HASH_POLYTOUCHIN, 0, "fff",
+          (float)msg.getPolyKeyPressure(),
+          (float)msg.getNote(),
+          (float)msg.getChannel());
+        break;
+      case CHANNEL_PRESSURE:
+        context->sendMessageToReceiverV(HV_HASH_TOUCHIN, 0, "ff",
+          (float)msg.getChannelPressure(),
+          (float)msg.getChannel());
+        break;
+      case PITCH_BEND_CHANGE:
+        context->sendMessageToReceiverV(HV_HASH_BENDIN, 0, "ff",
+          (float)msg.getPitchBend(),
+          (float)msg.getChannel());
+        break;
+      case PROGRAM_CHANGE:
+        context->sendMessageToReceiverV(HV_HASH_PGMIN, 0, "ff",
+          (float)msg.getProgramChange(),
+          (float)msg.getChannel());
+        break;
+      default:
+        break;
     }
   }
 
