@@ -184,7 +184,7 @@ public:
         (float)msg.getPolyKeyPressure(),
         (float)msg.getNote(),
         (float)msg.getChannel());
-      break
+      break;
     case CHANNEL_PRESSURE:
       context->sendMessageToReceiverV(HV_HASH_TOUCHIN, 0, "ff",
         (float)msg.getChannelPressure(),
