@@ -67,7 +67,7 @@ extern "C" {
 class HeavyPatch : public Patch {
 public:
   HeavyPatch() {
-    context = new Heavy_owl(getSampleRate(), HEAVY_MESSAGE_POOL_SIZE, HEAVY_MESSAGE_IN_QUEUE_SIZE, HEAVY_MESSAGE_OUT_QUEUE_SIZE);
+    context = new Heavy_{{name}}(getSampleRate(), HEAVY_MESSAGE_POOL_SIZE, HEAVY_MESSAGE_IN_QUEUE_SIZE, HEAVY_MESSAGE_OUT_QUEUE_SIZE);
     context->setUserData(this);
     context->setPrintHook(&owlPrintHook);
     context->setSendHook(&owlSendHook);
