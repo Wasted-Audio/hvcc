@@ -27,7 +27,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip setuptools wheel
-          pip install tox tox-gh-actions
+          pip install -U tox tox-gh-actions poetry
       - name: Run tox
         run: tox
 
