@@ -126,7 +126,7 @@ public:
       uint8_t note = hv_msg_getFloat(m, 1);
       uint8_t ch = hv_msg_getFloat(m, 2);
       ch %= 16;
-      sendMidi(MidiMessage::kp(ch, note, value));
+      sendMidi(MidiMessage::at(ch, note, value));
       }
       break;
     case HV_HASH_TOUCHOUT:
