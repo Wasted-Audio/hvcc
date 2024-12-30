@@ -1,6 +1,90 @@
 CHANGELOG
 =====
 
+0.13.1
+-----
+
+Bugfixes:
+
+* Intermediate Result performance counter
+* OWL: MIDI Aftertouch fixes; Context name fix
+
+Refactor:
+
+* split `__init__.py` in to separate main and compiler sections
+* CI: install tox requirements via poetry
+
+0.13.0
+-----
+
+Features:
+
+* Migrating to poetry for project management
+* Standalone binary (only Linux for now)
+* DPF: Allow modgui on desktop
+* DPF: Enable host transport events without midi input
+* JS: midi out and device select by @Reinissance
+* Docs: general updates/corrections and improvements
+* Allow loading external generator python module @eu-ch
+* Meta: additional global setting to automatically set `HV_SIMD_NONE`
+* Add version info to cli and IR result.
+
+Bugfixes:
+
+* Daisy template newline
+
+Typing:
+
+* HeavyLang and HeavyIR objects
+* Compiler results
+* Extern info
+* Heavy IR Graph
+
+0.12.1
+-----
+
+Features:
+
+* Only disable DSP with new `--nodsp` flag
+* Use pydantic types to define metadata objects
+* DPF: CV flag in portgroups
+* DPF: flag to disable scoped denormals
+
+Bugfixes:
+
+* wwise: allow Bang messages in OnSendMessageCallback()
+* Improve `[cos~]` precision.
+
+0.12.0
+-----
+
+* Core: parse remote/send messages
+* Core: MIDI i/o added to memoryPool
+* Core: support `[else/knob]` as `[float]`
+* Daisy: set heavy context after hw.init()
+* OWL: add Polytouchin and Polytouchout
+* JS: webmidi input
+* Docs: add instructions for loading custom samples in JS
+* Small Bugfixes:
+  * MIDI out objects in output Paremeters
+  * JS: AudioWorklet fillTableWithFloatBuffer
+
+0.11.0
+-----
+
+* Core: add attributes and send type to send params
+* DPF: add "read only" outputParameter type based on send params
+* JS: add output Parameter and output Event to generator and html template
+* Daisy: update `wstd2daisy` and allow for setting `displayprocess` code into the template
+* Testing: move `tinywav` to git submodule
+* JS Bugfix: printHook and sendHook for AudioWorklet; mention emsdk limitations in docs
+* Object Bugfix: `[stripnote]` missing right inlet
+* Small Bugfixes:
+  * set default name argument
+  * `emcc` call on Windows - thanks to @vulcu
+  * deallocation in test_signal - thanks to @eu-ch
+  * quotes around WWISE paths - thanks to @eu-ch
+
 0.10.0
 -----
 

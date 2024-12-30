@@ -1,5 +1,5 @@
 # Copyright (C) 2014-2018 Enzien Audio, Ltd.
-# Copyright (C) 2023 Wasted Audio
+# Copyright (C) 2023-2024 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -22,6 +22,8 @@ from typing import Optional, List, Dict, TYPE_CHECKING
 
 from .Connection import Connection
 from .NotificationEnum import NotificationEnum
+
+from hvcc.types.compiler import CompilerMsg, CompilerNotif
 
 if TYPE_CHECKING:
     from .PdGraph import PdGraph
@@ -54,20 +56,20 @@ class PdObject:
         self._inlet_connections: Dict = defaultdict(list)
         self._outlet_connections: Dict = defaultdict(list)
 
-        self._warnings: List = []
-        self._errors: List = []
+        self._warnings: List[CompilerMsg] = []
+        self._errors: List[CompilerMsg] = []
 
     def add_warning(self, warning: str, enum: NotificationEnum = NotificationEnum.WARNING_GENERIC) -> None:
         """ Add a warning regarding this object.
         """
-        self._warnings.append({"enum": enum, "message": warning})
+        self._warnings.append(CompilerMsg(enum=enum, message=warning))
 
     def add_error(self, error: str, enum: NotificationEnum = NotificationEnum.ERROR_GENERIC) -> None:
         """ Add an error regarding this object.
         """
-        self._errors.append({"enum": enum, "message": error})
+        self._errors.append(CompilerMsg(enum=enum, message=error))
 
-    def get_notices(self) -> Dict:
+    def get_notices(self) -> CompilerNotif:
         """ Returns a dictionary of all warnings and errors at this object.
         """
         # TODO(mhroth): we might want to consider moving to a more expressive format.
@@ -95,22 +97,23 @@ class PdObject:
             }]
         }
         """
-        return {
-            "warnings": [
-                {
-                    "enum": n["enum"],
-                    "message": "{0} in \"{1}\" @ (x:{2}, y:{3}): {4}".format(
-                        self, "/".join(self.get_graph_heirarchy()), self.pos_x, self.pos_y, n["message"])
-                } for n in self._warnings
+
+        return CompilerNotif(
+            has_error=len(self._errors) > 0,
+            warnings=[
+                CompilerMsg(enum=n.enum, message="{0} in \"{1}\" @ (x:{2}, y:{3}): {4}".format(
+                    self, "/".join(self.get_graph_heirarchy()), self.pos_x, self.pos_y, n.message
+                )) for n in self._warnings
             ],
-            "errors": [
-                {
-                    "enum": n["enum"],
-                    "message": "{0} in \"{1}\" @ (x:{2}, y:{3}): {4}".format(
-                        self, "/".join(self.get_graph_heirarchy()), self.pos_x, self.pos_y, n["message"])
-                } for n in self._errors
+            errors=[
+                CompilerMsg(enum=n.enum, message="{0} in \"{1}\" @ (x:{2}, y:{3}): {4}".format(
+                    self, "/".join(self.get_graph_heirarchy()), self.pos_x, self.pos_y, n.message
+                )) for n in self._errors
             ]
-        }
+        )
+
+    def get_inlet_connections(self) -> Dict:
+        return self._inlet_connections
 
     def get_inlet_connection_type(self, inlet_index: int) -> Optional[str]:
         """ Returns the inlet connection type of this Pd object.

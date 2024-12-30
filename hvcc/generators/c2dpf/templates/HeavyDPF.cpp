@@ -3,9 +3,12 @@
 #include "Heavy_{{name}}.h"
 #include "{{class_name}}.hpp"
 #include <set>
+{% if meta.denormals is sameas false %}
+#include "extra/ScopedDenormalDisable.hpp"
+{% endif %}
 
 
-#define HV_LV2_NUM_PARAMETERS {{receivers|length}}
+#define HV_DPF_NUM_PARAMETER {{receivers|length + senders|length}}
 
 #define HV_HASH_NOTEIN          0x67E37CA3
 #define HV_HASH_CTLIN           0x41BE0f9C
@@ -55,7 +58,8 @@ static void hvSendHookFunc(HeavyContextInterface *c, const char *sendName, uint3
   {{class_name}}* plugin = ({{class_name}}*)c->getUserData();
   if (plugin != nullptr)
   {
-{%- if meta.midi_output is defined and meta.midi_output == 1 %}
+    plugin->setOutputParameter(sendHash, m);
+{%- if meta.midi_output is sameas true %}
 #if DISTRHO_PLUGIN_WANT_MIDI_OUTPUT
     plugin->handleMidiSend(sendHash, m);
 #endif
@@ -78,9 +82,9 @@ static void hvPrintHookFunc(HeavyContextInterface *c, const char *printLabel, co
 // Main DPF plugin class
 
 {{class_name}}::{{class_name}}()
- : Plugin(HV_LV2_NUM_PARAMETERS, 0, 0)
+ : Plugin(HV_DPF_NUM_PARAMETER, 0, 0)
 {
-  {% for k, v in receivers -%}
+  {% for k, v in receivers + senders -%}
   _parameters[{{loop.index-1}}] = {{v.attributes.default}}f;
   {% endfor %}
 
@@ -91,7 +95,7 @@ static void hvPrintHookFunc(HeavyContextInterface *c, const char *printLabel, co
 
   {% if receivers|length > 0 %}
   // ensure that the new context has the current parameters
-  for (int i = 0; i < HV_LV2_NUM_PARAMETERS; ++i) {
+  for (int i = 0; i < HV_DPF_NUM_PARAMETER; ++i) {
     setParameterValue(i, _parameters[i]);
   }
   {%- endif %}
@@ -101,63 +105,19 @@ static void hvPrintHookFunc(HeavyContextInterface *c, const char *printLabel, co
   hv_{{name}}_free(_context);
 }
 
-{%- if meta.port_groups is defined %}
-{% include 'HeavyDPF_PortGroups.cpp' %}
+{%- if meta.port_groups != None %}
+{% include 'portGroups.cpp' %}
 {%- endif %}
 
 void {{class_name}}::initParameter(uint32_t index, Parameter& parameter)
 {
-  {%- if receivers|length > 0 -%}
+  {%- if (receivers|length > 0) or (senders|length > 0) -%}
   // initialise parameters with defaults
   switch (index)
   {
-    {% for k, v in receivers -%}
-      case param{{v.display}}:
-        parameter.name = "{{v.display.replace('_', ' ')}}";
-        parameter.symbol = "{{v.display|lower}}";
-      {%- if v.attributes.type == 'db': %}
-        parameter.unit = "dB";
-      {%- elif v.attributes.type in ['hz', 'log_hz']: %}
-        parameter.unit = "Hz";
-      {%- endif %}
-        parameter.hints = kParameterIsAutomatable
-      {%- if v.attributes.type == 'bool': %}
-        | kParameterIsBoolean
-      {%- elif v.attributes.type == 'trig': -%}
-        | kParameterIsTrigger
-      {%- elif v.attributes.type == 'int': -%}
-        | kParameterIsInteger
-      {%- elif v.attributes.type in ['log', 'log_hz']: -%}
-        | kParameterIsLogarithmic
-      {%- endif %};
-        parameter.ranges.min = {{v.attributes.min}}f;
-        parameter.ranges.max = {{v.attributes.max}}f;
-        parameter.ranges.def = {{v.attributes.default}}f;
-      {%- if v.attributes.type == 'db' and not (meta.enumerators is defined and meta.enumerators[v.display] is defined): %}
-        {
-          ParameterEnumerationValue* const enumValues = new ParameterEnumerationValue[1];
-          enumValues[0].value = {{v.attributes.min}}f;
-          enumValues[0].label = "-inf";
-          parameter.enumValues.count = 1;
-          parameter.enumValues.values = enumValues;
-        }
-      {%- endif %}
-      {%- if meta.enumerators is defined and meta.enumerators[v.display] is defined %}
-        {% set enums = meta.enumerators[v.display] %}
-        {% set enumlen = enums|length %}
-        if (ParameterEnumerationValue *values = new ParameterEnumerationValue[{{enumlen}}])
-        {
-          parameter.enumValues.restrictedMode = true;
-          {% for i in enums -%}
-          values[{{loop.index - 1}}].value = {{loop.index - 1}}.0f;
-          values[{{loop.index - 1}}].label = "{{i}}";
-          {% endfor -%}
-          parameter.enumValues.count = {{enumlen}};
-          parameter.enumValues.values = values;
-        }
-      {%- endif %}
-        break;
-    {% endfor %}
+    {% for k, v in receivers + senders %}
+{% include 'initParameter.cpp' %}
+    {% endfor -%}
   }
   {% endif %}
 }
@@ -167,7 +127,7 @@ void {{class_name}}::initParameter(uint32_t index, Parameter& parameter)
 
 float {{class_name}}::getParameterValue(uint32_t index) const
 {
-  {%- if receivers|length > 0 %}
+  {%- if (receivers|length > 0) or (senders|length > 0) %}
   return _parameters[index];
   {% else %}
   return 0.0f;
@@ -194,6 +154,19 @@ void {{class_name}}::setParameterValue(uint32_t index, float value)
   {%- endif %}
 }
 
+void {{class_name}}::setOutputParameter(uint32_t sendHash, const HvMessage *m)
+{
+  {%- if senders|length > 0 %}
+  switch (sendHash) {
+    {% for k, v in senders -%}
+    case {{v.hash}}: // {{v.display}}
+      _parameters[param{{v.display}}] = hv_msg_getFloat(m, 0);
+      break;
+    {% endfor %}
+  }
+  {%- endif %}
+}
+
 
 // -------------------------------------------------------------------
 // Process
@@ -208,18 +181,19 @@ void {{class_name}}::setParameterValue(uint32_t index, float value)
 
 // }
 
-{%- if meta.midi_input is defined and meta.midi_input == 1 %}
+{%- if meta.midi_input is sameas true %}
 #if DISTRHO_PLUGIN_WANT_MIDI_INPUT
-{% include 'HeavyDPF_MIDI_Input.cpp' %}
+{% include 'midiInput.cpp' %}
 #endif
 {% endif %}
 
-{%- if meta.midi_output is defined and meta.midi_output == 1 %}
+{%- if meta.midi_output is sameas true %}
 #if DISTRHO_PLUGIN_WANT_MIDI_OUTPUT
-{% include 'HeavyDPF_MIDI_Output.cpp' %}
+{% include 'midiOutput.cpp' %}
 #endif
 {% endif %}
 
+{% include 'hostTransportEvents.cpp' %}
 
 
 // -------------------------------------------------------------------
@@ -233,6 +207,10 @@ void {{class_name}}::run(const float** inputs, float** outputs, uint32_t frames,
 void {{class_name}}::run(const float** inputs, float** outputs, uint32_t frames)
 {
 #endif
+  hostTransportEvents(frames);
+{% if meta.denormals is sameas false %}
+  const ScopedDenormalDisable sdd;
+{% endif %}
   const TimePosition& timePos(getTimePosition());
   if (timePos.playing && timePos.bbt.valid)
     _context->sendMessageToReceiverV(HV_HASH_DPF_BPM, 0, "f", timePos.bbt.beatsPerMinute);
@@ -254,7 +232,7 @@ void {{class_name}}::sampleRateChanged(double newSampleRate)
 
   {% if receivers|length > 0 -%}
   // ensure that the new context has the current parameters
-  for (int i = 0; i < HV_LV2_NUM_PARAMETERS; ++i) {
+  for (int i = 0; i < HV_DPF_NUM_PARAMETER; ++i) {
     setParameterValue(i, _parameters[i]);
   }
   {%- endif %}

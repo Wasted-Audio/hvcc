@@ -1,5 +1,5 @@
 # Copyright (C) 2014-2018 Enzien Audio, Ltd.
-# Copyright (C) 2023 Wasted Audio
+# Copyright (C) 2023-2024 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,6 +19,7 @@ import os
 import re
 from collections import Counter
 from collections import OrderedDict
+from pathlib import Path
 from typing import List, Dict, Optional, Type, Any, Generator
 
 from .HeavyObject import HeavyObject
@@ -45,9 +46,11 @@ from .NotificationEnum import NotificationEnum
 class PdParser:
 
     # library search paths
+    __LIB_DIR = os.path.join(os.path.dirname(__file__), "libs")
     __HVLIB_DIR = os.path.join(os.path.dirname(__file__), "libs", "heavy")
     __HVLIB_CONVERTED_DIR = os.path.join(os.path.dirname(__file__), "libs", "heavy_converted")
     __PDLIB_DIR = os.path.join(os.path.dirname(__file__), "libs", "pd")
+    __ELSELIB_DIR = os.path.join(os.path.dirname(__file__), "libs", "else")
     __PDLIB_CONVERTED_DIR = os.path.join(os.path.dirname(__file__), "libs", "pd_converted")
 
     # detect a dollar argument in a string
@@ -72,6 +75,7 @@ class PdParser:
         """ Returns a set of all pd objects names supported by the parser.
         """
         pd_objects = [os.path.splitext(f)[0] for f in os.listdir(cls.__PDLIB_DIR) if f.endswith(".pd")]
+        pd_objects += [f"else/{os.path.splitext(f)[0]}" for f in os.listdir(cls.__ELSELIB_DIR) if f.endswith(".pd")]
         pd_objects.extend(cls.__PD_CLASSES.keys())
         return pd_objects
 
@@ -187,7 +191,7 @@ class PdParser:
             pd_graph_class)
 
         if is_root:
-            if g.get_notices()["errors"]:
+            if g.get_notices().has_error:
                 # return the graph early here as there are already errors and it is
                 # clearly invalid, avoids triggering unrelated errors in validation
                 return g
@@ -218,13 +222,14 @@ class PdParser:
 
         g = pd_graph_class(graph_args, pd_path, pos_x, pos_y)
 
+        remotes: Dict = {}
+
         # parse and add all Heavy arguments to the graph
         for li in file_hv_arg_dict[canvas_line]:
             line = li.split()
             assert line[4] == "@hv_arg"
             is_required = (line[9] == "true")
-            default_value = HeavyObject.force_arg_type(line[8], line[7]) \
-                if not is_required else None
+            default_value = HeavyObject.force_arg_type(line[8], line[7]) if not is_required else None
             g.add_hv_arg(
                 arg_index=int(line[5][2:]) - 1,  # strip off the leading "\$" and make index zero-based
                 name=line[6],
@@ -415,6 +420,26 @@ class PdParser:
                                 pos_x=int(line[2]), pos_y=int(line[3]),
                                 is_root=False)
 
+                        # is this object in lib/else?
+                        elif os.path.isfile(os.path.join(self.__ELSELIB_DIR, f"{obj_type}.pd")):
+                            self.obj_counter[obj_type] += 1
+                            hvlib_path = os.path.join(self.__ELSELIB_DIR, f"{obj_type}.pd")
+                            x = self.graph_from_file(
+                                file_path=hvlib_path,
+                                obj_args=obj_args,
+                                pos_x=int(line[2]), pos_y=int(line[3]),
+                                is_root=False)
+
+                        # is this object in lib? (sub-directory)
+                        elif os.path.isfile(os.path.join(self.__LIB_DIR, f"{obj_type}.pd")):
+                            self.obj_counter[obj_type] += 1
+                            hvlib_path = os.path.join(self.__LIB_DIR, f"{obj_type}.pd")
+                            x = self.graph_from_file(
+                                file_path=hvlib_path,
+                                obj_args=obj_args,
+                                pos_x=int(line[2]), pos_y=int(line[3]),
+                                is_root=False)
+
                         # is this an object that must be programatically parsed?
                         elif obj_type in self.__PD_CLASSES:
                             self.obj_counter[obj_type] += 1
@@ -473,11 +498,19 @@ class PdParser:
 
                     elif line[1] == "msg":
                         self.obj_counter["msg"] += 1
-                        g.add_object(PdMessageObject(
+                        msg = PdMessageObject(
                             obj_type="msg",
                             obj_args=[" ".join(line[4:])],
                             pos_x=int(line[2]),
-                            pos_y=int(line[3])))
+                            pos_y=int(line[3]))
+
+                        index = g.add_object(msg)
+
+                        if len(msg.obj_dict) > 0:
+                            remotes[index] = []
+
+                            for remote in msg.obj_dict['remote']:
+                                remotes[index].append(remote)
 
                     elif line[1] == "connect":
                         g.add_parsed_connection(
@@ -492,7 +525,9 @@ class PdParser:
                                 "[declare] objects are not supported in abstractions. "
                                 "They can only be in the root canvas.")
                         elif len(line) >= 4 and line[2] == "-path":
-                            did_add = self.add_relative_search_directory(line[3])
+                            pd_parent = Path(pd_path).parent
+                            pd_search = os.path.join(pd_parent, line[3])
+                            did_add = self.add_relative_search_directory(pd_search)
                             if not did_add:
                                 g.add_warning(
                                     f"\"{line[3]}\" is not a valid relative abstraction "
@@ -530,6 +565,28 @@ class PdParser:
                 # NOTE(mhroth): should the exception be added as an error?
                 # Sometimes it's all that we have, so perhaps it's a good idea.
                 g.add_error(str(e), NotificationEnum.ERROR_EXCEPTION)
+
+        # parse remote messages
+        for index in remotes.keys():
+            first_msg = g.get_object(index)
+            conns = first_msg.get_inlet_connections()
+
+            for remote in remotes[index]:
+                self.obj_counter["msg"] += 1
+                msg = PdMessageObject('msg', [' '.join(msg for msg in remote['message'])])
+                msg_index = g.add_object(msg)
+
+                self.obj_counter["send"] += 1
+                send = PdSendObject('send', [remote['receiver']])
+                send_index = g.add_object(send)
+
+                # connect new message to upstream objects of first message
+                for conn in conns['0']:
+                    up_obj = conn.from_obj
+                    up_index = g.get_objects().index(up_obj)
+                    g.add_parsed_connection(up_index, 0, msg_index, 0)
+
+                g.add_parsed_connection(msg_index, 0, send_index, 0)
 
         return g
 

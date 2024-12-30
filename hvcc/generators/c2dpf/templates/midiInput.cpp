@@ -3,67 +3,6 @@
 
 void {{class_name}}::handleMidiInput(uint32_t frames, const MidiEvent* midiEvents, uint32_t midiEventCount)
 {
-  // Realtime events
-  const TimePosition& timePos(getTimePosition());
-  bool reset = false;
-
-  if (timePos.playing)
-  {
-    if (timePos.frame == 0)
-    {
-      _context->sendMessageToReceiverV(HV_HASH_MIDIREALTIMEIN, 0,
-        "ff", (float) MIDI_RT_RESET);
-      reset = true;
-    }
-
-    if (! this->wasPlaying)
-    {
-      if (timePos.frame == 0)
-      {
-        _context->sendMessageToReceiverV(HV_HASH_MIDIREALTIMEIN, 0,
-          "ff", (float) MIDI_RT_START);
-      }
-      if (! reset)
-      {
-        _context->sendMessageToReceiverV(HV_HASH_MIDIREALTIMEIN, 0,
-          "ff", (float) MIDI_RT_CONTINUE);
-      }
-    }
-  }
-  else if (this->wasPlaying)
-  {
-    _context->sendMessageToReceiverV(HV_HASH_MIDIREALTIMEIN, 0,
-      "ff", (float) MIDI_RT_STOP);
-  }
-  this->wasPlaying = timePos.playing;
-
-  // sending clock ticks
-  if (timePos.playing && timePos.bbt.valid)
-  {
-    float samplesPerBeat = 60 * getSampleRate() / timePos.bbt.beatsPerMinute;
-    float samplesPerTick = samplesPerBeat / 24.0;
-
-    /* get state */
-    double nextClockTick = this->nextClockTick;
-    double sampleAtCycleStart = this->sampleAtCycleStart;
-    double sampleAtCycleEnd = sampleAtCycleStart + frames;
-
-    if (nextClockTick >= 0 && sampleAtCycleStart >= 0 && sampleAtCycleEnd > sampleAtCycleStart) {
-      while (nextClockTick < sampleAtCycleEnd) {
-        double delayMs = 1000*(nextClockTick - sampleAtCycleStart)/getSampleRate();
-        if (delayMs >= 0.0) {
-          _context->sendMessageToReceiverV(HV_HASH_MIDIREALTIMEIN, delayMs,
-            "ff", (float) MIDI_RT_CLOCK);
-        }
-        nextClockTick += samplesPerTick;
-      }
-    }
-
-    /* save variables for next cycle */
-    this->sampleAtCycleStart = sampleAtCycleEnd;
-    this->nextClockTick = nextClockTick;
-  }
-
   // Midi events
   for (uint32_t i=0; i < midiEventCount; ++i)
   {
