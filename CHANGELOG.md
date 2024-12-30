@@ -7,10 +7,12 @@ Next Release
 Bugfixes:
 
 * Intermediate Result performance counter
+* OWL: MIDI Aftertouch fixes; Context name fix
 
 Refactor:
 
 * split `__init__.py` in to separate main and compiler sections
+* CI: install tox requirements via poetry
 
 0.13.0
 -----
