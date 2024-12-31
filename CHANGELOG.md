@@ -1,6 +1,13 @@
 CHANGELOG
 =====
 
+Next Release
+-----
+
+Bugfixes:
+
+* Incorrect use of new extern formatting in ir2c and c2js templates
+
 0.13.1
 -----
 
