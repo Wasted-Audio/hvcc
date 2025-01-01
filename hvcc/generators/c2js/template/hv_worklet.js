@@ -176,25 +176,25 @@ class {{name}}_AudioLibWorklet extends AudioWorkletProcessor {
 }
 
 var parameterInHashes = {
-  {%- for k,v in externs.parameters.in %}
+  {%- for k,v in externs.parameters.inParam %}
   "{{v.display}}": {{v.hash}}, // {{v.display}}
   {%- endfor %}
 };
 
 var parameterOutHashes = {
-  {%- for k,v in externs.parameters.out %}
+  {%- for k,v in externs.parameters.outParam %}
   "{{v.display}}": {{v.hash}}, // {{v.display}}
   {%- endfor %}
 };
 
 var eventInHashes = {
-  {%- for k,v in externs.events.in %}
+  {%- for k,v in externs.events.inEvent %}
   "{{v.display}}": {{v.hash}}, // {{v.display}}
   {%- endfor %}
 };
 
 var eventOutHashes = {
-  {%- for k,v in externs.events.out %}
+  {%- for k,v in externs.events.outEvent %}
   "{{v.display}}": {{v.hash}}, // {{v.display}}
   {%- endfor %}
 };
@@ -216,7 +216,7 @@ function sendMidiIn(hv_context, message) {
       var channel = message[0] & 0x0F;
       var data1 = message[1];
       var data2 = message[2];
-  
+
       // all events to [midiin]
       for (var i = 1; i <= 2; i++) {
         _hv_sendMessageToReceiverFF(hv_context, HV_HASH_MIDIIN, 0,
@@ -224,14 +224,14 @@ function sendMidiIn(hv_context, message) {
             channel
         );
       }
-  
+
       // realtime events to [midirealtimein]
       if (MIDI_REALTIME.includes(message[0])) {
         _hv_sendMessageToReceiverFF(hv_context, HV_HASH_MIDIREALTIMEIN, 0,
           message[0]
         );
       }
-  
+
       switch(command) {
         case 0x80: // note off
           _hv_sendMessageToReceiverFFF(hv_context, HV_HASH_NOTEIN, 0,
@@ -335,7 +335,7 @@ function sendMidiOut(sendName, msg) {
             ]
           case "__hv_midiout":
             let firstByte = _hv_msg_getFloat(msg, 0);
-            return (firstByte === 192 || firstByte === 208) ? 
+            return (firstByte === 192 || firstByte === 208) ?
               [_hv_msg_getFloat(msg, 0), _hv_msg_getFloat(msg, 1)] :
               [_hv_msg_getFloat(msg, 0), _hv_msg_getFloat(msg, 1), _hv_msg_getFloat(msg, 2)];
           default:
