@@ -13,33 +13,33 @@ extern "C" {
 #pragma mark - Heavy Context
 #endif
 
-{% if externs.parameters.in|length > 0 -%}
+{% if externs.parameters.inParam|length > 0 -%}
 typedef enum {
-  {%- for k,v in externs.parameters.in %}
+  {%- for k,v in externs.parameters.inParam %}
   HV_{{name|upper}}_PARAM_IN_{{k|upper}} = {{v.hash}}, // {{v.display}}
   {%- endfor %}
 } Hv_{{name}}_ParameterIn;
 {% endif -%}
 
-{% if externs.parameters.out|length > 0 %}
+{% if externs.parameters.outParam|length > 0 %}
 typedef enum {
-  {%- for k,v in externs.parameters.out %}
+  {%- for k,v in externs.parameters.outParam %}
   HV_{{name|upper}}_PARAM_OUT_{{k|upper}} = {{v.hash}}, // {{v.display}}
   {%- endfor %}
 } Hv_{{name}}_ParameterOut;
 {% endif -%}
 
-{% if externs.events.in|length > 0 %}
+{% if externs.events.inEvent|length > 0 %}
 typedef enum {
-  {%- for k,v in externs.events.in %}
+  {%- for k,v in externs.events.inEvent %}
   HV_{{name|upper}}_EVENT_IN_{{k|upper}} = {{v.hash}}, // {{v.display}}
   {%- endfor %}
 } Hv_{{name}}_EventIn;
 {% endif -%}
 
-{% if externs.events.out|length > 0 %}
+{% if externs.events.outEvent|length > 0 %}
 typedef enum {
-  {%- for k,v in externs.events.out %}
+  {%- for k,v in externs.events.outEvent %}
   HV_{{name|upper}}_EVENT_OUT_{{k|upper}} = {{v.hash}}, // {{v.display}}
   {%- endfor %}
 } Hv_{{name}}_EventOut;

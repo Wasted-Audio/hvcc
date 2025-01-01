@@ -171,7 +171,7 @@ int Heavy_{{name}}::process(float **inputBuffers, float **outputBuffers, int n) 
 
   sendBangToReceiver(0xDD21C0EB); // send to __hv_bang~ on next cycle
 
-  {%- if signal.numInputBuffers > 0 or signal.numOutputBuffers > 0 %}
+  {%- if nodsp is sameas false %}
   const int n4 = n & ~HV_N_SIMD_MASK; // ensure that the block size is a multiple of HV_N_SIMD
 
   sendFloatToReceiver(0xB5B01859, static_cast<float>(n4)); // send to __hv_blocksize

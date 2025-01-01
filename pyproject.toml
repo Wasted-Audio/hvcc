@@ -1,0 +1,62 @@
+[tool.poetry]
+name = "hvcc"
+version = "0.13.2"
+description = "`hvcc` is a python-based dataflow audio programming language compiler that generates C/C++ code and a variety of specific framework wrappers."
+authors = ["Enzien Audio, Wasted Audio"]
+license = "GPLv3"
+readme = "README.md"
+documentation = "https://wasted-audio.github.io/hvcc/"
+repository = "https://github.com/Wasted-Audio/hvcc"
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Topic :: Software Development :: Compilers",
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12"
+]
+
+[tool.poetry.scripts]
+hvcc = "hvcc:main"
+hvutil = "hvcc.utils:main"
+
+[tool.poetry.dependencies]
+python = "^3.8.1"
+Jinja2 = ">=2.11"
+importlib-resources = ">=5.1"
+wstd2daisy = ">=0.5.3"
+pydantic = ">=2.9.1"
+
+[tool.poetry.group.dev.dependencies]
+numpy = [
+    { version = "^2.0.1", python = "^3.9" },
+    { version = "^1.24.3", python = "==3.8"}
+]
+scipy = [
+    { version = "^1.13.1", python = "^3.9"},
+    { version = "^1.9.1", python = "==3.8"}
+]
+pytest-cov = "^5.0.0"
+flake8 = "^7.1.1"
+mypy = "^1.11.2"
+pytest = "^8.3.3"
+
+[tool.poetry-pyinstaller-plugin]
+collect = { all = ["json2daisy"] }
+include = { "hvcc/generators" = "hvcc/generators", "hvcc/core" = "hvcc/core", "hvcc/interpreters" = "hvcc/interpreters" }
+
+
+[tool.poetry-pyinstaller-plugin.scripts]
+Heavy = { source = "hvcc/main.py", type = "onefile", bundle = true, arch = "x86_64" }
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.mypy]
+plugins = [
+  "pydantic.mypy"
+]

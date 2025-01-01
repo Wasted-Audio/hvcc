@@ -1,5 +1,5 @@
 # Copyright (C) 2014-2018 Enzien Audio, Ltd.
-# Copyright (C) 2023 Wasted Audio
+# Copyright (C) 2023-2024 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,6 +17,8 @@
 from typing import Dict, List
 
 from .HeavyObject import HeavyObject
+
+from hvcc.types.IR import IRSignalList
 
 
 class SignalRPole(HeavyObject):
@@ -39,22 +41,22 @@ class SignalRPole(HeavyObject):
         }
 
     @classmethod
-    def get_C_def(cls, obj_type: str, obj_id: int) -> List[str]:
+    def get_C_def(cls, obj_type: str, obj_id: str) -> List[str]:
         return [f"SignalRPole sRPole_{obj_id};"]
 
     @classmethod
-    def get_C_init(cls, obj_type: str, obj_id: int, args: Dict) -> List[str]:
+    def get_C_init(cls, obj_type: str, obj_id: str, args: Dict) -> List[str]:
         return [f"sRPole_init(&sRPole_{obj_id});"]
 
     @classmethod
-    def get_C_free(cls, obj_type: str, obj_id: int, args: Dict) -> List[str]:
+    def get_C_free(cls, obj_type: str, obj_id: str, args: Dict) -> List[str]:
         return []
 
     @classmethod
-    def get_C_process(cls, process_dict: Dict, obj_type: str, obj_id: int, args: Dict) -> List[str]:
+    def get_C_process(cls, process_dict: IRSignalList, obj_type: str, obj_id: str, args: Dict) -> List[str]:
         return [
             "__hv_rpole_f(&sRPole_{0}, VIf({1}), VIf({2}), VOf({3}));".format(
-                process_dict["id"],
-                cls._c_buffer(process_dict["inputBuffers"][0]),
-                cls._c_buffer(process_dict["inputBuffers"][1]),
-                cls._c_buffer(process_dict["outputBuffers"][0]))]
+                process_dict.id,
+                cls._c_buffer(process_dict.inputBuffers[0]),
+                cls._c_buffer(process_dict.inputBuffers[1]),
+                cls._c_buffer(process_dict.outputBuffers[0]))]

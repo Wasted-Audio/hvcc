@@ -4,10 +4,14 @@ import shutil
 import time
 import json2daisy  # type: ignore
 
-from typing import Dict, Optional
+from typing import Any, Dict, Optional
 
 from ..copyright import copyright_manager
 from . import parameters
+
+from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
+from hvcc.types.compiler import Generator, CompilerResp, CompilerNotif, CompilerMsg, ExternInfo
+from hvcc.types.meta import Meta, Daisy
 
 
 hv_midi_messages = {
@@ -22,7 +26,7 @@ hv_midi_messages = {
 }
 
 
-class c2daisy:
+class c2daisy(Generator):
     """ Generates a Daisy wrapper for a given patch.
     """
 
@@ -31,30 +35,23 @@ class c2daisy:
         cls,
         c_src_dir: str,
         out_dir: str,
-        externs: Dict,
+        externs: ExternInfo,
         patch_name: Optional[str] = None,
-        patch_meta: Optional[Dict] = None,
+        patch_meta: Meta = Meta(),
         num_input_channels: int = 0,
         num_output_channels: int = 0,
         copyright: Optional[str] = None,
         verbose: Optional[bool] = False
-    ) -> Dict:
+    ) -> CompilerResp:
 
         tick = time.time()
 
         out_dir = os.path.join(out_dir, "daisy")
 
-        if patch_meta:
-            patch_name = patch_meta.get("name", patch_name)
-            daisy_meta = patch_meta.get("daisy", {})
-        else:
-            daisy_meta = {}
-
-        board = daisy_meta.get("board", "pod")
+        daisy_meta: Daisy = patch_meta.daisy
+        board = daisy_meta.board
 
         copyright_c = copyright_manager.get_copyright_for_c(copyright)
-        # copyright_plist = copyright or u"Copyright {0} Enzien Audio, Ltd." \
-        #     " All Rights Reserved.".format(datetime.datetime.now().year)
 
         try:
             # ensure that the output directory does not exist
@@ -69,17 +66,17 @@ class c2daisy:
             source_dir = os.path.join(out_dir, "source")
             shutil.copytree(c_src_dir, source_dir)
 
-            if daisy_meta.get('board_file'):
-                header, board_info = json2daisy.generate_header_from_file(daisy_meta['board_file'])
+            if daisy_meta.board_file is not None:
+                header, board_info = json2daisy.generate_header_from_file(daisy_meta.board_file)
             else:
                 header, board_info = json2daisy.generate_header_from_name(board)
 
             # remove heavy out params from externs
-            externs['parameters']['out'] = [
-                t for t in externs['parameters']['out'] if not any(x == y for x in hv_midi_messages for y in t)]
+            externs.parameters.outParam = [
+                t for t in externs.parameters.outParam if not any(x == y for x in hv_midi_messages for y in t)]
 
             component_glue = parameters.parse_parameters(
-                externs['parameters'], board_info['components'], board_info['aliases'], 'hardware')
+                externs.parameters, board_info['components'], board_info['aliases'], 'hardware')
             component_glue['class_name'] = board_info['name']
             component_glue['patch_name'] = patch_name
             component_glue['header'] = f"HeavyDaisy_{patch_name}.hpp"
@@ -87,12 +84,12 @@ class c2daisy:
             component_glue['num_output_channels'] = num_output_channels
             component_glue['has_midi'] = board_info['has_midi']
             component_glue['displayprocess'] = board_info['displayprocess']
-            component_glue['debug_printing'] = daisy_meta.get('debug_printing', False)
-            component_glue['usb_midi'] = daisy_meta.get('usb_midi', False)
-            component_glue['pool_sizes_kb'] = externs["memoryPoolSizesKb"]
+            component_glue['debug_printing'] = daisy_meta.debug_printing
+            component_glue['usb_midi'] = daisy_meta.usb_midi
+            component_glue['pool_sizes_kb'] = externs.memoryPoolSizesKb
 
             # samplerate
-            samplerate = daisy_meta.get('samplerate', 48000)
+            samplerate = daisy_meta.samplerate
             if samplerate >= 96000:
                 component_glue['samplerate'] = 96000
             elif samplerate >= 48000:
@@ -105,8 +102,8 @@ class c2daisy:
                 component_glue['samplerate'] = 8000
 
             # blocksize
-            blocksize = daisy_meta.get('blocksize')
-            if blocksize:
+            blocksize = daisy_meta.blocksize
+            if blocksize is not None:
                 component_glue['blocksize'] = max(min(256, blocksize), 1)
             else:
                 component_glue['blocksize'] = None
@@ -125,20 +122,18 @@ class c2daisy:
             with open(daisy_cpp_path, 'w') as f:
                 f.write(rendered_cpp)
 
-            makefile_replacements = {'name': patch_name}
-            makefile_replacements['linker_script'] = daisy_meta.get('linker_script', '')
-            if makefile_replacements['linker_script'] != '':
-                makefile_replacements['linker_script'] = daisy_meta["linker_script"]
+            makefile_replacements: Dict[str, Any] = {'name': patch_name}
+            makefile_replacements['linker_script'] = daisy_meta.linker_script
 
             # libdaisy path
-            path = daisy_meta.get('libdaisy_path', 2)
+            path = daisy_meta.libdaisy_path
             if isinstance(path, int):
                 makefile_replacements['libdaisy_path'] = f'{"../" * path}libdaisy'
             elif isinstance(path, str):
                 makefile_replacements['libdaisy_path'] = path
 
-            makefile_replacements['bootloader'] = daisy_meta.get('bootloader', '')
-            makefile_replacements['debug_printing'] = daisy_meta.get('debug_printing', False)
+            makefile_replacements['bootloader'] = daisy_meta.bootloader
+            makefile_replacements['debug_printing'] = daisy_meta.debug_printing
 
             rendered_makefile = env.get_template('Makefile').render(makefile_replacements)
             with open(os.path.join(source_dir, "Makefile"), "w") as f:
@@ -146,36 +141,27 @@ class c2daisy:
 
             # ======================================================================================
 
-            return {
-                "stage": "c2daisy",
-                "notifs": {
-                    "has_error": False,
-                    "exception": None,
-                    "warnings": [],
-                    "errors": []
-                },
-                "in_dir": c_src_dir,
-                "in_file": "",
-                "out_dir": out_dir,
-                "out_file": os.path.basename(daisy_h_path),
-                "compile_time": time.time() - tick
-            }
+            return CompilerResp(
+                stage="c2daisy",
+                in_dir=c_src_dir,
+                out_dir=out_dir,
+                out_file=os.path.basename(daisy_h_path),
+                compile_time=time.time() - tick
+            )
 
         except Exception as e:
-            return {
-                "stage": "c2daisy",
-                "notifs": {
-                    "has_error": True,
-                    "exception": e,
-                    "warnings": [],
-                    "errors": [{
-                        "enum": -1,
-                        "message": str(e)
-                    }]
-                },
-                "in_dir": c_src_dir,
-                "in_file": "",
-                "out_dir": out_dir,
-                "out_file": "",
-                "compile_time": time.time() - tick
-            }
+            return CompilerResp(
+                stage="c2daisy",
+                notifs=CompilerNotif(
+                    has_error=True,
+                    exception=e,
+                    warnings=[],
+                    errors=[CompilerMsg(
+                        enum=NotificationEnum.ERROR_EXCEPTION,
+                        message=str(e)
+                    )]
+                ),
+                in_dir=c_src_dir,
+                out_dir=out_dir,
+                compile_time=time.time() - tick
+            )

@@ -1,5 +1,5 @@
 # Copyright (C) 2014-2018 Enzien Audio, Ltd.
-# Copyright (C) 2023 Wasted Audio
+# Copyright (C) 2023-2024 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -18,6 +18,8 @@ from typing import Dict, List
 
 from .HeavyObject import HeavyObject
 
+from hvcc.types.IR import IRSignalList
+
 
 class SignalTabhead(HeavyObject):
     """Handles __tabhead~f
@@ -35,21 +37,21 @@ class SignalTabhead(HeavyObject):
         return {"HvSignalTabread.h", "HvSignalTabread.c"}
 
     @classmethod
-    def get_C_free(cls, obj_type: str, obj_id: int, args: Dict) -> List[str]:
+    def get_C_free(cls, obj_type: str, obj_id: str, args: Dict) -> List[str]:
         return []
 
     @classmethod
-    def get_C_init(cls, obj_type: str, obj_id: int, args: Dict) -> List[str]:
+    def get_C_init(cls, obj_type: str, obj_id: str, args: Dict) -> List[str]:
         return [f"sTabhead_init(&sTabhead_{obj_id}, &hTable_{args['table_id']});"]
 
     @classmethod
-    def get_C_onMessage(cls, obj_type: str, obj_id: int, inlet_index: int, args: Dict) -> List[str]:
+    def get_C_onMessage(cls, obj_type: str, obj_id: str, inlet_index: int, args: Dict) -> List[str]:
         return []  # TODO(mhroth): deal with this later
 
     @classmethod
-    def get_C_process(cls, process_dict: Dict, obj_type: str, obj_id: int, args: Dict) -> List[str]:
+    def get_C_process(cls, process_dict: IRSignalList, obj_type: str, obj_id: str, args: Dict) -> List[str]:
         return [
             "__hv_tabhead_f(&sTabhead_{0}, {1});".format(
-                process_dict["id"],
-                ", ".join([f"VOf({cls._c_buffer(b)})" for b in process_dict["outputBuffers"]])
+                process_dict.id,
+                ", ".join([f"VOf({cls._c_buffer(b)})" for b in process_dict.outputBuffers])
             )]

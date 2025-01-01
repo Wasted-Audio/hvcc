@@ -1,5 +1,5 @@
 # Copyright (C) 2014-2018 Enzien Audio, Ltd.
-# Copyright (C) 2023 Wasted Audio
+# Copyright (C) 2023-2024 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,10 +19,12 @@ import json
 import os
 import time
 
-from typing import Optional, Dict
+from typing import Optional
 
 from .HeavyException import HeavyException
 from .HeavyParser import HeavyParser
+
+from hvcc.types.compiler import CompilerResp, CompilerNotif, CompilerMsg
 
 
 class hv2ir:
@@ -34,7 +36,7 @@ class hv2ir:
         ir_file: str,
         patch_name: Optional[str] = None,
         verbose: bool = False
-    ) -> Dict:
+    ) -> CompilerResp:
         """ Compiles a HeavyLang file into a HeavyIR file.
             Returns a tuple of compile time in seconds, a notification dictionary,
             and a heavy object counter.
@@ -50,21 +52,20 @@ class hv2ir:
             # parse heavy file
             hv_graph = HeavyParser.graph_from_file(hv_file=hv_file, xname=patch_name)
         except HeavyException as e:
-            return {
-                "stage": "hv2ir",
-                "compile_time": time.time() - tick,
-                "notifs": {
-                    "has_error": True,
-                    "exception": e,
-                    "errors": [{"message": e.message}],
-                    "warnings": []
-                },
-                "obj_counter": None,
-                "in_file": os.path.basename(hv_file),
-                "in_dir": os.path.dirname(hv_file),
-                "out_file": os.path.basename(ir_file),
-                "out_dir": os.path.dirname(ir_file)
-            }
+            return CompilerResp(
+                stage="hv2ir",
+                compile_time=time.time() - tick,
+                notifs=CompilerNotif(
+                    has_error=True,
+                    exception=e,
+                    errors=[CompilerMsg(message=e.message)],
+                    warnings=[]
+                ),
+                in_file=os.path.basename(hv_file),
+                in_dir=os.path.dirname(hv_file),
+                out_file=os.path.basename(ir_file),
+                out_dir=os.path.dirname(ir_file)
+            )
 
         try:
             # get a counter of all heavy objects
@@ -80,58 +81,59 @@ class hv2ir:
             # generate Heavy.IR
             ir = hv_graph.to_ir()
         except HeavyException as e:
-            return {
-                "stage": "hv2ir",
-                "compile_time": time.time() - tick,
-                "notifs": {
-                    "has_error": True,
-                    "exception": e,
-                    "errors": [{"message": e.message}],
-                    "warnings": []
-                },
-                "obj_counter": hv_counter,
-                "in_file": os.path.basename(hv_file),
-                "in_dir": os.path.dirname(hv_file),
-                "out_file": os.path.basename(ir_file),
-                "out_dir": os.path.dirname(ir_file)
-            }
+            return CompilerResp(
+                stage="hv2ir",
+                compile_time=time.time() - tick,
+                notifs=CompilerNotif(
+                    has_error=True,
+                    exception=e,
+                    errors=[CompilerMsg(message=e.message)],
+                    warnings=[]
+                ),
+                in_file=os.path.basename(hv_file),
+                in_dir=os.path.dirname(hv_file),
+                out_file=os.path.basename(ir_file),
+                out_dir=os.path.dirname(ir_file),
+                obj_counter=hv_counter
+            )
 
-        # write the hv.ir file
-        with open(ir_file, "w") as f:
-            if verbose:
-                json.dump(
-                    ir,
-                    f,
-                    sort_keys=True,
-                    indent=2,
-                    separators=(",", ": "))
-            else:
-                json.dump(ir, f)
+        if ir is not None:
+            # write the hv.ir file
+            with open(ir_file, "w") as f:
+                if verbose:
+                    json.dump(
+                        ir.model_dump(),
+                        f,
+                        sort_keys=True,
+                        indent=2,
+                        separators=(",", ": "))
+                else:
+                    json.dump(ir.model_dump(), f)
 
-        if verbose and ir is not None:
-            if len(ir["signal"]["processOrder"]) > 0:
-                print("")
-                print("=== Signal Order ===")
-                for so in ir["signal"]["processOrder"]:
-                    o = ir["objects"][so["id"]]
-                    if len(o["args"]) > 0:
-                        print("{0} {{{1}}}".format(
-                            o["type"],
-                            " ".join([f"{k}:{v}" for k, v in o["args"].items()])))
-                    else:
-                        print(o["type"])
+            if verbose and ir is not None:
+                if len(ir.signal.processOrder) > 0:
+                    print("")
+                    print("=== Signal Order ===")
+                    for so in ir.signal.processOrder:
+                        o = ir.objects[so.id]
+                        if len(o.args) > 0:
+                            print("{0} {{{1}}}".format(
+                                o.type,
+                                " ".join([f"{k}:{v}" for k, v in o.args.items()])))
+                        else:
+                            print(o.type)
 
-        return {
-            "stage": "hv2ir",
-            "compile_time": time.time() - tick,  # record the total compile time
-            "notifs": hv_graph.get_notices(),
-            "obj_counter": hv_counter,
-            "in_file": os.path.basename(hv_file),
-            "in_dir": os.path.dirname(hv_file),
-            "out_file": os.path.basename(ir_file),
-            "out_dir": os.path.dirname(ir_file),
-            "ir": ir
-        }
+        return CompilerResp(
+            stage="hv2ir",
+            compile_time=time.time() - tick,  # record the total compile time
+            notifs=hv_graph.get_notices(),
+            in_file=os.path.basename(hv_file),
+            in_dir=os.path.dirname(hv_file),
+            out_file=os.path.basename(ir_file),
+            out_dir=os.path.dirname(ir_file),
+            obj_counter=hv_counter,
+            ir=ir
+        )
 
 
 def main() -> None:
@@ -158,7 +160,7 @@ def main() -> None:
         verbose=args.verbose)
 
     if args.verbose:
-        print(f"Total hv2ir time: {(d['compile_time'] * 1000):.2f}ms")
+        print(f"Total hv2ir time: {(d.compile_time * 1000):.2f}ms")
 
 
 if __name__ == "__main__":
