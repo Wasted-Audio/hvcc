@@ -18,6 +18,8 @@ from typing import Dict, List
 
 from .HeavyObject import HeavyObject
 
+from hvcc.types.IR import IRSignalList
+
 
 class SignalRFFT(HeavyObject):
 
@@ -33,7 +35,7 @@ class SignalRFFT(HeavyObject):
         return {"HvSignalRFFT.h", "HvSignalRFFT.c", "pffft.h", "pffft.c"}
 
     @classmethod
-    def get_C_init(cls, obj_type: str, obj_id: int, args: Dict) -> List[str]:
+    def get_C_init(cls, obj_type: str, obj_id: str, args: Dict) -> List[str]:
         return [
             "sRFFT_init(&sRFFT_{0}, &hTable_{1}, {2});".format(
                 obj_id,
@@ -42,7 +44,7 @@ class SignalRFFT(HeavyObject):
         ]
 
     @classmethod
-    def get_C_onMessage(cls, obj_type: str, obj_id: int, inlet_index: int, args: Dict) -> List[str]:
+    def get_C_onMessage(cls, obj_type: str, obj_id: str, inlet_index: int, args: Dict) -> List[str]:
         return [
             "sRFFT_onMessage(_c, &Context(_c)->sRFFT_{0}, {1}, m, NULL);".format(
                 obj_id,
@@ -50,23 +52,23 @@ class SignalRFFT(HeavyObject):
         ]
 
     @classmethod
-    def get_C_process(cls, process_dict: Dict, obj_type: str, obj_id: int, args: Dict) -> List[str]:
+    def get_C_process(cls, process_dict: IRSignalList, obj_type: str, obj_id: str, args: Dict) -> List[str]:
         if obj_type == "__rfft~f":
             return [
                 "__hv_rfft_f(&sRFFT_{0}, VIf({1}), VOf({2}), VOf({3}));".format(
-                    process_dict["id"],
-                    cls._c_buffer(process_dict["inputBuffers"][0]),
-                    cls._c_buffer(process_dict["outputBuffers"][0]),
-                    cls._c_buffer(process_dict["outputBuffers"][1])
+                    process_dict.id,
+                    cls._c_buffer(process_dict.inputBuffers[0]),
+                    cls._c_buffer(process_dict.outputBuffers[0]),
+                    cls._c_buffer(process_dict.outputBuffers[1])
                 )
             ]
         elif obj_type == "__rifft~f":
             return [
                 "__hv_rifft_f(&sRFFT_{0}, VIf({1}), VIf({2}), VOf({3}));".format(
-                    process_dict["id"],
-                    cls._c_buffer(process_dict["inputBuffers"][0]),
-                    cls._c_buffer(process_dict["inputBuffers"][1]),
-                    cls._c_buffer(process_dict["outputBuffers"][0])
+                    process_dict.id,
+                    cls._c_buffer(process_dict.inputBuffers[0]),
+                    cls._c_buffer(process_dict.inputBuffers[1]),
+                    cls._c_buffer(process_dict.outputBuffers[0])
                 )
             ]
         else:
