@@ -1,6 +1,14 @@
 CHANGELOG
 =====
 
+Next Release
+-----
+
+Bugfixes:
+
+* Daisy: add ScopedIrqBlocker to several functions. Should fix midi input issues and potentially others.
+
+
 0.13.2
 -----
 
