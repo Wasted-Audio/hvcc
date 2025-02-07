@@ -99,6 +99,8 @@ DaisyHvParamOut DaisyOutputParameters[DaisyNumOutputParameters] = {
 // Typical Switch case for Message Type.
 void HandleMidiMessage(MidiEvent m)
 {
+  ScopedIrqBlocker block; //< Disables interrupts while in scope
+
   for (int i = 0; i <= 2; ++i) {
     hv->sendMessageToReceiverV(HV_HASH_MIDIIN, 0, "ff",
     (float) m.data[i],
@@ -476,6 +478,8 @@ static void printHook(HeavyContextInterface *c, const char *printLabel, const ch
  */
 void LoopWriteIn(Heavy_{{patch_name}}* hv)
 {
+  ScopedIrqBlocker block; //< Disables interrupts while in scope
+
   {% for param in loop_write_in %}
   {% if param.bool %}
   if ({{param.process}})
@@ -505,6 +509,8 @@ void CallbackWriteIn(Heavy_{{patch_name}}* hv)
  *
  */
 void LoopWriteOut() {
+  ScopedIrqBlocker block; //< Disables interrupts while in scope
+
   {% for param in loop_write_out %}
   {% if param.bool %}
   if ({{param.value}})
