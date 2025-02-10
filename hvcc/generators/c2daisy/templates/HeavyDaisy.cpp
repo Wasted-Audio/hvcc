@@ -47,10 +47,11 @@ static void sendHook(HeavyContextInterface *c, const char *receiverName, uint32_
 static void printHook(HeavyContextInterface *c, const char *printLabel, const char *msgString, const HvMessage *m);
 /** FIFO to hold messages as we're ready to print them */
 FIFO<FixedCapStr<64>, 64> event_log;
-{% elif (has_midi is sameas true) or (usb_midi is sameas true) %}
-FIFO<uint8_t, MIDI_OUT_FIFO_SIZE> midi_tx_fifo;
 {% elif usb_midi is sameas true %}
 daisy::MidiUsbHandler midiusb;
+{% endif %}
+{% if (has_midi is sameas true) or (usb_midi is sameas true) %}
+FIFO<uint8_t, MIDI_OUT_FIFO_SIZE> midi_tx_fifo;
 {% endif %}
 // int midiOutCount;
 // uint8_t* midiOutData;
