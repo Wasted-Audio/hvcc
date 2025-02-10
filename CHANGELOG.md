@@ -7,6 +7,7 @@ Next Release
 Bugfixes:
 
 * Daisy: add ScopedIrqBlocker to several functions. Should fix midi input issues and potentially others.
+* Daisy: use FIFO to buffer midi TX messages and call them in the main loop instead of during process()
 
 
 0.13.2

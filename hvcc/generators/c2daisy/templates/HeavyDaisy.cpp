@@ -6,7 +6,7 @@
 
 #define SAMPLE_RATE {{samplerate}}.f
 
-{% if has_midi or usb_midi %}
+{% if (has_midi is sameas true) or (usb_midi is sameas true) %}
 #define HV_HASH_NOTEIN          0x67E37CA3
 #define HV_HASH_CTLIN           0x41BE0f9C
 #define HV_HASH_POLYTOUCHIN     0xBC530F59
@@ -31,6 +31,8 @@
 #define MIDI_RT_STOP            0xFC
 #define MIDI_RT_ACTIVESENSE     0xFE
 #define MIDI_RT_RESET           0xFF
+
+#define MIDI_OUT_FIFO_SIZE      128
 {% endif %}
 
 using namespace daisy;
@@ -45,6 +47,8 @@ static void sendHook(HeavyContextInterface *c, const char *receiverName, uint32_
 static void printHook(HeavyContextInterface *c, const char *printLabel, const char *msgString, const HvMessage *m);
 /** FIFO to hold messages as we're ready to print them */
 FIFO<FixedCapStr<64>, 64> event_log;
+{% elif (has_midi is sameas true) or (usb_midi is sameas true) %}
+FIFO<uint8_t, MIDI_OUT_FIFO_SIZE> midi_tx_fifo;
 {% elif usb_midi is sameas true %}
 daisy::MidiUsbHandler midiusb;
 {% endif %}
@@ -260,6 +264,26 @@ int main(void)
     LoopWriteOut();
     {% endif %}
 
+    {% if (has_midi is sameas true) or (usb_midi is sameas true) %}
+    uint8_t midiData[MIDI_OUT_FIFO_SIZE];
+    size_t numElements = 0;
+
+    while(!midi_tx_fifo.IsEmpty()) && numElements < MIDI_OUT_FIFO_SIZE)
+    {
+      midiData[numElements] = midi_tx_fifo.PopFront();
+    }
+
+    if(numElements > 0)
+    {
+      {% if has_midi is sameas true %}
+      hardware.midi.SendMessage(midiData, numElements);
+      {% endif %}
+      {% if (debug_printing is not sameas true) and (usb_midi is sameas true) %}
+      midiusb.SendMessage(midiData, numElements);
+      {% endif %}
+    }
+    {% endif %}
+
     {% if debug_printing is sameas true %}
     /** Now separately, every 5ms we'll print the top message in our queue if there is one */
     if(now - log_time > 5)
@@ -302,12 +326,9 @@ void audiocallback(daisy::AudioHandle::InputBuffer in, daisy::AudioHandle::Outpu
 {% if (has_midi is sameas true) or (usb_midi is sameas true) %}
 void HandleMidiOut(uint8_t *midiData, const uint8_t numElements)
 {
-  {% if has_midi is sameas true %}
-  hardware.midi.SendMessage(midiData, numElements);
-  {% endif %}
-  {% if (debug_printing is not sameas true) and (usb_midi is sameas true) %}
-  midiusb.SendMessage(midiData, numElements);
-  {% endif %}
+  for (int i = 0; i < numElements; i++) {
+    midi_tx_fifo.PushBack(midiData[i]);
+  }
 }
 
 void HandleMidiSend(uint32_t sendHash, const HvMessage *m)
