@@ -268,7 +268,7 @@ int main(void)
     uint8_t midiData[MIDI_OUT_FIFO_SIZE];
     size_t numElements = 0;
 
-    while(!midi_tx_fifo.IsEmpty()) && numElements < MIDI_OUT_FIFO_SIZE)
+    while(!midi_tx_fifo.IsEmpty() && numElements < MIDI_OUT_FIFO_SIZE)
     {
       midiData[numElements] = midi_tx_fifo.PopFront();
     }
