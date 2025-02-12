@@ -80,7 +80,8 @@ class c2js(Generator):
         """Run the emcc command to compile C source files to a javascript library.
         """
 
-        if os.name == 'nt':
+        # Detect Windows OS, but ignore if running in MingW
+        if os.name == 'nt' and os.environ.get('MSYSTEM') is None:
             emcc_path = which("emcc.bat")
         else:
             emcc_path = which("emcc")
