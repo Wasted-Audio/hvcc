@@ -27,7 +27,10 @@ from hvcc.core.hv2ir import hv2ir
 from hvcc.generators.ir2c import ir2c
 from hvcc.generators.ir2c import ir2c_perf
 from hvcc.generators.c2js import c2js
-from hvcc.generators.c2daisy import c2daisy
+try:
+    from hvcc.generators.c2daisy import c2daisy
+except ModuleNotFoundError:
+    c2daisy = None
 from hvcc.generators.c2dpf import c2dpf
 from hvcc.generators.c2owl import c2owl
 from hvcc.generators.c2pdext import c2pdext
@@ -327,7 +330,10 @@ def compile_dataflow(
     if "daisy" in generators:
         if verbose:
             print("--> Generating Daisy module")
-        results.root["c2daisy"] = c2daisy.c2daisy.compile(**gen_args)
+        if c2daisy:
+            results.root["c2daisy"] = c2daisy.c2daisy.compile(**gen_args)
+        else:
+            print("--> Daisy generator not available")
 
     if "dpf" in generators:
         if verbose:
