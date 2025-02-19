@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "hvcc"
-version = "0.13.1"
+version = "0.13.3"
 description = "`hvcc` is a python-based dataflow audio programming language compiler that generates C/C++ code and a variety of specific framework wrappers."
 authors = ["Enzien Audio, Wasted Audio"]
 license = "GPLv3"
