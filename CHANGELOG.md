@@ -1,6 +1,13 @@
 CHANGELOG
 =====
 
+Next Release
+-----
+
+Bugfixes:
+
+* sending `[stop(` to `[line~]` when it's not running no longer jumps the current value (#188)
+
 0.13.3
 -----
 
