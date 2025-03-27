@@ -53,6 +53,7 @@ class HeavyObject:
     def get_C_init(cls, obj_type: str, obj_id: str, args: Dict) -> List[str]:
         return [f"{cls.preamble}_init(&{cls.preamble}_{obj_id})"]
 
+    @classmethod
     def get_C_def(cls, obj_type: str, obj_id: str) -> List[str]:
         return ["{0} {1}_{2};".format(
             cls.get_C_struct(obj_type),

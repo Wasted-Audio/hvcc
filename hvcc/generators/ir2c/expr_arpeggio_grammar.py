@@ -1,6 +1,6 @@
-from arpeggio import ParserPython, StrMatch
-from arpeggio import ZeroOrMore
-from arpeggio import RegExMatch as regex
+from arpeggio import ParserPython, StrMatch     # type: ignore
+from arpeggio import ZeroOrMore                 # type: ignore
+from arpeggio import RegExMatch as regex        # type: ignore
 
 
 class SuppressStrMatch(StrMatch):
