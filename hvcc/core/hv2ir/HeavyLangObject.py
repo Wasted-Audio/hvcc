@@ -1,5 +1,5 @@
 # Copyright (C) 2014-2018 Enzien Audio, Ltd.
-# Copyright (C) 2023 Wasted Audio
+# Copyright (C) 2023-2024 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -26,6 +26,9 @@ from typing import Optional, Union, List, Dict, Any, TYPE_CHECKING
 from .Connection import Connection
 from .HeavyException import HeavyException
 
+from hvcc.types.compiler import CompilerMsg, CompilerNotif
+from hvcc.types.Lang import HeavyLangType, LangNode, LangLet, LangLetType, LangValueType
+
 if TYPE_CHECKING:
     from .HeavyGraph import HeavyGraph
     from .HeavyIrObject import HeavyIrObject
@@ -40,7 +43,7 @@ class HeavyLangObject:
 
     # load the Heavy object definitions
     with open(os.path.join(os.path.dirname(__file__), "../json/heavy.lang.json"), "r") as f:
-        _HEAVY_LANG_DICT = json.load(f)
+        _HEAVY_LANG_DICT = HeavyLangType(**json.load(f)).root
 
     def __init__(
         self,
@@ -67,19 +70,19 @@ class HeavyLangObject:
         self.annotations: Dict = annotations or {}
 
         # a list of locally generated warnings and errors (notifications)
-        self.warnings: List = []
-        self.errors: List = []
+        self.warnings: List[CompilerMsg] = []
+        self.errors: List[CompilerMsg] = []
 
         # resolve arguments and fill in missing defaults for HeavyLang objects
         self.__resolve_default_lang_args()
 
         # the list of connections at each inlet
-        num_inlets = num_inlets if num_inlets >= 0 else len(self._obj_desc["inlets"])
+        num_inlets = num_inlets if num_inlets >= 0 else len(self._obj_desc.inlets)
         # print("=-=-=-=-   HeavyLangObject::__init__", self.type, self._obj_desc)
         self.inlet_connections: List = [[] for _ in range(num_inlets)]
 
         # the list of connections at each outlet
-        num_outlets = num_outlets if num_outlets >= 0 else len(self._obj_desc["outlets"])
+        num_outlets = num_outlets if num_outlets >= 0 else len(self._obj_desc.outlets)
         self.outlet_connections: List = [[] for _ in range(num_outlets)]
 
     @property
@@ -108,43 +111,49 @@ class HeavyLangObject:
         return self.args.get("name", None)
 
     @property
-    def _obj_desc(self) -> Dict:
+    def _obj_desc(self) -> LangNode:
         """ Returns the HeavyLang object description.
         """
         return self._HEAVY_LANG_DICT[self.type]
 
-    def inlet_connection_type(self, index: int) -> Dict:
-        return self._obj_desc["inlets"][index]
+    def inlet_connection_type(self, index: int) -> LangLet:
+        return self._obj_desc.inlets[index]
 
-    def outlet_connection_type(self, index: int) -> Dict:
-        return self._obj_desc["outlets"][index]
+    def outlet_connection_type(self, index: int) -> LangLet:
+        return self._obj_desc.outlets[index]
 
     def name_for_arg(self, index: int = 0) -> str:
         """ Returns the name of the argument at the given index.
         """
-        return self._obj_desc["args"][index]["name"]
+        return self._obj_desc.args[index].name
 
     def add_warning(self, warning: str) -> None:
         """ Add a warning to this object.
         """
-        self.warnings.append({"message": warning})
+        self.warnings.append(CompilerMsg(message=warning))
 
     def add_error(self, error: str) -> None:
         """ Add an error to this object and raise an exception.
         """
-        self.errors.append({"message": error})
+        self.errors.append(CompilerMsg(message=error))
         raise HeavyException(error)
 
-    def get_notices(self) -> Dict:
+    def get_notices(self) -> CompilerNotif:
         """ Returns a dictionary of all warnings and errors at this object.
         """
-        return {
-            "warnings": [{"message": f"{self}: {n['message']}"} for n in self.warnings],
-            "errors": [{"message": f"{self}: {n['message']}"} for n in self.errors],
-        }
+        return CompilerNotif(
+            has_error=len(self.errors) > 0,
+            warnings=[CompilerMsg(message=f"{self}: {n.message}") for n in self.warnings],
+            errors=[CompilerMsg(message=f"{self}: {n.message}") for n in self.errors],
+        )
 
     @classmethod
-    def force_arg_type(cls, value: Any, value_type: str, graph: Optional['HeavyGraph'] = None) -> Any:
+    def force_arg_type(
+        cls,
+        value: LangValueType,
+        value_type: Optional[str] = None,
+        graph: Optional['HeavyGraph'] = None
+    ) -> Any:
         """ Attempts to convert a value to a given value type. Raises an Exception otherwise.
             If the value_type is unknown and a graph is provided, a warning will be registered.
         """
@@ -157,7 +166,7 @@ class HeavyLangObject:
             return int(decimal.Decimal(value))
         elif value_type == "string":
             return str(value) if value is not None else None
-        elif value_type == "boolean":
+        elif value_type == "bool":
             if isinstance(value, str):
                 return value.strip().lower() not in ["false", "f", "0"]
             else:
@@ -196,20 +205,20 @@ class HeavyLangObject:
         """ Resolves missing default arguments. Also checks to make sure that all
             required arguments are present. Does nothing if the object is IR.
         """
-        if self.type in HeavyLangObject._HEAVY_LANG_DICT:
-            for arg in self._obj_desc["args"]:
-                if arg["name"] not in self.args:
+        if self.type in self._HEAVY_LANG_DICT.keys():
+            for arg in self._obj_desc.args:
+                if arg.name not in self.args:
                     # if a defined argument is not in the argument dictionary
-                    if not arg["required"]:
+                    if not arg.required:
                         # if the argument is not required, use the default
-                        self.args[arg["name"]] = arg["default"]
+                        self.args[arg.name] = arg.default
                     else:
-                        self.add_error(f"Required argument \"{arg['name']}\" not present for object {self}.")
+                        self.add_error(f"Required argument \"{arg.name}\" not present for object {self}.")
                 else:
                     # enforce argument types
-                    self.args[arg["name"]] = HeavyLangObject.force_arg_type(
-                        self.args[arg["name"]],
-                        arg["value_type"],
+                    self.args[arg.name] = self.force_arg_type(
+                        self.args[arg.name],
+                        arg.value_type,
                         self.graph)
 
     @property
@@ -245,7 +254,7 @@ class HeavyLangObject:
         else:
             raise HeavyException(f"Connection {c} does not connect to this object {self}.")
 
-    def replace_connection(self, c: Connection, n_list: list) -> None:
+    def replace_connection(self, c: Connection, n_list: List) -> None:
         """ Replaces connection c with connection list n_list, maintaining connection order
         """
         if c.from_object is self:
@@ -317,12 +326,12 @@ class HeavyLangObject:
         """
         return all(len(c) == 0 for c in self.inlet_connections)
 
-    def _resolved_outlet_type(self, outlet_index: int = 0) -> Optional[str]:
+    def _resolved_outlet_type(self, outlet_index: int = 0) -> Optional[LangLetType]:
         """ Returns the connection type expected at the given outlet.
             The result may be influenced by the state of the input connections.
         """
         # get the defined connection type
-        connection_type = self._obj_desc["outlets"][outlet_index]["connectionType"]
+        connection_type = self._obj_desc.outlets[outlet_index].connectionType
         if connection_type == "-~>" and self.graph is not None:
             # if the connection type is defined as mixed,
             # use the default approach to resolve it
@@ -344,7 +353,7 @@ class HeavyLangObject:
 
         return None
 
-    def _resolve_connection_types(self, obj_stack: Optional[set] = None) -> Optional[None]:
+    def _resolve_connection_types(self, obj_stack: Optional[set] = None) -> None:
         """ Resolves the type of all connections before reduction to IR object types.
             If connections incident on an object are incompatible, they are either
             resolved, potentially by inserting conversion objects, or pruned.

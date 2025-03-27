@@ -10,6 +10,7 @@
     {% endfor -%}
 
     <style>
+      .horizontal { display: flex; justify-content: space-evenly; align-items: center; }
       .widget { max-width: 900px; margin: auto; }
       .row { width: 100%; margin-bottom: 10px; }
       .col { display: inline-block; }
@@ -27,6 +28,7 @@
     <script type="text/javascript">
       var heavyModule = null;
       var loader = null;
+      midioutPort = null;
 
       window.onload = function() {
         {{name}}_Module().then(loadedModule => {
@@ -49,7 +51,8 @@
             // optional: provide a callback handler for [print] messages
             printHook: onPrint,
             // optional: provide a callback handler for [s {sendName} @hv_param] messages
-            sendHook: onFloatMessage,
+            // sendName "midiOutMessage" is reserved for MIDI output messages!
+            sendHook: onSendMessage,
             // optional: pass an existing web audio context, otherwise a new one
             // will be constructed.
             webAudioContext: null
@@ -74,19 +77,63 @@
         console.log(message);
       }
     {%- if midi | length or midi_out | length %}
+
       if (navigator.requestMIDIAccess) {
         navigator.requestMIDIAccess()
         .then(onMIDISuccess, onMIDIFailure);
       }
 
       function onMIDISuccess(midiAccess) {
-        console.log("MIDI ready!");
-        var inputs = midiAccess.inputs.values();
 
-        for (var input = inputs.next(); input && !input.done; input = inputs.next()) {
-          // each time there is a midi message call the onMIDIMessage function
-          input.value.onmidimessage = onMIDIMessage;
-        }
+        {%- if midi | length %}
+        
+          var midiInputs = [];
+          var inputs = midiAccess.inputs.values();
+          midiInputs = Array.from(midiAccess.inputs.values());
+          var midiInputsSelect = document.getElementById("midiInputs");
+
+          midiInputs.forEach((input, index) => {
+            var option = document.createElement("option");
+            option.value = index;
+            option.text = input.name;
+            midiInputsSelect.add(option);
+          });
+
+          // Preselect the first MIDI input and output
+          if (midiInputs.length > 0) {
+            midiInputsSelect.selectedIndex = 0;
+            midiInputs[0].onmidimessage = onMIDIMessage;
+          }
+
+          midiInputsSelect.onchange = function() {
+            var selectedInput = midiInputs[midiInputsSelect.value];
+            midiInputs.forEach(input => input.onmidimessage = null); // Clear previous handlers
+            selectedInput.onmidimessage = onMIDIMessage;
+          };
+        {%- endif %}
+
+        {%- if midi_out | length %}
+          var midiOutputs = [];
+          var outputs = midiAccess.outputs.values();
+          midiOutputs = Array.from(midiAccess.outputs.values());
+          var midiOutputsSelect = document.getElementById("midiOutputs");
+
+          midiOutputs.forEach((output, index) => {
+            var option = document.createElement("option");
+            option.value = index;
+            option.text = output.name;
+            midiOutputsSelect.add(option);
+          });
+
+          if (midiOutputs.length > 0) {
+            midiOutputsSelect.selectedIndex = 0;
+            midioutPort = midiOutputs[0];
+          }
+
+          midiOutputsSelect.onchange = function() {
+            midioutPort = midiOutputs[midiOutputsSelect.value];
+          };
+        {%- endif %}
       }
 
       function onMIDIFailure(msg) {
@@ -101,70 +148,84 @@
         }
       }
     {%- endif %}
+      
+      
 
-      function onFloatMessage(sendName, floatValue) {
+      function onMidiOutMessage(message) {
+        if (midioutPort !== null) {
+          midioutPort.send(message);
+        }
+        else {
+          console.error("No MIDI output port available.");
+        }
+      }
+
+      function onSendMessage(sendName, message) {
 
         switch (sendName) {
-    {%- if parameters_out | length %}
-      {%- for k, v in parameters_out %}
-          case "{{k}}":
-            document.getElementById("parameter_{{k}}").value = floatValue;
-            document.getElementById("value_{{k}}").textContent = Number(floatValue).toFixed(2);
+          {%- if parameters_out | length %}
+            {%- for k, v in parameters_out %}
+                case "{{k}}":
+                  document.getElementById("parameter_{{k}}").value = message;
+                  document.getElementById("value_{{k}}").textContent = Number(floatValue).toFixed(2);
+                  break;
+            {%- endfor %}
+          {%- endif %}
+          {%- if events_out | length %}
+            {%- for k, v in events_out %}
+                case "{{k}}":
+                  {{k}}_counter += 1;
+                  document.getElementById("{{k}}_counter").innerHTML = {{k}}_counter;
+                  break;
+            {%- endfor %}
+          {%- endif %}
+          case "midiOutMessage":
+            onMidiOutMessage(message);
             break;
-      {%- endfor %}
-    {%- endif %}
-    {%- if events_out | length %}
-      {%- for k, v in events_out %}
-          case "{{k}}":
-            {{k}}_counter += 1;
-            document.getElementById("{{k}}_counter").innerHTML = {{k}}_counter;
-            break;
-      {%- endfor %}
-    {%- endif %}
           default:
-            console.log(sendName, floatValue);
+            console.log(sendName, message);
         }
       }
 
       {%- if events | length %}
       // Generated Event Update Methods
-{%- for k, v in events %}
-      function sendEvent_{{k}}() {
-        if(loader.webAudioWorklet) {
-          loader.sendEvent("{{v.display}}");
-        } else {
-          loader.audiolib.sendEvent("{{v.display}}");
-        }
-      }
-{% endfor %}
-      {%- endif %}
+        {%- for k, v in events %}
+              function sendEvent_{{k}}() {
+                if(loader.webAudioWorklet) {
+                  loader.sendEvent("{{v.display}}");
+                } else {
+                  loader.audiolib.sendEvent("{{v.display}}");
+                }
+              }
+        {% endfor %}
+              {%- endif %}
 
-  {%- if events_out | length %}
-    {%- for k, v in events_out %}
-      var {{k}}_counter = 0;
-    {%- endfor %}
-  {%- endif %}
+          {%- if events_out | length %}
+            {%- for k, v in events_out %}
+              var {{k}}_counter = 0;
+            {%- endfor %}
+          {%- endif %}
 
 
-      // randomizer
-      function randomiseParameters() {
-{%- for k, v in parameters %}
-        updateSlider_{{k}}(Math.random());
-{% endfor %}
-      }
-      {%- if parameters | length %}
-      // Generated Parameter Update Methods
-{%- for k, v in parameters %}
-      function updateSlider_{{k}}(value) {
-        document.getElementById("value_{{k}}").textContent = Number(value).toFixed(2);
-        document.getElementById("parameter_{{k}}").value = value;
-        if(loader.webAudioWorklet) {
-          loader.sendFloatParameterToWorklet("{{v.display}}", value);
-        } else {
-          loader.audiolib.setFloatParameter("{{v.display}}", value);
-        }
-      }
-{% endfor %}
+              // randomizer
+              function randomiseParameters() {
+        {%- for k, v in parameters %}
+                updateSlider_{{k}}(Math.random());
+        {% endfor %}
+              }
+              {%- if parameters | length %}
+              // Generated Parameter Update Methods
+        {%- for k, v in parameters %}
+              function updateSlider_{{k}}(value) {
+                document.getElementById("value_{{k}}").textContent = Number(value).toFixed(2);
+                document.getElementById("parameter_{{k}}").value = value;
+                if(loader.webAudioWorklet) {
+                  loader.sendFloatParameterToWorklet("{{v.display}}", value);
+                } else {
+                  loader.audiolib.setFloatParameter("{{v.display}}", value);
+                }
+              }
+        {% endfor %}
       {%- endif %}
     </script>
   </head>
@@ -233,6 +294,22 @@
       {%- endfor %}
       {%- endif %}
 
+      {%- if midi | length or midi_out | length%}
+      <div class="horizontal" style="text-align: center;">
+        {%- if midi | length %}
+        <div>
+          <div>MIDI inputs:</div>
+          <select id="midiInputs" onchange="console.log(this.value)"></select>
+        </div>
+        {%- endif %}
+        {%- if midi_out | length %}
+        <div>
+          <div>MIDI outputs:</div>
+          <select id="midiOutputs" onchange="console.log(this.value)"></select>
+        </div>
+        {%- endif %}
+      </div>
+      {%- endif %}
       <div class="row">
         <span class="link"><em>powered by <a href="https://github.com/Wasted-Audio/hvcc"><strong>heavy</strong></em></a></span>
       </div>

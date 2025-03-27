@@ -1,5 +1,5 @@
 # Copyright (C) 2014-2018 Enzien Audio, Ltd.
-# Copyright (C) 2021-2023 Wasted Audio
+# Copyright (C) 2021-2024 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,13 +20,17 @@ import time
 import jinja2
 
 from shutil import which
-from typing import Dict, Optional
+from typing import Optional
 
 from hvcc.core.hv2ir.HeavyException import HeavyException
 from ..copyright import copyright_manager
 
+from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
+from hvcc.types.compiler import Generator, CompilerResp, CompilerNotif, CompilerMsg, ExternInfo
+from hvcc.types.meta import Meta
 
-class c2js:
+
+class c2js(Generator):
     """Compiles a directory of C source files into javascript. Requires the
     emscripten library to be installed - https://github.com/kripken/emscripten
     """
@@ -76,7 +80,8 @@ class c2js:
         """Run the emcc command to compile C source files to a javascript library.
         """
 
-        if os.name == 'nt':
+        # Detect Windows OS, but ignore if running in MingW
+        if os.name == 'nt' and os.environ.get('MSYSTEM') is None:
             emcc_path = which("emcc.bat")
         else:
             emcc_path = which("emcc")
@@ -157,24 +162,24 @@ class c2js:
         cls,
         c_src_dir: str,
         out_dir: str,
-        externs: Dict,
+        externs: ExternInfo,
         patch_name: Optional[str] = None,
-        patch_meta: Optional[Dict] = None,
+        patch_meta: Meta = Meta(),
         num_input_channels: int = 0,
         num_output_channels: int = 0,
         copyright: Optional[str] = None,
         verbose: Optional[bool] = False
-    ) -> Dict:
+    ) -> CompilerResp:
 
         tick = time.time()
 
-        parameter_list = externs["parameters"]["in"]
-        parameter_out_list = externs["parameters"]["out"]
-        event_list = externs["events"]["in"]
-        event_out_list = externs["events"]["out"]
+        parameter_list = externs.parameters.inParam
+        parameter_out_list = externs.parameters.outParam
+        event_list = externs.events.inEvent
+        event_out_list = externs.events.outEvent
 
-        midi_list = externs["midi"]["in"]
-        midi_out_list = externs["midi"]["out"]
+        midi_list = externs.midi.inMidi
+        midi_out_list = externs.midi.outMidi
 
         out_dir = os.path.join(out_dir, "js")
         patch_name = patch_name or "heavy"
@@ -202,7 +207,7 @@ class c2js:
                     name=patch_name,
                     copyright=copyright_js,
                     externs=externs,
-                    pool_sizes_kb=externs["memoryPoolSizesKb"]))
+                    pool_sizes_kb=externs.memoryPoolSizesKb))
 
             js_path = cls.run_emscripten(c_src_dir=c_src_dir,
                                          out_dir=out_dir,
@@ -239,7 +244,7 @@ class c2js:
                     name=patch_name,
                     copyright=copyright_js,
                     externs=externs,
-                    pool_sizes_kb=externs["memoryPoolSizesKb"]))
+                    pool_sizes_kb=externs.memoryPoolSizesKb))
 
             pre_js_path = os.path.join(out_dir, "hv_worklet_start.js")
             with open(pre_js_path, "w") as f:
@@ -247,7 +252,7 @@ class c2js:
                     name=patch_name,
                     copyright=copyright_js,
                     externs=externs,
-                    pool_sizes_kb=externs["memoryPoolSizesKb"]))
+                    pool_sizes_kb=externs.memoryPoolSizesKb))
 
             js_path = cls.run_emscripten(c_src_dir=c_src_dir,
                                          out_dir=out_dir,
@@ -263,36 +268,27 @@ class c2js:
             os.remove(post_js_path)
             os.remove(pre_js_path)
 
-            return {
-                "stage": "c2js",
-                "notifs": {
-                    "has_error": False,
-                    "exception": None,
-                    "warnings": [],
-                    "errors": []
-                },
-                "in_dir": c_src_dir,
-                "in_file": "",
-                "out_dir": out_dir,
-                "out_file": js_out_file,
-                "compile_time": time.time() - tick
-            }
+            return CompilerResp(
+                stage="c2js",
+                in_dir=c_src_dir,
+                out_dir=out_dir,
+                out_file=js_out_file,
+                compile_time=time.time() - tick
+            )
 
         except Exception as e:
-            return {
-                "stage": "c2js",
-                "notifs": {
-                    "has_error": True,
-                    "exception": e,
-                    "warnings": [],
-                    "errors": [{
-                        "enum": -1,
-                        "message": str(e)
-                    }]
-                },
-                "in_dir": c_src_dir,
-                "in_file": "",
-                "out_dir": out_dir,
-                "out_file": "",
-                "compile_time": time.time() - tick
-            }
+            return CompilerResp(
+                stage="c2js",
+                notifs=CompilerNotif(
+                    has_error=True,
+                    exception=e,
+                    warnings=[],
+                    errors=[CompilerMsg(
+                        enum=NotificationEnum.ERROR_EXCEPTION,
+                        message=str(e)
+                    )]
+                ),
+                in_dir=c_src_dir,
+                out_dir=out_dir,
+                compile_time=time.time() - tick
+            )

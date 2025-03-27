@@ -1,5 +1,5 @@
 # Copyright (C) 2014-2018 Enzien Audio, Ltd.
-# Copyright (C) 2023 Wasted Audio
+# Copyright (C) 2023-2024 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -33,7 +33,7 @@ class ControlTabread(HeavyObject):
         return {"HvControlTabread.h", "HvControlTabread.c"}
 
     @classmethod
-    def get_C_init(cls, obj_type: str, obj_id: int, args: Dict) -> List[str]:
+    def get_C_init(cls, obj_type: str, obj_id: str, args: Dict) -> List[str]:
         return [
             "cTabread_init(&cTabread_{0}, &hTable_{1}); // {2}".format(
                 obj_id,
@@ -42,11 +42,11 @@ class ControlTabread(HeavyObject):
         ]
 
     @classmethod
-    def get_C_free(cls, obj_type: str, obj_id: int, args: Dict) -> List[str]:
+    def get_C_free(cls, obj_type: str, obj_id: str, args: Dict) -> List[str]:
         return []
 
     @classmethod
-    def get_C_onMessage(cls, obj_type: str, obj_id: int, inlet_index: int, args: Dict) -> List[str]:
+    def get_C_onMessage(cls, obj_type: str, obj_id: str, inlet_index: int, args: Dict) -> List[str]:
         return [
             "cTabread_onMessage(_c, &Context(_c)->cTabread_{0}, {1}, m, &cTabread_{0}_sendMessage);".format(
                 obj_id,

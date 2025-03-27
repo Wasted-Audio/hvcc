@@ -1,5 +1,5 @@
 # Copyright (C) 2014-2018 Enzien Audio, Ltd.
-# Copyright (C) 2023 Wasted Audio
+# Copyright (C) 2023-2024 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,6 +19,7 @@ import os
 import re
 from collections import Counter
 from collections import OrderedDict
+from pathlib import Path
 from typing import List, Dict, Optional, Type, Any, Generator
 
 from .HeavyObject import HeavyObject
@@ -191,7 +192,7 @@ class PdParser:
             pd_graph_class)
 
         if is_root:
-            if g.get_notices()["errors"]:
+            if g.get_notices().has_error:
                 # return the graph early here as there are already errors and it is
                 # clearly invalid, avoids triggering unrelated errors in validation
                 return g
@@ -532,7 +533,9 @@ class PdParser:
                                 "[declare] objects are not supported in abstractions. "
                                 "They can only be in the root canvas.")
                         elif len(line) >= 4 and line[2] == "-path":
-                            did_add = self.add_relative_search_directory(line[3])
+                            pd_parent = Path(pd_path).parent
+                            pd_search = os.path.join(pd_parent, line[3])
+                            did_add = self.add_relative_search_directory(pd_search)
                             if not did_add:
                                 g.add_warning(
                                     f"\"{line[3]}\" is not a valid relative abstraction "

@@ -94,7 +94,7 @@ protected:
         {
     {%- for k, v in receivers + senders %}
         {%- set v_display = v.display|lower %}
-        {%- if meta.enumerators is defined and meta.enumerators[v.display] is defined -%}
+        {%- if meta.enumerators != None and meta.enumerators[v.display] is defined -%}
             {%- set enums = meta.enumerators[v.display] -%}
             {%- set enumlen = enums|length %}
             {%- set enum_list = v_display + "_list" %}

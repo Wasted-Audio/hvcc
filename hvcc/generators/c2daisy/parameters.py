@@ -2,6 +2,8 @@
 from copy import deepcopy
 from typing import Any, Dict, Optional
 
+from hvcc.types.compiler import ExternParams
+
 
 def filter_match(
     set: Dict,
@@ -128,7 +130,7 @@ def de_alias(
 
 
 def parse_parameters(
-    parameters: Dict,
+    parameters: ExternParams,
     components: Dict,
     aliases: Dict,
     object_name: str
@@ -144,16 +146,16 @@ def parse_parameters(
     replacements: Dict = {}
     params_in: Dict = {}
     params_in_original_names: Dict = {}
-    for key, item in parameters['in']:
+    for key, recv in parameters.inParam:
         de_aliased = de_alias(key, aliases, components)
-        params_in[de_aliased] = item
+        params_in[de_aliased] = recv
         params_in_original_names[de_aliased] = key
 
     params_out = {}
     params_out_original_names = {}
-    for key, item in parameters['out']:
+    for key, msg in parameters.outParam:
         de_aliased = de_alias(key, aliases, components)
-        params_out[de_aliased] = item
+        params_out[de_aliased] = msg
         params_out_original_names[de_aliased] = key
 
     [verify_param_exists(key, params_in_original_names[key],

@@ -1,5 +1,5 @@
 # Copyright (C) 2014-2018 Enzien Audio, Ltd.
-# Copyright (C) 2023 Wasted Audio
+# Copyright (C) 2023-2024 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from typing import Dict
+from hvcc.types.compiler import CompilerNotif
 
 
 class HeavyException(Exception):
@@ -24,4 +24,4 @@ class HeavyException(Exception):
     def __init__(self, message: str = "") -> None:
         super(Exception, self).__init__(message)
         self.message = message
-        self.notes: Dict = {}
+        self.notes: CompilerNotif = CompilerNotif()

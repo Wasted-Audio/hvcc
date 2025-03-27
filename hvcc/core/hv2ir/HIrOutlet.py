@@ -1,5 +1,5 @@
 # Copyright (C) 2014-2018 Enzien Audio, Ltd.
-# Copyright (C) 2023 Wasted Audio
+# Copyright (C) 2023-2024 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,6 +19,8 @@ from typing import Dict, List, Optional
 from .HeavyIrObject import HeavyIrObject
 from .HeavyGraph import HeavyGraph
 
+from hvcc.types.IR import IROnMessage
+
 
 class HIrOutlet(HeavyIrObject):
     """ A specific implementation of the outlet object.
@@ -33,7 +35,7 @@ class HIrOutlet(HeavyIrObject):
     ) -> None:
         super().__init__("__outlet", args=args, graph=graph, annotations=annotations)
 
-    def get_ir_on_message(self, inlet_index: int = 0) -> List:
+    def get_ir_on_message(self, inlet_index: int = 0) -> List[IROnMessage]:
         x = []
         if self.graph is not None:
             for c in self.graph.outlet_connections[self.args["index"]]:

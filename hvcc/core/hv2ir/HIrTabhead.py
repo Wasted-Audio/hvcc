@@ -1,5 +1,5 @@
 # Copyright (C) 2014-2018 Enzien Audio, Ltd.
-# Copyright (C) 2023 Wasted Audio
+# Copyright (C) 2023-2024 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from typing import Dict, Optional
+from typing import Dict, Optional, List, Set, Tuple
 
 
 from .HeavyIrObject import HeavyIrObject
@@ -35,7 +35,7 @@ class HIrTabhead(HeavyIrObject):
         assert obj_type in {"__tabhead~f", "__tabhead"}
         super().__init__(obj_type, args=args, graph=graph, annotations=annotations)
 
-    def reduce(self) -> Optional[tuple]:
+    def reduce(self) -> Optional[Tuple[Set, List]]:
         if self.graph is not None:
             table_obj = self.graph.resolve_object_for_name(
                 self.args["table"],
