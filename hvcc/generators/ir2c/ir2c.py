@@ -220,7 +220,7 @@ class ir2c:
         impl_list = []
         for x in ir.control.sendMessage:
             obj_id = x.id
-            o = ir.objects.obj_id
+            o = ir.objects[obj_id]
             print("control objects:", o.type)
             obj_class = ir2c.get_class(o.type)
             impl = obj_class.get_C_impl(
@@ -247,33 +247,33 @@ class ir2c:
         process_list: List = []
         # print("--------------- for each signal in order")
         process_classes = set()
-        for x in ir.signal.processOrder:
-            # print("--- signal", x["id"], o["type"], ir2c.get_class(o["type"]))
-            obj_id = x.id
-            o = ir.objects.obj_id
+        for y in ir.signal.processOrder:
+            # print("--- signal", y.id, o.type, ir2c.get_class(o.type))
+            obj_id = y.id
+            o = ir.objects[obj_id]
             print("process objects:", o.type)
             obj_cls = ir2c.get_class(o.type)
             process_classes.add(obj_cls)
             process_list.extend(obj_cls.get_C_process(
-                x,
+                y,
                 o.type,
                 obj_id,
                 o.args))
 
             # begin experiment for expr~
             obj_header_lines.extend(obj_cls.get_C_obj_header_code(
-                o["type"], obj_id, o["args"]
+                o.type, obj_id, o.args
             ))
             obj_impl_lines.extend(obj_cls.get_C_obj_impl_code(
-                o["type"], obj_id, o["args"]
+                o.type, obj_id, o.args
             ))
         # once for each class
         for prc_cls in process_classes:
             class_header_lines.extend(prc_cls.get_C_class_header_code(
-                o["type"], o["args"]
+                o.type, o.args
             ))
             class_impl_lines.extend(prc_cls.get_C_class_impl_code(
-                o["type"], o["args"]
+                o.type, o.args
             ))
         #
         # Load the C-language template files and use the parsed strings to fill them in.

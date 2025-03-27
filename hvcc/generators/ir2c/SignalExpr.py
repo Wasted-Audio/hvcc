@@ -15,6 +15,8 @@
 
 from typing import Dict, List
 
+from hvcc.types.IR import IRSignalList
+
 from .expr_c_writer import ExprCWriter
 from .HeavyObject import HeavyObject
 
@@ -48,7 +50,7 @@ class SignalExpr(HeavyObject):
         return lines
 
     @classmethod
-    def get_C_obj_header_code(cls, obj_type: str, obj_id: int, args: Dict) -> List[str]:
+    def get_C_obj_header_code(cls, obj_type: str, obj_id: str, args: Dict) -> List[str]:
         lines = super().get_C_obj_header_code(obj_type, obj_id, args)
         func_name = f"{cls.preamble}_{obj_id}_evaluate"
         cls.obj_eval_functions[obj_id] = func_name
@@ -58,7 +60,7 @@ class SignalExpr(HeavyObject):
         return lines
 
     @classmethod
-    def get_C_obj_impl_code(cls, obj_type: str, obj_id: int, args: Dict) -> List[str]:
+    def get_C_obj_impl_code(cls, obj_type: str, obj_id: str, args: Dict) -> List[str]:
         """
         (Per object) this creates the _sendMessage function that other objects use to
         send messages to this object.
@@ -91,12 +93,12 @@ class SignalExpr(HeavyObject):
         return lines
 
     @classmethod
-    def get_C_process(cls, process_dict: Dict, obj_type: str, obj_id: int, args: Dict) -> List[str]:
+    def get_C_process(cls, process_dict: IRSignalList, obj_type: str, obj_id: str, args: Dict) -> List[str]:
         input_args = []
-        for b in process_dict["inputBuffers"]:
+        for b in process_dict.inputBuffers:
             buf = HeavyObject._c_buffer(b)
             input_args.append(f"VIf({buf})")
-        out_buf = HeavyObject._c_buffer(process_dict["outputBuffers"][0])
+        out_buf = HeavyObject._c_buffer(process_dict.outputBuffers[0])
         out_buf = f"VOf({out_buf})"
 
         call = [

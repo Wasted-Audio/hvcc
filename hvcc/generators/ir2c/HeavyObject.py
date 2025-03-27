@@ -50,7 +50,7 @@ class HeavyObject:
         return set()
 
     @classmethod
-    def get_C_init(cls, obj_type: str, obj_id: int, args: Dict) -> List[str]:
+    def get_C_init(cls, obj_type: str, obj_id: str, args: Dict) -> List[str]:
         return [f"{cls.preamble}_init(&{cls.preamble}_{obj_id})"]
 
     def get_C_def(cls, obj_type: str, obj_id: str) -> List[str]:
@@ -103,15 +103,15 @@ class HeavyObject:
         return send_message_list
 
     @classmethod
-    def get_C_onMessage(cls, obj_type: str, obj_id: int, inlet_index: int, args: Dict) -> List[str]:
+    def get_C_onMessage(cls, obj_type: str, obj_id: str, inlet_index: int, args: Dict) -> List[str]:
         raise NotImplementedError("method get_C_onMessage not implemented", cls, obj_type)
 
     @classmethod
-    def get_C_obj_header_code(cls, obj_type: str, obj_id: int, args: Dict) -> List[str]:
+    def get_C_obj_header_code(cls, obj_type: str, obj_id: str, args: Dict) -> List[str]:
         return []
 
     @classmethod
-    def get_C_obj_impl_code(cls, obj_type: str, obj_id: int, args: Dict) -> List[str]:
+    def get_C_obj_impl_code(cls, obj_type: str, obj_id: str, args: Dict) -> List[str]:
         return []
 
     @classmethod

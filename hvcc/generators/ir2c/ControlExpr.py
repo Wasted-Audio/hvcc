@@ -33,7 +33,7 @@ class ControlExpr(HeavyObject):
         return {"HvControlExpr.h", "HvControlExpr.c"}
 
     @classmethod
-    def get_C_init(cls, obj_type: str, obj_id: int, args: Dict) -> List[str]:
+    def get_C_init(cls, obj_type: str, obj_id: str, args: Dict) -> List[str]:
         """(Per object) code that gets inserted into from the Heavy_heavy ctor.
             Only if "ir[init]" == true
         """
@@ -42,7 +42,7 @@ class ControlExpr(HeavyObject):
         return [f"cExpr_init(&cExpr_{obj_id}, {eval_f});"]
 
     @classmethod
-    def get_C_def(cls, obj_type: str, obj_id: int) -> List[str]:
+    def get_C_def(cls, obj_type: str, obj_id: str) -> List[str]:
         """(Per object) code that gets inserted into the header file
             Only if "ir[init]" == true
         """
@@ -53,7 +53,7 @@ class ControlExpr(HeavyObject):
         return lines
 
     @classmethod
-    def get_C_onMessage(cls, obj_type: str, obj_id: int, inlet_index: int, args: Dict) -> List[str]:
+    def get_C_onMessage(cls, obj_type: str, obj_id: str, inlet_index: int, args: Dict) -> List[str]:
         """
         (Per object) code that gets inserted into the c<PREAMBLE>_<OBJID>_sendMessage
         method in the .cpp file
@@ -70,7 +70,7 @@ class ControlExpr(HeavyObject):
     """
 
     # @classmethod
-    # def get_C_process(cls, process_dict: Dict, obj_type: str, obj_id: int, args: Dict) -> List[str]:
+    # def get_C_process(cls, process_dict: Dict, obj_type: str, obj_id: str, args: Dict) -> List[str]:
     #     return [
     #         "printf(\"hello world\")"
     #     ]
@@ -83,7 +83,7 @@ class ControlExpr(HeavyObject):
     def get_C_impl(
         cls,
         obj_type: str,
-        obj_id: int,
+        obj_id: str,
         on_message_list: List,
         get_obj_class: Callable,
         objects: Dict,
