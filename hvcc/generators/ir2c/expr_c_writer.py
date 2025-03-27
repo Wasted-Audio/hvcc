@@ -112,7 +112,7 @@ class ExprCWriter:
                 for node in expr_tree.nodes:
                     val = _to_c_simd_R(node)
                     args.append(val)
-                    if type(val) == str and val.startswith("Bf"):
+                    if isinstance(val, str) and val.startswith("Bf"):
                         buffers.append(val)
                 if r_vec:
                     next_buf = r_vec
