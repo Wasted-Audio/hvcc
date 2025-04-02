@@ -130,10 +130,11 @@ void sLine_onMessage(HeavyContextInterface *_c, SignalLine *o, int letIn,
     o->m = vdupq_n_f32(0.0f);
     o->t = vdupq_n_f32(x);
 #else // HV_SIMD_NONE
+    float x = (o->n > 0) ? (o->x + o->m) : o->t;
     o->n = 0;
-    o->x += o->m;
+    o->x = x;
     o->m = 0.0f;
-    o->t = o->x;
+    o->t = x;
 #endif
   }
 }

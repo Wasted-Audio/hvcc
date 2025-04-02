@@ -3,6 +3,9 @@
 #include "Heavy_{{name}}.h"
 #include "{{class_name}}.hpp"
 #include <set>
+{% if meta.denormals is sameas false %}
+#include "extra/ScopedDenormalDisable.hpp"
+{% endif %}
 
 
 #define HV_DPF_NUM_PARAMETER {{receivers|length + senders|length}}
@@ -56,7 +59,7 @@ static void hvSendHookFunc(HeavyContextInterface *c, const char *sendName, uint3
   if (plugin != nullptr)
   {
     plugin->setOutputParameter(sendHash, m);
-{%- if meta.midi_output is defined and meta.midi_output == 1 %}
+{%- if meta.midi_output is sameas true %}
 #if DISTRHO_PLUGIN_WANT_MIDI_OUTPUT
     plugin->handleMidiSend(sendHash, m);
 #endif
@@ -102,7 +105,7 @@ static void hvPrintHookFunc(HeavyContextInterface *c, const char *printLabel, co
   hv_{{name}}_free(_context);
 }
 
-{%- if meta.port_groups is defined %}
+{%- if meta.port_groups != None %}
 {% include 'portGroups.cpp' %}
 {%- endif %}
 
@@ -178,18 +181,19 @@ void {{class_name}}::setOutputParameter(uint32_t sendHash, const HvMessage *m)
 
 // }
 
-{%- if meta.midi_input is defined and meta.midi_input == 1 %}
+{%- if meta.midi_input is sameas true %}
 #if DISTRHO_PLUGIN_WANT_MIDI_INPUT
 {% include 'midiInput.cpp' %}
 #endif
 {% endif %}
 
-{%- if meta.midi_output is defined and meta.midi_output == 1 %}
+{%- if meta.midi_output is sameas true %}
 #if DISTRHO_PLUGIN_WANT_MIDI_OUTPUT
 {% include 'midiOutput.cpp' %}
 #endif
 {% endif %}
 
+{% include 'hostTransportEvents.cpp' %}
 
 
 // -------------------------------------------------------------------
@@ -203,6 +207,10 @@ void {{class_name}}::run(const float** inputs, float** outputs, uint32_t frames,
 void {{class_name}}::run(const float** inputs, float** outputs, uint32_t frames)
 {
 #endif
+  hostTransportEvents(frames);
+{% if meta.denormals is sameas false %}
+  const ScopedDenormalDisable sdd;
+{% endif %}
   const TimePosition& timePos(getTimePosition());
   if (timePos.playing && timePos.bbt.valid)
     _context->sendMessageToReceiverV(HV_HASH_DPF_BPM, 0, "f", timePos.bbt.beatsPerMinute);

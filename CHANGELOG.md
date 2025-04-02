@@ -4,11 +4,93 @@ CHANGELOG
 Next Release
 -----
 
+Bugfixes:
+
+* sending `[stop(` to `[line~]` when it's not running no longer jumps the current value (#188)
+
+0.13.3
+-----
+
+Bugfixes:
+
+* Daisy: add ScopedIrqBlocker to several functions. Should fix midi input issues and potentially others.
+* Daisy: use FIFO to buffer midi TX messages and call them in the main loop instead of during process()
+* JS: Ignore windows batch if inside of MingW environment
+
+0.13.2
+-----
+
+Bugfixes:
+
+* Incorrect use of new extern formatting in ir2c and c2js templates
+
+0.13.1
+-----
+
+Bugfixes:
+
+* Intermediate Result performance counter
+* OWL: MIDI Aftertouch fixes; Context name fix
+
+Refactor:
+
+* split `__init__.py` in to separate main and compiler sections
+* CI: install tox requirements via poetry
+
+0.13.0
+-----
+
+Features:
+
+* Migrating to poetry for project management
+* Standalone binary (only Linux for now)
+* DPF: Allow modgui on desktop
+* DPF: Enable host transport events without midi input
+* JS: midi out and device select by @Reinissance
+* Docs: general updates/corrections and improvements
+* Allow loading external generator python module @eu-ch
+* Meta: additional global setting to automatically set `HV_SIMD_NONE`
+* Add version info to cli and IR result.
+
+Bugfixes:
+
+* Daisy template newline
+
+Typing:
+
+* HeavyLang and HeavyIR objects
+* Compiler results
+* Extern info
+* Heavy IR Graph
+
+0.12.1
+-----
+
+Features:
+
+* Only disable DSP with new `--nodsp` flag
+* Use pydantic types to define metadata objects
+* DPF: CV flag in portgroups
+* DPF: flag to disable scoped denormals
+
+Bugfixes:
+
+* wwise: allow Bang messages in OnSendMessageCallback()
+* Improve `[cos~]` precision.
+
+0.12.0
+-----
+
 * Core: parse remote/send messages
 * Core: MIDI i/o added to memoryPool
+* Core: support `[else/knob]` as `[float]`
+* Daisy: set heavy context after hw.init()
 * OWL: add Polytouchin and Polytouchout
 * JS: webmidi input
-* Bugfix: MIDI out objects in output Paremeters
+* Docs: add instructions for loading custom samples in JS
+* Small Bugfixes:
+  * MIDI out objects in output Paremeters
+  * JS: AudioWorklet fillTableWithFloatBuffer
 
 0.11.0
 -----

@@ -1,6 +1,6 @@
 # Heavy Compiler Collection (hvcc)
 
-[![Build Status](https://github.com/Wasted-Audio/hvcc/actions/workflows/build.yml/badge.svg)](https://github.com/Wasted-Audio/hvcc/actions)
+[![Build Status](https://github.com/Wasted-Audio/hvcc/actions/workflows/ci.yml/badge.svg)](https://github.com/Wasted-Audio/hvcc/actions)
 [![pypi](https://img.shields.io/pypi/v/hvcc.svg)](https://pypi.python.org/pypi/hvcc)
 [![python](https://img.shields.io/pypi/pyversions/hvcc.svg)](https://pypi.python.org/pypi/hvcc)
 

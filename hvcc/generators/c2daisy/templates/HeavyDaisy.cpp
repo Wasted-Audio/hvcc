@@ -6,7 +6,7 @@
 
 #define SAMPLE_RATE {{samplerate}}.f
 
-{% if has_midi or usb_midi %}
+{% if (has_midi is sameas true) or (usb_midi is sameas true) %}
 #define HV_HASH_NOTEIN          0x67E37CA3
 #define HV_HASH_CTLIN           0x41BE0f9C
 #define HV_HASH_POLYTOUCHIN     0xBC530F59
@@ -31,27 +31,32 @@
 #define MIDI_RT_STOP            0xFC
 #define MIDI_RT_ACTIVESENSE     0xFE
 #define MIDI_RT_RESET           0xFF
+
+#define MIDI_OUT_FIFO_SIZE      128
 {% endif %}
 
 using namespace daisy;
 
 json2daisy::Daisy{{ class_name|capitalize }} hardware;
 
-Heavy_{{patch_name}} hv(SAMPLE_RATE, {{pool_sizes_kb.internal}}, {{pool_sizes_kb.inputQueue}}, {{pool_sizes_kb.outputQueue}});
+Heavy_{{patch_name}}* hv;
 
 void audiocallback(daisy::AudioHandle::InputBuffer in, daisy::AudioHandle::OutputBuffer out, size_t size);
 static void sendHook(HeavyContextInterface *c, const char *receiverName, uint32_t receiverHash, const HvMessage * m);
-{% if debug_printing %}
+{% if debug_printing is sameas true %}
 static void printHook(HeavyContextInterface *c, const char *printLabel, const char *msgString, const HvMessage *m);
 /** FIFO to hold messages as we're ready to print them */
 FIFO<FixedCapStr<64>, 64> event_log;
-{% elif usb_midi %}
+{% elif usb_midi is sameas true %}
 daisy::MidiUsbHandler midiusb;
+{% endif %}
+{% if (has_midi is sameas true) or (usb_midi is sameas true) %}
+FIFO<uint8_t, MIDI_OUT_FIFO_SIZE> midi_tx_fifo;
 {% endif %}
 // int midiOutCount;
 // uint8_t* midiOutData;
-void CallbackWriteIn(Heavy_{{patch_name}}& hv);
-void LoopWriteIn(Heavy_{{patch_name}}& hv);
+void CallbackWriteIn(Heavy_{{patch_name}}* hv);
+void LoopWriteIn(Heavy_{{patch_name}}* hv);
 void CallbackWriteOut();
 void LoopWriteOut();
 void PostProcess();
@@ -95,12 +100,14 @@ DaisyHvParamOut DaisyOutputParameters[DaisyNumOutputParameters] = {
 };
 {% endif %}
 
-{% if has_midi or usb_midi %}
+{% if (has_midi is sameas true) or (usb_midi is sameas true) %}
 // Typical Switch case for Message Type.
 void HandleMidiMessage(MidiEvent m)
 {
+  ScopedIrqBlocker block; //< Disables interrupts while in scope
+
   for (int i = 0; i <= 2; ++i) {
-    hv.sendMessageToReceiverV(HV_HASH_MIDIIN, 0, "ff",
+    hv->sendMessageToReceiverV(HV_HASH_MIDIIN, 0, "ff",
     (float) m.data[i],
     (float) m.channel);
   }
@@ -132,13 +139,13 @@ void HandleMidiMessage(MidiEvent m)
           break;
       }
 
-      hv.sendMessageToReceiverV(HV_HASH_MIDIREALTIMEIN, 0, "ff",
+      hv->sendMessageToReceiverV(HV_HASH_MIDIREALTIMEIN, 0, "ff",
         (float) srtType);
       break;
     }
     case NoteOff: {
       NoteOnEvent p = m.AsNoteOn();
-      hv.sendMessageToReceiverV(HV_HASH_NOTEIN, 0, "fff",
+      hv->sendMessageToReceiverV(HV_HASH_NOTEIN, 0, "fff",
         (float) p.note, // pitch
         (float) 0, // velocity
         (float) p.channel);
@@ -146,7 +153,7 @@ void HandleMidiMessage(MidiEvent m)
     }
     case NoteOn: {
       NoteOnEvent p = m.AsNoteOn();
-      hv.sendMessageToReceiverV(HV_HASH_NOTEIN, 0, "fff",
+      hv->sendMessageToReceiverV(HV_HASH_NOTEIN, 0, "fff",
         (float) p.note, // pitch
         (float) p.velocity, // velocity
         (float) p.channel);
@@ -154,7 +161,7 @@ void HandleMidiMessage(MidiEvent m)
     }
     case PolyphonicKeyPressure: { // polyphonic aftertouch
       PolyphonicKeyPressureEvent p = m.AsPolyphonicKeyPressure();
-      hv.sendMessageToReceiverV(HV_HASH_POLYTOUCHIN, 0, "fff",
+      hv->sendMessageToReceiverV(HV_HASH_POLYTOUCHIN, 0, "fff",
         (float) p.pressure, // pressure
         (float) p.note, // note
         (float) p.channel);
@@ -162,7 +169,7 @@ void HandleMidiMessage(MidiEvent m)
     }
     case ControlChange: {
       ControlChangeEvent p = m.AsControlChange();
-      hv.sendMessageToReceiverV(HV_HASH_CTLIN, 0, "fff",
+      hv->sendMessageToReceiverV(HV_HASH_CTLIN, 0, "fff",
         (float) p.value, // value
         (float) p.control_number, // cc number
         (float) p.channel);
@@ -170,14 +177,14 @@ void HandleMidiMessage(MidiEvent m)
     }
     case ProgramChange: {
       ProgramChangeEvent p = m.AsProgramChange();
-      hv.sendMessageToReceiverV(HV_HASH_PGMIN, 0, "ff",
+      hv->sendMessageToReceiverV(HV_HASH_PGMIN, 0, "ff",
         (float) p.program,
         (float) p.channel);
       break;
     }
     case ChannelPressure: {
       ChannelPressureEvent p = m.AsChannelPressure();
-      hv.sendMessageToReceiverV(HV_HASH_TOUCHIN, 0, "ff",
+      hv->sendMessageToReceiverV(HV_HASH_TOUCHIN, 0, "ff",
         (float) p.pressure,
         (float) p.channel);
       break;
@@ -186,7 +193,7 @@ void HandleMidiMessage(MidiEvent m)
       PitchBendEvent p = m.AsPitchBend();
       // combine 7bit lsb and msb into 32bit int
       hv_uint32_t value = (((hv_uint32_t) m.data[1]) << 7) | ((hv_uint32_t) m.data[0]);
-      hv.sendMessageToReceiverV(HV_HASH_BENDIN, 0, "ff",
+      hv->sendMessageToReceiverV(HV_HASH_BENDIN, 0, "ff",
         (float) value,
         (float) p.channel);
       break;
@@ -200,32 +207,34 @@ void HandleMidiMessage(MidiEvent m)
 int main(void)
 {
   hardware.Init(true);
+  hv = new Heavy_{{patch_name}}(SAMPLE_RATE, {{pool_sizes_kb.internal}}, {{pool_sizes_kb.inputQueue}}, {{pool_sizes_kb.outputQueue}});
+
   {% if samplerate %}
   hardware.SetAudioSampleRate({{samplerate}});
   {% endif %}
   {% if blocksize %}
   hardware.SetAudioBlockSize({{blocksize}});
   {% endif %}
-  {% if has_midi %}
+  {% if has_midi is sameas true %}
   MidiUartHandler::Config midi_config;
   hardware.midi.Init(midi_config);
   hardware.midi.StartReceive();
   {% endif %}
-  {% if not debug_printing and usb_midi %}
+  {% if (debug_printing is not sameas true) and (usb_midi is sameas true) %}
   MidiUsbHandler::Config midiusb_config;
   midiusb.Init(midiusb_config);
   midiusb.StartReceive();
   {% endif %}
 
   hardware.StartAudio(audiocallback);
-  {% if debug_printing %}
+  {% if debug_printing is sameas true %}
   hardware.som.StartLog();
-  hv.setPrintHook(printHook);
+  hv->setPrintHook(printHook);
 
   uint32_t now      = System::GetNow();
   uint32_t log_time = System::GetNow();
   {% endif %}
-  hv.setSendHook(sendHook);
+  hv->setSendHook(sendHook);
 
   for(;;)
   {
@@ -241,7 +250,7 @@ int main(void)
       HandleMidiMessage(hardware.midi.PopEvent());
     }
     {% endif %}
-    {% if not debug_printing and usb_midi %}
+    {% if (debug_printing is not sameas true) and (usb_midi is sameas true) %}
     midiusb.Listen();
     while(midiusb.HasEvents())
     {
@@ -256,7 +265,27 @@ int main(void)
     LoopWriteOut();
     {% endif %}
 
-    {% if debug_printing %}
+    {% if (has_midi is sameas true) or (usb_midi is sameas true) %}
+    uint8_t midiData[MIDI_OUT_FIFO_SIZE];
+    size_t numElements = 0;
+
+    while(!midi_tx_fifo.IsEmpty() && numElements < MIDI_OUT_FIFO_SIZE)
+    {
+      midiData[numElements++] = midi_tx_fifo.PopFront();
+    }
+
+    if(numElements > 0)
+    {
+      {% if has_midi is sameas true %}
+      hardware.midi.SendMessage(midiData, numElements);
+      {% endif %}
+      {% if (debug_printing is not sameas true) and (usb_midi is sameas true) %}
+      midiusb.SendMessage(midiData, numElements);
+      {% endif %}
+    }
+    {% endif %}
+
+    {% if debug_printing is sameas true %}
     /** Now separately, every 5ms we'll print the top message in our queue if there is one */
     if(now - log_time > 5)
     {
@@ -288,22 +317,19 @@ void audiocallback(daisy::AudioHandle::InputBuffer in, daisy::AudioHandle::Outpu
   hardware.ProcessAllControls();
   CallbackWriteIn(hv);
   {% endif %}
-  hv.process((float**)in, (float**)out, size);
+  hv->process((float**)in, (float**)out, size);
   {% if  output_parameters|length > 0 %}
   CallbackWriteOut();
   {% endif %}
   hardware.PostProcess();
 }
 
-{% if has_midi or usb_midi %}
+{% if (has_midi is sameas true) or (usb_midi is sameas true) %}
 void HandleMidiOut(uint8_t *midiData, const uint8_t numElements)
 {
-  {% if has_midi %}
-  hardware.midi.SendMessage(midiData, numElements);
-  {% endif %}
-  {% if not debug_printing and usb_midi %}
-  midiusb.SendMessage(midiData, numElements);
-  {% endif %}
+  for (int i = 0; i < numElements; i++) {
+    midi_tx_fifo.PushBack(midiData[i]);
+  }
 }
 
 void HandleMidiSend(uint32_t sendHash, const HvMessage *m)
@@ -446,12 +472,12 @@ static void sendHook(HeavyContextInterface *c, const char *receiverName, uint32_
     }
   }
   {% endif %}
-  {% if has_midi or usb_midi %}
+  {% if (has_midi is sameas true) or (usb_midi is sameas true) %}
   HandleMidiSend(receiverHash, m);
   {% endif %}
 }
 
-{% if debug_printing %}
+{% if debug_printing is sameas true %}
 /** Receives messages from the PD [print] object and writes them to the serial console.
  *
  */
@@ -472,14 +498,16 @@ static void printHook(HeavyContextInterface *c, const char *printLabel, const ch
 /** Sends signals from the Daisy hardware to the PD patch via the receive objects during the main loop
  *
  */
-void LoopWriteIn(Heavy_{{patch_name}}& hv)
+void LoopWriteIn(Heavy_{{patch_name}}* hv)
 {
+  ScopedIrqBlocker block; //< Disables interrupts while in scope
+
   {% for param in loop_write_in %}
   {% if param.bool %}
   if ({{param.process}})
-    hv.sendBangToReceiver((uint32_t) HV_{{patch_name|upper}}_PARAM_IN_{{param.hash_enum|upper}});
+    hv->sendBangToReceiver((uint32_t) HV_{{patch_name|upper}}_PARAM_IN_{{param.hash_enum|upper}});
   {% else %}
-  hv.sendFloatToReceiver((uint32_t) HV_{{patch_name|upper}}_PARAM_IN_{{param.hash_enum|upper}}, {{param.process}});
+  hv->sendFloatToReceiver((uint32_t) HV_{{patch_name|upper}}_PARAM_IN_{{param.hash_enum|upper}}, {{param.process}});
   {% endif %}
   {% endfor %}
 }
@@ -487,14 +515,14 @@ void LoopWriteIn(Heavy_{{patch_name}}& hv)
 /** Sends signals from the Daisy hardware to the PD patch via the receive objects during the audio callback
  *
  */
-void CallbackWriteIn(Heavy_{{patch_name}}& hv)
+void CallbackWriteIn(Heavy_{{patch_name}}* hv)
 {
   {% for param in callback_write_in %}
   {% if param.bool %}
   if ({{param.process}})
-    hv.sendBangToReceiver((uint32_t) HV_{{patch_name|upper}}_PARAM_IN_{{param.hash_enum|upper}});
+    hv->sendBangToReceiver((uint32_t) HV_{{patch_name|upper}}_PARAM_IN_{{param.hash_enum|upper}});
   {% else %}
-  hv.sendFloatToReceiver((uint32_t) HV_{{patch_name|upper}}_PARAM_IN_{{param.hash_enum|upper}}, {{param.process}});
+  hv->sendFloatToReceiver((uint32_t) HV_{{patch_name|upper}}_PARAM_IN_{{param.hash_enum|upper}}, {{param.process}});
   {% endif %}
   {% endfor %}
 }
@@ -503,6 +531,8 @@ void CallbackWriteIn(Heavy_{{patch_name}}& hv)
  *
  */
 void LoopWriteOut() {
+  ScopedIrqBlocker block; //< Disables interrupts while in scope
+
   {% for param in loop_write_out %}
   {% if param.bool %}
   if ({{param.value}})

@@ -1,5 +1,5 @@
 # Copyright (C) 2014-2018 Enzien Audio, Ltd.
-# Copyright (C) 2023 Wasted Audio
+# Copyright (C) 2023-2024 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -18,6 +18,8 @@ from typing import Callable, Dict, List
 
 from .HeavyObject import HeavyObject
 
+from hvcc.types.IR import IRObjectdict, IROnMessage
+
 
 class ControlSend(HeavyObject):
 
@@ -25,17 +27,17 @@ class ControlSend(HeavyObject):
     preamble = "cSend"
 
     @classmethod
-    def get_C_onMessage(cls, obj_type: str, obj_id: int, inlet_index: int, args: Dict) -> List[str]:
+    def get_C_onMessage(cls, obj_type: str, obj_id: str, inlet_index: int, args: Dict) -> List[str]:
         return [f"cSend_{obj_id}_sendMessage(_c, 0, m);"]
 
     @classmethod
     def get_C_impl(
         cls,
         obj_type: str,
-        obj_id: int,
-        on_message_list: List,
+        obj_id: str,
+        on_message_list: List[List[IROnMessage]],
         get_obj_class: Callable,
-        objects: Dict
+        objects: Dict[str, IRObjectdict]
     ) -> List[str]:
         # Note(joe): if no corresponding receivers exist and there's no extern indicator
         # then there is not much need to generate code stub
@@ -44,9 +46,9 @@ class ControlSend(HeavyObject):
                 cls.get_preamble(obj_type),
                 obj_id)]
 
-        if objects[obj_id]["args"].get("extern", False):
+        if objects[obj_id].args.get("extern", False):
             # call the send hook
-            send_name = objects[obj_id]["args"]["name"]
+            send_name = objects[obj_id].args["name"]
             send_message_list.append("if (_c->getSendHook() != nullptr) _c->getSendHook()(_c, \"{0}\", {1}, m);".format(
                 send_name,
                 cls.get_hash_string(send_name)))

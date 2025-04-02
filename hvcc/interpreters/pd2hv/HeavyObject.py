@@ -1,5 +1,5 @@
 # Copyright (C) 2014-2018 Enzien Audio, Ltd.
-# Copyright (C) 2023 Wasted Audio
+# Copyright (C) 2023-2024 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,22 +17,25 @@
 import decimal
 import json
 import importlib_resources
-from typing import Optional, List, Dict, Any
+from typing import Optional, List, Dict, Any, Union, cast
 
 from .Connection import Connection
 from .NotificationEnum import NotificationEnum
 from .PdObject import PdObject
+
+from hvcc.types.IR import HeavyIRType, IRNode, IRArg
+from hvcc.types.Lang import HeavyLangType, LangNode, LangArg
 
 
 class HeavyObject(PdObject):
 
     heavy_lang_json = importlib_resources.files('hvcc') / 'core/json/heavy.lang.json'
     with open(heavy_lang_json, "r") as f:
-        __HEAVY_LANG_OBJS = json.load(f)
+        __HEAVY_LANG_OBJS = HeavyLangType(**json.load(f)).root
 
     heavy_ir_json = importlib_resources.files('hvcc') / 'core/json/heavy.ir.json'
     with open(heavy_ir_json, "r") as f:
-        __HEAVY_IR_OBJS = json.load(f)
+        __HEAVY_IR_OBJS = HeavyIRType(**json.load(f)).root
 
     def __init__(
         self,
@@ -42,6 +45,8 @@ class HeavyObject(PdObject):
         pos_y: int = 0
     ) -> None:
         super().__init__(obj_type, obj_args, pos_x, pos_y)
+
+        self.__obj_dict: Union[IRNode, LangNode]
 
         # get the object dictionary (note that it is NOT a copy)
         if self.is_hvlang:
@@ -54,24 +59,26 @@ class HeavyObject(PdObject):
         # resolve arguments
         obj_args = obj_args or []
         self.obj_dict = {}
-        for i, a in enumerate(self.__obj_dict["args"]):
+
+        for i, a in enumerate(self.__obj_dict.args):
+            arg = cast(Union[IRArg, LangArg], a)
             # if the argument exists (and has been correctly resolved)
             if i < len(obj_args) and obj_args[i] is not None:
                 # force the Heavy argument type
                 # Catch type errors as early as possible
                 try:
-                    self.obj_dict[a["name"]] = self.force_arg_type(
+                    self.obj_dict[arg.name] = self.force_arg_type(
                         obj_args[i],
-                        a["value_type"])
+                        arg.value_type)
                 except Exception as e:
                     self.add_error(
-                        f"Heavy {obj_type} cannot convert argument \"{a['name']}\""
-                        f" with value \"{obj_args[i]}\" to type {a['value_type']}: {e}")
+                        f"Heavy {obj_type} cannot convert argument \"{arg.name}\""
+                        f" with value \"{obj_args[i]}\" to type {arg.value_type}: {e}")
             else:
                 # the default argument is required
-                if a["required"]:
+                if arg.required:
                     self.add_error(
-                        f"Required argument \"{a['name']}\" to object {obj_type} not present: {obj_args}")
+                        f"Required argument \"{arg.name}\" to object {obj_type} not present: {obj_args}")
                 else:
                     # don't worry about supplying a default,
                     # let hv2ir take care of it. pd2hv only passes on the
@@ -87,7 +94,11 @@ class HeavyObject(PdObject):
             self.__annotations["scope"] = "public"
 
     @classmethod
-    def force_arg_type(cls, value: str, value_type: str) -> Any:
+    def force_arg_type(
+        cls,
+        value: str,
+        value_type: Optional[str] = None
+    ) -> Any:
         # TODO(mhroth): add support for mixedarray?
         if value_type == "auto":
             try:
@@ -135,24 +146,24 @@ class HeavyObject(PdObject):
 
     @property
     def is_hvlang(self) -> bool:
-        return self.obj_type in self.__HEAVY_LANG_OBJS
+        return self.obj_type in self.__HEAVY_LANG_OBJS.keys()
 
     @property
     def is_hvir(self) -> bool:
-        return self.obj_type in self.__HEAVY_IR_OBJS
+        return self.obj_type in self.__HEAVY_IR_OBJS.keys()
 
     def get_inlet_connection_type(self, inlet_index: int) -> Optional[str]:
         """ Returns the inlet connection type, None if the inlet does not exist.
         """
         # TODO(mhroth): it's stupid that hvlang and hvir json have different data formats here
-        if self.is_hvlang:
-            if len(self.__obj_dict["inlets"]) > inlet_index:
-                return self.__obj_dict["inlets"][inlet_index]["connectionType"]
+        if self.is_hvlang and isinstance(self.__obj_dict, LangNode):
+            if len(self.__obj_dict.inlets) > inlet_index:
+                return self.__obj_dict.inlets[inlet_index].connectionType
             else:
                 return None
-        elif self.is_hvir:
-            if len(self.__obj_dict["inlets"]) > inlet_index:
-                return self.__obj_dict["inlets"][inlet_index]
+        elif self.is_hvir and isinstance(self.__obj_dict, IRNode):
+            if len(self.__obj_dict.inlets) > inlet_index:
+                return self.__obj_dict.inlets[inlet_index]
             else:
                 return None
         else:
@@ -162,14 +173,14 @@ class HeavyObject(PdObject):
         """ Returns the outlet connection type, None if the inlet does not exist.
         """
         # TODO(mhroth): it's stupid that hvlang and hvir json have different data formats here
-        if self.is_hvlang:
-            if len(self.__obj_dict["outlets"]) > outlet_index:
-                return self.__obj_dict["outlets"][outlet_index]["connectionType"]
+        if self.is_hvlang and isinstance(self.__obj_dict, LangNode):
+            if len(self.__obj_dict.outlets) > outlet_index:
+                return self.__obj_dict.outlets[outlet_index].connectionType
             else:
                 return None
-        elif self.is_hvir:
-            if len(self.__obj_dict["outlets"]) > outlet_index:
-                return self.__obj_dict["outlets"][outlet_index]
+        elif self.is_hvir and isinstance(self.__obj_dict, IRNode):
+            if len(self.__obj_dict.outlets) > outlet_index:
+                return self.__obj_dict.outlets[outlet_index]
             else:
                 return None
         else:

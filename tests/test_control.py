@@ -322,7 +322,8 @@ def main():
         help="The path to the Pd file to read.")
     args = parser.parse_args()
     if os.path.exists(args.pd_path):
-        result = TestPdControlPatches._test_control_patch(args.pd_path)
+        test_control = TestPdControlPatches()
+        result = test_control._test_control_patch(pd_file=args.pd_path)
         print(result)
     else:
         print(f"Pd file path '{args.pd_path}' doesn't exist")
