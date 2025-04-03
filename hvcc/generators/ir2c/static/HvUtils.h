@@ -55,7 +55,7 @@
 #if !(HV_SIMD_NONE || HV_SIMD_NEON || HV_SIMD_SSE || HV_SIMD_AVX)
   #define HV_SIMD_NEON __ARM_NEON__
   #define HV_SIMD_SSE (__SSE__ && __SSE2__ && __SSE3__ && __SSSE3__ && __SSE4_1__)
-  #define HV_SIMD_AVX (__AVX__ && HV_SIMD_SSE)
+  #define HV_SIMD_AVX (__AVX2__ && HV_SIMD_SSE)
 #endif
 #ifndef HV_SIMD_FMA
   #define HV_SIMD_FMA __FMA__
