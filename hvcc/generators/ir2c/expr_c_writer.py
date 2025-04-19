@@ -1,37 +1,58 @@
-from .expr_arpeggio_parser import ExprArpeggioParser, ExprNode
+# Copyright (C) 2022-2025 Daniel Billotte, Wasted Audio
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 import re
+from typing import List, Union
+
+from .expr_arpeggio_parser import ExprArpeggioParser, ExprNode, ParseExpr
 
 
 class ExprCWriter:
-    def __init__(self, expression):
+    def __init__(self, expression: str):
         self.expression = expression
-        self.expr_tree = ExprArpeggioParser.parse_to_ast(expression)
-        self.parse_tree = ExprArpeggioParser.parse(expression)
-        self.num_buffers = None
+        self.expr_tree: ExprNode = ExprArpeggioParser.parse_to_ast(expression)
+        self.parse_tree: ParseExpr = ExprArpeggioParser.parse(expression)
+        self.num_buffers: Union[int, None] = None
 
-    def to_ast(self):
+    def to_ast(self) -> ExprNode:
         return self.expr_tree
 
-    def to_parse_tree(self):
+    def to_parse_tree(self) -> ParseExpr:
         return self.parse_tree
 
-    def to_c_simd(self, vv_in, v_out):
+    def to_c_simd(
+        self,
+        vv_in: Union[str, None] = None,
+        v_out: str = ""
+    ) -> List[str]:
         self._simd_bind_variables(vv_in)
         self._simd_replace_constants()
         return self._to_c_simd(v_out)
 
-    def num_simd_buffers(self):
+    def num_simd_buffers(self) -> int:
         if self.num_buffers is None:
-            self.to_c_simd()
+            return len(self.to_c_simd())
         return self.num_buffers
 
-    def to_c_nested(self):
+    def to_c_nested(self) -> str:
         return self._to_c_nested()
 
-    def _simd_replace_constants(self):
+    def _simd_replace_constants(self) -> None:
         self._simd_replace_constants_R(self.expr_tree)
 
-    def _simd_replace_constants_R(self, tree):
+    def _simd_replace_constants_R(self, tree: ExprNode) -> None:
         if tree.type == "func" and tree.value.startswith("_load_"):
             return  # don't re-replace anything
 
@@ -44,21 +65,23 @@ class ExprCWriter:
             else:
                 self._simd_replace_constants_R(node)
 
-    def _simd_bind_variables(self, a_name="A"):
+    def _simd_bind_variables(self, a_name: Union[str, None] = "A") -> None:
+        assert a_name
         self._bind_vars_R(self.expr_tree, a_name)
 
-    def _bind_vars_R(self, tree, a_name):
+    def _bind_vars_R(self, tree: ExprNode, a_name: str) -> None:
         if tree.type == "var":
             self._bind_var_node(tree, a_name)
         else:
             for node in tree.nodes:
                 self._bind_vars_R(node, a_name)
 
-    def _bind_var_node(self, node, a_name):
+    def _bind_var_node(self, node: ExprNode, a_name) -> None:
         if node.type != "var":
             print("called on non-var node: ", node)
-            return
+            pass
         parts = re.match(r"\$(v|f)(\d+)", node.value)
+        assert parts
         node.value = f"{a_name}[{int(parts[2])-1}]"
         node.type = "bound_var"
 
@@ -66,11 +89,11 @@ class ExprCWriter:
         """Inner class for managing the swapping of buffers from
            output to input in successive calls.
         """
-        def __init__(self):
-            self._avail = set()
-            self._next = 0
+        def __init__(self) -> None:
+            self._avail: set = set()
+            self._next: int = 0
 
-        def next(self):
+        def next(self) -> int:
             """If a buffer is available return it, otherwise
             allocate a new one and return it. """
 
@@ -80,19 +103,19 @@ class ExprCWriter:
             self._next += 1
             return nxt
 
-        def free(self, n):
+        def free(self, n: int) -> None:
             """Return a buffer back to the pool to be reused"""
             self._avail.add(n)
 
-        def num_allocated(self):
+        def num_allocated(self) -> int:
             """Return the buffers allocated in so far."""
             return self._next
 
-    def _to_c_simd(self, v_out):
+    def _to_c_simd(self, v_out: str) -> List[str]:
         ba = ExprCWriter.BufferAllocator()
-        lines = []
+        lines: List[str] = []
 
-        def _to_c_simd_R(expr_tree, r_vec=None):
+        def _to_c_simd_R(expr_tree: ExprNode, r_vec: Union[str, None] = None) -> str:
             if expr_tree.type in ("num_i", "num_f", "var", "bound_var"):
                 return expr_tree.value
 
@@ -104,7 +127,7 @@ class ExprCWriter:
                 and expr_tree.value.startswith("_load_")
             ):
                 next_buf = f"Bf{ba.next()}"
-                args.append("&" + next_buf)
+                args.append(f"&{next_buf}")
                 const_value = _to_c_simd_R(expr_tree.nodes[0])
                 for i in range(8):
                     args.append(const_value)
@@ -114,16 +137,17 @@ class ExprCWriter:
                     args.append(val)
                     if isinstance(val, str) and val.startswith("Bf"):
                         buffers.append(val)
-                if r_vec:
+                if r_vec is not None:
                     next_buf = r_vec
                     args.append(next_buf)
                 else:
                     next_buf = f"Bf{ba.next()}"
-                    args.append("&" + next_buf)
+                    args.append(f"&{next_buf}")
 
             f_name = ExprOpMap.get_hv_func_simd(expr_tree.value)
             lines.append(f"{f_name}({', '.join(args)});")
-            [ba.free(int(b[2])) for b in buffers]
+            for b in buffers:
+                ba.free(int(b[2]))
 
             return next_buf
 
@@ -131,10 +155,10 @@ class ExprCWriter:
         self.num_buffers = ba.num_allocated()
         return lines
 
-    def _to_c_nested(self):
+    def _to_c_nested(self) -> str:
         """Output C-code as nested function calls"""
 
-        def _to_c_nested_R(expr_tree):
+        def _to_c_nested_R(expr_tree: ExprNode) -> str:
             if expr_tree.type in ("num_i", "num_f", "var"):
                 return expr_tree.value
             else:
@@ -142,7 +166,7 @@ class ExprCWriter:
                 args = [_to_c_nested_R(p) for p in expr_tree.nodes]
                 return f"{f_name}({', '.join(args)})"
 
-        return _to_c_nested_R(self.expr_tree) + ";"
+        return f"{_to_c_nested_R(self.expr_tree)};"
 
 
 class ExprOpMap:
@@ -211,9 +235,9 @@ class ExprOpMap:
     }
 
     @classmethod
-    def get_hv_func(cls, symbol):
+    def get_hv_func(cls, symbol: str) -> str:
         return cls.op_map[symbol]
 
     @classmethod
-    def get_hv_func_simd(cls, symbol):
-        return "__" + cls.op_map[symbol]
+    def get_hv_func_simd(cls, symbol: str) -> str:
+        return f"__{cls.op_map[symbol]}"

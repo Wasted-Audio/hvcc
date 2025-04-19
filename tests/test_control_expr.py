@@ -1,5 +1,4 @@
-# Copyright (C) 2014-2018 Enzien Audio, Ltd.
-# Copyright (C) 2022 Wasted Audio
+# Copyright (C) 2022-2025 Daniel Billotte, Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -29,6 +28,12 @@ class TestPdControlExprPatches(TestPdControlBase):
 
     def test_div(self):
         self._test_control_patch("test-div.pd")
+
+    def test_lt_gt(self):
+        self._test_control_patch("test-lt-gt.pd")
+
+    def test_cos(self):
+        self._test_control_patch("test-cos.pd")
 
 
 def main():

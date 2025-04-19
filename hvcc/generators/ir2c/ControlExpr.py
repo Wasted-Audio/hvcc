@@ -1,4 +1,4 @@
-# Copyright (C) 2014-2018 Enzien Audio, Ltd.
+# Copyright (C) 2022-2025 Daniel Billotte, Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -13,9 +13,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from .HeavyObject import HeavyObject
 import re
 from typing import Callable, Dict, List
+
+from .HeavyObject import HeavyObject
 
 
 class ControlExpr(HeavyObject):
@@ -113,14 +114,16 @@ that have been cast to either float or int
 
 
 # todo(dgb): need to handle the 's' type
-def var_n(a_name, var):
+def var_n(a_name: str, var: str) -> str:
     parts = re.match(r"\$([fi])(\d)", var)
+    assert parts
     type = "float" if parts[1] == "f" else "int"
     return f"(({type})({a_name}[{int(parts[2])-1}]))"
 
 
-def bind_expr(exp="$f1+2", a_name="a"):
+def bind_expr(exp: str = "$f1+2", a_name: str = "a") -> str:
     vars = re.findall(r"\$[fis]\d", exp)
+    assert vars
     new_exp = exp
     for var in vars:
         new_exp = new_exp.replace(var, var_n(a_name, var))

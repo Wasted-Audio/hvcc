@@ -1,4 +1,4 @@
-# Copyright (C) 2014-2018 Enzien Audio, Ltd.
+# Copyright (C) 2022-2025 Daniel Billotte, Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -71,7 +71,7 @@ class SignalExpr(HeavyObject):
         expr = args["expressions"][0]
         expr_parser = ExprCWriter(expr)
         expr_lines = expr_parser.to_c_simd("bIns", "bOut")[:-1]
-        expr_lines = "\n".join(
+        expr_line = "\n".join(
             [f"\t{line}" for line in expr_lines]
         )
         num_buffers = expr_parser.num_simd_buffers()
@@ -86,7 +86,7 @@ class SignalExpr(HeavyObject):
             f"void {func_name}(hv_bInf_t* bIns, hv_bOutf_t bOut) {{",
 
             buffer_declaration,
-            expr_lines,
+            expr_line,
             "}",
 
         ])
