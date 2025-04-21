@@ -15,6 +15,7 @@
 
 import argparse
 import os
+import unittest
 
 from tests.framework.base_control import TestPdControlBase
 
@@ -74,9 +75,9 @@ class TestPdControlExprPatches(TestPdControlBase):
 
     # Functions
 
-    # not yet supported
-    # def test_if(self):
-    #     self._test_control_patch("test-if.pd")
+    @unittest.skip("not yet supported")
+    def test_if(self):
+        self._test_control_patch("test-if.pd")
 
     def test_int(self):
         self._test_control_patch("test-int.pd")
@@ -105,9 +106,9 @@ class TestPdControlExprPatches(TestPdControlBase):
     def test_copysign(self):
         self._test_control_patch("test-copysign.pd")
 
-    # not yet supported
-    # def test_imodf_modf(self):
-    #     self._test_control_patch("test-imodf-modf.pd")
+    @unittest.skip("not yet supported")
+    def test_imodf_modf(self):
+        self._test_control_patch("test-imodf-modf.pd")
 
     def test_remainder_fmod(self):
         self._test_control_patch("test-remainder-fmod.pd")
@@ -135,9 +136,9 @@ class TestPdControlExprPatches(TestPdControlBase):
     def test_log10(self):
         self._test_control_patch("test-log10.pd")
 
-    # not yet supported
-    # def test_fact(self):
-    #     self._test_control_patch("test-fact.pd")
+    @unittest.skip("not yet supported")
+    def test_fact(self):
+        self._test_control_patch("test-fact.pd")
 
     def test_erf_erfc(self):
         self._test_control_patch("test-erf-erfc.pd")
