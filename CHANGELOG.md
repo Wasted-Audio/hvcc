@@ -8,6 +8,7 @@ Bugfixes:
 
 * sending `[stop(` to `[line~]` when it's not running no longer jumps the current value (#188)
 * JS: emsdk 4.0.7 EXPORTED_RUNTIME_METHODS
+* Typing: move obj_perf to defaultdict()
 * Documentation: corrections
 * CI: move to ubuntu-22.04
 * Dependency updates
