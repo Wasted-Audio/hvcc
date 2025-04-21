@@ -166,6 +166,14 @@ class TestPdControlExprPatches(TestPdControlBase):
     def test_atan2(self):
         self._test_control_patch("test-atan2.pd")
 
+    # Some complex expressions
+
+    def test_complex_expr1(self):
+        self._test_control_patch("test-complex-expr1.pd")
+
+    # def test_complex_expr2(self):
+    #     self._test_control_patch("test-complex-expr2.pd")
+
 
 def main():
     # TODO(mhroth): make this work
