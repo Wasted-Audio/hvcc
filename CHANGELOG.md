@@ -7,6 +7,12 @@ Next Release
 Bugfixes:
 
 * sending `[stop(` to `[line~]` when it's not running no longer jumps the current value (#188)
+* Daisy: improve MIDI input/output handling
+* JS: Detect MingW build environment
+* JS: emsdk 4.0.7 EXPORTED_RUNTIME_METHODS
+* Documentation: corrections
+* CI: move to ubuntu-22.04
+* Dependency updates
 
 0.13.3
 -----
