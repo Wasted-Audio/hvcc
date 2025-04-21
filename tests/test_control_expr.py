@@ -54,9 +54,8 @@ class TestPdControlExprPatches(TestPdControlBase):
     def test_lte_gte(self):
         self._test_control_patch("test-lte-gte.pd")
 
-    # not yet supported
-    # def test_eq_neq(self):
-    #     self._test_control_patch("test-eq-neq.pd")
+    def test_eq_neq(self):
+        self._test_control_patch("test-eq-neq.pd")
 
     def test_bit_and(self):
         self._test_control_patch("test-bit-and.pd")
