@@ -68,8 +68,8 @@ class PdExprObject(PdObject):
             re.findall(r"\$[fisv]\d+", self.expressions[0])
         }
         self.num_inlets = max(var_nums) if len(var_nums) > 0 else 1
-        if self.num_inlets > 10:
-            self.add_error("Heavy expr supports upto 10 variables")
+        if self.num_inlets > 100:
+            self.add_error("Heavy expr supports upto 100 variables")
 
     def validate_configuration(self):
         # things that could be validated:

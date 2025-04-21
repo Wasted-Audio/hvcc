@@ -115,7 +115,7 @@ that have been cast to either float or int
 
 # todo(dgb): need to handle the 's' type
 def var_n(a_name: str, var: str) -> str:
-    parts = re.match(r"\$([fi])(\d)", var)
+    parts = re.match(r"\$([fi])(\d+)", var)
     assert parts
     type = "float" if parts[1] == "f" else "int"
     return f"(({type})({a_name}[{int(parts[2])-1}]))"
@@ -136,10 +136,12 @@ def sanitize_expr(exp: str) -> str:
 
 
 def bind_expr(exp: str = "$f1+2", a_name: str = "a") -> str:
-    vars = re.findall(r"\$[fis]\d", exp)
+    vars = re.findall(r"\$[fis]\d+", exp)
     exp = sanitize_expr(exp)
 
     if vars:
+        # reverse list so we start replacing the bigger variables
+        vars.sort(reverse=True)
         for var in vars:
             exp = exp.replace(var, var_n(a_name, var))
 

@@ -23,7 +23,7 @@
 extern "C" {
 #endif
 
-#define MAX_EXPR_ARGS 10
+#define MAX_EXPR_ARGS 100
 
 typedef struct ControlExpr {
   float args[MAX_EXPR_ARGS];
