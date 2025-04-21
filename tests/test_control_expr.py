@@ -20,8 +20,14 @@ from tests.framework.base_control import TestPdControlBase
 
 
 class TestPdControlExprPatches(TestPdControlBase):
+    """
+        Consider all available expressions: https://pd.iem.sh/objects/expr~/
+    """
+
     SCRIPT_DIR = os.path.dirname(__file__)
     TEST_DIR = os.path.join(os.path.dirname(__file__), "pd", "control_expr")
+
+    # Math operations
 
     def test_tilde(self):
         """ only supports integers """
@@ -67,12 +73,98 @@ class TestPdControlExprPatches(TestPdControlBase):
     def test_log_or(self):
         self._test_control_patch("test-log-or.pd")
 
-    def test_cos(self):
-        self._test_control_patch("test-cos.pd")
+    # Functions
 
     # not yet supported
     # def test_if(self):
     #     self._test_control_patch("test-if.pd")
+
+    def test_int(self):
+        self._test_control_patch("test-int.pd")
+
+    def test_rint(self):
+        self._test_control_patch("test-rint.pd")
+
+    def test_float(self):
+        self._test_control_patch("test-float.pd")
+
+    def test_min_max(self):
+        self._test_control_patch("test-min-max.pd")
+
+    def test_abs(self):
+        self._test_control_patch("test-abs.pd")
+
+    def test_isinf(self):
+        self._test_control_patch("test-isinf.pd")
+
+    def test_finite(self):
+        self._test_control_patch("test-finite.pd")
+
+    def test_isnan(self):
+        self._test_control_patch("test-isnan.pd")
+
+    def test_copysign(self):
+        self._test_control_patch("test-copysign.pd")
+
+    # not yet supported
+    # def test_imodf_modf(self):
+    #     self._test_control_patch("test-imodf-modf.pd")
+
+    def test_remainder_fmod(self):
+        self._test_control_patch("test-remainder-fmod.pd")
+
+    def test_ceil_floor(self):
+        self._test_control_patch("test-ceil-floor.pd")
+
+    # Power functions
+
+    def test_pow(self):
+        self._test_control_patch("test-pow.pd")
+
+    def test_sqrt(self):
+        self._test_control_patch("test-sqrt.pd")
+
+    def test_exp(self):
+        self._test_control_patch("test-exp.pd")
+
+    def test_expm1(self):
+        self._test_control_patch("test-expm1.pd")
+
+    def test_ln_log(self):
+        self._test_control_patch("test-ln-log.pd")
+
+    def test_log10(self):
+        self._test_control_patch("test-log10.pd")
+
+    # not yet supported
+    # def test_fact(self):
+    #     self._test_control_patch("test-fact.pd")
+
+    def test_erf_erfc(self):
+        self._test_control_patch("test-erf-erfc.pd")
+
+    def test_cbrt(self):
+        self._test_control_patch("test-cbrt.pd")
+
+    def test_log1p(self):
+        self._test_control_patch("test-log1p.pd")
+
+    def test_ldexp(self):
+        self._test_control_patch("test-ldexp.pd")
+
+    # Trigonometric
+
+    def test_sin_asin_sinh_asinh(self):
+        self._test_control_patch("test-sin-asin-sinh-asinh.pd")
+
+    def test_cos_acos_cosh_acosh(self):
+        self._test_control_patch("test-cos-acos-cosh-acosh.pd")
+
+    def test_tan_atan_tanh_atanh(self):
+        self._test_control_patch("test-tan-atan-tanh-atanh.pd")
+
+    def test_atan2(self):
+        self._test_control_patch("test-atan2.pd")
 
 
 def main():

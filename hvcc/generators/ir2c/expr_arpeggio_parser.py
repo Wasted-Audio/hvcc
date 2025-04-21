@@ -81,6 +81,7 @@ class ExprArpeggioParser():
                     if subtree is None:
                         subtree = foo
                     else:
+                        assert tmp
                         tmp.nodes.append(foo)
                     tmp = foo
             assert val and tmp and subtree

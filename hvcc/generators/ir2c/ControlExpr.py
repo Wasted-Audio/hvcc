@@ -121,10 +121,26 @@ def var_n(a_name: str, var: str) -> str:
     return f"(({type})({a_name}[{int(parts[2])-1}]))"
 
 
+def sanitize_expr(exp: str) -> str:
+    replace = [
+        (r"\,", ","),
+        ("min(", "fmin("),
+        ("max(", "fmax("),
+        ("ln(", "log("),
+    ]
+
+    for r in replace:
+        exp = exp.replace(r[0], r[1])
+
+    return exp
+
+
 def bind_expr(exp: str = "$f1+2", a_name: str = "a") -> str:
     vars = re.findall(r"\$[fis]\d", exp)
-    assert vars
-    new_exp = exp
-    for var in vars:
-        new_exp = new_exp.replace(var, var_n(a_name, var))
-    return new_exp
+    exp = sanitize_expr(exp)
+
+    if vars:
+        for var in vars:
+            exp = exp.replace(var, var_n(a_name, var))
+
+    return exp
