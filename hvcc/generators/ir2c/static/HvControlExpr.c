@@ -75,3 +75,13 @@ float expr_if(float eval, float trueValue, float falseValue)
 {
   return eval ? trueValue : falseValue;
 }
+
+
+float expr_fact(float factor) {
+  int n = (int) factor;
+  float f = 1.0f;
+  for (int i = n; i > 0; --i) {
+    f *= i;
+  }
+  return f;
+}

@@ -138,7 +138,6 @@ class TestPdControlExprPatches(TestPdControlBase):
     def test_log10(self):
         self._test_control_patch("test-log10.pd")
 
-    @unittest.skip("not yet supported")
     def test_fact(self):
         self._test_control_patch("test-fact.pd")
 
