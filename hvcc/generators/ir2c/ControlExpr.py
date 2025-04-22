@@ -127,6 +127,7 @@ def sanitize_expr(exp: str) -> str:
         ("min(", "fmin("),
         ("max(", "fmax("),
         ("ln(", "log("),
+        ("if(", "expr_if(")
     ]
 
     for r in replace:

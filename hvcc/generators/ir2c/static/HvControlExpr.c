@@ -69,3 +69,9 @@ void cExpr_onMessage(HeavyContextInterface *_c, ControlExpr *o, int letIn, const
     }
   }
 }
+
+
+float expr_if(float eval, float trueValue, float falseValue)
+{
+  return eval ? trueValue : falseValue;
+}

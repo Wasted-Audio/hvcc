@@ -37,6 +37,10 @@ void cExpr_free(ControlExpr *o);
 void cExpr_onMessage(HeavyContextInterface *_c, ControlExpr *o, int letIn, const HvMessage *m,
     void (*sendMessage)(HeavyContextInterface *, int, const HvMessage *));
 
+
+float expr_if(float eval, float trueValue, float falseValue);
+
+
 #ifdef __cplusplus
 } // extern "C"
 #endif

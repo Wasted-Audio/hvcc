@@ -75,9 +75,11 @@ class TestPdControlExprPatches(TestPdControlBase):
 
     # Functions
 
-    @unittest.skip("not yet supported")
     def test_if(self):
         self._test_control_patch("test-if.pd")
+
+    def test_if2(self):
+        self._test_control_patch("test-if2.pd")
 
     def test_int(self):
         self._test_control_patch("test-int.pd")
