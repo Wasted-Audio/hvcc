@@ -15,7 +15,7 @@
 
 import argparse
 import os
-import unittest
+# import unittest
 
 from tests.framework.base_control import TestPdControlBase
 
