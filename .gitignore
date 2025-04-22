@@ -178,3 +178,6 @@ DerivedData
 generators/vs2015/Heavy/generated
 generators/c2js/emsdk_portable/
 generators/c2js/emsdk/
+
+### ZXMushroom63 ###
+synthetic_test_2

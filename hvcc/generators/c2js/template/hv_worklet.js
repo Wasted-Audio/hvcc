@@ -26,6 +26,10 @@ class {{name}}_AudioLibWorklet extends AudioWorkletProcessor {
             Module.HEAPF32.buffer,
             Module._malloc(lengthInSamples * Float32Array.BYTES_PER_ELEMENT),
             lengthInSamples);
+        this.inputBuffer = new Float32Array(
+          Module.HEAPF32.buffer,
+          Module._malloc(lengthInSamples * Float32Array.BYTES_PER_ELEMENT),
+          lengthInSamples);
 
         this.port.onmessage = (e) => {
           console.log(e.data);
@@ -50,7 +54,10 @@ class {{name}}_AudioLibWorklet extends AudioWorkletProcessor {
 
     process(inputs, outputs, parameters) {
       try{
-        _hv_processInline(this.heavyContext, null, this.processBuffer.byteOffset, this.blockSize);
+        if (inputs.length > 0 && inputs[0][0]) {
+          this.inputBuffer.set(inputs[0][0]);
+        }
+        _hv_processInline(this.heavyContext, this.inputBuffer.byteOffset, this.processBuffer.byteOffset, this.blockSize);
 
         // TODO: Figure out what "multiple outputs" means if not multiple channels
         var output = outputs[0];

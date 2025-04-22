@@ -165,6 +165,10 @@ var {{name}}_AudioLib = function(options) {
       Module.HEAPF32.buffer,
       Module._malloc(lengthInSamples * Float32Array.BYTES_PER_ELEMENT),
       lengthInSamples);
+  this.inputBuffer = new Float32Array(
+    Module.HEAPF32.buffer,
+    Module._malloc(lengthInSamples * Float32Array.BYTES_PER_ELEMENT),
+    lengthInSamples);
 }
 
 var parameterInHashes = {
@@ -198,7 +202,8 @@ var tableHashes = {
 };
 
 {{name}}_AudioLib.prototype.process = function(event) {
-    _hv_processInline(this.heavyContext, null, this.processBuffer.byteOffset, this.blockSize);
+    this.inputBuffer.set(event.inputBuffer.getChannelData(i));
+    _hv_processInline(this.heavyContext, this.inputBuffer.byteOffset, this.processBuffer.byteOffset, this.blockSize);
 
     for (var i = 0; i < this.getNumOutputChannels(); ++i) {
       var output = event.outputBuffer.getChannelData(i);
