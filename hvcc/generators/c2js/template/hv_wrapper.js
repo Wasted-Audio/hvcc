@@ -160,14 +160,17 @@ var {{name}}_AudioLib = function(options) {
   this.setSendHook(options.sendHook);
 
   // allocate temporary buffers (pointer size is 4 bytes in javascript)
+  var lengthOutSamples = this.blockSize * this.getNumOutputChannels();
+  var lengthInSamples = this.blockSize * this.getNumInputChannels();
+  
   this.processBuffer = new Float32Array(
       Module.HEAPF32.buffer,
-      Module._malloc(lengthInSamples * Float32Array.BYTES_PER_ELEMENT),
-      lengthInSamples * this.getNumOutputChannels());
+      Module._malloc(lengthOutSamples * Float32Array.BYTES_PER_ELEMENT),
+      lengthOutSamples);
   this.inputBuffer = new Float32Array(
     Module.HEAPF32.buffer,
     Module._malloc(lengthInSamples * Float32Array.BYTES_PER_ELEMENT),
-    lengthInSamples * this.getNumInputChannels());
+    lengthInSamples);
 }
 
 var parameterInHashes = {
