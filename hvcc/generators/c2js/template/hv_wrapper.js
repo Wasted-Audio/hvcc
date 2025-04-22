@@ -203,6 +203,9 @@ var tableHashes = {
 {{name}}_AudioLib.prototype.process = function(event) {
     // Note(ZXMushroom63): calling getNumXXXChannels() every iteration of the for loop is slightly less efficient than calling once and storing the result
     for (let i = 0; i < this.getNumInputChannels(); i++) {
+      if ((event.inputBuffer.numberOfChannels - 2) < i) {
+        continue;
+      }
       this.inputBuffer.set(event.inputBuffer.getChannelData(i), i * blockSize);
     }
     
