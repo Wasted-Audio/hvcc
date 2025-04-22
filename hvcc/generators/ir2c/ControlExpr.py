@@ -123,16 +123,18 @@ def var_n(a_name: str, var: str) -> str:
 
 def sanitize_expr(exp: str) -> str:
     replace = [
-        (r"\,", ","),
-        ("min(", "fmin("),
-        ("max(", "fmax("),
-        ("ln(", "log("),
-        ("if(", "expr_if("),
-        ("fact(", "expr_fact("),
+        (r"\\,", ","),
+        (r"min\(", "fmin("),
+        (r"max\(", "fmax("),
+        (r"ln\(", "log("),
+        (r"if\(", "expr_if("),
+        (r"fact\(", "expr_fact("),
+        (r"\bmodf\(", "expr_modf("),
+        (r"imodf\(", "expr_imodf("),
     ]
 
     for r in replace:
-        exp = exp.replace(r[0], r[1])
+        exp = re.sub(r[0], r[1], exp)
 
     return exp
 

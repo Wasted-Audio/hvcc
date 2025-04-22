@@ -108,9 +108,11 @@ class TestPdControlExprPatches(TestPdControlBase):
     def test_copysign(self):
         self._test_control_patch("test-copysign.pd")
 
-    @unittest.skip("not yet supported")
-    def test_imodf_modf(self):
-        self._test_control_patch("test-imodf-modf.pd")
+    def test_modf(self):
+        self._test_control_patch("test-modf.pd")
+
+    def test_imodf(self):
+        self._test_control_patch("test-imodf.pd")
 
     def test_remainder_fmod(self):
         self._test_control_patch("test-remainder-fmod.pd")
