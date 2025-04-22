@@ -160,15 +160,14 @@ var {{name}}_AudioLib = function(options) {
   this.setSendHook(options.sendHook);
 
   // allocate temporary buffers (pointer size is 4 bytes in javascript)
-  var lengthInSamples = this.blockSize * this.getNumOutputChannels();
   this.processBuffer = new Float32Array(
       Module.HEAPF32.buffer,
       Module._malloc(lengthInSamples * Float32Array.BYTES_PER_ELEMENT),
-      lengthInSamples);
+      lengthInSamples * this.getNumOutputChannels());
   this.inputBuffer = new Float32Array(
     Module.HEAPF32.buffer,
     Module._malloc(lengthInSamples * Float32Array.BYTES_PER_ELEMENT),
-    lengthInSamples);
+    lengthInSamples * this.getNumInputChannels());
 }
 
 var parameterInHashes = {
@@ -202,9 +201,14 @@ var tableHashes = {
 };
 
 {{name}}_AudioLib.prototype.process = function(event) {
-    this.inputBuffer.set(event.inputBuffer.getChannelData(i));
+    // Note(ZXMushroom63): calling getNumXXXChannels() every iteration of the for loop is slightly less efficient than calling once and storing the result
+    for (let i = 0; i < this.getNumInputChannels(); i++) {
+      this.inputBuffer.set(event.inputBuffer.getChannelData(i), i * blockSize);
+    }
+    
     _hv_processInline(this.heavyContext, this.inputBuffer.byteOffset, this.processBuffer.byteOffset, this.blockSize);
 
+    // Note(ZXMushroom63): could be optimised using Float32Array.set(samples, offset)
     for (var i = 0; i < this.getNumOutputChannels(); ++i) {
       var output = event.outputBuffer.getChannelData(i);
 

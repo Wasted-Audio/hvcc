@@ -54,12 +54,18 @@ class {{name}}_AudioLibWorklet extends AudioWorkletProcessor {
 
     process(inputs, outputs, parameters) {
       try{
-        if (inputs.length > 0 && inputs[0][0]) {
-          this.inputBuffer.set(inputs[0][0]);
+        if (inputs.length > 0 && inputs[0].length) {
+          for (let c = 0; c < this.getNumInputChannels(); c++) {
+            if (!inputs[0][c]) {
+              continue;
+            }
+            this.inputBuffer.set(inputs[0][c], c * this.blockSize);
+          }
         }
         _hv_processInline(this.heavyContext, this.inputBuffer.byteOffset, this.processBuffer.byteOffset, this.blockSize);
 
         // TODO: Figure out what "multiple outputs" means if not multiple channels
+        // Note(ZXMushroom63): Maybe it means the different connections to other AudioNodes? One node can connect to multiple others.
         var output = outputs[0];
 
         for (var i = 0; i < this.getNumOutputChannels(); ++i) {
