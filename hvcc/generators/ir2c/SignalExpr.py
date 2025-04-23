@@ -17,7 +17,7 @@ from typing import Dict, List
 
 from hvcc.types.IR import IRSignalList
 
-from .expr_c_writer import ExprCWriter
+from .expr.expr_c_writer import ExprCWriter
 from .HeavyObject import HeavyObject
 
 
