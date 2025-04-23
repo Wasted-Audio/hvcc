@@ -206,7 +206,7 @@
             paramSlider.min = param.min;
             paramSlider.max = param.max;
             paramSlider.value = param.value;
-            paramSlider.readOnly = true;
+            paramSlider.disabled = true;
             param.onUpdate = function () {
               paramSlider.value = param.value;
               paramSliderDisplay.innerText = param.value;
