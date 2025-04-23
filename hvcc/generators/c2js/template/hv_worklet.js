@@ -75,8 +75,7 @@ class {{name}}_AudioLibWorklet extends AudioWorkletProcessor {
 
         var outputChannelCount = this.getNumOutputChannels();
         for (var i = 0; i < outputChannelCount; ++i) {
-          var channel = output[i];
-          output.set(this.processBuffer.subarray(i * this.blockSize, (i + 1) * this.blockSize))
+          output[i].set(this.processBuffer.subarray(i * this.blockSize, (i + 1) * this.blockSize))
         }
       } catch(e){
         this.port.postMessage({ type:'error', error: e.toString() });
