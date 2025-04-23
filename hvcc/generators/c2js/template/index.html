@@ -29,6 +29,7 @@
       var heavyModule = null;
       var loader = null;
       var sampleOscillator = null;
+      var isPlaying = false;
       midioutPort = null;
 
       window.onload = function() {
@@ -63,20 +64,25 @@
             {% endfor -%}
 
             sampleOscillator = loader.webAudioContext.createOscillator();
-            sampleOscillator.connect(loader.webAudioWorklet);
+            sampleOscillator.connect(loader.node);
             sampleOscillator.start(0);
+
+            // loader.node is the ScriptProcessorNode or AudioWorkletNode
+            loader.node.connect(loader.webAudioContext.destination);
           });
+        } else {
+          loader.node.connect(loader.webAudioContext.destination);
         }
-        
-        loader.start();
+        isPlaying = true;
       }
 
       function stop() {
-        loader.stop();
+        loader.node.disconnect(loader.webAudioContext.destination);
+        isPlaying = false;
       }
 
       function toggleTransport(element) {
-        (loader.isPlaying) ? stop() : start();
+        (isPlaying) ? stop() : start();
       }
 
       function onPrint(message) {
@@ -147,11 +153,7 @@
       }
 
       function onMIDIMessage(message) {
-        if(loader.webAudioWorklet) {
-          loader.sendMidi(message.data);
-        } else {
-          loader.audiolib.sendMidi(message.data);
-        }
+        loader.sendMidi(message.data);
       }
     {%- endif %}
       
@@ -197,11 +199,7 @@
       // Generated Event Update Methods
         {%- for k, v in events %}
               function sendEvent_{{k}}() {
-                if(loader.webAudioWorklet) {
-                  loader.sendEvent("{{v.display}}");
-                } else {
-                  loader.audiolib.sendEvent("{{v.display}}");
-                }
+                loader.sendEvent("{{v.display}}");
               }
         {% endfor %}
               {%- endif %}
@@ -225,11 +223,7 @@
               function updateSlider_{{k}}(value) {
                 document.getElementById("value_{{k}}").textContent = Number(value).toFixed(2);
                 document.getElementById("parameter_{{k}}").value = value;
-                if(loader.webAudioWorklet) {
-                  loader.sendFloatParameterToWorklet("{{v.display}}", value);
-                } else {
-                  loader.audiolib.setFloatParameter("{{v.display}}", value);
-                }
+                loader.setFloatParameter("{{v.display}}", value);
               }
         {% endfor %}
       {%- endif %}

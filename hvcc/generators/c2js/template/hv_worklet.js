@@ -34,7 +34,6 @@ class {{name}}_AudioLibWorklet extends AudioWorkletProcessor {
           lengthInSamples);
 
         this.port.onmessage = (e) => {
-          console.log(e.data);
           switch(e.data.type){
             case 'setFloatParameter':
               this.setFloatParameter(e.data.name, e.data.value);
@@ -68,15 +67,14 @@ class {{name}}_AudioLibWorklet extends AudioWorkletProcessor {
         } else {
           this.inputBuffer.set(0); //clear buffer when no inputs are connected
         }
-        
+
         _hv_processInline(this.heavyContext, this.inputBuffer.byteOffset, this.processBuffer.byteOffset, this.blockSize);
 
         var output = outputs[0];
 
         var outputChannelCount = this.getNumOutputChannels();
         for (var i = 0; i < outputChannelCount; ++i) {
-          var channel = output[i];
-          output.set(this.processBuffer.subarray(i * this.blockSize, (i + 1) * this.blockSize))
+          output[i].set(this.processBuffer.subarray(i * this.blockSize, (i + 1) * this.blockSize))
         }
       } catch(e){
         this.port.postMessage({ type:'error', error: e.toString() });
