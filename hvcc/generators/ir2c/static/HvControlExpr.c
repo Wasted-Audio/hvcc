@@ -16,7 +16,7 @@
 
 #include "HvControlExpr.h"
 
-hv_size_t cExpr_init(ControlExpr *o, float(*eval_fptr)(float*)) {
+hv_size_t cExpr_init(ControlExpr *o, float(*eval_fptr)(const float*)) {
   o->eval_fptr = eval_fptr;
   for(int i=0; i < MAX_EXPR_ARGS; i++) {
     o->args[i] = 0.0f;

@@ -27,10 +27,10 @@ extern "C" {
 
 typedef struct ControlExpr {
   float args[MAX_EXPR_ARGS];
-  float(*eval_fptr)(float*);
+  float(*eval_fptr)(const float*);
 } ControlExpr;
 
-hv_size_t cExpr_init(ControlExpr *o, float(*eval_fptr)(float*));
+hv_size_t cExpr_init(ControlExpr *o, float(*eval_fptr)(const float*));
 
 void cExpr_free(ControlExpr *o);
 

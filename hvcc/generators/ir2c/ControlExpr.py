@@ -50,7 +50,7 @@ class ControlExpr(HeavyObject):
 
         lines = super().get_C_def(obj_type, obj_id)
         lines.append("// --------------- big ol' comment ------------")
-        lines.append(f"static float {cls.preamble}_{obj_id}_evaluate(float* args);")
+        lines.append(f"static float {cls.preamble}_{obj_id}_evaluate(const float* args);")
         return lines
 
     @classmethod
@@ -100,7 +100,7 @@ class ControlExpr(HeavyObject):
         bound_expr = bind_expr(expr, "args")
         lines.extend([
             "",
-            f"float Heavy_{{{{name}}}}::{cls.preamble}_{obj_id}_evaluate(float* args) {{",
+            f"float Heavy_{{{{name}}}}::{cls.preamble}_{obj_id}_evaluate(const float* args) {{",
             f"\treturn {bound_expr};",
             "}",
         ])
