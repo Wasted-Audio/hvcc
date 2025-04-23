@@ -147,8 +147,9 @@ hv_uint32_t msg_getHash(const HvMessage *const m, int i) {
   switch (msg_getType(m,i)) {
     case HV_MSG_BANG: return 0xFFFFFFFF;
     case HV_MSG_FLOAT: {
-      float f = msg_getFloat(m,i);
-      return *((hv_uint32_t *) &f);
+      union { float f; hv_uint32_t u; } fhash;
+      fhash.f = msg_getFloat(m,i);
+      return fhash.u;
     }
     case HV_MSG_SYMBOL: return hv_string_to_hash(msg_getSymbol(m,i));
     case HV_MSG_HASH: return (&(m->elem)+i)->data.h;
