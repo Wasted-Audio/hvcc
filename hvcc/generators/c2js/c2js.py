@@ -234,21 +234,23 @@ class c2js(Generator):
             js_out_file = os.path.basename(js_path)
 
             # generate index.html from template
-            with open(os.path.join(out_dir, "index.html"), "w") as f:
-                try:
-                    f.write(env.get_template("index.html").render(
-                        name=patch_name,
-                        includes=[f"./{js_out_file}"],
-                        parameters=parameter_list,
-                        parameters_out=parameter_out_list,
-                        events=event_list,
-                        events_out=event_out_list,
-                        midi=midi_list,
-                        midi_out=midi_out_list,
-                        copyright=copyright_html))
-                except Exception as e:
-                    print(f"Line Number: {e.lineno}")
-                    raise e
+            for html_file in ["index.html", "dynamic.html"]:
+                with open(os.path.join(out_dir, html_file), "w") as f:
+                    try:
+                        f.write(env.get_template(html_file).render(
+                            name=patch_name,
+                            includes=[f"./{js_out_file}"],
+                            parameters=parameter_list,
+                            parameters_out=parameter_out_list,
+                            events=event_list,
+                            events_out=event_out_list,
+                            midi=midi_list,
+                            midi_out=midi_out_list,
+                            copyright=copyright_html))
+                    except Exception as e:
+                        print(f"Line Number: {e.lineno}")
+                        print("File: " + html_file)
+                        raise e
 
             # generate heavy js worklet from template
             # Note: this file will be incorporated into the emscripten output

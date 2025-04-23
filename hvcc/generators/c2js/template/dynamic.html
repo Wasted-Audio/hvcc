@@ -42,7 +42,164 @@
 
       function moduleLoaded() {
         loader = new heavyModule.AudioLibLoader();
+        dynamicallyCreateUI();
         document.getElementById("transportButton").style.visibility = "visible";
+
+        loader.midiOutEvent.onFired = function onMidiOutMessage(message) {
+          if (midioutPort !== null) {
+            midioutPort.send(message);
+          }
+          else {
+            console.error("No MIDI output port available.");
+          }
+        }
+      }
+
+      function dynamicallyCreateUI() {
+        const container = document.querySelector("#container");
+
+
+        // INPUT EVENTS
+        const eventsInKeys = Object.keys(loader.eventsIn);
+        const eventsInRow = document.createElement("div");
+        container.appendChild(eventsInRow);
+
+        eventsInRow.classList.add("row", "events");
+        if (eventsInKeys.length > 0) {
+          const eventsCol = document.createElement("div");
+          eventsCol.classList.add("col", "events");
+          eventsCol.innerHTML = "Input Events:<br>";
+
+          for (const eventKey in loader.eventsIn) {
+            const event = loader.eventsIn[eventKey];
+            const btn = document.createElement("button");
+            btn.innerText = event.displayName;
+            btn.addEventListener("click", ()=>{
+              event.fire();
+            });
+            eventsCol.appendChild(btn);
+          }
+
+          eventsInRow.appendChild(eventsCol)
+        }
+
+
+        // OUTPUT EVENTS
+        const eventsOutKeys = Object.keys(loader.eventsOut);
+        if (eventsOutKeys.length > 0) {
+          const eventsOutRow = document.createElement("div");
+          eventsOutRow.classList.add("row", "events");
+          container.appendChild(eventsOutRow);
+
+          const eventsCol = document.createElement("div");
+          eventsCol.classList.add("col", "events");
+          eventsCol.innerHTML = "Output Events:<br>";
+
+          for (const eventKey in loader.eventsOut) {
+            const event = loader.eventsOut[eventKey];
+            const counter = document.createElement("span");
+
+            var counterValue = 0;
+            counter.innerText = event.displayName + ": " + counterValue;
+            event.onFire = function () {
+              counterValue++;
+              counter.innerText = event.displayName + ": " + counterValue;
+            };
+            eventsCol.appendChild(counter);
+          }
+
+          eventsOutRow.appendChild(eventsCol)
+        }
+
+
+        // INPUT PARAMETERS
+        const paramsInKeys = Object.keys(loader.paramsIn);
+        if (paramsInKeys.length > 0) {
+          const paramsHeaderRow = document.createElement("div");
+          paramsHeaderRow.classList.add("row");
+          paramsHeaderRow.innerText = "Input Parameters: ";
+          container.appendChild(paramsHeaderRow);
+
+
+          for (const paramKey in loader.paramsIn) {
+            const paramsContentRow = document.createElement("div");
+            paramsContentRow.classList.add("row");
+            const param = loader.paramsIn[paramKey];
+
+            const paramName = document.createElement("div");
+            paramName.classList.add("col", "parameter-name");
+            paramName.innerText = param.displayName;
+            paramsContentRow.appendChild(paramName);
+
+            const paramSliderWrapper = document.createElement("div");
+            paramSliderWrapper.classList.add("col", "parameter-slider");
+            paramsContentRow.appendChild(paramSliderWrapper);
+
+            const paramSliderDisplay = document.createElement("div");
+            paramSliderDisplay.classList.add("col", "parameter-value");
+            paramSliderDisplay.innerText = param.value;
+            paramsContentRow.appendChild(paramSliderDisplay);
+
+            const paramSlider = document.createElement("input");
+            paramSlider.type = "range";
+            paramSlider.step = 0.01;
+            paramSlider.min = param.min;
+            paramSlider.max = param.max;
+            paramSlider.value = param.value;
+            paramSlider.addEventListener("input", function () {
+              param.setValue(paramSlider.value);
+              paramSliderDisplay.innerText = param.value;
+            });
+            paramSliderWrapper.appendChild(paramSlider);
+
+            container.appendChild(paramsContentRow);
+          }
+        }
+
+
+        // OUTPUT PARAMS
+        const paramsOutKeys = Object.keys(loader.paramsOut);
+        if (paramsOutKeys.length > 0) {
+          const paramsHeaderRow = document.createElement("div");
+          paramsHeaderRow.classList.add("row");
+          paramsHeaderRow.innerText = "Output Parameters: ";
+          container.appendChild(paramsHeaderRow);
+
+          for (const paramKey in loader.paramsOut) {
+            const paramsContentRow = document.createElement("div");
+            paramsContentRow.classList.add("row");
+            const param = loader.paramsOut[paramKey];
+
+            const paramName = document.createElement("div");
+            paramName.classList.add("col", "parameter-name");
+            paramName.innerText = param.displayName;
+            paramsContentRow.appendChild(paramName);
+
+            const paramSliderWrapper = document.createElement("div");
+            paramSliderWrapper.classList.add("col", "parameter-slider");
+            paramsContentRow.appendChild(paramSliderWrapper);
+
+            const paramSliderDisplay = document.createElement("div");
+            paramSliderDisplay.classList.add("col", "parameter-value");
+            paramSliderDisplay.innerText = param.value;
+            paramsContentRow.appendChild(paramSliderDisplay);
+
+            const paramSlider = document.createElement("input");
+            paramSlider.type = "range";
+            paramSlider.step = 0.01;
+            paramSlider.min = param.min;
+            paramSlider.max = param.max;
+            paramSlider.value = param.value;
+            paramSlider.readOnly = true;
+            param.onUpdate = function () {
+              paramSlider.value = param.value;
+              paramSliderDisplay.innerText = param.value;
+            }
+            paramSliderWrapper.appendChild(paramSlider);
+
+            container.appendChild(paramsContentRow);
+          }
+        }
       }
 
       function start() {
@@ -54,15 +211,11 @@
             printHook: onPrint,
             // optional: provide a callback handler for [s {sendName} @hv_param] messages
             // sendName "midiOutMessage" is reserved for MIDI output messages!
-            sendHook: onSendMessage,
+            sendHook: null,
             // optional: pass an existing web audio context, otherwise a new one
             // will be constructed.
             webAudioContext: null
           }).then(() => {
-            {% for k, v in parameters -%}
-            updateSlider_{{k}}({{v.attributes.default}});
-            {% endfor -%}
-
             sampleOscillator = loader.webAudioContext.createOscillator();
             sampleOscillator.connect(loader.node);
             sampleOscillator.start(0);
@@ -156,81 +309,10 @@
         loader.sendMidi(message.data);
       }
     {%- endif %}
-      
-      
-
-      function onMidiOutMessage(message) {
-        if (midioutPort !== null) {
-          midioutPort.send(message);
-        }
-        else {
-          console.error("No MIDI output port available.");
-        }
-      }
-
-      function onSendMessage(sendName, message) {
-
-        switch (sendName) {
-          {%- if parameters_out | length %}
-            {%- for k, v in parameters_out %}
-                case "{{k}}":
-                  document.getElementById("parameter_{{k}}").value = message;
-                  document.getElementById("value_{{k}}").textContent = Number(floatValue).toFixed(2);
-                  break;
-            {%- endfor %}
-          {%- endif %}
-          {%- if events_out | length %}
-            {%- for k, v in events_out %}
-                case "{{k}}":
-                  {{k}}_counter += 1;
-                  document.getElementById("{{k}}_counter").innerHTML = {{k}}_counter;
-                  break;
-            {%- endfor %}
-          {%- endif %}
-          case "midiOutMessage":
-            onMidiOutMessage(message);
-            break;
-          default:
-            console.log(sendName, message);
-        }
-      }
-
-      {%- if events | length %}
-      // Generated Event Update Methods
-        {%- for k, v in events %}
-              function sendEvent_{{k}}() {
-                loader.sendEvent("{{v.display}}");
-              }
-        {% endfor %}
-              {%- endif %}
-
-          {%- if events_out | length %}
-            {%- for k, v in events_out %}
-              var {{k}}_counter = 0;
-            {%- endfor %}
-          {%- endif %}
-
-
-              // randomizer
-              function randomiseParameters() {
-        {%- for k, v in parameters %}
-                updateSlider_{{k}}(Math.random());
-        {% endfor %}
-              }
-              {%- if parameters | length %}
-              // Generated Parameter Update Methods
-        {%- for k, v in parameters %}
-              function updateSlider_{{k}}(value) {
-                document.getElementById("value_{{k}}").textContent = Number(value).toFixed(2);
-                document.getElementById("parameter_{{k}}").value = value;
-                loader.setFloatParameter("{{v.display}}", value);
-              }
-        {% endfor %}
-      {%- endif %}
     </script>
   </head>
   <body>
-    <div class="widget">
+    <div class="widget" id="container">
       <div class="row title">
         <div class="col"><h2>{{name}}</h2></div>
         <div class="col transport">
@@ -239,60 +321,7 @@
             <input type="checkbox" id="transportButton" onchange="toggleTransport();">
           </label>
         </div>
-        <div>
-          <button style="padding: 10px;" type="button" id="randomiseButton" onclick="randomiseParameters();">Randomise</button>
-        </div>
       </div>
-
-      <div class="row events" style="text-align: center;">
-      {%- if events | length %}
-        <div class="col events">
-          Input Events:<br>
-        {%- for k, v in events %}
-          <button type="button" id="trigger_{{k}}" onclick="sendEvent_{{k}}();">{{k}}</button><br>
-        {%- endfor %}
-        </div>
-        {%- endif %}
-
-      {%- if events_out | length %}
-        <div class="col events">
-          Output Events:<br>
-        {%- for k, v in events_out %}
-          {{k}}: <a id="{{k}}_counter">0</a><br>
-        {%- endfor %}
-        </div>
-      {%- endif %}
-      </div>
-
-      {%- if parameters | length %}
-      <div class="row" style="text-align: center;">
-        Input Parameters:
-      </div>
-      {%- for k, v in parameters %}
-      <div class="row">
-        <div class="col parameter-name">{{k}}</div>
-        <div class="col parameter-slider">
-          <input id="parameter_{{k}}" type="range" min="{{v.attributes.min}}" max="{{v.attributes.max}}" step="0.01" value="{{v.attributes.default}}" onchange="updateSlider_{{k}}(value);" oninput="updateSlider_{{k}}(value)">
-        </div>
-        <div class="col parameter-value" id="value_{{k}}">{{v.attributes.default}}</div>
-      </div>
-      {%- endfor %}
-      {%- endif %}
-
-      {%- if parameters_out | length %}
-      <div class="row" style="text-align: center;">
-        Output Parameters:
-      </div>
-      {%- for k, v in parameters_out %}
-      <div class="row">
-        <div class="col parameter-name">{{k}}</div>
-        <div class="col parameter-slider">
-          <input id="parameter_{{k}}" type="range" min="{{v.attributes.min}}" max="{{v.attributes.max}}" step="0.01" value="{{v.attributes.default}}">
-        </div>
-        <div class="col parameter-value" id="value_{{k}}">{{v.attributes.default}}</div>
-      </div>
-      {%- endfor %}
-      {%- endif %}
 
       {%- if midi | length or midi_out | length%}
       <div class="horizontal" style="text-align: center;">

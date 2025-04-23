@@ -20,11 +20,11 @@ var AudioLibLoader = function () {
   this.eventsIn = {
   {% for k, v in events %}
   "{{k}}": {
-    "displayName": "{{v.display}}",
-      "eventId": "{{v.display}}",
-        "fire": function () {
-          self.sendEvent(this.eventId);
-        }
+    "displayName": "{{k}}",
+    "eventId": "{{v.display}}",
+    "fire": function () {
+      self.sendEvent(this.eventId);
+    }
   },
   {% endfor %}
 };
@@ -46,7 +46,7 @@ this.eventsOut = {
 this.eventsOut = {};
 {% endif %}
 
-this.eventsOut.midiOutMessage = {
+this.midiOutEvent = {
   "displayName": "midiOutMessage",
   "eventId": "midiOutMessage",
   "onFired": null
@@ -61,7 +61,7 @@ this.paramsIn = {
   "default": {{ v.attributes.default }},
   "type": "{{ v.attributes.type }}",
   "eventId": "{{v.display}}",
-    "displayName": "{{v.display}}",
+    "displayName": "{{k}}",
       "value": {{ v.attributes.default }},
   "setValue": function (v) {
     this.value = v;
@@ -71,7 +71,7 @@ this.paramsIn = {
 {% endfor %}
   };
 {% else %}
-this.paramsIn = [];
+this.paramsIn = {};
 {% endif %}
 
 {% if parameters_out | length %}
@@ -90,7 +90,7 @@ this.paramsOut = {
 {% endfor %}
   };
 {% else %}
-this.paramsOut = [];
+this.paramsOut = {};
 {% endif %}
 }
 
@@ -140,8 +140,8 @@ AudioLibLoader.prototype.init = function (options) {
             options.sendHook(event.data.payload[0], event.data.payload[1]);
           } else if (event.data.type === 'midiOut' && options.sendHook) {
             options.sendHook("midiOutMessage", event.data.payload);
-            if (this.eventsOut.midiOutMessage.onFired) {
-              this.eventsOut.midiOutMessage.onFired(event.data.payload);
+            if (this.midiOutEvent.onFired) {
+              this.midiOutEvent.onFired(event.data.payload);
             }
           } else {
             console.log('Unhandled message from {{name}}_AudioLibWorklet:', event.data);
@@ -162,7 +162,12 @@ AudioLibLoader.prototype.init = function (options) {
       });
       this.node = this.webAudioProcessor;
     }
-  }) ();
+    
+    for (k in this.paramsIn) {
+      const param = this.paramsIn[k];
+      param.setValue(param.default);
+    }
+  })();
 } else {
   console.error("heavy: failed to load - WebAudio API not available in this browser")
 }
