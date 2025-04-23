@@ -55,7 +55,7 @@ this.midiOutEvent = {
 {% if parameters | length %}
 this.paramsIn = {
   {% for k, v in parameters %}
-"{{k}}": {
+"{{v.display}}": {
   "min": {{ v.attributes.min }},
   "max": {{ v.attributes.max }},
   "default": {{ v.attributes.default }},
@@ -64,7 +64,6 @@ this.paramsIn = {
     "displayName": "{{k}}",
       "value": {{ v.attributes.default }},
   "setValue": function (v) {
-    this.value = v;
     self.setFloatParameter("{{v.display}}", v)
   }
 },
@@ -172,6 +171,10 @@ AudioLibLoader.prototype.init = function (options) {
 }
 
 AudioLibLoader.prototype.setFloatParameter = function (name, value) {
+  if (this.paramsIn[name]) {
+    this.paramsIn[name].value = value;
+  }
+  
   if (this.audiolib) {
     this.audiolib.setFloatParameter(name, value);
   } else {
