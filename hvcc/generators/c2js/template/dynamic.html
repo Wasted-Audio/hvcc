@@ -61,7 +61,7 @@
         });
         document.getElementById("transportButton").style.visibility = "visible";
 
-        loader.midiOutEvent.onFired = function onMidiOutMessage(message) {
+        loader.midiOutEvent.onFire = function onMidiOutMessage(message) {
           if (midioutPort !== null) {
             midioutPort.send(message);
           }

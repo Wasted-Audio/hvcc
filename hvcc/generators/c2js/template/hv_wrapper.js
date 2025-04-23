@@ -38,7 +38,7 @@ this.eventsOut = {
 "{{k}}": {
   "displayName": "{{k}}",
     "eventId": "{{k}}",
-      "onFired": null
+      "onFire": null
 },
 {% endfor %}
   };
@@ -49,7 +49,7 @@ this.eventsOut = {};
 this.midiOutEvent = {
   "displayName": "midiOutMessage",
   "eventId": "midiOutMessage",
-  "onFired": null
+  "onFire": null
 }
 
 {% if parameters | length %}
@@ -101,7 +101,7 @@ this.paramsOut = {};
  *   @param options.sendHook (Function) callback that gets triggered for messages sent via @hv_param/@hv_event
  */
 AudioLibLoader.prototype.init = function (options) {
-
+  options.sendHook ||= ()=>{}; //default to empty function
   // use provided web audio context or create a new one
   this.webAudioContext = options.webAudioContext ||
     (new (window.AudioContext || window.webkitAudioContext || null));
@@ -120,9 +120,9 @@ AudioLibLoader.prototype.init = function (options) {
         });
         this.node = this.webAudioWorklet;
         this.webAudioWorklet.port.onmessage = (event) => {
-          if (event.data.type === 'printHook' && options.printHook) {
+          if (event.data.type === 'printHook') {
             options.printHook(event.data.payload);
-          } else if (event.data.type === 'sendHook' && options.sendHook) {
+          } else if (event.data.type === 'sendHook') {
 
             if (this.paramsOut[event.data.payload[0]]) {
               this.paramsOut[event.data.payload[0]].value = event.data.payload[1];
@@ -131,17 +131,15 @@ AudioLibLoader.prototype.init = function (options) {
               }
             }
 
-            if (this.eventsOut[event.data.payload[0]]) {
-              if (this.paramsOut[event.data.payload[0]].onFired) {
-                this.paramsOut[event.data.payload[0]].onFired(event.data.payload[1]);
-              }
+            if (this.eventsOut[event.data.payload[0]] && this.eventsOut[event.data.payload[0]].onFire) {
+              this.eventsOut[event.data.payload[0]].onFire(event.data.payload[1]);
             }
 
             options.sendHook(event.data.payload[0], event.data.payload[1]);
-          } else if (event.data.type === 'midiOut' && options.sendHook) {
+          } else if (event.data.type === 'midiOut') {
             options.sendHook("midiOutMessage", event.data.payload);
-            if (this.midiOutEvent.onFired) {
-              this.midiOutEvent.onFired(event.data.payload);
+            if (this.midiOutEvent.onFire) {
+              this.midiOutEvent.onFire(event.data.payload);
             }
           } else {
             console.log('Unhandled message from {{name}}_AudioLibWorklet:', event.data);
