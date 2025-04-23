@@ -209,6 +209,12 @@ class c2js(Generator):
                     name=patch_name,
                     copyright=copyright_js,
                     externs=externs,
+                    parameters=parameter_list,
+                    parameters_out=parameter_out_list,
+                    events=event_list,
+                    events_out=event_out_list,
+                    midi=midi_list,
+                    midi_out=midi_out_list,
                     pool_sizes_kb=externs.memoryPoolSizesKb))
                 except Exception as e:
                     print(f"Line Number: {e.lineno}")

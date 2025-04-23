@@ -8,11 +8,90 @@ var audioWorkletSupported = (typeof AudioWorklet === 'function');
  */
 
 var AudioLibLoader = function () {
+  var self = this;
   this.webAudioContext = null;
   this.webAudioProcessor = null;
   this.webAudioWorklet = null;
   this.node = null; // accessor for the used node
   this.audiolib = null;
+
+
+  {% if events | length %}
+  this.eventsIn = {
+  {% for k, v in events %}
+  "{{k}}": {
+    "displayName": "{{v.display}}",
+      "eventId": "{{v.display}}",
+        "fire": function () {
+          self.sendEvent(this.eventId);
+        }
+  },
+  {% endfor %}
+};
+{% else %}
+this.eventsIn = {};
+{% endif %}
+
+{% if events_out | length %}
+this.eventsOut = {
+  {% for k, v in events_out %}
+"{{k}}": {
+  "displayName": "{{k}}",
+    "eventId": "{{k}}",
+      "onFired": null
+},
+{% endfor %}
+  };
+{% else %}
+this.eventsOut = {};
+{% endif %}
+
+this.eventsOut.midiOutMessage = {
+  "displayName": "midiOutMessage",
+  "eventId": "midiOutMessage",
+  "onFired": null
+}
+
+{% if parameters | length %}
+this.paramsIn = {
+  {% for k, v in parameters %}
+"{{k}}": {
+  "min": {{ v.attributes.min }},
+  "max": {{ v.attributes.max }},
+  "default": {{ v.attributes.default }},
+  "type": "{{ v.attributes.type }}",
+  "eventId": "{{v.display}}",
+    "displayName": "{{v.display}}",
+      "value": {{ v.attributes.default }},
+  "setValue": function (v) {
+    this.value = v;
+    self.setFloatParameter("{{v.display}}", v)
+  }
+},
+{% endfor %}
+  };
+{% else %}
+this.paramsIn = [];
+{% endif %}
+
+{% if parameters_out | length %}
+this.paramsOut = {
+  {% for k, v in parameters_out %}
+"{{k}}": {
+  "min": {{ v.attributes.min }},
+  "max": {{ v.attributes.max }},
+  "type": "{{ v.attributes.type }}",
+  "default": {{ v.attributes.default }},
+  "eventId": "{{k}}",
+    "displayName": "{{k}}",
+      "value": {{ v.attributes.default }},
+  "onUpdate": null
+},
+{% endfor %}
+  };
+{% else %}
+this.paramsOut = [];
+{% endif %}
 }
 
 /*
@@ -44,9 +123,26 @@ AudioLibLoader.prototype.init = function (options) {
           if (event.data.type === 'printHook' && options.printHook) {
             options.printHook(event.data.payload);
           } else if (event.data.type === 'sendHook' && options.sendHook) {
+
+            if (this.paramsOut[event.data.payload[0]]) {
+              this.paramsOut[event.data.payload[0]].value = event.data.payload[1];
+              if (this.paramsOut[event.data.payload[0]].onUpdate) {
+                this.paramsOut[event.data.payload[0]].onUpdate(event.data.payload[1]);
+              }
+            }
+
+            if (this.eventsOut[event.data.payload[0]]) {
+              if (this.paramsOut[event.data.payload[0]].onFired) {
+                this.paramsOut[event.data.payload[0]].onFired(event.data.payload[1]);
+              }
+            }
+
             options.sendHook(event.data.payload[0], event.data.payload[1]);
           } else if (event.data.type === 'midiOut' && options.sendHook) {
             options.sendHook("midiOutMessage", event.data.payload);
+            if (this.eventsOut.midiOutMessage.onFired) {
+              this.eventsOut.midiOutMessage.onFired(event.data.payload);
+            }
           } else {
             console.log('Unhandled message from {{name}}_AudioLibWorklet:', event.data);
           }
@@ -66,10 +162,10 @@ AudioLibLoader.prototype.init = function (options) {
       });
       this.node = this.webAudioProcessor;
     }
-  })();
-  } else {
-    console.error("heavy: failed to load - WebAudio API not available in this browser")
-  }
+  }) ();
+} else {
+  console.error("heavy: failed to load - WebAudio API not available in this browser")
+}
 }
 
 AudioLibLoader.prototype.setFloatParameter = function (name, value) {
@@ -138,7 +234,7 @@ var {{ name }}_AudioLib = function (options) {
   this.blockSize = options.blockSize || 2048;
 
   // instantiate heavy context
-  this.heavyContext = _hv_{{ name }}_new_with_options(this.sampleRate, {{ pool_sizes_kb.internal }}, {{ pool_sizes_kb.inputQueue }}, {{ pool_sizes_kb.outputQueue }});
+  this.heavyContext = _hv_{{ name}}_new_with_options(this.sampleRate, {{ pool_sizes_kb.internal }}, {{ pool_sizes_kb.inputQueue }}, {{ pool_sizes_kb.outputQueue }});
 this.setPrintHook(options.printHook);
 this.setSendHook(options.sendHook);
 
@@ -159,7 +255,7 @@ this.inputBuffer = new Float32Array(
 var parameterInHashes = {
   {% for k, v in externs.parameters.inParam %}
 "{{v.display}}": {{ v.hash }}, // {{v.display}}
- {% endfor %}
+{% endfor %}
 };
 
 var parameterOutHashes = {
