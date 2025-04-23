@@ -23,9 +23,8 @@ class PdExprObject(PdObject):
     """
     Limitations (compared to vanilla pd):
     - only supports a single expression
-    - pd docs say expr support 9 variables, experiments show that
-      it supports at least 20... This version currently supports up
-      to 10 variables as defined in HvControlExpr.h
+    - Available pd docs/examples say expr support up to 100 variables
+      This version currently supports up to 100 variables as defined in HvControlExpr.h
     - I don't know what pd-expr does with strings, haven't experimented
       and haven't given it any thought yet here
 
@@ -44,9 +43,6 @@ class PdExprObject(PdObject):
             Validate the expr object and any heavy restrictions, then
             convert it directly into a HeavyIR object.
         """
-        # self.obj_type = obj_type
-
-        print("In Pd expr Obj")
         assert obj_type in ["expr", "expr~"]
         super().__init__(obj_type, obj_args, pos_x, pos_y)
 

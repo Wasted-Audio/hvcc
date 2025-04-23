@@ -37,17 +37,10 @@ void cExpr_onMessage(HeavyContextInterface *_c, ControlExpr *o, int letIn, const
     case 0: { // first inlet stores all values of input msg and triggers an output
       if (msg_isBang(m,0)) {
         ; // pass through to sending the msg below
-
-      } else if (! msg_isFloat(m,0)) {
-        printf("Got value other than bang or float\n");
-        break;
-
       } else {
         for (int i = hv_min_i(numElements, msg_getNumElements(m))-1; i >= 0; --i) {
           if (msg_isFloat(m, i)) {
             o->args[i] = msg_getFloat(m, i);
-          } else {
-            printf("Got value other than float\n");
           }
         }
       }
@@ -62,8 +55,6 @@ void cExpr_onMessage(HeavyContextInterface *_c, ControlExpr *o, int letIn, const
     default: { // rest of inlets just store values
       if (msg_isFloat(m,0)) {
         o->args[letIn] = msg_getFloat(m, 0);
-      } else {
-        printf("Got value other than float\n");
       }
       break;
     }

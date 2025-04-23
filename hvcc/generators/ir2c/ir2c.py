@@ -262,7 +262,7 @@ class ir2c:
         # generate the list of functions to process
         process_list: List = []
         # print("--------------- for each signal in order")
-        process_classes = set()
+        process_classes: set[Type[HeavyObject]] = set()
         for y in ir.signal.processOrder:
             # print("--- signal", y.id, o.type, ir2c.get_class(o.type))
             obj_id = y.id

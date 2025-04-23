@@ -30,7 +30,6 @@ hv_size_t cPack_init(ControlPack *o, int nargs, ...) {
   }
   va_end(ap);
   return numBytes;
-
 }
 
 void cPack_free(ControlPack *o) {

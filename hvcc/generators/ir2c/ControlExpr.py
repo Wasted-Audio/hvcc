@@ -20,8 +20,6 @@ from .HeavyObject import HeavyObject
 
 
 class ControlExpr(HeavyObject):
-    """Just a stub to get the thing working"""
-
     c_struct = "ControlExpr"
     preamble = "cExpr"
 
@@ -35,7 +33,7 @@ class ControlExpr(HeavyObject):
 
     @classmethod
     def get_C_init(cls, obj_type: str, obj_id: str, args: Dict) -> List[str]:
-        """(Per object) code that gets inserted into from the Heavy_heavy ctor.
+        """ (Per object) code that gets inserted into from the Heavy_heavy ctor.
             Only if "ir[init]" == true
         """
 
@@ -44,20 +42,21 @@ class ControlExpr(HeavyObject):
 
     @classmethod
     def get_C_def(cls, obj_type: str, obj_id: str) -> List[str]:
-        """(Per object) code that gets inserted into the header file
+        """ (Per object) code that gets inserted into the header file
             Only if "ir[init]" == true
         """
 
         lines = super().get_C_def(obj_type, obj_id)
-        lines.append("// --------------- big ol' comment ------------")
         lines.append(f"static float {cls.preamble}_{obj_id}_evaluate(const float* args);")
         return lines
 
     @classmethod
     def get_C_onMessage(cls, obj_type: str, obj_id: str, inlet_index: int, args: Dict) -> List[str]:
-        """
-        (Per object) code that gets inserted into the c<PREAMBLE>_<OBJID>_sendMessage
-        method in the .cpp file
+        """ (Per object) code that gets inserted into the c<PREAMBLE>_<OBJID>_sendMessage
+            method in the .cpp file
+
+            The get_C_onMessage method returns the code that will get inserted into
+            the cReceive_<UID>_sendMessage method
         """
 
         return [
@@ -65,20 +64,6 @@ class ControlExpr(HeavyObject):
                 obj_id,
                 inlet_index)
         ]
-    """
-    The get_C_onMessage method returns the code that will get inserted into
-    the cReceive_<UID>_sendMessage method
-    """
-
-    # @classmethod
-    # def get_C_process(cls, process_dict: Dict, obj_type: str, obj_id: str, args: Dict) -> List[str]:
-    #     return [
-    #         "printf(\"hello world\")"
-    #     ]
-    """
-    The get_C_process method seems to only get called by Signal IR objects, it does
-    not get called for Control IR objects
-    """
 
     @classmethod
     def get_C_impl(
@@ -121,16 +106,18 @@ def var_n(a_name: str, var: str) -> str:
     return f"(({type})({a_name}[{int(parts[2])-1}]))"
 
 
-def sanitize_expr(exp: str) -> str:
+def internal_expr(exp: str) -> str:
+    """ Convert function names to C or internal names
+    """
     replace = [
         (r"\\,", ","),
-        (r"min\(", "fmin("),
-        (r"max\(", "fmax("),
-        (r"ln\(", "log("),
-        (r"if\(", "expr_if("),
-        (r"fact\(", "expr_fact("),
+        (r"\bmin\(", "fmin("),
+        (r"\bmax\(", "fmax("),
+        (r"\bln\(", "log("),
+        (r"\bif\(", "expr_if("),
+        (r"\bfact\(", "expr_fact("),
         (r"\bmodf\(", "expr_modf("),
-        (r"imodf\(", "expr_imodf("),
+        (r"\bimodf\(", "expr_imodf("),
     ]
 
     for r in replace:
@@ -141,10 +128,11 @@ def sanitize_expr(exp: str) -> str:
 
 def bind_expr(exp: str = "$f1+2", a_name: str = "a") -> str:
     vars = re.findall(r"\$[fis]\d+", exp)
-    exp = sanitize_expr(exp)
+    exp = internal_expr(exp)
 
     if vars:
         # reverse list so we start replacing the bigger variables
+        # and don't get conflicts
         vars.sort(reverse=True)
         for var in vars:
             exp = exp.replace(var, var_n(a_name, var))
