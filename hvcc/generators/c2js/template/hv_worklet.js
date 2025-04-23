@@ -55,28 +55,28 @@ class {{name}}_AudioLibWorklet extends AudioWorkletProcessor {
     }
 
     process(inputs, outputs, parameters) {
+      // Currently only supports one output connection and one input connection (inputs[0] and outputs[0])
       try{
-        if (inputs.length > 0 && inputs[0].length) {
-          for (let c = 0; c < this.getNumInputChannels(); c++) {
+        var inputChannelCount = this.getNumInputChannels();
+        if (inputs.length > 0 && inputs[0].length && inputChannelCount > 0) {
+          for (let c = 0; c < inputChannelCount; c++) {
             if (!inputs[0][c]) {
               continue;
             }
             this.inputBuffer.set(inputs[0][c], c * this.blockSize);
           }
+        } else {
+          this.inputBuffer.set(0); //clear buffer when no inputs are connected
         }
+        
         _hv_processInline(this.heavyContext, this.inputBuffer.byteOffset, this.processBuffer.byteOffset, this.blockSize);
 
-        // TODO: Figure out what "multiple outputs" means if not multiple channels
-        // Note(ZXMushroom63): Maybe it means the different connections to other AudioNodes? One node can connect to multiple others.
         var output = outputs[0];
 
-        for (var i = 0; i < this.getNumOutputChannels(); ++i) {
+        var outputChannelCount = this.getNumOutputChannels();
+        for (var i = 0; i < outputChannelCount; ++i) {
           var channel = output[i];
-
-          var offset = i * this.blockSize;
-          for (var j = 0; j < this.blockSize; ++j) {
-            channel[j] = this.processBuffer[offset+j];
-          }
+          output.set(this.processBuffer.subarray(i * this.blockSize, (i + 1) * this.blockSize))
         }
       } catch(e){
         this.port.postMessage({ type:'error', error: e.toString() });

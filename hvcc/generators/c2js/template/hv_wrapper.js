@@ -204,24 +204,30 @@ var tableHashes = {
 };
 
 {{name}}_AudioLib.prototype.process = function(event) {
+    // Currently only supports one output connection and one input connection
     // Note(ZXMushroom63): calling getNumXXXChannels() every iteration of the for loop is slightly less efficient than calling once and storing the result
-    for (let i = 0; i < this.getNumInputChannels(); i++) {
-      if ((event.inputBuffer.numberOfChannels - 2) < i) {
-        continue;
+    var inputChannelCount = this.getNumInputChannels();
+    if (inputChannelCount > 0) {
+      for (let i = 0; i < inputChannelCount; i++) {
+        if ((event.inputBuffer.numberOfChannels - 2) < i) {
+          continue;
+        }
+        this.inputBuffer.set(event.inputBuffer.getChannelData(i), i * blockSize);
       }
-      this.inputBuffer.set(event.inputBuffer.getChannelData(i), i * blockSize);
+    } else {
+      this.inputBuffer.set(0); //clear buffer when no inputs are connected
     }
     
     _hv_processInline(this.heavyContext, this.inputBuffer.byteOffset, this.processBuffer.byteOffset, this.blockSize);
 
-    // Note(ZXMushroom63): could be optimised using Float32Array.set(samples, offset)
-    for (var i = 0; i < this.getNumOutputChannels(); ++i) {
+    var outputChannelCount = this.getNumOutputChannels();
+    for (var i = 0; i < outputChannelCount; ++i) {
       var output = event.outputBuffer.getChannelData(i);
 
-      var offset = i * this.blockSize;
-      for (var j = 0; j < this.blockSize; ++j) {
-        output[j] = this.processBuffer[offset+j];
-      }
+      output.set(this.processBuffer.subarray(i * this.blockSize, (i + 1) * this.blockSize))
+      // for (var j = 0; j < this.blockSize; ++j) {
+      //   output[j] = this.processBuffer[offset+j];
+      // }
     }
 }
 
