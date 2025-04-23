@@ -204,11 +204,15 @@ class c2js(Generator):
             # and removed afterwards
             post_js_path = os.path.join(out_dir, "hv_wrapper.js")
             with open(post_js_path, "w") as f:
-                f.write(env.get_template("hv_wrapper.js").render(
+                try:
+                    f.write(env.get_template("hv_wrapper.js").render(
                     name=patch_name,
                     copyright=copyright_js,
                     externs=externs,
                     pool_sizes_kb=externs.memoryPoolSizesKb))
+                except Exception as e:
+                    print(f"Line Number: {e.lineno}")
+                    raise e
 
             js_path = cls.run_emscripten(c_src_dir=c_src_dir,
                                          out_dir=out_dir,
@@ -225,35 +229,47 @@ class c2js(Generator):
 
             # generate index.html from template
             with open(os.path.join(out_dir, "index.html"), "w") as f:
-                f.write(env.get_template("index.html").render(
-                    name=patch_name,
-                    includes=[f"./{js_out_file}"],
-                    parameters=parameter_list,
-                    parameters_out=parameter_out_list,
-                    events=event_list,
-                    events_out=event_out_list,
-                    midi=midi_list,
-                    midi_out=midi_out_list,
-                    copyright=copyright_html))
+                try:
+                    f.write(env.get_template("index.html").render(
+                        name=patch_name,
+                        includes=[f"./{js_out_file}"],
+                        parameters=parameter_list,
+                        parameters_out=parameter_out_list,
+                        events=event_list,
+                        events_out=event_out_list,
+                        midi=midi_list,
+                        midi_out=midi_out_list,
+                        copyright=copyright_html))
+                except Exception as e:
+                    print(f"Line Number: {e.lineno}")
+                    raise e
 
             # generate heavy js worklet from template
             # Note: this file will be incorporated into the emscripten output
             # and removed afterwards
             post_js_path = os.path.join(out_dir, "hv_worklet.js")
             with open(post_js_path, "w") as f:
-                f.write(env.get_template("hv_worklet.js").render(
-                    name=patch_name,
-                    copyright=copyright_js,
-                    externs=externs,
-                    pool_sizes_kb=externs.memoryPoolSizesKb))
+                try:
+                    f.write(env.get_template("hv_worklet.js").render(
+                        name=patch_name,
+                        copyright=copyright_js,
+                        externs=externs,
+                        pool_sizes_kb=externs.memoryPoolSizesKb))
+                except Exception as e:
+                    print(f"Line Number: {e.lineno}")
+                    raise e
 
             pre_js_path = os.path.join(out_dir, "hv_worklet_start.js")
             with open(pre_js_path, "w") as f:
-                f.write(env.get_template("hv_worklet_start.js").render(
-                    name=patch_name,
-                    copyright=copyright_js,
-                    externs=externs,
-                    pool_sizes_kb=externs.memoryPoolSizesKb))
+                try:
+                    f.write(env.get_template("hv_worklet_start.js").render(
+                        name=patch_name,
+                        copyright=copyright_js,
+                        externs=externs,
+                        pool_sizes_kb=externs.memoryPoolSizesKb))
+                except Exception as e:
+                    print(f"Line Number: {e.lineno}")
+                    raise e
 
             js_path = cls.run_emscripten(c_src_dir=c_src_dir,
                                          out_dir=out_dir,
