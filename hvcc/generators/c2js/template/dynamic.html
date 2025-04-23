@@ -43,6 +43,22 @@
       function moduleLoaded() {
         loader = new heavyModule.AudioLibLoader();
         dynamicallyCreateUI();
+        
+        loader.init({
+          // optional: set audio processing block size, default is 2048
+          blockSize: 2048,
+          // optional: provide a callback handler for [print] messages
+          printHook: onPrint,
+          // optional: provide a callback handler for [s {sendName} @hv_param] messages
+          // sendName "midiOutMessage" is reserved for MIDI output messages!
+          sendHook: null,
+          // optional: pass an existing web audio context, otherwise a new one
+          // will be constructed.
+          webAudioContext: null
+        }).then(x => {
+          // run once the audio context has been initialised
+          addFilterListeners();
+        });
         document.getElementById("transportButton").style.visibility = "visible";
 
         loader.midiOutEvent.onFired = function onMidiOutMessage(message) {
@@ -203,29 +219,7 @@
       }
 
       function start() {
-        if(!loader.webAudioContext) {
-          loader.init({
-            // optional: set audio processing block size, default is 2048
-            blockSize: 2048,
-            // optional: provide a callback handler for [print] messages
-            printHook: onPrint,
-            // optional: provide a callback handler for [s {sendName} @hv_param] messages
-            // sendName "midiOutMessage" is reserved for MIDI output messages!
-            sendHook: null,
-            // optional: pass an existing web audio context, otherwise a new one
-            // will be constructed.
-            webAudioContext: null
-          }).then(() => {
-            sampleOscillator = loader.webAudioContext.createOscillator();
-            sampleOscillator.connect(loader.node);
-            sampleOscillator.start(0);
-
-            // loader.node is the ScriptProcessorNode or AudioWorkletNode
-            loader.node.connect(loader.webAudioContext.destination);
-          });
-        } else {
-          loader.node.connect(loader.webAudioContext.destination);
-        }
+        loader.node.connect(loader.webAudioContext.destination);
         isPlaying = true;
       }
 
@@ -309,6 +303,21 @@
         loader.sendMidi(message.data);
       }
     {%- endif %}
+
+      function addFilterListeners() {
+        const filePicker = document.querySelector("#filePicker");
+        const filePlayer = document.querySelector("#filePlayer");
+        filePicker.addEventListener("input", ()=>{
+          if (filePicker.files.length > 0) {
+            filePlayer.src = URL.createObjectURL(filePicker.files[0]);
+            filePlayer.controls = true;
+            filePicker.remove();
+          }
+        });
+
+        const source = loader.webAudioContext.createMediaElementSource(filePlayer);
+        source.connect(loader.node);
+      }
     </script>
   </head>
   <body>
@@ -320,6 +329,13 @@
             start / stop
             <input type="checkbox" id="transportButton" onchange="toggleTransport();">
           </label>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col"><h3>Filter input: </h3></div>
+        <div class="col">
+          <input type="file" accept="audio/*" id="filePicker">
+          <audio id="filePlayer"></audio>
         </div>
       </div>
 
