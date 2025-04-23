@@ -186,6 +186,9 @@ class ir2c:
         with open(hv_ir_path, "r") as f:
             ir = IRGraph(**json.load(f))
 
+        # the project name to be used as a part of file and function names
+        name = ir.name.escaped
+
         # generate the copyright
         copyright = copyright_manager.get_copyright_for_c(copyright)
 
@@ -213,7 +216,13 @@ class ir2c:
             o = ir.objects[obj_id]
             print("init objects:", o.type)
             obj_class = ir2c.get_class(o.type)
-            init_list.extend(obj_class.get_C_init(o.type, obj_id, o.args))
+            init_raw = obj_class.get_C_init(o.type, obj_id, o.args)
+
+            for init in init_raw:
+                # render name into Expr inits
+                init_render = env.from_string(init).render(name=name)
+                init_list.append(init_render)
+
             def_list.extend(obj_class.get_C_def(o.type, obj_id))
             free_list.extend(obj_class.get_C_free(o.type, obj_id, o.args))
 
@@ -230,7 +239,14 @@ class ir2c:
                 ir2c.get_class,
                 ir.objects,
                 o.args)
-            impl_list.append("\n".join(PrettyfyC.prettyfy_list(impl)))
+
+            impl_render = []
+            for imp in impl:
+                # Render name into Expr impls
+                imp_render = env.from_string(imp).render(name=name)
+                impl_render.append(imp_render)
+
+            impl_list.append("\n".join(PrettyfyC.prettyfy_list(impl_render)))
             decl_list.extend(obj_class.get_C_decl(o.type, obj_id, o.args))
 
         # generate static table data initialisers
@@ -282,9 +298,6 @@ class ir2c:
         # make the output directory if necessary
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
-
-        # the project name to be used as a part of file and function names
-        name = ir.name.escaped
 
         # ensure that send_receive dictionary is alphabetised by the receiver key
         send_receive = OrderedDict(sorted([(k, v) for k, v in ir.control.receivers.items()], key=lambda x: x[0]))

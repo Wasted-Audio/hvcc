@@ -39,7 +39,7 @@ class ControlExpr(HeavyObject):
             Only if "ir[init]" == true
         """
 
-        eval_f = f"&Heavy_heavy::{cls.preamble}_{obj_id}_evaluate"
+        eval_f = f"&Heavy_{{{{name}}}}::{cls.preamble}_{obj_id}_evaluate"
         return [f"cExpr_init(&cExpr_{obj_id}, {eval_f});"]
 
     @classmethod
@@ -100,7 +100,7 @@ class ControlExpr(HeavyObject):
         bound_expr = bind_expr(expr, "args")
         lines.extend([
             "",
-            f"float Heavy_heavy::{cls.preamble}_{obj_id}_evaluate(float* args) {{",
+            f"float Heavy_{{{{name}}}}::{cls.preamble}_{obj_id}_evaluate(float* args) {{",
             f"\treturn {bound_expr};",
             "}",
         ])
