@@ -100,12 +100,10 @@ static inline void __hv_phasor_f(SignalPhasor *o, hv_bInf_t bIn, hv_bOutf_t bOut
   *bOut = vsubq_f32(vreinterpretq_f32_u32(vorrq_u32(vshrq_n_u32(pp, 9), vdupq_n_u32(0x3F800000))), vdupq_n_f32(1.0f));
   o->phase = vdupq_n_u32(pp[3]);
 #else // HV_SIMD_NONE
-  {
-    union { float f; hv_uint32_t u; } uphase;
-    uphase.u = (o->phase >> 9) | 0x3F800000;
-    *bOut = uphase.f - 1.0f;
-    o->phase += ((int) (bIn * o->step.f2sc));
-  }
+  union { float f; hv_uint32_t u; } uphase;
+  uphase.u = (o->phase >> 9) | 0x3F800000;
+  *bOut = uphase.f - 1.0f;
+  o->phase += ((int) (bIn * o->step.f2sc));
 #endif
 }
 
@@ -129,12 +127,10 @@ static inline void __hv_phasor_k_f(SignalPhasor *o, hv_bOutf_t bOut) {
       vdupq_n_f32(1.0f));
   o->phase = vaddq_u32(o->phase, vreinterpretq_u32_s32(o->inc));
 #else // HV_SIMD_NONE
-  {
-    union { float f; hv_uint32_t u; } uphase;
-    uphase.u = (o->phase >> 9) | 0x3F800000;
-    *bOut = uphase.f - 1.0f;
-    o->phase += o->inc;
-  }
+  union { float f; hv_uint32_t u; } uphase;
+  uphase.u = (o->phase >> 9) | 0x3F800000;
+  *bOut = uphase.f - 1.0f;
+  o->phase += o->inc;
 #endif
 }
 
