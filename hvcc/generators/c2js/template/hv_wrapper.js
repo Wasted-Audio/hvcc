@@ -204,7 +204,7 @@ var tableHashes = {
 };
 
 {{name}}_AudioLib.prototype.process = function(event) {
-    // Currently only supports one output connection and one input connection
+    // Currently only supports one output connection and one input connection on the worklet/scriptprocessor. (unlimited channels though)
     // Note(ZXMushroom63): calling getNumXXXChannels() every iteration of the for loop is slightly less efficient than calling once and storing the result
     var inputChannelCount = this.getNumInputChannels();
     if (inputChannelCount > 0) {
@@ -224,10 +224,7 @@ var tableHashes = {
     for (var i = 0; i < outputChannelCount; ++i) {
       var output = event.outputBuffer.getChannelData(i);
 
-      output.set(this.processBuffer.subarray(i * this.blockSize, (i + 1) * this.blockSize))
-      // for (var j = 0; j < this.blockSize; ++j) {
-      //   output[j] = this.processBuffer[offset+j];
-      // }
+      output.set(this.processBuffer.subarray(i * this.blockSize, (i + 1) * this.blockSize));
     }
 }
 

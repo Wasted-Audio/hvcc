@@ -28,7 +28,6 @@
     <script type="text/javascript">
       var heavyModule = null;
       var loader = null;
-      var sampleOscillator = null;
       midioutPort = null;
 
       window.onload = function() {
@@ -61,10 +60,6 @@
             {% for k, v in parameters -%}
             updateSlider_{{k}}({{v.attributes.default}});
             {% endfor -%}
-
-            sampleOscillator = loader.webAudioContext.createOscillator();
-            sampleOscillator.connect(loader.webAudioWorklet);
-            sampleOscillator.start(0);
           });
         }
         
