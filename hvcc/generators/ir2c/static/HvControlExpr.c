@@ -86,9 +86,22 @@ float expr_if(float eval, float trueValue, float falseValue)
 
 float expr_fact(float factor) {
   int n = (int) factor;
-  float f = 1.0f;
-  for (int i = n; i > 0; --i) {
-    f *= i;
+  if(n < 0) {
+    // not portable (needs C99)
+    return NAN;
+    // what is a portable alternative? 0?
   }
-  return f;
+  else if(n > 34) {
+    // 34 is the limit for float32
+    // not portable (needs C99)
+    return INFINITY;
+    // what is a portable alternative? FLT_MAX? (=3.40282e+38)
+  }
+  else {
+    float f = 1.0f;
+    for (int i = n; i > 0; --i) {
+      f *= i;
+    }
+    return f;
+  }
 }
