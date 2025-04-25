@@ -64,17 +64,15 @@ void cExpr_onMessage(HeavyContextInterface *_c, ControlExpr *o, int letIn, const
 
 float expr_modf(float mod)
 {
-  float* iptr;
-  modff(mod, iptr);
-  return mod - *iptr;
+  return fmod(mod, 1);
 }
 
 
 float expr_imodf(float mod)
 {
-  float* iptr;
-  modff(mod, iptr);
-  return *iptr;
+  float iptr;
+  modff(mod, &iptr);
+  return iptr;
 }
 
 
