@@ -41,8 +41,7 @@ float expr_modf(float mod);
 
 float expr_imodf(float mod);
 
-//float expr_if(float eval, float trueValue, float falseValue);
-#define expr_if(q, a, b) ((q)?(a):(b))
+float expr_if(float eval, float trueValue, float falseValue);
 
 float expr_fact(float factor);
 
