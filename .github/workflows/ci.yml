@@ -2,8 +2,11 @@ name: HVCC
 
 on:
   push:
+    branches:
+      - '*'
   pull_request:
-    branches: [ develop ]
+    branches:
+      - '*'
 
 jobs:
 
