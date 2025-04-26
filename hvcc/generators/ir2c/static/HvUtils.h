@@ -273,6 +273,23 @@ static inline hv_int32_t __hv_utils_min_i(hv_int32_t x, hv_int32_t y) { return (
   }
 #endif
 #define hv_min_max_log2(a) __hv_utils_min_max_log2(a)
+#define hv_if_f(a, b, c) ((a) ? (b) : (c))
+#define hv_modf_f(a) fmod(a, 1)
+#define hv_cbrt_f(a) cbrt(a)
+#define hv_copysign_f(a, b) copysign(a, b)
+#define hv_remainder_f(a, b) remainder(a, b)
+#define hv_erf_f(a) erf(a)
+#define hv_erfc_f(a) erfc(a)
+#define hv_expm1_f(a) expm1(a)
+#define hv_finite_f(a) finite(a)
+#define hv_fmod_f(a, b) fmod(a, b)
+#define hv_ldexp_f(a, b) ldexp(a, b)
+#define hv_isinf_f(a) isinf(a)
+#define hv_isnan_f(a) isnan(a)
+#define hv_ln_f(a) log(a)
+#define hv_log10_f(a) log10(a)
+#define hv_log1p_f(a) log1p(a)
+#define hv_rint_f(a) rint(a)
 
 // Atomics
 #if HV_WIN

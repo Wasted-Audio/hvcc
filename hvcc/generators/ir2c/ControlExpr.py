@@ -114,10 +114,12 @@ def internal_expr(exp: str) -> str:
         (r"\bmin\(", "fmin("),
         (r"\bmax\(", "fmax("),
         (r"\bln\(", "log("),
-        (r"\bif\(", "expr_if("),
+        (r"\bif\(", "hv_if_f("),
         (r"\bfact\(", "expr_fact("),
-        (r"\bmodf\(", "expr_modf("),
+        (r"\bmodf\(", "hv_modf_f("),
         (r"\bimodf\(", "expr_imodf("),
+        (r"\bround\(", "rint("),
+        (r"\bnearbyint\(", "rint("),
     ]
 
     for r in replace:
