@@ -14,7 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import re
-from typing import Callable, Dict, List
+from typing import Callable, Dict, List, Tuple
 
 from .HeavyObject import HeavyObject
 
@@ -109,20 +109,14 @@ def var_n(a_name: str, var: str) -> str:
 def internal_expr(exp: str) -> str:
     """ Convert function names to C or internal names
     """
-    replace = [
-        (r"\\,", ","),
-        (r"\bmin\(", "fmin("),
-        (r"\bmax\(", "fmax("),
-        (r"\bln\(", "log("),
-        (r"\bif\(", "hv_if_f("),
-        (r"\bfact\(", "expr_fact("),
-        (r"\bmodf\(", "hv_modf_f("),
-        (r"\bimodf\(", "expr_imodf("),
-        (r"\bround\(", "rint("),
-        (r"\bnearbyint\(", "rint("),
+
+    internal: List[Tuple[str, str]] = [
+        (r"\\,",            ","),
+        (r"\bfact\(",       "expr_fact("),
+        (r"\bimodf\(",      "expr_imodf("),
     ]
 
-    for r in replace:
+    for r in internal + hv_utils:
         exp = re.sub(r[0], r[1], exp)
 
     return exp
@@ -140,3 +134,47 @@ def bind_expr(exp: str = "$f1+2", a_name: str = "a") -> str:
             exp = exp.replace(var, var_n(a_name, var))
 
     return exp
+
+
+hv_utils: List[Tuple[str, str]] = [
+    (r"\bmin\(",        "hv_min_f("),
+    (r"\bmax\(",        "hv_max_f("),
+    (r"\bsin\(",        "hv_sin_f("),
+    (r"\bsinh\(",       "hv_sinh_f("),
+    (r"\bcos\(",        "hv_cos_f("),
+    (r"\bcosh\(",       "hv_cosh_f("),
+    (r"\basin\(",       "hv_asin_f("),
+    (r"\basinh\(",      "hv_asinh_f("),
+    (r"\bacos\(",       "hv_acos_f("),
+    (r"\bacosh\(",      "hv_acosh_f("),
+    (r"\batanh\(",      "hv_atanh_f("),
+    (r"\batan2\(",      "hv_atan2_f("),
+    (r"\batan\(",       "hv_atan_f("),
+    (r"\btanh\(",       "hv_tanh_f("),
+    (r"\btan\(",        "hv_tan_f("),
+    (r"\bexp\(",        "hv_exp_f("),
+    (r"\babs\(",        "hv_abs_f("),
+    (r"\bsqrt\(",       "hv_sqrt_f("),
+    (r"\blog\(",        "hv_log_f("),
+    (r"\bceil\(",       "hv_ceil_f("),
+    (r"\bfloor\(",      "hv_floor_f("),
+    (r"\bround\(",      "hv_round_f("),
+    (r"\bpow\(",        "hv_pow_f("),
+    (r"\bif\(",         "hv_if_f("),
+    (r"\bmodf\(",       "hv_modf_f("),
+    (r"\bcbrt\(",       "hv_cbrt_f("),
+    (r"\bcopysign\(",   "hv_copysign_f("),
+    (r"\bremainder\(",  "hv_remainder_f("),
+    (r"\berf\(",        "hv_erf_f("),
+    (r"\berfc\(",       "hv_erfc_f("),
+    (r"\bexpm1\(",      "hv_expm1_f("),
+    (r"\bfinite\(",     "hv_finite_f("),
+    (r"\bfmod\(",       "hv_fmod_f("),
+    (r"\bldexp\(",      "hv_ldexp_f("),
+    (r"\bisinf\(",      "hv_isinf_f("),
+    (r"\bisnan\(",      "hv_isnan_f("),
+    (r"\bln\(",         "hv_ln_f("),
+    (r"\blog10\(",      "hv_log10_f("),
+    (r"\blog1p\(",      "hv_log1p_f("),
+    (r"\brint\(",       "hv_rint_f("),
+]

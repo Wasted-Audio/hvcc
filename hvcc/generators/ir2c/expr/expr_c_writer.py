@@ -201,14 +201,14 @@ class ExprOpMap:
         "erfc": "hv_erfc_f",
         "exp": "hv_exp_f",
         "expm1": "hv_expm1_f",
-        "fact": "hv_?_f",
+        # "fact": "hv_?_f",
         "finite": "hv_finite_f",
         "float": "hv_cast_if",
         "floor": "hv_floor_f",
         "fmod": "hv_fmod_f",
         "ldexp": "hv_ldexp_f",
         "if": "hv_if_f",
-        "imodf": "hv_?_f",
+        # "imodf": "hv_?_f",
         "int": "hv_cast_fi",
         "isinf": "hv_isinf_f",
         "isnan": "hv_isnan_f",
@@ -221,15 +221,15 @@ class ExprOpMap:
         "modf": "hv_modf_f",
         "pow": "hv_pow_f",
         "remainder": "hv_remainder_f",
-        "rint": "hv_rint_f",        # round to nearest int
-        "round": "hv_rint_f",       # round to nearest int
-        "nearbyint": "hv_rint_f",   # round to nearest int
+        "rint": "hv_rint_f",          # round to nearest int
+        "round": "hv_rint_f",         # round to nearest int
+        "nearbyint": "hv_rint_f",     # round to nearest int
         "sin": "hv_sin_f",
         "sinh": "hv_sinh_f",
-        "size": "hv_?_f",           # size of a table
+        # "size": "hv_?_f",           # size of a table
         "sqrt": "hv_sqrt_f",
-        "sum": "hv_?_f",            # sum of all elements of a table
-        "Sum": "hv_?_f",            # sum of elemnets of a specified boundary of a table???
+        # "sum": "hv_?_f",            # sum of all elements of a table
+        # "Sum": "hv_?_f",            # sum of elemnets of a specified boundary of a table???
         "tan": "hv_tan_f",
         "tanh": "hv_tanh_f",
         "_load_f": "hv_var_k_f",
