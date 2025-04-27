@@ -37,21 +37,11 @@ void cExpr_free(ControlExpr *o);
 void cExpr_onMessage(HeavyContextInterface *_c, ControlExpr *o, int letIn, const HvMessage *m,
     void (*sendMessage)(HeavyContextInterface *, int, const HvMessage *));
 
-static inline float expr_modf(float mod)
-{
-  return fmod(mod, 1);
-}
-
 static inline float expr_imodf(float mod)
 {
   float iptr;
   modff(mod, &iptr);
   return iptr;
-}
-
-static inline float expr_if(float eval, float trueValue, float falseValue)
-{
-  return eval ? trueValue : falseValue;
 }
 
 static inline float expr_fact(float factor) {
