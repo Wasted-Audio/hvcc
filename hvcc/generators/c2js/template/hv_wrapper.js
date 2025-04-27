@@ -212,7 +212,7 @@ var tableHashes = {
         if ((event.inputBuffer.numberOfChannels - 2) < i) {
           continue;
         }
-        this.inputBuffer.set(event.inputBuffer.getChannelData(i), i * blockSize);
+        this.inputBuffer.set(event.inputBuffer.getChannelData(i), i * this.blockSize);
       }
     } else {
       this.inputBuffer.set(0); //clear buffer when no inputs are connected
