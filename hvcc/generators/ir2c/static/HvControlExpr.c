@@ -28,7 +28,6 @@ void cExpr_free(ControlExpr *o) {
   ;
 }
 
-
 void cExpr_onMessage(HeavyContextInterface *_c, ControlExpr *o, int letIn, const HvMessage *m,
     void (*sendMessage)(HeavyContextInterface *, int, const HvMessage *)) {
 
@@ -60,29 +59,6 @@ void cExpr_onMessage(HeavyContextInterface *_c, ControlExpr *o, int letIn, const
     }
   }
 }
-
-
-float expr_modf(float mod)
-{
-  float* iptr;
-  modff(mod, iptr);
-  return mod - *iptr;
-}
-
-
-float expr_imodf(float mod)
-{
-  float* iptr;
-  modff(mod, iptr);
-  return *iptr;
-}
-
-
-float expr_if(float eval, float trueValue, float falseValue)
-{
-  return eval ? trueValue : falseValue;
-}
-
 
 float expr_fact(float factor) {
   int n = (int) factor;
