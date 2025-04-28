@@ -59,22 +59,3 @@ void cExpr_onMessage(HeavyContextInterface *_c, ControlExpr *o, int letIn, const
     }
   }
 }
-
-float expr_fact(float factor) {
-  int n = (int) factor;
-  if(n <= 1) {
-    // follow Pure data convention
-    return 1;
-  }
-  else if(n > 34) {
-    // follow Pure data convention
-    return INFINITY; // C99 constant
-  }
-  else {
-    float f = 1.0f;
-    for (int i = n; i > 1; --i) {
-      f *= i;
-    }
-    return f;
-  }
-}
