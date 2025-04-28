@@ -28,7 +28,6 @@ void cExpr_free(ControlExpr *o) {
   ;
 }
 
-
 void cExpr_onMessage(HeavyContextInterface *_c, ControlExpr *o, int letIn, const HvMessage *m,
     void (*sendMessage)(HeavyContextInterface *, int, const HvMessage *)) {
 

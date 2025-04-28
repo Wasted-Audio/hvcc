@@ -46,11 +46,21 @@ static inline float expr_imodf(float mod)
 
 static inline float expr_fact(float factor) {
   int n = (int) factor;
-  float f = 1.0f;
-  for (int i = n; i > 0; --i) {
-    f *= i;
+  if(n <= 1) {
+    // follow Pure data convention
+    return 1;
   }
-  return f;
+  else if(n > 34) {
+    // follow Pure data convention
+    return INFINITY; // C99 constant
+  }
+  else {
+    float f = 1.0f;
+    for (int i = n; i > 1; --i) {
+      f *= i;
+    }
+    return f;
+  }
 }
 
 #ifdef __cplusplus
