@@ -1,20 +1,7 @@
-#N canvas 96 248 412 280 10;
-#X text 24 213 // Note: Pd's internal implementation of [mtof] uses
-doubles instead of floats so there will be slight rounding discrepencies.
-;
+#N canvas 96 248 416 183 10;
+#X text 21 115 // Note: Pd's internal implementation of [mtof] uses doubles instead of floats so there will be slight rounding discrepencies.;
 #X obj 25 20 inlet;
-#X obj 25 185 outlet;
-#X obj 25 162 * 440;
-#X obj 25 44 - 69;
-#X obj 25 68 / 12;
-#X obj 25 139 pow 1;
-#X msg 25 116 2;
-#X obj 25 92 t a a;
-#X connect 1 0 4 0;
+#X obj 25 85 outlet;
+#X obj 25 51 expr pow(2 \, ($f1-69)/12)*440;
+#X connect 1 0 3 0;
 #X connect 3 0 2 0;
-#X connect 4 0 5 0;
-#X connect 5 0 8 0;
-#X connect 6 0 3 0;
-#X connect 7 0 6 0;
-#X connect 8 0 7 0;
-#X connect 8 1 6 1;
