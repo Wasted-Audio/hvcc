@@ -23,7 +23,7 @@
 extern "C" {
 #endif
 
-#define HV_TABWRITE_STOPPED -1 // ~0x0
+#define HV_TABWRITE_STOPPED (~(hv_uint32_t)0x0)
 
 typedef struct SignalTabwrite {
   HvTable *table;
