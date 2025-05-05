@@ -29,6 +29,7 @@ Jinja2 = ">=2.11"
 importlib-resources = ">=5.1"
 wstd2daisy = ">=0.5.3"
 pydantic = ">=2.9.1"
+arpeggio = "^2.0.2"
 
 [tool.poetry.group.dev.dependencies]
 numpy = [

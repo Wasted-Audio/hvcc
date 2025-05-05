@@ -16,6 +16,22 @@ files = [
 typing-extensions = {version = ">=4.0.0", markers = "python_version < \"3.9\""}
 
 [[package]]
+name = "arpeggio"
+version = "2.0.2"
+description = "Packrat parser interpreter"
+optional = false
+python-versions = "*"
+groups = ["main"]
+files = [
+    {file = "Arpeggio-2.0.2-py2.py3-none-any.whl", hash = "sha256:f7c8ae4f4056a89e020c24c7202ac8df3e2bc84e416746f20b0da35bb1de0250"},
+    {file = "Arpeggio-2.0.2.tar.gz", hash = "sha256:c790b2b06e226d2dd468e4fbfb5b7f506cec66416031fde1441cf1de2a0ba700"},
+]
+
+[package.extras]
+dev = ["mike", "mkdocs", "twine", "wheel"]
+test = ["coverage", "coveralls", "flake8", "pytest"]
+
+[[package]]
 name = "colorama"
 version = "0.4.6"
 description = "Cross-platform colored terminal text."
@@ -1315,4 +1331,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.8.1"
-content-hash = "55bb2a378eb654bbe16dee42ab2d4a286630aa700d3149a6bedfef6587d6205d"
+content-hash = "2dd6e0de46ee817b0c5002905a0b628af7aad59c7243ff9643f10b465840af2b"

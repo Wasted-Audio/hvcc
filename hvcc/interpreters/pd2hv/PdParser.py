@@ -27,6 +27,7 @@ from .HeavyGraph import HeavyGraph              # pre-converted Heavy graphs
 from .HvSwitchcase import HvSwitchcase          # __switchcase
 from .PdAudioIoObject import PdAudioIoObject    # adc~/dac~
 from .PdBinopObject import PdBinopObject        # binary arithmatic operators
+from .PdExprObject import PdExprObject          # expr/expr~
 from .PdGraph import PdGraph                    # canvas
 from .PdLetObject import PdLetObject            # inlet/inlet~/outlet/outlet~
 from .PdMessageObject import PdMessageObject    # msg
@@ -651,6 +652,8 @@ class PdParser:
     __PD_CLASSES = {
         "adc~": PdAudioIoObject,
         "dac~": PdAudioIoObject,
+        "expr": PdExprObject,
+        "expr~": PdExprObject,
         "inlet": PdLetObject,
         "inlet~": PdLetObject,
         "outlet": PdLetObject,
