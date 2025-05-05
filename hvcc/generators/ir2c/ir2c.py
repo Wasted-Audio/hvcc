@@ -196,6 +196,9 @@ class ir2c:
         # Parse the hv.ir data structure and generate C-language strings.
         #
 
+        # Reset the obj_eval_functions state
+        SignalExpr.obj_eval_functions = {}
+
         # generate set of header files to include
         include_set = set([x for o in ir.objects.values() for x in ir2c.get_class(o.type).get_C_header_set()])
 

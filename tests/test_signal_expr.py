@@ -15,7 +15,7 @@
 
 import argparse
 import os
-# import unittest
+import unittest
 
 from tests.framework.base_control import TestPdControlBase
 
@@ -30,9 +30,10 @@ class TestPdControlExprPatches(TestPdControlBase):
 
     # Math operations
 
-    # def test_tilde(self):
-    #     """ only supports integers """
-    #     self._test_control_patch("test-tilde.pd")
+    @unittest.skip("not supported yet")
+    def test_tilde(self):
+        """ only supports integers """
+        self._test_control_patch("test-tilde.pd")
 
     # def test_mult(self):
     #     self._test_control_patch("test-mult.pd")
@@ -93,8 +94,8 @@ class TestPdControlExprPatches(TestPdControlBase):
     # def test_min_max(self):
     #     self._test_control_patch("test-min-max.pd")
 
-    # def test_abs(self):
-    #     self._test_control_patch("test-abs.pd")
+    def test_abs(self):
+        self._test_control_patch("test-abs.pd")
 
     # def test_isinf(self):
     #     self._test_control_patch("test-isinf.pd")
@@ -117,8 +118,8 @@ class TestPdControlExprPatches(TestPdControlBase):
     # def test_remainder_fmod(self):
     #     self._test_control_patch("test-remainder-fmod.pd")
 
-    # def test_ceil_floor(self):
-    #     self._test_control_patch("test-ceil-floor.pd")
+    def test_ceil_floor(self):
+        self._test_control_patch("test-ceil-floor.pd")
 
     # # Power functions
 
@@ -128,11 +129,11 @@ class TestPdControlExprPatches(TestPdControlBase):
     def test_sqrt(self):
         self._test_control_patch("test-sqrt.pd")
 
-    # def test_exp(self):
-    #     self._test_control_patch("test-exp.pd")
+    def test_exp(self):
+        self._test_control_patch("test-exp.pd")
 
-    # def test_expm1(self):
-    #     self._test_control_patch("test-expm1.pd")
+    def test_expm1(self):
+        self._test_control_patch("test-expm1.pd")
 
     # def test_ln_log(self):
     #     self._test_control_patch("test-ln-log.pd")
@@ -143,11 +144,11 @@ class TestPdControlExprPatches(TestPdControlBase):
     # def test_fact(self):
     #     self._test_control_patch("test-fact.pd")
 
-    # def test_erf_erfc(self):
-    #     self._test_control_patch("test-erf-erfc.pd")
+    def test_erf_erfc(self):
+        self._test_control_patch("test-erf-erfc.pd")
 
-    # def test_cbrt(self):
-    #     self._test_control_patch("test-cbrt.pd")
+    def test_cbrt(self):
+        self._test_control_patch("test-cbrt.pd")
 
     # def test_log1p(self):
     #     self._test_control_patch("test-log1p.pd")
