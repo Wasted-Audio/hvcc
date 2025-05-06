@@ -68,7 +68,7 @@ def f_name():   return [                                                        
                     regex(r"\bexp(?=\()"),
                     regex(r"\bexpm1(?=\()"),
                     # regex(r"\bfact(?=\()"),
-                    # regex(r"\bfinite(?=\()"),
+                    regex(r"\bfinite(?=\()"),
                     regex(r"\bfloat(?=\()"),
                     regex(r"\bfloor(?=\()"),
                     regex(r"\bfmod(?=\()"),

@@ -155,6 +155,7 @@ hv_utils: List[Tuple[str, str]] = [
     (r"\berfc(?=\()",       "hv_erfc_f"),
     (r"\bexp(?=\()",        "hv_exp_f"),
     (r"\bexpm1(?=\()",      "hv_expm1_f"),
+    (r"\bfinite(?=\()",     "hv_finite_f"),
     (r"\bfloor(?=\()",      "hv_floor_f"),
     (r"\bif(?=\()",         "hv_if_f"),
     (r"\bisinf(?=\()",      "hv_isinf_f"),
@@ -177,5 +178,4 @@ hv_utils: List[Tuple[str, str]] = [
     (r"\bsqrt(?=\()",       "hv_sqrt_f"),
     (r"\btan(?=\()",        "hv_tan_f"),
     (r"\btanh(?=\()",       "hv_tanh_f"),
-    (r"\bfinite(?=\()",     "hv_finite_f"),
 ]
