@@ -21,11 +21,17 @@ class {{name}}_AudioLibWorklet extends AudioWorkletProcessor {
         this.setSendHook();
 
         // allocate temporary buffers (pointer size is 4 bytes in javascript)
-        var lengthInSamples = this.blockSize * this.getNumOutputChannels();
+        var lengthOutSamples = this.blockSize * this.getNumOutputChannels();
+        var lengthInSamples = this.blockSize * this.getNumInputChannels();
+
         this.processBuffer = new Float32Array(
             Module.HEAPF32.buffer,
-            Module._malloc(lengthInSamples * Float32Array.BYTES_PER_ELEMENT),
-            lengthInSamples);
+            Module._malloc(lengthOutSamples * Float32Array.BYTES_PER_ELEMENT),
+            lengthOutSamples);
+        this.inputBuffer = new Float32Array(
+          Module.HEAPF32.buffer,
+          Module._malloc(lengthInSamples * Float32Array.BYTES_PER_ELEMENT),
+          lengthInSamples);
 
         this.port.onmessage = (e) => {
           console.log(e.data);
@@ -49,19 +55,27 @@ class {{name}}_AudioLibWorklet extends AudioWorkletProcessor {
     }
 
     process(inputs, outputs, parameters) {
+      // Currently only supports one output connection and one input connection (inputs[0] and outputs[0])
       try{
-        _hv_processInline(this.heavyContext, null, this.processBuffer.byteOffset, this.blockSize);
+        var inputChannelCount = this.getNumInputChannels();
+        if (inputs.length > 0 && inputs[0].length && inputChannelCount > 0) {
+          for (let c = 0; c < inputChannelCount; c++) {
+            if (!inputs[0][c]) {
+              continue;
+            }
+            this.inputBuffer.set(inputs[0][c], c * this.blockSize);
+          }
+        } else {
+          this.inputBuffer.set(0); //clear buffer when no inputs are connected
+        }
+        
+        _hv_processInline(this.heavyContext, this.inputBuffer.byteOffset, this.processBuffer.byteOffset, this.blockSize);
 
-        // TODO: Figure out what "multiple outputs" means if not multiple channels
         var output = outputs[0];
 
-        for (var i = 0; i < this.getNumOutputChannels(); ++i) {
-          var channel = output[i];
-
-          var offset = i * this.blockSize;
-          for (var j = 0; j < this.blockSize; ++j) {
-            channel[j] = this.processBuffer[offset+j];
-          }
+        var outputChannelCount = this.getNumOutputChannels();
+        for (var i = 0; i < outputChannelCount; ++i) {
+          output[i].set(this.processBuffer.subarray(i * this.blockSize, (i + 1) * this.blockSize))
         }
       } catch(e){
         this.port.postMessage({ type:'error', error: e.toString() });
