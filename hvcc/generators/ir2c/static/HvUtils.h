@@ -290,6 +290,9 @@ static inline hv_int32_t __hv_utils_min_i(hv_int32_t x, hv_int32_t y) { return (
 #define hv_log10_f(a) log10f(a)
 #define hv_log1p_f(a) log1pf(a)
 #define hv_rint_f(a) rintf(a)
+#define hv_shl_i(a, b) ((a) << (b))
+#define hv_shr_i(a, b) ((a) >> (b))
+
 
 // Atomics
 #if HV_WIN
