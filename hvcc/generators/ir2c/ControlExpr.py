@@ -133,7 +133,6 @@ def bind_expr(exp: str = "$f1+2", a_name: str = "a") -> str:
         for var in vars:
             exp = exp.replace(var, var_n(a_name, var))
 
-    print(exp)
     return exp
 
 

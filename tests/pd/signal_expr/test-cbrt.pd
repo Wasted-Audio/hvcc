@@ -7,7 +7,7 @@
 #X msg 143 161 -5;
 #X obj 143 222 sig~;
 #X obj 60 313 snapshot~;
-#X obj 60 108 t_values;
+#X obj 60 108 t_delays;
 #X obj 143 256 expr~ cbrt($v1);
 #X connect 0 0 1 0;
 #X connect 1 0 8 0;

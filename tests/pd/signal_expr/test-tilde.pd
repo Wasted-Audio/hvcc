@@ -4,7 +4,7 @@
 #X obj 60 345 print;
 #X obj 143 222 sig~;
 #X obj 60 313 snapshot~;
-#X obj 60 108 t_values;
+#X obj 60 108 t_delays;
 #X msg 143 161 5.7;
 #X msg 109 161 -3.1;
 #X msg 76 161 2.3;

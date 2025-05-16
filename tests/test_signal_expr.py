@@ -35,26 +35,27 @@ class TestPdControlExprPatches(TestPdControlBase):
         """ only supports integers """
         self._test_control_patch("test-tilde.pd")
 
-    # def test_mult(self):
-    #     self._test_control_patch("test-mult.pd")
+    def test_mult(self):
+        self._test_control_patch("test-mult.pd")
 
-    # def test_div(self):
-    #     self._test_control_patch("test-div.pd")
+    def test_div(self):
+        self._test_control_patch("test-div.pd")
 
-    # def test_modulo(self):
-    #     self._test_control_patch("test-modulo.pd")
+    def test_modulo(self):
+        self._test_control_patch("test-modulo.pd")
 
-    # def test_add_sub(self):
-    #     self._test_control_patch("test-add-sub.pd")
+    def test_add_sub(self):
+        self._test_control_patch("test-add-sub.pd")
 
-    # def test_shift(self):
-    #     self._test_control_patch("test-shift.pd")
+    def test_shift(self):
+        self._test_control_patch("test-shift.pd")
 
-    # def test_lt_gt(self):
-    #     self._test_control_patch("test-lt-gt.pd")
+    def test_lt_gt(self):
+        self._test_control_patch("test-lt-gt.pd")
 
-    # def test_lte_gte(self):
-    #     self._test_control_patch("test-lte-gte.pd")
+    @unittest.skip("not working yet")
+    def test_lte_gte(self):
+        self._test_control_patch("test-lte-gte.pd")
 
     # def test_eq_neq(self):
     #     self._test_control_patch("test-eq-neq.pd")
@@ -82,14 +83,14 @@ class TestPdControlExprPatches(TestPdControlBase):
     # def test_if2(self):
     #     self._test_control_patch("test-if2.pd")
 
-    # def test_int(self):
-    #     self._test_control_patch("test-int.pd")
+    def test_int(self):
+        self._test_control_patch("test-int.pd")
 
     # def test_rint(self):
     #     self._test_control_patch("test-rint.pd")
 
-    # def test_float(self):
-    #     self._test_control_patch("test-float.pd")
+    def test_float(self):
+        self._test_control_patch("test-float.pd")
 
     # def test_min_max(self):
     #     self._test_control_patch("test-min-max.pd")
@@ -109,8 +110,8 @@ class TestPdControlExprPatches(TestPdControlBase):
     # def test_copysign(self):
     #     self._test_control_patch("test-copysign.pd")
 
-    # def test_modf(self):
-    #     self._test_control_patch("test-modf.pd")
+    def test_modf(self):
+        self._test_control_patch("test-modf.pd")
 
     # def test_imodf(self):
     #     self._test_control_patch("test-imodf.pd")
@@ -135,11 +136,11 @@ class TestPdControlExprPatches(TestPdControlBase):
     def test_expm1(self):
         self._test_control_patch("test-expm1.pd")
 
-    # def test_ln_log(self):
-    #     self._test_control_patch("test-ln-log.pd")
+    def test_ln_log(self):
+        self._test_control_patch("test-ln-log.pd")
 
-    # def test_log10(self):
-    #     self._test_control_patch("test-log10.pd")
+    def test_log10(self):
+        self._test_control_patch("test-log10.pd")
 
     # def test_fact(self):
     #     self._test_control_patch("test-fact.pd")
@@ -150,8 +151,8 @@ class TestPdControlExprPatches(TestPdControlBase):
     def test_cbrt(self):
         self._test_control_patch("test-cbrt.pd")
 
-    # def test_log1p(self):
-    #     self._test_control_patch("test-log1p.pd")
+    def test_log1p(self):
+        self._test_control_patch("test-log1p.pd")
 
     # def test_ldexp(self):
     #     self._test_control_patch("test-ldexp.pd")

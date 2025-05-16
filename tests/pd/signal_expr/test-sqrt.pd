@@ -8,7 +8,7 @@
 #X obj 143 222 sig~;
 #X obj 143 256 expr~ sqrt($v1);
 #X obj 60 313 snapshot~;
-#X obj 60 108 t_values;
+#X obj 60 108 t_delays;
 #X connect 0 0 1 0;
 #X connect 1 0 9 0;
 #X connect 3 0 6 0;

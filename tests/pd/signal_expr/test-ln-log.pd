@@ -11,8 +11,8 @@
 #X obj 274 222 sig~;
 #X obj 274 345 print;
 #X obj 274 313 snapshot~;
-#X obj 143 256 expr~ erf($v1);
-#X obj 274 256 expr~ erfc($v1);
+#X obj 143 256 expr~ ln($v1);
+#X obj 274 256 expr~ log($v1);
 #X connect 0 0 1 0;
 #X connect 1 0 8 0;
 #X connect 3 0 6 0;

@@ -475,6 +475,34 @@ static inline void __hv_cast_fi(hv_bInf_t bIn, hv_bOuti_t bOut) {
 #endif
 }
 
+// expr~ expects all float i/o
+static inline void __hv_cast_if_expr(hv_bInf_t bIn, hv_bOutf_t bOut) {
+#if HV_SIMD_AVX
+  hv_assert(0); // __hv_cast_if_expr() not implemented
+#elif HV_SIMD_SSE
+  hv_assert(0); // __hv_cast_if_expr() not implemented
+#elif HV_SIMD_NEON
+  hv_assert(0); // __hv_cast_if_expr() not implemented
+#else // HV_SIMD_NONE
+  *bOut = (float) bIn;
+#endif
+}
+
+// expr~ expects all float i/o
+static inline void __hv_cast_fi_expr(hv_bInf_t bIn, hv_bOutf_t bOut) {
+#if HV_SIMD_AVX
+  hv_assert(0); // __hv_cast_fi_expr() not implemented
+#elif HV_SIMD_SSE
+  hv_assert(0); // __hv_cast_fi_expr() not implemented
+#elif HV_SIMD_NEON
+  hv_assert(0); // __hv_cast_fi_expr() not implemented
+#else // HV_SIMD_NONE
+  if (bIn < 0.0f) *bOut = hv_rint_f(bIn);
+  else if (bIn > 0.0f) *bOut = hv_floor_f(bIn);
+  else *bOut = 0.0f;
+#endif
+}
+
 static inline void __hv_div_f(hv_bInf_t bIn0, hv_bInf_t bIn1, hv_bOutf_t bOut) {
 #if HV_SIMD_AVX
   __m256 a = _mm256_cmp_ps(bIn1, _mm256_setzero_ps(), _CMP_EQ_OQ);
@@ -780,5 +808,103 @@ static inline void __hv_erfc_f(hv_bInf_t bIn, hv_bOutf_t bOut) {
   *bOut = hv_erfc_f(bIn);
 #endif
 }
+
+static inline void __hv_ln_f(hv_bInf_t bIn, hv_bOutf_t bOut) {
+#if HV_SIMD_AVX
+  hv_assert(0); // __hv_ln_f() not implemented
+#elif HV_SIMD_SSE
+  hv_assert(0); // __hv_ln_f() not implemented
+#elif HV_SIMD_NEON
+  hv_assert(0); // __hv_ln_f() not implemented
+#else // HV_SIMD_NONE
+  *bOut = hv_ln_f(bIn);
+#endif
+}
+
+static inline void __hv_log_f(hv_bInf_t bIn, hv_bOutf_t bOut) {
+#if HV_SIMD_AVX
+  hv_assert(0); // __hv_log_f() not implemented
+#elif HV_SIMD_SSE
+  hv_assert(0); // __hv_log_f() not implemented
+#elif HV_SIMD_NEON
+  hv_assert(0); // __hv_log_f() not implemented
+#else // HV_SIMD_NONE
+  *bOut = hv_log_f(bIn);
+#endif
+}
+
+static inline void __hv_log1p_f(hv_bInf_t bIn, hv_bOutf_t bOut) {
+#if HV_SIMD_AVX
+  hv_assert(0); // __hv_log1p_f() not implemented
+#elif HV_SIMD_SSE
+  hv_assert(0); // __hv_log1p_f() not implemented
+#elif HV_SIMD_NEON
+  hv_assert(0); // __hv_log1p_f() not implemented
+#else // HV_SIMD_NONE
+  *bOut = hv_log1p_f(bIn);
+#endif
+}
+
+static inline void __hv_log10_f(hv_bInf_t bIn, hv_bOutf_t bOut) {
+#if HV_SIMD_AVX
+  hv_assert(0); // __hv_log10_f() not implemented
+#elif HV_SIMD_SSE
+  hv_assert(0); // __hv_log10_f() not implemented
+#elif HV_SIMD_NEON
+  hv_assert(0); // __hv_log10_f() not implemented
+#else // HV_SIMD_NONE
+  *bOut = hv_log10_f(bIn);
+#endif
+}
+
+static inline void __hv_modf_f(hv_bInf_t bIn, hv_bOutf_t bOut) {
+#if HV_SIMD_AVX
+  hv_assert(0); // __hv_modf_f() not implemented
+#elif HV_SIMD_SSE
+  hv_assert(0); // __hv_modf_f() not implemented
+#elif HV_SIMD_NEON
+  hv_assert(0); // __hv_modf_f() not implemented
+#else // HV_SIMD_NONE
+  *bOut = hv_modf_f(bIn);
+#endif
+}
+
+static inline void __hv_modulo_f(hv_bInf_t bIn0, hv_bInf_t bIn1, hv_bOutf_t bOut) {
+#if HV_SIMD_AVX
+  hv_assert(0); // __hv_modulo_f() not implemented
+#elif HV_SIMD_SSE
+  hv_assert(0); // __hv_modulo_f() not implemented
+#elif HV_SIMD_NEON
+  hv_assert(0); // __hv_modulo_f() not implemented
+#else // HV_SIMD_NONE
+  float modded = hv_fmod_f(bIn0, bIn1);
+  if (modded < 0.0f) *bOut = hv_rint_f(modded);
+  else if (modded >= 0.0f) *bOut = hv_floor_f(modded);
+#endif
+}
+
+static inline void __hv_shl_f(hv_bInf_t bIn0, hv_bInf_t bIn1, hv_bOutf_t bOut) {
+#if HV_SIMD_AVX
+  hv_assert(0); // __hv_shl_f() not implemented
+#elif HV_SIMD_SSE
+  hv_assert(0); // __hv_shl_f() not implemented
+#elif HV_SIMD_NEON
+  hv_assert(0); // __hv_shl_f() not implemented
+#else // HV_SIMD_NONE
+  *bOut = (float) hv_shl_i((int) bIn0, (int) bIn1);
+#endif
+}
+
+static inline void __hv_shr_f(hv_bInf_t bIn0, hv_bInf_t bIn1, hv_bOutf_t bOut) {
+  #if HV_SIMD_AVX
+    hv_assert(0); // __hv_shr_f() not implemented
+  #elif HV_SIMD_SSE
+    hv_assert(0); // __hv_shr_f() not implemented
+  #elif HV_SIMD_NEON
+    hv_assert(0); // __hv_shr_f() not implemented
+  #else // HV_SIMD_NONE
+    *bOut = (float) hv_shr_i((int) bIn0, (int) bIn1);
+  #endif
+  }
 
 #endif // _HEAVY_MATH_H_

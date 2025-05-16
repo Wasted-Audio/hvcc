@@ -8,7 +8,7 @@
 #X msg 143 161 5.7;
 #X msg 109 161 -3.1;
 #X msg 76 161 2.3;
-#X obj 143 256 expr~ expm1($v1);
+#X obj 143 256 expr~ modf($v1);
 #X connect 0 0 1 0;
 #X connect 1 0 5 0;
 #X connect 3 0 9 0;

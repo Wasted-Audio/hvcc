@@ -5,7 +5,7 @@
 #X msg 52 85 2.3;
 #X obj 52 50 t b b b;
 #X msg 161 85 5.5;
-#X obj 52 127 expr ($f1 < $f2) < $i3;
+#X obj 52 127 expr ($f1 < $f2) > $i3;
 #X connect 0 0 4 0;
 #X connect 2 0 6 1;
 #X connect 3 0 6 0;

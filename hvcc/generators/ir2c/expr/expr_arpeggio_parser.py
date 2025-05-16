@@ -46,6 +46,7 @@ class ExprArpeggioParser():
     @classmethod
     def parse(cls, expr) -> ParseExpr:
         """Parse the input expression and return a parse tree"""
+        print("--> expression: ", expr)
         return expr_grammar.parse(expr)
 
     @classmethod
@@ -68,7 +69,7 @@ class ExprArpeggioParser():
             return ExprNode("func", expr[0].value, [cls.to_expr_tree(p) for p in expr[1:]])
         elif expr.rule_name == "unary":
             return ExprNode("unary", expr[0].value, [cls.to_expr_tree(expr[1])])
-        elif expr.rule_name == "term":
+        elif expr.rule_name in ():
             # this is RtoL associativity
             val = None
             tmp = None
@@ -89,7 +90,7 @@ class ExprArpeggioParser():
             return subtree
 
         elif expr.rule_name in (
-            "lor", "land", "bor", "xor", "band", "eq", "gtlt", "shift", "factor"
+            "lor", "land", "bor", "xor", "band", "eq", "gtlt", "shift", "factor", "term"
         ):
             # this is LtoR associativity
             subtree = None
