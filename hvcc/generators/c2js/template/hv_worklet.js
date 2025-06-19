@@ -11,7 +11,7 @@ class {{name}}_AudioLibWorklet extends AudioWorkletProcessor {
 
         // As of right now (June 2022), blockSize is always 128.
         // In the future, it could become dynamic,
-        // and we'll have to read the lengths of incoming outputs and re-alloc the processBuffer if it changes.
+        // and we'll have to read the lengths of incoming outputs and re-alloc the outputBuffer if it changes.
         this.blockSize = 128;
 
         // instantiate heavy context
@@ -24,7 +24,7 @@ class {{name}}_AudioLibWorklet extends AudioWorkletProcessor {
         var lengthOutSamples = this.blockSize * this.getNumOutputChannels();
         var lengthInSamples = this.blockSize * this.getNumInputChannels();
 
-        this.processBuffer = new Float32Array(
+        this.outputBuffer = new Float32Array(
             Module.HEAPF32.buffer,
             Module._malloc(lengthOutSamples * Float32Array.BYTES_PER_ELEMENT),
             lengthOutSamples);
@@ -69,13 +69,13 @@ class {{name}}_AudioLibWorklet extends AudioWorkletProcessor {
           this.inputBuffer.set(0); //clear buffer when no inputs are connected
         }
         
-        _hv_processInline(this.heavyContext, this.inputBuffer.byteOffset, this.processBuffer.byteOffset, this.blockSize);
+        _hv_processInline(this.heavyContext, this.inputBuffer.byteOffset, this.outputBuffer.byteOffset, this.blockSize);
 
         var output = outputs[0];
 
         var outputChannelCount = this.getNumOutputChannels();
         for (var i = 0; i < outputChannelCount; ++i) {
-          output[i].set(this.processBuffer.subarray(i * this.blockSize, (i + 1) * this.blockSize))
+          output[i].set(this.outputBuffer.subarray(i * this.blockSize, (i + 1) * this.blockSize))
         }
       } catch(e){
         this.port.postMessage({ type:'error', error: e.toString() });

@@ -163,7 +163,7 @@ var {{name}}_AudioLib = function(options) {
   var lengthOutSamples = this.blockSize * this.getNumOutputChannels();
   var lengthInSamples = this.blockSize * this.getNumInputChannels();
   
-  this.processBuffer = new Float32Array(
+  this.outputBuffer = new Float32Array(
       Module.HEAPF32.buffer,
       Module._malloc(lengthOutSamples * Float32Array.BYTES_PER_ELEMENT),
       lengthOutSamples);
@@ -218,13 +218,13 @@ var tableHashes = {
       this.inputBuffer.set(0); //clear buffer when no inputs are connected
     }
     
-    _hv_processInline(this.heavyContext, this.inputBuffer.byteOffset, this.processBuffer.byteOffset, this.blockSize);
+    _hv_processInline(this.heavyContext, this.inputBuffer.byteOffset, this.outputBuffer.byteOffset, this.blockSize);
 
     var outputChannelCount = this.getNumOutputChannels();
     for (var i = 0; i < outputChannelCount; ++i) {
       var output = event.outputBuffer.getChannelData(i);
 
-      output.set(this.processBuffer.subarray(i * this.blockSize, (i + 1) * this.blockSize));
+      output.set(this.outputBuffer.subarray(i * this.blockSize, (i + 1) * this.blockSize));
     }
 }
 
