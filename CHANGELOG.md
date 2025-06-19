@@ -1,6 +1,19 @@
 CHANGELOG
 =====
 
+Next Release
+-----
+
+Features:
+
+* Metadata: optional Dict for external generators
+
+Bugfixes:
+
+* Core: dereferencing type-punned pointer warning
+* Core: signed/unsigned mismatch in HvSignalTabwrite.h
+* c2dpf: portGroup template fix with i/o port 0 as CV
+
 0.13.4
 -----
 

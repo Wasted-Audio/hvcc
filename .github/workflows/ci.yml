@@ -1,9 +1,6 @@
 name: HVCC
 
-on:
-  push:
-  pull_request:
-    branches: [ develop ]
+on: [push, pull_request]
 
 jobs:
 
