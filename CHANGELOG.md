@@ -7,6 +7,7 @@ Next Release
 Features:
 
 * Metadata: optional Dict for external generators
+* JS: audio inputs now work
 
 Bugfixes:
 
