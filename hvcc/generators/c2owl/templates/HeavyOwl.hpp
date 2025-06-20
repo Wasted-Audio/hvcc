@@ -10,6 +10,8 @@
 #include "HeavyOwlConstants.h"
 
 #define BUTTON_Push PUSHBUTTON
+#define BUTTON_Green GREEN_BUTTON
+#define BUTTON_Red RED_BUTTON
 #define BUTTON_B1 BUTTON_A
 #define BUTTON_B2 BUTTON_B
 #define BUTTON_B3 BUTTON_C
@@ -18,6 +20,9 @@
 #define BUTTON_B6 BUTTON_F
 #define BUTTON_B7 BUTTON_G
 #define BUTTON_B8 BUTTON_H
+#define BUTTON_B9 BUTTON_I
+#define BUTTON_B10 BUTTON_J
+#define BUTTON_B11 BUTTON_K
 
 #define HV_HASH_NOTEIN          0x67E37CA3
 #define HV_HASH_CTLIN           0x41BE0f9C
