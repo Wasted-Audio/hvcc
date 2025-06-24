@@ -36,7 +36,7 @@ class SignalExpr(HeavyObject):
         return obj_type == "_expr~"
 
     @classmethod
-    def get_C_header_set(self) -> set:
+    def get_C_header_set(cls) -> set:
         return {"HvMath.h"}
 
     @classmethod
