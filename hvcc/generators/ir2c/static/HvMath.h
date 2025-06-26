@@ -919,6 +919,18 @@ static inline void __hv_bit_and_f(hv_bInf_t bIn0, hv_bInf_t bIn1, hv_bOutf_t bOu
 #endif
 }
 
+static inline void __hv_bit_or_f(hv_bInf_t bIn0, hv_bInf_t bIn1, hv_bOutf_t bOut) {
+#if HV_SIMD_AVX
+  hv_assert(0); // __hv_shr_f() not implemented
+#elif HV_SIMD_SSE
+  hv_assert(0); // __hv_shr_f() not implemented
+#elif HV_SIMD_NEON
+  hv_assert(0); // __hv_shr_f() not implemented
+#else // HV_SIMD_NONE
+  *bOut = (float) ((int) bIn0 | (int) bIn1);
+#endif
+}
+
 static inline void __hv_exc_or_f(hv_bInf_t bIn0, hv_bInf_t bIn1, hv_bOutf_t bOut) {
 #if HV_SIMD_AVX
   hv_assert(0); // __hv_shr_f() not implemented
