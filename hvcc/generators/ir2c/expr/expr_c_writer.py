@@ -186,6 +186,7 @@ class ExprOpMap:
         ">>":           "hv_shr_f",
         "==":           "hv_eq_f",
         "!=":           "hv_neq_f",
+        "&":           "hv_bitand_f",
         "&&":           "hv_and_f",
         "||":           "hv_or_f",
         "abs":          "hv_abs_f",
