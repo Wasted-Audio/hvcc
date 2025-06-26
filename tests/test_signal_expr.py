@@ -63,8 +63,8 @@ class TestPdControlExprPatches(TestPdControlBase):
     def test_bit_and(self):
         self._test_control_patch("test-bit-and.pd")
 
-    # def test_exc_or(self):
-    #     self._test_control_patch("test-exc-or.pd")
+    def test_exc_or(self):
+        self._test_control_patch("test-exc-or.pd")
 
     # def test_bit_or(self):
     #     self._test_control_patch("test-bit-or.pd")
