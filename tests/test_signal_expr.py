@@ -85,8 +85,8 @@ class TestPdControlExprPatches(TestPdControlBase):
     def test_int(self):
         self._test_control_patch("test-int.pd")
 
-    # def test_rint(self):
-    #     self._test_control_patch("test-rint.pd")
+    def test_rint(self):
+        self._test_control_patch("test-rint.pd")
 
     def test_float(self):
         self._test_control_patch("test-float.pd")
