@@ -190,7 +190,7 @@ class ExprOpMap:
         "&":            "hv_bit_and_f",
         "&&":           "hv_log_and_f",
         "|":            "hv_bit_or_f",
-        "||":           "hv_or_f",
+        "||":           "hv_log_or_f",
         "abs":          "hv_abs_f",
         "acos":         "hv_acos_f",
         "acosh":        "hv_acosh_f",

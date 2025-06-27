@@ -72,8 +72,8 @@ class TestPdControlExprPatches(TestPdControlBase):
     def test_log_and(self):
         self._test_control_patch("test-log-and.pd")
 
-    # def test_log_or(self):
-    #     self._test_control_patch("test-log-or.pd")
+    def test_log_or(self):
+        self._test_control_patch("test-log-or.pd")
 
     # # Functions
 
