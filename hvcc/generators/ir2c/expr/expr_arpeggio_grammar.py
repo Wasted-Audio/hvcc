@@ -44,8 +44,8 @@ def number():   return [num_f, num_i]                                           
 def var():      return regex(r"\$[fisv]\d+")                                                        # noqa
 def func():     return [                                                                            # noqa
                     (f_name, hide("("), expr, hide(")")),                                           # noqa
-                    (f_name, hide("("), expr, hide(","), expr, hide(")")),                          # noqa
-                    (f_name, hide("("), expr, hide(","), expr, hide(","), expr, hide(")"))          # noqa
+                    (f_name, hide("("), expr, hide(r"\,"), expr, hide(")")),                        # noqa
+                    (f_name, hide("("), expr, hide(r"\,"), expr, hide(r"\,"), expr, hide(")"))      # noqa
                 ]                                                                                   # noqa
 def group():    return hide("("), expr, hide(")")                                                   # noqa
 def num_f():    return regex(r"\d+\.\d+")  # prob need to cover exponential syntax, others?         # noqa

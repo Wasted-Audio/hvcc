@@ -91,8 +91,8 @@ class TestPdControlExprPatches(TestPdControlBase):
     def test_float(self):
         self._test_control_patch("test-float.pd")
 
-    # def test_min_max(self):
-    #     self._test_control_patch("test-min-max.pd")
+    def test_min_max(self):
+        self._test_control_patch("test-min-max.pd")
 
     def test_abs(self):
         self._test_control_patch("test-abs.pd")

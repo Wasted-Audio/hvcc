@@ -112,7 +112,7 @@ class ExprCWriter:
             return self._next
 
     def _to_c_simd(self, v_out: str) -> List[str]:
-        ba = ExprCWriter.BufferAllocator()
+        ba = self.BufferAllocator()
         lines: List[str] = []
 
         def _to_c_simd_R(expr_tree: ExprNode, r_vec: Union[str, None] = None) -> str:
