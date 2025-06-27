@@ -32,8 +32,9 @@ def land():     return bor, ZeroOrMore("&&", bor)                               
 def bor():      return xor, ZeroOrMore("|", xor)                                                    # noqa
 def xor():      return band, ZeroOrMore("^", band)                                                  # noqa
 def band():     return eq, ZeroOrMore("&", eq)                                                      # noqa
-def eq():       return gtlt, ZeroOrMore(["==","!="], gtlt)                                          # noqa
-def gtlt():     return shift, ZeroOrMore(["<","<=",">",">="], shift)                                # noqa
+def eq():       return gtlte, ZeroOrMore(["==","!="], gtlte)                                        # noqa
+def gtlte():    return gtlt, ZeroOrMore(["<=",">="], gtlt)                                          # noqa
+def gtlt():     return shift, ZeroOrMore(["<",">"], shift)                                          # noqa
 def shift():    return term, ZeroOrMore(["<<",">>"], term)                                          # noqa
 def term():     return factor, ZeroOrMore(["+","-"], factor)    # RtoL                              # noqa
 def factor():   return unary, ZeroOrMore(["*","/","%"], unary)                                      # noqa

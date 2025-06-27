@@ -90,7 +90,7 @@ class ExprArpeggioParser():
             return subtree
 
         elif expr.rule_name in (
-            "lor", "land", "bor", "xor", "band", "eq", "gtlt", "shift", "factor", "term"
+            "lor", "land", "bor", "xor", "band", "eq", "gtlte", "gtlt", "shift", "factor", "term"
         ):
             # this is LtoR associativity
             subtree = None

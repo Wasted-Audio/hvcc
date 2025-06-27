@@ -53,7 +53,6 @@ class TestPdControlExprPatches(TestPdControlBase):
     def test_lt_gt(self):
         self._test_control_patch("test-lt-gt.pd")
 
-    @unittest.skip("not working yet")
     def test_lte_gte(self):
         self._test_control_patch("test-lte-gte.pd")
 
