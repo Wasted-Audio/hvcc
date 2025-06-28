@@ -160,11 +160,17 @@ var {{name}}_AudioLib = function(options) {
   this.setSendHook(options.sendHook);
 
   // allocate temporary buffers (pointer size is 4 bytes in javascript)
-  var lengthInSamples = this.blockSize * this.getNumOutputChannels();
-  this.processBuffer = new Float32Array(
+  var lengthOutSamples = this.blockSize * this.getNumOutputChannels();
+  var lengthInSamples = this.blockSize * this.getNumInputChannels();
+  
+  this.outputBuffer = new Float32Array(
       Module.HEAPF32.buffer,
-      Module._malloc(lengthInSamples * Float32Array.BYTES_PER_ELEMENT),
-      lengthInSamples);
+      Module._malloc(lengthOutSamples * Float32Array.BYTES_PER_ELEMENT),
+      lengthOutSamples);
+  this.inputBuffer = new Float32Array(
+    Module.HEAPF32.buffer,
+    Module._malloc(lengthInSamples * Float32Array.BYTES_PER_ELEMENT),
+    lengthInSamples);
 }
 
 var parameterInHashes = {
@@ -198,15 +204,27 @@ var tableHashes = {
 };
 
 {{name}}_AudioLib.prototype.process = function(event) {
-    _hv_processInline(this.heavyContext, null, this.processBuffer.byteOffset, this.blockSize);
+    // Currently only supports one output connection and one input connection on the worklet/scriptprocessor. (unlimited channels though)
+    // Note(ZXMushroom63): calling getNumXXXChannels() every iteration of the for loop is slightly less efficient than calling once and storing the result
+    var inputChannelCount = this.getNumInputChannels();
+    if (inputChannelCount > 0) {
+      for (let i = 0; i < inputChannelCount; i++) {
+        if ((event.inputBuffer.numberOfChannels - 2) < i) {
+          continue;
+        }
+        this.inputBuffer.set(event.inputBuffer.getChannelData(i), i * this.blockSize);
+      }
+    } else {
+      this.inputBuffer.set(0); //clear buffer when no inputs are connected
+    }
+    
+    _hv_processInline(this.heavyContext, this.inputBuffer.byteOffset, this.outputBuffer.byteOffset, this.blockSize);
 
-    for (var i = 0; i < this.getNumOutputChannels(); ++i) {
+    var outputChannelCount = this.getNumOutputChannels();
+    for (var i = 0; i < outputChannelCount; ++i) {
       var output = event.outputBuffer.getChannelData(i);
 
-      var offset = i * this.blockSize;
-      for (var j = 0; j < this.blockSize; ++j) {
-        output[j] = this.processBuffer[offset+j];
-      }
+      output.set(this.outputBuffer.subarray(i * this.blockSize, (i + 1) * this.blockSize));
     }
 }
 
