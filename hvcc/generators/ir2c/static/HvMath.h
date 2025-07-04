@@ -709,6 +709,18 @@ static inline void __hv_and_f(hv_bInf_t bIn0, hv_bInf_t bIn1, hv_bOutf_t bOut) {
 #endif
 }
 
+static inline void __hv_not_f(hv_bInf_t bIn, hv_bOutf_t bOut) {
+#if HV_SIMD_AVX
+  hv_assert(0); // __hv_not_f() not implemented
+#elif HV_SIMD_SSE
+  hv_assert(0); // __hv_not_f() not implemented
+#elif HV_SIMD_NEON
+  hv_assert(0); // __hv_not_f() not implemented
+#else // HV_SIMD_NONE
+  *bOut = hv_not_f(bIn);
+#endif
+}
+
 static inline void __hv_andnot_f(hv_bInf_t bIn0_mask, hv_bInf_t bIn1, hv_bOutf_t bOut) {
 #if HV_SIMD_AVX
   *bOut = _mm256_andnot_ps(bIn0_mask, bIn1);
@@ -931,6 +943,18 @@ static inline void __hv_bit_or_f(hv_bInf_t bIn0, hv_bInf_t bIn1, hv_bOutf_t bOut
 #endif
 }
 
+static inline void __hv_bit_not_f(hv_bInf_t bIn, hv_bOutf_t bOut) {
+#if HV_SIMD_AVX
+  hv_assert(0); // __hv_bit_not_f() not implemented
+#elif HV_SIMD_SSE
+  hv_assert(0); // __hv_bit_not_f() not implemented
+#elif HV_SIMD_NEON
+  hv_assert(0); // __hv_bit_not_f() not implemented
+#else // HV_SIMD_NONE
+  *bOut = (float) hv_bit_not_i((int) bIn);
+#endif
+}
+
 static inline void __hv_exc_or_f(hv_bInf_t bIn0, hv_bInf_t bIn1, hv_bOutf_t bOut) {
 #if HV_SIMD_AVX
   hv_assert(0); // __hv_exc_or_f() not implemented
@@ -988,6 +1012,18 @@ static inline void __hv_round_f(hv_bInf_t bIn, hv_bOutf_t bOut) {
   hv_assert(0); // __hv_round_f() not implemented
 #else // HV_SIMD_NONE
   *bOut = hv_round_f(bIn);
+#endif
+}
+
+static inline void __hv_if_f(hv_bInf_t bIn0, hv_bInf_t bIn1, hv_bInf_t bIn2, hv_bOutf_t bOut) {
+#if HV_SIMD_AVX
+  hv_assert(0); // __hv_if_f() not implemented
+#elif HV_SIMD_SSE
+  hv_assert(0); // __hv_if_f() not implemented
+#elif HV_SIMD_NEON
+  hv_assert(0); // __hv_if_f() not implemented
+#else // HV_SIMD_NONE
+  *bOut = hv_if_f(bIn0, bIn1, bIn2);
 #endif
 }
 

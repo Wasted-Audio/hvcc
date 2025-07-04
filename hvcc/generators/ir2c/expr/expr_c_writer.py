@@ -171,8 +171,8 @@ class ExprCWriter:
 
 class ExprOpMap:
     op_map = {
-        # "~":            "hv_?_f",
-        "-":            "hv_sub_f",
+        "~":            "hv_bit_not_f",
+        "!":            "hv_not_f",
         "*":            "hv_mul_f",
         "/":            "hv_div_f",
         "%":            "hv_modulo_f",

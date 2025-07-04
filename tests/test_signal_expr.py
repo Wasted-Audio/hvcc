@@ -30,11 +30,6 @@ class TestPdControlExprPatches(TestPdControlBase):
 
     # Math operations
 
-    @unittest.skip("not supported yet")
-    def test_tilde(self):
-        """ only supports integers """
-        self._test_control_patch("test-tilde.pd")
-
     def test_mult(self):
         self._test_control_patch("test-mult.pd")
 
@@ -74,13 +69,26 @@ class TestPdControlExprPatches(TestPdControlBase):
     def test_log_or(self):
         self._test_control_patch("test-log-or.pd")
 
-    # # Functions
+    # Unary
 
-    # def test_if(self):
-    #     self._test_control_patch("test-if.pd")
+    @unittest.skip("not supported yet")
+    def test_unary_neg(self):
+        self._test_control_patch("test-unary-neg.pd")
 
-    # def test_if2(self):
-    #     self._test_control_patch("test-if2.pd")
+    def test_unary_tilde(self):
+        self._test_control_patch("test-unary-tilde.pd")
+
+    def test_unary_not(self):
+        self._test_control_patch("test-unary-not.pd")
+
+    # Functions
+
+    def test_if(self):
+        self._test_control_patch("test-if.pd")
+
+    @unittest.skip("not supported yet (needs unary operator)")
+    def test_if2(self):
+        self._test_control_patch("test-if2.pd")
 
     def test_int(self):
         self._test_control_patch("test-int.pd")
