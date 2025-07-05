@@ -26,7 +26,7 @@ hide = SuppressStrMatch
 
 
 def expr():     return none  # EOF                                                                  # noqa
-def none():     return lor, ZeroOrMore(" ", lor)                                                    # noqa
+def none():     return lor, ZeroOrMore(" ", lor)  # needed for logical `or`: `||`                   # noqa
 def lor():      return land, ZeroOrMore("||", land)                                                 # noqa
 def land():     return bor, ZeroOrMore("&&", bor)                                                   # noqa
 def bor():      return xor, ZeroOrMore("|", xor)                                                    # noqa
