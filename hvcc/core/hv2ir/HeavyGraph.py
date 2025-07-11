@@ -965,7 +965,7 @@ class HeavyGraph(HeavyIrObject):
         # receivers into one logical receiver.
         # NOTE(mhroth): a code-compatible name is only necessary for externed receivers
         return {((f"_{k}") if re.match(r"\d", k) else k): IRReceiver(
-            display=k,
+            display=re.sub(r"\[.+\]", "", k),  # drop ordering syntax for display
             hash=f"0x{HeavyLangObject.get_hash(k):X}",
             extern=v[0].args["extern"],
             attributes=v[0].args["attributes"],
