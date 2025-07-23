@@ -75,7 +75,6 @@ static void hvSendHookFunc(HeavyContextInterface *c, const char *sendName, uint3
 #if DISTRHO_PLUGIN_WANT_MIDI_OUTPUT
     plugin->handleMidiSend(sendHash, m);
 #endif
-  }
 {% endif %}
   }
 }

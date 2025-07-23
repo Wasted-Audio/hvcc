@@ -81,7 +81,7 @@ class PdSendObject(PdObject):
                 self.__extern_type = None
 
         # TODO(dromer): deprecate @owl on next stable release
-        if '@raw' in self.obj_args[1] or '@owl' in self.obj_args[1]:
+        if '@raw' in self.obj_args or '@owl' in self.obj_args:
             try:
                 pd_raw_args = parse_pd_raw_args(self.obj_args)
                 self.__attributes.update(pd_raw_args)
