@@ -8,6 +8,7 @@ FILES_DSP = $(filter-out HeavyDPF_{{name}}_UI.cpp, $(wildcard *.cpp))
 FILES_DSP = $(wildcard *.cpp)
 {%- endif %}
 FILES_DSP += $(wildcard *.c)
+FILES_DSP += ../../tinywav/tinywav.c
 
 {%- if meta.enable_ui is sameas true %}
 FILES_UI = HeavyDPF_{{name}}_UI.cpp
@@ -30,6 +31,8 @@ BUILD_CXX_FLAGS += -I ../../{{dpf_path}}dpf-widgets/opengl
 BUILD_CXX_FLAGS += -I ../../{{dpf_path}}{{dependency}}
 	{%- endfor %}
 {%- endif %}
+BUILD_CXX_FLAGS += -I ../../tinywav
+BUILD_C_FLAGS += -I ../../tinywav
 
 BUILD_C_FLAGS += -Wno-unused-parameter -std=c11 -fno-strict-aliasing -pthread
 BUILD_CXX_FLAGS += -Wno-unused-parameter -fno-strict-aliasing -pthread

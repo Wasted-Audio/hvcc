@@ -37,6 +37,10 @@
 
 #define HV_HASH_DPF_BPM         0xDF8C2721
 
+#define HV_HASH_SND_WRITE       0x74140F5F
+#define HV_HASH_SND_READ        0xEB5BD581
+#define HV_HASH_SND_READ_RES    0x280AFD69
+
 // midi realtime messages
 std::set<int> mrtSet {
   MIDI_RT_CLOCK,
@@ -59,10 +63,19 @@ static void hvSendHookFunc(HeavyContextInterface *c, const char *sendName, uint3
   if (plugin != nullptr)
   {
     plugin->setOutputParameter(sendHash, m);
+    switch (sendHash)
+    {
+      case HV_HASH_SND_WRITE:
+      case HV_HASH_SND_READ:
+      case HV_HASH_SND_READ_RES:
+        plugin->sndFileOperator(sendHash, m);
+        break;
+    }
 {%- if meta.midi_output is sameas true %}
 #if DISTRHO_PLUGIN_WANT_MIDI_OUTPUT
     plugin->handleMidiSend(sendHash, m);
 #endif
+  }
 {% endif %}
   }
 }
@@ -167,6 +180,83 @@ void {{class_name}}::setOutputParameter(uint32_t sendHash, const HvMessage *m)
   {%- endif %}
 }
 
+void HeavyDPF_soundfilermock::sndFileOperator(uint32_t sendHash, const HvMessage *m)
+{
+  switch (sendHash) {
+    case HV_HASH_SND_READ: // read_file_out
+    {
+      char buf[64];
+      char buf2[64];
+      char* dst = buf;
+      char* dst2 = buf2;
+      const char *fileName = hv_msg_getSymbol(m, 0);
+      const char *tableName = hv_msg_getSymbol(m, 1);
+
+      dst = strncpy(dst, fileName, 63);
+      dst2 = strncpy(dst2, tableName, 63);
+      printf("> %s - %s \n", buf, buf2);
+
+      hv_uint32_t tableHash = hv_string_to_hash(tableName);
+      float *table = _context->getBufferForTable(tableHash);
+      int tableSize = _context->getLengthForTable(tableHash);
+
+      TinyWav tw;
+      tinywav_open_read(&tw, fileName, TW_INLINE);
+
+      tinywav_read_f(&tw, table, tableSize);
+      tinywav_close_read(&tw);
+
+      break;
+    }
+    case HV_HASH_SND_READ_RES: // read_file_resize_out
+    {
+      const char *fileName = hv_msg_getSymbol(m, 0);
+      const char *tableName = hv_msg_getSymbol(m, 1);
+
+      printf("> resize \n");
+
+      hv_uint32_t tableHash = hv_string_to_hash(tableName);
+
+      TinyWav tw;
+      tinywav_open_read(&tw, fileName, TW_INLINE);
+      int tableSize = tw.numFramesInHeader;
+
+      printf("> %d \n", tableSize);
+
+      _context->setLengthForTable(tableHash, (uint32_t)tableSize);
+      float *table = _context->getBufferForTable(tableHash);
+
+      tinywav_read_f(&tw, table, tableSize);
+      tinywav_close_read(&tw);
+
+      break;
+    }
+    case HV_HASH_SND_WRITE: // write_file_out
+    {
+      const char *fileName = hv_msg_getSymbol(m, 0);
+      const char *tableName = hv_msg_getSymbol(m, 1);
+
+      printf("> writing file \n");
+
+      hv_uint32_t tableHash = hv_string_to_hash(tableName);
+      float *table = _context->getBufferForTable(tableHash);
+      int tableSize = _context->getLengthForTable(tableHash);
+
+      TinyWav tw;
+      tinywav_open_write(
+        &tw, 1,
+        _context->getSampleRate(),
+        TW_FLOAT32, TW_INLINE,
+        fileName
+      );
+      tinywav_write_f(&tw, table, tableSize);
+      tinywav_close_write(&tw);
+
+      break;
+    }
+    default: break;
+  }
+}
 
 // -------------------------------------------------------------------
 // Process

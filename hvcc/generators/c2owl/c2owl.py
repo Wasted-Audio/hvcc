@@ -36,7 +36,7 @@ class c2owl(Generator):
                     continue
 
                 # If a name has been specified
-                if recv.attributes.get('raw'):
+                if recv.attributes.get('raw') is not None:
                     key = recv.attributes['raw']
                     jdata.append((key, name, 'RECV', f"0x{heavy_hash(name):X}",
                                   recv.attributes['min'],
@@ -53,7 +53,7 @@ class c2owl(Generator):
                 try:
                     if obj.type == '__send':
                         name = obj.args['name']
-                        if obj.args['attributes'].get('raw'):
+                        if obj.args['attributes'].get('raw') is not None:
                             key = obj.args['attributes']['raw']
                             jdata.append((key, f'{name}>', 'SEND', f"0x{heavy_hash(name):X}",
                                           obj.args['attributes']['min'],
