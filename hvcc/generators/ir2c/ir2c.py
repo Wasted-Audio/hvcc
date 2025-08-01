@@ -196,6 +196,9 @@ class ir2c:
         # Parse the hv.ir data structure and generate C-language strings.
         #
 
+        # Reset the obj_eval_functions state
+        SignalExpr.obj_eval_functions = {}
+
         # generate set of header files to include
         include_set = set([x for o in ir.objects.values() for x in ir2c.get_class(o.type).get_C_header_set()])
 
@@ -214,7 +217,7 @@ class ir2c:
         class_impl_lines = []
         for obj_id in ir.init.order:
             o = ir.objects[obj_id]
-            print("init objects:", o.type)
+            # print("init objects:", o.type)
             obj_class = ir2c.get_class(o.type)
             init_raw = obj_class.get_C_init(o.type, obj_id, o.args)
 
@@ -230,7 +233,7 @@ class ir2c:
         for x in ir.control.sendMessage:
             obj_id = x.id
             o = ir.objects[obj_id]
-            print("control objects:", o.type)
+            # print("control objects:", o.type)
             obj_class = ir2c.get_class(o.type)
             impl = obj_class.get_C_impl(
                 o.type,
@@ -267,7 +270,7 @@ class ir2c:
             # print("--- signal", y.id, o.type, ir2c.get_class(o.type))
             obj_id = y.id
             o = ir.objects[obj_id]
-            print("process objects:", o.type)
+            # print("process objects:", o.type)
             obj_cls = ir2c.get_class(o.type)
             process_classes.add(obj_cls)
             process_list.extend(obj_cls.get_C_process(

@@ -36,7 +36,7 @@ class SignalExpr(HeavyObject):
         return obj_type == "_expr~"
 
     @classmethod
-    def get_C_header_set(self) -> set:
+    def get_C_header_set(cls) -> set:
         return {"HvMath.h"}
 
     @classmethod
@@ -51,7 +51,7 @@ class SignalExpr(HeavyObject):
 
     @classmethod
     def get_C_obj_header_code(cls, obj_type: str, obj_id: str, args: Dict) -> List[str]:
-        lines = super().get_C_obj_header_code(obj_type, obj_id, args)
+        lines = []
         func_name = f"{cls.preamble}_{obj_id}_evaluate"
         cls.obj_eval_functions[obj_id] = func_name
         lines.extend([
@@ -66,8 +66,7 @@ class SignalExpr(HeavyObject):
         send messages to this object.
         """
 
-        lines = super().get_C_obj_impl_code(obj_type, obj_id, args)
-
+        lines = []
         expr = args["expressions"][0]
         expr_parser = ExprCWriter(expr)
         expr_lines = expr_parser.to_c_simd("bIns", "bOut")[:-1]

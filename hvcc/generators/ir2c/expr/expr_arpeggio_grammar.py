@@ -25,14 +25,16 @@ class SuppressStrMatch(StrMatch):
 hide = SuppressStrMatch
 
 
-def expr():     return lor  # EOF                                                                   # noqa
+def expr():     return none  # EOF                                                                  # noqa
+def none():     return lor, ZeroOrMore(" ", lor)  # needed for logical `or`: `||`                   # noqa
 def lor():      return land, ZeroOrMore("||", land)                                                 # noqa
 def land():     return bor, ZeroOrMore("&&", bor)                                                   # noqa
 def bor():      return xor, ZeroOrMore("|", xor)                                                    # noqa
 def xor():      return band, ZeroOrMore("^", band)                                                  # noqa
 def band():     return eq, ZeroOrMore("&", eq)                                                      # noqa
-def eq():       return gtlt, ZeroOrMore(["==","!="], gtlt)                                          # noqa
-def gtlt():     return shift, ZeroOrMore(["<","<=",">",">="], shift)                                # noqa
+def eq():       return gtlte, ZeroOrMore(["==","!="], gtlte)                                        # noqa
+def gtlte():    return gtlt, ZeroOrMore(["<=",">="], gtlt)                                          # noqa
+def gtlt():     return shift, ZeroOrMore(["<",">"], shift)                                          # noqa
 def shift():    return term, ZeroOrMore(["<<",">>"], term)                                          # noqa
 def term():     return factor, ZeroOrMore(["+","-"], factor)    # RtoL                              # noqa
 def factor():   return unary, ZeroOrMore(["*","/","%"], unary)                                      # noqa
@@ -42,21 +44,62 @@ def number():   return [num_f, num_i]                                           
 def var():      return regex(r"\$[fisv]\d+")                                                        # noqa
 def func():     return [                                                                            # noqa
                     (f_name, hide("("), expr, hide(")")),                                           # noqa
-                    (f_name, hide("("), expr, hide(","), expr, hide(")")),                          # noqa
-                    (f_name, hide("("), expr, hide(","), expr, hide(","), expr, hide(")"))          # noqa
+                    (f_name, hide("("), expr, hide(r"\,"), expr, hide(")")),                        # noqa
+                    (f_name, hide("("), expr, hide(r"\,"), expr, hide(r"\,"), expr, hide(")"))      # noqa
                 ]                                                                                   # noqa
 def group():    return hide("("), expr, hide(")")                                                   # noqa
 def num_f():    return regex(r"\d+\.\d+")  # prob need to cover exponential syntax, others?         # noqa
 def num_i():    return regex(r"\d+")       # need to cover bin/octal/hex?                           # noqa
 def f_name():   return [                                                                            # noqa
-                    "abs", "acos", "acosh", "asin", "asinh", "atan", "atan2",                       # noqa
-                    "cbrt", "ceil", "copysign", "cos", "cosh", "drem", "erf",                       # noqa
-                    "erfc", "exp", "expm1", "fact", "finite", "float", "floor",                     # noqa
-                    "fmod", "ldexp", "if", "imodf", "int", "isinf", "isnan",                        # noqa
-                    "ln", "log", "log10", "log1p", "max", "min", "modf", "pow",                     # noqa
-                    "rint", "sin", "sinh", "size", "sqrt", "sum", "Sum",                            # noqa
-                    "tan", "tanh",                                                                  # noqa
-                ]                                                                                   # noqa
+                    regex(r"\babs(?=\()"),
+                    regex(r"\bacos(?=\()"),
+                    regex(r"\bacosh(?=\()"),
+                    regex(r"\basin(?=\()"),
+                    regex(r"\basinh(?=\()"),
+                    regex(r"\batan(?=\()"),
+                    regex(r"\batan2(?=\()"),
+                    regex(r"\batanh(?=\()"),
+                    regex(r"\bcbrt(?=\()"),
+                    regex(r"\bceil(?=\()"),
+                    regex(r"\bcopysign(?=\()"),
+                    regex(r"\bcos(?=\()"),
+                    regex(r"\bcosh(?=\()"),
+                    regex(r"\bdrem(?=\()"),
+                    regex(r"\berf(?=\()"),
+                    regex(r"\berfc(?=\()"),
+                    regex(r"\bexp(?=\()"),
+                    regex(r"\bexpm1(?=\()"),
+                    # regex(r"\bfact(?=\()"),
+                    regex(r"\bfinite(?=\()"),
+                    regex(r"\bfloat(?=\()"),
+                    regex(r"\bfloor(?=\()"),
+                    regex(r"\bfmod(?=\()"),
+                    regex(r"\bif(?=\()"),
+                    # regex(r"\bimodf(?=\()"),
+                    regex(r"\bint(?=\()"),
+                    regex(r"\bisinf(?=\()"),
+                    regex(r"\bisnan(?=\()"),
+                    regex(r"\bldexp(?=\()"),
+                    regex(r"\bln(?=\()"),
+                    regex(r"\blog(?=\()"),
+                    regex(r"\blog10(?=\()"),
+                    regex(r"\blog1p(?=\()"),
+                    regex(r"\bmax(?=\()"),
+                    regex(r"\bmin(?=\()"),
+                    regex(r"\bmodf(?=\()"),
+                    regex(r"\bpow(?=\()"),
+                    regex(r"\brint(?=\()"),
+                    regex(r"\bround(?=\()"),
+                    regex(r"\bnearbyint(?=\()"),
+                    regex(r"\bsin(?=\()"),
+                    regex(r"\bsinh(?=\()"),
+                    # regex(r"\bsize(?=\()"),
+                    regex(r"\bsqrt(?=\()"),
+                    # regex(r"\bsum(?=\()"),
+                    # regex(r"\bSum(?=\()"),
+                    regex(r"\btan(?=\()"),
+                    regex(r"\btanh(?=\()"),
+                ]
 
 
 expr_grammar = ParserPython(expr, reduce_tree=True)

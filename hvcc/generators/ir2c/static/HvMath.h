@@ -332,6 +332,18 @@ static inline void __hv_exp_f(hv_bInf_t bIn, hv_bOutf_t bOut) {
 #endif
 }
 
+static inline void __hv_expm1_f(hv_bInf_t bIn, hv_bOutf_t bOut) {
+#if HV_SIMD_AVX
+  hv_assert(0); // __hv_expm1_f() not implemented
+#elif HV_SIMD_SSE
+  hv_assert(0); // __hv_expm1_f() not implemented
+#elif HV_SIMD_NEON
+  hv_assert(0); // __hv_expm1_f() not implemented
+#else // HV_SIMD_NONE
+  *bOut = hv_expm1_f(bIn);
+#endif
+}
+
 static inline void __hv_ceil_f(hv_bInf_t bIn, hv_bOutf_t bOut) {
 #if HV_SIMD_AVX
   *bOut = _mm256_ceil_ps(bIn);
@@ -460,6 +472,34 @@ static inline void __hv_cast_fi(hv_bInf_t bIn, hv_bOuti_t bOut) {
   *bOut = vcvtq_s32_f32(bIn);
 #else // HV_SIMD_NONE
   *bOut = (int) bIn;
+#endif
+}
+
+// expr~ expects all float i/o
+static inline void __hv_cast_if_expr(hv_bInf_t bIn, hv_bOutf_t bOut) {
+#if HV_SIMD_AVX
+  hv_assert(0); // __hv_cast_if_expr() not implemented
+#elif HV_SIMD_SSE
+  hv_assert(0); // __hv_cast_if_expr() not implemented
+#elif HV_SIMD_NEON
+  hv_assert(0); // __hv_cast_if_expr() not implemented
+#else // HV_SIMD_NONE
+  *bOut = (float) bIn;
+#endif
+}
+
+// expr~ expects all float i/o
+static inline void __hv_cast_fi_expr(hv_bInf_t bIn, hv_bOutf_t bOut) {
+#if HV_SIMD_AVX
+  hv_assert(0); // __hv_cast_fi_expr() not implemented
+#elif HV_SIMD_SSE
+  hv_assert(0); // __hv_cast_fi_expr() not implemented
+#elif HV_SIMD_NEON
+  hv_assert(0); // __hv_cast_fi_expr() not implemented
+#else // HV_SIMD_NONE
+  if (bIn < 0.0f) *bOut = hv_rint_f(bIn);
+  else if (bIn > 0.0f) *bOut = hv_floor_f(bIn);
+  else *bOut = 0.0f;
 #endif
 }
 
@@ -669,6 +709,18 @@ static inline void __hv_and_f(hv_bInf_t bIn0, hv_bInf_t bIn1, hv_bOutf_t bOut) {
 #endif
 }
 
+static inline void __hv_not_f(hv_bInf_t bIn, hv_bOutf_t bOut) {
+#if HV_SIMD_AVX
+  hv_assert(0); // __hv_not_f() not implemented
+#elif HV_SIMD_SSE
+  hv_assert(0); // __hv_not_f() not implemented
+#elif HV_SIMD_NEON
+  hv_assert(0); // __hv_not_f() not implemented
+#else // HV_SIMD_NONE
+  *bOut = hv_not_f(bIn);
+#endif
+}
+
 static inline void __hv_andnot_f(hv_bInf_t bIn0_mask, hv_bInf_t bIn1, hv_bOutf_t bOut) {
 #if HV_SIMD_AVX
   *bOut = _mm256_andnot_ps(bIn0_mask, bIn1);
@@ -730,6 +782,248 @@ static inline void __hv_fms_f(hv_bInf_t bIn0, hv_bInf_t bIn1, hv_bInf_t bIn2, hv
 #endif
 #else // HV_SIMD_NONE
   *bOut = (bIn0 * bIn1) - bIn2;
+#endif
+}
+
+static inline void __hv_cbrt_f(hv_bInf_t bIn, hv_bOutf_t bOut) {
+#if HV_SIMD_AVX
+  hv_assert(0); // __hv_cbrt_f() not implemented
+#elif HV_SIMD_SSE
+  hv_assert(0); // __hv_cbrt_f() not implemented
+#elif HV_SIMD_NEON
+  hv_assert(0); // __hv_cbrt_f() not implemented
+#else // HV_SIMD_NONE
+  *bOut = hv_cbrt_f(bIn);
+#endif
+}
+
+static inline void __hv_erf_f(hv_bInf_t bIn, hv_bOutf_t bOut) {
+#if HV_SIMD_AVX
+  hv_assert(0); // __hv_erf_f() not implemented
+#elif HV_SIMD_SSE
+  hv_assert(0); // __hv_erf_f() not implemented
+#elif HV_SIMD_NEON
+  hv_assert(0); // __hv_erf_f() not implemented
+#else // HV_SIMD_NONE
+  *bOut = hv_erf_f(bIn);
+#endif
+}
+
+static inline void __hv_erfc_f(hv_bInf_t bIn, hv_bOutf_t bOut) {
+#if HV_SIMD_AVX
+  hv_assert(0); // __hv_erfc_f() not implemented
+#elif HV_SIMD_SSE
+  hv_assert(0); // __hv_erfc_f() not implemented
+#elif HV_SIMD_NEON
+  hv_assert(0); // __hv_erfc_f() not implemented
+#else // HV_SIMD_NONE
+  *bOut = hv_erfc_f(bIn);
+#endif
+}
+
+static inline void __hv_ln_f(hv_bInf_t bIn, hv_bOutf_t bOut) {
+#if HV_SIMD_AVX
+  hv_assert(0); // __hv_ln_f() not implemented
+#elif HV_SIMD_SSE
+  hv_assert(0); // __hv_ln_f() not implemented
+#elif HV_SIMD_NEON
+  hv_assert(0); // __hv_ln_f() not implemented
+#else // HV_SIMD_NONE
+  *bOut = hv_ln_f(bIn);
+#endif
+}
+
+static inline void __hv_log_f(hv_bInf_t bIn, hv_bOutf_t bOut) {
+#if HV_SIMD_AVX
+  hv_assert(0); // __hv_log_f() not implemented
+#elif HV_SIMD_SSE
+  hv_assert(0); // __hv_log_f() not implemented
+#elif HV_SIMD_NEON
+  hv_assert(0); // __hv_log_f() not implemented
+#else // HV_SIMD_NONE
+  *bOut = hv_log_f(bIn);
+#endif
+}
+
+static inline void __hv_log1p_f(hv_bInf_t bIn, hv_bOutf_t bOut) {
+#if HV_SIMD_AVX
+  hv_assert(0); // __hv_log1p_f() not implemented
+#elif HV_SIMD_SSE
+  hv_assert(0); // __hv_log1p_f() not implemented
+#elif HV_SIMD_NEON
+  hv_assert(0); // __hv_log1p_f() not implemented
+#else // HV_SIMD_NONE
+  *bOut = hv_log1p_f(bIn);
+#endif
+}
+
+static inline void __hv_log10_f(hv_bInf_t bIn, hv_bOutf_t bOut) {
+#if HV_SIMD_AVX
+  hv_assert(0); // __hv_log10_f() not implemented
+#elif HV_SIMD_SSE
+  hv_assert(0); // __hv_log10_f() not implemented
+#elif HV_SIMD_NEON
+  hv_assert(0); // __hv_log10_f() not implemented
+#else // HV_SIMD_NONE
+  *bOut = hv_log10_f(bIn);
+#endif
+}
+
+static inline void __hv_modf_f(hv_bInf_t bIn, hv_bOutf_t bOut) {
+#if HV_SIMD_AVX
+  hv_assert(0); // __hv_modf_f() not implemented
+#elif HV_SIMD_SSE
+  hv_assert(0); // __hv_modf_f() not implemented
+#elif HV_SIMD_NEON
+  hv_assert(0); // __hv_modf_f() not implemented
+#else // HV_SIMD_NONE
+  *bOut = hv_modf_f(bIn);
+#endif
+}
+
+static inline void __hv_modulo_f(hv_bInf_t bIn0, hv_bInf_t bIn1, hv_bOutf_t bOut) {
+#if HV_SIMD_AVX
+  hv_assert(0); // __hv_modulo_f() not implemented
+#elif HV_SIMD_SSE
+  hv_assert(0); // __hv_modulo_f() not implemented
+#elif HV_SIMD_NEON
+  hv_assert(0); // __hv_modulo_f() not implemented
+#else // HV_SIMD_NONE
+  float modded = hv_fmod_f(bIn0, bIn1);
+  if (modded < 0.0f) *bOut = hv_rint_f(modded);
+  else if (modded >= 0.0f) *bOut = hv_floor_f(modded);
+#endif
+}
+
+static inline void __hv_shl_f(hv_bInf_t bIn0, hv_bInf_t bIn1, hv_bOutf_t bOut) {
+#if HV_SIMD_AVX
+  hv_assert(0); // __hv_shl_f() not implemented
+#elif HV_SIMD_SSE
+  hv_assert(0); // __hv_shl_f() not implemented
+#elif HV_SIMD_NEON
+  hv_assert(0); // __hv_shl_f() not implemented
+#else // HV_SIMD_NONE
+  *bOut = (float) hv_shl_i((int) bIn0, (int) bIn1);
+#endif
+}
+
+static inline void __hv_shr_f(hv_bInf_t bIn0, hv_bInf_t bIn1, hv_bOutf_t bOut) {
+#if HV_SIMD_AVX
+  hv_assert(0); // __hv_shr_f() not implemented
+#elif HV_SIMD_SSE
+  hv_assert(0); // __hv_shr_f() not implemented
+#elif HV_SIMD_NEON
+  hv_assert(0); // __hv_shr_f() not implemented
+#else // HV_SIMD_NONE
+  *bOut = (float) hv_shr_i((int) bIn0, (int) bIn1);
+#endif
+}
+
+static inline void __hv_bit_and_f(hv_bInf_t bIn0, hv_bInf_t bIn1, hv_bOutf_t bOut) {
+#if HV_SIMD_AVX
+  hv_assert(0); // __hv_bit_and_f() not implemented
+#elif HV_SIMD_SSE
+  hv_assert(0); // __hv_bit_and_f() not implemented
+#elif HV_SIMD_NEON
+  hv_assert(0); // __hv_bit_and_f() not implemented
+#else // HV_SIMD_NONE
+  *bOut = (float) ((int) bIn0 & (int) bIn1);
+#endif
+}
+
+static inline void __hv_bit_or_f(hv_bInf_t bIn0, hv_bInf_t bIn1, hv_bOutf_t bOut) {
+#if HV_SIMD_AVX
+  hv_assert(0); // __hv_bit_or_f() not implemented
+#elif HV_SIMD_SSE
+  hv_assert(0); // __hv_bit_or_f() not implemented
+#elif HV_SIMD_NEON
+  hv_assert(0); // __hv_bit_or_f() not implemented
+#else // HV_SIMD_NONE
+  *bOut = (float) ((int) bIn0 | (int) bIn1);
+#endif
+}
+
+static inline void __hv_bit_not_f(hv_bInf_t bIn, hv_bOutf_t bOut) {
+#if HV_SIMD_AVX
+  hv_assert(0); // __hv_bit_not_f() not implemented
+#elif HV_SIMD_SSE
+  hv_assert(0); // __hv_bit_not_f() not implemented
+#elif HV_SIMD_NEON
+  hv_assert(0); // __hv_bit_not_f() not implemented
+#else // HV_SIMD_NONE
+  *bOut = (float) hv_bit_not_i((int) bIn);
+#endif
+}
+
+static inline void __hv_exc_or_f(hv_bInf_t bIn0, hv_bInf_t bIn1, hv_bOutf_t bOut) {
+#if HV_SIMD_AVX
+  hv_assert(0); // __hv_exc_or_f() not implemented
+#elif HV_SIMD_SSE
+  hv_assert(0); // __hv_exc_or_f() not implemented
+#elif HV_SIMD_NEON
+  hv_assert(0); // __hv_exc_or_f() not implemented
+#else // HV_SIMD_NONE
+  *bOut = (float) ((int) bIn0 ^ (int) bIn1);
+#endif
+}
+
+static inline void __hv_log_and_f(hv_bInf_t bIn0, hv_bInf_t bIn1, hv_bOutf_t bOut) {
+#if HV_SIMD_AVX
+  hv_assert(0); // __hv_log_and_f() not implemented
+#elif HV_SIMD_SSE
+  hv_assert(0); // __hv_log_and_f() not implemented
+#elif HV_SIMD_NEON
+  hv_assert(0); // __hv_log_and_f() not implemented
+#else // HV_SIMD_NONE
+  *bOut = bIn0 && bIn1;
+#endif
+}
+
+static inline void __hv_log_or_f(hv_bInf_t bIn0, hv_bInf_t bIn1, hv_bOutf_t bOut) {
+#if HV_SIMD_AVX
+  hv_assert(0); // __hv_log_or_f() not implemented
+#elif HV_SIMD_SSE
+  hv_assert(0); // __hv_log_or_f() not implemented
+#elif HV_SIMD_NEON
+  hv_assert(0); // __hv_log_or_f() not implemented
+#else // HV_SIMD_NONE
+  *bOut = bIn0 || bIn1;
+#endif
+}
+
+static inline void __hv_rint_f(hv_bInf_t bIn, hv_bOutf_t bOut) {
+#if HV_SIMD_AVX
+  hv_assert(0); // __hv_rint_f() not implemented
+#elif HV_SIMD_SSE
+  hv_assert(0); // __hv_rint_f() not implemented
+#elif HV_SIMD_NEON
+  hv_assert(0); // __hv_rint_f() not implemented
+#else // HV_SIMD_NONE
+  *bOut = hv_rint_f(bIn);
+#endif
+}
+
+static inline void __hv_round_f(hv_bInf_t bIn, hv_bOutf_t bOut) {
+#if HV_SIMD_AVX
+  hv_assert(0); // __hv_round_f() not implemented
+#elif HV_SIMD_SSE
+  hv_assert(0); // __hv_round_f() not implemented
+#elif HV_SIMD_NEON
+  hv_assert(0); // __hv_round_f() not implemented
+#else // HV_SIMD_NONE
+  *bOut = hv_round_f(bIn);
+#endif
+}
+
+static inline void __hv_if_f(hv_bInf_t bIn0, hv_bInf_t bIn1, hv_bInf_t bIn2, hv_bOutf_t bOut) {
+#if HV_SIMD_AVX
+  hv_assert(0); // __hv_if_f() not implemented
+#elif HV_SIMD_SSE
+  hv_assert(0); // __hv_if_f() not implemented
+#elif HV_SIMD_NEON
+  hv_assert(0); // __hv_if_f() not implemented
+#else // HV_SIMD_NONE
+  *bOut = hv_if_f(bIn0, bIn1, bIn2);
 #endif
 }
 
