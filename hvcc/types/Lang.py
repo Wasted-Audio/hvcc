@@ -41,7 +41,10 @@ class HeavyLangType(RootModel):
 
 if __name__ == "__main__":
     import json
-    import importlib_resources
+    try:
+        import importlib_resources
+    except ImportError:
+        import importlib.resources as importlib_resources
 
     heavy_lang_json = importlib_resources.files('hvcc') / 'core/json/heavy.lang.json'
     with open(heavy_lang_json, "r") as f:

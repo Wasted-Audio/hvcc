@@ -16,8 +16,11 @@
 
 import decimal
 import json
-import importlib_resources
 from typing import Optional, List, Dict, Any, Union, cast
+try:
+    import importlib_resources
+except ImportError:
+    import importlib.resources as importlib_resources
 
 from .Connection import Connection
 from .NotificationEnum import NotificationEnum
