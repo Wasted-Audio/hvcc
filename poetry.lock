@@ -280,7 +280,7 @@ description = "Read resources from Python packages"
 optional = false
 python-versions = ">=3.9"
 groups = ["main"]
-markers = "python_version >= \"3.9\""
+markers = "python_version >= \"3.9\" and python_full_version <= \"3.11.0\""
 files = [
     {file = "importlib_resources-6.5.2-py3-none-any.whl", hash = "sha256:789cfdc3ed28c78b67a06acb8126751ced69a3d5f79c095a98298cd8a760ccec"},
     {file = "importlib_resources-6.5.2.tar.gz", hash = "sha256:185f87adef5bcc288449d98fb4fba07cea78bc036455dd44c5fc4a2fe78fed2c"},
@@ -1315,4 +1315,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.8.1"
-content-hash = "55bb2a378eb654bbe16dee42ab2d4a286630aa700d3149a6bedfef6587d6205d"
+content-hash = "ebc83bf3afd4231e7d1c554a9376bc65bdccd35c60c8d69d7456b185b42634ca"
