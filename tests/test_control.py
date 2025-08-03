@@ -198,6 +198,9 @@ class TestPdControlPatches(TestPdControlBase):
     def test_pack(self):
         self._test_control_patch("test-pack.pd")
 
+    def test_pack_symbol(self):
+        self._test_control_patch("test-pack-symbol.pd")
+
     def test_pack_wrong_args(self):
         self._test_control_patch_expect_error("test-pack_wrong_args.pd", NotificationEnum.ERROR_PACK_FLOAT_ARGUMENTS)
 
