@@ -143,10 +143,11 @@ if __name__ == "__main__":
     """ Test object definitions
     """
     import json
-    try:
-        import importlib_resources
-    except ImportError:
+    import sys
+    if sys.version_info >= (3, 11):
         import importlib.resources as importlib_resources
+    else:
+        import importlib_resources
 
     heavy_ir_json = importlib_resources.files('hvcc') / 'core/json/heavy.ir.json'
     with open(heavy_ir_json, "r") as f:

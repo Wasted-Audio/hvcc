@@ -16,11 +16,12 @@
 
 import decimal
 import json
+import sys
 from typing import Optional, List, Dict, Any, Union, cast
-try:
-    import importlib_resources
-except ImportError:
+if sys.version_info >= (3, 11):
     import importlib.resources as importlib_resources
+else:
+    import importlib_resources
 
 from .Connection import Connection
 from .NotificationEnum import NotificationEnum
