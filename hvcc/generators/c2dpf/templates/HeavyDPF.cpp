@@ -182,18 +182,19 @@ void {{class_name}}::setOutputParameter(uint32_t sendHash, const HvMessage *m)
 void HeavyDPF_soundfilermock::sndFileOperator(uint32_t sendHash, const HvMessage *m)
 {
   switch (sendHash) {
-    case HV_HASH_SND_READ: // read_file_out
+    case HV_HASH_SND_READ: // __hv_snd_read
     {
-      char buf[64];
-      char buf2[64];
-      char* dst = buf;
-      char* dst2 = buf2;
-      const char *fileName = hv_msg_getSymbol(m, 0);
-      const char *tableName = hv_msg_getSymbol(m, 1);
+      float sndID = hv_msg_getFloat(m, 0);
+      const char *fileName = hv_msg_getSymbol(m, 1);
+      const char *tableName = hv_msg_getSymbol(m, 2);
 
-      dst = strncpy(dst, fileName, 63);
-      dst2 = strncpy(dst2, tableName, 63);
-      printf("> %s - %s \n", buf, buf2);
+      char sndRecInfo[32];
+      char sndRecSamples[32];
+      char *bufInfo = sndRecInfo;
+      char *bufSamples = sndRecSamples;
+
+      snprintf(bufInfo, 31, "%d__hv_snd_info", (int) sndID);
+      snprintf(bufSamples, 31, "%d__hv_snd_samples", (int) sndID);
 
       hv_uint32_t tableHash = hv_string_to_hash(tableName);
       float *table = _context->getBufferForTable(tableHash);
@@ -203,16 +204,38 @@ void HeavyDPF_soundfilermock::sndFileOperator(uint32_t sendHash, const HvMessage
       tinywav_open_read(&tw, fileName, TW_INLINE);
 
       tinywav_read_f(&tw, table, tableSize);
+
+      _context->sendMessageToReceiverV(
+        hv_string_to_hash(sndRecInfo), 0, "ffffs",
+        (float) tw.h.SampleRate,  // sample rate
+        44.0,                     // header size
+        1.0,                      // channels
+        (float) tw.sampFmt,       // bytes per sample
+        "l"                       // endianness
+      );
+
+      _context->sendFloatToReceiver(
+        hv_string_to_hash(sndRecSamples),
+        float(tableSize)
+      );
+
       tinywav_close_read(&tw);
 
       break;
     }
-    case HV_HASH_SND_READ_RES: // read_file_resize_out
+    case HV_HASH_SND_READ_RES: // __hv_snd_read_resize
     {
-      const char *fileName = hv_msg_getSymbol(m, 0);
-      const char *tableName = hv_msg_getSymbol(m, 1);
+      float sndID = hv_msg_getFloat(m, 0);
+      const char *fileName = hv_msg_getSymbol(m, 1);
+      const char *tableName = hv_msg_getSymbol(m, 2);
 
-      printf("> resize \n");
+      char sndRecInfo[32];
+      char sndRecSamples[32];
+      char *bufInfo = sndRecInfo;
+      char *bufSamples = sndRecSamples;
+
+      snprintf(bufInfo, 31, "%d__hv_snd_info", (int) sndID);
+      snprintf(bufSamples, 31, "%d__hv_snd_samples", (int) sndID);
 
       hv_uint32_t tableHash = hv_string_to_hash(tableName);
 
@@ -220,22 +243,42 @@ void HeavyDPF_soundfilermock::sndFileOperator(uint32_t sendHash, const HvMessage
       tinywav_open_read(&tw, fileName, TW_INLINE);
       int tableSize = tw.numFramesInHeader;
 
-      printf("> %d \n", tableSize);
-
       _context->setLengthForTable(tableHash, (uint32_t)tableSize);
       float *table = _context->getBufferForTable(tableHash);
 
       tinywav_read_f(&tw, table, tableSize);
+
+      _context->sendMessageToReceiverV(
+        hv_string_to_hash(sndRecInfo), 0, "ffffs",
+        (float) tw.h.SampleRate,  // sample rate
+        44.0,                     // header size
+        1.0,                      // channels
+        (float) tw.sampFmt,       // bytes per sample
+        "l"                       // endianness
+      );
+
+      _context->sendFloatToReceiver(
+        hv_string_to_hash(sndRecSamples),
+        float(tableSize)
+      );
+
       tinywav_close_read(&tw);
 
       break;
     }
-    case HV_HASH_SND_WRITE: // write_file_out
+    case HV_HASH_SND_WRITE: // __hv_snd_write
     {
-      const char *fileName = hv_msg_getSymbol(m, 0);
-      const char *tableName = hv_msg_getSymbol(m, 1);
+      float sndID = hv_msg_getFloat(m, 0);
+      const char *fileName = hv_msg_getSymbol(m, 1);
+      const char *tableName = hv_msg_getSymbol(m, 2);
 
-      printf("> writing file \n");
+      char sndRecInfo[32];
+      char sndRecSamples[32];
+      char *bufInfo = sndRecInfo;
+      char *bufSamples = sndRecSamples;
+
+      snprintf(bufInfo, 31, "%d__hv_snd_info", (int) sndID);
+      snprintf(bufSamples, 31, "%d__hv_snd_samples", (int) sndID);
 
       hv_uint32_t tableHash = hv_string_to_hash(tableName);
       float *table = _context->getBufferForTable(tableHash);
@@ -249,6 +292,21 @@ void HeavyDPF_soundfilermock::sndFileOperator(uint32_t sendHash, const HvMessage
         fileName
       );
       tinywav_write_f(&tw, table, tableSize);
+
+      _context->sendMessageToReceiverV(
+        hv_string_to_hash(sndRecInfo), 0, "ffffs",
+        (float) tw.h.SampleRate,  // sample rate
+        44.0,                     // header size
+        1.0,                      // channels
+        (float) tw.sampFmt,       // bytes per sample
+        "l"                       // endianness
+      );
+
+      _context->sendFloatToReceiver(
+        hv_string_to_hash(sndRecSamples),
+        float(tableSize)
+      );
+
       tinywav_close_write(&tw);
 
       break;
