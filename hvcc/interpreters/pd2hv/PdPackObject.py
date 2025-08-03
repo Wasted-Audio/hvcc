@@ -40,7 +40,7 @@ class PdPackObject(PdObject):
             try:
                 self.values.append(float(x))
             except Exception:
-                if x in {"f", "float"}:
+                if x in {"f", "float", "s", "symbol"}:
                     self.values.append(0.0)
                 else:
                     self.add_error(
