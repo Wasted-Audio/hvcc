@@ -33,14 +33,15 @@ class ir2c_perf:
         blocksize: int = 512,
         mhz: int = 1000,
         verbose: bool = False
-    ) -> Dict[str, Counter]:
+    ) -> Dict[str, Dict[str, float]]:
         # read the hv.ir.json file
         with open(os.path.join(os.path.dirname(__file__), "../../core/json/heavy.ir.json"), "r") as f:
             HEAVY_IR_JSON = HeavyIRType(**json.load(f)).root
 
         objects: Counter = Counter()
-        perf: Counter = Counter()
-        per_object_perf: Dict[str, Counter] = defaultdict(Counter)
+        perf: Dict[str, float] = defaultdict(float)
+        per_object_perf: Dict[str, Dict[str, float]] = defaultdict(lambda: defaultdict(float))
+
         for o in ir.signal.processOrder:
             obj_id = o.id
             obj_type = ir.objects[obj_id].type
@@ -48,9 +49,10 @@ class ir2c_perf:
                 objects[obj_type] += 1
                 obj_perf = HEAVY_IR_JSON[obj_type].perf
                 assert obj_perf is not None
-                c = Counter(obj_perf.model_dump())
-                perf = perf + c
-                per_object_perf[obj_type] = per_object_perf[obj_type] + c
+                c = defaultdict(float, **obj_perf.model_dump())
+                for k, v in c.items():
+                    perf[k] = perf[k] + v
+                    per_object_perf[obj_type][k] = per_object_perf[obj_type][k] + v
             else:
                 print(f"ERROR: Unknown object type {obj_type}")
 
@@ -88,7 +90,8 @@ class ir2c_perf:
             for k, v in items:
                 if perf["avx"] > 0:
                     print(
-                        "{2:>2.2g}%  {3:<5} {0:<16} {1}".format(k, v, int(100.0 * v["avx"] / perf["avx"]), objects[k])
+                        "{2:>2.2g}%  {3:<5} {0:<16} {1}".format(
+                            k, dict(v), int(100.0 * v["avx"] / perf["avx"]), objects[k])
                     )
 
         return per_object_perf

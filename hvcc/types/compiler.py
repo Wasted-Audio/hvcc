@@ -35,7 +35,7 @@ class CompilerResp(BaseModel):
     out_file: str = ""
     compile_time: float = 0.0
     obj_counter: Counter = Counter()
-    obj_perf: Dict[str, Counter] = defaultdict(Counter)
+    obj_perf: Dict[str, Dict[str, float]] = defaultdict(lambda: defaultdict(float))
     ir: Optional[IRGraph] = None
 
 

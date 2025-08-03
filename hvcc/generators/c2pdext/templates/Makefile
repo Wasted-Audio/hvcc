@@ -15,4 +15,5 @@ common.sources += $(wildcard pdext/*.cpp)
 # all extra files to be included in binary distribution of the library
 #datafiles = helloworld-help.pd helloworld-meta.pd README.md
 
-include Makefile.pdlibbuilder
+PDLIBBUILDER_DIR=.
+include $(PDLIBBUILDER_DIR)/Makefile.pdlibbuilder

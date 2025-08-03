@@ -1,6 +1,41 @@
 CHANGELOG
 =====
 
+Next Release
+-----
+
+Features:
+
+* Metadata: optional Dict for external generators
+* JS: audio inputs now work - thanks to @ZXMushroom63
+
+Bugfixes:
+
+* Core: dereferencing type-punned pointer warning - thanks to @grrr
+* Core: signed/unsigned mismatch in HvSignalTabwrite.h - thanks to @grrr
+* c2dpf: portGroup template fix with i/o port 0 as CV
+
+0.13.4
+-----
+
+Bugfixes:
+
+* sending `[stop(` to `[line~]` when it's not running no longer jumps the current value (#188)
+* JS: emsdk 4.0.7 EXPORTED_RUNTIME_METHODS
+* Typing: move obj_perf to defaultdict()
+* Documentation: corrections
+* CI: move to ubuntu-22.04
+* Dependency updates
+
+0.13.3
+-----
+
+Bugfixes:
+
+* Daisy: add ScopedIrqBlocker to several functions. Should fix midi input issues and potentially others.
+* Daisy: use FIFO to buffer midi TX messages and call them in the main loop instead of during process()
+* JS: Ignore windows batch if inside of MingW environment
+
 0.13.2
 -----
 

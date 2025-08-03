@@ -203,6 +203,7 @@ def load_ext_generator(module_name: str, verbose: bool) -> Optional[Generator]:
             print(f"---> Module {module_name} does not contain a class derived from hvcc.types.Compiler")
         return None
     except ModuleNotFoundError:
+        print(f"---> Module {module_name} not found")
         return None
 
 

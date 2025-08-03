@@ -63,3 +63,4 @@ class Meta(BaseModel):
     nosimd: Optional[bool] = False
     daisy: Daisy = Daisy()
     dpf: DPF = DPF()
+    external: Optional[Dict] = None
