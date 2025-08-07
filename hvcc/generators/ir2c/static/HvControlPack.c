@@ -45,7 +45,7 @@ void cPack_onMessage(HeavyContextInterface *_c, ControlPack *o, int letIn, const
       for (int i = hv_min_i(numElements, msg_getNumElements(m))-1; i >= 0; --i) {
         switch (msg_getType(m, i)) {
           case HV_MSG_FLOAT: msg_setFloat(o->msg, i, msg_getFloat(m, i)); break;
-          case HV_MSG_SYMBOL: msg_setSymbol(o->msg, i, msg_getSymbol(m, i+1)); break;
+          case HV_MSG_SYMBOL:
           case HV_MSG_HASH: msg_setHash(o->msg, i, msg_getHash(m, i)); break;
           default: break;
         }
