@@ -15,7 +15,6 @@ from hvcc.types.compiler import Generator, CompilerResp, CompilerNotif, Compiler
 from hvcc.types.meta import Meta
 
 from ..copyright import copyright_manager
-from ..filters import filter_plugin_id
 
 
 class c2fmod(Generator):
@@ -48,7 +47,6 @@ class c2fmod(Generator):
 
         templates_dir = os.path.join(os.path.dirname(__file__), "templates")
         is_source_plugin = num_input_channels == 0
-        plugin_id = filter_plugin_id(patch_name)
 
         out_dir = os.path.join(out_dir, "fmod")
         if not os.path.exists(out_dir):
@@ -83,7 +81,6 @@ class c2fmod(Generator):
                 with open(file_path, "w") as g:
                     g.write(env.get_template(f).render(
                         name=patch_name,
-                        plugin_id=plugin_id,
                         in_params=in_parameter_list,
                         out_params=out_parameter_list,
                         out_events=out_event_list,
