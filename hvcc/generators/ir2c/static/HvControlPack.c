@@ -57,7 +57,7 @@ void cPack_onMessage(HeavyContextInterface *_c, ControlPack *o, int letIn, const
     default: { // rest of inlets just store values
       switch (msg_getType(m, 0)) {
         case HV_MSG_FLOAT: msg_setFloat(o->msg, letIn, msg_getFloat(m, 0)); break;
-        case HV_MSG_SYMBOL:
+        case HV_MSG_SYMBOL: msg_setSymbol(o->msg, letIn, msg_getSymbol(m, 1)); break;
         case HV_MSG_HASH: msg_setHash(o->msg, letIn, msg_getHash(m, 0)); break;
         default: break;
       }
