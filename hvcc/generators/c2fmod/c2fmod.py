@@ -8,7 +8,7 @@ import os
 import shutil
 import time
 
-from typing import Dict, Optional
+from typing import Optional
 
 from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
 from hvcc.types.compiler import Generator, CompilerResp, CompilerNotif, CompilerMsg, ExternInfo
@@ -36,7 +36,7 @@ class c2fmod(Generator):
     ) -> CompilerResp:
         tick = time.time()
 
-        patch_name = patch_name.lower() or "heavy"
+        patch_name = patch_name.lower() if patch_name is not None else "heavy"
 
         in_parameter_list = externs.parameters.inParam
         out_parameter_list = externs.parameters.outParam
@@ -68,7 +68,7 @@ class c2fmod(Generator):
 
             heavy_src_files = [f for f in os.listdir(c_src_dir) if f.endswith(".c") or f.endswith(".cpp")]
 
-            src_ext_list = ["h", "hpp", "c", "cpp", "js", "md", "txt" ]
+            src_ext_list = ["h", "hpp", "c", "cpp", "js", "md", "txt"]
 
             for f in env.list_templates(extensions=src_ext_list):
                 file_dir = os.path.join(out_dir, os.path.dirname(f))
@@ -83,6 +83,7 @@ class c2fmod(Generator):
                 with open(file_path, "w") as g:
                     g.write(env.get_template(f).render(
                         name=patch_name,
+                        plugin_id=plugin_id,
                         in_params=in_parameter_list,
                         out_params=out_parameter_list,
                         out_events=out_event_list,
