@@ -8,6 +8,7 @@ Features:
 
 * Metadata: optional Dict for external generators
 * JS: audio inputs now work - thanks to @ZXMushroom63
+* Objects: support symbol in `[pack]` (not on first inlet!)
 
 Bugfixes:
 
