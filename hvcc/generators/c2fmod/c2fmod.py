@@ -1,3 +1,8 @@
+# Heavy Compiler Collection
+# Copyright (C) 2024 Wasted Audio
+#
+# SPDX-License-Identifier: GPL-3.0-only
+
 import jinja2
 import os
 import shutil

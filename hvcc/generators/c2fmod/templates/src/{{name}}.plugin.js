@@ -1,5 +1,5 @@
 studio.plugins.registerPluginDescription("{{name}}", {
-  companyName: "PlugData",
+  companyName: "Wasted Audio",
   productName: "{{name|capitalize}}",
   parameters: {
     {%- for param, i in in_params %}
