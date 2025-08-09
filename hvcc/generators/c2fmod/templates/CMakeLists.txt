@@ -2,9 +2,8 @@ cmake_minimum_required(VERSION 3.29.0)
 
 project({{name}})
 
-if((NOT IS_DIRECTORY ${CMAKE_SOURCE_DIR}/include/fmod)
-  OR (NOT IS_SYMLINK ${CMAKE_SOURCE_DIR}/include/fmod))
-  message(FATAL_ERROR "FMOD SDK MISSING: ${CMAKE_SOURCE_DIR}/fmod")
+if(NOT IS_DIRECTORY ${CMAKE_SOURCE_DIR}/include/fmod)
+  message(FATAL_ERROR "FMOD SDK MISSING: ${CMAKE_SOURCE_DIR}/include/fmod")
 endif()
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
