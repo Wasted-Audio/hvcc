@@ -23,6 +23,11 @@ add_library(
   ${CMAKE_SOURCE_DIR}/src/{{name}}.cpp
 )
 
+set_target_properties(
+  objlib PROPERTIES
+  POSITION_INDEPENDENT_CODE True
+)
+
 target_sources(
   objlib PRIVATE
   {%- for file in heavy_src_files %}
