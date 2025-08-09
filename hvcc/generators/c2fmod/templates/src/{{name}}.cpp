@@ -99,7 +99,7 @@ static FMOD_RESULT F_CALL PluginProcess
 
       {%- if is_source_plugin %}
 
-      outBuffers[0].buffernumchannels[0] = ctx->numOutputs;
+      outBuffers[0].buffernumchannels[0] = plugin->numOutputs;
       return FMOD_OK;
 
       {%- else %}
