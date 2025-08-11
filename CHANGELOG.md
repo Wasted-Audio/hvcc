@@ -8,6 +8,8 @@ Features:
 
 * Metadata: optional Dict for external generators
 * JS: audio inputs now work - thanks to @ZXMushroom63
+* Generator: new FMOD generator - thanks to @michaelhartung
+* Objects: support symbol in `[pack]` (not on first inlet!)
 
 Bugfixes:
 
