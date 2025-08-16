@@ -20,6 +20,15 @@
 #include "tinywav.h"
 
 int main(int argc, const char *argv[]) {
+  #if HV_SIMD_AVX
+    printf("AVX!\n");
+  #elif HV_SIMD_SSE
+    printf("SSE!\n");
+  #elif HV_SIMD_NEON
+    printf("NEON!\n");
+  #else // HV_SIMD_NONE
+    printf("NONE!\n");
+  #endif
   if (argc < 5) return -1;
   const char *outputPath = argv[1];
   const double sampleRate = atof(argv[2]);
@@ -40,7 +49,7 @@ int main(int argc, const char *argv[]) {
       (int32_t) hv_getSampleRate(context),
       TW_FLOAT32, TW_INLINE, outputPath);
 
-  float *outBuffers = (float *) malloc(
+  float *outBuffers = (float *) hv_malloc(
       hv_getNumOutputChannels(context) * blockSize * sizeof(float));
 
   for (int i = 0; i < numIterations; ++i) {
