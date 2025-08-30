@@ -123,6 +123,9 @@ class TestPdControlPatches(TestPdControlBase):
     def test_gui(self):
         self._test_control_patch("test-gui.pd")
 
+    def test_gui_send_receive(self):
+        self._test_control_patch("test-gui-send-receive.pd")
+
     def test_hanging_binop(self):
         self._test_control_patch("test-hanging_binop.pd")
 

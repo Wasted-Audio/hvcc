@@ -1,0 +1,13 @@
+#N canvas 827 239 734 565 12;
+#X obj 108 84 loadbang;
+#X msg 108 110 20;
+#X obj 108 187 vsl 17 128 0 127 0 0 two one empty 0 -9 0 10 #191919 #ffffff #ffffff 0 1;
+#X obj 108 477 print;
+#X obj 317 228 bng 25 250 50 0 three two empty 17 7 0 10 #191919 #ffffff #ffffff;
+#X msg 108 439 30;
+#X obj 108 136 send one;
+#X obj 108 405 receive three;
+#X connect 0 0 1 0;
+#X connect 1 0 6 0;
+#X connect 5 0 3 0;
+#X connect 7 0 5 0;

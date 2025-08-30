@@ -176,9 +176,9 @@ class PdParser:
         graph_args = [self.__DOLLAR_ZERO] + (obj_args or [])
 
         if not canvas_line.startswith("#N canvas"):
-            g = pd_graph_class(graph_args, file_path, pos_x, pos_y)
-            g.add_error(f"Pd files must begin with \"#N canvas\": {canvas_line}")
-            return g
+            g_cls = pd_graph_class(graph_args, file_path, pos_x, pos_y)
+            g_cls.add_error(f"Pd files must begin with \"#N canvas\": {canvas_line}")
+            return g_cls
 
         g = self.graph_from_canvas(
             file_iterator,
@@ -202,7 +202,7 @@ class PdParser:
     def graph_from_canvas(
         self,
         file_iterator: Generator,
-        file_hv_arg_dict: Dict,
+        file_hv_arg_dict: Dict[str, List[Any]],
         canvas_line: str,
         graph_args: List,
         pd_path: str,
@@ -222,7 +222,9 @@ class PdParser:
 
         g = pd_graph_class(graph_args, pd_path, pos_x, pos_y)
 
-        remotes: Dict = {}
+        msg_send: Dict = {}
+        gui_send: Dict = {}
+        gui_recv: Dict = {}
 
         # parse and add all Heavy arguments to the graph
         for li in file_hv_arg_dict[canvas_line]:
@@ -240,7 +242,7 @@ class PdParser:
         try:  # this try will capture any critical errors
             for li in file_iterator:
                 # remove width parameter
-                line = self.__RE_WIDTH.sub("", li).split()
+                line = self.__RE_WIDTH.sub("", li).split()  # TODO: don't split on `\ `
 
                 if line[0] == "#N":
                     if line[1] == "canvas":
@@ -467,7 +469,32 @@ class PdParser:
                                 obj_type="comment",
                                 obj_args=[f"null object placeholder ({obj_type})"])
 
-                        g.add_object(x)
+                        assert x is not None
+                        index = g.add_object(x)
+
+                        # add gui send/receive objects
+                        arg_index = {
+                            'nbx':       (6, 7),
+                            'vsl':       (6, 7),
+                            'hsl':       (6, 7),
+                            'vradio':    (4, 5),
+                            'hradio':    (4, 5),
+                            'bng':       (4, 5),
+                            'tgl':       (2, 3),
+                            'knob':      (5, 6),
+                            'else/knob': (5, 6),
+                        }
+
+                        if obj_type in arg_index.keys():
+                            # todo: deal with escaped spaces in the name `\ `
+                            send_index = arg_index[obj_type][0]
+                            recv_index = arg_index[obj_type][1]
+
+                            if send_index != 'empty':
+                                gui_send[index] = obj_args[send_index]
+
+                            if recv_index != 'empty':
+                                gui_recv[index] = obj_args[recv_index]
 
                     elif line[1] in {"floatatom", "symbolatom"}:
                         self.obj_counter[line[1]] += 1
@@ -507,10 +534,10 @@ class PdParser:
                         index = g.add_object(msg)
 
                         if len(msg.obj_dict) > 0:
-                            remotes[index] = []
+                            msg_send[index] = []
 
                             for remote in msg.obj_dict['remote']:
-                                remotes[index].append(remote)
+                                msg_send[index].append(remote)
 
                     elif line[1] == "connect":
                         g.add_parsed_connection(
@@ -567,11 +594,11 @@ class PdParser:
                 g.add_error(str(e), NotificationEnum.ERROR_EXCEPTION)
 
         # parse remote messages
-        for index in remotes.keys():
+        for index in msg_send.keys():
             first_msg = g.get_object(index)
             conns = first_msg.get_inlet_connections()
 
-            for remote in remotes[index]:
+            for remote in msg_send[index]:
                 self.obj_counter["msg"] += 1
                 msg = PdMessageObject('msg', [' '.join(msg for msg in remote['message'])])
                 msg_index = g.add_object(msg)
@@ -587,6 +614,22 @@ class PdParser:
                     g.add_parsed_connection(up_index, 0, msg_index, 0)
 
                 g.add_parsed_connection(msg_index, 0, send_index, 0)
+
+        # parse gui sends
+        for index in gui_send.keys():
+            self.obj_counter["send"] += 1
+            send = PdSendObject('send', [gui_send[index]])
+            send_index = g.add_object(send)
+
+            g.add_parsed_connection(index, 0, send_index, 0)
+
+        # parse gui receives
+        for index in gui_recv.keys():
+            self.obj_counter["receive"] += 1
+            recv = PdReceiveObject('receive', [gui_recv[index]])
+            recv_index = g.add_object(recv)
+
+            g.add_parsed_connection(recv_index, 0, index, 0)
 
         return g
 
