@@ -6,5 +6,4 @@
 [@ 0.000] print: bang
 [@ 0.000] print: 7
 [@ 0.000] print: 8
-[@ 0.000] print: symbol float
 [@ 0.000] print: 10

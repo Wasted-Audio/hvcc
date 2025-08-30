@@ -18,11 +18,11 @@ Possible objects to include:
 - Toggle (tgl)
 - Knob (knob, else/knob)
 - Float atom (floatatom)
-- Symbol atom (symbolatom)
 
 There are some objects that also have send/receive capabilities, but at this moment it doesn't make sense to support them:
 
 - Canvas (cnv)
+- Symbol atom (symbolatom)
 
 ## Decision
 
