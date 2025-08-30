@@ -1,1 +1,10 @@
-[@ 0.000] print: 30
+[@ 0.000] print: 1
+[@ 0.000] print: 2
+[@ 0.000] print: 3
+[@ 0.000] print: 4
+[@ 0.000] print: 5
+[@ 0.000] print: bang
+[@ 0.000] print: 7
+[@ 0.000] print: 8
+[@ 0.000] print: symbol float
+[@ 0.000] print: 10
