@@ -490,10 +490,10 @@ class PdParser:
                             send_index = arg_index[obj_type][0]
                             recv_index = arg_index[obj_type][1]
 
-                            if send_index != 'empty':
+                            if obj_args[send_index] != 'empty':
                                 gui_send[index] = obj_args[send_index]
 
-                            if recv_index != 'empty':
+                            if obj_args[recv_index] != 'empty':
                                 gui_recv[index] = obj_args[recv_index]
 
                     elif line[1] in {"floatatom", "symbolatom"}:
