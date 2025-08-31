@@ -143,9 +143,9 @@ if __name__ == "__main__":
     """ Test object definitions
     """
     import json
-    import importlib_resources
+    from importlib import resources
 
-    heavy_ir_json = importlib_resources.files('hvcc') / 'core/json/heavy.ir.json'
+    heavy_ir_json = resources.files('hvcc') / 'core/json/heavy.ir.json'
     with open(heavy_ir_json, "r") as f:
         data = json.load(f)
         heavy_ir = HeavyIRType(root=data)

@@ -16,7 +16,7 @@
 
 import decimal
 import json
-import importlib_resources
+from importlib import resources
 from typing import Optional, List, Dict, Any, Union, cast
 
 from .Connection import Connection
@@ -29,11 +29,11 @@ from hvcc.types.Lang import HeavyLangType, LangNode, LangArg
 
 class HeavyObject(PdObject):
 
-    heavy_lang_json = importlib_resources.files('hvcc') / 'core/json/heavy.lang.json'
+    heavy_lang_json = resources.files('hvcc') / 'core/json/heavy.lang.json'
     with open(heavy_lang_json, "r") as f:
         __HEAVY_LANG_OBJS = HeavyLangType(**json.load(f)).root
 
-    heavy_ir_json = importlib_resources.files('hvcc') / 'core/json/heavy.ir.json'
+    heavy_ir_json = resources.files('hvcc') / 'core/json/heavy.ir.json'
     with open(heavy_ir_json, "r") as f:
         __HEAVY_IR_OBJS = HeavyIRType(**json.load(f)).root
 
