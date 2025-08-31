@@ -23,6 +23,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
         run: |
+          sudo apt update && sudo apt install libopenblas-dev
           python -m pip install --upgrade pip setuptools wheel
           pip install -U tox tox-gh-actions poetry
       - name: Run tox
