@@ -69,12 +69,12 @@ def main() -> bool:
         "--gen",
         nargs="+",
         default=["c"],
-        help="List of generator outputs: c, unity, wwise, js, pdext, daisy, dpf, fabric, owl")
+        help="List of generator outputs: c, unity, wwise, js, pdext, daisy, dpf, fabric, owl.")
     parser.add_argument(
         "-G",
         "--ext-gen",
         nargs="*",
-        help="List of external generator modules, see 'External Generators' docs page.")
+        help="Name of a Python module that implements a generator, see 'External Generators' docs page.")
     parser.add_argument(
         "--results_path",
         help="Write results dictionary to the given path as a JSON-formatted string."
