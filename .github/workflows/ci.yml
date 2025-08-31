@@ -27,7 +27,9 @@ jobs:
           python -m pip install --upgrade pip setuptools wheel
           pip install -U tox tox-gh-actions poetry
       - name: Run tox
-        run: tox
+        run: |
+          ( while true; do free -h && uptime; sleep 10; done ) &
+          tox
 
   build:
     runs-on: ubuntu-22.04
