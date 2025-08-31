@@ -144,9 +144,10 @@ if __name__ == "__main__":
     """
     import json
     from importlib import resources
+    from pathlib import Path
 
-    heavy_ir_json = resources.files('hvcc') / 'core/json/heavy.ir.json'
-    with open(heavy_ir_json, "r") as f:
+    heavy_ir_json = str(resources.files('hvcc') / 'core/json/heavy.ir.json')
+    with open(Path(heavy_ir_json), "r") as f:
         data = json.load(f)
         heavy_ir = HeavyIRType(root=data)
         print(heavy_ir.root.keys())
