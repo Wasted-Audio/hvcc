@@ -69,7 +69,7 @@ def main() -> bool:
         "--gen",
         nargs="+",
         default=["c"],
-        help="List of generator outputs: c, unity, wwise, js, pdext, daisy, dpf, fabric, owl.")
+        help="List of generator outputs: c, daisy, dpf, js, owl, pdext, unity, wwise.")
     parser.add_argument(
         "-G",
         "--ext-gen",
