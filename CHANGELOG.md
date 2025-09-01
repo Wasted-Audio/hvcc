@@ -16,6 +16,7 @@ Bugfixes:
 * Core: dereferencing type-punned pointer warning - thanks to @grrr
 * Core: signed/unsigned mismatch in HvSignalTabwrite.h - thanks to @grrr
 * c2dpf: portGroup template fix with i/o port 0 as CV
+* c2wwise: use correct SDK header paths and allow any platform in the xml - thanks to @eu-ch
 
 0.13.4
 -----
