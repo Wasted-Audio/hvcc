@@ -6,6 +6,7 @@
 #include "DistrhoPlugin.hpp"
 #include "DistrhoPluginInfo.h"
 #include "Heavy_{{name}}.hpp"
+#include "tinywav.h"
 
 START_NAMESPACE_DISTRHO
 
@@ -49,6 +50,7 @@ public:
   void handleMidiSend(uint32_t sendHash, const HvMessage *m);
   void hostTransportEvents(uint32_t frames);
   void setOutputParameter(uint32_t sendHash, const HvMessage *m);
+  void sndFileOperator(uint32_t sendHash, const HvMessage *m);
 
 protected:
   // -------------------------------------------------------------------
