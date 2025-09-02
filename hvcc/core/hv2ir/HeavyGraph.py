@@ -964,13 +964,29 @@ class HeavyGraph(HeavyIrObject):
         # as the grouping of control receivers should have grouped all same-named
         # receivers into one logical receiver.
         # NOTE(mhroth): a code-compatible name is only necessary for externed receivers
-        return {((f"_{k}") if re.match(r"\d", k) else k): IRReceiver(
-            display=re.sub(r"\[.+\]", "", k),  # drop ordering syntax for display
-            hash=f"0x{HeavyLangObject.get_hash(k):X}",
-            extern=v[0].args["extern"],
-            attributes=v[0].args["attributes"],
-            ids=[v[0].id]
-        ) for k, v in self.local_vars.get_registered_objects_for_type("__receive").items()}
+
+        # return {((f"_{k}") if re.match(r"\d", k) else k): IRReceiver(
+        #     display=re.sub(r"\[.+\]", "", k),  # drop ordering syntax for display
+        #     hash=f"0x{HeavyLangObject.get_hash(k):X}",
+        #     extern=v[0].args["extern"],
+        #     attributes=v[0].args["attributes"],
+        #     ids=[v[0].id]
+        # ) for k, v in self.local_vars.get_registered_objects_for_type("__receive").items()}
+
+        ir_rec_dict = {}
+
+        for k, v in self.local_vars.get_registered_objects_for_type("__receive").items():
+            k = re.sub(r"\[.+\]", "", k)  # drop ordering syntax
+            ir_rec_dict[(f"_{k}") if re.match(r"\d", k) else k] = IRReceiver(
+                display=k,
+                hash=f"0x{HeavyLangObject.get_hash(k):X}",
+                extern=v[0].args["extern"],
+                attributes=v[0].args["attributes"],
+                ids=[v[0].id]
+            )
+
+        return ir_rec_dict
+
 
     def get_ir_signal_list(self) -> List[IRSignalList]:
         return [x for o in self.signal_order for x in o.get_ir_signal_list()]
