@@ -255,7 +255,8 @@ class ir2c:
         name = ir.name.escaped
 
         # ensure that send_receive dictionary is alphabetised by the receiver key
-        send_receive = OrderedDict(sorted([(k, v) for k, v in ir.control.receivers.items()], key=lambda x: x[0]))
+        # send_receive = OrderedDict(sorted([(k, v) for k, v in ir.control.receivers.items()], key=lambda x: x[0]))
+        send_receive = ir.control.receivers
 
         # write HeavyContext.h
         with open(os.path.join(output_dir, f"Heavy_{name}.hpp"), "w") as f:

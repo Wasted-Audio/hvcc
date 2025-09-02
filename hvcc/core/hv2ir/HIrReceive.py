@@ -37,7 +37,8 @@ class HIrReceive(HeavyIrObject):
         super().__init__("__receive", args=args, graph=graph, annotations=annotations)
         if args is not None and args["extern"]:
             # externed receivers must contain only alphanumeric characters or underscores,
+            # or use square brackets for ordering them (will de dropped for display),
             # so that the names can be easily and transparently turned into code
-            if re.search(r"\W", args["name"]):
+            if re.search(r"\W,\[,\]", args["name"]):
                 self.add_error(f"Parameter and Event names may only contain \
                                 alphanumeric characters or underscore: '{args['name']}'")
