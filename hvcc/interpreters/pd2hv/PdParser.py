@@ -54,10 +54,13 @@ class PdParser:
     __PDLIB_CONVERTED_DIR = os.path.join(os.path.dirname(__file__), "libs", "pd_converted")
 
     # detect a dollar argument in a string
-    __RE_DOLLAR = re.compile(r"\$(\d+)")
+    RE_DOLLAR = re.compile(r"\$(\d+)")
 
     # detect width parameter e.g. "#X obj 172 79 t b b, f 22;"
-    __RE_WIDTH = re.compile(r", f \d+$")
+    RE_WIDTH = re.compile(r", f \d+$")
+
+    # split arguments on non-escaped spaces e.g. "test\ ing"
+    RE_SPACE = re.compile(r'(?<!\\)\ ')
 
     def __init__(self) -> None:
         # the current global value of $0
@@ -242,7 +245,9 @@ class PdParser:
         try:  # this try will capture any critical errors
             for li in file_iterator:
                 # remove width parameter
-                line = self.__RE_WIDTH.sub("", li).split()  # TODO: don't split on `\ `
+                li = self.RE_WIDTH.sub("", li)
+                line = self.RE_SPACE.split(li)
+                line = [i.replace('\\ ', ' ') for i in line]
 
                 if line[0] == "#N":
                     if line[1] == "canvas":
@@ -486,7 +491,6 @@ class PdParser:
                         }
 
                         if obj_type in arg_index.keys():
-                            # todo: deal with escaped spaces in the name `\ `
                             send_index = arg_index[obj_type][0]
                             recv_index = arg_index[obj_type][1]
 
@@ -662,7 +666,7 @@ class PdParser:
         # TODO(mhroth): can this be done more elegantly?
         resolved_obj_args = list(obj_args)  # make a copy of the original obj_args
         for i, a in enumerate(obj_args):
-            for m in set(cls.__RE_DOLLAR.findall(a)):
+            for m in set(cls.RE_DOLLAR.findall(a)):
                 x = int(m)  # the dollar index (i.e. $x)
                 if len(graph.obj_args) > x:
                     a = a.replace(fr"\${m}", str(graph.obj_args[x]))
