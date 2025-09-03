@@ -246,7 +246,9 @@ class PdParser:
             for li in file_iterator:
                 # remove width parameter
                 li = self.RE_WIDTH.sub("", li)
+                # split on non-escaped spaces
                 line = self.RE_SPACE.split(li)
+                # replace escaped spaces
                 line = [i.replace('\\ ', ' ') for i in line]
 
                 if line[0] == "#N":
