@@ -633,7 +633,7 @@ class PdParser:
         # parse gui sends
         for index in gui_send.keys():
             self.obj_counter["send"] += 1
-            send = PdSendObject('send', [gui_send[index]])
+            send = PdSendObject('send', gui_send[index].split())
             send_index = g.add_object(send)
 
             g.add_parsed_connection(index, 0, send_index, 0)
@@ -641,7 +641,7 @@ class PdParser:
         # parse gui receives
         for index in gui_recv.keys():
             self.obj_counter["receive"] += 1
-            recv = PdReceiveObject('receive', [gui_recv[index]])
+            recv = PdReceiveObject('receive', gui_recv[index].split())
             recv_index = g.add_object(recv)
 
             g.add_parsed_connection(recv_index, 0, index, 0)
