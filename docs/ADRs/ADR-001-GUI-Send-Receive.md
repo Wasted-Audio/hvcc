@@ -48,4 +48,6 @@ Be able to set send and/or receive configuration on PD GUI objects and be able t
 
 This should have little to no impact on other existing functionality and only adds a new feature.
 
+One improvement could be to integrate the GUI object min/max values with the externed parameter min/max/default. This however does not fit the MVP for this feature and would need additional investigation into the UX and possible implementation.
+
 When we work on the pd2gui parser these send/receive configurations can be re-used to identify externalized parameters and their association to graphical objects.
