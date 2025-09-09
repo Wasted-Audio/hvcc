@@ -36,7 +36,7 @@ scipy = [
     { version = "^1.13.1", python = "^3.9"},
 ]
 
-pytest-cov = "^5.0.0"
+pytest-cov = ">=5,<7"
 flake8 = "^7.1.1"
 mypy = "^1.11.2"
 pytest = "^8.3.3"
