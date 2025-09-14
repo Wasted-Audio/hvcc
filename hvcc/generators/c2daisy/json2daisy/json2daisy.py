@@ -178,7 +178,6 @@ def generate_header(board_description_dict: dict) -> 'tuple[str, dict]':
 
     # alphabetize by component name
     components = sorted(components.items(), key=lambda x: x[1]['component'])
-    # components = list(map(map_load, components))
     components = list(map(lambda p: map_load(p, json_defs_file), components))
 
     # flatten pin dicts into multiple entries
