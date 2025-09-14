@@ -12,7 +12,7 @@ def map_load(pair: list, json_defs_file: str):
     """
 
     # load the default components
-    comp_string = resources.files('json2daisy').joinpath(json_defs_file).read_text()
+    comp_string = resources.files(__package__).joinpath(json_defs_file).read_text()
     component_defs = json.loads(comp_string)
 
     pair[1]['name'] = pair[0]
@@ -233,7 +233,7 @@ def generate_header(board_description_dict: dict) -> 'tuple[str, dict]':
         components, 'component', ['AnalogControl', 'AnalogControlBipolar'],
         'map_init', key_exclude='default', match_exclude=True)
 
-    comp_string = resources.files('json2daisy').joinpath(json_defs_file).read_text()
+    comp_string = resources.files(__package__).joinpath(json_defs_file).read_text()
     definitions_dict = json.loads(comp_string)
 
     for name in definitions_dict:
@@ -271,7 +271,7 @@ def generate_header(board_description_dict: dict) -> 'tuple[str, dict]':
     replacements['hidupdaterates'] = filter_map_template(
         components, 'updaterate', key_exclude='default', match_exclude=True)
 
-    license_string = resources.files('json2daisy').joinpath('resources/LICENSE').read_text()
+    license_string = resources.files(__package__).joinpath('resources/LICENSE').read_text()
     replacements['license'] = '/*\n * ' + '\n * '.join([line for line in license_string.split('\n')]) + '\n */'
 
     component_declarations = list(filter(lambda x: not x.get('default', False), components))
@@ -297,7 +297,7 @@ def generate_header(board_description_dict: dict) -> 'tuple[str, dict]':
     # rendered_header = env.get_template('daisy.h').render(replacements)
 
     # This following works, but is really annoying
-    header_str = resources.files('json2daisy').joinpath(os.path.join('templates', 'daisy.h')).read_text()
+    header_str = resources.files(__package__).joinpath(os.path.join('templates', 'daisy.h')).read_text()
     header_env = jinja2.Environment(
         loader=jinja2.BaseLoader(),
         trim_blocks=True,
