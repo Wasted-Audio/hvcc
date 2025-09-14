@@ -362,7 +362,7 @@ def generate_header_from_name(board_name: str) -> 'tuple[str, dict]':
 
     try:
         description_file = os.path.join('resources', f'{board_name}.json')
-        daisy_description = resources.files('json2daisy').joinpath(description_file).read_text()
+        daisy_description = resources.files(__package__).joinpath(description_file).read_text()
         daisy_description_dict = json.loads(daisy_description)
     except FileNotFoundError:
         raise FileNotFoundError(f'Unknown Daisy board   "{board_name}"')

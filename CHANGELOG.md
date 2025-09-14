@@ -19,6 +19,11 @@ Bugfixes:
 * c2dpf: portGroup template fix with i/o port 0 as CV
 * c2wwise: use correct SDK header paths and allow any platform in the xml - thanks to @eu-ch
 
+Updates:
+
+* drop py3.8 - add py3.13
+* integrate json2daisy library, tests and documentation
+
 0.13.4
 -----
 
