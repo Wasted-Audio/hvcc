@@ -1,0 +1,201 @@
+{
+  "name": "petal",
+  "som": "seed",
+  "parents": {
+    "i2c": {
+      "component": "i2c",
+      "pin": {
+        "scl": 11,
+        "sda": 12
+      }
+    },
+    "led_driver": {
+      "component": "PCA9685",
+      "address": "{0x00, 0x01}",
+      "parent": "i2c",
+      "driver_count": 2
+    }
+  },
+  "audio": {
+    "channels": 2
+  },
+  "components": {
+    "sw1": {
+      "component": "Switch",
+      "pin": 8
+    },
+    "sw2": {
+      "component": "Switch",
+      "pin": 9
+    },
+    "sw3": {
+      "component": "Switch",
+      "pin": 10
+    },
+    "sw4": {
+      "component": "Switch",
+      "pin": 13
+    },
+    "sw5": {
+      "component": "Switch",
+      "pin": 25
+    },
+    "sw6": {
+      "component": "Switch",
+      "pin": 26
+    },
+    "sw7": {
+      "component": "Switch",
+      "pin": 7
+    },
+    "encoder": {
+      "component": "Encoder",
+      "pin": {
+        "a": 28,
+        "b": 27,
+        "click": 14
+      }
+    },
+    "knob1": {
+      "component": "AnalogControl",
+      "pin": 16
+    },
+    "knob2": {
+      "component": "AnalogControl",
+      "pin": 19
+    },
+    "knob3": {
+      "component": "AnalogControl",
+      "pin": 17
+    },
+    "knob4": {
+      "component": "AnalogControl",
+      "pin": 20
+    },
+    "knob5": {
+      "component": "AnalogControl",
+      "pin": 18
+    },
+    "knob6": {
+      "component": "AnalogControl",
+      "pin": 21
+    },
+    "expression": {
+      "component": "AnalogControl",
+      "pin": 15
+    },
+    "led_ring_1": {
+      "component": "PCA9685RgbLed",
+      "index": {
+        "red": 0,
+        "green": 1,
+        "blue": 2
+      },
+      "parent": "led_driver"
+    },
+    "led_ring_2": {
+      "component": "PCA9685RgbLed",
+      "index": {
+        "red": 6,
+        "green": 7,
+        "blue": 8
+      },
+      "parent": "led_driver"
+    },
+    "led_ring_3": {
+      "component": "PCA9685RgbLed",
+      "index": {
+        "red": 12,
+        "green": 13,
+        "blue": 14
+      },
+      "parent": "led_driver"
+    },
+    "led_ring_4": {
+      "component": "PCA9685RgbLed",
+      "index": {
+        "red": 16,
+        "green": 17,
+        "blue": 18
+      },
+      "parent": "led_driver"
+    },
+    "led_ring_5": {
+      "component": "PCA9685RgbLed",
+      "index": {
+        "red": 3,
+        "green": 4,
+        "blue": 5
+      },
+      "parent": "led_driver"
+    },
+    "led_ring_6": {
+      "component": "PCA9685RgbLed",
+      "index": {
+        "red": 9,
+        "green": 10,
+        "blue": 11
+      },
+      "parent": "led_driver"
+    },
+    "led_ring_7": {
+      "component": "PCA9685RgbLed",
+      "index": {
+        "red": 19,
+        "green": 20,
+        "blue": 21
+      },
+      "parent": "led_driver"
+    },
+    "led_ring_8": {
+      "component": "PCA9685RgbLed",
+      "index": {
+        "red": 22,
+        "green": 23,
+        "blue": 24
+      },
+      "parent": "led_driver"
+    },
+    "led_fs_1": {
+      "component": "PCA9685Led",
+      "index": 15,
+      "parent": "led_driver"
+    },
+    "led_fs_2": {
+      "component": "PCA9685Led",
+      "index": 25,
+      "parent": "led_driver"
+    },
+    "led_fs_3": {
+      "component": "PCA9685Led",
+      "index": 26,
+      "parent": "led_driver"
+    },
+    "led_fs_4": {
+      "component": "PCA9685Led",
+      "index": 27,
+      "parent": "led_driver"
+    }
+  },
+  "aliases": {
+    "switch": "sw1",
+    "switch1": "sw1",
+    "switch2": "sw2",
+    "switch3": "sw3",
+    "switch4": "sw4",
+    "switch5": "sw5",
+    "switch6": "sw6",
+    "switch7": "sw7",
+    "encswitch": "encoder_rise",
+    "enp": "encoder_press",
+    "press": "encoder_press",
+    "knob": "knob1",
+    "ctrl": "knob1",
+    "ctrl1": "knob1",
+    "ctrl2": "knob2",
+    "ctrl3": "knob3",
+    "ctrl4": "knob4",
+    "ctrl5": "knob5",
+    "ctrl6": "knob6"
+  }
+}
