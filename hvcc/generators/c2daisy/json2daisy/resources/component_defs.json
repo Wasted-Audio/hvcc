@@ -12,13 +12,12 @@
 		]
 	},
 	"Switch": {
-		"map_init": "{name}.Init(som.GetPin({pin}), som.AudioCallbackRate(), {type}, {polarity}, {pull});",
+		"map_init": "{name}.Init(som.GetPin({pin}), som.AudioCallbackRate(), {type}, {polarity});",
 		"typename": "daisy::Switch",
 		"direction": "in",
 		"pin": "a",
 		"type": "daisy::Switch::TYPE_MOMENTARY",
 		"polarity": "daisy::Switch::POLARITY_INVERTED",
-		"pull": "daisy::Switch::PULL_UP",
 		"process": "{name}.Debounce();",
 		"updaterate": "{name}.SetUpdateRate(som.AudioCallbackRate());",
 		"mapping": [
@@ -222,11 +221,11 @@
 	},
 	"GateOut": {
 		"map_init": "{name}.Init(som.GetPin({pin}), {mode}, {pull});",
-		"typename": "GPIO",
+		"typename": "daisy::GPIO",
 		"direction": "out",
 		"pin": "a",
-		"mode": "GPIO::Mode::OUTPUT",
-		"pull": "GPIO::Pull::NOPULL",
+		"mode": "daisy::GPIO::Mode::OUTPUT",
+		"pull": "daisy::GPIO::Pull::NOPULL",
 		"mapping": [
 			{
 				"name": "{name}",

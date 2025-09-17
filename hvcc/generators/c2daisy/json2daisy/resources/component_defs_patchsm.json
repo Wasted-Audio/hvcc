@@ -222,12 +222,12 @@
 	},
 	"GateOut": {
 		"map_init": "{name}.Init(daisy::patch_sm::DaisyPatchSM::{pin}, {mode}, {pull});",
-		"typename": "GPIO",
+		"typename": "daisy::GPIO",
 		"direction": "out",
 		"pin": "a",
 		"default_prefix": "som.",
-		"mode": "GPIO::Mode::OUTPUT",
-		"pull": "GPIO::Pull::NOPULL",
+		"mode": "daisy::GPIO::Mode::OUTPUT",
+		"pull": "daisy::GPIO::Pull::NOPULL",
 		"mapping": [
 			{
 				"name": "{name}",

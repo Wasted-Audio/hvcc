@@ -67,7 +67,7 @@ struct DaisyPatch {
     knob4.Init(som.adc.GetPtr(3), som.AudioCallbackRate(), true, false);
 
     // Gate outs
-    gateout.Init(som.GetPin(17), GPIO::Mode::OUTPUT, GPIO::Pull::NOPULL);
+    gateout.Init(som.GetPin(17), daisy::GPIO::Mode::OUTPUT, daisy::GPIO::Pull::NOPULL);
 
     // DAC
     cvout1.bitdepth = daisy::DacHandle::BitDepth::BITS_12;
@@ -225,7 +225,7 @@ struct DaisyPatch {
   daisy::Encoder encoder;
   daisy::GateIn gatein1;
   daisy::GateIn gatein2;
-  GPIO gateout;
+  daisy::GPIO gateout;
   daisy::OledDisplay<daisy::SSD130x4WireSpi128x64Driver> display;
   daisy::MidiUartHandler midi;
 

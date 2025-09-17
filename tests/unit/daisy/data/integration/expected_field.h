@@ -54,8 +54,8 @@ struct DaisyField {
     led_driver.Init(i2c, {0x00, 0x02}, led_driver_dma_buffer_a, led_driver_dma_buffer_b);
 
     // Switches
-    sw1.Init(som.GetPin(30), som.AudioCallbackRate(), daisy::Switch::TYPE_MOMENTARY, daisy::Switch::POLARITY_INVERTED, daisy::Switch::PULL_UP);
-    sw2.Init(som.GetPin(29), som.AudioCallbackRate(), daisy::Switch::TYPE_MOMENTARY, daisy::Switch::POLARITY_INVERTED, daisy::Switch::PULL_UP);
+    sw1.Init(som.GetPin(30), som.AudioCallbackRate(), daisy::Switch::TYPE_MOMENTARY, daisy::Switch::POLARITY_INVERTED);
+    sw2.Init(som.GetPin(29), som.AudioCallbackRate(), daisy::Switch::TYPE_MOMENTARY, daisy::Switch::POLARITY_INVERTED);
 
     // Muxes
     pad_shift.Init({ som.GetPin(28), som.GetPin(27), { som.GetPin(26) } });
@@ -89,7 +89,7 @@ struct DaisyField {
     knob8.Init(som.adc.GetMuxPtr(pot_mux_index, 7), som.AudioCallbackRate(), false, false);
 
     // Gate outs
-    gateout.Init(som.GetPin(15), GPIO::Mode::OUTPUT, GPIO::Pull::NOPULL);
+    gateout.Init(som.GetPin(15), daisy::GPIO::Mode::OUTPUT, daisy::GPIO::Pull::NOPULL);
 
     // DAC
     cvout1.bitdepth = daisy::DacHandle::BitDepth::BITS_12;
@@ -241,7 +241,7 @@ struct DaisyField {
   daisy::DacHandle::Config cvout1;
   daisy::DacHandle::Config cvout2;
   daisy::GateIn gatein;
-  GPIO gateout;
+  daisy::GPIO gateout;
   daisy::LedDriverPca9685<2, true> led_driver;
   daisy::Switch sw1;
   daisy::Switch sw2;
