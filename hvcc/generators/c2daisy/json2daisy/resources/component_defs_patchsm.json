@@ -12,13 +12,12 @@
 		]
 	},
 	"Switch": {
-		"map_init": "{name}.Init(daisy::patch_sm::DaisyPatchSM::{pin}, som.AudioCallbackRate(), {type}, {polarity}, {pull});",
+		"map_init": "{name}.Init(daisy::patch_sm::DaisyPatchSM::{pin}, som.AudioCallbackRate(), {type}, {polarity});",
 		"typename": "daisy::Switch",
 		"direction": "in",
 		"pin": "a",
 		"type": "daisy::Switch::TYPE_MOMENTARY",
 		"polarity": "daisy::Switch::POLARITY_INVERTED",
-		"pull": "daisy::Switch::PULL_UP",
 		"process": "{name}.Debounce();",
 		"updaterate": "{name}.SetUpdateRate(som.AudioCallbackRate());",
 		"mapping": [

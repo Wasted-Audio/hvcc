@@ -51,8 +51,8 @@ struct DaisyPatch_init {
 
 
     // Switches
-    sw1.Init(daisy::patch_sm::DaisyPatchSM::B7, som.AudioCallbackRate(), daisy::Switch::TYPE_MOMENTARY, daisy::Switch::POLARITY_INVERTED, daisy::Switch::PULL_UP);
-    sw2.Init(daisy::patch_sm::DaisyPatchSM::B8, som.AudioCallbackRate(), daisy::Switch::TYPE_MOMENTARY, daisy::Switch::POLARITY_INVERTED, daisy::Switch::PULL_UP);
+    sw1.Init(daisy::patch_sm::DaisyPatchSM::B7, som.AudioCallbackRate(), daisy::Switch::TYPE_MOMENTARY, daisy::Switch::POLARITY_INVERTED);
+    sw2.Init(daisy::patch_sm::DaisyPatchSM::B8, som.AudioCallbackRate(), daisy::Switch::TYPE_MOMENTARY, daisy::Switch::POLARITY_INVERTED);
 
     // Muxes
 
