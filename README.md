@@ -45,13 +45,12 @@ hvcc has been integrated into several projects and services. This allows to easi
 Python 3.9 up to 3.13
 
 * `jinja2` (for generator templating)
-* `importlib_resources` (for reading static resources)
 * `json2daisy` (for daisy integration)
 
 For tests:
 
 * `tox` (python install)
-* `numpy/scipy` (requirements-dev)
+* `numpy/scipy` (dev dependencies)
 * `midifile` (git submodule)
 * `tinywav` (git submodule)
 * `clang/clang++` (system install)
