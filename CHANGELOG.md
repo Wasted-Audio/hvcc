@@ -23,6 +23,7 @@ Updates:
 
 * drop py3.8 - add py3.13
 * integrate json2daisy library, tests and documentation
+* move to libDaisy 8.x pin definitions
 
 0.13.4
 -----
