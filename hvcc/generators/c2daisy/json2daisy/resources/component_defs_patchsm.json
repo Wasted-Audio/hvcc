@@ -221,17 +221,17 @@
 		]
 	},
 	"GateOut": {
-		"map_init": "{name}.pin  = daisy::patch_sm::DaisyPatchSM::{pin};\n\t\t{name}.mode = {mode};\n\t\t{name}.pull = {pull};\n\t\tdsy_gpio_init(&{name});",
-		"typename": "dsy_gpio",
+		"map_init": "GPIO {name};\n\t{name}.Init(daisy::patch_sm::DaisyPatchSM::{pin}, {mode}, {pull});",
+		"typename": "GPIO",
 		"direction": "out",
 		"pin": "a",
 		"default_prefix": "som.",
-		"mode": "DSY_GPIO_MODE_OUTPUT_PP",
-		"pull": "DSY_GPIO_NOPULL",
+		"mode": "GPIO::Mode::OUTPUT",
+		"pull": "GPIO::Pull::NOPULL",
 		"mapping": [
 			{
 				"name": "{name}",
-				"set": "dsy_gpio_write(&{class_name}.{default_prefix}{name}, {value});"
+				"set": "{class_name}.{name}.Write({value});"
 			}
 		]
 	},

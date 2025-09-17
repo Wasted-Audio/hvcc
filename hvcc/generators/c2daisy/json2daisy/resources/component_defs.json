@@ -230,7 +230,7 @@
 		"mapping": [
 			{
 				"name": "{name}",
-				"set": "{class_name}.{name}.Write(, {value});",
+				"set": "{class_name}.{name}.Write({value});",
 				"where": "hook"
 			}
 		]
