@@ -221,7 +221,7 @@
 		]
 	},
 	"GateOut": {
-		"map_init": "GPIO {name};\n\t{name}.Init(daisy::patch_sm::DaisyPatchSM::{pin}, {mode}, {pull});",
+		"map_init": "{name}.Init(daisy::patch_sm::DaisyPatchSM::{pin}, {mode}, {pull});",
 		"typename": "GPIO",
 		"direction": "out",
 		"pin": "a",

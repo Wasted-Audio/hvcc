@@ -61,8 +61,7 @@ struct DaisyField {
     pad_shift.Init({ som.GetPin(28), som.GetPin(27), { som.GetPin(26) } });
 
     // Gate ins
-    Pin gatein_pin = som.GetPin(0);
-    gatein.Init(&gatein_pin, true);
+    gatein.Init(som.GetPin(0), true);
 
     // Single channel ADC initialization
     cfg[0].InitSingle(som.GetPin(17));
@@ -90,7 +89,6 @@ struct DaisyField {
     knob8.Init(som.adc.GetMuxPtr(pot_mux_index, 7), som.AudioCallbackRate(), false, false);
 
     // Gate outs
-    GPIO gateout;
     gateout.Init(som.GetPin(15), GPIO::Mode::OUTPUT, GPIO::Pull::NOPULL);
 
     // DAC

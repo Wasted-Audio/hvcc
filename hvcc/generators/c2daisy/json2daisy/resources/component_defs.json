@@ -127,7 +127,7 @@
 		]
 	},
 	"GateIn": {
-		"map_init": "Pin {name}_pin = som.GetPin({pin});\n    {name}.Init(&{name}_pin, {invert});",
+		"map_init": "{name}.Init(som.GetPin({pin}), {invert});",
 		"typename": "daisy::GateIn",
 		"direction": "in",
 		"pin": "a",
@@ -221,7 +221,7 @@
 		]
 	},
 	"GateOut": {
-		"map_init": "GPIO {name};\n    {name}.Init(som.GetPin({pin}), {mode}, {pull});",
+		"map_init": "{name}.Init(som.GetPin({pin}), {mode}, {pull});",
 		"typename": "GPIO",
 		"direction": "out",
 		"pin": "a",
