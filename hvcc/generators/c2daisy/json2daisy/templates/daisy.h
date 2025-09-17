@@ -204,11 +204,11 @@ struct Daisy{{ name|capitalize }} {
     sai_config[0].b_sync          = daisy::SaiHandle::Config::Sync::SLAVE;
     sai_config[0].a_dir           = daisy::SaiHandle::Config::Direction::TRANSMIT;
     sai_config[0].b_dir           = daisy::SaiHandle::Config::Direction::RECEIVE;
-    sai_config[0].pin_config.fs   = Pin(PORTE, 4);
-    sai_config[0].pin_config.mclk = Pin(PORTE, 2);
-    sai_config[0].pin_config.sck  = Pin(PORTE, 5);
-    sai_config[0].pin_config.sa   = Pin(PORTE, 6);
-    sai_config[0].pin_config.sb   = Pin(PORTE, 3);
+    sai_config[0].pin_config.fs   = daisy::Pin(daisy::PORTE, 4);
+    sai_config[0].pin_config.mclk = daisy::Pin(daisy::PORTE, 2);
+    sai_config[0].pin_config.sck  = daisy::Pin(daisy::PORTE, 5);
+    sai_config[0].pin_config.sa   = daisy::Pin(daisy::PORTE, 6);
+    sai_config[0].pin_config.sb   = daisy::Pin(daisy::PORTE, 3);
 
     {% for codec in external_codecs %}
     sai_config[{{loop.index}}].periph          = daisy::SaiHandle::Config::Peripheral::{{codec.periph}};
@@ -231,8 +231,9 @@ struct Daisy{{ name|capitalize }} {
     sai_handle[{{loop.index}}].Init(sai_config[{{loop.index}}]);
     {% endfor %}
 
-    Pin codec_reset_pin = som.GetPin(29);
-    daisy::Ak4556::Init(codec_reset_pin);
+    daisy::Pin codec_reset_pin = som.GetPin(29);
+    daisy::Ak4556 codec;
+    codec.Init(codec_reset_pin);
 
     daisy::AudioHandle::Config cfg;
     cfg.blocksize  = 48;
