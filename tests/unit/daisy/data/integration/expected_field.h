@@ -1,18 +1,18 @@
 /*
  * MIT License
- * 
+ *
  * Copyright (c) 2021 Electrosmith
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -20,7 +20,7 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
- * 
+ *
  */
 
 #ifndef __JSON2DAISY_FIELD_H__
@@ -42,32 +42,27 @@ struct DaisyField {
   /** Initializes the board according to the JSON board description
    *  \param boost boosts the clock speed from 400 to 480 MHz
    */
-  void Init(bool boost=true) 
+  void Init(bool boost=true)
   {
     som.Configure();
     som.Init(boost);
 
     // i2c
-    i2c.Init({daisy::I2CHandle::Config::Peripheral::I2C_1, {som.GetPin(11), som.GetPin(12)}, daisy::I2CHandle::Config::Speed::I2C_1MHZ, daisy::I2CHandle::Config::Mode::I2C_MASTER}); 
- 
+    i2c.Init({daisy::I2CHandle::Config::Peripheral::I2C_1, {som.GetPin(11), som.GetPin(12)}, daisy::I2CHandle::Config::Speed::I2C_1MHZ, daisy::I2CHandle::Config::Mode::I2C_MASTER});
 
     // LED Drivers
-    led_driver.Init(i2c, {0x00, 0x02}, led_driver_dma_buffer_a, led_driver_dma_buffer_b); 
- 
+    led_driver.Init(i2c, {0x00, 0x02}, led_driver_dma_buffer_a, led_driver_dma_buffer_b);
 
     // Switches
     sw1.Init(som.GetPin(30), som.AudioCallbackRate(), daisy::Switch::TYPE_MOMENTARY, daisy::Switch::POLARITY_INVERTED, daisy::Switch::PULL_UP);
-    sw2.Init(som.GetPin(29), som.AudioCallbackRate(), daisy::Switch::TYPE_MOMENTARY, daisy::Switch::POLARITY_INVERTED, daisy::Switch::PULL_UP); 
- 
+    sw2.Init(som.GetPin(29), som.AudioCallbackRate(), daisy::Switch::TYPE_MOMENTARY, daisy::Switch::POLARITY_INVERTED, daisy::Switch::PULL_UP);
 
     // Muxes
-    pad_shift.Init({ som.GetPin(28), som.GetPin(27), { som.GetPin(26) } }); 
- 
+    pad_shift.Init({ som.GetPin(28), som.GetPin(27), { som.GetPin(26) } });
 
     // Gate ins
-    dsy_gpio_pin gatein_pin = som.GetPin(0);
-    gatein.Init(&gatein_pin, true); 
- 
+    Pin gatein_pin = som.GetPin(0);
+    gatein.Init(&gatein_pin, true);
 
     // Single channel ADC initialization
     cfg[0].InitSingle(som.GetPin(17));
@@ -75,16 +70,14 @@ struct DaisyField {
     cfg[2].InitSingle(som.GetPin(25));
     cfg[3].InitSingle(som.GetPin(24));
     size_t pot_mux_index = 4;
-    cfg[pot_mux_index].InitMux(som.GetPin(16), 8, som.GetPin(21), som.GetPin(20), som.GetPin(19)); 
+    cfg[pot_mux_index].InitMux(som.GetPin(16), 8, som.GetPin(21), som.GetPin(20), som.GetPin(19));
     som.adc.Init(cfg, ANALOG_COUNT);
- 
 
     // AnalogControl objects
     cv1.InitBipolarCv(som.adc.GetPtr(0), som.AudioCallbackRate());
     cv2.InitBipolarCv(som.adc.GetPtr(1), som.AudioCallbackRate());
     cv3.InitBipolarCv(som.adc.GetPtr(2), som.AudioCallbackRate());
-    cv4.InitBipolarCv(som.adc.GetPtr(3), som.AudioCallbackRate()); 
- 
+    cv4.InitBipolarCv(som.adc.GetPtr(3), som.AudioCallbackRate());
 
     // Multiplexed AnlogControl objects
     knob1.Init(som.adc.GetMuxPtr(pot_mux_index, 0), som.AudioCallbackRate(), false, false);
@@ -94,16 +87,13 @@ struct DaisyField {
     knob5.Init(som.adc.GetMuxPtr(pot_mux_index, 2), som.AudioCallbackRate(), false, false);
     knob6.Init(som.adc.GetMuxPtr(pot_mux_index, 5), som.AudioCallbackRate(), false, false);
     knob7.Init(som.adc.GetMuxPtr(pot_mux_index, 6), som.AudioCallbackRate(), false, false);
-    knob8.Init(som.adc.GetMuxPtr(pot_mux_index, 7), som.AudioCallbackRate(), false, false); 
- 
+    knob8.Init(som.adc.GetMuxPtr(pot_mux_index, 7), som.AudioCallbackRate(), false, false);
 
     // Gate outs
-    gateout.pin  = som.GetPin(15);
-    gateout.mode = DSY_GPIO_MODE_OUTPUT_PP;
-    gateout.pull = DSY_GPIO_NOPULL;
-    dsy_gpio_init(&gateout); 
+    GPIO gateout;
+    gateout.Init(som.GetPin(15), GPIO::Mode::OUTPUT, GPIO::Pull::NOPULL);
 
-    // DAC 
+    // DAC
     cvout1.bitdepth = daisy::DacHandle::BitDepth::BITS_12;
     cvout1.buff_state = daisy::DacHandle::BufferState::ENABLED;
     cvout1.mode = daisy::DacHandle::Mode::POLLING;
@@ -115,27 +105,26 @@ struct DaisyField {
     cvout2.mode = daisy::DacHandle::Mode::POLLING;
     cvout2.chn = daisy::DacHandle::Channel::BOTH;
     som.dac.Init(cvout2);
-    som.dac.WriteValue(daisy::DacHandle::Channel::BOTH, 0); 
+    som.dac.WriteValue(daisy::DacHandle::Channel::BOTH, 0);
 
     // Display
-    
+
         daisy::OledDisplay<daisy::SSD130x4WireSpi128x64Driver>::Config display_config;
         display_config.driver_config.transport_config.Defaults();
-        
+
         display.Init(display_config);
           display.Fill(0);
           display.Update();
-         
+
 
     som.adc.Start();
   }
 
   /** Handles all the controls processing that needs to occur at the block rate
-   * 
+   *
    */
-  void ProcessAllControls() 
+  void ProcessAllControls()
   {
- 
     cv1.Process();
     cv2.Process();
     cv3.Process();
@@ -149,11 +138,11 @@ struct DaisyField {
     knob7.Process();
     knob8.Process();
     sw1.Debounce();
-    sw2.Debounce(); 
+    sw2.Debounce();
   }
 
   /** Handles all the maintenance processing. This should be run last within the audio callback.
-   * 
+   *
    */
   void PostProcess()
   {
@@ -177,7 +166,7 @@ struct DaisyField {
   }
 
   /** Handles processing that shouldn't occur in the audio block, such as blocking transfers
-   * 
+   *
    */
   void LoopProcess()
   {
@@ -187,7 +176,7 @@ struct DaisyField {
   /** Sets the audio sample rate
    *  \param sample_rate the new sample rate in Hz
    */
-  void SetAudioSampleRate(size_t sample_rate) 
+  void SetAudioSampleRate(size_t sample_rate)
   {
     daisy::SaiHandle::Config::SampleRate enum_rate;
     if (sample_rate >= 96000)
@@ -220,13 +209,13 @@ struct DaisyField {
   /** Sets the audio block size
    *  \param block_size the new block size in words
    */
-  inline void SetAudioBlockSize(size_t block_size) 
+  inline void SetAudioBlockSize(size_t block_size)
   {
     som.SetAudioBlockSize(block_size);
   }
 
   /** Starts up the audio callback process with the given callback
-   * 
+   *
    */
   inline void StartAudio(daisy::AudioHandle::AudioCallback cb)
   {
@@ -254,7 +243,7 @@ struct DaisyField {
   daisy::DacHandle::Config cvout1;
   daisy::DacHandle::Config cvout2;
   daisy::GateIn gatein;
-  dsy_gpio gateout;
+  GPIO gateout;
   daisy::LedDriverPca9685<2, true> led_driver;
   daisy::Switch sw1;
   daisy::Switch sw2;

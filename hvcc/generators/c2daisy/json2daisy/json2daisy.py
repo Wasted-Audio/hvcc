@@ -304,6 +304,8 @@ def generate_header(board_description_dict: dict) -> 'tuple[str, dict]':
     ).from_string(header_str)
 
     rendered_header = header_env.render(replacements)
+    rendered_header_lines = rendered_header.splitlines()
+    rendered_header = "\n".join(line.rstrip() for line in rendered_header_lines) + "\n"
 
     # removing all unnecessary fields
     for comp in components:

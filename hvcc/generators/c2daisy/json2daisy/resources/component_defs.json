@@ -127,7 +127,7 @@
 		]
 	},
 	"GateIn": {
-		"map_init": "dsy_gpio_pin {name}_pin = som.GetPin({pin});\n    {name}.Init(&{name}_pin, {invert});",
+		"map_init": "Pin {name}_pin = som.GetPin({pin});\n    {name}.Init(&{name}_pin, {invert});",
 		"typename": "daisy::GateIn",
 		"direction": "in",
 		"pin": "a",
@@ -221,16 +221,16 @@
 		]
 	},
 	"GateOut": {
-		"map_init": "{name}.pin  = som.GetPin({pin});\n    {name}.mode = {mode};\n    {name}.pull = {pull};\n    dsy_gpio_init(&{name});",
-		"typename": "dsy_gpio",
+		"map_init": "GPIO {name};\n    {name}.Init(som.GetPin({pin}), {mode}, {pull});",
+		"typename": "GPIO",
 		"direction": "out",
 		"pin": "a",
-		"mode": "DSY_GPIO_MODE_OUTPUT_PP",
-		"pull": "DSY_GPIO_NOPULL",
+		"mode": "GPIO::Mode::OUTPUT",
+		"pull": "GPIO::Pull::NOPULL",
 		"mapping": [
 			{
 				"name": "{name}",
-				"set": "dsy_gpio_write(&{class_name}.{name}, {value});",
+				"set": "{class_name}.{name}.Write(, {value});",
 				"where": "hook"
 			}
 		]
