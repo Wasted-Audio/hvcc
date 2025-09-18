@@ -1,18 +1,18 @@
 /*
  * MIT License
- * 
+ *
  * Copyright (c) 2021 Electrosmith
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -20,7 +20,7 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
- * 
+ *
  */
 
 #ifndef __JSON2DAISY_PETAL_H__
@@ -41,32 +41,28 @@ struct DaisyPetal {
   /** Initializes the board according to the JSON board description
    *  \param boost boosts the clock speed from 400 to 480 MHz
    */
-  void Init(bool boost=true) 
+  void Init(bool boost=true)
   {
     som.Configure();
     som.Init(boost);
 
     // i2c
-    i2c.Init({daisy::I2CHandle::Config::Peripheral::I2C_1, {som.GetPin(11), som.GetPin(12)}, daisy::I2CHandle::Config::Speed::I2C_1MHZ, daisy::I2CHandle::Config::Mode::I2C_MASTER}); 
- 
+    i2c.Init({daisy::I2CHandle::Config::Peripheral::I2C_1, {som.GetPin(11), som.GetPin(12)}, daisy::I2CHandle::Config::Speed::I2C_1MHZ, daisy::I2CHandle::Config::Mode::I2C_MASTER});
 
     // LED Drivers
-    led_driver.Init(i2c, {0x00, 0x01}, led_driver_dma_buffer_a, led_driver_dma_buffer_b); 
- 
+    led_driver.Init(i2c, {0x00, 0x01}, led_driver_dma_buffer_a, led_driver_dma_buffer_b);
 
     // Switches
-    sw1.Init(som.GetPin(8), som.AudioCallbackRate(), daisy::Switch::TYPE_MOMENTARY, daisy::Switch::POLARITY_INVERTED, daisy::Switch::PULL_UP);
-    sw2.Init(som.GetPin(9), som.AudioCallbackRate(), daisy::Switch::TYPE_MOMENTARY, daisy::Switch::POLARITY_INVERTED, daisy::Switch::PULL_UP);
-    sw3.Init(som.GetPin(10), som.AudioCallbackRate(), daisy::Switch::TYPE_MOMENTARY, daisy::Switch::POLARITY_INVERTED, daisy::Switch::PULL_UP);
-    sw4.Init(som.GetPin(13), som.AudioCallbackRate(), daisy::Switch::TYPE_MOMENTARY, daisy::Switch::POLARITY_INVERTED, daisy::Switch::PULL_UP);
-    sw5.Init(som.GetPin(25), som.AudioCallbackRate(), daisy::Switch::TYPE_MOMENTARY, daisy::Switch::POLARITY_INVERTED, daisy::Switch::PULL_UP);
-    sw6.Init(som.GetPin(26), som.AudioCallbackRate(), daisy::Switch::TYPE_MOMENTARY, daisy::Switch::POLARITY_INVERTED, daisy::Switch::PULL_UP);
-    sw7.Init(som.GetPin(7), som.AudioCallbackRate(), daisy::Switch::TYPE_MOMENTARY, daisy::Switch::POLARITY_INVERTED, daisy::Switch::PULL_UP); 
- 
+    sw1.Init(som.GetPin(8), som.AudioCallbackRate(), daisy::Switch::TYPE_MOMENTARY, daisy::Switch::POLARITY_INVERTED);
+    sw2.Init(som.GetPin(9), som.AudioCallbackRate(), daisy::Switch::TYPE_MOMENTARY, daisy::Switch::POLARITY_INVERTED);
+    sw3.Init(som.GetPin(10), som.AudioCallbackRate(), daisy::Switch::TYPE_MOMENTARY, daisy::Switch::POLARITY_INVERTED);
+    sw4.Init(som.GetPin(13), som.AudioCallbackRate(), daisy::Switch::TYPE_MOMENTARY, daisy::Switch::POLARITY_INVERTED);
+    sw5.Init(som.GetPin(25), som.AudioCallbackRate(), daisy::Switch::TYPE_MOMENTARY, daisy::Switch::POLARITY_INVERTED);
+    sw6.Init(som.GetPin(26), som.AudioCallbackRate(), daisy::Switch::TYPE_MOMENTARY, daisy::Switch::POLARITY_INVERTED);
+    sw7.Init(som.GetPin(7), som.AudioCallbackRate(), daisy::Switch::TYPE_MOMENTARY, daisy::Switch::POLARITY_INVERTED);
 
     // Rotary encoders
-    encoder.Init(som.GetPin(28), som.GetPin(27), som.GetPin(14), som.AudioCallbackRate()); 
- 
+    encoder.Init(som.GetPin(28), som.GetPin(27), som.GetPin(14), som.AudioCallbackRate());
 
     // Single channel ADC initialization
     cfg[0].InitSingle(som.GetPin(16));
@@ -75,9 +71,8 @@ struct DaisyPetal {
     cfg[3].InitSingle(som.GetPin(20));
     cfg[4].InitSingle(som.GetPin(18));
     cfg[5].InitSingle(som.GetPin(21));
-    cfg[6].InitSingle(som.GetPin(15)); 
+    cfg[6].InitSingle(som.GetPin(15));
     som.adc.Init(cfg, ANALOG_COUNT);
- 
 
     // AnalogControl objects
     knob1.Init(som.adc.GetPtr(0), som.AudioCallbackRate(), false, false);
@@ -86,17 +81,16 @@ struct DaisyPetal {
     knob4.Init(som.adc.GetPtr(3), som.AudioCallbackRate(), false, false);
     knob5.Init(som.adc.GetPtr(4), som.AudioCallbackRate(), false, false);
     knob6.Init(som.adc.GetPtr(5), som.AudioCallbackRate(), false, false);
-    expression.Init(som.adc.GetPtr(6), som.AudioCallbackRate(), false, false); 
+    expression.Init(som.adc.GetPtr(6), som.AudioCallbackRate(), false, false);
 
     som.adc.Start();
   }
 
   /** Handles all the controls processing that needs to occur at the block rate
-   * 
+   *
    */
-  void ProcessAllControls() 
+  void ProcessAllControls()
   {
- 
     knob1.Process();
     knob2.Process();
     knob3.Process();
@@ -111,19 +105,19 @@ struct DaisyPetal {
     sw4.Debounce();
     sw5.Debounce();
     sw6.Debounce();
-    sw7.Debounce(); 
+    sw7.Debounce();
   }
 
   /** Handles all the maintenance processing. This should be run last within the audio callback.
-   * 
+   *
    */
   void PostProcess()
   {
-    
+
   }
 
   /** Handles processing that shouldn't occur in the audio block, such as blocking transfers
-   * 
+   *
    */
   void LoopProcess()
   {
@@ -133,7 +127,7 @@ struct DaisyPetal {
   /** Sets the audio sample rate
    *  \param sample_rate the new sample rate in Hz
    */
-  void SetAudioSampleRate(size_t sample_rate) 
+  void SetAudioSampleRate(size_t sample_rate)
   {
     daisy::SaiHandle::Config::SampleRate enum_rate;
     if (sample_rate >= 96000)
@@ -167,13 +161,13 @@ struct DaisyPetal {
   /** Sets the audio block size
    *  \param block_size the new block size in words
    */
-  inline void SetAudioBlockSize(size_t block_size) 
+  inline void SetAudioBlockSize(size_t block_size)
   {
     som.SetAudioBlockSize(block_size);
   }
 
   /** Starts up the audio callback process with the given callback
-   * 
+   *
    */
   inline void StartAudio(daisy::AudioHandle::AudioCallback cb)
   {
@@ -202,8 +196,8 @@ struct DaisyPetal {
   daisy::Switch sw6;
   daisy::Switch sw7;
   daisy::I2CHandle i2c;
-  
-  
+
+
 
 };
 

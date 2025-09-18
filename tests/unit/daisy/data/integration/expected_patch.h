@@ -1,18 +1,18 @@
 /*
  * MIT License
- * 
+ *
  * Copyright (c) 2021 Electrosmith
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -20,7 +20,7 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
- * 
+ *
  */
 
 #ifndef __JSON2DAISY_PATCH_H__
@@ -41,45 +41,35 @@ struct DaisyPatch {
   /** Initializes the board according to the JSON board description
    *  \param boost boosts the clock speed from 400 to 480 MHz
    */
-  void Init(bool boost=true) 
+  void Init(bool boost=true)
   {
     som.Configure();
     som.Init(boost);
- 
 
     // Gate ins
-    dsy_gpio_pin gatein1_pin = som.GetPin(20);
-    gatein1.Init(&gatein1_pin, true);
-    dsy_gpio_pin gatein2_pin = som.GetPin(19);
-    gatein2.Init(&gatein2_pin, true); 
- 
+    gatein1.Init(som.GetPin(20), true);
+    gatein2.Init(som.GetPin(19), true);
 
     // Rotary encoders
-    encoder.Init(som.GetPin(12), som.GetPin(11), som.GetPin(0), som.AudioCallbackRate()); 
- 
+    encoder.Init(som.GetPin(12), som.GetPin(11), som.GetPin(0), som.AudioCallbackRate());
 
     // Single channel ADC initialization
     cfg[0].InitSingle(som.GetPin(15));
     cfg[1].InitSingle(som.GetPin(16));
     cfg[2].InitSingle(som.GetPin(21));
-    cfg[3].InitSingle(som.GetPin(18)); 
+    cfg[3].InitSingle(som.GetPin(18));
     som.adc.Init(cfg, ANALOG_COUNT);
- 
 
     // AnalogControl objects
     knob1.Init(som.adc.GetPtr(0), som.AudioCallbackRate(), true, false);
     knob2.Init(som.adc.GetPtr(1), som.AudioCallbackRate(), true, false);
     knob3.Init(som.adc.GetPtr(2), som.AudioCallbackRate(), true, false);
-    knob4.Init(som.adc.GetPtr(3), som.AudioCallbackRate(), true, false); 
- 
+    knob4.Init(som.adc.GetPtr(3), som.AudioCallbackRate(), true, false);
 
     // Gate outs
-    gateout.pin  = som.GetPin(17);
-    gateout.mode = DSY_GPIO_MODE_OUTPUT_PP;
-    gateout.pull = DSY_GPIO_NOPULL;
-    dsy_gpio_init(&gateout); 
+    gateout.Init(som.GetPin(17), daisy::GPIO::Mode::OUTPUT, daisy::GPIO::Pull::NOPULL);
 
-    // DAC 
+    // DAC
     cvout1.bitdepth = daisy::DacHandle::BitDepth::BITS_12;
     cvout1.buff_state = daisy::DacHandle::BufferState::ENABLED;
     cvout1.mode = daisy::DacHandle::Mode::POLLING;
@@ -91,17 +81,17 @@ struct DaisyPatch {
     cvout2.mode = daisy::DacHandle::Mode::POLLING;
     cvout2.chn = daisy::DacHandle::Channel::BOTH;
     som.dac.Init(cvout2);
-    som.dac.WriteValue(daisy::DacHandle::Channel::BOTH, 0); 
+    som.dac.WriteValue(daisy::DacHandle::Channel::BOTH, 0);
 
     // Display
-    
+
         daisy::OledDisplay<daisy::SSD130x4WireSpi128x64Driver>::Config display_config;
         display_config.driver_config.transport_config.Defaults();
-        
+
         display.Init(display_config);
           display.Fill(0);
           display.Update();
-         
+
 
     // External Codec Initialization
     daisy::SaiHandle::Config sai_config[2];
@@ -114,11 +104,11 @@ struct DaisyPatch {
     sai_config[0].b_sync          = daisy::SaiHandle::Config::Sync::SLAVE;
     sai_config[0].a_dir           = daisy::SaiHandle::Config::Direction::TRANSMIT;
     sai_config[0].b_dir           = daisy::SaiHandle::Config::Direction::RECEIVE;
-    sai_config[0].pin_config.fs   = {DSY_GPIOE, 4};
-    sai_config[0].pin_config.mclk = {DSY_GPIOE, 2};
-    sai_config[0].pin_config.sck  = {DSY_GPIOE, 5};
-    sai_config[0].pin_config.sa   = {DSY_GPIOE, 6};
-    sai_config[0].pin_config.sb   = {DSY_GPIOE, 3};
+    sai_config[0].pin_config.fs   = daisy::Pin(daisy::PORTE, 4);
+    sai_config[0].pin_config.mclk = daisy::Pin(daisy::PORTE, 2);
+    sai_config[0].pin_config.sck  = daisy::Pin(daisy::PORTE, 5);
+    sai_config[0].pin_config.sa   = daisy::Pin(daisy::PORTE, 6);
+    sai_config[0].pin_config.sb   = daisy::Pin(daisy::PORTE, 3);
 
     sai_config[1].periph          = daisy::SaiHandle::Config::Peripheral::SAI_2;
     sai_config[1].sr              = daisy::SaiHandle::Config::SampleRate::SAI_48KHZ;
@@ -137,15 +127,16 @@ struct DaisyPatch {
     sai_handle[0].Init(sai_config[0]);
     sai_handle[1].Init(sai_config[1]);
 
-    dsy_gpio_pin codec_reset_pin = som.GetPin(29);
-    daisy::Ak4556::Init(codec_reset_pin);
+    daisy::Pin codec_reset_pin = som.GetPin(29);
+    daisy::Ak4556 codec;
+    codec.Init(codec_reset_pin);
 
     daisy::AudioHandle::Config cfg;
     cfg.blocksize  = 48;
     cfg.samplerate = daisy::SaiHandle::Config::SampleRate::SAI_48KHZ;
     cfg.postgain   = 0.5f;
     som.audio_handle.Init(
-      cfg, 
+      cfg,
       sai_handle[0]
       ,sai_handle[1]
     );
@@ -154,38 +145,37 @@ struct DaisyPatch {
   }
 
   /** Handles all the controls processing that needs to occur at the block rate
-   * 
+   *
    */
-  void ProcessAllControls() 
+  void ProcessAllControls()
   {
- 
     knob1.Process();
     knob2.Process();
     knob3.Process();
     knob4.Process();
-    encoder.Debounce(); 
+    encoder.Debounce();
   }
 
   /** Handles all the maintenance processing. This should be run last within the audio callback.
-   * 
+   *
    */
   void PostProcess()
   {
-    
+
   }
 
   /** Handles processing that shouldn't occur in the audio block, such as blocking transfers
-   * 
+   *
    */
   void LoopProcess()
   {
-    
+
   }
 
   /** Sets the audio sample rate
    *  \param sample_rate the new sample rate in Hz
    */
-  void SetAudioSampleRate(size_t sample_rate) 
+  void SetAudioSampleRate(size_t sample_rate)
   {
     daisy::SaiHandle::Config::SampleRate enum_rate;
     if (sample_rate >= 96000)
@@ -209,13 +199,13 @@ struct DaisyPatch {
   /** Sets the audio block size
    *  \param block_size the new block size in words
    */
-  inline void SetAudioBlockSize(size_t block_size) 
+  inline void SetAudioBlockSize(size_t block_size)
   {
     som.SetAudioBlockSize(block_size);
   }
 
   /** Starts up the audio callback process with the given callback
-   * 
+   *
    */
   inline void StartAudio(daisy::AudioHandle::AudioCallback cb)
   {
@@ -236,7 +226,7 @@ struct DaisyPatch {
   daisy::Encoder encoder;
   daisy::GateIn gatein1;
   daisy::GateIn gatein2;
-  dsy_gpio gateout;
+  daisy::GPIO gateout;
   daisy::OledDisplay<daisy::SSD130x4WireSpi128x64Driver> display;
   daisy::MidiUartHandler midi;
 

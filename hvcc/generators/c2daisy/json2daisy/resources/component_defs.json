@@ -12,13 +12,12 @@
 		]
 	},
 	"Switch": {
-		"map_init": "{name}.Init(som.GetPin({pin}), som.AudioCallbackRate(), {type}, {polarity}, {pull});",
+		"map_init": "{name}.Init(som.GetPin({pin}), som.AudioCallbackRate(), {type}, {polarity});",
 		"typename": "daisy::Switch",
 		"direction": "in",
 		"pin": "a",
 		"type": "daisy::Switch::TYPE_MOMENTARY",
 		"polarity": "daisy::Switch::POLARITY_INVERTED",
-		"pull": "daisy::Switch::PULL_UP",
 		"process": "{name}.Debounce();",
 		"updaterate": "{name}.SetUpdateRate(som.AudioCallbackRate());",
 		"mapping": [
@@ -127,7 +126,7 @@
 		]
 	},
 	"GateIn": {
-		"map_init": "dsy_gpio_pin {name}_pin = som.GetPin({pin});\n    {name}.Init(&{name}_pin, {invert});",
+		"map_init": "{name}.Init(som.GetPin({pin}), {invert});",
 		"typename": "daisy::GateIn",
 		"direction": "in",
 		"pin": "a",
@@ -221,16 +220,16 @@
 		]
 	},
 	"GateOut": {
-		"map_init": "{name}.pin  = som.GetPin({pin});\n    {name}.mode = {mode};\n    {name}.pull = {pull};\n    dsy_gpio_init(&{name});",
-		"typename": "dsy_gpio",
+		"map_init": "{name}.Init(som.GetPin({pin}), {mode}, {pull});",
+		"typename": "daisy::GPIO",
 		"direction": "out",
 		"pin": "a",
-		"mode": "DSY_GPIO_MODE_OUTPUT_PP",
-		"pull": "DSY_GPIO_NOPULL",
+		"mode": "daisy::GPIO::Mode::OUTPUT",
+		"pull": "daisy::GPIO::Pull::NOPULL",
 		"mapping": [
 			{
 				"name": "{name}",
-				"set": "dsy_gpio_write(&{class_name}.{name}, {value});",
+				"set": "{class_name}.{name}.Write({value});",
 				"where": "hook"
 			}
 		]
