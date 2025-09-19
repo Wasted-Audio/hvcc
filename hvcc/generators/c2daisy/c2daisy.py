@@ -2,12 +2,12 @@ import jinja2
 import os
 import shutil
 import time
-import json2daisy  # type: ignore
 
 from typing import Any, Dict, Optional
 
 from ..copyright import copyright_manager
-from . import parameters
+from .parameters import parse_parameters
+from .json2daisy import generate_header_from_file, generate_header_from_name
 
 from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
 from hvcc.types.compiler import Generator, CompilerResp, CompilerNotif, CompilerMsg, ExternInfo
@@ -67,15 +67,15 @@ class c2daisy(Generator):
             shutil.copytree(c_src_dir, source_dir)
 
             if daisy_meta.board_file is not None:
-                header, board_info = json2daisy.generate_header_from_file(daisy_meta.board_file)
+                header, board_info = generate_header_from_file(daisy_meta.board_file)
             else:
-                header, board_info = json2daisy.generate_header_from_name(board)
+                header, board_info = generate_header_from_name(board)
 
             # remove heavy out params from externs
             externs.parameters.outParam = [
                 t for t in externs.parameters.outParam if not any(x == y for x in hv_midi_messages for y in t)]
 
-            component_glue = parameters.parse_parameters(
+            component_glue = parse_parameters(
                 externs.parameters, board_info['components'], board_info['aliases'], 'hardware')
             component_glue['class_name'] = board_info['name']
             component_glue['patch_name'] = patch_name

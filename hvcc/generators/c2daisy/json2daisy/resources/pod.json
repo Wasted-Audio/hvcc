@@ -1,0 +1,69 @@
+{
+	"name": "pod",
+	"som": "seed",
+	"defines": {
+		"OOPSY_TARGET_HAS_MIDI_INPUT": 1
+	},
+	"display": {},
+	"audio": {
+    "channels": 2
+  },
+	"components": {
+		"sw1": {
+			"component": "Switch",
+			"pin": 27
+		},
+		"sw2": {
+			"component": "Switch",
+			"pin": 28
+		},
+		"knob1": {
+			"component": "AnalogControl",
+			"pin": 21
+		},
+		"knob2": {
+			"component": "AnalogControl",
+			"pin": 15
+		},
+		"encoder": {
+			"component": "Encoder",
+			"pin": {
+				"a": 26,
+				"b": 25,
+				"click": 13
+			}
+		},
+		"led1": {
+			"component": "RgbLed",
+			"pin": {
+				"r": 20,
+				"g": 19,
+				"b": 18
+			}
+		},
+		"led2": {
+			"component": "RgbLed",
+			"pin": {
+				"r": 17,
+				"g": 24,
+				"b": 23
+			}
+		}
+	},
+	"aliases": {
+		"switch": "sw1",
+		"button": "sw1",
+		"switch1": "sw1",
+		"button1": "sw1",
+		"switch2": "sw2",
+		"button2": "sw2",
+		"encswitch": "encoder_rise",
+		"enp": "encoder_press",
+		"press": "encoder_press",
+		"knob": "knob1",
+		"ctrl": "knob1",
+		"ctrl1": "knob1",
+		"ctrl2": "knob2",
+		"led": "led1"
+	}
+}

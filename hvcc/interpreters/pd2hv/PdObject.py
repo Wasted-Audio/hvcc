@@ -115,6 +115,9 @@ class PdObject:
     def get_inlet_connections(self) -> Dict:
         return self._inlet_connections
 
+    def get_outlet_connections(self) -> Dict:
+        return self._outlet_connections
+
     def get_inlet_connection_type(self, inlet_index: int) -> Optional[str]:
         """ Returns the inlet connection type of this Pd object.
             For the sake of convenience, the connection type is reported in

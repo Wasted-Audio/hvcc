@@ -33,6 +33,7 @@ from hvcc.generators.c2owl import c2owl
 from hvcc.generators.c2pdext import c2pdext
 from hvcc.generators.c2wwise import c2wwise
 from hvcc.generators.c2unity import c2unity
+from hvcc.generators.c2fmod import c2fmod
 from hvcc.types.compiler import (
     CompilerResults, CompilerResp, CompilerNotif, CompilerMsg, Generator,
     ExternInfo, ExternMemoryPool, ExternMidi, ExternEvents, ExternParams
@@ -203,6 +204,7 @@ def load_ext_generator(module_name: str, verbose: bool) -> Optional[Generator]:
             print(f"---> Module {module_name} does not contain a class derived from hvcc.types.Compiler")
         return None
     except ModuleNotFoundError:
+        print(f"---> Module {module_name} not found")
         return None
 
 
@@ -353,6 +355,11 @@ def compile_dataflow(
         if verbose:
             print("--> Generating Wwise plugin")
         results.root["c2wwise"] = c2wwise.c2wwise.compile(**gen_args)
+
+    if "fmod" in generators:
+        if verbose:
+            print("--> Generating Fmod plugin")
+        results.root["c2fmod"] = c2fmod.c2fmod.compile(**gen_args)
 
     if ext_generators:
         for module_name in ext_generators:
