@@ -1,0 +1,1391 @@
+{
+	"UserLed": {
+		"map_init": "",
+		"typename": "",
+		"direction": "out",
+		"mapping": [
+			{
+				"name": "{name}",
+				"set": "{class_name}.som.SetLed({value});",
+				"where": "hook"
+			}
+		]
+	},
+	"Switch": {
+		"map_init": "{name}.Init(som.GetPin({pin}), som.AudioCallbackRate(), {type}, {polarity});",
+		"typename": "daisy::Switch",
+		"direction": "in",
+		"pin": "a",
+		"type": "daisy::Switch::TYPE_MOMENTARY",
+		"polarity": "daisy::Switch::POLARITY_INVERTED",
+		"process": "{name}.Debounce();",
+		"updaterate": "{name}.SetUpdateRate(som.AudioCallbackRate());",
+		"mapping": [
+			{
+				"name": "{name}_press",
+				"get": "({class_name}.{name}.Pressed()?1.f:0.f)",
+				"range": [
+					0,
+					1
+				],
+				"bool": false
+			},
+			{
+				"name": "{name}",
+				"get": "({class_name}.{name}.RisingEdge()?1.f:0.f)",
+				"range": [
+					0,
+					1
+				],
+				"bool": true
+			},
+			{
+				"name": "{name}_fall",
+				"get": "({class_name}.{name}.FallingEdge()?1.f:0.f)",
+				"range": [
+					0,
+					1
+				],
+				"bool": true
+			},
+			{
+				"name": "{name}_seconds",
+				"get": "({class_name}.{name}.TimeHeldMs()*0.001f)",
+				"range": null,
+				"bool": false
+			}
+		]
+	},
+	"Switch3": {
+		"map_init": "{name}.Init(som.GetPin({pin_a}), som.GetPin({pin_b}));",
+		"typename": "daisy::Switch3",
+		"direction": "in",
+		"pin": "a,b",
+		"mapping": [
+			{
+				"name": "{name}",
+				"get": "({class_name}.{name}.Read()*0.5f+0.5f)",
+				"range": [
+					0,
+					2
+				],
+				"bool": false
+			}
+		]
+	},
+	"Encoder": {
+		"map_init": "{name}.Init(som.GetPin({pin_a}), som.GetPin({pin_b}), som.GetPin({pin_click}), som.AudioCallbackRate());",
+		"typename": "daisy::Encoder",
+		"direction": "in",
+		"pin": "a,b,click",
+		"process": "{name}.Debounce();",
+		"updaterate": "{name}.SetUpdateRate(som.AudioCallbackRate());",
+		"mapping": [
+			{
+				"name": "{name}",
+				"get": "({class_name}.{name}.Increment())",
+				"range": [
+					-1,
+					1
+				],
+				"bool": false
+			},
+			{
+				"name": "{name}_press",
+				"get": "({class_name}.{name}.Pressed()?1.f:0.f)",
+				"range": [
+					0,
+					1
+				],
+				"bool": false
+			},
+			{
+				"name": "{name}_rise",
+				"get": "({class_name}.{name}.RisingEdge()?1.f:0.f)",
+				"range": [
+					0,
+					1
+				],
+				"bool": true
+			},
+			{
+				"name": "{name}_fall",
+				"get": "({class_name}.{name}.FallingEdge()?1.f:0.f)",
+				"range": [
+					0,
+					1
+				],
+				"bool": true
+			},
+			{
+				"name": "{name}_seconds",
+				"get": "({class_name}.{name}.TimeHeldMs()*0.001f)",
+				"range": null,
+				"bool": false
+			}
+		]
+	},
+	"GateIn": {
+		"map_init": "{name}.Init(som.GetPin({pin}), {invert});",
+		"typename": "daisy::GateIn",
+		"direction": "in",
+		"pin": "a",
+		"invert": "true",
+		"mapping": [
+			{
+				"name": "{name}",
+				"get": "({class_name}.{name}.State()?1.f:0.f)",
+				"range": [
+					0,
+					1
+				],
+				"bool": false
+			},
+			{
+				"name": "{name}_trig",
+				"get": "({class_name}.{name}.Trig()?1.f:0.f)",
+				"range": [
+					0,
+					1
+				],
+				"bool": true
+			}
+		]
+	},
+	"AnalogControl": {
+		"init_single": "cfg[{i}].InitSingle(som.GetPin({pin}));",
+		"map_init": "{name}.Init(som.adc.GetPtr({i}), som.AudioCallbackRate(), {flip}, {invert});",
+		"typename": "daisy::AnalogControl",
+		"direction": "in",
+		"pin": "a",
+		"flip": "false",
+		"invert": "false",
+		"slew": "1.0/som.AudioCallbackRate()",
+		"process": "{name}.Process();",
+		"updaterate": "{name}.SetSampleRate(som.AudioCallbackRate());",
+		"mapping": [
+			{
+				"name": "{name}",
+				"get": "({class_name}.{name}.Value())",
+				"range": [
+					0,
+					1
+				],
+				"bool": false
+			}
+		]
+	},
+	"Led": {
+		"map_init": "{name}.Init(som.GetPin({pin}), {invert});\n    {name}.Set(0.0f);",
+		"typename": "daisy::Led",
+		"direction": "out",
+		"pin": "a",
+		"invert": "true",
+		"postprocess": "{name}.Update();",
+		"mapping": [
+			{
+				"name": "{name}",
+				"set": "{class_name}.{name}.Set({value});"
+			}
+		]
+	},
+	"RgbLed": {
+		"map_init": "{name}.Init(som.GetPin({pin_r}), som.GetPin({pin_g}), som.GetPin({pin_b}), {invert});\n    {name}.Set(0.0f, 0.0f, 0.0f);",
+		"typename": "daisy::RgbLed",
+		"direction": "out",
+		"pin": "r,g,b",
+		"invert": "true",
+		"postprocess": "{name}.Update();",
+		"mapping": [
+			{
+				"name": "{name}_red",
+				"set": "{class_name}.{name}.SetRed({value});"
+			},
+			{
+				"name": "{name}_green",
+				"set": "{class_name}.{name}.SetGreen({value});"
+			},
+			{
+				"name": "{name}_blue",
+				"set": "{class_name}.{name}.SetBlue({value});"
+			},
+			{
+				"name": "{name}",
+				"set": "{class_name}.{name}.Set({value},{value},{value});"
+			},
+			{
+				"name": "{name}_white",
+				"set": "{class_name}.{name}.Set({value},{value},{value});"
+			}
+		]
+	},
+	"GateOut": {
+		"map_init": "{name}.Init(som.GetPin({pin}), {mode}, {pull});",
+		"typename": "daisy::GPIO",
+		"direction": "out",
+		"pin": "a",
+		"mode": "daisy::GPIO::Mode::OUTPUT",
+		"pull": "daisy::GPIO::Pull::NOPULL",
+		"mapping": [
+			{
+				"name": "{name}",
+				"set": "{class_name}.{name}.Write({value});",
+				"where": "hook"
+			}
+		]
+	},
+	"CVOuts": {
+		"map_init": "{name}.bitdepth = {bitdepth};\n    {name}.buff_state = {buff_state};\n    {name}.mode = {mode};\n    {name}.chn = {channel};\n    som.dac.Init({name});\n    som.dac.WriteValue({channel}, 0);",
+		"typename": "daisy::DacHandle::Config",
+		"direction": "out",
+		"pin": "",
+		"bitdepth": "daisy::DacHandle::BitDepth::BITS_12",
+		"buff_state": "daisy::DacHandle::BufferState::ENABLED",
+		"mode": "daisy::DacHandle::Mode::POLLING",
+		"channel": "daisy::DacHandle::Channel::BOTH",
+		"mapping": [
+			{
+				"name": "{name}1",
+				"set": "{class_name}.som.dac.WriteValue(daisy::DacHandle::Channel::ONE, {value} * 4095);",
+				"where": "main"
+			},
+			{
+				"name": "{name}2",
+				"set": "{class_name}.som.dac.WriteValue(daisy::DacHandle::Channel::TWO, {value} * 4095);",
+				"where": "main"
+			}
+		]
+	},
+	"i2c": {
+		"map_init": "{name}.Init({{{peripheral}, {{som.GetPin({pin_scl}), som.GetPin({pin_sda})}}, {speed}, {mode}}});",
+		"typename": "daisy::I2CHandle",
+		"pin": "scl,sda",
+		"peripheral": "daisy::I2CHandle::Config::Peripheral::I2C_1",
+		"speed": "daisy::I2CHandle::Config::Speed::I2C_1MHZ",
+		"mode": "daisy::I2CHandle::Config::Mode::I2C_MASTER",
+		"mapping": []
+	},
+	"PCA9685": {
+		"map_init": "{name}.Init({parent}, {address}, {name}_dma_buffer_a, {name}_dma_buffer_b);",
+		"typename": "daisy::LedDriverPca9685<{driver_count}, true>",
+		"non_class_decl": "daisy::LedDriverPca9685<{driver_count}, true>::DmaBuffer DMA_BUFFER_MEM_SECTION {name}_dma_buffer_a, {name}_dma_buffer_b;",
+		"driver_count": 1,
+		"address": "{0x00}",
+		"parent": "",
+		"pin": "",
+		"loopprocess": "{name}.SwapBuffersAndTransmit();",
+		"mapping": []
+	},
+	"PCA9685Led": {
+		"map_init": "",
+		"pin": "",
+		"typename": "",
+		"parent": "",
+		"direction": "out",
+		"index": 0,
+		"mapping": [
+			{
+				"name": "{name}",
+				"set": "{class_name}.{parent}.SetLed({index}, {value});"
+			}
+		]
+	},
+	"PCA9685RgbLed": {
+		"map_init": "",
+		"typename": "",
+		"direction": "out",
+		"parent": "",
+		"pin": "",
+		"index": {
+			"red": 0,
+			"green": 1,
+			"blue": 2
+		},
+		"mapping": [
+			{
+				"name": "{name}_red",
+				"set": "{class_name}.{parent}.SetLed({index_red}, {value});"
+			},
+			{
+				"name": "{name}_green",
+				"set": "{class_name}.{parent}.SetLed({index_green}, {value});"
+			},
+			{
+				"name": "{name}_blue",
+				"set": "{class_name}.{parent}.SetLed({index_blue}, {value});"
+			},
+			{
+				"name": "{name}",
+				"set": "{class_name}.{parent}.SetLed({index_red}, {value});\n    {class_name}.{parent}.SetLed({index_green}, {value});\n    {class_name}.{parent}.SetLed({index_blue}, {value});"
+			},
+			{
+				"name": "{name}_white",
+				"set": "{class_name}.{parent}.SetLed({index_red}, {value});\n    {class_name}.{parent}.SetLed({index_green}, {value});\n    {class_name}.{parent}.SetLed({index_blue}, {value});"
+			}
+		]
+	},
+	"CD4021": {
+		"map_init": "{name}.Init({{ som.GetPin({pin_clk}), som.GetPin({pin_cs}), {{ som.GetPin({pin_data}) }} }});",
+		"typename": "daisy::ShiftRegister4021<{driver_count}>",
+		"non_class_decl": "uint8_t {name}_debounced[8*{driver_count}];",
+		"driver_count": 1,
+		"pin": "clk,cs,data",
+		"postprocess": "{name}.Update();",
+		"mapping": []
+	},
+	"CD4021Switch": {
+		"map_init": "",
+		"typename": "",
+		"direction": "in",
+		"parent": "",
+		"index": 0,
+		"postprocess": "{parent}_debounced[{index}] = {parent}.State({index}) | ({parent}_debounced[{index}] << 1);",
+		"mapping": [
+			{
+				"name": "{name}",
+				"get": "(json2daisy::{parent}_debounced[{index}] == 0xFE)",
+				"bool": true
+			},
+			{
+				"name": "{name}_press",
+				"get": "(json2daisy::{parent}_debounced[{index}] != 0xFF)",
+				"bool": false
+			},
+			{
+				"name": "{name}_fall",
+				"get": "(json2daisy::{parent}_debounced[{index}] == 0x7F)",
+				"bool": true
+			}
+		]
+	},
+	"CD4051": {
+		"init_single": "size_t {name}_index = {i};\n    cfg[{name}_index].InitMux(som.GetPin({pin_adc}), {mux_count}, som.GetPin({pin_sel0}), som.GetPin({pin_sel1}), som.GetPin({pin_sel2}));",
+		"typename": "",
+		"mux_count": 1,
+		"pin": "adc,sel0,sel1,sel2",
+		"mapping": []
+	},
+	"CD4051AnalogControl": {
+		"map_init": "{name}.Init(som.adc.GetMuxPtr({parent}_index, {index}), som.AudioCallbackRate(), {flip}, {invert});",
+		"parent": "",
+		"index": 0,
+		"typename": "daisy::AnalogControl",
+		"direction": "in",
+		"flip": "false",
+		"invert": "false",
+		"slew": "1.0/som.AudioCallbackRate()",
+		"process": "{name}.Process();",
+		"updaterate": "{name}.SetSampleRate(som.AudioCallbackRate());",
+		"mapping": [
+			{
+				"name": "{name}",
+				"get": "({class_name}.{name}.Value())",
+				"range": [
+					0,
+					1
+				],
+				"bool": false
+			}
+		]
+	},
+	"AnalogControlBipolar": {
+		"init_single": "cfg[{i}].InitSingle(som.GetPin({pin}));",
+		"map_init": "{name}.InitBipolarCv(som.adc.GetPtr({i}), som.AudioCallbackRate());",
+		"typename": "daisy::AnalogControl",
+		"direction": "in",
+		"pin": "a",
+		"slew": "1.0/som.AudioCallbackRate()",
+		"process": "{name}.Process();",
+		"updaterate": "{name}.SetSampleRate(som.AudioCallbackRate());",
+		"mapping": [
+			{
+				"name": "{name}",
+				"get": "({class_name}.{name}.Value())",
+				"range": [
+					0,
+					1
+				],
+				"bool": false
+			}
+		]
+	},
+	"MotorShield": {
+		"map_init": "daisy::Pca9685::Config {name}_pca_config;\n    {name}_pca_config.address = {address};\n    {name}_pca_config.periph = {periph};\n    {name}_pca_config.speed = {speed};\n    {name}_pca_config.scl = som.GetPin({pin_scl});\n    {name}_pca_config.sda = som.GetPin({pin_sda});\n    daisy::Adafruit_MotorShield::Config {name}_config;\n    {name}_config.pca9685_config = {name}_pca_config;\n    {name}_config.frequency = {frequency};\n    {name}.Init({name}_config);",
+		"typename": "daisy::Adafruit_MotorShield",
+		"direction": "out",
+		"pin": "scl,sda",
+		"address": "daisy::Pca9685::PCA9685_I2C_BASE_ADDRESS",
+		"periph": "daisy::I2CHandle::Config::Peripheral::I2C_1",
+		"speed": "daisy::I2CHandle::Config::Speed::I2C_400KHZ",
+		"frequency": "1600",
+		"mapping": []
+	},
+	"StepperMotor": {
+		"map_init": "{name} = {parent}.GetStepper({steps}, {index});\n    {name}->SetSpeed({speed});",
+		"typename": "daisy::Adafruit_MotorShield::Adafruit_StepperMotor*",
+		"direction": "out",
+		"parent": "",
+		"steps": 48,
+		"index": 1,
+		"speed": 60,
+		"loopprocess": "{name}->Process();",
+		"mapping": [
+			{
+				"name": "{name}",
+				"set": "if ({value} > 0)\n    {class_name}.{name}->StepNonblocking({value}, daisy::Adafruit_MotorShield::FORWARD);\n  else if ({value} < 0)\n    {class_name}.{name}->StepNonblocking(-{value}, daisy::Adafruit_MotorShield::BACKWARD);",
+				"bool": true,
+				"where": "hook"
+			},
+			{
+				"name": "{name}_release",
+				"set": "{class_name}.{name}->Release();",
+				"bool": true,
+				"where": "hook"
+			}
+		]
+	},
+	"DcMotor": {
+		"map_init": "{name} = {parent}.GetMotor({index});\n    {name}->SetSpeedFine({speed} * 4095);",
+		"typename": "daisy::Adafruit_MotorShield::Adafruit_DCMotor*",
+		"direction": "out",
+		"parent": "",
+		"index": 1,
+		"speed": 0.25,
+		"mapping": [
+			{
+				"name": "{name}",
+				"set": "if ({value} > 0)\n      {class_name}.{name}->Run(daisy::Adafruit_MotorShield::FORWARD);\n    else if ({value} < 0)\n      {class_name}.{name}->Run(daisy::Adafruit_MotorShield::BACKWARD);\n    else\n      {class_name}.{name}->FullOff();",
+				"where": "main"
+			}
+		]
+	},
+	"Bme280": {
+		"map_init": "daisy::Bme280I2CTransport::Config {name}_config;\n    {name}_config.periph = {periph};\n    {name}_config.speed = {speed};\n    {name}_config.scl = som.GetPin({pin_scl});\n    {name}_config.sda = som.GetPin({pin_sda});\n    {name}_config.address = {address};\n    daisy::Bme280I2C::Config {name}_config_main;\n    {name}_config_main.transport_config = {name}_config;\n    {name}.Init({name}_config_main);",
+		"typename": "daisy::Bme280I2C",
+		"direction": "in",
+		"pin": "scl,sda",
+		"address": "daisy::Pca9685::PCA9685_I2C_BASE_ADDRESS",
+		"periph": "daisy::I2CHandle::Config::Peripheral::I2C_1",
+		"speed": "daisy::I2CHandle::Config::Speed::I2C_400KHZ",
+		"pressure": 1013,
+		"mapping": [
+			{
+				"name": "{name}",
+				"get": "{class_name}.{name}.ReadTemperature()",
+				"where": "main"
+			},
+			{
+				"name": "{name}_temp",
+				"get": "{class_name}.{name}.ReadTemperature()",
+				"where": "main"
+			},
+			{
+				"name": "{name}_hum",
+				"get": "{class_name}.{name}.ReadHumidity()",
+				"where": "main"
+			},
+			{
+				"name": "{name}_press",
+				"get": "{class_name}.{name}.ReadPressure()",
+				"where": "main"
+			},
+			{
+				"name": "{name}_alt",
+				"get": "{class_name}.{name}.ReadAltitude({pressure})",
+				"where": "main"
+			}
+		]
+	},
+	"HallSensor": {
+		"map_init": "daisy::HallSensor::Config {name}_config;\n    {name}_config.pull = {typename}::{pull};\n    {name}_config.pin = som.GetPin({pin});\n    {name}.Init({name}_config);",
+		"typename": "daisy::HallSensor",
+		"direction": "in",
+		"pin": 14,
+		"pull": "UP",
+		"mapping": [
+			{
+				"name": "{name}",
+				"get": "{class_name}.{name}.State()"
+			},
+			{
+				"name": "{name}_count",
+				"get": "{class_name}.{name}.GetCount()"
+			}
+		]
+	},
+	"Tlv493d": {
+		"map_init": "daisy::Tlv493dI2CTransport::Config {name}_config;\n    {name}_config.address = {address};\n    {name}_config.periph = {periph};\n    {name}_config.speed = {speed};\n    {name}_config.scl = som.GetPin({pin_scl});\n    {name}_config.sda = som.GetPin({pin_sda});\n    daisy::Tlv493dI2C::Config {name}_main_conf;\n    {name}_main_conf.transport_config = {name}_config;\n    {name}.Init({name}_main_conf);",
+		"typename": "daisy::Tlv493dI2C",
+		"direction": "in",
+		"pin": "scl,sda",
+		"address": "TLV493D_ADDRESS1",
+		"periph": "daisy::I2CHandle::Config::Peripheral::I2C_1",
+		"speed": "daisy::I2CHandle::Config::Speed::I2C_400KHZ",
+		"loopprocess": "{name}.UpdateData();",
+		"mapping": [
+			{
+				"name": "{name}",
+				"get": "{class_name}.{name}.GetAmount()"
+			},
+			{
+				"name": "{name}_x",
+				"get": "{class_name}.{name}.GetX()"
+			},
+			{
+				"name": "{name}_y",
+				"get": "{class_name}.{name}.GetY()"
+			},
+			{
+				"name": "{name}_z",
+				"get": "{class_name}.{name}.GetZ()"
+			},
+			{
+				"name": "{name}_amount",
+				"get": "{class_name}.{name}.GetAmount()"
+			},
+			{
+				"name": "{name}_azimuth",
+				"get": "{class_name}.{name}.GetAzimuth()"
+			},
+			{
+				"name": "{name}_polar",
+				"get": "{class_name}.{name}.GetPolar()"
+			}
+		]
+	},
+	"Mpr121": {
+		"map_init": "daisy::Mpr121I2CTransport::Config {name}_config;\n    {name}_config.periph = {periph};\n    {name}_config.speed = {speed};\n    {name}_config.dev_addr = {address};\n    daisy::Mpr121I2C::Config {name}_main_conf;\n    {name}_main_conf.transport_config = {name}_config;\n    {name}_main_conf.touch_threshold = {touch_threshold};\n    {name}_main_conf.release_threshold = {release_threshold};\n    {name}.Init({name}_main_conf);",
+		"typename": "daisy::Mpr121I2C",
+		"direction": "in",
+		"pin": "scl,sda",
+		"address": "MPR121_I2CADDR_DEFAULT",
+		"periph": "daisy::I2CHandle::Config::Peripheral::I2C_1",
+		"speed": "daisy::I2CHandle::Config::Speed::I2C_400KHZ",
+		"touch_threshold": "MPR121_TOUCH_THRESHOLD_DEFAULT",
+		"release_threshold": "MPR121_RELEASE_THRESHOLD_DEFAULT",
+		"mapping": [
+			{
+				"name": "{name}",
+				"get": "(({class_name}.{name}.Touched() & 0x001) ? 1.0f : 0.f)",
+				"where": "main"
+			},
+			{
+				"name": "{name}_ch0",
+				"get": "(({class_name}.{name}.Touched() & 0x001) ? 1.0f : 0.f)",
+				"where": "main"
+			},
+			{
+				"name": "{name}_ch1",
+				"get": "(({class_name}.{name}.Touched() & 0x002) ? 1.0f : 0.f)",
+				"where": "main"
+			},
+			{
+				"name": "{name}_ch2",
+				"get": "(({class_name}.{name}.Touched() & 0x004) ? 1.0f : 0.f)",
+				"where": "main"
+			},
+			{
+				"name": "{name}_ch3",
+				"get": "(({class_name}.{name}.Touched() & 0x008) ? 1.0f : 0.f)",
+				"where": "main"
+			},
+			{
+				"name": "{name}_ch4",
+				"get": "(({class_name}.{name}.Touched() & 0x010) ? 1.0f : 0.f)",
+				"where": "main"
+			},
+			{
+				"name": "{name}_ch5",
+				"get": "(({class_name}.{name}.Touched() & 0x020) ? 1.0f : 0.f)",
+				"where": "main"
+			},
+			{
+				"name": "{name}_ch6",
+				"get": "(({class_name}.{name}.Touched() & 0x040) ? 1.0f : 0.f)",
+				"where": "main"
+			},
+			{
+				"name": "{name}_ch7",
+				"get": "(({class_name}.{name}.Touched() & 0x080) ? 1.0f : 0.f)",
+				"where": "main"
+			},
+			{
+				"name": "{name}_ch8",
+				"get": "(({class_name}.{name}.Touched() & 0x100) ? 1.0f : 0.f)",
+				"where": "main"
+			},
+			{
+				"name": "{name}_ch9",
+				"get": "(({class_name}.{name}.Touched() & 0x200) ? 1.0f : 0.f)",
+				"where": "main"
+			},
+			{
+				"name": "{name}_ch10",
+				"get": "(({class_name}.{name}.Touched() & 0x400) ? 1.0f : 0.f)",
+				"where": "main"
+			},
+			{
+				"name": "{name}_ch11",
+				"get": "(({class_name}.{name}.Touched() & 0x800) ? 1.0f : 0.f)",
+				"where": "main"
+			},
+			{
+				"name": "{name}_ch0_raw",
+				"get": "{class_name}.{name}.FilteredData(0)",
+				"where": "main",
+				"range": [
+					0,
+					1023
+				]
+			},
+			{
+				"name": "{name}_ch1_raw",
+				"get": "{class_name}.{name}.FilteredData(1)",
+				"where": "main",
+				"range": [
+					0,
+					1023
+				]
+			},
+			{
+				"name": "{name}_ch2_raw",
+				"get": "{class_name}.{name}.FilteredData(2)",
+				"where": "main",
+				"range": [
+					0,
+					1023
+				]
+			},
+			{
+				"name": "{name}_ch3_raw",
+				"get": "{class_name}.{name}.FilteredData(3)",
+				"where": "main",
+				"range": [
+					0,
+					1023
+				]
+			},
+			{
+				"name": "{name}_ch4_raw",
+				"get": "{class_name}.{name}.FilteredData(4)",
+				"where": "main",
+				"range": [
+					0,
+					1023
+				]
+			},
+			{
+				"name": "{name}_ch5_raw",
+				"get": "{class_name}.{name}.FilteredData(5)",
+				"where": "main",
+				"range": [
+					0,
+					1023
+				]
+			},
+			{
+				"name": "{name}_ch6_raw",
+				"get": "{class_name}.{name}.FilteredData(6)",
+				"where": "main",
+				"range": [
+					0,
+					1023
+				]
+			},
+			{
+				"name": "{name}_ch7_raw",
+				"get": "{class_name}.{name}.FilteredData(7)",
+				"where": "main",
+				"range": [
+					0,
+					1023
+				]
+			},
+			{
+				"name": "{name}_ch8_raw",
+				"get": "{class_name}.{name}.FilteredData(8)",
+				"where": "main",
+				"range": [
+					0,
+					1023
+				]
+			},
+			{
+				"name": "{name}_ch9_raw",
+				"get": "{class_name}.{name}.FilteredData(9)",
+				"where": "main",
+				"range": [
+					0,
+					1023
+				]
+			},
+			{
+				"name": "{name}_ch10_raw",
+				"get": "{class_name}.{name}.FilteredData(10)",
+				"where": "main",
+				"range": [
+					0,
+					1023
+				]
+			},
+			{
+				"name": "{name}_ch11_raw",
+				"get": "{class_name}.{name}.FilteredData(11)",
+				"where": "main",
+				"range": [
+					0,
+					1023
+				]
+			}
+		]
+	},
+	"Apds9960": {
+		"map_init": "daisy::Apds9960I2CTransport::Config {name}_config;\n    {name}_config.periph = {periph};\n    {name}_config.speed = {speed};\n    {name}_config.scl = som.GetPin({pin_scl});\n    {name}_config.sda = som.GetPin({pin_sda});\n    daisy::Apds9960I2C::Config {name}_main_conf;\n    {name}_main_conf.transport_config = {name}_config;\n    {name}.Init({name}_main_conf);",
+		"typename": "daisy::Apds9960I2C",
+		"direction": "in",
+		"pin": "scl,sda",
+		"periph": "daisy::I2CHandle::Config::Peripheral::I2C_1",
+		"speed": "daisy::I2CHandle::Config::Speed::I2C_400KHZ",
+		"mapping": [
+			{
+				"name": "{name}",
+				"get": "{class_name}.{name}.ReadGesture()",
+				"where": "main"
+			},
+			{
+				"name": "{name}_gest",
+				"get": "{class_name}.{name}.ReadGesture()",
+				"where": "main"
+			},
+			{
+				"name": "{name}_prox",
+				"get": "{class_name}.{name}.ReadProximity()",
+				"where": "main"
+			},
+			{
+				"name": "{name}_red",
+				"get": "{class_name}.{name}.GetColorDataRed()",
+				"where": "main"
+			},
+			{
+				"name": "{name}_green",
+				"get": "{class_name}.{name}.GetColorDataGreen()",
+				"where": "main"
+			},
+			{
+				"name": "{name}_blue",
+				"get": "{class_name}.{name}.GetColorDataBlue()",
+				"where": "main"
+			},
+			{
+				"name": "{name}_clear",
+				"get": "{class_name}.{name}.GetColorDataClear()",
+				"where": "main"
+			}
+		]
+	},
+	"Bmp390": {
+		"map_init": "daisy::Bmp390I2CTransport::Config {name}_config;\n    {name}_config.periph = {periph};\n    {name}_config.speed = {speed};\n    {name}_config.scl = som.GetPin({pin_scl});\n    {name}_config.sda = som.GetPin({pin_sda});\n    daisy::Bmp390I2C::Config {name}_config_main;\n    {name}_config_main.transport_config = {name}_config;\n   {name}.Init({name}_config_main);",
+		"typename": "daisy::Bmp390I2C",
+		"direction": "in",
+		"pin": "scl,sda",
+		"periph": "daisy::I2CHandle::Config::Peripheral::I2C_1",
+		"speed": "daisy::I2CHandle::Config::Speed::I2C_400KHZ",
+		"pressure": 1013,
+		"loopprocess": "{name}.Process();",
+		"mapping": [
+			{
+				"name": "{name}",
+				"get": "{class_name}.{name}.ReadTemperature()"
+			},
+			{
+				"name": "{name}_temp",
+				"get": "{class_name}.{name}.ReadTemperature()"
+			},
+			{
+				"name": "{name}_press",
+				"get": "{class_name}.{name}.ReadPressure()"
+			},
+			{
+				"name": "{name}_alt",
+				"get": "{class_name}.{name}.ReadAltitude({pressure})"
+			}
+		]
+	},
+	"Vl53l1x": {
+		"map_init": "daisy::Vl53l1xI2CTransport::Config {name}_config;\n    {name}_config.periph = {periph};\n    {name}_config.speed = {speed};\n    {name}_config.scl = som.GetPin({pin_scl});\n    {name}_config.sda = som.GetPin({pin_sda});\n    {name}_config.dev_addr = {address};\n    daisy::Vl53l1xI2C::Config {name}_main_conf;\n    {name}_main_conf.transport_config = {name}_config;\n    {name}_main_conf.xShut = som.GetPin({pin_xshut});\n    {name}.Init({name}_main_conf);\n    {name}.StartRanging();\n    {name}.StartTemperatureUpdate();",
+		"typename": "daisy::Vl53l1xI2C",
+		"direction": "in",
+		"pin": "scl,sda,xshut",
+		"address": 82,
+		"periph": "daisy::I2CHandle::Config::Peripheral::I2C_1",
+		"speed": "daisy::I2CHandle::Config::Speed::I2C_400KHZ",
+		"loopprocess": "{name}.Process();",
+		"mapping": [
+			{
+				"name": "{name}",
+				"get": "{class_name}.{name}.GetDistance()"
+			},
+			{
+				"name": "{name}_dist",
+				"get": "{class_name}.{name}.GetDistance()"
+			},
+			{
+				"name": "{name}_sig_per_spad",
+				"get": "{class_name}.{name}.GetSignalPerSpad()"
+			},
+			{
+				"name": "{name}_amb_per_spad",
+				"get": "{class_name}.{name}.GetAmbientPerSpad()"
+			},
+			{
+				"name": "{name}_sig_rate",
+				"get": "{class_name}.{name}.GetSignalRate()"
+			},
+			{
+				"name": "{name}_amb_rate",
+				"get": "{class_name}.{name}.GetAmbientRate()"
+			},
+			{
+				"name": "{name}_spad_nb",
+				"get": "{class_name}.{name}.GetSpadNb()"
+			}
+		]
+	},
+	"Vl53l0x": {
+		"map_init": "daisy::Adafruit_VL53L0X::Config {name}_config;\n    {name}_config.periph = {periph};\n    {name}_config.speed = {speed};\n    {name}_config.scl = som.GetPin({pin_scl});\n    {name}_config.sda = som.GetPin({pin_sda});\n    {name}_config.dev_addr = {address};\n    {name}_config.vl_config = {vl_config};\n    {name}.Init({name}_config);",
+		"typename": "daisy::Adafruit_VL53L0X",
+		"direction": "in",
+		"pin": "scl,sda",
+		"address": "VL53L0X_I2C_ADDR",
+		"periph": "daisy::I2CHandle::Config::Peripheral::I2C_1",
+		"speed": "daisy::I2CHandle::Config::Speed::I2C_400KHZ",
+		"vl_config": "daisy::Adafruit_VL53L0X::VL53L0X_Sense_config_t::VL53L0X_SENSE_DEFAULT",
+		"loopprocess": "{name}.Process();",
+		"mapping": [
+			{
+				"name": "{name}",
+				"get": "{class_name}.{name}.GetRangeMilliMeter()"
+			}
+		]
+	},
+	"NeoTrellis": {
+		"map_init": "daisy::NeoTrellisI2CTransport::Config {name}_config;\n    {name}_config.periph = {periph};\n    {name}_config.speed = {speed};\n    {name}_config.scl = som.GetPin({pin_scl});\n    {name}_config.sda = som.GetPin({pin_sda});\n    {name}_config.address = {address};\n    daisy::NeoTrellisI2C::Config {name}_main_conf;\n    {name}_main_conf.transport_config = {name}_config;\n    {name}.Init({name}_main_conf);",
+		"typename": "daisy::NeoTrellisI2C",
+		"direction": "in",
+		"pin": "scl,sda",
+		"address": "NEO_TRELLIS_ADDR",
+		"periph": "daisy::I2CHandle::Config::Peripheral::I2C_1",
+		"speed": "daisy::I2CHandle::Config::Speed::I2C_400KHZ",
+		"loopprocess": "{name}.Process();",
+		"mapping": [
+			{
+				"name": "{name}",
+				"get": "{class_name}.{name}.GetRising(0)",
+				"bool": true
+			},
+			{
+				"name": "{name}_0",
+				"get": "{class_name}.{name}.GetRising(0)",
+				"bool": true
+			},
+			{
+				"name": "{name}_1",
+				"get": "{class_name}.{name}.GetRising(1)",
+				"bool": true
+			},
+			{
+				"name": "{name}_2",
+				"get": "{class_name}.{name}.GetRising(2)",
+				"bool": true
+			},
+			{
+				"name": "{name}_3",
+				"get": "{class_name}.{name}.GetRising(3)",
+				"bool": true
+			},
+			{
+				"name": "{name}_4",
+				"get": "{class_name}.{name}.GetRising(4)",
+				"bool": true
+			},
+			{
+				"name": "{name}_5",
+				"get": "{class_name}.{name}.GetRising(5)",
+				"bool": true
+			},
+			{
+				"name": "{name}_6",
+				"get": "{class_name}.{name}.GetRising(6)",
+				"bool": true
+			},
+			{
+				"name": "{name}_7",
+				"get": "{class_name}.{name}.GetRising(7)",
+				"bool": true
+			},
+			{
+				"name": "{name}_8",
+				"get": "{class_name}.{name}.GetRising(8)",
+				"bool": true
+			},
+			{
+				"name": "{name}_9",
+				"get": "{class_name}.{name}.GetRising(9)",
+				"bool": true
+			},
+			{
+				"name": "{name}_10",
+				"get": "{class_name}.{name}.GetRising(10)",
+				"bool": true
+			},
+			{
+				"name": "{name}_11",
+				"get": "{class_name}.{name}.GetRising(11)",
+				"bool": true
+			},
+			{
+				"name": "{name}_12",
+				"get": "{class_name}.{name}.GetRising(12)",
+				"bool": true
+			},
+			{
+				"name": "{name}_13",
+				"get": "{class_name}.{name}.GetRising(13)",
+				"bool": true
+			},
+			{
+				"name": "{name}_14",
+				"get": "{class_name}.{name}.GetRising(14)",
+				"bool": true
+			},
+			{
+				"name": "{name}_15",
+				"get": "{class_name}.{name}.GetRising(15)",
+				"bool": true
+			},
+			{
+				"name": "{name}_0_falling",
+				"get": "{class_name}.{name}.GetFalling(0)",
+				"bool": true
+			},
+			{
+				"name": "{name}_1_falling",
+				"get": "{class_name}.{name}.GetFalling(1)",
+				"bool": true
+			},
+			{
+				"name": "{name}_2_falling",
+				"get": "{class_name}.{name}.GetFalling(2)",
+				"bool": true
+			},
+			{
+				"name": "{name}_3_falling",
+				"get": "{class_name}.{name}.GetFalling(3)",
+				"bool": true
+			},
+			{
+				"name": "{name}_4_falling",
+				"get": "{class_name}.{name}.GetFalling(4)",
+				"bool": true
+			},
+			{
+				"name": "{name}_5_falling",
+				"get": "{class_name}.{name}.GetFalling(5)",
+				"bool": true
+			},
+			{
+				"name": "{name}_6_falling",
+				"get": "{class_name}.{name}.GetFalling(6)",
+				"bool": true
+			},
+			{
+				"name": "{name}_7_falling",
+				"get": "{class_name}.{name}.GetFalling(7)",
+				"bool": true
+			},
+			{
+				"name": "{name}_8_falling",
+				"get": "{class_name}.{name}.GetFalling(8)",
+				"bool": true
+			},
+			{
+				"name": "{name}_9_falling",
+				"get": "{class_name}.{name}.GetFalling(9)",
+				"bool": true
+			},
+			{
+				"name": "{name}_10_falling",
+				"get": "{class_name}.{name}.GetFalling(10)",
+				"bool": true
+			},
+			{
+				"name": "{name}_11_falling",
+				"get": "{class_name}.{name}.GetFalling(11)",
+				"bool": true
+			},
+			{
+				"name": "{name}_12_falling",
+				"get": "{class_name}.{name}.GetFalling(12)",
+				"bool": true
+			},
+			{
+				"name": "{name}_13_falling",
+				"get": "{class_name}.{name}.GetFalling(13)",
+				"bool": true
+			},
+			{
+				"name": "{name}_14_falling",
+				"get": "{class_name}.{name}.GetFalling(14)",
+				"bool": true
+			},
+			{
+				"name": "{name}_15_falling",
+				"get": "{class_name}.{name}.GetFalling(15)",
+				"bool": true
+			},
+			{
+				"name": "{name}_0_state",
+				"get": "({class_name}.{name}.GetState(0) ? 1.0f : 0.0f)"
+			},
+			{
+				"name": "{name}_1_state",
+				"get": "({class_name}.{name}.GetState(1) ? 1.0f : 0.0f)"
+			},
+			{
+				"name": "{name}_2_state",
+				"get": "({class_name}.{name}.GetState(2) ? 1.0f : 0.0f)"
+			},
+			{
+				"name": "{name}_3_state",
+				"get": "({class_name}.{name}.GetState(3) ? 1.0f : 0.0f)"
+			},
+			{
+				"name": "{name}_4_state",
+				"get": "({class_name}.{name}.GetState(4) ? 1.0f : 0.0f)"
+			},
+			{
+				"name": "{name}_5_state",
+				"get": "({class_name}.{name}.GetState(5) ? 1.0f : 0.0f)"
+			},
+			{
+				"name": "{name}_6_state",
+				"get": "({class_name}.{name}.GetState(6) ? 1.0f : 0.0f)"
+			},
+			{
+				"name": "{name}_7_state",
+				"get": "({class_name}.{name}.GetState(7) ? 1.0f : 0.0f)"
+			},
+			{
+				"name": "{name}_8_state",
+				"get": "({class_name}.{name}.GetState(8) ? 1.0f : 0.0f)"
+			},
+			{
+				"name": "{name}_9_state",
+				"get": "({class_name}.{name}.GetState(9) ? 1.0f : 0.0f)"
+			},
+			{
+				"name": "{name}_10_state",
+				"get": "({class_name}.{name}.GetState(10) ? 1.0f : 0.0f)"
+			},
+			{
+				"name": "{name}_11_state",
+				"get": "({class_name}.{name}.GetState(11) ? 1.0f : 0.0f)"
+			},
+			{
+				"name": "{name}_12_state",
+				"get": "({class_name}.{name}.GetState(12) ? 1.0f : 0.0f)"
+			},
+			{
+				"name": "{name}_13_state",
+				"get": "({class_name}.{name}.GetState(13) ? 1.0f : 0.0f)"
+			},
+			{
+				"name": "{name}_14_state",
+				"get": "({class_name}.{name}.GetState(14) ? 1.0f : 0.0f)"
+			},
+			{
+				"name": "{name}_15_state",
+				"get": "({class_name}.{name}.GetState(15) ? 1.0f : 0.0f)"
+			}
+		]
+	},
+	"NeoTrellisLeds": {
+		"map_init": "",
+		"parent": "",
+		"direction": "out",
+		"loopprocess": "{parent}.pixels.Show();",
+		"mapping": [
+			{
+				"name": "{name}",
+				"set": "{class_name}.{parent}.pixels.SetPixelColor(0, {class_name}.{parent}.pixels.Color({value}, {value}, {value}));",
+				"where": "main"
+			},
+			{
+				"name": "{name}_0",
+				"set": "{class_name}.{parent}.pixels.SetPixelColor(0, {class_name}.{parent}.pixels.Color({value}, {value}, {value}));",
+				"where": "main"
+			},
+			{
+				"name": "{name}_1",
+				"set": "{class_name}.{parent}.pixels.SetPixelColor(1, {class_name}.{parent}.pixels.Color({value}, {value}, {value}));",
+				"where": "main"
+			},
+			{
+				"name": "{name}_2",
+				"set": "{class_name}.{parent}.pixels.SetPixelColor(2, {class_name}.{parent}.pixels.Color({value}, {value}, {value}));",
+				"where": "main"
+			},
+			{
+				"name": "{name}_3",
+				"set": "{class_name}.{parent}.pixels.SetPixelColor(3, {class_name}.{parent}.pixels.Color({value}, {value}, {value}));",
+				"where": "main"
+			},
+			{
+				"name": "{name}_4",
+				"set": "{class_name}.{parent}.pixels.SetPixelColor(4, {class_name}.{parent}.pixels.Color({value}, {value}, {value}));",
+				"where": "main"
+			},
+			{
+				"name": "{name}_5",
+				"set": "{class_name}.{parent}.pixels.SetPixelColor(5, {class_name}.{parent}.pixels.Color({value}, {value}, {value}));",
+				"where": "main"
+			},
+			{
+				"name": "{name}_6",
+				"set": "{class_name}.{parent}.pixels.SetPixelColor(6, {class_name}.{parent}.pixels.Color({value}, {value}, {value}));",
+				"where": "main"
+			},
+			{
+				"name": "{name}_7",
+				"set": "{class_name}.{parent}.pixels.SetPixelColor(7, {class_name}.{parent}.pixels.Color({value}, {value}, {value}));",
+				"where": "main"
+			},
+			{
+				"name": "{name}_8",
+				"set": "{class_name}.{parent}.pixels.SetPixelColor(8, {class_name}.{parent}.pixels.Color({value}, {value}, {value}));",
+				"where": "main"
+			},
+			{
+				"name": "{name}_9",
+				"set": "{class_name}.{parent}.pixels.SetPixelColor(9, {class_name}.{parent}.pixels.Color({value}, {value}, {value}));",
+				"where": "main"
+			},
+			{
+				"name": "{name}_10",
+				"set": "{class_name}.{parent}.pixels.SetPixelColor(10, {class_name}.{parent}.pixels.Color({value}, {value}, {value}));",
+				"where": "main"
+			},
+			{
+				"name": "{name}_11",
+				"set": "{class_name}.{parent}.pixels.SetPixelColor(11, {class_name}.{parent}.pixels.Color({value}, {value}, {value}));",
+				"where": "main"
+			},
+			{
+				"name": "{name}_12",
+				"set": "{class_name}.{parent}.pixels.SetPixelColor(12, {class_name}.{parent}.pixels.Color({value}, {value}, {value}));",
+				"where": "main"
+			},
+			{
+				"name": "{name}_13",
+				"set": "{class_name}.{parent}.pixels.SetPixelColor(13, {class_name}.{parent}.pixels.Color({value}, {value}, {value}));",
+				"where": "main"
+			},
+			{
+				"name": "{name}_14",
+				"set": "{class_name}.{parent}.pixels.SetPixelColor(14, {class_name}.{parent}.pixels.Color({value}, {value}, {value}));",
+				"where": "main"
+			},
+			{
+				"name": "{name}_15",
+				"set": "{class_name}.{parent}.pixels.SetPixelColor(15, {class_name}.{parent}.pixels.Color({value}, {value}, {value}));",
+				"where": "main"
+			}
+		]
+	},
+	"Bno055": {
+		"map_init": "daisy::Bno055I2CTransport::Config {name}_config;\n    {name}_config.periph = {periph};\n    {name}_config.speed = {speed};\n    {name}_config.scl = som.GetPin({pin_scl});\n    {name}_config.sda = som.GetPin({pin_sda});\n    {name}_config.address = {address};\n    daisy::Bno055I2C::Config {name}_main_conf;\n    {name}_main_conf.transport_config = {name}_config;\n    {name}.Init({name}_main_conf);",
+		"typename": "daisy::Bno055I2C",
+		"direction": "in",
+		"pin": "scl,sda",
+		"address": "BNO055_ADDRESS_A",
+		"periph": "daisy::I2CHandle::Config::Peripheral::I2C_1",
+		"speed": "daisy::I2CHandle::Config::Speed::I2C_400KHZ",
+		"loopprocess": "{name}.Process();",
+		"mapping": [
+			{
+				"name": "{name}",
+				"get": "{class_name}.{name}.GetVectorAccelerometer().x"
+			},
+			{
+				"name": "{name}_accel_x",
+				"get": "{class_name}.{name}.GetVectorAccelerometer().x"
+			},
+			{
+				"name": "{name}_accel_y",
+				"get": "{class_name}.{name}.GetVectorAccelerometer().y"
+			},
+			{
+				"name": "{name}_accel_z",
+				"get": "{class_name}.{name}.GetVectorAccelerometer().z"
+			},
+			{
+				"name": "{name}_magnet_x",
+				"get": "{class_name}.{name}.GetVectorMagnetometer().x"
+			},
+			{
+				"name": "{name}_magnet_y",
+				"get": "{class_name}.{name}.GetVectorMagnetometer().y"
+			},
+			{
+				"name": "{name}_magnet_z",
+				"get": "{class_name}.{name}.GetVectorMagnetometer().z"
+			},
+			{
+				"name": "{name}_gyro_x",
+				"get": "{class_name}.{name}.GetVectorGyroscope().x"
+			},
+			{
+				"name": "{name}_gyro_y",
+				"get": "{class_name}.{name}.GetVectorGyroscope().y"
+			},
+			{
+				"name": "{name}_gyro_z",
+				"get": "{class_name}.{name}.GetVectorGyroscope().z"
+			},
+			{
+				"name": "{name}_euler_x",
+				"get": "{class_name}.{name}.GetVectorEuler().x"
+			},
+			{
+				"name": "{name}_euler_y",
+				"get": "{class_name}.{name}.GetVectorEuler().y"
+			},
+			{
+				"name": "{name}_euler_z",
+				"get": "{class_name}.{name}.GetVectorEuler().z"
+			},
+			{
+				"name": "{name}_linear_accel_x",
+				"get": "{class_name}.{name}.GetVectorLinearAccel().x"
+			},
+			{
+				"name": "{name}_linear_accel_y",
+				"get": "{class_name}.{name}.GetVectorLinearAccel().y"
+			},
+			{
+				"name": "{name}_linear_accel_z",
+				"get": "{class_name}.{name}.GetVectorLinearAccel().z"
+			},
+			{
+				"name": "{name}_grav_x",
+				"get": "{class_name}.{name}.GetVectorGravity().x"
+			},
+			{
+				"name": "{name}_grav_y",
+				"get": "{class_name}.{name}.GetVectorGravity().y"
+			},
+			{
+				"name": "{name}_grav_z",
+				"get": "{class_name}.{name}.GetVectorGravity().z"
+			},
+			{
+				"name": "{name}_quat_x",
+				"get": "{class_name}.{name}.GetQuat().x"
+			},
+			{
+				"name": "{name}_quat_y",
+				"get": "{class_name}.{name}.GetQuat().y"
+			},
+			{
+				"name": "{name}_quat_z",
+				"get": "{class_name}.{name}.GetQuat().z"
+			},
+			{
+				"name": "{name}_quat_w",
+				"get": "{class_name}.{name}.GetQuat().w"
+			}
+		]
+	},
+	"Icm20948": {
+		"map_init": "daisy::Icm20948I2CTransport::Config {name}_config;\n    {name}_config.periph = {periph};\n    {name}_config.speed = {speed};\n    {name}_config.scl = som.GetPin({pin_scl});\n    {name}_config.sda = som.GetPin({pin_sda});\n    {name}_config.address = {address};\n    daisy::Icm20948I2C::Config {name}_main_conf;\n    {name}_main_conf.transport_config = {name}_config;\n    {name}.Init({name}_main_conf);",
+		"typename": "daisy::Icm20948I2C",
+		"direction": "in",
+		"pin": "scl,sda",
+		"address": "ICM20948_I2CADDR_DEFAULT",
+		"periph": "daisy::I2CHandle::Config::Peripheral::I2C_1",
+		"speed": "daisy::I2CHandle::Config::Speed::I2C_400KHZ",
+		"loopprocess": "{name}.Process();",
+		"mapping": [
+			{
+				"name": "{name}",
+				"get": "{class_name}.{name}.GetAccelVect().x"
+			},
+			{
+				"name": "{name}_accel_x",
+				"get": "{class_name}.{name}.GetAccelVect().x"
+			},
+			{
+				"name": "{name}_accel_y",
+				"get": "{class_name}.{name}.GetAccelVect().y"
+			},
+			{
+				"name": "{name}_accel_z",
+				"get": "{class_name}.{name}.GetAccelVect().z"
+			},
+			{
+				"name": "{name}_magnet_x",
+				"get": "{class_name}.{name}.GetMagVect().x"
+			},
+			{
+				"name": "{name}_magnet_y",
+				"get": "{class_name}.{name}.GetMagVect().y"
+			},
+			{
+				"name": "{name}_magnet_z",
+				"get": "{class_name}.{name}.GetMagVect().z"
+			},
+			{
+				"name": "{name}_gyro_x",
+				"get": "{class_name}.{name}.GetGyroVect().x"
+			},
+			{
+				"name": "{name}_gyro_y",
+				"get": "{class_name}.{name}.GetGyroVect().y"
+			},
+			{
+				"name": "{name}_gyro_z",
+				"get": "{class_name}.{name}.GetGyroVect().z"
+			}
+		]
+	},
+	"Dps310": {
+		"map_init": "daisy::Dps310I2CTransport::Config {name}_config;\n    {name}_config.address = {address};\n    {name}_config.periph = {periph};\n    {name}_config.speed = {speed};\n    {name}_config.scl = som.GetPin({pin_scl});\n    {name}_config.sda = som.GetPin({pin_sda});\n    daisy::Dps310I2C::Config {name}_config_main;\n    {name}_config_main.transport_config = {name}_config;\n   {name}.Init({name}_config_main);",
+		"typename": "daisy::Dps310I2C",
+		"direction": "in",
+		"pin": "scl,sda",
+		"periph": "daisy::I2CHandle::Config::Peripheral::I2C_1",
+		"speed": "daisy::I2CHandle::Config::Speed::I2C_400KHZ",
+		"address": "DPS310_I2CADDR_DEFAULT",
+		"pressure": 1013,
+		"loopprocess": "{name}.Process();",
+		"mapping": [
+			{
+				"name": "{name}",
+				"get": "{class_name}.{name}.GetTemperature()"
+			},
+			{
+				"name": "{name}_temp",
+				"get": "{class_name}.{name}.GetTemperature()"
+			},
+			{
+				"name": "{name}_press",
+				"get": "{class_name}.{name}.GetPressure()"
+			},
+			{
+				"name": "{name}_alt",
+				"get": "{class_name}.{name}.GetAltitude({pressure})"
+			}
+		]
+	}
+}

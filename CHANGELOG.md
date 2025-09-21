@@ -6,16 +6,31 @@ Next Release
 
 Features:
 
+* Objects: support `[soundfiler]` (DPF only)
+
+0.14.0
+-----
+
+Features:
+
 * Metadata: optional Dict for external generators
 * JS: audio inputs now work - thanks to @ZXMushroom63
+* Generator: new FMOD generator - thanks to @michaelhartung
 * Objects: support symbol in `[pack]` (not on first inlet!)
-* Objects: support `[soundfiler]` (DPF only)
+* Objects: support receive/send configuration for GUI objects
 
 Bugfixes:
 
 * Core: dereferencing type-punned pointer warning - thanks to @grrr
 * Core: signed/unsigned mismatch in HvSignalTabwrite.h - thanks to @grrr
 * c2dpf: portGroup template fix with i/o port 0 as CV
+* c2wwise: use correct SDK header paths and allow any platform in the xml - thanks to @eu-ch
+
+Updates:
+
+* drop py3.8 - add py3.13
+* integrate json2daisy library, tests and documentation
+* move to libDaisy 8.x pin definitions
 
 0.13.4
 -----

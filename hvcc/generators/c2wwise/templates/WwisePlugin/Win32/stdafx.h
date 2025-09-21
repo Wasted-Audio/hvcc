@@ -27,8 +27,6 @@
 #define VC_EXTRALEAN    // Exclude rarely-used stuff from Windows headers
 #endif
 
-#include <AK/Wwise/TargetVer.h>
-
 #define _ATL_CSTRING_EXPLICIT_CONSTRUCTORS  // some CString constructors will be explicit
 
 #include <afxwin.h>         // MFC core and standard components
