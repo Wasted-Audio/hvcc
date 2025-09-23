@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-22.04
     strategy:
       matrix:
-        python-version: ['3.8', '3.9', '3.10', '3.11', '3.12']
+        python-version: ['3.9', '3.10', '3.11', '3.12', '3.13']
 
     steps:
       - uses: actions/checkout@v3
@@ -51,7 +51,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: heavy-binary-linux-x86_64
-          path: dist/pyinstaller/manylinux_2_31_x86_64/Heavy
+          path: dist/pyinstaller/manylinux_2_35_x86_64/Heavy
 
   dispatch:
     needs: test

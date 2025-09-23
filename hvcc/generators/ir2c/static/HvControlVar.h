@@ -24,7 +24,7 @@ extern "C" {
 #endif
 
 typedef struct ControlVar {
-  Element e; // type is only every HV_MSG_FLOAT or HV_MSG_HASH
+  Element e; // type is only ever HV_MSG_FLOAT or HV_MSG_HASH
 } ControlVar;
 
 hv_size_t cVar_init_f(ControlVar *o, float k);

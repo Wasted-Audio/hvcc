@@ -1,0 +1,142 @@
+{
+  "Switch": {
+		"map_init": "",
+		"typename": "",
+		"direction": "in",
+		"index": 1,
+		"updaterate": "",
+		"mapping": [
+			{
+				"name": "{name}_press",
+				"get": "({class_name}.som.footswitch{index}.Pressed()?1.f:0.f)",
+				"range": [
+					0,
+					1
+				],
+				"bool": false
+			},
+			{
+				"name": "{name}",
+				"get": "({class_name}.som.footswitch{index}.RisingEdge()?1.f:0.f)",
+				"range": [
+					0,
+					1
+				],
+				"bool": true
+			},
+			{
+				"name": "{name}_fall",
+				"get": "({class_name}.som.footswitch{index}.FallingEdge()?1.f:0.f)",
+				"range": [
+					0,
+					1
+				],
+				"bool": true
+			},
+			{
+				"name": "{name}_seconds",
+				"get": "({class_name}.som.footswitch{index}.TimeHeldMs()*0.001f)",
+				"bool": false
+			}
+		]
+	},
+  "Switch3": {
+		"map_init": "",
+		"typename": "",
+		"direction": "in",
+		"index": 0,
+		"mapping": [
+			{
+				"name": "{name}",
+				"get": "({class_name}.som.toggle[{index}].Read())",
+				"range": [
+					0,
+					2
+				],
+				"bool": false
+			}
+		]
+	},
+  "AnalogControl": {
+		"init_single": "",
+		"map_init": "",
+		"typename": "",
+		"direction": "in",
+		"index": 0,
+		"updaterate": "",
+		"mapping": [
+			{
+				"name": "{name}",
+				"get": "({class_name}.som.knob[{index}].Value())",
+				"range": [
+					0,
+					1
+				],
+				"bool": false
+			}
+		]
+	},
+	"Expression": {
+		"map_init": "",
+		"typename": "",
+		"direction": "in",
+		"mapping": [
+			{
+				"name": "{name}",
+				"get": "({class_name}.som.GetExpressionValue())"
+			}
+		]
+	},
+	"Led": {
+		"map_init": "",
+		"typename": "",
+		"direction": "out",
+		"index": 2,
+		"postprocess": "",
+		"mapping": [
+			{
+				"name": "{name}",
+				"set": "{class_name}.som.led[{index}].Set({value});"
+			}
+		]
+	},
+  "RgbLed": {
+		"map_init": "",
+		"typename": "",
+		"direction": "out",
+		"index": "r,g,b",
+		"mapping": [
+			{
+				"name": "{name}",
+				"set": "{class_name}.som.led[{index_r}].Set({value});  \n{class_name}.som.led[{index_g}].Set({value});  \n{class_name}.som.led[{index_b}].Set({value});"
+			},
+			{
+				"name": "{name}_red",
+				"set": "{class_name}.som.led[{index_r}].Set({value});"
+			},
+			{
+				"name": "{name}_green",
+				"set": "{class_name}.som.led[{index_g}].Set({value});"
+			},
+			{
+				"name": "{name}_blue",
+        "set": "{class_name}.som.led[{index_b}].Set({value});"
+			},
+			{
+				"name": "{name}_white",
+				"set": "{class_name}.som.led[{index_r}].Set({value});  \n{class_name}.som.led[{index_g}].Set({value});  \n{class_name}.som.led[{index_b}].Set({value});"
+			}
+		]
+	},
+	"Relay": {
+		"map_init": "",
+		"typename": "",
+		"direction": "out",
+		"mapping": [
+			{
+				"name": "{name}",
+				"set": "{class_name}.som.SetBypassState({value});"
+			}
+		]
+	}
+}
