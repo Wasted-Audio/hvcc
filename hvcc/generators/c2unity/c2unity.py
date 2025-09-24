@@ -81,8 +81,6 @@ class c2unity(Generator):
 
             heavy_src_files = [f for f in os.listdir(c_src_dir) if f.endswith(".c") or f.endswith(".cpp")]
 
-            src_ext_list = ["h", "hpp", "c", "cpp", "js", "md", "txt"]
-
             # generate files from templates
             for f in env.list_templates(filter_func=filter_templates):
                 file_path = os.path.join(out_dir, f)
