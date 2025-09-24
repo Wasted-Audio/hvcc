@@ -21,7 +21,7 @@ import time
 from typing import Optional
 
 from ..copyright import copyright_manager
-from ..filters import filter_string_cap, filter_templates, filter_xcode_build, filter_xcode_fileref
+from ..filters import filter_templates
 
 from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
 from hvcc.types.compiler import Generator, CompilerResp, CompilerNotif, CompilerMsg, ExternInfo
@@ -61,18 +61,8 @@ class c2unity(Generator):
 
         templates_dir = os.path.join(os.path.dirname(__file__), "templates")
 
-        # static_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "static")
-        # src_out_dir = os.path.join(out_dir, "source")
-
         # initialise the jinja template environment
         env = jinja2.Environment()
-        # env.filters["xcode_build"] = filter_xcode_build
-        # env.filters["xcode_fileref"] = filter_xcode_fileref
-        # env.filters["cap"] = filter_string_cap
-
-        # env.loader = jinja2.FileSystemLoader(
-        #     encoding="utf-8-sig",
-        #     searchpath=[os.path.join(os.path.dirname(os.path.abspath(__file__)), "templates")])
 
         env.loader = jinja2.FileSystemLoader(
             encoding="utf-8-sig", searchpath=[templates_dir]
@@ -83,13 +73,6 @@ class c2unity(Generator):
             out_dir = os.path.abspath(out_dir)
             if os.path.exists(out_dir):
                 shutil.rmtree(out_dir)
-
-            # copy over static files
-            # shutil.copytree(static_dir, out_dir)
-
-            # copy over generated C source files
-            # src_out_dir = os.path.join(out_dir, "source", "heavy")
-            # shutil.copytree(c_src_dir, src_out_dir)
 
             patch_src_dir = os.path.join(out_dir, "include", "Heavy")
             if os.path.exists(patch_src_dir):
