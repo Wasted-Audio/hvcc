@@ -3,12 +3,12 @@
 // http://docs.unity3d.com/500/Documentation/Manual/AudioMixerNativeAudioPlugin.html
 
 #include "AudioPluginUtil.h"
-#include "heavy/Heavy_{{patch_name}}.hpp"
+#include "Heavy_{{name}}.hpp"
 
-namespace Hv_{{patch_name}}_UnityPlugin {
+namespace Hv_{{name}}_UnityPlugin {
 
   enum Param {
-    {%- for k, v in parameters %}
+    {%- for k, v in in_params %}
     P_{{k|upper}},
     {%- endfor %}
     P_NUM_HV_PARAMS_
@@ -16,7 +16,7 @@ namespace Hv_{{patch_name}}_UnityPlugin {
 
   struct EffectData {
     struct Data {
-      float p[{{parameters|length if parameters|length > 0 else 1}}];
+      float p[{{in_params|length if in_params|length > 0 else 1}}];
       HeavyContextInterface *context;
     } data;
   };
@@ -26,16 +26,16 @@ namespace Hv_{{patch_name}}_UnityPlugin {
     definition.paramdefs = new UnityAudioParameterDefinition[numparams];
     // channels will be set to 0 if numInputChannels > 0 else it will be set to numOutputChannels
     definition.channels = {{0 if num_input_channels else num_output_channels}};
-    {%- for k, v in parameters %}
+    {%- for k, v in in_params %}
     {%- if v.display|length > 15 %}
 #if HV_WIN
     // Unity Windows doesn't seem to like parameter names that are longer than 15 chars
-    RegisterParameter(definition, "{{v.display|cap(15)}}", "", {{v.attributes.min}}f, {{v.attributes.max}}f, {{v.attributes.default}}f, 1.0f, 1.0f, P_{{k|upper}}, "{{v.display}}");
+    AudioPluginUtil::RegisterParameter(definition, "{{v.display|cap(15)}}", "", {{v.attributes.min}}f, {{v.attributes.max}}f, {{v.attributes.default}}f, 1.0f, 1.0f, P_{{k|upper}}, "{{v.display}}");
 #else
-    RegisterParameter(definition, "{{v.display}}", "", {{v.attributes.min}}f, {{v.attributes.max}}f, {{v.attributes.default}}f, 1.0f, 1.0f, P_{{k|upper}}, "{{v.display}}");
+    AudioPluginUtil::RegisterParameter(definition, "{{v.display}}", "", {{v.attributes.min}}f, {{v.attributes.max}}f, {{v.attributes.default}}f, 1.0f, 1.0f, P_{{k|upper}}, "{{v.display}}");
 #endif
     {%- else %}
-    RegisterParameter(definition, "{{v.display}}", "", {{v.attributes.min}}f, {{v.attributes.max}}f, {{v.attributes.default}}f, 1.0f, 1.0f, P_{{k|upper}}, "{{v.display}}");
+    AudioPluginUtil::RegisterParameter(definition, "{{v.display}}", "", {{v.attributes.min}}f, {{v.attributes.max}}f, {{v.attributes.default}}f, 1.0f, 1.0f, P_{{k|upper}}, "{{v.display}}");
     {%- endif %}
     {%- endfor %}
     return numparams;
@@ -43,9 +43,9 @@ namespace Hv_{{patch_name}}_UnityPlugin {
 
   UNITY_AUDIODSP_RESULT UNITY_AUDIODSP_CALLBACK CreateCallback(UnityAudioEffectState* state) {
     EffectData* effectdata = new EffectData;
-    effectdata->data.context = new Heavy_{{patch_name}}((double) state->samplerate, {{pool_sizes_kb.internal}}, {{pool_sizes_kb.inputQueue}}, {{pool_sizes_kb.outputQueue}});
+    effectdata->data.context = new Heavy_{{name}}((double) state->samplerate, {{pool_sizes_kb.internal}}, {{pool_sizes_kb.inputQueue}}, {{pool_sizes_kb.outputQueue}});
     state->effectdata = effectdata;
-    InitParametersFromDefinitions(InternalRegisterEffectDefinition, effectdata->data.p);
+    AudioPluginUtil::InitParametersFromDefinitions(InternalRegisterEffectDefinition, effectdata->data.p);
     return UNITY_AUDIODSP_OK;
   }
 
@@ -61,8 +61,8 @@ namespace Hv_{{patch_name}}_UnityPlugin {
     EffectData::Data *data = &state->GetEffectData<EffectData>()->data;
 
     switch (index) {
-      {%- for k, v in parameters %}
-      case P_{{k|upper}}: data->context->sendFloatToReceiver(Heavy_{{patch_name}}::Parameter::In::{{k|upper}}, value); break;
+      {%- for k, v in in_params %}
+      case P_{{k|upper}}: data->context->sendFloatToReceiver(Heavy_{{name}}::Parameter::In::{{k|upper}}, value); break;
       {%- endfor %}
       default: return UNITY_AUDIODSP_ERR_UNSUPPORTED;
     }

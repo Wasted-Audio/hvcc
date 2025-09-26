@@ -1,6 +1,11 @@
 CHANGELOG
 =====
 
+Next Release
+-----
+
+* Unity Generator: change build system to use CMake - thanks to @michaelhartung
+
 0.14.0
 -----
 
