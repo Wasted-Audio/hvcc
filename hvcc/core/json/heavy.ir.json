@@ -2071,7 +2071,7 @@
     ],
     "args": [{
       "name": "values",
-      "value_type": "floatarray",
+      "value_type": "mixedarray",
       "description": "The preset values to this pack object.",
       "default": [0.0, 0.0],
       "required": false
@@ -2778,6 +2778,34 @@
     },
     "outlets": [
       "~f>",
+      "-->"
+    ],
+    "args": [{
+      "default": null,
+      "value_type": "string",
+      "name": "table",
+      "description": "The name of the table to reference.",
+      "required": true
+    }],
+    "perf": {
+      "avx": 1,
+      "sse": 1
+    }
+  },
+  "__tabread_stoppable~f": {
+    "inlets": [
+      "-->",
+      "-->",
+      "-->"
+    ],
+    "ir": {
+      "control": true,
+      "signal": true,
+      "init": true
+    },
+    "outlets": [
+      "~f>",
+      "-->",
       "-->"
     ],
     "args": [{

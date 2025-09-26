@@ -8,8 +8,12 @@ LIBDAISY_DIR = {{libdaisy_path}}
 LDSCRIPT = {{linker_script}}
 {% endif %}
 
-{% if bootloader %}
-C_DEFS += -DBOOT_APP
+{% if bootloader != None %}
+APP_TYPE = {{bootloader}}
+{% endif %}
+
+{% if debug_printing is sameas true %}
+LDFLAGS += -u _printf_float
 {% endif %}
 
 # Project Source

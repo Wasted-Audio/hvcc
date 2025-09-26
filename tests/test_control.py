@@ -123,6 +123,9 @@ class TestPdControlPatches(TestPdControlBase):
     def test_gui(self):
         self._test_control_patch("test-gui.pd")
 
+    def test_gui_send_receive(self):
+        self._test_control_patch("test-gui-send-receive.pd")
+
     def test_hanging_binop(self):
         self._test_control_patch("test-hanging_binop.pd")
 
@@ -174,9 +177,11 @@ class TestPdControlPatches(TestPdControlBase):
     def test_msg(self):
         self._test_control_patch("test-msg.pd")
 
+    def test_remote_msg(self):
+        self._test_control_patch("test-remote-msg.pd")
+
     def test_msg_remote_args(self):
         self._test_control_patch("test-msg_remote_args.pd")
-        self._test_control_patch_expect_warning("test-msg_remote_args.pd", NotificationEnum.WARNING_GENERIC)
 
     def test_mtof(self):
         self._test_control_patch("test-mtof.pd")
@@ -195,6 +200,9 @@ class TestPdControlPatches(TestPdControlBase):
 
     def test_pack(self):
         self._test_control_patch("test-pack.pd")
+
+    def test_pack_symbol(self):
+        self._test_control_patch("test-pack-symbol.pd")
 
     def test_pack_wrong_args(self):
         self._test_control_patch_expect_error("test-pack_wrong_args.pd", NotificationEnum.ERROR_PACK_FLOAT_ARGUMENTS)
@@ -320,7 +328,8 @@ def main():
         help="The path to the Pd file to read.")
     args = parser.parse_args()
     if os.path.exists(args.pd_path):
-        result = TestPdControlPatches._test_control_patch(args.pd_path)
+        test_control = TestPdControlPatches()
+        result = test_control._test_control_patch(pd_file=args.pd_path)
         print(result)
     else:
         print(f"Pd file path '{args.pd_path}' doesn't exist")

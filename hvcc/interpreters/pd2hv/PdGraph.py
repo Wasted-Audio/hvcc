@@ -1,5 +1,5 @@
 # Copyright (C) 2014-2018 Enzien Audio, Ltd.
-# Copyright (C) 2023 Wasted Audio
+# Copyright (C) 2023-2024 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,11 +15,13 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
-from typing import Optional, List, Dict
+from typing import Optional, List, Dict, Any
 
 from .Connection import Connection
 from .NotificationEnum import NotificationEnum
 from .PdObject import PdObject
+
+from hvcc.types.compiler import CompilerNotif
 
 
 class PdGraph(PdObject):
@@ -37,8 +39,8 @@ class PdGraph(PdObject):
         # file location of this graph
         self.__pd_path = pd_path
 
-        self.__objs: List = []
-        self.__connections: List = []
+        self.__objs: List[PdObject] = []
+        self.__connections: List[Connection] = []
 
         self.__inlet_objects: List = []
         self.__outlet_objects: List = []
@@ -72,7 +74,7 @@ class PdGraph(PdObject):
         else:
             return self.parent_graph.__pd_path == self.__pd_path if not self.is_root else False
 
-    def add_object(self, obj: PdObject) -> None:
+    def add_object(self, obj: PdObject) -> int:
         obj.parent_graph = self
         self.__objs.append(obj)
 
@@ -87,6 +89,8 @@ class PdGraph(PdObject):
             self.__outlet_objects.sort(key=lambda o: o.pos_x)
             for i, o in enumerate(self.__outlet_objects):
                 o.let_index = i
+
+        return (len(self.__objs) - 1)
 
     def add_parsed_connection(self, from_index: int, from_outlet: int, to_index: int, to_inlet: int) -> None:
         """ Add a connection to the graph which has been parsed externally.
@@ -116,7 +120,14 @@ class PdGraph(PdObject):
                            "Have all inlets and outlets been declared?",
                            NotificationEnum.ERROR_UNABLE_TO_CONNECT_OBJECTS)
 
-    def add_hv_arg(self, arg_index: int, name: str, value_type: str, default_value: str, required: bool) -> None:
+    def add_hv_arg(
+        self,
+        arg_index: int,
+        name: str,
+        value_type: str,
+        default_value: Optional[Any],
+        required: bool
+    ) -> None:
         """ Add a Heavy argument to the graph. Indicies are from zero (not one, like Pd).
         """
         # ensure that self.hv_args is big enough, as heavy arguments are not
@@ -131,6 +142,12 @@ class PdGraph(PdObject):
             "default": default_value,
             "required": required
         }
+
+    def get_object(self, obj_index: int) -> PdObject:
+        return self.__objs[obj_index]
+
+    def get_objects(self) -> List[PdObject]:
+        return self.__objs
 
     def get_inlet_connection_type(self, inlet_index: int) -> str:
         return self.__inlet_objects[inlet_index].get_inlet_connection_type(inlet_index)
@@ -166,17 +183,17 @@ class PdGraph(PdObject):
         else:
             return False
 
-    def get_notices(self) -> Dict:
+    def get_notices(self) -> CompilerNotif:
         notices = PdObject.get_notices(self)
         for o in self.__objs:
             n = o.get_notices()
-            notices["warnings"].extend(n["warnings"])
-            notices["errors"].extend(n["errors"])
+            notices.warnings.extend(n.warnings)
+            notices.errors.extend(n.errors)
 
         # remove ERROR_EXCEPTION if there are already other errors.
         # The exception is always a result of some other error
-        if any((n["enum"] != NotificationEnum.ERROR_EXCEPTION) for n in notices["errors"]):
-            notices["errors"] = [n for n in notices["errors"] if n["enum"] != NotificationEnum.ERROR_EXCEPTION]
+        if any((n.enum != NotificationEnum.ERROR_EXCEPTION) for n in notices.errors):
+            notices.errors = [n for n in notices.errors if n.enum != NotificationEnum.ERROR_EXCEPTION]
 
         return notices
 

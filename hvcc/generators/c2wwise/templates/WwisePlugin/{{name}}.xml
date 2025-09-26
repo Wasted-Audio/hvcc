@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+{{copyright}}
+<PluginModule>
+{%- if plugin_type == "Source" %}
+  <SourcePlugin Name="{{name}}" CompanyID="64" PluginID="{{plugin_id}}" EngineDllName="{{name}}">
+    <PluginInfo CanUnlink="true">
+      <PlatformSupport>
+        <Platform Name="Any">
+          {% if tables|length > 0 -%}
+            <CanReferenceDataFile>true</CanReferenceDataFile>
+          {% endif -%}
+        </Platform>
+      </PlatformSupport>
+    </PluginInfo>
+    {%- if parameters|length > 0 %}
+    <Properties>
+      {%- for k, v in parameters %}
+      <Property Name="{{k}}" Type="Real32" SupportRTPCType="Exclusive">
+        <UserInterface DisplayName="{{v.display}}" Step="0.01" Fine="0.001" Decimals="2" />
+        <DefaultValue>{{v.attributes.default}}</DefaultValue>
+        <AudioEnginePropertyID>{{loop.index-1}}</AudioEnginePropertyID>
+        <Restrictions>
+          <ValueRestriction>
+            <Range Type="Real32">
+              <Min>{{v.attributes.min}}</Min>
+              <Max>{{v.attributes.max}}</Max>
+            </Range>
+          </ValueRestriction>
+        </Restrictions>
+      </Property>
+      {%- endfor %}
+    </Properties>
+    {%- endif %}
+  </SourcePlugin>
+{%- elif plugin_type == "FX" %}
+  <EffectPlugin Name="{{name}}" CompanyID="64" PluginID="{{plugin_id}}" EngineDllName="{{name}}">
+    <PluginInfo>
+      <PlatformSupport>
+        <Platform Name="Any">
+          <CanBeInsertOnBusses>true</CanBeInsertOnBusses>
+          <CanBeInsertOnAudioObjects>true</CanBeInsertOnAudioObjects>
+          <CanBeRendered>true</CanBeRendered>
+        </Platform>
+      </PlatformSupport>
+    </PluginInfo>
+    {%- if parameters|length > 0 %}
+    <Properties>
+      {%- for k, v in parameters %}
+      <Property Name="{{k}}" Type="Real32" SupportRTPCType="Exclusive">
+        <UserInterface DisplayName="{{v.display}}" Step="0.01" Fine="0.001" Decimals="2" />
+        <DefaultValue>{{v.attributes.default}}</DefaultValue>
+        <AudioEnginePropertyID>{{loop.index-1}}</AudioEnginePropertyID>
+        <Restrictions>
+          <ValueRestriction>
+            <Range Type="Real32">
+              <Min>{{v.attributes.min}}</Min>
+              <Max>{{v.attributes.max}}</Max>
+            </Range>
+          </ValueRestriction>
+        </Restrictions>
+      </Property>
+      {%- endfor %}
+    </Properties>
+    {%- endif %}
+  </EffectPlugin>
+{%- endif %}
+</PluginModule>
+{# force new line #}

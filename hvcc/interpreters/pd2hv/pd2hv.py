@@ -1,5 +1,5 @@
 # Copyright (C) 2014-2018 Enzien Audio, Ltd.
-# Copyright (C) 2023 Wasted Audio
+# Copyright (C) 2023-2024 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -18,9 +18,10 @@ import argparse
 import json
 import os
 import time
-from typing import Dict, List, Optional
+from typing import List, Optional
 
 from hvcc.interpreters.pd2hv.PdParser import PdParser
+from hvcc.types.compiler import CompilerResp, CompilerNotif
 
 
 class Colours:
@@ -50,7 +51,7 @@ class pd2hv:
         search_paths: Optional[List] = None,
         verbose: bool = False,
         export_args: bool = False
-    ) -> Dict:
+    ) -> CompilerResp:
 
         tick = time.time()
 
@@ -63,22 +64,19 @@ class pd2hv:
         notices = pd_graph.get_notices()
 
         # check for errors
-        if len(notices["errors"]) > 0:
-            return {
-                "stage": "pd2hv",
-                "obj_counter": dict(parser.obj_counter),
-                "notifs": {
-                    "has_error": True,
-                    "exception": None,
-                    "errors": notices["errors"],
-                    "warnings": notices["warnings"]
-                },
-                "in_dir": os.path.dirname(pd_path),
-                "in_file": os.path.basename(pd_path),
-                "out_dir": None,
-                "out_file": None,
-                "compile_time": (time.time() - tick)
-            }
+        if len(notices.errors) > 0:
+            return CompilerResp(
+                stage="pd2hv",
+                obj_counter=parser.obj_counter,
+                notifs=CompilerNotif(
+                    has_error=True,
+                    errors=notices.errors,
+                    warnings=notices.warnings
+                ),
+                in_dir=os.path.dirname(pd_path),
+                in_file=os.path.basename(pd_path),
+                compile_time=(time.time() - tick)
+            )
 
         if not os.path.exists(hv_dir):
             os.makedirs(hv_dir)
@@ -86,30 +84,20 @@ class pd2hv:
         hv_file = f"{os.path.splitext(os.path.basename(pd_path))[0]}.hv.json"
         hv_path = os.path.join(hv_dir, hv_file)
         with open(hv_path, "w") as f:
-            if verbose:
-                json.dump(pd_graph.to_hv(export_args=export_args),
-                          f,
-                          sort_keys=True,
-                          indent=2,
-                          separators=(",", ": "))
-            else:
-                json.dump(pd_graph.to_hv(export_args=export_args), f)
+            json.dump(pd_graph.to_hv(export_args=export_args), f, indent=4)
 
-        return {
-            "stage": "pd2hv",
-            "obj_counter": dict(parser.obj_counter),
-            "notifs": {
-                "has_error": False,
-                "exception": None,
-                "errors": notices["errors"],
-                "warnings": notices["warnings"]
-            },
-            "in_dir": os.path.dirname(pd_path),
-            "in_file": os.path.basename(pd_path),
-            "out_dir": hv_dir,
-            "out_file": hv_file,
-            "compile_time": (time.time() - tick)
-        }
+        return CompilerResp(
+            stage="pd2hv",
+            obj_counter=parser.obj_counter,
+            notifs=CompilerNotif(
+                warnings=notices.warnings
+            ),
+            in_dir=os.path.dirname(pd_path),
+            in_file=os.path.basename(pd_path),
+            out_dir=hv_dir,
+            out_file=hv_file,
+            compile_time=(time.time() - tick)
+        )
 
 
 def main() -> None:
@@ -142,25 +130,25 @@ def main() -> None:
         verbose=args.verbose,
         export_args=args.export)
 
-    for i, n in enumerate(result["notifs"]["errors"]):
+    for i, n in enumerate(result.notifs.errors):
         print("{0:3d}) {1}Error #{2:4d}:{3} {4}".format(
             i + 1,
             Colours.red,
-            n["enum"],
+            n.enum,
             Colours.end,
-            n["message"]))
-    for i, n in enumerate(result["notifs"]["warnings"]):
+            n.message))
+    for i, n in enumerate(result.notifs.warnings):
         print("{0:3d}) {1}Warning #{2:4d}:{3} {4}".format(
             i + 1,
             Colours.yellow,
-            n["enum"],
+            n.enum,
             Colours.end,
-            n["message"]))
+            n.message))
 
     if args.verbose:
-        if len(result["notifs"]["errors"]) == 0:
-            print("Heavy file written to", os.path.join(result["out_dir"], result["out_file"]))
-        print("Total pd2hv compile time: {0:.2f}ms".format(result["compile_time"] * 1000))
+        if len(result.notifs.errors) == 0:
+            print("Heavy file written to", os.path.join(result.out_dir, result.out_file))
+        print("Total pd2hv compile time: {0:.2f}ms".format(result.compile_time * 1000))
 
 
 if __name__ == "__main__":
