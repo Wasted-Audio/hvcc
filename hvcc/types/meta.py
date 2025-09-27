@@ -9,7 +9,7 @@ from pydantic import BaseModel, HttpUrl
 
 DaisyBoards = Literal['pod', 'petal', 'patch', 'patch_init', 'field']
 DaisyBootloader = Literal['BOOT_NONE', 'BOOT_SRAM', 'BOOT_QSPI']
-DPFFormats = Literal['lv2', 'lv2_sep', 'vst2', 'vst3', 'clap', 'jack', 'dssi', 'ladspa']
+DPFFormats = Literal['lv2', 'lv2_sep', 'vst2', 'vst3', 'clap', 'jack', 'dssi', 'ladspa', 'au']
 
 
 class Daisy(BaseModel):
