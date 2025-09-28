@@ -1040,4 +1040,16 @@ static inline void __hv_isinf_f(hv_bInf_t bIn0, hv_bOutf_t bOut) {
 #endif
 }
 
+static inline void __hv_finite_f(hv_bInf_t bIn0, hv_bOutf_t bOut) {
+#if HV_SIMD_AVX
+  hv_assert(0); // __hv_finite_f() not implemented
+#elif HV_SIMD_SSE
+  hv_assert(0); // __hv_finite_f() not implemented
+#elif HV_SIMD_NEON
+  hv_assert(0); // __hv_finite_f() not implemented
+#else // HV_SIMD_NONE
+  *bOut = hv_finite_f(bIn0);
+#endif
+}
+
 #endif // _HEAVY_MATH_H_

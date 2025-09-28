@@ -281,7 +281,7 @@ static inline hv_int32_t __hv_utils_min_i(hv_int32_t x, hv_int32_t y) { return (
 #define hv_erf_f(a) erff(a)
 #define hv_erfc_f(a) erfcf(a)
 #define hv_expm1_f(a) expm1f(a)
-#define hv_finite_f(a) finitef(a)
+#define hv_finite_f(a) isfinite(a)
 #define hv_fmod_f(a, b) fmodf(a, b)
 #define hv_ldexp_f(a, b) ldexpf(a, b)
 #define hv_isinf_f(a) isinf(a)
