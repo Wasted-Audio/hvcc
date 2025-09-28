@@ -131,8 +131,8 @@ class TestPdControlExprPatches(TestPdControlBase):
 
     # # Power functions
 
-    # def test_pow(self):
-    #     self._test_control_patch("test-pow.pd")
+    def test_pow(self):
+        self._test_control_patch("test-pow.pd")
 
     def test_sqrt(self):
         self._test_control_patch("test-sqrt.pd")
