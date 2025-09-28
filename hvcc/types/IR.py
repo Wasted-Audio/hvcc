@@ -143,10 +143,11 @@ if __name__ == "__main__":
     """ Test object definitions
     """
     import json
-    import importlib_resources
+    from importlib import resources
+    from pathlib import Path
 
-    heavy_ir_json = importlib_resources.files('hvcc') / 'core/json/heavy.ir.json'
-    with open(heavy_ir_json, "r") as f:
+    heavy_ir_json = str(resources.files('hvcc') / 'core/json/heavy.ir.json')
+    with open(Path(heavy_ir_json), "r") as f:
         data = json.load(f)
         heavy_ir = HeavyIRType(root=data)
         print(heavy_ir.root.keys())

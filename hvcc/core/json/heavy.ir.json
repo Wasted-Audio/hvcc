@@ -2119,7 +2119,7 @@
     ],
     "args": [{
       "name": "values",
-      "value_type": "floatarray",
+      "value_type": "mixedarray",
       "description": "The preset values to this pack object.",
       "default": [0.0, 0.0],
       "required": false

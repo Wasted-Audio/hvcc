@@ -84,14 +84,7 @@ class pd2hv:
         hv_file = f"{os.path.splitext(os.path.basename(pd_path))[0]}.hv.json"
         hv_path = os.path.join(hv_dir, hv_file)
         with open(hv_path, "w") as f:
-            if verbose:
-                json.dump(pd_graph.to_hv(export_args=export_args),
-                          f,
-                          sort_keys=True,
-                          indent=2,
-                          separators=(",", ": "))
-            else:
-                json.dump(pd_graph.to_hv(export_args=export_args), f)
+            json.dump(pd_graph.to_hv(export_args=export_args), f, indent=4)
 
         return CompilerResp(
             stage="pd2hv",

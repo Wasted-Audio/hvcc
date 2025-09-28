@@ -123,6 +123,9 @@ class TestPdControlPatches(TestPdControlBase):
     def test_gui(self):
         self._test_control_patch("test-gui.pd")
 
+    def test_gui_send_receive(self):
+        self._test_control_patch("test-gui-send-receive.pd")
+
     def test_hanging_binop(self):
         self._test_control_patch("test-hanging_binop.pd")
 
@@ -197,6 +200,9 @@ class TestPdControlPatches(TestPdControlBase):
 
     def test_pack(self):
         self._test_control_patch("test-pack.pd")
+
+    def test_pack_symbol(self):
+        self._test_control_patch("test-pack-symbol.pd")
 
     def test_pack_wrong_args(self):
         self._test_control_patch_expect_error("test-pack_wrong_args.pd", NotificationEnum.ERROR_PACK_FLOAT_ARGUMENTS)
