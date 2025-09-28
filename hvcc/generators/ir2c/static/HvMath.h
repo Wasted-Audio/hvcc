@@ -1090,4 +1090,28 @@ static inline void __hv_imod_f(hv_bInf_t bIn0, hv_bOutf_t bOut) {
 #endif
 }
 
+static inline void __hv_remainder_f(hv_bInf_t bIn0, hv_bInf_t bIn1, hv_bOutf_t bOut) {
+#if HV_SIMD_AVX
+  hv_assert(0); // __hv_remainder_f() not implemented
+#elif HV_SIMD_SSE
+  hv_assert(0); // __hv_remainder_f() not implemented
+#elif HV_SIMD_NEON
+  hv_assert(0); // __hv_remainder_f() not implemented
+#else // HV_SIMD_NONE
+  *bOut = hv_remainder_f(bIn0, bIn1);
+#endif
+}
+
+static inline void __hv_fmod_f(hv_bInf_t bIn0, hv_bInf_t bIn1, hv_bOutf_t bOut) {
+#if HV_SIMD_AVX
+  hv_assert(0); // __hv_fmod_f() not implemented
+#elif HV_SIMD_SSE
+  hv_assert(0); // __hv_fmod_f() not implemented
+#elif HV_SIMD_NEON
+  hv_assert(0); // __hv_fmod_f() not implemented
+#else // HV_SIMD_NONE
+  *bOut = hv_fmod_f(bIn0, bIn1);
+#endif
+}
+
 #endif // _HEAVY_MATH_H_

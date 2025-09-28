@@ -88,6 +88,7 @@ def f_name():   return [                                                        
                     regex(r"\bmin(?=\()"),
                     regex(r"\bmodf(?=\()"),
                     regex(r"\bpow(?=\()"),
+                    regex(r"\bremainder(?=\()"),
                     regex(r"\brint(?=\()"),
                     regex(r"\bround(?=\()"),
                     regex(r"\bnearbyint(?=\()"),

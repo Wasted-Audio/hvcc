@@ -123,8 +123,8 @@ class TestPdControlExprPatches(TestPdControlBase):
     def test_imodf(self):
         self._test_control_patch("test-imodf.pd")
 
-    # def test_remainder_fmod(self):
-    #     self._test_control_patch("test-remainder-fmod.pd")
+    def test_remainder_fmod(self):
+        self._test_control_patch("test-remainder-fmod.pd")
 
     def test_ceil_floor(self):
         self._test_control_patch("test-ceil-floor.pd")
