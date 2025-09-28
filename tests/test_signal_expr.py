@@ -114,8 +114,8 @@ class TestPdControlExprPatches(TestPdControlBase):
     def test_isnan(self):
         self._test_control_patch("test-isnan.pd")
 
-    # def test_copysign(self):
-    #     self._test_control_patch("test-copysign.pd")
+    def test_copysign(self):
+        self._test_control_patch("test-copysign.pd")
 
     def test_modf(self):
         self._test_control_patch("test-modf.pd")
