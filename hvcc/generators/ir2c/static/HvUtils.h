@@ -284,7 +284,7 @@ static inline hv_int32_t __hv_utils_min_i(hv_int32_t x, hv_int32_t y) { return (
 #define hv_finite_f(a) finitef(a)
 #define hv_fmod_f(a, b) fmodf(a, b)
 #define hv_ldexp_f(a, b) ldexpf(a, b)
-#define hv_isinf_f(a) isinff(a)
+#define hv_isinf_f(a) isinf(a)
 #define hv_isnan_f(a) isnanf(a)
 #define hv_ln_f(a) logf(a)
 #define hv_log10_f(a) log10f(a)

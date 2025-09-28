@@ -105,8 +105,8 @@ class TestPdControlExprPatches(TestPdControlBase):
     def test_abs(self):
         self._test_control_patch("test-abs.pd")
 
-    # def test_isinf(self):
-    #     self._test_control_patch("test-isinf.pd")
+    def test_isinf(self):
+        self._test_control_patch("test-isinf.pd")
 
     # def test_finite(self):
     #     self._test_control_patch("test-finite.pd")

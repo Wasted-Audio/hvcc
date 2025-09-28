@@ -18,6 +18,7 @@
 #define _HEAVY_MATH_H_
 
 #include "HvUtils.h"
+#include <math.h>
 
 // https://software.intel.com/sites/landingpage/IntrinsicsGuide/
 // https://gcc.gnu.org/onlinedocs/gcc-4.8.1/gcc/ARM-NEON-Intrinsics.html
@@ -1024,6 +1025,18 @@ static inline void __hv_if_f(hv_bInf_t bIn0, hv_bInf_t bIn1, hv_bInf_t bIn2, hv_
   hv_assert(0); // __hv_if_f() not implemented
 #else // HV_SIMD_NONE
   *bOut = hv_if_f(bIn0, bIn1, bIn2);
+#endif
+}
+
+static inline void __hv_isinf_f(hv_bInf_t bIn0, hv_bOutf_t bOut) {
+#if HV_SIMD_AVX
+  hv_assert(0); // __hv_isinf_f() not implemented
+#elif HV_SIMD_SSE
+  hv_assert(0); // __hv_isinf_f() not implemented
+#elif HV_SIMD_NEON
+  hv_assert(0); // __hv_isinf_f() not implemented
+#else // HV_SIMD_NONE
+  *bOut = hv_isinf_f(bIn0);
 #endif
 }
 
