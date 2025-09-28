@@ -208,7 +208,7 @@ class ExprOpMap:
         "erfc":         "hv_erfc_f",
         "exp":          "hv_exp_f",
         "expm1":        "hv_expm1_f",
-        # "fact":         "hv_?_f",
+        "fact":         "hv_fact_f",
         "finite":       "hv_finite_f",
         "float":        "hv_cast_if_expr",
         "floor":        "hv_floor_f",

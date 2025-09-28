@@ -1114,4 +1114,31 @@ static inline void __hv_fmod_f(hv_bInf_t bIn0, hv_bInf_t bIn1, hv_bOutf_t bOut) 
 #endif
 }
 
+static inline void __hv_fact_f(hv_bInf_t bIn0, hv_bOutf_t bOut) {
+#if HV_SIMD_AVX
+  hv_assert(0); // __hv_fact_f() not implemented
+#elif HV_SIMD_SSE
+  hv_assert(0); // __hv_fact_f() not implemented
+#elif HV_SIMD_NEON
+  hv_assert(0); // __hv_fact_f() not implemented
+#else // HV_SIMD_NONE
+  int n = (int) bIn0;
+  if(n <= 1) {
+    // follow Pure data convention
+    *bOut = 1;
+  }
+  else if(n > 34) {
+    // follow Pure data convention
+    *bOut = INFINITY; // C99 constant
+  }
+  else {
+    float f = 1.0f;
+    for (int i = n; i > 1; --i) {
+      f *= i;
+    }
+    *bOut = f;
+  }
+#endif
+}
+
 #endif // _HEAVY_MATH_H_

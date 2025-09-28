@@ -69,7 +69,7 @@ def f_name():   return [                                                        
                     regex(r"\berfc(?=\()"),
                     regex(r"\bexp(?=\()"),
                     regex(r"\bexpm1(?=\()"),
-                    # regex(r"\bfact(?=\()"),
+                    regex(r"\bfact(?=\()"),
                     regex(r"\bfinite(?=\()"),
                     regex(r"\bfloat(?=\()"),
                     regex(r"\bfloor(?=\()"),

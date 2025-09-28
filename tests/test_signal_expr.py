@@ -149,8 +149,8 @@ class TestPdControlExprPatches(TestPdControlBase):
     def test_log10(self):
         self._test_control_patch("test-log10.pd")
 
-    # def test_fact(self):
-    #     self._test_control_patch("test-fact.pd")
+    def test_fact(self):
+        self._test_control_patch("test-fact.pd", num_iterations=2)
 
     def test_erf_erfc(self):
         self._test_control_patch("test-erf-erfc.pd")
