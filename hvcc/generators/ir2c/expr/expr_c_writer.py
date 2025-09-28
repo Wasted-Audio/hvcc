@@ -214,7 +214,7 @@ class ExprOpMap:
         "floor":        "hv_floor_f",
         "fmod":         "hv_fmod_f",
         "if":           "hv_if_f",
-        # "imodf":        "hv_?_f",
+        "imodf":        "hv_imod_f",
         "int":          "hv_cast_fi_expr",
         "isinf":        "hv_isinf_f",
         "isnan":        "hv_isnan_f",

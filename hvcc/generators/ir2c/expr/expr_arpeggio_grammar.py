@@ -75,7 +75,7 @@ def f_name():   return [                                                        
                     regex(r"\bfloor(?=\()"),
                     regex(r"\bfmod(?=\()"),
                     regex(r"\bif(?=\()"),
-                    # regex(r"\bimodf(?=\()"),
+                    regex(r"\bimodf(?=\()"),
                     regex(r"\bint(?=\()"),
                     regex(r"\bisinf(?=\()"),
                     regex(r"\bisnan(?=\()"),

@@ -1076,4 +1076,18 @@ static inline void __hv_copysign_f(hv_bInf_t bIn0, hv_bInf_t bIn1, hv_bOutf_t bO
 #endif
 }
 
+static inline void __hv_imod_f(hv_bInf_t bIn0, hv_bOutf_t bOut) {
+#if HV_SIMD_AVX
+  hv_assert(0); // __hv_imod_f() not implemented
+#elif HV_SIMD_SSE
+  hv_assert(0); // __hv_imod_f() not implemented
+#elif HV_SIMD_NEON
+  hv_assert(0); // __hv_imod_f() not implemented
+#else // HV_SIMD_NONE
+  float iptr;
+  modff(bIn0, &iptr);
+  *bOut = iptr;
+#endif
+}
+
 #endif // _HEAVY_MATH_H_

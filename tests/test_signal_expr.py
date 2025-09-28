@@ -120,8 +120,8 @@ class TestPdControlExprPatches(TestPdControlBase):
     def test_modf(self):
         self._test_control_patch("test-modf.pd")
 
-    # def test_imodf(self):
-    #     self._test_control_patch("test-imodf.pd")
+    def test_imodf(self):
+        self._test_control_patch("test-imodf.pd")
 
     # def test_remainder_fmod(self):
     #     self._test_control_patch("test-remainder-fmod.pd")
