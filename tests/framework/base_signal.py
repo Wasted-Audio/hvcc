@@ -20,6 +20,8 @@ import shutil
 import subprocess
 import numpy
 
+from typing import List, Optional
+
 from scipy.io import wavfile
 
 from tests.framework.base_test import HvBaseTest
@@ -29,12 +31,12 @@ class TestPdSignalBase(HvBaseTest):
 
     def compile_and_run(
         self,
-        source_files,
-        out_dir,
-        sample_rate=None,
-        block_size=None,
-        num_iterations=None,
-        flag=None
+        source_files: List[str],
+        out_dir: str,
+        sample_rate: Optional[int] = None,
+        block_size: Optional[int] = None,
+        num_iterations: Optional[int] = None,
+        flag: Optional[str] = None
     ):
         exe_path = self._compile_and_run(source_files, out_dir, flag)
 
@@ -50,7 +52,13 @@ class TestPdSignalBase(HvBaseTest):
 
         return wav_path
 
-    def _compare_wave_output(self, out_dir, c_sources, golden_path, flag=None):
+    def _compare_wave_output(
+        self,
+        out_dir: str,
+        c_sources: List[str],
+        golden_path: str,
+        flag: Optional[str] = None
+    ):
         # http://stackoverflow.com/questions/10580676/comparing-two-numpy-arrays-for-equality-element-wise
         # http://docs.scipy.org/doc/numpy/reference/routines.testing.html
 
@@ -69,7 +77,7 @@ class TestPdSignalBase(HvBaseTest):
         except AssertionError as e:
             self.fail(e)
 
-    def _test_signal_patch(self, pd_file):
+    def _test_signal_patch(self, pd_file: str):
         """Compiles, runs, and tests a signal patch.
         """
 
