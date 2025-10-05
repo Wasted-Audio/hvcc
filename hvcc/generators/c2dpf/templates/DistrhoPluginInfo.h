@@ -9,13 +9,13 @@
 #define DISTRHO_PLUGIN_URI                  "urn:hvcc:{{name}}"
 {%- endif %}
 {%- if meta.maker != None %}
-#define DISTRHO_PLUGIN_BRAND                "{{meta.maker}}";
+#define DISTRHO_PLUGIN_BRAND                "{{meta.maker}}"
 {% else %}
-#define DISTRHO_PLUGIN_BRAND                "Wasted Audio";
+#define DISTRHO_PLUGIN_BRAND                "Wasted Audio"
 {%- endif %}
 
 {%- if meta.brand_id != None %}
-#define DISTRHO_PLUGIN_BRAND_ID             {{meta.brand_id}};
+#define DISTRHO_PLUGIN_BRAND_ID             {{meta.brand_id}}
 {%- endif %}
 
 {%- if meta.brand_id_no_vst3 is sameas true %}
@@ -23,7 +23,7 @@
 {%- endif %}
 
 {%- if meta.unique_id != None %}
-#define DISTRHO_PLUGIN_UNIQUE_ID             {{meta.unique_id}};
+#define DISTRHO_PLUGIN_UNIQUE_ID             {{meta.unique_id}}
 {%- endif %}
 
 {%- if meta.plugin_clap_id != None %}
