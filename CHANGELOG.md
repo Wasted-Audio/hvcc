@@ -4,6 +4,11 @@ CHANGELOG
 Next Release
 -----
 
+* Unity Generator: change build system to use CMake - thanks to @michaelhartung
+
+0.14.0
+-----
+
 Features:
 
 * Metadata: optional Dict for external generators
@@ -18,6 +23,12 @@ Bugfixes:
 * Core: signed/unsigned mismatch in HvSignalTabwrite.h - thanks to @grrr
 * c2dpf: portGroup template fix with i/o port 0 as CV
 * c2wwise: use correct SDK header paths and allow any platform in the xml - thanks to @eu-ch
+
+Updates:
+
+* drop py3.8 - add py3.13
+* integrate json2daisy library, tests and documentation
+* move to libDaisy 8.x pin definitions
 
 0.13.4
 -----
