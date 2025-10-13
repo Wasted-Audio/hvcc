@@ -22,7 +22,6 @@ import shutil
 import time
 
 from collections import Counter
-from collections import OrderedDict
 from typing import Dict, List, Optional, Type, Union
 
 from hvcc.generators.ir2c.PrettyfyC import PrettyfyC

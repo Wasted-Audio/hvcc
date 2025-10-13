@@ -987,6 +987,5 @@ class HeavyGraph(HeavyIrObject):
 
         return ir_rec_dict
 
-
     def get_ir_signal_list(self) -> List[IRSignalList]:
         return [x for o in self.signal_order for x in o.get_ir_signal_list()]
