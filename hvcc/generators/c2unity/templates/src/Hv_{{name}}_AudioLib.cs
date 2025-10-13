@@ -1,4 +1,4 @@
-{%- set hasParams = true if parameters|length > 0 -%}
+{%- set hasParams = true if in_params | length > 0 -%}
 {%- set hasEvents = true if events|length > 0 -%}
 {%- set hasTables = true if tables|length > 0 -%}
 {{copyright}}
@@ -13,22 +13,22 @@ using AOT;
 #if UNITY_EDITOR
 using UnityEditor;
 
-[CustomEditor(typeof(Hv_{{patch_name}}_AudioLib))]
-public class Hv_{{patch_name}}_Editor : Editor {
+[CustomEditor(typeof(Hv_{{name}}_AudioLib))]
+public class Hv_{{name}}_Editor : Editor {
 
-  [MenuItem("Heavy/{{patch_name}}")]
-  static void CreateHv_{{patch_name}}() {
+  [MenuItem("Heavy/{{name}}")]
+  static void CreateHv_{{name}}() {
     GameObject target = Selection.activeGameObject;
     if (target != null) {
-      target.AddComponent<Hv_{{patch_name}}_AudioLib>();
+      target.AddComponent<Hv_{{name}}_AudioLib>();
     }
   }
   {%- if hasParams or hasEvents or hasTables %}
 
-  private Hv_{{patch_name}}_AudioLib _dsp;
+  private Hv_{{name}}_AudioLib _dsp;
 
   private void OnEnable() {
-    _dsp = target as Hv_{{patch_name}}_AudioLib;
+    _dsp = target as Hv_{{name}}_AudioLib;
   }
 
   public override void OnInspectorGUI() {
@@ -45,7 +45,7 @@ public class Hv_{{patch_name}}_Editor : Editor {
 
     // {{v.display}}
     if (GUILayout.Button("{{v.display}}")) {
-      _dsp.SendEvent(Hv_{{patch_name}}_AudioLib.Event.{{k|title}});
+      _dsp.SendEvent(Hv_{{name}}_AudioLib.Event.{{k|title}});
     }
     {%- endfor %}
     {%- endif %}
@@ -54,14 +54,14 @@ public class Hv_{{patch_name}}_Editor : Editor {
     GUI.enabled = true;
     EditorGUILayout.Space();
     EditorGUI.indentLevel++;
-    {%- for k, v in parameters %}
+    {%- for k, v in in_params %}
 
     // {{v.display}}
     GUILayout.BeginHorizontal();
-    float {{k}} = _dsp.GetFloatParameter(Hv_{{patch_name}}_AudioLib.Parameter.{{k|title}});
+    float {{k}} = _dsp.GetFloatParameter(Hv_{{name}}_AudioLib.Parameter.{{k|title}});
     float new{{k|title}} = EditorGUILayout.Slider("{{v.display}}", {{k}}, {{v.attributes.min}}f, {{v.attributes.max}}f);
     if ({{k}} != new{{k|title}}) {
-      _dsp.SetFloatParameter(Hv_{{patch_name}}_AudioLib.Parameter.{{k|title}}, new{{k|title}});
+      _dsp.SetFloatParameter(Hv_{{name}}_AudioLib.Parameter.{{k|title}}, new{{k|title}});
     }
     GUILayout.EndHorizontal();
     {%- endfor %}
@@ -94,14 +94,14 @@ public class Hv_{{patch_name}}_Editor : Editor {
 #endif // UNITY_EDITOR
 
 [RequireComponent (typeof (AudioSource))]
-public class Hv_{{patch_name}}_AudioLib : MonoBehaviour {
+public class Hv_{{name}}_AudioLib : MonoBehaviour {
   {% if hasEvents %}
   // Events are used to trigger bangs in the patch context (thread-safe).
   // Example usage:
   /*
     void Start () {
-        Hv_{{patch_name}}_AudioLib script = GetComponent<Hv_{{patch_name}}_AudioLib>();
-        script.SendEvent(Hv_{{patch_name}}_AudioLib.Event.{{events[0][0]|title}});
+        Hv_{{name}}_AudioLib script = GetComponent<Hv_{{name}}_AudioLib>();
+        script.SendEvent(Hv_{{name}}_AudioLib.Event.{{events[0][0]|title}});
     }
   */
   public enum Event : uint {
@@ -115,14 +115,14 @@ public class Hv_{{patch_name}}_AudioLib : MonoBehaviour {
   // Example usage:
   /*
     void Start () {
-        Hv_{{patch_name}}_AudioLib script = GetComponent<Hv_{{patch_name}}_AudioLib>();
+        Hv_{{name}}_AudioLib script = GetComponent<Hv_{{name}}_AudioLib>();
         // Get and set a parameter
-        float {{parameters[0][0]}} = script.GetFloatParameter(Hv_{{patch_name}}_AudioLib.Parameter.{{parameters[0][0]|title}});
-        script.SetFloatParameter(Hv_{{patch_name}}_AudioLib.Parameter.{{parameters[0][0]|title}}, {{parameters[0][0]}} + 0.1f);
+        float {{in_params[0][0]}} = script.GetFloatParameter(Hv_{{name}}_AudioLib.Parameter.{{in_params[0][0]|title}});
+        script.SetFloatParameter(Hv_{{name}}_AudioLib.Parameter.{{in_params[0][0]|title}}, {{in_params[0][0]}} + 0.1f);
     }
   */
   public enum Parameter : uint {
-    {%- for k,v in parameters %}
+    {%- for k,v in in_params %}
     {{k|title}} = {{v.hash}},
     {%- endfor %}
   }
@@ -134,12 +134,12 @@ public class Hv_{{patch_name}}_AudioLib : MonoBehaviour {
     public AudioClip clip;
 
     void Start () {
-        Hv_{{patch_name}}_AudioLib script = GetComponent<Hv_{{patch_name}}_AudioLib>();
+        Hv_{{name}}_AudioLib script = GetComponent<Hv_{{name}}_AudioLib>();
         // copy clip contents into a temporary buffer
         float[] buffer = new float[clip.samples];
         clip.GetData(buffer, 0);
         // fill a buffer called "channelL"
-        looper.FillTableWithFloatBuffer((uint) Hv_{{patch_name}}_AudioLib.Table.Channell, buffer);
+        looper.FillTableWithFloatBuffer((uint) Hv_{{name}}_AudioLib.Table.Channell, buffer);
         // notify a (non-exposed) receiver of the buffer size
         looper.SendFloatToReceiver("setTableSize-channelL", clip.samples);
     }
@@ -154,12 +154,12 @@ public class Hv_{{patch_name}}_AudioLib : MonoBehaviour {
   // Example usage:
   /*
     void Start () {
-        Hv_{{patch_name}}_AudioLib script = GetComponent<Hv_{{patch_name}}_AudioLib>();
+        Hv_{{name}}_AudioLib script = GetComponent<Hv_{{name}}_AudioLib>();
         script.RegisterSendHook();
         script.FloatReceivedCallback += OnFloatMessage;
     }
 
-    void OnFloatMessage(Hv_{{patch_name}}_AudioLib.FloatMessage message) {
+    void OnFloatMessage(Hv_{{name}}_AudioLib.FloatMessage message) {
         Debug.Log(message.receiverName + ": " + message.value);
     }
   */
@@ -175,7 +175,7 @@ public class Hv_{{patch_name}}_AudioLib : MonoBehaviour {
   public delegate void FloatMessageReceived(FloatMessage message);
   public FloatMessageReceived FloatReceivedCallback;
 
-  {%- for k, v in parameters %}
+  {%- for k, v in in_params %}
   public float {{k}} = {{v.attributes.default}}f;
   {%- endfor %}
   {%- for k, v in tables %}
@@ -183,7 +183,7 @@ public class Hv_{{patch_name}}_AudioLib : MonoBehaviour {
   {%- endfor %}
 
   // internal state
-  private Hv_{{patch_name}}_Context _context;
+  private Hv_{{name}}_Context _context;
 
   public bool IsInstantiated() {
     return (_context != null);
@@ -193,25 +193,25 @@ public class Hv_{{patch_name}}_AudioLib : MonoBehaviour {
     _context.RegisterSendHook();
   }
   {% if hasEvents %}
-  // see Hv_{{patch_name}}_AudioLib.Event for definitions
-  public void SendEvent(Hv_{{patch_name}}_AudioLib.Event e) {
+  // see Hv_{{name}}_AudioLib.Event for definitions
+  public void SendEvent(Hv_{{name}}_AudioLib.Event e) {
     if (IsInstantiated()) _context.SendBangToReceiver((uint) e);
   }
   {% endif %}
   {%- if hasParams %}
-  // see Hv_{{patch_name}}_AudioLib.Parameter for definitions
-  public float GetFloatParameter(Hv_{{patch_name}}_AudioLib.Parameter param) {
+  // see Hv_{{name}}_AudioLib.Parameter for definitions
+  public float GetFloatParameter(Hv_{{name}}_AudioLib.Parameter param) {
     switch (param) {
-      {%- for k, v in parameters %}
+      {%- for k, v in in_params %}
       case Parameter.{{k|title}}: return {{k}};
       {%- endfor %}
       default: return 0.0f;
     }
   }
 
-  public void SetFloatParameter(Hv_{{patch_name}}_AudioLib.Parameter param, float x) {
+  public void SetFloatParameter(Hv_{{name}}_AudioLib.Parameter param, float x) {
     switch (param) {
-      {%- for k, v in parameters %}
+      {%- for k, v in in_params %}
       case Parameter.{{k|title}}: {
         x = Mathf.Clamp(x, {{v.attributes.min}}f, {{v.attributes.max}}f);
         {{k}} = x;
@@ -229,7 +229,7 @@ public class Hv_{{patch_name}}_AudioLib : MonoBehaviour {
 
   public void FillTableWithMonoAudioClip(string tableName, AudioClip clip) {
     if (clip.channels > 1) {
-      Debug.LogWarning("Hv_{{patch_name}}_AudioLib: Only loading first channel of '" +
+      Debug.LogWarning("Hv_{{name}}_AudioLib: Only loading first channel of '" +
           clip.name + "' into table '" +
           tableName + "'. Multi-channel files are not supported.");
     }
@@ -240,7 +240,7 @@ public class Hv_{{patch_name}}_AudioLib : MonoBehaviour {
 
   public void FillTableWithMonoAudioClip(uint tableHash, AudioClip clip) {
     if (clip.channels > 1) {
-      Debug.LogWarning("Hv_{{patch_name}}_AudioLib: Only loading first channel of '" +
+      Debug.LogWarning("Hv_{{name}}_AudioLib: Only loading first channel of '" +
           clip.name + "' into table '" +
           tableHash + "'. Multi-channel files are not supported.");
     }
@@ -262,7 +262,7 @@ public class Hv_{{patch_name}}_AudioLib : MonoBehaviour {
   }
 
   private void Awake() {
-    _context = new Hv_{{patch_name}}_Context((double) AudioSettings.outputSampleRate);
+    _context = new Hv_{{name}}_Context((double) AudioSettings.outputSampleRate);
     {% if hasTables -%}
     // Note: only copies first channel from audio clips
     {%- for k, v in tables %}
@@ -271,7 +271,7 @@ public class Hv_{{patch_name}}_AudioLib : MonoBehaviour {
       int length = {{k}}Clip.samples;
       float[] buffer = new float[length];
       {{k}}Clip.GetData(buffer, 0);
-      _context.FillTableWithFloatBuffer((uint) Hv_{{patch_name}}_AudioLib.Table.{{k|title}}, buffer);
+      _context.FillTableWithFloatBuffer((uint) Hv_{{name}}_AudioLib.Table.{{k|title}}, buffer);
       _context.SendFloatToReceiver(_context.StringToHash("setTableSize-{{v.display}}"), length);
     }
     {%- endfor %}
@@ -279,7 +279,7 @@ public class Hv_{{patch_name}}_AudioLib : MonoBehaviour {
   }
   {% if hasParams %}
   private void Start() {
-    {%- for k, v in parameters %}
+    {%- for k, v in in_params %}
     _context.SendFloatToReceiver((uint) Parameter.{{k|title}}, {{k}});
     {%- endfor %}
   }
@@ -287,7 +287,7 @@ public class Hv_{{patch_name}}_AudioLib : MonoBehaviour {
   private void Update() {
     // retreive sent messages
     if (_context.IsSendHookRegistered()) {
-      Hv_{{patch_name}}_AudioLib.FloatMessage tempMessage;
+      Hv_{{name}}_AudioLib.FloatMessage tempMessage;
       while ((tempMessage = _context.msgQueue.GetNextMessage()) != null) {
         FloatReceivedCallback(tempMessage);
       }
@@ -300,27 +300,27 @@ public class Hv_{{patch_name}}_AudioLib : MonoBehaviour {
   }
 }
 
-class Hv_{{patch_name}}_Context {
+class Hv_{{name}}_Context {
 
 #if UNITY_IOS && !UNITY_EDITOR
   private const string _dllName = "__Internal";
 #else
-  private const string _dllName = "Hv_{{patch_name}}_AudioLib";
+  private const string _dllName = "Hv_{{name}}_AudioLib";
 #endif
 
   // Thread-safe message queue
   public class SendMessageQueue {
     private readonly object _msgQueueSync = new object();
-    private readonly Queue<Hv_{{patch_name}}_AudioLib.FloatMessage> _msgQueue = new Queue<Hv_{{patch_name}}_AudioLib.FloatMessage>();
+    private readonly Queue<Hv_{{name}}_AudioLib.FloatMessage> _msgQueue = new Queue<Hv_{{name}}_AudioLib.FloatMessage>();
 
-    public Hv_{{patch_name}}_AudioLib.FloatMessage GetNextMessage() {
+    public Hv_{{name}}_AudioLib.FloatMessage GetNextMessage() {
       lock (_msgQueueSync) {
         return (_msgQueue.Count != 0) ? _msgQueue.Dequeue() : null;
       }
     }
 
     public void AddMessage(string receiverName, float value) {
-      Hv_{{patch_name}}_AudioLib.FloatMessage msg = new Hv_{{patch_name}}_AudioLib.FloatMessage(receiverName, value);
+      Hv_{{name}}_AudioLib.FloatMessage msg = new Hv_{{name}}_AudioLib.FloatMessage(receiverName, value);
       lock (_msgQueueSync) {
         _msgQueue.Enqueue(msg);
       }
@@ -333,7 +333,7 @@ class Hv_{{patch_name}}_Context {
   private SendHook _sendHook = null;
 
   [DllImport (_dllName)]
-  private static extern IntPtr hv_{{patch_name}}_new_with_options(double sampleRate, int poolKb, int inQueueKb, int outQueueKb);
+  private static extern IntPtr hv_{{name}}_new_with_options(double sampleRate, int poolKb, int inQueueKb, int outQueueKb);
 
   [DllImport (_dllName)]
   private static extern int hv_processInlineInterleaved(IntPtr ctx,
@@ -394,14 +394,14 @@ class Hv_{{patch_name}}_Context {
 
   private delegate void SendHook(IntPtr context, string sendName, uint sendHash, IntPtr message);
 
-  public Hv_{{patch_name}}_Context(double sampleRate, int poolKb={{pool_sizes_kb.internal}}, int inQueueKb={{pool_sizes_kb.inputQueue}}, int outQueueKb={{pool_sizes_kb.outputQueue}}) {
+  public Hv_{{name}}_Context(double sampleRate, int poolKb={{pool_sizes_kb.internal}}, int inQueueKb={{pool_sizes_kb.inputQueue}}, int outQueueKb={{pool_sizes_kb.outputQueue}}) {
     gch = GCHandle.Alloc(msgQueue);
-    _context = hv_{{patch_name}}_new_with_options(sampleRate, poolKb, inQueueKb, outQueueKb);
+    _context = hv_{{name}}_new_with_options(sampleRate, poolKb, inQueueKb, outQueueKb);
     hv_setPrintHook(_context, new PrintHook(OnPrint));
     hv_setUserData(_context, GCHandle.ToIntPtr(gch));
   }
 
-  ~Hv_{{patch_name}}_Context() {
+  ~Hv_{{name}}_Context() {
     hv_delete(_context);
     GC.KeepAlive(_context);
     GC.KeepAlive(_sendHook);

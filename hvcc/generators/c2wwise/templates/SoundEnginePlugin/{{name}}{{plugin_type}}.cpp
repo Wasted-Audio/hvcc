@@ -9,6 +9,7 @@
 
 #include <AK/AkWwiseSDKVersion.h>
 #include <AK/SoundEngine/Common/IAkPlugin.h>
+#include <AK/Tools/Common/AkFNVHash.h>
 
 namespace {{name}}_Private
 {
@@ -213,7 +214,6 @@ AKRESULT {{name}}{{plugin_type}}::Init(AK::IAkPluginMemAlloc* in_pAllocator, Con
     LoadPluginMediaToHeavyTable(m_pWwiseCtx, m_pHeavyCtx, {{loop.index-1}}, {{v.hash}}, hv_stringToHash("setTableSize-{{v.display}}")); // table '{{v.display}}'
   {%- endfor %}
 {% endif %}
-    AK_PERF_RECORDING_RESET();
 
     return AK_Success;
 }
@@ -251,8 +251,6 @@ AKRESULT {{name}}{{plugin_type}}::GetPluginInfo(AkPluginInfo& out_rPluginInfo)
 
 void {{name}}{{plugin_type}}::Execute(AkAudioBuffer* io_pBuffer)
 {
-    AK_PERF_RECORDING_START("{{name}}{{plugin_type}}", 25, 30);
-
     // Retrieve RTPC values and send in as a message to context
 {%- for k, v in parameters %}
     if (m_pParams->m_paramChangeHandler.HasChanged({{loop.index-1}}))
@@ -291,5 +289,4 @@ void {{name}}{{plugin_type}}::Execute(AkAudioBuffer* io_pBuffer)
     // Edge case - a control-only plugin was built, outputting silence
     io_pBuffer->ZeroPadToMaxFrames();
 {% endif %}
-    AK_PERF_RECORDING_STOP("{{name}}{{plugin_type}}", 25, 30);
 }
