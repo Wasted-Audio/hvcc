@@ -1,6 +1,7 @@
 # ADR-001: pd2gui Parser
 
 Date: 2025-09-12
+
 Issue: https://github.com/Wasted-Audio/hvcc/issues/294
 
 ## Context
@@ -21,8 +22,78 @@ Possible objects to include:
 - Canvas (cnv)
 - Comment (text)
 
+### Object settings
+
+Not all GUI objects are equal and they support a variety of options:
+
+- `position`: supported by all
+- `label`: which has `text`, `color`, `position` (x/y), and `height` [bng, tgl, vradio, hradio, vsl, nbx, hsl, cnv]
+- `label`: with only `text` and `position` (left/right/top/bottom) [floatatom]
+- `label`: with `size`, `position` (x/y), `show number` (never/always/when active/when typing) [knob]
+- `size`: single value [bng, tgl, vradio, hradio, knob]
+- `size`: x/y [vsl, hsl, canvas]
+- `size`: width (chars) [nbx]
+- `size`: width/font height [floatatom]
+- `minimum`: value [vsl, hsl, knob, floatatom]
+- `maximum`: value [vsl, hsl, knob, floatatom]
+- `foreground`: color [bng, tgl, vsl, hsl, vradio, hradio, nbx, knob]
+- `background`: color [bng, tgl, vsl, hsl, vradio, hradio, nbx, knob, canvas]
+- `options`: integer amount [vradio, hradio]
+- `initialize`: [bng, tgl, nbx, vradio, hradio, vsl, hsl, canvas]
+- `min/max flash time`: integers [bng]
+- `non-zero value`: float [tgl]
+- `logarithmic`: bool [vsl, hsl]
+- `steady`: steady on click / jump on click [vsl, hsl]
+
+Unique to [knob]:
+
+- `initial value`: float
+- `angular range`: int
+- `angular offset`: int
+- `arc start`: float
+- `log mode`: linear/logarithmic/exponential
+- `exp factor`: float
+- `discrete`: bool
+- `show ticks`: bool
+- `steps`: int (number of ticks)
+- `circular drag`: bool
+- `read only`: bool
+- `jump on click`: bool
+- `variable`
+- `parameter`
+- `arc`: color
+- `square`: bool
+- `show arc`: bool
+
+The location of these settings in the object line in the pd patch will be different depending on the object type.
+
+The canvas of the main patch, subpatches and abstractions has the following properties:
+
+- `width`: int
+- `height`: int
+- `graph on parent`: bool - required for subpatches and abstractions, otherwise the entire object is ignored
+- `hide name and args`: bool
+- `x range`: float, float
+- `y range`: float, float
+
+The order of objects determines the order in which they are displayed. First in the patch file means displayed on top.
+
+It might not be feasible to include all of the available object settings.
+
+### Intermediate JSON
+
+Each of the parsed objects should be validated through a pydantic object and the final intermediate result JSON will then consist of a list of objects and a number of general settings.
+
+Because there can be nested objects part of the JSON is recursive where each graph can contain a number of sub-graphs.
+
 ## Decision
 
+A new parser will be created, using a similar approach to pd2hv. The parser selects valid GUI objects containing `@hv_param` receive configurations and constructs validated pydantic objects that are added to a GUI-graph definition. Subpatches and abstractions that have graph-on-parent enabled will be recursively parsed as well, thus expanding the graph.
+
+This step should be able to run independently from the DSP parser.
+
 ## MVP Definition
+
+Being able to recursively parse a PD patch based on exposed GUI objects and generating an intermediate JSON that can be used in subsequent steps for creating custom UIs.
 
 ## Future Improvements
