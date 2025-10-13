@@ -130,7 +130,7 @@ def generate_extern_info(hvir: IRGraph, results: CompilerResults) -> ExternInfo:
     """
     # Exposed input parameters
     in_parameter_list = [(k, v) for k, v in hvir.control.receivers.items() if v.extern == "param"]
-    in_parameter_list.sort(key=lambda x: x[0])
+    # in_parameter_list.sort(key=lambda x: x[0])
     check_extern_name_conflicts("input parameter", in_parameter_list, results)
 
     # Exposed input events
