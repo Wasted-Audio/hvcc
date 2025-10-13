@@ -66,7 +66,7 @@ class DPF(BaseModel):
         if 'au' in self.plugin_formats:
             if self.brand_id is None:
                 raise ValueError("brand_id is required for au plugins")
-            if self.unique_id is  None:
+            if self.unique_id is None:
                 raise ValueError("unique_id is required for au plugins")
         return self
 
