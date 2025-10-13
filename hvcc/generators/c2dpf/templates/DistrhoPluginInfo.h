@@ -11,7 +11,7 @@
 {%- if meta.maker != None %}
 #define DISTRHO_PLUGIN_BRAND                "{{meta.maker}}"
 {% else %}
-#define DISTRHO_PLUGIN_BRAND                "Wasted Audio"
+#define DISTRHO_PLUGIN_BRAND                "Heavy"
 {%- endif %}
 {%- if meta.brand_id != None %}
 #define DISTRHO_PLUGIN_BRAND_ID             {{meta.brand_id}}
