@@ -81,20 +81,26 @@ The order of objects determines the order in which they are displayed. First in 
 
 It might not be feasible, or sensible, to include all of the available object settings.
 
-### Intermediate JSON
-
-Each of the parsed objects should be validated through a pydantic object and the final intermediate result JSON will then consist of a list of objects and a number of general settings.
-
-Because there can be nested objects part of the JSON is recursive where each graph can contain a number of sub-graphs.
-
 ## Decision
 
 A new parser will be created, using a similar approach to pd2hv. The parser selects valid GUI objects containing `@hv_param` receive configurations and constructs validated pydantic objects that are added to a GUI-graph definition. Subpatches and abstractions that have graph-on-parent enabled will be recursively parsed as well, thus expanding the graph.
 
-This step should be able to run independently from the DSP parser.
+### Intermediate JSON
+
+Each of the parsed objects should be validated through a pydantic object and the final intermediate result JSON will then consist of a list of objects and a number of general settings. Because there can be nested objects, part of the JSON is recursive where each graph can contain a number of sub-graphs.
+
+### Object Visibility
+
+Only GUI objects that fit within the visible canvas should be added. This means that their position and size should be compared to the current canvas width and height. It will need to be determined if objects are allowed to be cut-off, or if they need to entirely fit within the current view.
+
+### Parser
+
+The high level structure of the parser can be based on the current pd2hv interpreter. With a main `PdParser` construct that can parse graphs from files and canvas. However instead of PdGraph objects it could construct the intermediate GUI JSON file, based on the pydantic object definitions, directly. The JSON can then be stored as `<name>.gui.ir.json` in the `ir` output folder.
 
 ## MVP Definition
 
-Being able to recursively parse a PD patch based on exposed GUI objects and generating an intermediate JSON that can be used in subsequent steps for creating custom UIs. The JSON configuration should contain most, of not all, of the GUI object settings so that consistent behavior can be created.
+Being able to recursively parse a PD patch based on exposed GUI objects and generating an intermediate JSON that can be used in subsequent steps for creating custom UIs. The JSON configuration should contain most, of not all, of the GUI object settings so that consistent behavior emulation can be created.
 
 ## Future Improvements
+
+Be able to run the pd2gui step independently from the DSP parser.
