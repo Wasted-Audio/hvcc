@@ -42,7 +42,7 @@ hvcc has been integrated into several projects and services. This allows to easi
 
 ## Requirements
 
-Python 3.9 up to 3.13
+Python 3.9 up to 3.14
 
 * `jinja2` (for generator templating)
 * `json2daisy` (for daisy integration)
