@@ -3,7 +3,7 @@
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
-from typing import List, Literal, Union, Tuple
+from typing import Literal
 
 from pydantic import BaseModel
 from pydantic_extra_types.color import Color
@@ -20,10 +20,12 @@ class Size(BaseModel):
 
 
 class Base(BaseModel):
+    type: str
     position: Coords
 
 
 class Label(BaseModel):
+    type: str = "label"
     text: str
     color: int
     pos: Coords
@@ -31,6 +33,7 @@ class Label(BaseModel):
 
 
 class Bang(Base):
+    type: str = "bang"
     label: Label
     size: int
     fg_color: Color
@@ -38,6 +41,7 @@ class Bang(Base):
 
 
 class Toggle(Base):
+    type: str = "toggle"
     label: Label
     size: int
     fg_color: Color
@@ -54,11 +58,11 @@ class Radio(Base):
 
 
 class VRadio(Radio):
-    type: str = "v"
+    type: str = "vradio"
 
 
 class HRadio(Radio):
-    type: str = "h"
+    type: str = "hradio"
 
 
 class Slider(Base):
@@ -73,14 +77,15 @@ class Slider(Base):
 
 
 class VSlider(Slider):
-    type: str = "v"
+    type: str = "vslider"
 
 
 class HSlider(Slider):
-    type: str = "h"
+    type: str = "hslider"
 
 
 class Knob(Base):
+    type: str = "knob"
     label_size: int
     label_pos: Size
     label_show: Literal["n", "a", "wa", "wt"]
@@ -109,6 +114,7 @@ class Knob(Base):
 
 
 class Number(Base):
+    type: str = "number"
     label: Label
     width: int
     fg_color: Color
@@ -116,6 +122,7 @@ class Number(Base):
 
 
 class Float(Base):
+    type: str = "float"
     label_text: str
     label_height: int
     label_pos: Literal["l", "r", "t", "b"]
@@ -125,10 +132,12 @@ class Float(Base):
 
 
 class Comment(Base):
+    type: str = "comment"
     text: str
 
 
 class Canvas(Base):
+    type: str = "canvas"
     label: Label
     size: Size
     bg_color: Color
@@ -137,16 +146,15 @@ class Canvas(Base):
 class GraphBase(BaseModel):
     width: int
     height: int
-    hide_name_args: bool
-    x_range: Tuple[float, float]
-    y_range: Tuple[float, float]
-    objects: List[Union[Bang, Toggle, Radio, Slider, Knob, Number, Float, Comment, Canvas]]
+    objects: list[Bang | Toggle | Radio | Slider | Knob | Number | Float | Comment | Canvas]
 
 
 class Graph(GraphBase):
-    pos: Coords
-    graphs: List["Graph"]
+    x_range: tuple[float, float]
+    y_range: tuple[float, float]
+    position: Coords
+    graphs: list["Graph"]
 
 
 class GraphTop(GraphBase):
-    graphs: List["Graph"]
+    graphs: list["Graph"]

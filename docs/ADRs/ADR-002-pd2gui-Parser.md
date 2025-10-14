@@ -6,7 +6,7 @@ Issue: https://github.com/Wasted-Audio/hvcc/issues/294
 
 ## Context
 
-The Heavy Compiler currently focusses on compiling PD patches on the DSP and Control level. PD however is a graphical environment and users will often use the GUI elements to design interfaces for controlling their patches. Therefore it is proposed to be able to use these GUI objects to design control interfaces. The goal is to create a PD patch parser that only takes into account visible GUI objects, that are connected to externed Heavy parameters, and generates an intermediate json object that can then be used downstream to create various new control interfaces.
+The Heavy Compiler currently focusses on compiling PD patches on the DSP and Control level. PD however is a graphical environment and users will often use the GUI elements to design interfaces for controlling their patches. Therefore it is proposed to be able to use these GUI objects to design control interfaces. The goal is to create a PD patch parser that only takes into account visible GUI objects, that are connected to externed Heavy parameters, and generates an intermediate JSON object that can then be used downstream to create various new control interfaces.
 
 Possible objects to include:
 
@@ -26,7 +26,7 @@ Possible objects to include:
 
 Not all GUI objects are equal and they support a variety of options:
 
-- `position`: supported by all
+- `position`: x/y coordinates, supported by all
 - `label`: which has `text`, `color`, `position` (x/y), and `height` [bng, tgl, vradio, hradio, vsl, nbx, hsl, cnv]
 - `label`: with only `text` and `position` (left/right/top/bottom) [floatatom]
 - `label`: with `size`, `position` (x/y), `show number` (never/always/when active/when typing) [knob]
@@ -69,16 +69,17 @@ The location of these settings in the object line in the pd patch will be differ
 
 The canvas of the main patch, subpatches and abstractions has the following properties:
 
+- `position`: x/y coordinates - position in the host patch (not needed for the top level)
 - `width`: int
 - `height`: int
 - `graph on parent`: bool - required for subpatches and abstractions, otherwise the entire object is ignored
-- `hide name and args`: bool
-- `x range`: float, float
-- `y range`: float, float
+- `hide name and args`: bool - not particularly useful, but maybe needed for consistency
+- `x range`: float, float - segment of the graph that is exposed to parent
+- `y range`: float, float - segment of the graph that is exposed to parent
 
 The order of objects determines the order in which they are displayed. First in the patch file means displayed on top.
 
-It might not be feasible to include all of the available object settings.
+It might not be feasible, or sensible, to include all of the available object settings.
 
 ### Intermediate JSON
 
@@ -94,6 +95,6 @@ This step should be able to run independently from the DSP parser.
 
 ## MVP Definition
 
-Being able to recursively parse a PD patch based on exposed GUI objects and generating an intermediate JSON that can be used in subsequent steps for creating custom UIs.
+Being able to recursively parse a PD patch based on exposed GUI objects and generating an intermediate JSON that can be used in subsequent steps for creating custom UIs. The JSON configuration should contain most, of not all, of the GUI object settings so that consistent behavior can be created.
 
 ## Future Improvements
