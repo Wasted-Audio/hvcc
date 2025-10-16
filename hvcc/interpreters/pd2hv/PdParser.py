@@ -71,7 +71,7 @@ class PdParser:
         self.obj_counter: Counter = Counter()
 
         # search paths at this graph level
-        self.__search_paths: List = []
+        self.search_paths: List = []
 
     @classmethod
     def get_supported_objects(cls) -> List:
@@ -104,7 +104,7 @@ class PdParser:
         return hv_arg_dict
 
     @classmethod
-    def __get_pd_line(cls, pd_path: str) -> Generator:
+    def get_pd_line(cls, pd_path: str) -> Generator:
         concat = ""  # concatination state
         with open(pd_path, "r") as f:
             for li in f:
@@ -119,16 +119,27 @@ class PdParser:
                 else:
                     concat = (f'{concat} {li}') if len(concat) > 0 else f'{li}'
 
+    @classmethod
+    def split_line(cls, li: str) -> list[str]:
+        # remove width parameter
+        li = cls.RE_WIDTH.sub("", li)
+        # split on non-escaped spaces
+        line = cls.RE_SPACE.split(li)
+        # replace escaped spaces
+        line = [i.replace('\\', ' ') for i in line]
+
+        return line
+
     def add_absolute_search_directory(self, search_dir: str) -> bool:
         if os.path.isdir(search_dir):
-            self.__search_paths.append(search_dir)
+            self.search_paths.append(search_dir)
             return True
         else:
             return False
 
     def add_relative_search_directory(self, search_dir: str) -> bool:
         search_dir = os.path.abspath(os.path.join(
-            self.__search_paths[0],
+            self.search_paths[0],
             search_dir))
         return self.add_absolute_search_directory(search_dir)
 
@@ -145,7 +156,7 @@ class PdParser:
             return abs_path
 
         # check search paths in reverse order (last added search path first)
-        for d in reversed(self.__search_paths):
+        for d in reversed(self.search_paths):
             abs_path = os.path.join(d, abs_filename)
             if os.path.isfile(abs_path):
                 return abs_path
@@ -165,14 +176,14 @@ class PdParser:
             Note that obj_args does not include $0.
             @param pd_graph_class  The python class to handle specific graph types
         """
-        # add main patch directory. The first entry of self.__search_paths is
+        # add main patch directory. The first entry of self.search_paths is
         # assumed to be the root path of the whole system
 
         if is_root:
-            self.__search_paths.append(os.path.dirname(file_path))
+            self.search_paths.append(os.path.dirname(file_path))
 
         file_hv_arg_dict = self.__get_hv_args(file_path)
-        file_iterator = self.__get_pd_line(file_path)
+        file_iterator = self.get_pd_line(file_path)
         canvas_line = file_iterator.__next__()
 
         self.__DOLLAR_ZERO += 1  # increment $0
@@ -244,12 +255,7 @@ class PdParser:
 
         try:  # this try will capture any critical errors
             for li in file_iterator:
-                # remove width parameter
-                li = self.RE_WIDTH.sub("", li)
-                # split on non-escaped spaces
-                line = self.RE_SPACE.split(li)
-                # replace escaped spaces
-                line = [i.replace('\\ ', ' ') for i in line]
+                line = self.split_line(li)
 
                 if line[0] == "#N":
                     if line[1] == "canvas":

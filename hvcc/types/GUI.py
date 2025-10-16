@@ -10,18 +10,22 @@ from pydantic_extra_types.color import Color
 
 
 class Coords(BaseModel):
-    x: int
-    y: int
+    x: int = 0
+    y: int = 0
 
 
 class Size(BaseModel):
-    x: int
-    y: int
+    x: int = 0
+    y: int = 0
 
 
 class Base(BaseModel):
     type: str
     position: Coords
+
+
+class BaseParam(Base):
+    parameter: str
 
 
 class Label(BaseModel):
@@ -32,7 +36,7 @@ class Label(BaseModel):
     height: int
 
 
-class Bang(Base):
+class Bang(BaseParam):
     type: str = "bang"
     label: Label
     size: int
@@ -40,7 +44,7 @@ class Bang(Base):
     bg_color: Color
 
 
-class Toggle(Base):
+class Toggle(BaseParam):
     type: str = "toggle"
     label: Label
     size: int
@@ -49,7 +53,7 @@ class Toggle(Base):
     non_zero: float
 
 
-class Radio(Base):
+class Radio(BaseParam):
     label: Label
     size: int
     fg_color: Color
@@ -65,7 +69,7 @@ class HRadio(Radio):
     type: str = "hradio"
 
 
-class Slider(Base):
+class Slider(BaseParam):
     label: Label
     size: Coords
     min: float
@@ -84,7 +88,7 @@ class HSlider(Slider):
     type: str = "hslider"
 
 
-class Knob(Base):
+class Knob(BaseParam):
     type: str = "knob"
     label_size: int
     label_pos: Size
@@ -113,7 +117,7 @@ class Knob(Base):
     arc_show: bool
 
 
-class Number(Base):
+class Number(BaseParam):
     type: str = "number"
     label: Label
     width: int
@@ -121,7 +125,7 @@ class Number(Base):
     bg_color: Color
 
 
-class Float(Base):
+class Float(BaseParam):
     type: str = "float"
     label_text: str
     label_height: int
@@ -143,18 +147,21 @@ class Canvas(Base):
     bg_color: Color
 
 
+GUIObjects = Bang | Toggle | Radio | Slider | Knob | Number | Float | Comment | Canvas
+
+
 class GraphBase(BaseModel):
-    width: int
-    height: int
-    objects: list[Bang | Toggle | Radio | Slider | Knob | Number | Float | Comment | Canvas]
+    objects: list[GUIObjects]
 
 
 class Graph(GraphBase):
-    x_range: tuple[float, float]
-    y_range: tuple[float, float]
     position: Coords
+    gop_start: Coords
+    gop_size: Size
     graphs: list["Graph"]
 
 
-class GraphTop(GraphBase):
+class GraphRoot(GraphBase):
+    width: int
+    height: int
     graphs: list["Graph"]
