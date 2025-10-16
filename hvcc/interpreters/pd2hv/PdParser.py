@@ -126,7 +126,7 @@ class PdParser:
         # split on non-escaped spaces
         line = cls.RE_SPACE.split(li)
         # replace escaped spaces
-        line = [i.replace('\\', ' ') for i in line]
+        line = [i.replace('\\ ', ' ') for i in line]
 
         return line
 
