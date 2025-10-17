@@ -524,17 +524,23 @@ class PdParser:
                         assert obj_array is None, "#X array object is already being parsed."
                         # array names can have dollar arguments in them.
                         # ensure that they are resolved
-                        table_name = self.__resolve_object_args(
+                        table_def = self.__resolve_object_args(
                             obj_type="array",
                             obj_args=[line[2]],
-                            graph=g)[0]
+                            graph=g)[0].split(' ')
+                        table_name = table_def[0]
+                        # check if we need to extern the table
+                        if len(table_def) > 1:
+                            table_extern = table_def[1] == '@hv_table'
+                        else:
+                            table_extern = False
                         # Pd encodes arrays with length greater than 999,999 with
                         # scientific notatation (e.g. 1e6) which Python's int() can't parse
                         table_size = int(decimal.Decimal(line[3]))
                         obj_array = HeavyObject(
                             obj_type="table",
                             # ensure that obj_array has its own values instance
-                            obj_args=[table_name, table_size, []])
+                            obj_args=[table_name, table_size, [], table_extern])
                         # TODO(mhroth): position information
                         g.add_object(obj_array)
 
