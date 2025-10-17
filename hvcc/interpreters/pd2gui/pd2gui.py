@@ -4,13 +4,12 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 import argparse
-import json
 import os
 import time
 
 from typing import Optional
 
-from hvcc.interpreters.pd2gui.PdParser import PdGUIParser
+from hvcc.interpreters.pd2gui.PdGUIParser import PdGUIParser
 from hvcc.types.compiler import CompilerResp, CompilerNotif
 
 
@@ -49,10 +48,10 @@ class pd2gui:
         if not os.path.exists(ir_dir):
             os.makedirs(ir_dir)
 
-        gui_file = f"{os.path.splitext(os.path.basename(pd_path))[0]}.gui.json.json"
+        gui_file = f"{os.path.splitext(os.path.basename(pd_path))[0]}.gui.json"
         gui_path = os.path.join(ir_dir, gui_file)
         with open(gui_path, "w") as f:
-            json.dump(gui_graph.model_dump(), f, indent=4)
+            f.write(gui_graph.model_dump_json(indent=2))
 
         return CompilerResp(
             stage="pd2gui",

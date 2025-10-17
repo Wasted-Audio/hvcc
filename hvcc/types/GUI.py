@@ -3,7 +3,8 @@
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
-from typing import Literal
+from enum import IntEnum
+from typing import Literal, Optional
 
 from pydantic import BaseModel
 from pydantic_extra_types.color import Color
@@ -19,6 +20,12 @@ class Size(BaseModel):
     y: int = 0
 
 
+class Font(IntEnum):
+    courier = 0
+    helvetica = 1
+    times = 2
+
+
 class Base(BaseModel):
     type: str
     position: Coords
@@ -29,16 +36,16 @@ class BaseParam(Base):
 
 
 class Label(BaseModel):
-    type: str = "label"
     text: str
-    color: int
-    pos: Coords
-    height: int
+    position: Coords
+    color: Color
+    font: Font
+    font_size: int
 
 
 class Bang(BaseParam):
     type: str = "bang"
-    label: Label
+    label: Optional[Label] = None
     size: int
     fg_color: Color
     bg_color: Color
@@ -46,7 +53,7 @@ class Bang(BaseParam):
 
 class Toggle(BaseParam):
     type: str = "toggle"
-    label: Label
+    label: Optional[Label] = None
     size: int
     fg_color: Color
     bg_color: Color
@@ -54,7 +61,7 @@ class Toggle(BaseParam):
 
 
 class Radio(BaseParam):
-    label: Label
+    label: Optional[Label] = None
     size: int
     fg_color: Color
     bg_color: Color
@@ -70,7 +77,7 @@ class HRadio(Radio):
 
 
 class Slider(BaseParam):
-    label: Label
+    label: Optional[Label] = None
     size: Coords
     min: float
     max: float
@@ -119,7 +126,7 @@ class Knob(BaseParam):
 
 class Number(BaseParam):
     type: str = "number"
-    label: Label
+    label: Optional[Label] = None
     width: int
     fg_color: Color
     bg_color: Color
@@ -142,7 +149,7 @@ class Comment(Base):
 
 class Canvas(Base):
     type: str = "canvas"
-    label: Label
+    label: Optional[Label] = None
     size: Size
     bg_color: Color
 

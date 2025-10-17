@@ -10,8 +10,8 @@ from typing import Generator
 
 from hvcc.interpreters.pd2hv.PdParser import PdParser
 from hvcc.types.GUI import (
-    Size, Coords,
-    # Label, Bang, Toggle, VRadio, HRadio, VSlider, HSlider, Knob, Number, Float, Canvas,
+    Size, Coords, Font, Label, Color, Canvas,
+    # Label, Bang, Toggle, VRadio, HRadio, VSlider, HSlider, Knob, Number, Float,
     Comment, GUIObjects, Graph, GraphRoot
 )
 
@@ -54,6 +54,7 @@ class PdGUIParser(PdParser):
 
         objects: list[GUIObjects] = []
         graphs: list[Graph] = []
+        x: GUIObjects
 
         # graph on parent settings
         gop: bool = False
@@ -116,6 +117,32 @@ class PdGUIParser(PdParser):
                             g = self.gui_from_file(abs_path, is_root=False)
                             assert isinstance(g, Graph)
                             graphs.append(g)
+
+                        if line[4] == "cnv":
+                            label = Label(
+                                text=line[10],
+                                color=Color(line[16]),
+                                position=Coords(
+                                    x=int(line[11]),
+                                    y=int(line[12])
+                                ),
+                                font=Font(int(line[13])),
+                                font_size=int(line[14])
+                            ) if line[10] != "empty" else None
+
+                            x = Canvas(
+                                position=Coords(
+                                    x=int(line[2]),
+                                    y=int(line[3])
+                                ),
+                                label=label,
+                                size=Size(
+                                    x=int(line[6]),
+                                    y=int(line[7])
+                                ),
+                                bg_color=Color(line[15])
+                            )
+                            objects.append(x)
 
         except Exception as e:
             raise e
