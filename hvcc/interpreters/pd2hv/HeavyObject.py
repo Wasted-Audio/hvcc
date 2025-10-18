@@ -73,7 +73,8 @@ class HeavyObject(PdObject):
             "__tabread_stoppable~f"
         ):
             for i, a in enumerate(obj_args):
-                obj_args[i] = a.split(" ")[0] if "@hv_table" in a else a
+                if isinstance(a, str):
+                    obj_args[i] = a.split(" ")[0] if "@hv_table" in a else a
 
         for i, a in enumerate(self.__obj_dict.args):
             arg = cast(Union[IRArg, LangArg], a)
