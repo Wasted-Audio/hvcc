@@ -4,7 +4,10 @@ CHANGELOG
 Next Release
 -----
 
+Features:
+
 * Unity Generator: change build system to use CMake - thanks to @michaelhartung
+* Allow externing graphical arrays using `@hv_table`
 
 0.14.0
 -----
