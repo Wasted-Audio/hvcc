@@ -91,7 +91,7 @@ Each of the parsed objects should be validated through a pydantic object and the
 
 ### Object Visibility
 
-Only GUI objects that fit within the visible canvas should be added. This means that their position and size should be compared to the current canvas width and height. It will need to be determined if objects are allowed to be cut-off, or if they need to entirely fit within the current view.
+Only GUI objects that fit within the visible canvas should be added. This means that their position and size should be compared to the current canvas width and height and position. It will need to be determined if objects are allowed to be cut-off, or if they need to entirely fit within the current view.
 
 ### Parser
 
@@ -104,3 +104,4 @@ Being able to recursively parse a PD patch based on exposed GUI objects and gene
 ## Future Improvements
 
 Be able to run the pd2gui step independently from the DSP parser.
+Add graphical array to supported objects.
