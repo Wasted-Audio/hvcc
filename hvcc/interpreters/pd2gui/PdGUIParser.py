@@ -190,10 +190,10 @@ class PdGUIParser(PdParser):
             obj_min_x = 0
 
             if isinstance(obj, Canvas):
-                obj_min_y = min(obj.position.y, obj.position.y + obj.size.y)
-                obj_max_y = max(obj.position.y, obj.position.y + obj.size.y)
-                obj_min_x = min(obj.position.x, obj.position.x + obj.size.x)
-                obj_max_x = max(obj.position.x, obj.position.x + obj.size.x)
+                obj_min_y = obj.position.y
+                obj_max_y = obj.position.y + obj.size.y
+                obj_min_x = obj.position.x
+                obj_max_x = obj.position.x + obj.size.x
 
             # check if object is overlapping with gop
             if ((obj_min_y < gop_max_y) or (obj_min_x < gop_max_x)) and \
@@ -215,19 +215,19 @@ class PdGUIParser(PdParser):
         # maximum X corner of gop
         gop_max_x = max(gop_start.x, gop_start.x + gop_size.x)
 
-        for graph in graphs:
+        for g in graphs:
             # Y corners of graph
-            graph_min_y = min(graph.position.y, graph.position.y + graph.gop_size.y)
-            graph_max_y = max(graph.position.y, graph.position.y + graph.gop_size.y)
+            g_min_y = g.position.y
+            g_max_y = g.position.y + g.gop_size.y
 
             # X corners of graph
-            graph_min_x = min(graph.position.x, graph.position.x + graph.gop_size.x)
-            graph_max_x = max(graph.position.x, graph.position.x + graph.gop_size.x)
+            g_min_x = g.position.x
+            g_max_x = g.position.x + g.gop_size.x
 
             # check if graph is overlapping with gop
-            if ((graph_min_y < gop_max_y) or (graph_min_x < gop_max_x)) and \
-                    ((graph_max_y > gop_start.y) and (graph_max_x > gop_start.x)) and \
-                    ((graph_min_y < gop_max_y) and (graph_min_x < gop_max_x)):
-                filtered_graphs.append(graph)
+            if ((g_min_y < gop_max_y) or (g_min_x < gop_max_x)) and \
+                    ((g_max_y > gop_start.y) and (g_max_x > gop_start.x)) and \
+                    ((g_min_y < gop_max_y) and (g_min_x < gop_max_x)):
+                filtered_graphs.append(g)
 
         return filtered_graphs
