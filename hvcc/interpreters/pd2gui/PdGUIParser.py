@@ -195,6 +195,7 @@ class PdGUIParser(PdParser):
                 obj_min_x = min(obj.position.x, obj.position.x + obj.size.x)
                 obj_max_x = max(obj.position.x, obj.position.x + obj.size.x)
 
+            # check if object is overlapping with gop
             if ((obj_min_y < gop_max_y) or (obj_min_x < gop_max_x)) and \
                     ((obj_max_y > gop_start.y) and (obj_max_x > gop_start.x)) and \
                     ((obj_min_y < gop_max_y) and (obj_min_x < gop_max_x)):
@@ -215,15 +216,18 @@ class PdGUIParser(PdParser):
         gop_max_x = max(gop_start.x, gop_start.x + gop_size.x)
 
         for graph in graphs:
-            # minimum Y corner of graph
+            # Y corners of graph
             graph_min_y = min(graph.position.y, graph.position.y + graph.gop_size.y)
+            graph_max_y = max(graph.position.y, graph.position.y + graph.gop_size.y)
 
-            # minimum X corner of graph
+            # X corners of graph
             graph_min_x = min(graph.position.x, graph.position.x + graph.gop_size.x)
+            graph_max_x = max(graph.position.x, graph.position.x + graph.gop_size.x)
 
             # check if graph is overlapping with gop
             if ((graph_min_y < gop_max_y) or (graph_min_x < gop_max_x)) and \
-                    ((graph_min_y > gop_start.y) or (graph_min_x > gop_start.x)):
+                    ((graph_max_y > gop_start.y) and (graph_max_x > gop_start.x)) and \
+                    ((graph_min_y < gop_max_y) and (graph_min_x < gop_max_x)):
                 filtered_graphs.append(graph)
 
         return filtered_graphs
