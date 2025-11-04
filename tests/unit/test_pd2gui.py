@@ -12,12 +12,20 @@ def test_filter_graph():
         objects=[]
     )
 
+    c = Canvas(
+        position=Coords(x=0, y=0),
+        size=Size(x=100, y=100),
+        bg_color=Color("grey")
+    )
+
+    g.objects = [c]
+
     g_vis = Graph(
         position=Coords(x=0, y=0),
         gop_start=Coords(),
         gop_size=Size(x=100, y=100),
         graphs=[],
-        objects=[]
+        objects=[c]
     )
 
     g_vis2 = Graph(
@@ -33,7 +41,7 @@ def test_filter_graph():
         gop_start=Coords(),
         gop_size=Size(x=100, y=100),
         graphs=[],
-        objects=[]
+        objects=[c]
     )
 
     g_invis2 = Graph(
@@ -41,13 +49,13 @@ def test_filter_graph():
         gop_start=Coords(),
         gop_size=Size(x=100, y=100),
         graphs=[],
-        objects=[]
+        objects=[c]
     )
 
     graph_list = [g_vis, g_vis2, g_invis, g_invis2]
     filtered_graphs = p.filter_invisible_graphs(graph_list, g.gop_start, g.gop_size)
 
-    assert filtered_graphs == [g_vis, g_vis2]
+    assert filtered_graphs == [g_vis]
 
 
 def test_filter_object_canvas():

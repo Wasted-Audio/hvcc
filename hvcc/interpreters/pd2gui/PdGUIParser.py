@@ -179,17 +179,10 @@ class PdGUIParser(PdParser):
         gop_size: Size
     ) -> list[GUIObjects]:
         filtered_objects: list[GUIObjects] = []
-        # maximum Y corner of gop
         gop_max_y = gop_start.y + gop_size.y
-        # maximum X corner of gop
         gop_max_x = gop_start.x + gop_size.x
 
         for obj in objects:
-            obj_min_y = 0
-            obj_max_y = 0
-            obj_min_x = 0
-            obj_max_x = 0
-
             if isinstance(obj, Canvas):
                 obj_min_y = obj.position.y
                 obj_max_y = obj.position.y + obj.size.y
@@ -211,17 +204,16 @@ class PdGUIParser(PdParser):
         gop_size: Size
     ) -> list[Graph]:
         filtered_graphs: list[Graph] = []
-        # maximum Y corner of gop
         gop_max_y = gop_start.y + gop_size.y
-        # maximum X corner of gop
         gop_max_x = gop_start.x + gop_size.x
 
         for g in graphs:
-            # Y corners of graph
+            # skip empty graphs
+            if len(g.objects) == 0:
+                continue
+
             g_min_y = g.position.y
             g_max_y = g.position.y + g.gop_size.y
-
-            # X corners of graph
             g_min_x = g.position.x
             g_max_x = g.position.x + g.gop_size.x
 
