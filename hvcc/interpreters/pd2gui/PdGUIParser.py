@@ -85,7 +85,10 @@ class PdGUIParser(PdParser):
                             gop_size = Size(x=int(line[6]), y=int(line[7]))
 
                     elif line[1] == "restore" and gop:
-                        # TODO: remove invisible objects and graphs
+                        # TODO: remove invisible objects
+                        objects = self.filter_invisible_objects(objects, gop_start, gop_size)
+                        graphs = self.filter_invisible_graphs(graphs, gop_start, gop_size)
+
                         return Graph(
                             position=Coords(
                                 x=int(line[2]),
@@ -157,6 +160,8 @@ class PdGUIParser(PdParser):
                 graphs=graphs
             ), gop
         else:
+            objects = self.filter_invisible_objects(objects, gop_start, gop_size)
+            graphs = self.filter_invisible_graphs(graphs, gop_start, gop_size)
             return Graph(
                 position=Coords(
                     x=int(line[2]),
@@ -167,3 +172,38 @@ class PdGUIParser(PdParser):
                 objects=objects,
                 graphs=graphs
             ), gop
+
+    def filter_invisible_objects(
+        self,
+        objects: list[GUIObjects],
+        gop_start: Coords,
+        gop_size: Size
+    ) -> list[GUIObjects]:
+        return objects
+
+    def filter_invisible_graphs(
+        self,
+        graphs: list[Graph],
+        gop_start: Coords,
+        gop_size: Size
+    ) -> list[Graph]:
+        filtered_graphs: list[Graph] = []
+        if len(graphs) > 0:
+            # maximum Y corner of gop
+            gop_max_y = max(gop_start.y, gop_start.y + gop_size.y)
+            # maximum X corner of gop
+            gop_max_x = max(gop_start.x, gop_start.x + gop_size.x)
+
+            for i, graph in enumerate(graphs):
+                # minimum Y corner of graph
+                graph_min_y = min(graph.position.y, graph.position.y + graph.gop_size.y)
+
+                # minimum X corner of graph
+                graph_min_x = min(graph.position.x, graph.position.x + graph.gop_size.x)
+
+                # check if graph is overlapping with gop
+                if ((graph_min_y < gop_max_y) or (graph_min_x < gop_max_x)) and \
+                        ((graph_min_y > gop_start.y) or (graph_min_x > gop_start.x)):
+                    filtered_graphs.append(graph)
+
+        return filtered_graphs
