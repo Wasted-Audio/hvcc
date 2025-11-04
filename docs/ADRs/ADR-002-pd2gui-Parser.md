@@ -24,7 +24,7 @@ Possible objects to include:
 
 ### Object settings
 
-Not all GUI objects are equal and they support a variety of options:
+Not all GUI objects are equal and they support a variety of options. The location of these settings in the object line in the pd patch will be different depending on the object type:
 
 - `position`: x/y coordinates, supported by all
 - `label`: which has `text`, `color`, `position` (x/y), and `height` [bng, tgl, vradio, hradio, vsl, nbx, hsl, cnv]
@@ -65,8 +65,6 @@ Unique to [knob]:
 - `square`: bool
 - `show arc`: bool
 
-The location of these settings in the object line in the pd patch will be different depending on the object type.
-
 The canvas of the main patch, subpatches and abstractions has the following properties:
 
 - `position`: x/y coordinates - position in the host patch (not needed for the top level)
@@ -95,7 +93,7 @@ Only GUI objects that fit within the visible canvas should be added. This means 
 
 ### Parser
 
-The high level structure of the parser can be based on the current pd2hv interpreter. With a main `PdParser` construct that can parse graphs from files and canvas. However instead of PdGraph objects it could construct the intermediate GUI JSON file, based on the pydantic object definitions, directly. The JSON can then be stored as `<name>.gui.ir.json` in the `ir` output folder.
+The high level structure of the parser can be based on the current pd2hv interpreter and `PdParser`. With a main `PdGuiParser` construct that can recursively parse graphs from files and canvas. However instead of PdGraph objects it would construct the intermediate GUI JSON file, based on the pydantic object definitions, directly. The JSON can then be stored as `<name>.gui.ir.json` in the `ir` output folder.
 
 ## MVP Definition
 
