@@ -179,7 +179,28 @@ class PdGUIParser(PdParser):
         gop_start: Coords,
         gop_size: Size
     ) -> list[GUIObjects]:
-        return objects
+        filtered_objects: list[GUIObjects] = []
+        # maximum Y corner of gop
+        gop_max_y = max(gop_start.y, gop_start.y + gop_size.y)
+        # maximum X corner of gop
+        gop_max_x = max(gop_start.x, gop_start.x + gop_size.x)
+
+        for obj in objects:
+            obj_min_y = 0
+            obj_min_x = 0
+
+            if isinstance(obj, Canvas):
+                obj_min_y = min(obj.position.y, obj.position.y + obj.size.y)
+                obj_max_y = max(obj.position.y, obj.position.y + obj.size.y)
+                obj_min_x = min(obj.position.x, obj.position.x + obj.size.x)
+                obj_max_x = max(obj.position.x, obj.position.x + obj.size.x)
+
+            if ((obj_min_y < gop_max_y) or (obj_min_x < gop_max_x)) and \
+                    ((obj_max_y > gop_start.y) and (obj_max_x > gop_start.x)) and \
+                    ((obj_min_y < gop_max_y) and (obj_min_x < gop_max_x)):
+                filtered_objects.append(obj)
+
+        return filtered_objects
 
     def filter_invisible_graphs(
         self,
@@ -188,22 +209,21 @@ class PdGUIParser(PdParser):
         gop_size: Size
     ) -> list[Graph]:
         filtered_graphs: list[Graph] = []
-        if len(graphs) > 0:
-            # maximum Y corner of gop
-            gop_max_y = max(gop_start.y, gop_start.y + gop_size.y)
-            # maximum X corner of gop
-            gop_max_x = max(gop_start.x, gop_start.x + gop_size.x)
+        # maximum Y corner of gop
+        gop_max_y = max(gop_start.y, gop_start.y + gop_size.y)
+        # maximum X corner of gop
+        gop_max_x = max(gop_start.x, gop_start.x + gop_size.x)
 
-            for i, graph in enumerate(graphs):
-                # minimum Y corner of graph
-                graph_min_y = min(graph.position.y, graph.position.y + graph.gop_size.y)
+        for graph in graphs:
+            # minimum Y corner of graph
+            graph_min_y = min(graph.position.y, graph.position.y + graph.gop_size.y)
 
-                # minimum X corner of graph
-                graph_min_x = min(graph.position.x, graph.position.x + graph.gop_size.x)
+            # minimum X corner of graph
+            graph_min_x = min(graph.position.x, graph.position.x + graph.gop_size.x)
 
-                # check if graph is overlapping with gop
-                if ((graph_min_y < gop_max_y) or (graph_min_x < gop_max_x)) and \
-                        ((graph_min_y > gop_start.y) or (graph_min_x > gop_start.x)):
-                    filtered_graphs.append(graph)
+            # check if graph is overlapping with gop
+            if ((graph_min_y < gop_max_y) or (graph_min_x < gop_max_x)) and \
+                    ((graph_min_y > gop_start.y) or (graph_min_x > gop_start.x)):
+                filtered_graphs.append(graph)
 
         return filtered_graphs
