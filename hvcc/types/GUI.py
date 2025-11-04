@@ -44,7 +44,7 @@ class Label(BaseModel):
 
 
 class Bang(BaseParam):
-    type: str = "bang"
+    type: Literal["bang"] = "bang"
     label: Optional[Label] = None
     size: int
     fg_color: Color
@@ -52,7 +52,7 @@ class Bang(BaseParam):
 
 
 class Toggle(BaseParam):
-    type: str = "toggle"
+    type: Literal["toggle"] = "toggle"
     label: Optional[Label] = None
     size: int
     fg_color: Color
@@ -69,11 +69,11 @@ class Radio(BaseParam):
 
 
 class VRadio(Radio):
-    type: str = "vradio"
+    type: Literal["vradio"] = "vradio"
 
 
 class HRadio(Radio):
-    type: str = "hradio"
+    type: Literal["hradio"] = "hradio"
 
 
 class Slider(BaseParam):
@@ -88,15 +88,15 @@ class Slider(BaseParam):
 
 
 class VSlider(Slider):
-    type: str = "vslider"
+    type: Literal["vslider"] = "vslider"
 
 
 class HSlider(Slider):
-    type: str = "hslider"
+    type: Literal["hslider"] = "hslider"
 
 
 class Knob(BaseParam):
-    type: str = "knob"
+    type: Literal["knob"] = "knob"
     label_size: int
     label_pos: Size
     label_show: Literal["n", "a", "wa", "wt"]
@@ -125,7 +125,7 @@ class Knob(BaseParam):
 
 
 class Number(BaseParam):
-    type: str = "number"
+    type: Literal["number"] = "number"
     label: Optional[Label] = None
     width: int
     fg_color: Color
@@ -133,7 +133,7 @@ class Number(BaseParam):
 
 
 class Float(BaseParam):
-    type: str = "float"
+    type: Literal["float"] = "float"
     label_text: str
     label_height: int
     label_pos: Literal["l", "r", "t", "b"]
@@ -143,12 +143,12 @@ class Float(BaseParam):
 
 
 class Comment(Base):
-    type: str = "comment"
+    type: Literal["comment"] = "comment"
     text: str
 
 
 class Canvas(Base):
-    type: str = "canvas"
+    type: Literal["canvas"] = "canvas"
     label: Optional[Label] = None
     size: Size
     bg_color: Color
