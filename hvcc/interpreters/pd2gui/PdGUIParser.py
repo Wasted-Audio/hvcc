@@ -5,8 +5,7 @@
 
 import os
 
-from typing import Generator
-
+from typing import Generator, Union
 
 from hvcc.interpreters.pd2hv.PdParser import PdParser
 from hvcc.types.GUI import (
@@ -25,7 +24,7 @@ class PdGUIParser(PdParser):
         self,
         file_path: str,
         is_root: bool = True
-    ) -> Graph | GraphRoot:
+    ) -> Union[Graph, GraphRoot]:
         if is_root:
             self.search_paths.append(os.path.dirname(file_path))
 
@@ -50,7 +49,7 @@ class PdGUIParser(PdParser):
         canvas_line: str,
         pd_path: str,
         is_root: bool = False
-    ) -> tuple[Graph | GraphRoot, bool]:
+    ) -> tuple[Union[Graph, GraphRoot], bool]:
 
         objects: list[GUIObjects] = []
         graphs: list[Graph] = []

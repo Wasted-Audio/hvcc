@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 from enum import IntEnum
-from typing import Literal, Optional
+from typing import Literal, Optional, Union
 
 from pydantic import BaseModel
 from pydantic_extra_types.color import Color
@@ -154,7 +154,7 @@ class Canvas(Base):
     bg_color: Color
 
 
-GUIObjects = Bang | Toggle | Radio | Slider | Knob | Number | Float | Comment | Canvas
+GUIObjects = Union[Bang, Toggle, Radio, Slider, Knob, Number, Float, Comment, Canvas]
 
 
 class GraphBase(BaseModel):
