@@ -100,12 +100,16 @@ class PdGUIParser(PdParser):
                         ), gop
 
                     elif line[1] == "text":
+                        text = " ".join(line[4:])
                         x = Comment(
                             position=Coords(
                                 x=int(line[2]),
                                 y=int(line[3])
                             ),
-                            text=" ".join(line[4:])
+                            text=text,
+                            size=Size(
+                                x=10, y=10*len(text)
+                            )
                         )
                         objects.append(x)
 
@@ -183,11 +187,10 @@ class PdGUIParser(PdParser):
         gop_max_x = gop_start.x + gop_size.x
 
         for obj in objects:
-            if isinstance(obj, Canvas):
-                obj_min_y = obj.position.y
-                obj_max_y = obj.position.y + obj.size.y
-                obj_min_x = obj.position.x
-                obj_max_x = obj.position.x + obj.size.x
+            obj_min_y = obj.position.y
+            obj_max_y = obj.position.y + obj.size.y
+            obj_min_x = obj.position.x
+            obj_max_x = obj.position.x + obj.size.x
 
             # check if object is overlapping with gop
             if ((obj_min_y < gop_max_y) or (obj_min_x < gop_max_x)) and \

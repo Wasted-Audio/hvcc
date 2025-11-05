@@ -29,6 +29,7 @@ class Font(IntEnum):
 class Base(BaseModel):
     type: str
     position: Coords
+    size: Size
 
 
 class BaseParam(Base):
@@ -43,10 +44,20 @@ class Label(BaseModel):
     font_size: int
 
 
+class Comment(Base):
+    type: Literal["comment"] = "comment"
+    text: str
+
+
+class Canvas(Base):
+    type: Literal["canvas"] = "canvas"
+    label: Optional[Label] = None
+    bg_color: Color
+
+
 class Bang(BaseParam):
     type: Literal["bang"] = "bang"
     label: Optional[Label] = None
-    size: int
     fg_color: Color
     bg_color: Color
 
@@ -54,7 +65,6 @@ class Bang(BaseParam):
 class Toggle(BaseParam):
     type: Literal["toggle"] = "toggle"
     label: Optional[Label] = None
-    size: int
     fg_color: Color
     bg_color: Color
     non_zero: float
@@ -62,7 +72,6 @@ class Toggle(BaseParam):
 
 class Radio(BaseParam):
     label: Optional[Label] = None
-    size: int
     fg_color: Color
     bg_color: Color
     options: int
@@ -78,7 +87,6 @@ class HRadio(Radio):
 
 class Slider(BaseParam):
     label: Optional[Label] = None
-    size: Coords
     min: float
     max: float
     fg_color: Color
@@ -98,9 +106,8 @@ class HSlider(Slider):
 class Knob(BaseParam):
     type: Literal["knob"] = "knob"
     label_size: int
-    label_pos: Size
+    label_pos: Coords
     label_show: Literal["n", "a", "wa", "wt"]
-    size: int
     min: float
     max: float
     fg_color: Color
@@ -127,7 +134,6 @@ class Knob(BaseParam):
 class Number(BaseParam):
     type: Literal["number"] = "number"
     label: Optional[Label] = None
-    width: int
     fg_color: Color
     bg_color: Color
 
@@ -137,21 +143,8 @@ class Float(BaseParam):
     label_text: str
     label_height: int
     label_pos: Literal["l", "r", "t", "b"]
-    size: int
     min: float
     max: float
-
-
-class Comment(Base):
-    type: Literal["comment"] = "comment"
-    text: str
-
-
-class Canvas(Base):
-    type: Literal["canvas"] = "canvas"
-    label: Optional[Label] = None
-    size: Size
-    bg_color: Color
 
 
 GUIObjects = Union[Bang, Toggle, Radio, Slider, Knob, Number, Float, Comment, Canvas]
