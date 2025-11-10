@@ -5,12 +5,12 @@
 
 import os
 
-from typing import Generator, Union
+from typing import Generator, Optional, Union
 
 from hvcc.interpreters.pd2hv.PdParser import PdParser
 from hvcc.types.GUI import (
-    Size, Coords, Font, Label, Color, Canvas,
-    # Label, Bang, Toggle, VRadio, HRadio, VSlider, HSlider, Knob, Number, Float,
+    Size, Coords, Font, Label, Color, Canvas, Bang, Toggle,
+    # VRadio, HRadio, VSlider, HSlider, Knob, Number, Float,
     Comment, GUIObjects, Graph, GraphRoot
 )
 
@@ -29,7 +29,7 @@ class PdGUIParser(PdParser):
             self.search_paths.append(os.path.dirname(file_path))
 
         file_iterator = self.get_pd_line(file_path)
-        canvas_line = file_iterator.__next__()
+        canvas_line: str = file_iterator.__next__()
 
         if not canvas_line.startswith("#N canvas"):
             raise Exception(f"Pd files must begin with \"#N canvas\": {canvas_line}")
@@ -53,7 +53,7 @@ class PdGUIParser(PdParser):
 
         objects: list[GUIObjects] = []
         graphs: list[Graph] = []
-        x: GUIObjects
+        x: Optional[GUIObjects]
 
         # graph on parent settings
         gop: bool = False
@@ -125,30 +125,16 @@ class PdGUIParser(PdParser):
                             graphs.append(g)
 
                         if line[4] == "cnv":
-                            label = Label(
-                                text=line[10],
-                                color=Color(line[16]),
-                                position=Coords(
-                                    x=int(line[11]),
-                                    y=int(line[12])
-                                ),
-                                font=Font(int(line[13])),
-                                font_size=int(line[14])
-                            ) if line[10] != "empty" else None
-
-                            x = Canvas(
-                                position=Coords(
-                                    x=int(line[2]),
-                                    y=int(line[3])
-                                ),
-                                label=label,
-                                size=Size(
-                                    x=int(line[6]),
-                                    y=int(line[7])
-                                ),
-                                bg_color=Color(line[15])
-                            )
+                            x = self.add_canvas(line)
                             objects.append(x)
+                        elif line[4] == "bng":
+                            x = self.add_bang(line)
+                            if x is not None:
+                                objects.append(x)
+                        elif line[4] == "tgl":
+                            x = self.add_toggle(line)
+                            if x is not None:
+                                objects.append(x)
 
         except Exception as e:
             raise e
@@ -176,8 +162,9 @@ class PdGUIParser(PdParser):
                 graphs=graphs
             ), gop
 
+    @classmethod
     def filter_invisible_objects(
-        self,
+        cls,
         objects: list[GUIObjects],
         gop_start: Coords,
         gop_size: Size
@@ -200,8 +187,9 @@ class PdGUIParser(PdParser):
 
         return filtered_objects
 
+    @classmethod
     def filter_invisible_graphs(
-        self,
+        cls,
         graphs: list[Graph],
         gop_start: Coords,
         gop_size: Size
@@ -227,3 +215,104 @@ class PdGUIParser(PdParser):
                 filtered_graphs.append(g)
 
         return filtered_graphs
+
+    @classmethod
+    def filter_params(cls, param: str) -> Optional[str]:
+        """ Only allow externed parameters
+        """
+
+        if "@hv_param" in param:
+            return param.split(" ")[0]
+        else:
+            return None
+
+    @classmethod
+    def add_canvas(cls, line: list[str]) -> Canvas:
+        label = Label(
+            text=line[10],
+            color=Color(line[16]),
+            position=Coords(
+                x=int(line[11]),
+                y=int(line[12])
+            ),
+            font=Font(int(line[13])),
+            font_size=int(line[14])
+        ) if line[10] != "empty" else None
+
+        return Canvas(
+            position=Coords(
+                x=int(line[2]),
+                y=int(line[3])
+            ),
+            label=label,
+            size=Size(
+                x=int(line[6]),
+                y=int(line[7])
+            ),
+            bg_color=Color(line[15])
+        )
+
+    @classmethod
+    def add_bang(cls, line: list[str]) -> Optional[Bang]:
+        param = cls.filter_params(line[10])
+        if param is None:
+            return None
+
+        label = Label(
+            text=line[11],
+            color=Color(line[18]),
+            position=Coords(
+                x=int(line[12]),
+                y=int(line[13])
+            ),
+            font=Font(int(line[14])),
+            font_size=int(line[15])
+        ) if line[11] != "empty" else None
+
+        return Bang(
+            position=Coords(
+                x=int(line[2]),
+                y=int(line[3])
+            ),
+            size=Size(
+                x=int(line[5]),
+                y=int(line[5])
+            ),
+            parameter=param,
+            label=label,
+            bg_color=Color(line[16]),
+            fg_color=Color(line[17])
+        )
+
+    @classmethod
+    def add_toggle(cls, line: list[str]) -> Optional[Toggle]:
+        param = cls.filter_params(line[8])
+        if param is None:
+            return None
+
+        label = Label(
+            text=line[9],
+            color=Color(line[16]),
+            position=Coords(
+                x=int(line[10]),
+                y=int(line[11])
+            ),
+            font=Font(int(line[12])),
+            font_size=int(line[13])
+        ) if line[9] != "empty" else None
+
+        return Toggle(
+            position=Coords(
+                x=int(line[2]),
+                y=int(line[3])
+            ),
+            size=Size(
+                x=int(line[5]),
+                y=int(line[5])
+            ),
+            parameter=param,
+            label=label,
+            bg_color=Color(line[14]),
+            fg_color=Color(line[15]),
+            non_zero=float(line[18])
+        )

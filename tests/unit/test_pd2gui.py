@@ -96,3 +96,13 @@ def test_filter_object_canvas():
     filtered_objects = p.filter_invisible_objects(objects, g.gop_start, g.gop_size)
 
     assert filtered_objects == [c_vis, c_vis2]
+
+
+def test_filter_params():
+    p = PdGUIParser()
+
+    param1 = "vol @hv_param"
+    param2 = "volume"
+
+    assert p.filter_params(param1) == "vol"
+    assert p.filter_params(param2) is None
