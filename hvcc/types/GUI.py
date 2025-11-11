@@ -33,6 +33,13 @@ class LabelShow(IntEnum):
     when_typing = 3
 
 
+class LabelPos(IntEnum):
+    left = 0
+    right = 1
+    top = 2
+    bottom = 3
+
+
 class Base(BaseModel):
     type: str
     position: Coords
@@ -146,9 +153,9 @@ class Number(BaseParam):
 
 class Float(BaseParam):
     type: Literal["float"] = "float"
+    font_size: int
     label_text: str
-    label_height: int
-    label_pos: Literal["l", "r", "t", "b"]
+    label_pos: LabelPos
     min: float
     max: float
 

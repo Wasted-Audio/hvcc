@@ -9,8 +9,8 @@ from typing import Generator, Optional, Union
 
 from hvcc.interpreters.pd2hv.PdParser import PdParser
 from hvcc.types.GUI import (
-    Size, Coords, Font, LabelShow, Label, Color, Canvas, Bang, Toggle,
-    VRadio, HRadio, VSlider, HSlider, Knob,  Number,  # Float,
+    Size, Coords, Font, LabelShow, LabelPos, Label, Color, Canvas,
+    Bang, Toggle, VRadio, HRadio, VSlider, HSlider, Knob,  Number, Float,
     Comment, GUIObjects, Graph, GraphRoot
 )
 
@@ -111,7 +111,9 @@ class PdGUIParser(PdParser):
                                 x=10, y=10*len(text)
                             )
                         )
-                        objects.append(x)
+
+                    elif line[1] == "floatatom":
+                        x = self.add_float(line)
 
                     elif line[1] == "obj":
                         if len(line) > 4:
@@ -139,8 +141,8 @@ class PdGUIParser(PdParser):
                         elif obj_type == "nbx":
                             x = self.add_number(line)
 
-                        if x is not None:
-                            objects.append(x)
+                    if x is not None:
+                        objects.append(x)
 
         except Exception as e:
             raise e
@@ -487,4 +489,27 @@ class PdGUIParser(PdParser):
             fg_color=Color(line[19]),
             log_mode=bool(int(line[9])),
             log_height=int(line[21])
+        )
+
+    @classmethod
+    def add_float(cls, line: list[str]) -> Optional[Float]:
+        param = cls.filter_params(line[9])
+        if param is None:
+            return None
+
+        return Float(
+            position=Coords(
+                x=int(line[2]),
+                y=int(line[3])
+            ),
+            size=Size(
+                x=int(line[4]) * int(line[11]),
+                y=int(line[11])
+            ),
+            parameter=param,
+            label_text=line[8],
+            font_size=int(line[11]),
+            label_pos=LabelPos(int(line[7])),
+            min=float(line[5]),
+            max=float(line[6])
         )
