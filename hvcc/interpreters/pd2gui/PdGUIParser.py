@@ -100,17 +100,7 @@ class PdGUIParser(PdParser):
                         ), gop
 
                     elif line[1] == "text":
-                        text = " ".join(line[4:])
-                        x = Comment(
-                            position=Coords(
-                                x=int(line[2]),
-                                y=int(line[3])
-                            ),
-                            text=text,
-                            size=Size(
-                                x=10, y=10*len(text)
-                            )
-                        )
+                        x = self.add_comment(line)
 
                     elif line[1] == "floatatom":
                         x = self.add_float(line)
@@ -489,6 +479,20 @@ class PdGUIParser(PdParser):
             fg_color=Color(line[19]),
             log_mode=bool(int(line[9])),
             log_height=int(line[21])
+        )
+
+    @classmethod
+    def add_comment(cls, line: list[str]) -> Comment:
+        text = " ".join(line[4:])
+        return Comment(
+            position=Coords(
+                x=int(line[2]),
+                y=int(line[3])
+            ),
+            text=text,
+            size=Size(
+                x=10, y=10*len(text)
+            )
         )
 
     @classmethod
