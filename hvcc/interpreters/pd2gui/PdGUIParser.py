@@ -126,27 +126,19 @@ class PdGUIParser(PdParser):
 
                         if obj_type == "cnv":
                             x = self.add_canvas(line)
-                            objects.append(x)
                         elif obj_type == "bng":
                             x = self.add_bang(line)
-                            if x is not None:
-                                objects.append(x)
                         elif obj_type == "tgl":
                             x = self.add_toggle(line)
-                            if x is not None:
-                                objects.append(x)
                         elif obj_type == "vradio" or obj_type == "hradio":
                             x = self.add_radio(line)
-                            if x is not None:
-                                objects.append(x)
                         elif obj_type == "vsl" or obj_type == "hsl":
                             x = self.add_slider(line)
-                            if x is not None:
-                                objects.append(x)
-                        elif obj_type == "knob":
+                        elif obj_type == "knob" or obj_type == "else/knob":
                             x = self.add_knob(line)
-                            if x is not None:
-                                objects.append(x)
+
+                        if x is not None:
+                            objects.append(x)
 
         except Exception as e:
             raise e
