@@ -331,7 +331,9 @@ class PdGUIParser(PdParser):
         if param is None:
             return None
 
-        radio: dict[str, type[Union[VRadio, HRadio]]] = {
+        radio_type = line[4]
+
+        radio_obj: dict[str, type[Union[VRadio, HRadio]]] = {
             "vradio": VRadio,
             "hradio": HRadio
         }
@@ -347,14 +349,14 @@ class PdGUIParser(PdParser):
             font_size=int(line[15])
         ) if line[11] != "empty" else None
 
-        return radio[line[4]](
+        return radio_obj[radio_type](
             position=Coords(
                 x=int(line[2]),
                 y=int(line[3])
             ),
             size=Size(
-                x=int(line[5]),
-                y=int(line[5]) * int(line[8])
+                x=int(line[5]) * (int(line[8]) if radio_type == "hradio" else 1),
+                y=int(line[5]) * (int(line[8]) if radio_type == "vradio" else 1)
             ),
             parameter=param,
             label=label,
