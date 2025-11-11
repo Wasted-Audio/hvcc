@@ -10,7 +10,7 @@ from typing import Generator, Optional, Union
 from hvcc.interpreters.pd2hv.PdParser import PdParser
 from hvcc.types.GUI import (
     Size, Coords, Font, Label, Color, Canvas, Bang, Toggle,
-    # VRadio, HRadio, VSlider, HSlider, Knob, Number, Float,
+    VRadio, HRadio, VSlider, HSlider,  # Knob, Number, Float,
     Comment, GUIObjects, Graph, GraphRoot
 )
 
@@ -133,6 +133,14 @@ class PdGUIParser(PdParser):
                                 objects.append(x)
                         elif line[4] == "tgl":
                             x = self.add_toggle(line)
+                            if x is not None:
+                                objects.append(x)
+                        elif line[4] == "vradio" or line[4] == "hradio":
+                            x = self.add_radio(line)
+                            if x is not None:
+                                objects.append(x)
+                        elif line[4] == "vsl" or line[4] == "hsl":
+                            x = self.add_slider(line)
                             if x is not None:
                                 objects.append(x)
 
@@ -315,4 +323,83 @@ class PdGUIParser(PdParser):
             bg_color=Color(line[14]),
             fg_color=Color(line[15]),
             non_zero=float(line[18])
+        )
+
+    @classmethod
+    def add_radio(cls, line: list[str]) -> Optional[Union[VRadio, HRadio]]:
+        param = cls.filter_params(line[10])
+        if param is None:
+            return None
+
+        radio: dict[str, type[Union[VRadio, HRadio]]] = {
+            "vradio": VRadio,
+            "hradio": HRadio
+        }
+
+        label = Label(
+            text=line[11],
+            color=Color(line[18]),
+            position=Coords(
+                x=int(line[12]),
+                y=int(line[13])
+            ),
+            font=Font(int(line[14])),
+            font_size=int(line[15])
+        ) if line[11] != "empty" else None
+
+        return radio[line[4]](
+            position=Coords(
+                x=int(line[2]),
+                y=int(line[3])
+            ),
+            size=Size(
+                x=int(line[5]),
+                y=int(line[5]) * int(line[8])
+            ),
+            parameter=param,
+            label=label,
+            bg_color=Color(line[16]),
+            fg_color=Color(line[17]),
+            options=int(line[8])
+        )
+
+    @classmethod
+    def add_slider(cls, line: list[str]) -> Optional[Union[VSlider, HSlider]]:
+        param = cls.filter_params(line[12])
+        if param is None:
+            return None
+
+        slider: dict[str, type[Union[VSlider, HSlider]]] = {
+            "vsl": VSlider,
+            "hsl": HSlider
+        }
+
+        label = Label(
+            text=line[13],
+            color=Color(line[20]),
+            position=Coords(
+                x=int(line[14]),
+                y=int(line[15])
+            ),
+            font=Font(int(line[16])),
+            font_size=int(line[17])
+        ) if line[13] != "empty" else None
+
+        return slider[line[4]](
+            position=Coords(
+                x=int(line[2]),
+                y=int(line[3])
+            ),
+            size=Size(
+                x=int(line[5]),
+                y=int(line[6])
+            ),
+            parameter=param,
+            label=label,
+            bg_color=Color(line[18]),
+            fg_color=Color(line[19]),
+            min=float(line[7]),
+            max=float(line[8]),
+            logarithmic=bool(int(line[9])),
+            steady=bool(int(line[22]))
         )
