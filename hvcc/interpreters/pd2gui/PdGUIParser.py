@@ -10,7 +10,7 @@ from typing import Generator, Optional, Union
 from hvcc.interpreters.pd2hv.PdParser import PdParser
 from hvcc.types.GUI import (
     Size, Coords, Font, LabelShow, Label, Color, Canvas, Bang, Toggle,
-    VRadio, HRadio, VSlider, HSlider, Knob,  # Number, Float,
+    VRadio, HRadio, VSlider, HSlider, Knob,  Number,  # Float,
     Comment, GUIObjects, Graph, GraphRoot
 )
 
@@ -136,6 +136,8 @@ class PdGUIParser(PdParser):
                             x = self.add_slider(line)
                         elif obj_type == "knob" or obj_type == "else/knob":
                             x = self.add_knob(line)
+                        elif obj_type == "nbx":
+                            x = self.add_number(line)
 
                         if x is not None:
                             objects.append(x)
@@ -451,4 +453,38 @@ class PdGUIParser(PdParser):
             arc=Color(line[13]),
             arc_start=float(line[23]),
             arc_show=bool(int(line[19]))
+        )
+
+    @classmethod
+    def add_number(cls, line: list[str]) -> Optional[Number]:
+        param = cls.filter_params(line[12])
+        if param is None:
+            return None
+
+        label = Label(
+            text=line[13],
+            color=Color(line[20]),
+            position=Coords(
+                x=int(line[14]),
+                y=int(line[15])
+            ),
+            font=Font(0),
+            font_size=int(line[17])
+        )
+
+        return Number(
+            position=Coords(
+                x=int(line[2]),
+                y=int(line[3])
+            ),
+            size=Size(
+                x=int(line[5])*int(line[17]),
+                y=int(line[6])
+            ),
+            parameter=param,
+            label=label,
+            bg_color=Color(line[18]),
+            fg_color=Color(line[19]),
+            log_mode=bool(int(line[9])),
+            log_height=int(line[21])
         )

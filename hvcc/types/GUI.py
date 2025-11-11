@@ -140,6 +140,8 @@ class Number(BaseParam):
     label: Optional[Label] = None
     fg_color: Color
     bg_color: Color
+    log_mode: bool
+    log_height: int
 
 
 class Float(BaseParam):
