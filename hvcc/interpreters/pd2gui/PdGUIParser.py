@@ -9,8 +9,8 @@ from typing import Generator, Optional, Union
 
 from hvcc.interpreters.pd2hv.PdParser import PdParser
 from hvcc.types.GUI import (
-    Size, Coords, Font, Label, Color, Canvas, Bang, Toggle,
-    VRadio, HRadio, VSlider, HSlider,  # Knob, Number, Float,
+    Size, Coords, Font, LabelShow, Label, Color, Canvas, Bang, Toggle,
+    VRadio, HRadio, VSlider, HSlider, Knob,  # Number, Float,
     Comment, GUIObjects, Graph, GraphRoot
 )
 
@@ -124,23 +124,27 @@ class PdGUIParser(PdParser):
                             assert isinstance(g, Graph)
                             graphs.append(g)
 
-                        if line[4] == "cnv":
+                        if obj_type == "cnv":
                             x = self.add_canvas(line)
                             objects.append(x)
-                        elif line[4] == "bng":
+                        elif obj_type == "bng":
                             x = self.add_bang(line)
                             if x is not None:
                                 objects.append(x)
-                        elif line[4] == "tgl":
+                        elif obj_type == "tgl":
                             x = self.add_toggle(line)
                             if x is not None:
                                 objects.append(x)
-                        elif line[4] == "vradio" or line[4] == "hradio":
+                        elif obj_type == "vradio" or obj_type == "hradio":
                             x = self.add_radio(line)
                             if x is not None:
                                 objects.append(x)
-                        elif line[4] == "vsl" or line[4] == "hsl":
+                        elif obj_type == "vsl" or obj_type == "hsl":
                             x = self.add_slider(line)
+                            if x is not None:
+                                objects.append(x)
+                        elif obj_type == "knob":
+                            x = self.add_knob(line)
                             if x is not None:
                                 objects.append(x)
 
@@ -404,4 +408,55 @@ class PdGUIParser(PdParser):
             max=float(line[8]),
             logarithmic=bool(int(line[9])),
             steady=bool(int(line[22]))
+        )
+
+    @classmethod
+    def add_knob(cls, line: list[str]) -> Optional[Knob]:
+        param = cls.filter_params(line[11])
+        if param is None:
+            return None
+
+        log_val = float(line[8])
+
+        if log_val == 0.0:
+            log_mode = "lin"
+        elif log_val == 1.0:
+            log_mode = "log"
+        else:
+            log_mode = "exp"
+
+        return Knob(
+            position=Coords(
+                x=int(line[2]),
+                y=int(line[3])
+            ),
+            size=Size(
+                x=int(line[5]),
+                y=int(line[5])
+            ),
+            parameter=param,
+            label_size=int(line[27]),
+            label_pos=Coords(
+                x=int(line[28]),
+                y=int(line[29])
+            ),
+            label_show=LabelShow(int(line[26])),
+            min=float(line[6]),
+            max=float(line[7]),
+            bg_color=Color(line[12]),
+            fg_color=Color(line[14]),
+            init_val=float(line[9]),
+            ang_range=int(line[20]),
+            ang_offset=int(line[21]),
+            log_mode=log_mode,
+            exp_fact=float(line[8]),
+            discrete=bool(int(line[18])),
+            ticks=bool(int(line[32])),
+            steps=int(line[17]),
+            circular=bool(int(line[16])),
+            jump=bool(0),
+            square=bool(int(line[15])),
+            arc=Color(line[13]),
+            arc_start=float(line[23]),
+            arc_show=bool(int(line[19]))
         )

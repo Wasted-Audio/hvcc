@@ -26,6 +26,13 @@ class Font(IntEnum):
     times = 2
 
 
+class LabelShow(IntEnum):
+    never = 0
+    always = 1
+    when_active = 2
+    when_typing = 3
+
+
 class Base(BaseModel):
     type: str
     position: Coords
@@ -107,7 +114,7 @@ class Knob(BaseParam):
     type: Literal["knob"] = "knob"
     label_size: int
     label_pos: Coords
-    label_show: Literal["n", "a", "wa", "wt"]
+    label_show: LabelShow
     min: float
     max: float
     fg_color: Color
@@ -121,10 +128,7 @@ class Knob(BaseParam):
     ticks: bool
     steps: int
     circular: bool
-    read_only: bool
     jump: bool
-    variable: str
-    parameter: str
     square: bool
     arc: Color
     arc_start: float
