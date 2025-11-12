@@ -1,8 +1,8 @@
 from hvcc.interpreters.pd2gui.PdGUIParser import PdGUIParser
-from hvcc.types.GUI import Graph, Canvas, Coords, Color, Size, GUIObjects
+from hvcc.types.GUI import Graph, Coords, Size, GUIObjects
 
 
-def test_filter_graph():
+def test_filter_graph(cnv_vis1):
     p = PdGUIParser()
     g = Graph(
         position=Coords(x=0, y=0),
@@ -12,18 +12,12 @@ def test_filter_graph():
         objects=[]
     )
 
-    c = Canvas(
-        position=Coords(x=0, y=0),
-        size=Size(x=100, y=100),
-        bg_color=Color("grey")
-    )
-
     g_vis = Graph(
         position=Coords(x=0, y=0),
         gop_start=Coords(),
         gop_size=Size(x=100, y=100),
         graphs=[],
-        objects=[c]
+        objects=[cnv_vis1]
     )
 
     g_vis2 = Graph(
@@ -39,7 +33,7 @@ def test_filter_graph():
         gop_start=Coords(),
         gop_size=Size(x=100, y=100),
         graphs=[],
-        objects=[c]
+        objects=[cnv_vis1]
     )
 
     g_invis2 = Graph(
@@ -47,7 +41,7 @@ def test_filter_graph():
         gop_start=Coords(),
         gop_size=Size(x=100, y=100),
         graphs=[],
-        objects=[c]
+        objects=[cnv_vis1]
     )
 
     graph_list = [g_vis, g_vis2, g_invis, g_invis2]
@@ -56,7 +50,7 @@ def test_filter_graph():
     assert filtered_graphs == [g_vis]
 
 
-def test_filter_nested_graph():
+def test_filter_nested_graph(cnv_vis1):
     p = PdGUIParser()
     g = Graph(
         position=Coords(x=0, y=0),
@@ -66,18 +60,12 @@ def test_filter_nested_graph():
         objects=[]
     )
 
-    c = Canvas(
-        position=Coords(x=0, y=0),
-        size=Size(x=100, y=100),
-        bg_color=Color("grey")
-    )
-
     g_nested_child = Graph(
         position=Coords(x=0, y=0),
         gop_start=Coords(),
         gop_size=Size(x=100, y=100),
         graphs=[],
-        objects=[c]
+        objects=[cnv_vis1]
     )
 
     g_nested_parent = Graph(
