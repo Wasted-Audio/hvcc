@@ -56,6 +56,51 @@ def test_filter_graph():
     assert filtered_graphs == [g_vis]
 
 
+def test_filter_nested_graph():
+    p = PdGUIParser()
+    g = Graph(
+        position=Coords(x=0, y=0),
+        gop_start=Coords(x=0, y=0),
+        gop_size=Size(x=100, y=100),
+        graphs=[],
+        objects=[]
+    )
+
+    c = Canvas(
+        position=Coords(x=0, y=0),
+        size=Size(x=100, y=100),
+        bg_color=Color("grey")
+    )
+
+    g_nested_child = Graph(
+        position=Coords(x=0, y=0),
+        gop_start=Coords(),
+        gop_size=Size(x=100, y=100),
+        graphs=[],
+        objects=[c]
+    )
+
+    g_nested_parent = Graph(
+        position=Coords(x=0, y=0),
+        gop_start=Coords(),
+        gop_size=Size(x=100, y=100),
+        graphs=[g_nested_child],
+        objects=[]
+    )
+
+    g_nested_empty = Graph(
+        position=Coords(x=0, y=0),
+        gop_start=Coords(),
+        gop_size=Size(x=100, y=100),
+        graphs=[],
+        objects=[]
+    )
+
+    filtered_graphs = p.filter_invisible_graphs([g_nested_parent, g_nested_empty], g.gop_start, g.gop_size)
+
+    assert filtered_graphs == [g_nested_parent]
+
+
 def test_filter_object_canvas(
     cnv_vis1,
     cnv_vis2,

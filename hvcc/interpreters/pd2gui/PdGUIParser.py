@@ -198,7 +198,7 @@ class PdGUIParser(PdParser):
 
         for g in graphs:
             # skip empty graphs
-            if len(g.objects) == 0:
+            if cls.graph_is_empty(g):
                 continue
 
             g_min_y = g.position.y
@@ -213,6 +213,20 @@ class PdGUIParser(PdParser):
                 filtered_graphs.append(g)
 
         return filtered_graphs
+
+    @classmethod
+    def graph_is_empty(cls, graph: Graph) -> bool:
+        """ A graph is considered empty when it doesn't have any objects
+            and all of it's child graphs are also empty.
+        """
+        g_empty: list[bool] = []
+
+        for g in graph.graphs:
+            g_empty.append(cls.graph_is_empty(g))
+
+        return len(graph.objects) == 0 and (
+            (len(g_empty) and all(g_empty)) or len(graph.graphs) == 0
+        )
 
     @classmethod
     def filter_params(cls, param: str) -> Optional[str]:
