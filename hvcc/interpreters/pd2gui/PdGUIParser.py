@@ -16,7 +16,7 @@ from hvcc.types.GUI import (
 
 
 class PdGUIParser(PdParser):
-    def __init__(self):
+    def __init__(self) -> None:
         # search paths at this graph level
         self.search_paths: list[str] = []
 
@@ -24,7 +24,7 @@ class PdGUIParser(PdParser):
         self,
         file_path: str,
         is_root: bool = True
-    ) -> Union[Graph, GraphRoot]:
+    ) -> tuple[Union[Graph, GraphRoot], bool]:
         if is_root:
             self.search_paths.append(os.path.dirname(file_path))
 
@@ -34,14 +34,14 @@ class PdGUIParser(PdParser):
         if not canvas_line.startswith("#N canvas"):
             raise Exception(f"Pd files must begin with \"#N canvas\": {canvas_line}")
 
-        g, _ = self.gui_from_canvas(
+        g, gop = self.gui_from_canvas(
             file_iterator,
             canvas_line,
             file_path,
             is_root
         )
 
-        return g
+        return g, gop
 
     def gui_from_canvas(
         self,
@@ -53,7 +53,7 @@ class PdGUIParser(PdParser):
 
         objects: list[GUIObjects] = []
         graphs: list[Graph] = []
-        x: Optional[GUIObjects]
+        x: Optional[GUIObjects] = None
 
         # graph on parent settings
         gop: bool = False
@@ -77,14 +77,13 @@ class PdGUIParser(PdParser):
 
                 elif line[0] == "#X":
                     if line[1] == "coords":
-                        if line[8] == "1":
+                        if int(line[8]) > 0:
                             # canvas is active
                             gop = True
                             gop_start = Coords(x=int(line[9]), y=int(line[10]))
                             gop_size = Size(x=int(line[6]), y=int(line[7]))
 
                     elif line[1] == "restore" and gop:
-                        # TODO: remove invisible objects
                         objects = self.filter_invisible_objects(objects, gop_start, gop_size)
                         graphs = self.filter_invisible_graphs(graphs, gop_start, gop_size)
 
@@ -112,9 +111,16 @@ class PdGUIParser(PdParser):
                         abs_path = self.find_abstraction_path(os.path.dirname(pd_path), obj_type)
 
                         if abs_path is not None:
-                            g = self.gui_from_file(abs_path, is_root=False)
-                            assert isinstance(g, Graph)
-                            graphs.append(g)
+                            g, gop = self.gui_from_file(abs_path, is_root=False)
+
+                            if gop:
+                                assert isinstance(g, Graph)
+                                # set object coordinates
+                                g.position = Coords(
+                                    x=int(line[2]),
+                                    y=int(line[3])
+                                )
+                                graphs.append(g)
 
                         if obj_type == "cnv":
                             x = self.add_canvas(line)
@@ -133,12 +139,22 @@ class PdGUIParser(PdParser):
 
                     if x is not None:
                         objects.append(x)
+                        x = None
 
         except Exception as e:
             raise e
 
         if is_root:
             line = self.split_line(canvas_line)
+
+            gop_start = Coords(x=0, y=0)
+            gop_size = Size(
+                x=int(line[4]),
+                y=int(line[5])
+            )
+
+            objects = self.filter_invisible_objects(objects, gop_start, gop_size)
+            graphs = self.filter_invisible_graphs(graphs, gop_start, gop_size)
 
             return GraphRoot(
                 width=int(line[4]),
@@ -149,6 +165,7 @@ class PdGUIParser(PdParser):
         else:
             objects = self.filter_invisible_objects(objects, gop_start, gop_size)
             graphs = self.filter_invisible_graphs(graphs, gop_start, gop_size)
+
             return Graph(
                 position=Coords(
                     x=int(line[2]),

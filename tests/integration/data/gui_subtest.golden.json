@@ -1,0 +1,37 @@
+{
+  "objects": [],
+  "width": 734,
+  "height": 565,
+  "graphs": [
+    {
+      "objects": [
+        {
+          "type": "canvas",
+          "position": {
+            "x": -89,
+            "y": -83
+          },
+          "size": {
+            "x": 521,
+            "y": 343
+          },
+          "label": null,
+          "bg_color": "#0daa00"
+        }
+      ],
+      "position": {
+        "x": 85,
+        "y": 83
+      },
+      "gop_start": {
+        "x": -2,
+        "y": 0
+      },
+      "gop_size": {
+        "x": 274,
+        "y": 166
+      },
+      "graphs": []
+    }
+  ]
+}

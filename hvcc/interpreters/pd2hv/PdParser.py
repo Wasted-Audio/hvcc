@@ -675,6 +675,7 @@ class PdParser:
         resolved_obj_args = list(obj_args)  # make a copy of the original obj_args
         for i, a in enumerate(obj_args):
             for m in set(cls.RE_DOLLAR.findall(a)):
+                assert isinstance(a, str)
                 x = int(m)  # the dollar index (i.e. $x)
                 if len(graph.obj_args) > x:
                     a = a.replace(fr"\${m}", str(graph.obj_args[x]))

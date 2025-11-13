@@ -1,3 +1,8 @@
+# Heavy Compiler Collection
+# Copyright (C) 2025 Wasted Audio
+#
+# SPDX-License-Identifier: GPL-3.0-only
+
 from hvcc.interpreters.pd2gui.PdGUIParser import PdGUIParser
 from hvcc.types.GUI import Graph, Coords, Size, GUIObjects
 

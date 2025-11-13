@@ -43,7 +43,7 @@ class pd2gui:
             for p in search_paths:
                 parser.add_absolute_search_directory(p)
 
-        gui_graph = parser.gui_from_file(pd_path)
+        gui_graph, _ = parser.gui_from_file(pd_path)
 
         if not os.path.exists(ir_dir):
             os.makedirs(ir_dir)
