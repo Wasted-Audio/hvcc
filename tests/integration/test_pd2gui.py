@@ -33,5 +33,8 @@ class TestPdGuiParser:
 
         assert gui == expected
 
-    def test_pd2gui(self):
-        self._test_gui_patch("gui_subtest.pd")
+    def test_abstraction(self):
+        self._test_gui_patch("gui_abstraction.pd")
+
+    def test_subpatch(self):
+        self._test_gui_patch("gui_subpatch.pd")

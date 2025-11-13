@@ -51,7 +51,7 @@ class pd2gui:
         gui_file = f"{os.path.splitext(os.path.basename(pd_path))[0]}.gui.json"
         gui_path = os.path.join(ir_dir, gui_file)
         with open(gui_path, "w") as f:
-            f.write(gui_graph.model_dump_json(indent=2))
+            f.write(gui_graph.model_dump_json(indent=2) + "\n")
 
         return CompilerResp(
             stage="pd2gui",
