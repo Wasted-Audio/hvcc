@@ -276,6 +276,9 @@ class TestPdControlPatches(TestPdControlBase):
     def test_tabwrite(self):
         self._test_control_patch("test-tabwrite.pd")
 
+    def test_tabwrite_hv_table(self):
+        self._test_control_patch("test-tabwrite_hv_table.pd")
+
     def test_tan(self):
         self._test_control_patch("test-tan.pd")
 

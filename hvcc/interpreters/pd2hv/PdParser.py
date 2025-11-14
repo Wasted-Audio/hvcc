@@ -148,7 +148,7 @@ class PdParser:
             Checks the local directory first, then all declared paths.
         """
 
-        abs_filename = f'{abs_name}.pd'
+        abs_filename = f"{abs_name}.pd"
 
         # check local directory first
         abs_path = os.path.join(os.path.abspath(local_dir), abs_filename)
@@ -484,25 +484,25 @@ class PdParser:
 
                         # add gui send/receive objects
                         arg_index = {
-                            'nbx':       (6, 7),
-                            'vsl':       (6, 7),
-                            'hsl':       (6, 7),
-                            'vradio':    (4, 5),
-                            'hradio':    (4, 5),
-                            'bng':       (4, 5),
-                            'tgl':       (2, 3),
-                            'knob':      (5, 6),
-                            'else/knob': (5, 6),
+                            "nbx":       (6, 7),
+                            "vsl":       (6, 7),
+                            "hsl":       (6, 7),
+                            "vradio":    (4, 5),
+                            "hradio":    (4, 5),
+                            "bng":       (4, 5),
+                            "tgl":       (2, 3),
+                            "knob":      (5, 6),
+                            "else/knob": (5, 6),
                         }
 
                         if obj_type in arg_index.keys():
                             send_index = arg_index[obj_type][0]
                             recv_index = arg_index[obj_type][1]
 
-                            if obj_args[send_index] != 'empty':
+                            if obj_args[send_index] != "empty":
                                 gui_send[index] = obj_args[send_index]
 
-                            if obj_args[recv_index] != 'empty':
+                            if obj_args[recv_index] != "empty":
                                 gui_recv[index] = obj_args[recv_index]
 
                     elif line[1] in ("floatatom", "symbolatom"):
@@ -516,27 +516,33 @@ class PdParser:
 
                         # symbolatom is not supported
                         # due to symbol/__var implementation
-                        if line[1] == 'floatatom':
-                            if line[10] != '-':
+                        if line[1] == "floatatom":
+                            if line[10] != "-":
                                 gui_send[index] = line[10]
 
-                            if line[9] != '-':
+                            if line[9] != "-":
                                 gui_recv[index] = line[9]
 
                     elif line[1] == "array":
                         assert obj_array is None, "#X array object is already being parsed."
                         # array names can have dollar arguments in them.
                         # ensure that they are resolved
-                        table_name = self.__resolve_object_args(
+                        table_def = self.__resolve_object_args(
                             obj_args=[line[2]],
-                            graph=g)[0]
+                            graph=g)[0].split(" ")
+                        table_name = table_def[0]
+                        # check if we need to extern the table
+                        if len(table_def) > 1:
+                            table_extern = table_def[1] == "@hv_table"
+                        else:
+                            table_extern = False
                         # Pd encodes arrays with length greater than 999,999 with
                         # scientific notatation (e.g. 1e6) which Python's int() can't parse
                         table_size = int(decimal.Decimal(line[3]))
                         obj_array = HeavyObject(
                             obj_type="table",
                             # ensure that obj_array has its own values instance
-                            obj_args=[table_name, table_size, []])
+                            obj_args=[table_name, table_size, [], table_extern])
                         # TODO(mhroth): position information
                         g.add_object(obj_array)
 
@@ -553,7 +559,7 @@ class PdParser:
                         if len(msg.obj_dict) > 0:
                             msg_send[index] = []
 
-                            for remote in msg.obj_dict['remote']:
+                            for remote in msg.obj_dict["remote"]:
                                 msg_send[index].append(remote)
 
                     elif line[1] == "connect":
@@ -617,15 +623,15 @@ class PdParser:
 
             for remote in msg_send[index]:
                 self.obj_counter["msg"] += 1
-                msg = PdMessageObject('msg', [' '.join(msg for msg in remote['message'])])
+                msg = PdMessageObject("msg", [" ".join(msg for msg in remote["message"])])
                 msg_index = g.add_object(msg)
 
                 self.obj_counter["send"] += 1
-                send = PdSendObject('send', [remote['receiver']])
+                send = PdSendObject("send", [remote["receiver"]])
                 send_index = g.add_object(send)
 
                 # connect new message to upstream objects of first message
-                for conn in conns['0']:
+                for conn in conns["0"]:
                     up_obj = conn.from_obj
                     up_index = g.get_objects().index(up_obj)
                     g.add_parsed_connection(up_index, 0, msg_index, 0)
