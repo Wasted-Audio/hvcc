@@ -20,7 +20,7 @@ import re
 from collections import Counter
 from collections import OrderedDict
 from pathlib import Path
-from typing import List, Dict, Optional, Type, Any, Generator
+from typing import Optional, Type, Any, Generator
 
 from .HeavyObject import HeavyObject
 from .HeavyGraph import HeavyGraph              # pre-converted Heavy graphs
@@ -71,10 +71,10 @@ class PdParser:
         self.obj_counter: Counter = Counter()
 
         # search paths at this graph level
-        self.search_paths: List = []
+        self.search_paths: list = []
 
     @classmethod
-    def get_supported_objects(cls) -> List:
+    def get_supported_objects(cls) -> list:
         """ Returns a set of all pd objects names supported by the parser.
         """
         pd_objects = [os.path.splitext(f)[0] for f in os.listdir(cls.__PDLIB_DIR) if f.endswith(".pd")]
@@ -89,7 +89,7 @@ class PdParser:
         """
         num_canvas = -1
         hv_arg_dict = OrderedDict()
-        hv_arg_list: Optional[List] = None
+        hv_arg_list: Optional[list] = None
         with open(pd_path, "r") as f:
             for li in f:
                 if li.startswith("#N canvas"):
@@ -166,7 +166,7 @@ class PdParser:
     def graph_from_file(
         self,
         file_path: str,
-        obj_args: Optional[List] = None,
+        obj_args: Optional[list] = None,
         pos_x: int = 0,
         pos_y: int = 0,
         is_root: bool = True,
@@ -216,9 +216,9 @@ class PdParser:
     def graph_from_canvas(
         self,
         file_iterator: Generator,
-        file_hv_arg_dict: Dict[str, List[Any]],
+        file_hv_arg_dict: dict[str, list[Any]],
         canvas_line: str,
-        graph_args: List,
+        graph_args: list,
         pd_path: str,
         pos_x: int = 0,
         pos_y: int = 0,
@@ -236,9 +236,9 @@ class PdParser:
 
         g = pd_graph_class(graph_args, pd_path, pos_x, pos_y)
 
-        msg_send: Dict = {}
-        gui_send: Dict = {}
-        gui_recv: Dict = {}
+        msg_send: dict = {}
+        gui_send: dict = {}
+        gui_recv: dict = {}
 
         # parse and add all Heavy arguments to the graph
         for li in file_hv_arg_dict[canvas_line]:
@@ -273,7 +273,6 @@ class PdParser:
                     if line[1] == "restore":
                         if len(line) > 5 and line[5] == "@hv_obj":
                             obj_args = self.__resolve_object_args(
-                                obj_type=line[6],
                                 obj_args=line[7:],
                                 graph=g,
                                 raise_on_failure=False,
@@ -336,12 +335,10 @@ class PdParser:
                             obj_type = line[4]
                             # sometimes objects have $ arguments in them as well
                             obj_type = self.__resolve_object_args(
-                                obj_type=obj_type,
                                 obj_args=[obj_type],
                                 graph=g,
                                 is_root=is_root)[0]
                             obj_args = self.__resolve_object_args(
-                                obj_type=obj_type,
                                 obj_args=line[5:],
                                 graph=g,
                                 is_root=is_root)
@@ -531,7 +528,6 @@ class PdParser:
                         # array names can have dollar arguments in them.
                         # ensure that they are resolved
                         table_name = self.__resolve_object_args(
-                            obj_type="array",
                             obj_args=[line[2]],
                             graph=g)[0]
                         # Pd encodes arrays with length greater than 999,999 with
@@ -657,8 +653,7 @@ class PdParser:
     @classmethod
     def __resolve_object_args(
         cls,
-        obj_type: str,
-        obj_args: List,
+        obj_args: list,
         graph: PdGraph,
         raise_on_failure: bool = True,
         is_root: bool = False

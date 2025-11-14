@@ -17,12 +17,17 @@ from hvcc.types.GUI import (
 
 class PdGUIParser(PdParser):
     def __init__(self) -> None:
+        # the current global value of $0
+        # Note(joe): set a high starting value to avoid potential user naming conflicts
+        self.__DOLLAR_ZERO = 1000
+
         # search paths at this graph level
         self.search_paths: list[str] = []
 
     def gui_from_file(
         self,
         file_path: str,
+        obj_args: Optional[list] = None,
         is_root: bool = True
     ) -> tuple[Union[Graph, GraphRoot], bool]:
         if is_root:
@@ -31,12 +36,16 @@ class PdGUIParser(PdParser):
         file_iterator = self.get_pd_line(file_path)
         canvas_line: str = file_iterator.__next__()
 
+        self.__DOLLAR_ZERO += 1  # increment $0
+        graph_args = [self.__DOLLAR_ZERO] + (obj_args or [])
+
         if not canvas_line.startswith("#N canvas"):
             raise Exception(f"Pd files must begin with \"#N canvas\": {canvas_line}")
 
         g, gop = self.gui_from_canvas(
             file_iterator,
             canvas_line,
+            graph_args,
             file_path,
             is_root
         )
@@ -47,6 +56,7 @@ class PdGUIParser(PdParser):
         self,
         file_iterator: Generator,
         canvas_line: str,
+        graph_args: list,
         pd_path: str,
         is_root: bool = False
     ) -> tuple[Union[Graph, GraphRoot], bool]:
@@ -69,6 +79,7 @@ class PdGUIParser(PdParser):
                         g, gop = self.gui_from_canvas(
                             file_iterator=file_iterator,
                             canvas_line=li,
+                            graph_args=graph_args,
                             pd_path=pd_path
                         )
                         if gop:
@@ -102,16 +113,37 @@ class PdGUIParser(PdParser):
                         x = self.add_comment(line)
 
                     elif line[1] == "floatatom":
+                        obj_args = self.__resolve_object_args(
+                            obj_args=line[1:],
+                            graph_args=graph_args,
+                            is_root=is_root
+                        )
+
+                        # replace args with resolved args
+                        line = line[:1] + obj_args
                         x = self.add_float(line)
 
                     elif line[1] == "obj":
                         if len(line) > 4:
                             obj_type = line[4]
+                            # sometimes objects have $ arguments in them as well
+                            obj_type = self.__resolve_object_args(
+                                obj_args=[obj_type],
+                                graph_args=graph_args,
+                                is_root=is_root)[0]
+                            obj_args = self.__resolve_object_args(
+                                obj_args=line[5:],
+                                graph_args=graph_args,
+                                is_root=is_root
+                            )
+
+                            # replace args with resolved args
+                            line = line[:5] + obj_args
 
                         abs_path = self.find_abstraction_path(os.path.dirname(pd_path), obj_type)
 
                         if abs_path is not None:
-                            g, gop = self.gui_from_file(abs_path, is_root=False)
+                            g, gop = self.gui_from_file(abs_path, obj_args=obj_args, is_root=False)
 
                             if gop:
                                 assert isinstance(g, Graph)
@@ -254,6 +286,45 @@ class PdGUIParser(PdParser):
             return param.split(" ")[0]
         else:
             return None
+
+    @classmethod
+    def __resolve_object_args(
+        cls,
+        obj_args: list,
+        graph_args: list,
+        raise_on_failure: bool = True,
+        is_root: bool = False
+    ) -> list:
+        """ Resolve object arguments against the given graph arguments.
+            By default this function raises an Exception if it cannot resolve an
+            argument.
+            This behaviour may be disabled, in which case the unresolved argument
+            is replaced with None (which is an otherwise invalid value). A value of
+            None typically indicates to a HeavyObject that the default value
+            may be used.
+        """
+        resolved_obj_args = list(obj_args)  # make a copy of the original obj_args
+        for i, a in enumerate(obj_args):
+            for m in set(cls.RE_DOLLAR.findall(a)):
+                assert isinstance(a, str)
+                x = int(m)  # the dollar index (i.e. $x)
+                if len(graph_args) > x:
+                    a = a.replace(fr"\${m}", str(graph_args[x]))
+
+                elif is_root:
+                    # NOTE(mhroth): this case is questionable, but since Pd
+                    # defaults to this behavior without warning, so will we.
+                    a = a.replace(fr"\${m}", "0")
+
+                else:
+                    if raise_on_failure:
+                        # NOTE(mhroth): this case is questionable, but since Pd
+                        # defaults to this behavior without warning, so will we.
+                        a = a.replace(fr"\${m}", "0")
+                    else:
+                        a = None  # indicate that this argument could not be resolved by replacing it with None
+            resolved_obj_args[i] = a
+        return resolved_obj_args
 
     @classmethod
     def add_canvas(cls, line: list[str]) -> Canvas:

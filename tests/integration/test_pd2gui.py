@@ -38,3 +38,9 @@ class TestPdGuiParser:
 
     def test_subpatch(self):
         self._test_gui_patch("gui_subpatch.pd")
+
+    def test_dollarzero(self):
+        self._test_gui_patch("gui_dollarzero.pd")
+
+    def test_abs_args(self):
+        self._test_gui_patch("gui_abs_args.pd")

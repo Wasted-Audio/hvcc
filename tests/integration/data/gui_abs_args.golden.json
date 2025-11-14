@@ -1,0 +1,60 @@
+{
+  "objects": [],
+  "width": 734,
+  "height": 565,
+  "graphs": [
+    {
+      "objects": [
+        {
+          "type": "vslider",
+          "position": {
+            "x": 35,
+            "y": 20
+          },
+          "size": {
+            "x": 17,
+            "y": 128
+          },
+          "parameter": "1_2_vol",
+          "label": null,
+          "min": 0.0,
+          "max": 127.0,
+          "fg_color": "white",
+          "bg_color": "#191919",
+          "logarithmic": false,
+          "steady": true
+        },
+        {
+          "type": "float",
+          "position": {
+            "x": 101,
+            "y": 81
+          },
+          "size": {
+            "x": 0,
+            "y": 0
+          },
+          "parameter": "float_vol",
+          "font_size": 0,
+          "label_text": "-",
+          "label_pos": 0,
+          "min": 0.0,
+          "max": 0.0
+        }
+      ],
+      "position": {
+        "x": 115,
+        "y": 107
+      },
+      "gop_start": {
+        "x": 0,
+        "y": 0
+      },
+      "gop_size": {
+        "x": 188,
+        "y": 177
+      },
+      "graphs": []
+    }
+  ]
+}
