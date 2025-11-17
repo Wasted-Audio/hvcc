@@ -81,7 +81,7 @@ It might not be feasible, or sensible, to include all of the available object se
 
 ## Decision
 
-A new parser will be created, using a similar approach to pd2hv. The parser selects valid GUI objects containing `@hv_param` receive configurations and constructs validated pydantic objects that are added to a GUI-graph definition. Subpatches and abstractions that have graph-on-parent enabled will be recursively parsed as well, thus expanding the graph.
+A new parser will be created, using a similar approach to pd2hv. The parser selects valid GUI objects containing `@hv_param` receive configurations and constructs validated pydantic objects that are added to a GUI-graph definition. Subpatches and abstractions that have graph-on-parent enabled will be recursively parsed as well, thus expanding the graph. Because receive configurations can include enumerated abstraction arguments (`$1/$2/etc`) the parser should take these into account as well and resolve these into the configuration.
 
 ### Intermediate JSON
 
