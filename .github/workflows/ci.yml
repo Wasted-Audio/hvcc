@@ -44,7 +44,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip setuptools wheel
-          pip install poetry poetry-pyinstaller-plugin
+          pip install poetry poetry-pyinstaller-plugin pyinstaller
       - name: Build binaries
         run: poetry build
 
