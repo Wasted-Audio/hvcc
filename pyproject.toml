@@ -43,15 +43,14 @@ mypy = "^1.11.2"
 pytest = "^8.3.3"
 
 [tool.poetry-pyinstaller-plugin]
-collect = { all = ["json2daisy"] }
 include = { "hvcc/generators" = "hvcc/generators", "hvcc/core" = "hvcc/core", "hvcc/interpreters" = "hvcc/interpreters" }
 
 
-[tool.poetry-pyinstaller-plugin.scripts]
+[tool.poetry-pyinstaller-plugin.targets]
 Heavy = { source = "hvcc/main.py", type = "onefile", bundle = true, arch = "x86_64" }
 
 [build-system]
-requires = ["poetry-core"]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.mypy]
