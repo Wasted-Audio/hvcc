@@ -507,9 +507,14 @@ class PdParser:
 
                     elif line[1] in ("floatatom", "symbolatom"):
                         self.obj_counter[line[1]] += 1
+                        obj_args = self.__resolve_object_args(
+                                obj_type=line[1],
+                                obj_args=line[1:],
+                                graph=g,
+                                is_root=is_root)
                         x = self.graph_from_file(
                             file_path=os.path.join(self.__PDLIB_DIR, f"{line[1]}.pd"),
-                            obj_args=[],
+                            obj_args=obj_args,
                             pos_x=int(line[2]), pos_y=int(line[3]),
                             is_root=False)
                         index = g.add_object(x)
@@ -517,11 +522,11 @@ class PdParser:
                         # symbolatom is not supported
                         # due to symbol/__var implementation
                         if line[1] == "floatatom":
-                            if line[10] != "-":
-                                gui_send[index] = line[10]
+                            if obj_args[9] != "-":
+                                gui_send[index] = obj_args[9]
 
-                            if line[9] != "-":
-                                gui_recv[index] = line[9]
+                            if obj_args[8] != "-":
+                                gui_recv[index] = obj_args[8]
 
                     elif line[1] == "array":
                         assert obj_array is None, "#X array object is already being parsed."
