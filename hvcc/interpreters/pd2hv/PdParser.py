@@ -184,7 +184,7 @@ class PdParser:
 
         file_hv_arg_dict = self.__get_hv_args(file_path)
         file_iterator = self.get_pd_line(file_path)
-        canvas_line = file_iterator.__next__()
+        canvas_line: str = file_iterator.__next__()
 
         self.__DOLLAR_ZERO += 1  # increment $0
         graph_args = [self.__DOLLAR_ZERO] + (obj_args or [])
@@ -194,7 +194,7 @@ class PdParser:
             g_cls.add_error(f"Pd files must begin with \"#N canvas\": {canvas_line}")
             return g_cls
 
-        g = self.graph_from_canvas(
+        g: PdGraph = self.graph_from_canvas(
             file_iterator,
             file_hv_arg_dict,
             canvas_line,
@@ -216,7 +216,7 @@ class PdParser:
     def graph_from_canvas(
         self,
         file_iterator: Generator,
-        file_hv_arg_dict: dict[str, list[Any]],
+        file_hv_arg_dict: dict[str, list[str]],
         canvas_line: str,
         graph_args: list,
         pd_path: str,
