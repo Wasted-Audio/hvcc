@@ -9,8 +9,9 @@ import time
 
 from typing import Optional
 
+from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
 from hvcc.interpreters.pd2gui.PdGUIParser import PdGUIParser
-from hvcc.types.compiler import CompilerResp, CompilerNotif
+from hvcc.types.compiler import CompilerResp, CompilerNotif, CompilerMsg
 
 
 class Colours:
@@ -43,25 +44,39 @@ class pd2gui:
             for p in search_paths:
                 parser.add_absolute_search_directory(p)
 
-        gui_graph, _ = parser.gui_from_file(pd_path)
+        try:
+            gui_graph, _ = parser.gui_from_file(pd_path)
 
-        if not os.path.exists(ir_dir):
-            os.makedirs(ir_dir)
+            if not os.path.exists(ir_dir):
+                os.makedirs(ir_dir)
 
-        gui_file = f"{os.path.splitext(os.path.basename(pd_path))[0]}.gui.json"
-        gui_path = os.path.join(ir_dir, gui_file)
-        with open(gui_path, "w") as f:
-            f.write(gui_graph.model_dump_json(indent=2) + "\n")
+            gui_file = f"{os.path.splitext(os.path.basename(pd_path))[0]}.gui.json"
+            gui_path = os.path.join(ir_dir, gui_file)
+            with open(gui_path, "w") as f:
+                f.write(gui_graph.model_dump_json(indent=2) + "\n")
 
-        return CompilerResp(
-            stage="pd2gui",
-            notifs=CompilerNotif(),
-            in_dir=os.path.dirname(pd_path),
-            in_file=os.path.basename(pd_path),
-            out_dir=ir_dir,
-            out_file=gui_file,
-            compile_time=(time.time() - tick)
-        )
+            return CompilerResp(
+                stage="pd2gui",
+                notifs=CompilerNotif(),
+                in_dir=os.path.dirname(pd_path),
+                in_file=os.path.basename(pd_path),
+                out_dir=ir_dir,
+                out_file=gui_file,
+                compile_time=(time.time() - tick)
+            )
+        except Exception as e:
+            return CompilerResp(
+                stage="pd2gui",
+                notifs=CompilerNotif(
+                    has_error=True,
+                    exception=e,
+                    errors=[CompilerMsg(
+                        enum=NotificationEnum.ERROR_EXCEPTION,
+                        message=str(e)
+                    )]
+                ),
+                compile_time=(time.time() - tick)
+            )
 
 
 def main() -> None:
