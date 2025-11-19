@@ -69,6 +69,8 @@ class PdGUIParser(PdParser):
         gop: bool = False
         gop_start: Coords = Coords()
         gop_size: Size = Size()
+        obj_type = ""
+        obj_args = []
 
         try:
             for li in file_iterator:
@@ -88,11 +90,14 @@ class PdGUIParser(PdParser):
 
                 elif line[0] == "#X":
                     if line[1] == "coords":
-                        if int(line[8]) > 0:
-                            # canvas is active
-                            gop = True
-                            gop_start = Coords(x=int(line[9]), y=int(line[10]))
-                            gop_size = Size(x=int(line[6]), y=int(line[7]))
+                        try:
+                            if int(line[8]) > 0:
+                                # canvas is active
+                                gop = True
+                                gop_start = Coords(x=int(line[9]), y=int(line[10]))
+                                gop_size = Size(x=int(line[6]), y=int(line[7]))
+                        except IndexError:
+                            continue
 
                     elif line[1] == "restore" and gop:
                         objects = self.filter_invisible_objects(objects, gop_start, gop_size)
