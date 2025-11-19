@@ -508,7 +508,6 @@ class PdParser:
                     elif line[1] in ("floatatom", "symbolatom"):
                         self.obj_counter[line[1]] += 1
                         obj_args = self.__resolve_object_args(
-                                obj_type=line[1],
                                 obj_args=line[1:],
                                 graph=g,
                                 is_root=is_root)
