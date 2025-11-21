@@ -45,7 +45,7 @@ hvcc has been integrated into several projects and services. This allows to easi
 Python 3.9 up to 3.14
 
 * `jinja2` (for generator templating)
-* `json2daisy` (for daisy integration)
+* `pydantic` (for data types)
 
 For tests:
 
