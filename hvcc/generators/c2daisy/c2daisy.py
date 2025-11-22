@@ -45,6 +45,7 @@ class c2daisy(Generator):
     ) -> CompilerResp:
 
         tick = time.time()
+        warnings = []
 
         out_dir = os.path.join(out_dir, "daisy")
 
@@ -66,24 +67,36 @@ class c2daisy(Generator):
             source_dir = os.path.join(out_dir, "source")
             shutil.copytree(c_src_dir, source_dir)
 
-            if daisy_meta.board_file is not None:
+            try:
                 header, board_info = generate_header_from_file(daisy_meta.board_file)
                 display_params = display_parameters(daisy_meta.board_file)
-            else:
+            except FileNotFoundError:
                 header, board_info = generate_header_from_name(board)
                 display_params = {}
+                warnings.append(
+                    CompilerMsg(
+                        enum=NotificationEnum.WARNING_GENERIC,
+                        message=f"Unable to load board description from {daisy_meta.board_file}. Using fallback."
+                    )
+                )
+
+            # inject display process code
+            try:
+                displayprocess = display_process(daisy_meta.board_file)
+            except (FileNotFoundError, KeyError, ValueError):
+                warnings.append(
+                    CompilerMsg(
+                        enum=NotificationEnum.WARNING_GENERIC,
+                        message=f"Unable to load display code from {daisy_meta.board_file}. Using fallback."
+                    )
+                )
+                displayprocess = board_info['displayprocess']
 
             # remove heavy out params from externs
             externs.parameters.outParam = [
                 t for t in externs.parameters.outParam
                 if not any(x == y for x in (hv_midi_messages + list(display_params.keys())) for y in t)
             ]
-
-            # inject display process code
-            try:
-                displayprocess = display_process(daisy_meta.board_file)
-            except (FileNotFoundError, KeyError, ValueError):
-                displayprocess = board_info['displayprocess']
 
             component_glue = parse_parameters(
                 externs.parameters, board_info['components'], board_info['aliases'], 'hardware')
@@ -154,6 +167,9 @@ class c2daisy(Generator):
 
             return CompilerResp(
                 stage="c2daisy",
+                notifs=CompilerNotif(
+                    warnings=warnings
+                ),
                 in_dir=c_src_dir,
                 out_dir=out_dir,
                 out_file=os.path.basename(daisy_h_path),
@@ -166,7 +182,7 @@ class c2daisy(Generator):
                 notifs=CompilerNotif(
                     has_error=True,
                     exception=e,
-                    warnings=[],
+                    warnings=warnings,
                     errors=[CompilerMsg(
                         enum=NotificationEnum.ERROR_EXCEPTION,
                         message=str(e)
