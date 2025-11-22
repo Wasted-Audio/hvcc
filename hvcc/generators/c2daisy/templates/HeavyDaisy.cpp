@@ -35,6 +35,10 @@
 #define MIDI_OUT_FIFO_SIZE      128
 {% endif %}
 
+{% for k, v in display_params.items() %}
+#define HV_HASH_{{k|upper}}     {{v}}
+{% endfor %}
+
 using namespace daisy;
 
 json2daisy::Daisy{{ class_name|capitalize }} hardware;
@@ -99,6 +103,10 @@ DaisyHvParamOut DaisyOutputParameters[DaisyNumOutputParameters] = {
 	{% endfor %}
 };
 {% endif %}
+
+{% for k, v in display_params.items() %}
+float f{{k}};
+{% endfor %}
 
 {% if (has_midi is sameas true) or (usb_midi is sameas true) %}
 // Typical Switch case for Message Type.
@@ -458,6 +466,19 @@ void HandleMidiSend(uint32_t sendHash, const HvMessage *m)
 {% endif %}
 
 
+void HandleDisplayParams(uint32_t sendHash, const HvMessage *m)
+{
+  switch(sendHash){
+  {% for k, v in display_params.items() %}
+    case HV_HASH_{{k|upper}}:
+      f{{k}} = msg_getFloat(m, 0);
+      break;
+  {% endfor %}
+    default:
+      break;
+  }
+}
+
 /** Receives messages from PD and writes them to the appropriate
  *  index in the `output_data` array, to be written later.
  */
@@ -475,6 +496,7 @@ static void sendHook(HeavyContextInterface *c, const char *receiverName, uint32_
   {% if (has_midi is sameas true) or (usb_midi is sameas true) %}
   HandleMidiSend(receiverHash, m);
   {% endif %}
+  HandleDisplayParams(receiverHash, m);
 }
 
 {% if debug_printing is sameas true %}

@@ -3,6 +3,7 @@ import json
 from copy import deepcopy
 from typing import Any, Dict, Optional
 
+from hvcc.core.hv2ir.HeavyLangObject import HeavyLangObject
 from hvcc.types.compiler import ExternParams
 
 
@@ -252,7 +253,7 @@ def parse_parameters(
     return replacements
 
 
-def display_parameters(description_file: str) -> list:
+def display_parameters(description_file: str) -> dict[str, str]:
     """
     Optional list of externed parameters that will be filtered out of the hardware configuration.
     These will be passed on to the sendHook callback and can be used by the Display function.
@@ -262,8 +263,11 @@ def display_parameters(description_file: str) -> list:
         daisy_description = json.load(file)
 
         try:
-            params = daisy_description['display']['params']
+            params = {
+                param: "0x{0:X}".format(HeavyLangObject.get_hash(param))
+                for param in daisy_description['display']['params']
+            }
         except KeyError:
-            return []
+            return {}
 
         return params

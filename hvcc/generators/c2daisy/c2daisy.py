@@ -71,12 +71,12 @@ class c2daisy(Generator):
                 display_params = display_parameters(daisy_meta.board_file)
             else:
                 header, board_info = generate_header_from_name(board)
-                display_params = []
+                display_params = {}
 
             # remove heavy out params from externs
             externs.parameters.outParam = [
                 t for t in externs.parameters.outParam
-                if not any(x == y for x in (hv_midi_messages + display_params) for y in t)
+                if not any(x == y for x in (hv_midi_messages + list(display_params.keys())) for y in t)
             ]
 
             component_glue = parse_parameters(
@@ -91,6 +91,7 @@ class c2daisy(Generator):
             component_glue['debug_printing'] = daisy_meta.debug_printing
             component_glue['usb_midi'] = daisy_meta.usb_midi
             component_glue['pool_sizes_kb'] = externs.memoryPoolSizesKb
+            component_glue['display_params'] = display_params
 
             # samplerate
             samplerate = daisy_meta.samplerate
