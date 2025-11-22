@@ -273,14 +273,17 @@ def display_parameters(description_file: str) -> dict[str, str]:
         return params
 
 
-def display_process(description_file: str, board_info: dict) -> str:
+def display_process(description_file: Optional[str] = None) -> str:
+    """
+    Try to load display processing code from file.
+    """
+
+    if description_file is None:
+        raise ValueError('description_file not provided')
 
     with open(description_file, 'rb') as file:
         daisy_description = json.load(file)
 
-        try:
-            process_file = daisy_description['display']['process_cpp']
-            with open(process_file, 'rb') as f:
-                return f.read().decode('utf-8')
-        except KeyError:
-            return board_info['process']
+        process_file = daisy_description['display']['process_cpp']
+        with open(process_file, 'rb') as f:
+            return f.read().decode('utf-8')
