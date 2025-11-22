@@ -5,8 +5,10 @@ import time
 
 from typing import Any, Dict, Optional
 
+from tests.unit import daisy
+
 from ..copyright import copyright_manager
-from .parameters import parse_parameters, display_parameters
+from .parameters import parse_parameters, display_parameters, display_process
 from .json2daisy import generate_header_from_file, generate_header_from_name
 
 from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
@@ -79,6 +81,9 @@ class c2daisy(Generator):
                 if not any(x == y for x in (hv_midi_messages + list(display_params.keys())) for y in t)
             ]
 
+            # inject display process code
+            displayprocess = display_process(daisy_meta.board_file, board_info)
+
             component_glue = parse_parameters(
                 externs.parameters, board_info['components'], board_info['aliases'], 'hardware')
             component_glue['class_name'] = board_info['name']
@@ -87,7 +92,7 @@ class c2daisy(Generator):
             component_glue['max_channels'] = board_info['channels']
             component_glue['num_output_channels'] = num_output_channels
             component_glue['has_midi'] = board_info['has_midi']
-            component_glue['displayprocess'] = board_info['displayprocess']
+            component_glue['displayprocess'] = displayprocess
             component_glue['debug_printing'] = daisy_meta.debug_printing
             component_glue['usb_midi'] = daisy_meta.usb_midi
             component_glue['pool_sizes_kb'] = externs.memoryPoolSizesKb

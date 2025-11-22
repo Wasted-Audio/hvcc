@@ -271,3 +271,16 @@ def display_parameters(description_file: str) -> dict[str, str]:
             return {}
 
         return params
+
+
+def display_process(description_file: str, board_info: dict) -> str:
+
+    with open(description_file, 'rb') as file:
+        daisy_description = json.load(file)
+
+        try:
+            process_file = daisy_description['display']['process_cpp']
+            with open(process_file, 'rb') as f:
+                return f.read().decode('utf-8')
+        except KeyError:
+            return board_info['process']
