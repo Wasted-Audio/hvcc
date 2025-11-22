@@ -465,7 +465,7 @@ void HandleMidiSend(uint32_t sendHash, const HvMessage *m)
 }
 {% endif %}
 
-
+{% if display_params|length > 0 %}
 void HandleDisplayParams(uint32_t sendHash, const HvMessage *m)
 {
   switch(sendHash){
@@ -478,6 +478,7 @@ void HandleDisplayParams(uint32_t sendHash, const HvMessage *m)
       break;
   }
 }
+{% endif %}
 
 /** Receives messages from PD and writes them to the appropriate
  *  index in the `output_data` array, to be written later.
@@ -496,7 +497,9 @@ static void sendHook(HeavyContextInterface *c, const char *receiverName, uint32_
   {% if (has_midi is sameas true) or (usb_midi is sameas true) %}
   HandleMidiSend(receiverHash, m);
   {% endif %}
+  {% if display_params|length > 0 %}
   HandleDisplayParams(receiverHash, m);
+  {% endif %}
 }
 
 {% if debug_printing is sameas true %}
