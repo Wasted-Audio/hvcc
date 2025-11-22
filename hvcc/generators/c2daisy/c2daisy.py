@@ -6,7 +6,7 @@ import time
 from typing import Any, Dict, Optional
 
 from ..copyright import copyright_manager
-from .parameters import parse_parameters
+from .parameters import parse_parameters, display_parameters
 from .json2daisy import generate_header_from_file, generate_header_from_name
 
 from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
@@ -14,7 +14,7 @@ from hvcc.types.compiler import Generator, CompilerResp, CompilerNotif, Compiler
 from hvcc.types.meta import Meta, Daisy
 
 
-hv_midi_messages = {
+hv_midi_messages = [
     "__hv_noteout",
     "__hv_ctlout",
     "__hv_polytouchout",
@@ -23,7 +23,7 @@ hv_midi_messages = {
     "__hv_bendout",
     "__hv_midiout",
     "__hv_midioutport"
-}
+]
 
 
 class c2daisy(Generator):
@@ -68,12 +68,16 @@ class c2daisy(Generator):
 
             if daisy_meta.board_file is not None:
                 header, board_info = generate_header_from_file(daisy_meta.board_file)
+                display_params = display_parameters(daisy_meta.board_file)
             else:
                 header, board_info = generate_header_from_name(board)
+                display_params = []
 
             # remove heavy out params from externs
             externs.parameters.outParam = [
-                t for t in externs.parameters.outParam if not any(x == y for x in hv_midi_messages for y in t)]
+                t for t in externs.parameters.outParam
+                if not any(x == y for x in (hv_midi_messages + display_params) for y in t)
+            ]
 
             component_glue = parse_parameters(
                 externs.parameters, board_info['components'], board_info['aliases'], 'hardware')

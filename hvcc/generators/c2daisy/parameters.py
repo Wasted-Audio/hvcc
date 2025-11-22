@@ -1,3 +1,4 @@
+import json
 
 from copy import deepcopy
 from typing import Any, Dict, Optional
@@ -249,3 +250,20 @@ def parse_parameters(
     replacements['output_comps'] = len(replacements['output_parameters'])
 
     return replacements
+
+
+def display_parameters(description_file: str) -> list:
+    """
+    Optional list of externed parameters that will be filtered out of the hardware configuration.
+    These will be passed on to the sendHook callback and can be used by the Display function.
+    """
+
+    with open(description_file, 'rb') as file:
+        daisy_description = json.load(file)
+
+        try:
+            params = daisy_description['display']['params']
+        except KeyError:
+            return []
+
+        return params
