@@ -6,7 +6,7 @@ import time
 from typing import Any, Dict, Optional
 
 from ..copyright import copyright_manager
-from .parameters import parse_parameters, display_parameters, display_process
+from .parameters import parse_parameters, display_parameters, display_processor
 from .json2daisy import generate_header_from_file, generate_header_from_name
 
 from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
@@ -82,15 +82,15 @@ class c2daisy(Generator):
 
             # inject display process code
             try:
-                displayprocess = display_process(daisy_meta.board_file)
+                display_process = display_processor(daisy_meta.board_file)
             except (FileNotFoundError, KeyError, ValueError):
+                display_process = board_info['display_process']
                 warnings.append(
                     CompilerMsg(
                         enum=NotificationEnum.WARNING_GENERIC,
                         message=f"Unable to load display code from {daisy_meta.board_file}. Using fallback."
                     )
                 )
-                displayprocess = board_info['displayprocess']
 
             # remove heavy out params from externs
             externs.parameters.outParam = [
@@ -110,7 +110,7 @@ class c2daisy(Generator):
             component_glue['usb_midi'] = daisy_meta.usb_midi
             component_glue['pool_sizes_kb'] = externs.memoryPoolSizesKb
             component_glue['display_params'] = display_params
-            component_glue['displayprocess'] = displayprocess
+            component_glue['display_process'] = display_process
 
             # samplerate
             samplerate = daisy_meta.samplerate

@@ -586,5 +586,5 @@ void CallbackWriteOut() {
  *
  */
 void Display() {
-{{displayprocess}}
+{{display_process}}
 }

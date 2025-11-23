@@ -273,7 +273,7 @@ def display_parameters(description_file: str) -> dict[str, str]:
         return params
 
 
-def display_process(description_file: Optional[str] = None) -> str:
+def display_processor(description_file: Optional[str] = None) -> str:
     """
     Try to load display processing code from file.
     """
