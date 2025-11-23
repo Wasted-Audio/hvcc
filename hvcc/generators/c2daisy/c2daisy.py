@@ -67,10 +67,10 @@ class c2daisy(Generator):
             source_dir = os.path.join(out_dir, "source")
             shutil.copytree(c_src_dir, source_dir)
 
-            try:
+            if daisy_meta.board_file is not None:
                 header, board_info = generate_header_from_file(daisy_meta.board_file)
                 display_params = display_parameters(daisy_meta.board_file)
-            except FileNotFoundError:
+            else:
                 header, board_info = generate_header_from_name(board)
                 display_params = {}
                 warnings.append(
