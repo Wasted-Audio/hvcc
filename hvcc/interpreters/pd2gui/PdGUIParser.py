@@ -597,7 +597,7 @@ class PdGUIParser(PdParser):
             ),
             text=text,
             size=Size(
-                x=10, y=10*len(text)
+                x=10*len(text), y=10
             )
         )
 
