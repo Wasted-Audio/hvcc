@@ -84,7 +84,7 @@ class c2daisy(Generator):
             try:
                 display_process = display_processor(daisy_meta.board_file)
             except (FileNotFoundError, KeyError, ValueError):
-                display_process = board_info['display_process']
+                display_process = board_info['displayprocess']
                 warnings.append(
                     CompilerMsg(
                         enum=NotificationEnum.WARNING_GENERIC,

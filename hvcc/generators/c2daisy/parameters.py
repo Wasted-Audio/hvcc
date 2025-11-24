@@ -284,6 +284,6 @@ def display_processor(description_file: Optional[str] = None) -> str:
     with open(description_file, 'rb') as file:
         daisy_description = json.load(file)
 
-        process_file = daisy_description['display']['process_cpp']
+        process_file = daisy_description['display']['process_file']
         with open(process_file, 'rb') as f:
             return f.read().decode('utf-8')
