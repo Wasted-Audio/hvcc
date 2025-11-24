@@ -9,6 +9,8 @@ from typing import Literal, Optional, Union
 from pydantic import BaseModel
 from pydantic_extra_types.color import Color
 
+from hvcc.version import VERSION
+
 
 class Coords(BaseModel):
     x: int = 0
@@ -165,16 +167,15 @@ GUIObjects = Union[Bang, Toggle, Radio, Slider, Knob, Number, Float, Comment, Ca
 
 class GraphBase(BaseModel):
     objects: list[GUIObjects]
+    graphs: list["Graph"]
 
 
 class Graph(GraphBase):
     position: Coords
     gop_start: Coords
     gop_size: Size
-    graphs: list["Graph"]
 
 
 class GraphRoot(GraphBase):
-    width: int
-    height: int
-    graphs: list["Graph"]
+    size: Size
+    version: str = VERSION

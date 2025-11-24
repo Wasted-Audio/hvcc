@@ -1,7 +1,5 @@
 {
   "objects": [],
-  "width": 734,
-  "height": 565,
   "graphs": [
     {
       "objects": [
@@ -19,6 +17,7 @@
           "bg_color": "#006200"
         }
       ],
+      "graphs": [],
       "position": {
         "x": 110,
         "y": 94
@@ -30,8 +29,12 @@
       "gop_size": {
         "x": 200,
         "y": 140
-      },
-      "graphs": []
+      }
     }
-  ]
+  ],
+  "size": {
+    "x": 734,
+    "y": 565
+  },
+  "version": "0.14.0"
 }

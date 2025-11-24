@@ -194,8 +194,7 @@ class PdGUIParser(PdParser):
             graphs = self.filter_invisible_graphs(graphs, gop_start, gop_size)
 
             return GraphRoot(
-                width=int(line[4]),
-                height=int(line[5]),
+                size=gop_size,
                 objects=objects,
                 graphs=graphs
             ), gop

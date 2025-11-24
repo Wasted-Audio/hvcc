@@ -1,7 +1,5 @@
 {
   "objects": [],
-  "width": 734,
-  "height": 565,
   "graphs": [
     {
       "objects": [
@@ -42,6 +40,7 @@
           "max": 0.0
         }
       ],
+      "graphs": [],
       "position": {
         "x": 115,
         "y": 107
@@ -53,8 +52,12 @@
       "gop_size": {
         "x": 188,
         "y": 177
-      },
-      "graphs": []
+      }
     }
-  ]
+  ],
+  "size": {
+    "x": 734,
+    "y": 565
+  },
+  "version": "0.14.0"
 }

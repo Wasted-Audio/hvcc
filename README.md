@@ -29,6 +29,7 @@ It has since then been expanded to provide further support for many different pl
 * [C++ API](/docs/06.cpp.md)
 * [Heavy Lang Info](/docs/07.heavy_lang.md)
 * [Heavy IR Info](/docs/08.heavy_ir_lang.md)
+* [Heavy GUI IR Info](/docs/11.heavy_gui_ir.md)
 * [Supported vanilla objects](/docs/09.supported_vanilla_objects.md)
 * [Unsupported vanilla objects](/docs/10.unsupported_vanilla_objects.md)
 
