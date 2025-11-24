@@ -47,6 +47,7 @@ Python 3.9 up to 3.14
 
 * `jinja2` (for generator templating)
 * `pydantic` (for data types)
+* `pydantic-extra-types` (for data types)
 
 For tests:
 
