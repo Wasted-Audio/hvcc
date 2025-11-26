@@ -568,7 +568,7 @@ class PdGUIParser(PdParser):
             ),
             font=Font(0),
             font_size=int(line[17])
-        )
+        ) if line[13] != "empty" else None
 
         return Number(
             position=Coords(
