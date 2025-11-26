@@ -108,6 +108,49 @@ DaisyHvParamOut DaisyOutputParameters[DaisyNumOutputParameters] = {
 float f{{k}};
 {% endfor %}
 
+{%if (persist_display_params is sameas true) %}
+bool trigger_save = false;
+struct StoredSettings {
+  {% for k, v in display_params.items() %}
+  float {{k}};
+  {% endfor %}
+
+  // Overloading the != operator
+  // This is necessary as this operator is used in the PersistentStorage source code
+  bool operator!=(const StoredSettings &a) const
+  {
+    return !({%- for k, v in display_params.items() %}a.{{k}} == {{k}}{{ " && " if not loop.last else "" }}{%- endfor %});
+  }
+};
+
+daisy::PersistentStorage<StoredSettings> settings(hardware.som.qspi);
+
+void Load()
+{
+    StoredSettings &localSettings = settings.GetSettings();
+
+    {% for k, v in display_params.items() %}
+    f{{k}} = localSettings.{{k}};
+    {% endfor %}
+
+    {% for k, v in display_params.items() %}
+    hv->sendFloatToReceiver(HV_HASH_{{k|upper}}, f{{k}});
+    {% endfor %}
+
+}
+
+void Save()
+{
+    StoredSettings &localSettings = settings.GetSettings();
+
+    {% for k, v in display_params.items() %}
+    localSettings.{{k}} = f{{k}};
+    {% endfor %}
+
+    trigger_save = true;
+}
+{% endif %}
+
 {% if (has_midi is sameas true) or (usb_midi is sameas true) %}
 // Typical Switch case for Message Type.
 void HandleMidiMessage(MidiEvent m)
@@ -217,6 +260,15 @@ int main(void)
   hardware.Init(true);
   hv = new Heavy_{{patch_name}}(SAMPLE_RATE, {{pool_sizes_kb.internal}}, {{pool_sizes_kb.inputQueue}}, {{pool_sizes_kb.outputQueue}});
 
+{%if (persist_display_params is sameas true) %}
+  StoredSettings defaultSettings = {
+{%- for k, v in display_params.items() %}0.0f{{ "," if not loop.last else "" }}
+{%- endfor %}
+};
+  settings.Init(defaultSettings);
+  Load();
+{% endif %}
+
   {% if samplerate %}
   hardware.SetAudioSampleRate({{samplerate}});
   {% endif %}
@@ -293,6 +345,15 @@ int main(void)
     }
     {% endif %}
 
+    {%if (persist_display_params is sameas true) %}
+    if (trigger_save)
+    {
+      settings.Save();
+      trigger_save = false;
+      System::Delay(100);
+    }
+    {% endif %}
+
     {% if debug_printing is sameas true %}
     /** Now separately, every 5ms we'll print the top message in our queue if there is one */
     if(now - log_time > 5)
@@ -323,6 +384,12 @@ void audiocallback(daisy::AudioHandle::InputBuffer in, daisy::AudioHandle::Outpu
   {% endif %}
   {% if  parameters|length > 0 %}
   hardware.ProcessAllControls();
+  {%if (persist_display_params is sameas true) %}
+  if (hardware.encoder.RisingEdge())
+  {
+    Save();
+  }
+  {% endif %}
   CallbackWriteIn(hv);
   {% endif %}
   hv->process((float**)in, (float**)out, size);

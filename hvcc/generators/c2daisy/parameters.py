@@ -271,6 +271,19 @@ def display_parameters(description_file: str) -> dict[str, str]:
             return {}
 
         return params
+    
+def persist_display_parameters(description_file: str) -> bool:
+    """
+    Whether or not the display_parameters will be persisted using daisy::PersistentStorage
+    """
+
+    with open(description_file, 'rb') as file:
+        daisy_description = json.load(file)
+
+        try:
+            return daisy_description['display']['persist_display_params']
+        except KeyError:
+            return False
 
 
 def display_processor(description_file: Optional[str] = None) -> str:

@@ -6,7 +6,7 @@ import time
 from typing import Any, Dict, Optional
 
 from ..copyright import copyright_manager
-from .parameters import parse_parameters, display_parameters, display_processor
+from .parameters import parse_parameters, display_parameters, display_processor, persist_display_parameters
 from .json2daisy import generate_header_from_file, generate_header_from_name
 
 from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
@@ -70,9 +70,11 @@ class c2daisy(Generator):
             if daisy_meta.board_file is not None:
                 header, board_info = generate_header_from_file(daisy_meta.board_file)
                 display_params = display_parameters(daisy_meta.board_file)
+                persist_display_params = persist_display_parameters(daisy_meta.board_file)
             else:
                 header, board_info = generate_header_from_name(board)
                 display_params = {}
+                persist_display_params = False
                 warnings.append(
                     CompilerMsg(
                         enum=NotificationEnum.WARNING_GENERIC,
@@ -111,6 +113,7 @@ class c2daisy(Generator):
             component_glue['pool_sizes_kb'] = externs.memoryPoolSizesKb
             component_glue['display_params'] = display_params
             component_glue['display_process'] = display_process
+            component_glue['persist_display_params'] = persist_display_params
 
             # samplerate
             samplerate = daisy_meta.samplerate
