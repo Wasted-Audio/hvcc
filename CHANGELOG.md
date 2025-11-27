@@ -9,6 +9,7 @@ Features:
 * Unity Generator: change build system to use CMake - thanks to @michaelhartung
 * Allow externing graphical arrays using `@hv_table`
 * DPF: support and documentation for Audio Unit format (macOS)
+* Daisy: support display parameters using `@hv_param`
 * New pd2gui parser that creates an Intermediate Representation JSON with exposed UI objects
 
 0.14.0
