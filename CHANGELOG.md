@@ -11,6 +11,10 @@ Features:
 * DPF: support and documentation for Audio Unit format (macOS)
 * Daisy: support display parameters using `@hv_param`
 
+Cleanup:
+
+* Daisy: allow more generic `HAS_MIDI` in the board.json
+
 0.14.0
 -----
 
