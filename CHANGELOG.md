@@ -10,6 +10,7 @@ Features:
 * Allow externing graphical arrays using `@hv_table`
 * DPF: support and documentation for Audio Unit format (macOS)
 * Daisy: support display parameters using `@hv_param`
+* Objects: support `[soundfiler]` (DPF only)
 
 Cleanup:
 

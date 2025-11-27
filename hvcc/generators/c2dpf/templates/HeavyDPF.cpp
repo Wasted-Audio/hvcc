@@ -2,6 +2,8 @@
 
 #include "Heavy_{{name}}.h"
 #include "{{class_name}}.hpp"
+#include "DistrhoPluginUtils.hpp"
+#include <string>
 #include <set>
 {% if meta.denormals is sameas false %}
 #include "extra/ScopedDenormalDisable.hpp"
@@ -37,6 +39,10 @@
 
 #define HV_HASH_DPF_BPM         0xDF8C2721
 
+#define HV_HASH_SND_WRITE       0x74140F5F
+#define HV_HASH_SND_READ        0xEB5BD581
+#define HV_HASH_SND_READ_RES    0x280AFD69
+
 // midi realtime messages
 std::set<int> mrtSet {
   MIDI_RT_CLOCK,
@@ -59,6 +65,14 @@ static void hvSendHookFunc(HeavyContextInterface *c, const char *sendName, uint3
   if (plugin != nullptr)
   {
     plugin->setOutputParameter(sendHash, m);
+    switch (sendHash)
+    {
+      case HV_HASH_SND_WRITE:
+      case HV_HASH_SND_READ:
+      case HV_HASH_SND_READ_RES:
+        plugin->sndFileOperator(sendHash, m);
+        break;
+    }
 {%- if meta.midi_output is sameas true %}
 #if DISTRHO_PLUGIN_WANT_MIDI_OUTPUT
     plugin->handleMidiSend(sendHash, m);
@@ -167,6 +181,7 @@ void {{class_name}}::setOutputParameter(uint32_t sendHash, const HvMessage *m)
   {%- endif %}
 }
 
+{% include 'sndFileOperator.cpp' %}
 
 // -------------------------------------------------------------------
 // Process

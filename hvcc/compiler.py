@@ -114,7 +114,7 @@ def count_midi_objects(hvir: IRGraph) -> Dict[str, List[str]]:
     }
 
 
-def filter_midi_from_out_parameters(output_parameter_list: List, midi_out_objects: List) -> List:
+def filter_objects_from_out_parameters(output_parameter_list: List, midi_out_objects: List) -> List:
     new_out_list = []
 
     for item in output_parameter_list:
@@ -161,7 +161,12 @@ def generate_extern_info(hvir: IRGraph, results: CompilerResults) -> ExternInfo:
     midi_objects = count_midi_objects(hvir)
 
     # filter midi objects from the output parameters list
-    out_parameter_list = filter_midi_from_out_parameters(out_parameter_list, midi_objects['out'])
+    out_parameter_list = filter_objects_from_out_parameters(out_parameter_list, midi_objects['out'])
+
+    # filter snd objects from the output parameters list
+    out_parameter_list = filter_objects_from_out_parameters(
+        out_parameter_list, ['__hv_snd_write', '__hv_snd_read', '__hv_snd_read_resize']
+    )
 
     return ExternInfo(
         parameters=ExternParams(
