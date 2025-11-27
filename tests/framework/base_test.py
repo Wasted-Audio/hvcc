@@ -20,7 +20,7 @@ import shutil
 import subprocess
 import unittest
 
-from typing import Optional
+from typing import List, Optional
 
 import hvcc
 
@@ -48,7 +48,7 @@ class HvBaseTest(unittest.TestCase):
 
     def _run_hvcc(
         self,
-        pd_path,
+        pd_path: str,
         expect_warning: bool = False,
         expect_fail: bool = False,
         expected_enum: NotificationEnum = NotificationEnum.EMPTY
@@ -97,9 +97,9 @@ class HvBaseTest(unittest.TestCase):
 
     def _compile_and_run(
         self,
-        source_files,
-        out_dir,
-        flag=None
+        source_files: List[str],
+        out_dir: str,
+        flag: Optional[str] = None
     ):
         exe_path = os.path.join(out_dir, "heavy")
 
@@ -119,9 +119,9 @@ class HvBaseTest(unittest.TestCase):
 
     def _compile_and_run_clang(
         self,
-        source_files,
-        out_dir,
-        flag=None,
+        source_files: List[str],
+        out_dir: str,
+        flag: Optional[str] = None,
     ):
         flag = flag or "HV_SIMD_NONE"
         self.assertTrue(flag in simd_flags, f"Unknown compiler flag: {flag}")

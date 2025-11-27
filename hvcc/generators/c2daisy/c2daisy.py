@@ -6,7 +6,7 @@ import time
 from typing import Any, Dict, Optional
 
 from ..copyright import copyright_manager
-from .parameters import parse_parameters
+from .parameters import parse_parameters, display_parameters, display_processor
 from .json2daisy import generate_header_from_file, generate_header_from_name
 
 from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
@@ -14,7 +14,7 @@ from hvcc.types.compiler import Generator, CompilerResp, CompilerNotif, Compiler
 from hvcc.types.meta import Meta, Daisy
 
 
-hv_midi_messages = {
+hv_midi_messages = [
     "__hv_noteout",
     "__hv_ctlout",
     "__hv_polytouchout",
@@ -23,7 +23,7 @@ hv_midi_messages = {
     "__hv_bendout",
     "__hv_midiout",
     "__hv_midioutport"
-}
+]
 
 
 class c2daisy(Generator):
@@ -45,6 +45,7 @@ class c2daisy(Generator):
     ) -> CompilerResp:
 
         tick = time.time()
+        warnings = []
 
         out_dir = os.path.join(out_dir, "daisy")
 
@@ -68,12 +69,34 @@ class c2daisy(Generator):
 
             if daisy_meta.board_file is not None:
                 header, board_info = generate_header_from_file(daisy_meta.board_file)
+                display_params = display_parameters(daisy_meta.board_file)
             else:
                 header, board_info = generate_header_from_name(board)
+                display_params = {}
+                warnings.append(
+                    CompilerMsg(
+                        enum=NotificationEnum.WARNING_GENERIC,
+                        message=f"Unable to load board description from {daisy_meta.board_file}. Using fallback."
+                    )
+                )
+
+            # inject display process code
+            try:
+                display_process = display_processor(daisy_meta.board_file)
+            except (FileNotFoundError, KeyError, ValueError):
+                display_process = board_info['displayprocess']
+                warnings.append(
+                    CompilerMsg(
+                        enum=NotificationEnum.WARNING_GENERIC,
+                        message=f"Unable to load display code from {daisy_meta.board_file}. Using fallback."
+                    )
+                )
 
             # remove heavy out params from externs
             externs.parameters.outParam = [
-                t for t in externs.parameters.outParam if not any(x == y for x in hv_midi_messages for y in t)]
+                t for t in externs.parameters.outParam
+                if not any(x == y for x in (hv_midi_messages + list(display_params.keys())) for y in t)
+            ]
 
             component_glue = parse_parameters(
                 externs.parameters, board_info['components'], board_info['aliases'], 'hardware')
@@ -83,10 +106,11 @@ class c2daisy(Generator):
             component_glue['max_channels'] = board_info['channels']
             component_glue['num_output_channels'] = num_output_channels
             component_glue['has_midi'] = board_info['has_midi']
-            component_glue['displayprocess'] = board_info['displayprocess']
             component_glue['debug_printing'] = daisy_meta.debug_printing
             component_glue['usb_midi'] = daisy_meta.usb_midi
             component_glue['pool_sizes_kb'] = externs.memoryPoolSizesKb
+            component_glue['display_params'] = display_params
+            component_glue['display_process'] = display_process
 
             # samplerate
             samplerate = daisy_meta.samplerate
@@ -143,6 +167,9 @@ class c2daisy(Generator):
 
             return CompilerResp(
                 stage="c2daisy",
+                notifs=CompilerNotif(
+                    warnings=warnings
+                ),
                 in_dir=c_src_dir,
                 out_dir=out_dir,
                 out_file=os.path.basename(daisy_h_path),
@@ -155,7 +182,7 @@ class c2daisy(Generator):
                 notifs=CompilerNotif(
                     has_error=True,
                     exception=e,
-                    warnings=[],
+                    warnings=warnings,
                     errors=[CompilerMsg(
                         enum=NotificationEnum.ERROR_EXCEPTION,
                         message=str(e)

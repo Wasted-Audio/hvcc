@@ -97,21 +97,6 @@ struct DaisyPetal_125b_sm {
     // DAC
 
 
-    // Adafruit Motor Shield
-
-
-    // Stepper motor pointer from the Adafruit Motor Shield
-
-
-    // DC motor pointer from the Adafruit Motor Shield
-
-
-    // BME280 pressure/temperature/humidity sensor
-
-
-    // Hall sensor
-
-
     // Accelerometer
 
 
@@ -121,22 +106,10 @@ struct DaisyPetal_125b_sm {
     // Gesture / color sensor
 
 
-    // Bmp390 pressure / temperature sensor
-
-
     // Dps310 pressure / temperature sensor
 
 
-    // Vl53l1x time of flight sensor
-
-
-    // Vl53l0x time of flight sensor
-
-
     // Adafruit Neo Trellis
-
-
-    // Bno055 9-DOF omega sensor
 
 
     // Icm20948 9-DOF sensor
