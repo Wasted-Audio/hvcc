@@ -197,11 +197,6 @@ def generate_header(board_description_dict: dict) -> 'tuple[str, dict]':
         target['display']['driver'] = target['display'].get('driver', "daisy::SSD130x4WireSpi128x64Driver")
         target['display']['config'] = target['display'].get('config', [])
         target['display']['dim'] = target['display'].get('dim', [128, 64])
-
-        target['defines']['OOPSY_TARGET_HAS_OLED'] = 1
-        target['defines']['OOPSY_OLED_DISPLAY_WIDTH'] = target['display']['dim'][0]
-        target['defines']['OOPSY_OLED_DISPLAY_HEIGHT'] = target['display']['dim'][1]
-
         target['displayprocess'] = target['display'].get('process', '')
 
     replacements = {}
