@@ -3,6 +3,8 @@
 #include "Heavy_{{patch_name}}.h"
 #include "Heavy_{{patch_name}}.hpp"
 #include "HeavyDaisy_{{patch_name}}.hpp"
+#include <string>
+#include "fatfs.h"
 
 #define SAMPLE_RATE {{samplerate}}.f
 
@@ -35,6 +37,12 @@
 #define MIDI_OUT_FIFO_SIZE      128
 {% endif %}
 
+#define DSY_TEXT __attribute__((section(".text")))
+
+#define HV_HASH_SND_WRITE       0x74140F5F
+#define HV_HASH_SND_READ        0xEB5BD581
+#define HV_HASH_SND_READ_RES    0x280AFD69
+
 {% for k, v in display_params.items() %}
 #define HV_HASH_{{k|upper}}     {{v}}
 {% endfor %}
@@ -59,12 +67,27 @@ FIFO<uint8_t, MIDI_OUT_FIFO_SIZE> midi_tx_fifo;
 {% endif %}
 // int midiOutCount;
 // uint8_t* midiOutData;
+
+/** SDMMC Configuration */
+SdmmcHandler sdmmc;
+/** FatFS Interface for libDaisy */
+DSY_TEXT FatFSInterface fsi;
+/** Global File object */
+DSY_TEXT FIL file;
+const int FILE_BUF_SIZE = 1024;
+DSY_TEXT float file_buf[FILE_BUF_SIZE];
+
+bool sndfile_action;
+uint32_t sndHash;
+const HvMessage *sndMsg;
+
 void CallbackWriteIn(Heavy_{{patch_name}}* hv);
 void LoopWriteIn(Heavy_{{patch_name}}* hv);
 void CallbackWriteOut();
 void LoopWriteOut();
 void PostProcess();
 void Display();
+void sndFileOperator(uint32_t sendHash, const HvMessage *m);
 
 {% if  output_parameters|length > 0 %}
 constexpr int DaisyNumOutputParameters = {{output_parameters|length}};
@@ -244,6 +267,36 @@ int main(void)
   {% endif %}
   hv->setSendHook(sendHook);
 
+  /** Initialize the SDMMC Hardware
+   *  For this example we'll use:
+   *  Medium (25MHz), 4-bit, w/out power save settings
+   */
+  SdmmcHandler::Config sd_cfg;
+  sd_cfg.Defaults();
+  sd_cfg.speed = SdmmcHandler::Speed::STANDARD;
+  sd_cfg.width = SdmmcHandler::BusWidth::BITS_1;
+  sdmmc.Init(sd_cfg);
+
+  /** Setup our interface to the FatFS middleware */
+  FatFSInterface::Config fsi_config;
+  fsi_config.media = FatFSInterface::Config::MEDIA_SD;
+  fsi.Init(fsi_config);
+
+  /** Get the reference to the FATFS Filesystem for use in mounting the hardware. */
+  FATFS& fs = fsi.GetSDFileSystem();
+
+  /** mount the filesystem to the root directory
+   *  fsi.GetSDPath can be used when mounting multiple filesystems on different media
+   */
+  auto mounted = f_mount(&fs, "/", 1);
+
+  if(mounted != FR_OK)
+  {
+      hardware.som.PrintLine("Failed to mount filesystem");
+  } else {
+      hardware.som.PrintLine("Filesystem mounted");
+  }
+
   for(;;)
   {
     {% if debug_printing %}
@@ -305,6 +358,12 @@ int main(void)
       }
     }
     {% endif %}
+
+    if (sndfile_action)
+    {
+      sndFileOperator(sndHash, sndMsg);
+      sndfile_action = false;
+    }
   }
 }
 
@@ -480,6 +539,8 @@ void HandleDisplayParams(uint32_t sendHash, const HvMessage *m)
 }
 {% endif %}
 
+{% include 'sndFileOperator.cpp' %}
+
 /** Receives messages from PD and writes them to the appropriate
  *  index in the `output_data` array, to be written later.
  */
@@ -500,6 +561,16 @@ static void sendHook(HeavyContextInterface *c, const char *receiverName, uint32_
   {% if display_params|length > 0 %}
   HandleDisplayParams(receiverHash, m);
   {% endif %}
+  switch (receiverHash)
+  {
+    case HV_HASH_SND_WRITE:
+    case HV_HASH_SND_READ:
+    case HV_HASH_SND_READ_RES:
+      sndHash = receiverHash;
+      sndMsg = m;
+      sndfile_action = true;
+      break;
+  }
 }
 
 {% if debug_printing is sameas true %}
