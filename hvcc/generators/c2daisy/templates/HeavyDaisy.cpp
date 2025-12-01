@@ -74,6 +74,12 @@ SdmmcHandler sdmmc;
 DSY_TEXT FatFSInterface fsi;
 /** Global File object */
 DSY_TEXT FIL file;
+const int FILE_BUF_SIZE = 1024;
+DSY_TEXT float file_buf[FILE_BUF_SIZE];
+
+bool sndfile_action;
+uint32_t sndHash;
+const HvMessage *sndMsg;
 
 void CallbackWriteIn(Heavy_{{patch_name}}* hv);
 void LoopWriteIn(Heavy_{{patch_name}}* hv);
@@ -352,6 +358,12 @@ int main(void)
       }
     }
     {% endif %}
+
+    if (sndfile_action)
+    {
+      sndFileOperator(sndHash, sndMsg);
+      sndfile_action = false;
+    }
   }
 }
 
@@ -554,7 +566,9 @@ static void sendHook(HeavyContextInterface *c, const char *receiverName, uint32_
     case HV_HASH_SND_WRITE:
     case HV_HASH_SND_READ:
     case HV_HASH_SND_READ_RES:
-      sndFileOperator(receiverHash, m);
+      sndHash = receiverHash;
+      sndMsg = m;
+      sndfile_action = true;
       break;
   }
 }
