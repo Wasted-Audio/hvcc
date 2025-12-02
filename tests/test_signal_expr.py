@@ -71,7 +71,6 @@ class TestPdControlExprPatches(TestPdControlBase):
 
     # Unary
 
-    @unittest.skip("not supported yet")
     def test_unary_neg(self):
         self._test_control_patch("test-unary-neg.pd")
 
@@ -86,7 +85,6 @@ class TestPdControlExprPatches(TestPdControlBase):
     def test_if(self):
         self._test_control_patch("test-if.pd")
 
-    @unittest.skip("not supported yet (needs unary operator)")
     def test_if2(self):
         self._test_control_patch("test-if2.pd")
 

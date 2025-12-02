@@ -116,6 +116,11 @@ class ExprCWriter:
         lines: List[str] = []
 
         def _to_c_simd_R(expr_tree: ExprNode, r_vec: Union[str, None] = None) -> str:
+            if expr_tree.value == "-" and len(expr_tree.nodes) == 1:
+                # Unary minus, treat as (0-arg) by inserting a 0-const node.
+                zero_node = ExprNode("func", "_load_f", [ExprNode("num_f", "0.0f")])
+                expr_tree.nodes.insert(0, zero_node)
+
             if expr_tree.type in ("num_i", "num_f", "var", "bound_var"):
                 return expr_tree.value
 
