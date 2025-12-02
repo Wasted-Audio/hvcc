@@ -172,8 +172,8 @@ class TestPdControlExprPatches(TestPdControlBase):
     def test_tan_atan_tanh_atanh(self):
         self._test_control_patch("test-tan-atan-tanh-atanh.pd", num_iterations=2)
 
-    # def test_atan2(self):
-    #     self._test_control_patch("test-atan2.pd")
+    def test_atan2(self):
+        self._test_control_patch("test-atan2.pd")
 
     # # Some complex expressions
 
