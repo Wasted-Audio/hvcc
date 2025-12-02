@@ -15,7 +15,6 @@
 
 import argparse
 import os
-import unittest
 
 from tests.framework.base_control import TestPdControlBase
 
@@ -164,8 +163,8 @@ class TestPdControlExprPatches(TestPdControlBase):
 
     # # Trigonometric
 
-    # def test_sin_asin_sinh_asinh(self):
-    #     self._test_control_patch("test-sin-asin-sinh-asinh.pd")
+    def test_sin_asin_sinh_asinh(self):
+        self._test_control_patch("test-sin-asin-sinh-asinh.pd", num_iterations=2)
 
     # def test_cos_acos_cosh_acosh(self):
     #     self._test_control_patch("test-cos-acos-cosh-acosh.pd")
