@@ -159,8 +159,8 @@ class TestPdControlExprPatches(TestPdControlBase):
     def test_log1p(self):
         self._test_control_patch("test-log1p.pd")
 
-    # def test_ldexp(self):
-    #     self._test_control_patch("test-ldexp.pd")
+    def test_ldexp(self):
+        self._test_control_patch("test-ldexp.pd")
 
     # # Trigonometric
 
