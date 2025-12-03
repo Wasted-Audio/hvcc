@@ -204,6 +204,8 @@ class ExprOpMap:
         "atan":         "hv_atan_f",
         "atan2":        "hv_atan2_f",
         "atanh":        "hv_atanh_f",
+        # "avg":          "hv_?_f",           # averages all elements of a table
+        # "Avg":          "hv_?_f",           # averages elements of a specified boundary of a table
         "cbrt":         "hv_cbrt_f",
         "ceil":         "hv_ceil_f",
         "copysign":     "hv_copysign_f",
@@ -238,10 +240,10 @@ class ExprOpMap:
         "nearbyint":    "hv_rint_f",        # round to nearest int
         "sin":          "hv_sin_f",
         "sinh":         "hv_sinh_f",
-        # "size":         "hv_?_f",           # size of a table
+        # "size":         "hv_?_f",          # size of a table
         "sqrt":         "hv_sqrt_f",
-        # "sum":          "hv_?_f",            # sum of all elements of a table
-        # "Sum":          "hv_?_f",            # sum of elemnets of a specified boundary of a table???
+        # "sum":          "hv_?_f",          # sum of all elements of a table
+        # "Sum":          "hv_?_f",          # sum of elemnets of a specified boundary of a table
         "tan":          "hv_tan_f",
         "tanh":         "hv_tanh_f",
         "_load_f":      "hv_var_k_f",

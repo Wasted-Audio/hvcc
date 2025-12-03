@@ -126,7 +126,7 @@ class TestPdControlExprPatches(TestPdControlBase):
     def test_ceil_floor(self):
         self._test_control_patch("test-ceil-floor.pd")
 
-    # # Power functions
+    # Power functions
 
     def test_pow(self):
         self._test_control_patch("test-pow.pd")
@@ -161,7 +161,7 @@ class TestPdControlExprPatches(TestPdControlBase):
     def test_ldexp(self):
         self._test_control_patch("test-ldexp.pd")
 
-    # # Trigonometric
+    # Trigonometric
 
     def test_sin_asin_sinh_asinh(self):
         self._test_control_patch("test-sin-asin-sinh-asinh.pd", num_iterations=2)
@@ -175,7 +175,7 @@ class TestPdControlExprPatches(TestPdControlBase):
     def test_atan2(self):
         self._test_control_patch("test-atan2.pd")
 
-    # # Some complex expressions
+    # Some complex expressions
 
     def test_complex_expr1(self):
         self._test_control_patch("test-complex-expr1.pd")
