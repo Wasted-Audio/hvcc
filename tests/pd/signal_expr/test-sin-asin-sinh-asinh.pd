@@ -1,4 +1,4 @@
-#N canvas 827 239 734 565 12;
+#N canvas 827 239 647 438 12;
 #X obj 60 47 loadbang;
 #X obj 60 74 bng 25 250 50 0 empty empty empty 17 7 0 10 #191919 #ffffff #ffffff;
 #X obj 112 393 print;
@@ -23,6 +23,7 @@
 #X obj 60 172 t b b;
 #X obj 60 198 del 2;
 #X msg 199 172 -3.16;
+#X text 251 46 -3.1 gave inconsistent rounding errors in CI on sinh() \; so it was changed to -3.16 for this test;
 #X connect 0 0 1 0;
 #X connect 1 0 8 0;
 #X connect 3 0 16 0;
