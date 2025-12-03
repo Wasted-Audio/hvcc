@@ -28,6 +28,7 @@ Please use English for all communications to include as many people as possible.
   * run `tox` for the full suite of tests or `poetry run pytest tests/` for just the test suite.
 * Write unit, integration or end-to-end tests as appropriate to your feature or bug-fix.
 * Review and update the [Changelog](CHANGELOG.md) and [Documentation](/docs/). Your changes may affect sections of these documents.
+* If your feature is large, or has a significant impact on other parts of the code, write an [Architecture Decision Record](/docs/ADRs/) describing the consideractions related to the change.
 
 ### Git best practices
 
