@@ -40,6 +40,6 @@ Please use English for all communications to include as many people as possible.
 
 Not only the core project can use contributions, but there are also several repositories dedicated to user examples.
 
-This stars with the [hvcc-examples](https://github.com/Wasted-Audio/hvcc-examples) project which contains some general abstractions and requirements. There are links to several dedicated generator projects that are based on this repository.
+This starts with the [hvcc-examples](https://github.com/Wasted-Audio/hvcc-examples) project which contains some general abstractions and requirements. There are links to several dedicated generator projects that are based on this repository.
 
 If you want to create a new generator example project open an [Issue](https://github.com/Wasted-Audio/hvcc-examples/issues) so it can be set up for you.
