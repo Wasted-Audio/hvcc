@@ -1,0 +1,4 @@
+#N canvas 827 239 734 565 12;
+#X obj 35 20 vsl 17 128 0 127 0 0 empty \$1_\$2_\$3\ @hv_param empty 0 -9 0 10 #191919 #ffffff #ffffff 0 1;
+#X floatatom 101 81 5 0 0 0 - float_\$3\ @hv_param - 0;
+#X coords 0 0 1 1 188 177 1 0 0;

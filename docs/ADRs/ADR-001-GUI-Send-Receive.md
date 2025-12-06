@@ -1,6 +1,7 @@
 # ADR-001: GUI Send Receive
 
 Date: 2025-08-29
+
 Issue: https://github.com/Wasted-Audio/hvcc/issues/186
 
 ## Context
