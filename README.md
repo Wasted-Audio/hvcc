@@ -62,18 +62,18 @@ For tests:
 hvcc is available from pypi.org and can be installed using python3 pip:
 
 ```sh
-~$ pip3 install hvcc
+pip3 install hvcc
 ```
 
 If you want to develop hvcc you can install it from the source directory:
 
 ```sh
-~$ git clone https://github.com/Wasted-Audio/hvcc.git
-~$ cd hvcc/
-~$ pip3 install -e .
+git clone https://github.com/Wasted-Audio/hvcc.git
+cd hvcc/
+pip3 install -e .
 ```
 
-Also review our [Contribution Guide](CONTRIBUTING.md) before opening a pull request.
+Also review our [Contribution Guide](/CONTRIBUTING.md) before opening a pull request.
 
 ## Usage
 
@@ -81,7 +81,9 @@ Also review our [Contribution Guide](CONTRIBUTING.md) before opening a pull requ
 
 Generate a C/C++ program from `input.pd` and place the files in `~/myProject/`
 
-`$ hvcc ~/myProject/_main.pd`
+```sh
+hvcc ~/myProject/_main.pd
+```
 
 This command will generate the following directories:
 
@@ -98,7 +100,7 @@ The `-o` or `--out_dir` parameter will specify where the output files are placed
 For example:
 
 ```sh
-~$ hvcc ~/myProject/_main.pd -o ~/Desktop/somewhere/else/
+hvcc ~/myProject/_main.pd -o ~/Desktop/somewhere/else/
 ```
 
 Will place all the generated files in `~/Desktop/somewhere/else/`.
@@ -108,7 +110,7 @@ Will place all the generated files in `~/Desktop/somewhere/else/`.
 The `-n` or `--name` parameter can be used to easily namespace the generated code so that there are no conflicts when integrating multiple patches into the same project.
 
 ```sh
-~$ hvcc ~/myProject/_main.pd -o ~/Desktop/somewhere/else/ -n mySynth
+hvcc ~/myProject/_main.pd -o ~/Desktop/somewhere/else/ -n mySynth
 ```
 
 ### `-g` Generators
@@ -118,7 +120,7 @@ Once `hvcc` has generated internal information about the patch the `-g` or `--ge
 For example:
 
 ```sh
-~$ hvcc ~/myProject/_main.pd -o ~/Desktop/somewhere/else/ -n mySynth -g unity
+hvcc ~/myProject/_main.pd -o ~/Desktop/somewhere/else/ -n mySynth -g unity
 ```
 
 Will also generate a `unity` section in the output directory contain all the build projects and source files to compile a Unity plugin.
@@ -126,7 +128,7 @@ Will also generate a `unity` section in the output directory contain all the bui
 It is also possible to pass a list of generators:
 
 ```sh
-~$ hvcc ~/myProject/_main.pd -o ~/Desktop/somewhere/else/ -n mySynth -g unity wwise js
+hvcc ~/myProject/_main.pd -o ~/Desktop/somewhere/else/ -n mySynth -g unity wwise js
 ```
 
 A list of available generator options can be found [here](/docs/03.generators.md)
@@ -140,7 +142,7 @@ This can be handy when using a third-party patch library like [heavylib](https:/
 Simply append any folder paths after the `-p` flag like so:
 
 ```sh
-~$ hvcc ~/myProject/_main.pd -o ~/Desktop/somewhere/else/ -n mySynth -p ~/Workspace/Projects/Enzien/heavylib/ ~/Desktop/myLib/
+hvcc ~/myProject/_main.pd -o ~/Desktop/somewhere/else/ -n mySynth -p ~/Workspace/Projects/Enzien/heavylib/ ~/Desktop/myLib/
 ```
 
 ### `-m` Meta Data
@@ -156,7 +158,7 @@ By default all the generated source files via `hvcc` will have the following cop
 This can be changed with `--copyright` parameter
 
 ```sh
-~$ hvcc ~/myProject/_main.pd -o ~/Desktop/somewhere/else/ -n mySynth --copyright "Copyright (c) Los Pollos Hermanos 2019"
+hvcc ~/myProject/_main.pd -o ~/Desktop/somewhere/else/ -n mySynth --copyright "Copyright (c) Los Pollos Hermanos 2019"
 ```
 
 ### `--help`
@@ -165,7 +167,7 @@ Displays all the available parameters and options for hvcc.
 
 ## Contact
 
-The Heavy community aims to be safe and inclusive, please read our [Code of Conduct](CODE_OF_CONDUCT.md) before engaging.
+The Heavy community aims to be safe and inclusive, please read our [Code of Conduct](/CODE_OF_CONDUCT.md) before engaging.
 
 There are several places where heavy/hvcc conversation is happening:
 
