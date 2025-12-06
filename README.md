@@ -61,15 +61,19 @@ For tests:
 
 hvcc is available from pypi.org and can be installed using python3 pip:
 
-`$ pip3 install hvcc`
+```sh
+~$ pip3 install hvcc
+```
 
 If you want to develop hvcc you can install it from the source directory:
 
-`$ git clone https://github.com/Wasted-Audio/hvcc.git`
+```sh
+~$ git clone https://github.com/Wasted-Audio/hvcc.git
+~$ cd hvcc/
+~$ pip3 install -e .
+```
 
-`$ cd hvcc/`
-
-`$ pip3 install -e .`
+Also review our [Contribution Guide](CONTRIBUTING.md) before opening a pull request.
 
 ## Usage
 
@@ -93,7 +97,9 @@ The `-o` or `--out_dir` parameter will specify where the output files are placed
 
 For example:
 
-`$ hvcc ~/myProject/_main.pd -o ~/Desktop/somewhere/else/`
+```sh
+~$ hvcc ~/myProject/_main.pd -o ~/Desktop/somewhere/else/
+```
 
 Will place all the generated files in `~/Desktop/somewhere/else/`.
 
@@ -101,7 +107,9 @@ Will place all the generated files in `~/Desktop/somewhere/else/`.
 
 The `-n` or `--name` parameter can be used to easily namespace the generated code so that there are no conflicts when integrating multiple patches into the same project.
 
-`$ hvcc ~/myProject/_main.pd -o ~/Desktop/somewhere/else/ -n mySynth`
+```sh
+~$ hvcc ~/myProject/_main.pd -o ~/Desktop/somewhere/else/ -n mySynth
+```
 
 ### `-g` Generators
 
@@ -109,13 +117,17 @@ Once `hvcc` has generated internal information about the patch the `-g` or `--ge
 
 For example:
 
-`$ hvcc ~/myProject/_main.pd -o ~/Desktop/somewhere/else/ -n mySynth -g unity`
+```sh
+~$ hvcc ~/myProject/_main.pd -o ~/Desktop/somewhere/else/ -n mySynth -g unity
+```
 
 Will also generate a `unity` section in the output directory contain all the build projects and source files to compile a Unity plugin.
 
 It is also possible to pass a list of generators:
 
-`$ hvcc ~/myProject/_main.pd -o ~/Desktop/somewhere/else/ -n mySynth -g unity wwise js`
+```sh
+~$ hvcc ~/myProject/_main.pd -o ~/Desktop/somewhere/else/ -n mySynth -g unity wwise js
+```
 
 A list of available generator options can be found [here](/docs/03.generators.md)
 
@@ -127,7 +139,9 @@ This can be handy when using a third-party patch library like [heavylib](https:/
 
 Simply append any folder paths after the `-p` flag like so:
 
-`$ hvcc ~/myProject/_main.pd -o ~/Desktop/somewhere/else/ -n mySynth -p ~/Workspace/Projects/Enzien/heavylib/ ~/Desktop/myLib/`
+```sh
+~$ hvcc ~/myProject/_main.pd -o ~/Desktop/somewhere/else/ -n mySynth -p ~/Workspace/Projects/Enzien/heavylib/ ~/Desktop/myLib/
+```
 
 ### `-m` Meta Data
 
@@ -141,13 +155,17 @@ By default all the generated source files via `hvcc` will have the following cop
 
 This can be changed with `--copyright` parameter
 
-`$ hvcc ~/myProject/_main.pd -o ~/Desktop/somewhere/else/ -n mySynth --copyright "Copyright (c) Los Pollos Hermanos 2019"`
+```sh
+~$ hvcc ~/myProject/_main.pd -o ~/Desktop/somewhere/else/ -n mySynth --copyright "Copyright (c) Los Pollos Hermanos 2019"
+```
 
 ### `--help`
 
 Displays all the available parameters and options for hvcc.
 
 ## Contact
+
+The Heavy community aims to be safe and inclusive, please read our [Code of Conduct](CODE_OF_CONDUCT.md) before engaging.
 
 There are several places where heavy/hvcc conversation is happening:
 
@@ -163,7 +181,7 @@ Or you can use the [discussions](https://github.com/Wasted-Audio/hvcc/discussion
 
 ## Funding
 
-This project is funded through [NGI0 Commons Fund](https://nlnet.nl/commonsfund), a fund established by [NLnet](https://nlnet.nl) with financial support from the European Commission's [Next Generation Internet](https://ngi.eu) program. Learn more at the [NLnet project page](https://nlnet.nl/project/HVCC).
+This project is partially funded through [NGI0 Commons Fund](https://nlnet.nl/commonsfund), a fund established by [NLnet](https://nlnet.nl) with financial support from the European Commission's [Next Generation Internet](https://ngi.eu) program. Learn more at the [NLnet project page](https://nlnet.nl/project/HVCC).
 
 [<img src="https://nlnet.nl/logo/banner.png" alt="NLnet foundation logo" width="20%" />](https://nlnet.nl)
 [<img src="https://nlnet.nl/image/logos/NGI0_tag.svg" alt="NGI Zero Logo" width="20%" />](https://nlnet.nl/commonsfund)

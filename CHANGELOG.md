@@ -12,6 +12,15 @@ Features:
 * Daisy: support display parameters using `@hv_param`
 * New pd2gui parser that creates an Intermediate Representation JSON with exposed UI objects
 
+Cleanup:
+
+* Daisy: allow more generic `HAS_MIDI` in the board.json
+
+Docs:
+
+* Add: Code Of Conduct
+* Add: Contributing Guide
+
 0.14.0
 -----
 
