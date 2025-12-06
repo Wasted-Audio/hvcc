@@ -217,7 +217,6 @@ class ir2c:
         class_impl_lines = []
         for obj_id in ir.init.order:
             o = ir.objects[obj_id]
-            # print("init objects:", o.type)
             obj_class = ir2c.get_class(o.type)
             init_raw = obj_class.get_C_init(o.type, obj_id, o.args)
 
@@ -233,7 +232,6 @@ class ir2c:
         for x in ir.control.sendMessage:
             obj_id = x.id
             o = ir.objects[obj_id]
-            # print("control objects:", o.type)
             obj_class = ir2c.get_class(o.type)
             impl = obj_class.get_C_impl(
                 o.type,
@@ -264,13 +262,10 @@ class ir2c:
 
         # generate the list of functions to process
         process_list: List = []
-        # print("--------------- for each signal in order")
         process_classes: set[Type[HeavyObject]] = set()
         for y in ir.signal.processOrder:
-            # print("--- signal", y.id, o.type, ir2c.get_class(o.type))
             obj_id = y.id
             o = ir.objects[obj_id]
-            # print("process objects:", o.type)
             obj_cls = ir2c.get_class(o.type)
             process_classes.add(obj_cls)
             process_list.extend(obj_cls.get_C_process(
@@ -286,6 +281,10 @@ class ir2c:
             obj_impl_lines.extend(obj_cls.get_C_obj_impl_code(
                 o.type, obj_id, o.args
             ))
+
+        # Render name into Expr~ impls
+        obj_impl_lines = [env.from_string(line).render(name=name) for line in obj_impl_lines]
+
         # once for each class
         for prc_cls in process_classes:
             class_header_lines.extend(prc_cls.get_C_class_header_code(

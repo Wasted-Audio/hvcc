@@ -78,7 +78,6 @@ class ExprCWriter:
 
     def _bind_var_node(self, node: ExprNode, a_name) -> None:
         if node.type != "var":
-            print("called on non-var node: ", node)
             pass
         parts = re.match(r"\$(v|f)(\d+)", node.value)
         assert parts

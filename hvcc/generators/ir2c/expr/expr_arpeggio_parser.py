@@ -46,7 +46,6 @@ class ExprArpeggioParser():
     @classmethod
     def parse(cls, expr) -> ParseExpr:
         """Parse the input expression and return a parse tree"""
-        print("--> expression: ", expr)
         return expr_grammar.parse(expr)
 
     @classmethod

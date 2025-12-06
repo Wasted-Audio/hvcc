@@ -79,7 +79,7 @@ class SignalExpr(HeavyObject):
             buffers = ", ".join([f"Bf{i}" for i in range(0, num_buffers)])
             buffer_declaration = f"\thv_bufferf_t {buffers};"
 
-        func_name = f"Heavy_heavy::{cls.preamble}_{obj_id}_evaluate"
+        func_name = f"Heavy_{{{{name}}}}::{cls.preamble}_{obj_id}_evaluate"
         lines.extend([
             "",
             f"void {func_name}(hv_bInf_t* bIns, hv_bOutf_t bOut) {{",
