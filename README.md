@@ -46,6 +46,7 @@ Python 3.9 up to 3.14
 
 * `jinja2` (for generator templating)
 * `pydantic` (for data types)
+* `arpeggio` (for `expr~` translation)
 
 For tests:
 
