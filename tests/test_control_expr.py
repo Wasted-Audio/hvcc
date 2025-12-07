@@ -177,6 +177,10 @@ class TestPdControlExprPatches(TestPdControlBase):
     # def test_complex_expr2(self):
     #     self._test_control_patch("test-complex-expr2.pd")
 
+    # Niche edge cases
+
+    def test_skip_var(self):
+        self._test_control_patch("test-skip-var.pd")
 
 def main():
     # TODO(mhroth): make this work

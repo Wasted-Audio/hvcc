@@ -27,9 +27,6 @@ class PdExprObject(PdObject):
       This version currently supports up to 100 variables as defined in HvControlExpr.h
     - I don't know what pd-expr does with strings, haven't experimented
       and haven't given it any thought yet here
-
-    Bugs:
-    - skipped variables cause crash, like "$f1 + $f3"
     """
 
     def __init__(
