@@ -182,6 +182,7 @@ class TestPdControlExprPatches(TestPdControlBase):
     def test_skip_var(self):
         self._test_control_patch("test-skip-var.pd")
 
+
 def main():
     # TODO(mhroth): make this work
     parser = argparse.ArgumentParser(

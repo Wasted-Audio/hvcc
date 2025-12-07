@@ -190,6 +190,7 @@ class TestPdControlExprPatches(TestPdControlBase):
     def test_var_types(self):
         self._test_control_patch("test-var-types.pd")
 
+
 def main():
     # TODO(mhroth): make this work
     parser = argparse.ArgumentParser(
