@@ -15,6 +15,7 @@
 
 import argparse
 import os
+import unittest
 
 from tests.framework.base_control import TestPdControlBase
 
@@ -183,6 +184,11 @@ class TestPdControlExprPatches(TestPdControlBase):
     # def test_complex_expr2(self):
     #     self._test_control_patch("test-complex-expr2.pd")
 
+    # Types
+
+    @unittest.skip("not implemented")
+    def test_var_types(self):
+        self._test_control_patch("test-var-types.pd")
 
 def main():
     # TODO(mhroth): make this work
