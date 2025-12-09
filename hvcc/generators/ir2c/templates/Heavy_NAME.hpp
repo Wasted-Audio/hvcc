@@ -87,8 +87,8 @@ class Heavy_{{name}} : public HeavyContext {
 
 
   /*
-  * Experimental code for expr/expr~ implementation
-  * Write out the generic header code
+  * Code for expr/expr~ implementation
+  * Write out the generic implementation code
   */
 
   // per class code

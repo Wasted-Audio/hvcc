@@ -156,10 +156,10 @@ void Heavy_{{name}}::{{x}}
 
 
 /*
- * Experimental code for expr/expr~ implementation
- * Write out the generic header code
+ * Code for expr/expr~ implementation
+ * Write out the generic implementation code
  */
- 
+
  // per class code
  {%- for line in class_impl_lines %}
  {{line}}

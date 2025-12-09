@@ -42,11 +42,11 @@ class HeavyObject:
         return cls.preamble
 
     @classmethod
-    def get_C_header_set(self) -> set:
+    def get_C_header_set(cls) -> set:
         return set()
 
     @classmethod
-    def get_C_file_set(self) -> set:
+    def get_C_file_set(cls) -> set:
         return set()
 
     @classmethod

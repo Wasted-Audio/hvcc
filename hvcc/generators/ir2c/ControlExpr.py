@@ -24,11 +24,11 @@ class ControlExpr(HeavyObject):
     preamble = "cExpr"
 
     @classmethod
-    def get_C_header_set(self) -> set:
+    def get_C_header_set(cls) -> set:
         return {"HvControlExpr.h"}
 
     @classmethod
-    def get_C_file_set(self) -> set:
+    def get_C_file_set(cls) -> set:
         return {"HvControlExpr.h", "HvControlExpr.c"}
 
     @classmethod
@@ -75,9 +75,8 @@ class ControlExpr(HeavyObject):
         objects: Dict,
         args: Dict
     ) -> List[str]:
-        """
-        (Per object) this creates the _sendMessage function that other objects use to
-        send messages to this object.
+        """ (Per object) this creates the _sendMessage function that other objects use to
+            send messages to this object.
         """
 
         lines = super().get_C_impl(obj_type, obj_id, on_message_list, get_obj_class, objects, args)
@@ -92,14 +91,12 @@ class ControlExpr(HeavyObject):
         return lines
 
 
-"""
-Below is code to rewrite the input expression into one that uses local variables
-that have been cast to either float or int
-"""
-
-
-# todo(dgb): need to handle the 's' type
 def var_n(a_name: str, var: str) -> str:
+    """ Rewrite the input expression into one that uses local variables
+        that have been cast to either float or int
+
+        todo(dgb): need to handle the 's' type
+    """
     parts = re.match(r"\$([fi])(\d+)", var)
     assert parts
     type = "float" if parts[1] == "f" else "int"
@@ -109,11 +106,10 @@ def var_n(a_name: str, var: str) -> str:
 def internal_expr(exp: str) -> str:
     """ Convert function names to C or internal names
     """
-
     internal: List[Tuple[str, str]] = [
-        (r"\\,",            ","),
-        (r"\bfact(?=\()",       "expr_fact"),
-        (r"\bimodf(?=\()",      "expr_imodf"),
+        (r"\\,",           ","),
+        (r"\bfact(?=\()",  "expr_fact"),
+        (r"\bimodf(?=\()", "expr_imodf"),
     ]
 
     for r in internal + hv_utils:
@@ -128,7 +124,7 @@ def bind_expr(exp: str = "$f1+2", a_name: str = "a") -> str:
 
     if vars:
         # reverse list so we start replacing the bigger variables
-        # and don't get conflicts
+        # and don't get conflicts. eg. $f11 vs $f1
         vars.sort(reverse=True)
         for var in vars:
             exp = exp.replace(var, var_n(a_name, var))

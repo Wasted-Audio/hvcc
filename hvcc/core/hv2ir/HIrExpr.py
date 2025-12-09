@@ -21,7 +21,8 @@ from .HeavyGraph import HeavyGraph
 
 
 class HIrExpr(HeavyIrObject):
-    """Just a stub to get it going..."""
+    """ This needs little logic as the expression is forwarded to ir2c
+    """
 
     def __init__(
         self,
