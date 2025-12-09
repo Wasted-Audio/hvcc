@@ -30,6 +30,9 @@ class TestPdSignalPatches(TestPdSignalBase):
     def test_phasor_control(self):
         self._test_signal_patch("test-phasor-control.pd")
 
+    def test_phasor_signal(self):
+        self._test_signal_patch("test-phasor-signal.pd")
+
 
 def main():
     parser = argparse.ArgumentParser(

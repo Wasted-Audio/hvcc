@@ -50,7 +50,7 @@ class TestPdSignalBase(HvBaseTest):
             str(block_size or 480),
             str(num_iterations or 100)])
 
-        return wav_path
+        return exe_path, wav_path
 
     def _compare_wave_output(
         self,

@@ -112,6 +112,9 @@ class HvBaseTest(unittest.TestCase):
                 source_files=source_files,
                 out_path=exe_path))
 
+        # run the clean command
+        subprocess.check_output(["make", "-C", os.path.dirname(makefile_path), "clean"])
+
         # run the compile command
         subprocess.check_output(["make", "-C", os.path.dirname(makefile_path), "-j"])
 
