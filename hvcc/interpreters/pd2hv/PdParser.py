@@ -354,6 +354,10 @@ class PdParser:
                                 pos_y=int(line[3])))
                             continue
 
+                        if obj_type in ('block~',):
+                            # we ignore the object and continue
+                            continue
+
                         # do we have an abstraction for this object?
                         abs_path = self.find_abstraction_path(os.path.dirname(pd_path), obj_type)
                         if abs_path is not None and not g.is_abstraction_on_call_stack(abs_path):
