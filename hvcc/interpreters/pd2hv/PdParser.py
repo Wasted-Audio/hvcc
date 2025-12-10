@@ -354,7 +354,7 @@ class PdParser:
                                 pos_y=int(line[3])))
                             continue
 
-                        if obj_type in ('block~'):
+                        if obj_type in ('block~',):
                             # we ignore the object and continue
                             continue
 
