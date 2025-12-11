@@ -274,7 +274,7 @@ class ir2c:
                 obj_id,
                 o.args))
 
-            # begin experiment for expr~
+            # Add Expr~ header and impl lines
             obj_header_lines.extend(obj_cls.get_C_obj_header_code(
                 o.type, obj_id, o.args
             ))

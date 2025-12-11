@@ -156,7 +156,7 @@ void Heavy_{{name}}::{{x}}
 
 
 /*
- * Code for expr/expr~ implementation
+ * Code for expr~ implementation
  * Write out the generic implementation code
  */
 

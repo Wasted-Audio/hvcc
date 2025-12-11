@@ -22,16 +22,16 @@ from .HeavyObject import HeavyObject
 
 
 class SignalExpr(HeavyObject):
-    """Handles the math objects.
+    """ Handles the math objects.
+        Note: obj_eval_functions dict accumulates until reset!
     """
 
     preamble = "cExprSig"
-
     obj_eval_functions: Dict = {}
 
     @classmethod
     def handles_type(cls, obj_type: str) -> bool:
-        """Returns true if the object type can be handled by this class
+        """ Returns true if the object type can be handled by this class
         """
         return obj_type == "_expr~"
 
@@ -41,11 +41,11 @@ class SignalExpr(HeavyObject):
 
     @classmethod
     def get_C_class_header_code(cls, obj_type: str, args: Dict) -> List[str]:
-        eval_funcs = ", ".join(cls.obj_eval_functions.values())
+        eval_funcs = ",\n\t\t".join(cls.obj_eval_functions.values())
         fptr_type = f"{cls.preamble}_evaluator"
         lines = [
             f"typedef void(*{fptr_type})(hv_bInf_t*, hv_bOutf_t);",
-            f"{fptr_type} {cls.preamble}_evaluators[{len(cls.obj_eval_functions)}] = {{{eval_funcs}}};",
+            f"{fptr_type} {cls.preamble}_evaluators[{len(cls.obj_eval_functions)}] = {{\n\t\t{eval_funcs}\n\t}};",
         ]
         return lines
 
@@ -61,9 +61,8 @@ class SignalExpr(HeavyObject):
 
     @classmethod
     def get_C_obj_impl_code(cls, obj_type: str, obj_id: str, args: Dict) -> List[str]:
-        """
-        (Per object) this creates the _sendMessage function that other objects use to
-        send messages to this object.
+        """ (Per object) this creates the _sendMessage function that other objects use to
+            send messages to this object.
         """
 
         lines = []
