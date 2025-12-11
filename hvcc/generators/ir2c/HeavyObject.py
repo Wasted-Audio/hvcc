@@ -1,5 +1,5 @@
 # Copyright (C) 2014-2018 Enzien Audio, Ltd.
-# Copyright (C) 2023-2024 Wasted Audio
+# Copyright (C) 2023-2025 Daniel Billotte, Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -51,7 +51,7 @@ class HeavyObject:
 
     @classmethod
     def get_C_init(cls, obj_type: str, obj_id: str, args: Dict) -> List[str]:
-        return [f"{cls.preamble}_init(&{cls.preamble}_{obj_id})"]
+        raise NotImplementedError("method get_C_init not implemented")
 
     @classmethod
     def get_C_def(cls, obj_type: str, obj_id: str) -> List[str]:

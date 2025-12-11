@@ -1,4 +1,4 @@
-#N canvas 1119 295 450 300 12;
+#N canvas 263 226 523 299 12;
 #X obj 52 25 loadbang;
 #X obj 52 260 print;
 #X obj 52 100 t b b b;
@@ -12,7 +12,8 @@
 #X obj 290 227 expr sinh($f1);
 #X obj 410 260 print;
 #X obj 410 227 expr asinh($f1);
-#X msg 106 135 -3.1;
+#X msg 106 135 -3.16;
+#X text 182 41 -3.1 gave inconsistent rounding errors in CI on sinh() \; so it was changed to -3.16 for this test;
 #X connect 0 0 5 0;
 #X connect 2 0 4 0;
 #X connect 2 1 13 0;
