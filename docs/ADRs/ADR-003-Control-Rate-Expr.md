@@ -21,6 +21,10 @@ In ir2c the object initialization and implementation can be constructed. Pd expr
 
 Generic object methods for initialization and message handling are added to static expr library files and missing C functions will need to be added to `HvUtils.h`.
 
+Unofficial [documentation](https://pd.iem.sh/objects/expr~/) mentions "up to 100" inlets/variables can be used, so we'll target this same number in our code which should be plenty of any use-case.
+
+Testing of this code should be fairly straightforward. We can use a similar setup as the current control tests that have test-patches that are built into a binary that prints results to stdout. These can then be compared to known values to validate the behavior.
+
 ## MVP Definition
 
 For the user to be able to create control rate expressions using common functions and both float and integer input variables.
