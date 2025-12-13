@@ -13,18 +13,19 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from typing import Union
+from typing import Literal, Union
 
 from arpeggio import ParsingExpression as ParseTreeNode, Terminal  # type: ignore
 from .expr_arpeggio_grammar import expr_grammar
 
 ParseExpr = Union[ParseTreeNode, Terminal]
+NodeType = Literal["binary", "bound_var", "num_i", "num_f", "var", "func", "unary"]
 
 
 class ExprNode:
     def __init__(
         self,
-        node_type: str,
+        node_type: NodeType,
         value: str,
         nodes: list = []
     ) -> None:
@@ -58,36 +59,32 @@ class ExprArpeggioParser():
     """
     @classmethod
     def to_expr_tree(cls, expr: ParseExpr) -> ExprNode:
-        if expr.rule_name == "num_i":
-            return ExprNode("num_i", expr.value)
-        elif expr.rule_name == "num_f":
-            return ExprNode("num_f", expr.value)
-        elif expr.rule_name == "var":
-            return ExprNode("var", expr.value)
+        if expr.rule_name in ("num_i", "num_f", "var"):
+            return ExprNode(expr.rule_name, expr.value)
         elif expr.rule_name == "func":
             return ExprNode("func", expr[0].value, [cls.to_expr_tree(p) for p in expr[1:]])
         elif expr.rule_name == "unary":
             return ExprNode("unary", expr[0].value, [cls.to_expr_tree(expr[1])])
-        elif expr.rule_name in ():
-            # this is RtoL associativity
-            val = None
-            tmp = None
-            subtree = None
-            for i in range(len(expr)):
-                if i % 2 == 0:
-                    val = cls.to_expr_tree(expr[i])
-                else:
-                    foo = ExprNode("binary", str(expr[i]), [val])
-                    if subtree is None:
-                        subtree = foo
-                    else:
-                        assert tmp
-                        tmp.nodes.append(foo)
-                    tmp = foo
-            assert val and tmp and subtree
-            tmp.nodes.append(val)
-            return subtree
-
+        # elif expr.rule_name in ():
+        #     # Note: this rule is not used by any expression
+        #     # this is RtoL associativity
+        #     val = None
+        #     tmp = None
+        #     subtree = None
+        #     for i in range(len(expr)):
+        #         if i % 2 == 0:
+        #             val = cls.to_expr_tree(expr[i])
+        #         else:
+        #             foo = ExprNode("binary", str(expr[i]), [val])
+        #             if subtree is None:
+        #                 subtree = foo
+        #             else:
+        #                 assert tmp
+        #                 tmp.nodes.append(foo)
+        #             tmp = foo
+        #     assert val and tmp and subtree
+        #     tmp.nodes.append(val)
+        #     return subtree
         elif expr.rule_name in (
             "lor", "land", "bor", "xor", "band", "eq", "gtlte", "gtlt", "shift", "factor", "term"
         ):
@@ -103,6 +100,5 @@ class ExprArpeggioParser():
                     subtree = ExprNode("binary", str(expr[i]), [subtree])
             assert subtree
             return subtree
-
         else:
             raise ValueError(f"Unknown rule {expr.rule_name}")
