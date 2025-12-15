@@ -40,7 +40,7 @@ class PdExprObject(PdObject):
             Validate the expr object and any heavy restrictions, then
             convert it directly into a HeavyIR object.
         """
-        assert obj_type in ["expr",]
+        assert obj_type in ["expr", "expr~"]
         super().__init__(obj_type, obj_args, pos_x, pos_y)
 
         # turn the arguments into a list of expressions, but only one for now

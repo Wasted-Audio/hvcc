@@ -54,6 +54,7 @@ from hvcc.generators.ir2c.SignalBiquad import SignalBiquad
 from hvcc.generators.ir2c.SignalCPole import SignalCPole
 from hvcc.generators.ir2c.SignalDel1 import SignalDel1
 from hvcc.generators.ir2c.SignalEnvelope import SignalEnvelope
+from hvcc.generators.ir2c.SignalExpr import SignalExpr
 from hvcc.generators.ir2c.SignalLine import SignalLine
 from hvcc.generators.ir2c.SignalLorenz import SignalLorenz
 from hvcc.generators.ir2c.SignalMath import SignalMath
@@ -83,6 +84,7 @@ class ir2c:
         "__cast_f": ControlCast,
         "__cast_s": ControlCast,
         "__expr": ControlExpr,
+        "__expr~": SignalExpr,
         "__message": ControlMessage,
         "__system": ControlSystem,
         "__receive": ControlReceive,
@@ -194,6 +196,9 @@ class ir2c:
         # Parse the hv.ir data structure and generate C-language strings.
         #
 
+        # Reset the obj_eval_functions state
+        SignalExpr.obj_eval_functions = {}
+
         # generate set of header files to include
         include_set = set([x for o in ir.objects.values() for x in ir2c.get_class(o.type).get_C_header_set()])
 
@@ -206,6 +211,10 @@ class ir2c:
         free_list = []
         def_list = []
         decl_list = []
+        obj_header_lines = []
+        obj_impl_lines = []
+        class_header_lines = []
+        class_impl_lines = []
         for obj_id in ir.init.order:
             o = ir.objects[obj_id]
             obj_class = ir2c.get_class(o.type)
@@ -265,6 +274,25 @@ class ir2c:
                 obj_id,
                 o.args))
 
+            # Add Expr~ header and impl lines
+            obj_header_lines.extend(obj_cls.get_C_obj_header_code(
+                o.type, obj_id, o.args
+            ))
+            obj_impl_lines.extend(obj_cls.get_C_obj_impl_code(
+                o.type, obj_id, o.args
+            ))
+
+        # Render name into Expr~ impls
+        obj_impl_lines = [env.from_string(line).render(name=name) for line in obj_impl_lines]
+
+        # once for each class
+        for prc_cls in process_classes:
+            class_header_lines.extend(prc_cls.get_C_class_header_code(
+                o.type, o.args
+            ))
+            class_impl_lines.extend(prc_cls.get_C_class_impl_code(
+                o.type, o.args
+            ))
         #
         # Load the C-language template files and use the parsed strings to fill them in.
         #
@@ -285,7 +313,9 @@ class ir2c:
                 def_list=def_list,
                 signal=ir.signal,
                 copyright=copyright,
-                externs=externs))
+                externs=externs,
+                class_header_lines=class_header_lines,
+                obj_header_lines=obj_header_lines))
 
         # write C++ implementation
         with open(os.path.join(output_dir, f"Heavy_{name}.cpp"), "w") as f:
@@ -300,6 +330,8 @@ class ir2c:
                 process_list=process_list,
                 table_data_list=table_data_list,
                 copyright=copyright,
+                class_impl_lines=class_impl_lines,
+                obj_impl_lines=obj_impl_lines,
                 nodsp=nodsp))
 
         # write C API, hv_NAME.h

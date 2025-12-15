@@ -12,6 +12,7 @@ Features:
 * Daisy: support display parameters using `@hv_param`
 * New pd2gui parser that creates an Intermediate Representation JSON with exposed UI objects
 * Support for `expr` and most of its functions - thanks to @dgbillotte
+* Support for `expr~` and most of its functions - thanks to @dgbillotte
 
 Cleanup:
 
