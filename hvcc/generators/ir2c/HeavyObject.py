@@ -1,5 +1,5 @@
 # Copyright (C) 2014-2018 Enzien Audio, Ltd.
-# Copyright (C) 2023-2024 Wasted Audio
+# Copyright (C) 2023-2025 Daniel Billotte, Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -42,12 +42,16 @@ class HeavyObject:
         return cls.preamble
 
     @classmethod
-    def get_C_header_set(self) -> set:
+    def get_C_header_set(cls) -> set:
         return set()
 
     @classmethod
-    def get_C_file_set(self) -> set:
+    def get_C_file_set(cls) -> set:
         return set()
+
+    @classmethod
+    def get_C_init(cls, obj_type: str, obj_id: str, args: Dict) -> List[str]:
+        raise NotImplementedError("method get_C_init not implemented")
 
     @classmethod
     def get_C_def(cls, obj_type: str, obj_id: str) -> List[str]:
@@ -75,7 +79,8 @@ class HeavyObject:
         obj_id: str,
         on_message_list: List[List[IROnMessage]],
         get_obj_class: Callable,
-        objects: Dict[str, IRObjectdict]
+        objects: Dict[str, IRObjectdict],
+        args: Dict
     ) -> List[str]:
         send_message_list = [
             "{0}_{1}_sendMessage(HeavyContextInterface *_c, int letIn, const HvMessage *m) {{".format(
@@ -99,12 +104,24 @@ class HeavyObject:
         return send_message_list
 
     @classmethod
-    def get_C_init(cls, obj_type: str, obj_id: str, args: Dict) -> List[str]:
-        raise NotImplementedError("method get_C_init not implemented")
+    def get_C_onMessage(cls, obj_type: str, obj_id: str, inlet_index: int, args: Dict) -> List[str]:
+        raise NotImplementedError("method get_C_onMessage not implemented", cls, obj_type)
 
     @classmethod
-    def get_C_onMessage(cls, obj_type: str, obj_id: str, inlet_index: int, args: Dict) -> List[str]:
-        raise NotImplementedError("method get_C_onMessage not implemented")
+    def get_C_obj_header_code(cls, obj_type: str, obj_id: str, args: Dict) -> List[str]:
+        return []
+
+    @classmethod
+    def get_C_obj_impl_code(cls, obj_type: str, obj_id: str, args: Dict) -> List[str]:
+        return []
+
+    @classmethod
+    def get_C_class_header_code(cls, obj_type: str, args: Dict) -> List[str]:
+        return []
+
+    @classmethod
+    def get_C_class_impl_code(cls, obj_type: str, args: Dict) -> List[str]:
+        return []
 
     @classmethod
     def get_C_process(cls, process_dict: IRSignalList, obj_type: str, obj_id: str, args: Dict) -> List[str]:

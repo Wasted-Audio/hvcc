@@ -1037,6 +1037,31 @@
 
     ]
   },
+  "__expr": {
+    "inlets": [],
+    "ir": {
+      "control": true,
+      "signal": false,
+      "init": true
+    },
+    "outlets": [
+      "-->"
+    ],
+    "args": [{
+        "name": "expressions",
+        "value_type": "stringarray",
+        "description": "The expression to evaluate",
+        "default": "",
+        "required": true
+    },
+    {
+      "name": "num_inlets",
+      "value_type": "int",
+      "description": "Number of inlets for this instance",
+      "default": "",
+      "required": true
+    }]
+  },
   "__floor": {
     "inlets": [
       "-->"
@@ -1049,9 +1074,7 @@
     "outlets": [
       "-->"
     ],
-    "args": [
-
-    ]
+    "args": []
   },
   "__floor~f": {
     "args": [
