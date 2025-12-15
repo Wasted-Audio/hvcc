@@ -1,4 +1,4 @@
-name: HVCC
+name: HVCC Build
 
 on: [push, pull_request]
 
@@ -55,7 +55,7 @@ jobs:
 
 
   build-macos:
-    runs-on: macos-14-intel
+    runs-on: macos-15-intel
     steps:
       - uses: actions/checkout@v3
         with:
@@ -77,4 +77,4 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: heavy-binary-macos-x86_64
-          path: dist/pyinstaller/macosx_14_0_x86_64/Heavy
+          path: dist/pyinstaller/macosx_15_0_x86_64/Heavy

@@ -1,4 +1,4 @@
-name: HVCC
+name: HVCC CI
 
 on: [push, pull_request]
 
