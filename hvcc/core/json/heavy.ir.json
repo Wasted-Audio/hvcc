@@ -1085,7 +1085,7 @@
       "description": "Number of inlets for this instance",
       "default": "",
       "required": true
-    }]    
+    }]
   },
   "__floor": {
     "inlets": [
