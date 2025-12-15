@@ -26,8 +26,10 @@
   #define HV_ANDROID 1
 #elif __unix__ || __unix
   #define HV_UNIX 1
-#elif !defined(HV_BARE_METAL)
+#else
+  #ifndef HV_BARE_METAL
   #warning Could not detect platform. Assuming Unix-like.
+  #endif
 #endif
 
 #ifdef EMSCRIPTEN
