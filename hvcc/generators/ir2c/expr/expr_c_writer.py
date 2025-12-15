@@ -19,6 +19,35 @@ from typing import List, Union
 from .expr_arpeggio_parser import ExprArpeggioParser, ExprNode, ParseExpr
 
 
+class BufferAllocator:
+    """ Class for managing the swapping of buffers from
+        output to input in successive calls.
+    """
+    def __init__(self) -> None:
+        self._avail: set = set()
+        self._next: int = 0
+
+    def next(self) -> int:
+        """ If a buffer is available return it, otherwise
+            allocate a new one and return it.
+        """
+        if len(self._avail) > 0:
+            return self._avail.pop()
+        nxt = self._next
+        self._next += 1
+        return nxt
+
+    def free(self, n: int) -> None:
+        """ Return a buffer back to the pool to be reused
+        """
+        self._avail.add(n)
+
+    def num_allocated(self) -> int:
+        """ Return the buffers allocated in so far.
+        """
+        return self._next
+
+
 class ExprCWriter:
     def __init__(self, expression: str):
         self.expression = expression
@@ -84,34 +113,8 @@ class ExprCWriter:
         node.value = f"{a_name}[{int(parts[2])-1}]"
         node.type = "bound_var"
 
-    class BufferAllocator:
-        """Inner class for managing the swapping of buffers from
-           output to input in successive calls.
-        """
-        def __init__(self) -> None:
-            self._avail: set = set()
-            self._next: int = 0
-
-        def next(self) -> int:
-            """If a buffer is available return it, otherwise
-            allocate a new one and return it. """
-
-            if len(self._avail) > 0:
-                return self._avail.pop()
-            nxt = self._next
-            self._next += 1
-            return nxt
-
-        def free(self, n: int) -> None:
-            """Return a buffer back to the pool to be reused"""
-            self._avail.add(n)
-
-        def num_allocated(self) -> int:
-            """Return the buffers allocated in so far."""
-            return self._next
-
     def _to_c_simd(self, v_out: str) -> List[str]:
-        ba = self.BufferAllocator()
+        ba = BufferAllocator()
         lines: List[str] = []
 
         def _to_c_simd_R(expr_tree: ExprNode, r_vec: Union[str, None] = None) -> str:
