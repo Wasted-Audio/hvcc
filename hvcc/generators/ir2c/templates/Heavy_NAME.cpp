@@ -155,21 +155,6 @@ void Heavy_{{name}}::{{x}}
 {%- endfor %}
 
 
-/*
- * Code for expr~ implementation
- * Write out the generic implementation code
- */
-
- // per class code
- {%- for line in class_impl_lines %}
- {{line}}
- {%- endfor %}
-
- // per object code
- {%- for line in obj_impl_lines %}
- {{line}}
- {%- endfor %}
-
 
 /*
  * Context Process Implementation

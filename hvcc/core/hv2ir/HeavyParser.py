@@ -313,5 +313,4 @@ LANG_CLASS_DICT = {
     "switchcase": HIrSwitchcase,
     "__pack": HIrPack,
     "__expr": HIrExpr,
-    "__expr~": HIrExpr,
 }
