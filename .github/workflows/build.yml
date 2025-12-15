@@ -55,7 +55,7 @@ jobs:
 
 
   build-macos:
-    runs-on: macos-14
+    runs-on: macos-14-intel
     steps:
       - uses: actions/checkout@v3
         with:
