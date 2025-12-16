@@ -13,6 +13,7 @@ Features:
 * New pd2gui parser that creates an Intermediate Representation JSON with exposed UI objects
 * Support for `expr` and most of its functions - thanks to @dgbillotte
 * Support for `expr~` and most of its functions - thanks to @dgbillotte
+* Add `HV_BARE_METAL` compiler macro for suppressing `HvUtils.h` warning
 
 Cleanup:
 
