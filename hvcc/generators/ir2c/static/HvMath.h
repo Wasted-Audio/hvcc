@@ -76,26 +76,57 @@ static inline void __hv_log2_f(hv_bInf_t bIn, hv_bOutf_t bOut) {
 #if HV_SIMD_AVX
   hv_assert(0); // __hv_log2_f() not implemented
 #elif HV_SIMD_SSE
-  // https://en.wikipedia.org/wiki/Fast_inverse_square_root
+  // A high-precision approximation of log2(x) using a 4th-order polynomial for the mantissa.
+  // The float x is broken into x = (1+m)*2^e. Then log2(x) = e + log2(1+m).
+  // We approximate log2(1+m) with a polynomial chosen to minimize error.
   __m128i a = _mm_castps_si128(bIn);
   __m128i b = _mm_srli_epi32(a, 23);
-  __m128i c = _mm_sub_epi32(b, _mm_set1_epi32(127)); // exponent (int)
-  __m128 d = _mm_cvtepi32_ps(c); // exponent (float)
+  __m128i c = _mm_sub_epi32(b, _mm_set1_epi32(127)); // e (integer)
+  __m128 d = _mm_cvtepi32_ps(c); // e (float)
   __m128i e = _mm_or_si128(_mm_andnot_si128(_mm_set1_epi32(0xFF800000), a), _mm_set1_epi32(0x3F800000));
-  __m128 f = _mm_castsi128_ps(e); // 1+m (float)
-  __m128 g = _mm_add_ps(d, f); // e + 1 + m
-  __m128 h = _mm_add_ps(g, _mm_set1_ps(-0.9569643f)); // e + 1 + m + (sigma-1)
-  *bOut = h;
+  __m128 f = _mm_castsi128_ps(e); // 1+m
+  __m128 m = _mm_sub_ps(f, _mm_set1_ps(1.0f)); // m
+
+  // Calculate 4th-order polynomial using Horner's method: ((((c4*m+c3)*m+c2)*m+c1)*m)
+  const __m128 C1 = _mm_set1_ps(1.442695f);
+  const __m128 C2 = _mm_set1_ps(-0.720124f);
+  const __m128 C3 = _mm_set1_ps(0.453033f);
+  const __m128 C4 = _mm_set1_ps(-0.211527f);
+
+#if HV_SIMD_FMA
+  __m128 p = _mm_fmadd_ps(C4, m, C3);
+  p = _mm_fmadd_ps(p, m, C2);
+  p = _mm_fmadd_ps(p, m, C1);
+#else
+  __m128 p = _mm_add_ps(_mm_mul_ps(C4, m), C3);
+  p = _mm_add_ps(_mm_mul_ps(p, m), C2);
+  p = _mm_add_ps(_mm_mul_ps(p, m), C1);
+#endif
+  p = _mm_mul_ps(p, m);
+
+  *bOut = _mm_add_ps(d, p); // e + poly(m)
 #elif HV_SIMD_NEON
+  // A high-precision approximation of log2(x) using a 4th-order polynomial for the mantissa.
   int32x4_t a = vreinterpretq_s32_f32(bIn);
   int32x4_t b = vshrq_n_s32(a, 23);
-  int32x4_t c = vsubq_s32(b, vdupq_n_s32(127));
-  float32x4_t d = vcvtq_f32_s32(c);
+  int32x4_t c = vsubq_s32(b, vdupq_n_s32(127)); // e (integer)
+  float32x4_t d = vcvtq_f32_s32(c); // e (float)
   int32x4_t e = vorrq_s32(vbicq_s32(a, vdupq_n_s32(0xFF800000)), vdupq_n_s32(0x3F800000));
-  float32x4_t f = vreinterpretq_f32_s32(e);
-  float32x4_t g = vaddq_f32(d, f);
-  float32x4_t h = vaddq_f32(g, vdupq_n_f32(-0.9569643f));
-  *bOut = h;
+  float32x4_t f = vreinterpretq_f32_s32(e); // 1+m
+  float32x4_t m = vsubq_f32(f, vdupq_n_f32(1.0f)); // m
+
+  // Calculate 4th-order polynomial using Horner's method: ((((c4*m+c3)*m+c2)*m+c1)*m)
+  const float32x4_t C1 = vdupq_n_f32(1.442695f);
+  const float32x4_t C2 = vdupq_n_f32(-0.720124f);
+  const float32x4_t C3 = vdupq_n_f32(0.453033f);
+  const float32x4_t C4 = vdupq_n_f32(-0.211527f);
+
+  float32x4_t p = vmlaq_f32(C3, C4, m); // C3 + C4*m
+  p = vmlaq_f32(C2, p, m);   // C2 + (C3+C4*m)*m
+  p = vmlaq_f32(C1, p, m);   // C1 + (C2...)*m
+  p = vmulq_f32(p, m);
+
+  *bOut = vaddq_f32(d, p); // e + poly(m)
 #else // HV_SIMD_NONE
   *bOut = 1.442695040888963f * hv_log_f(bIn);
 #endif
