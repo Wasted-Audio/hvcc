@@ -357,6 +357,14 @@ class PdParser:
 
                         if obj_type in ('block~',):
                             # we ignore the object and continue
+                            g.add_warning(
+                                "This graph contains an object that is ignored.",
+                                NotificationEnum.WARNING_USELESS_OBJECT)
+                            g.add_object(HeavyObject(
+                                obj_type="comment",
+                                obj_args=["null object placeholder"],
+                                pos_x=int(line[2]),
+                                pos_y=int(line[3])))
                             continue
 
                         # do we have an abstraction for this object?
