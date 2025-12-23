@@ -116,31 +116,6 @@ struct Daisy{{ name|capitalize }} {
     // Display
     {{ display }}
     {% endif %}
-    {% if MotorShield != '' %}
-
-    // Adafruit Motor Shield
-    {{ MotorShield }}
-    {% endif %}
-    {% if StepperMotor != '' %}
-
-    // Stepper motor pointer from the Adafruit Motor Shield
-    {{ StepperMotor }}
-    {% endif %}
-    {% if DcMotor != '' %}
-
-    // DC motor pointer from the Adafruit Motor Shield
-    {{ DcMotor }}
-    {% endif %}
-    {% if Bme280 != '' %}
-
-    // BME280 pressure/temperature/humidity sensor
-    {{ Bme280 }}
-    {% endif %}
-    {% if HallSensor != '' %}
-
-    // Hall sensor
-    {{ HallSensor }}
-    {% endif %}
     {% if Tlv493d != '' %}
 
     // Accelerometer
@@ -156,35 +131,15 @@ struct Daisy{{ name|capitalize }} {
     // Gesture / color sensor
     {{ Apds9960 }}
     {% endif %}
-    {% if Bmp390 != '' %}
-
-    // Bmp390 pressure / temperature sensor
-    {{ Bmp390 }}
-    {% endif %}
     {% if Dps310 != '' %}
 
     // Dps310 pressure / temperature sensor
     {{ Dps310 }}
     {% endif %}
-    {% if Vl53l1x != '' %}
-
-    // Vl53l1x time of flight sensor
-    {{ Vl53l1x }}
-    {% endif %}
-    {% if Vl53l0x != '' %}
-
-    // Vl53l0x time of flight sensor
-    {{ Vl53l0x }}
-    {% endif %}
     {% if NeoTrellis != '' %}
 
     // Adafruit Neo Trellis
     {{ NeoTrellis }}
-    {% endif %}
-    {% if Bno055 != '' %}
-
-    // Bno055 9-DOF omega sensor
-    {{ Bno055 }}
     {% endif %}
     {% if Icm20948 != '' %}
 

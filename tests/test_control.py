@@ -276,6 +276,9 @@ class TestPdControlPatches(TestPdControlBase):
     def test_tabwrite(self):
         self._test_control_patch("test-tabwrite.pd")
 
+    def test_tabwrite_hv_table(self):
+        self._test_control_patch("test-tabwrite_hv_table.pd")
+
     def test_tan(self):
         self._test_control_patch("test-tan.pd")
 
@@ -317,6 +320,11 @@ class TestPdControlPatches(TestPdControlBase):
 
     def test_wrap(self):
         self._test_control_patch("test-wrap.pd")
+
+    # edge cases
+
+    def test_extern_table(self):
+        self._test_control_patch("test-extern_table.pd")
 
 
 def main():

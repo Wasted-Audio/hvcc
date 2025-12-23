@@ -92,6 +92,7 @@ class c2js(Generator):
         c_flags = [
             f"-I {c_src_dir}",
             "-DHV_SIMD_NONE",
+            "-DHV_BARE_METAL",
             "-ffast-math",
             "-DNDEBUG",
             "-Wall"

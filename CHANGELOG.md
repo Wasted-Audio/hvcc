@@ -1,6 +1,29 @@
 CHANGELOG
 =====
 
+0.15.0
+-----
+
+Features:
+
+* Unity Generator: change build system to use CMake - thanks to @michaelhartung
+* Allow externing graphical arrays using `@hv_table`
+* DPF: support and documentation for Audio Unit format (macOS)
+* Daisy: support display parameters using `@hv_param`
+* New pd2gui parser that creates an Intermediate Representation JSON with exposed UI objects
+* Support for `expr` and most of its functions - thanks to @dgbillotte
+* Support for `expr~` and most of its functions - thanks to @dgbillotte
+* Add `HV_BARE_METAL` compiler macro for suppressing `HvUtils.h` warning
+
+Cleanup:
+
+* Daisy: allow more generic `HAS_MIDI` in the board.json
+
+Docs:
+
+* Add: Code Of Conduct
+* Add: Contributing Guide
+
 0.14.0
 -----
 

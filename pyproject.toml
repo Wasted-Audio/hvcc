@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "hvcc"
-version = "0.14.0"
+version = "0.15.0"
 description = "`hvcc` is a python-based dataflow audio programming language compiler that generates C/C++ code and a variety of specific framework wrappers."
 authors = ["Enzien Audio, Wasted Audio"]
 license = "GPLv3"
@@ -17,6 +17,7 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
 ]
 
 [tool.poetry.scripts]
@@ -27,6 +28,8 @@ hvutil = "hvcc.utils:main"
 python = "^3.9"
 Jinja2 = ">=2.11"
 pydantic = ">=2.9.1"
+pydantic-extra-types = "^2.10.6"
+arpeggio = "^2.0.2"
 
 [tool.poetry.group.dev.dependencies]
 numpy = "^2.0.1"
@@ -41,15 +44,14 @@ mypy = "^1.11.2"
 pytest = "^8.3.3"
 
 [tool.poetry-pyinstaller-plugin]
-collect = { all = ["json2daisy"] }
+collect = { "all" = ["arpeggio"] }
 include = { "hvcc/generators" = "hvcc/generators", "hvcc/core" = "hvcc/core", "hvcc/interpreters" = "hvcc/interpreters" }
 
-
-[tool.poetry-pyinstaller-plugin.scripts]
+[tool.poetry-pyinstaller-plugin.targets]
 Heavy = { source = "hvcc/main.py", type = "onefile", bundle = true, arch = "x86_64" }
 
 [build-system]
-requires = ["poetry-core"]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.mypy]

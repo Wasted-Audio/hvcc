@@ -22,10 +22,10 @@ import re
 import sys
 from typing import Any, List, Dict, Optional
 
+from hvcc.interpreters.pd2gui import pd2gui
 from hvcc.interpreters.pd2hv import pd2hv
 from hvcc.core.hv2ir import hv2ir
-from hvcc.generators.ir2c import ir2c
-from hvcc.generators.ir2c import ir2c_perf
+from hvcc.generators.ir2c import ir2c, ir2c_perf
 from hvcc.generators.c2js import c2js
 from hvcc.generators.c2daisy import c2daisy
 from hvcc.generators.c2dpf import c2dpf
@@ -251,6 +251,14 @@ def compile_dataflow(
     results.root["pd2hv"] = pd2hv.pd2hv.compile(
         pd_path=in_path,
         hv_dir=os.path.join(out_dir, "hv"),
+        search_paths=search_paths,
+        verbose=verbose)
+
+    if verbose:
+        print("--> Generating GUI IR")
+    results.root["pd2gui"] = pd2gui.pd2gui.compile(
+        pd_path=in_path,
+        ir_dir=os.path.join(out_dir, "ir"),
         search_paths=search_paths,
         verbose=verbose)
 

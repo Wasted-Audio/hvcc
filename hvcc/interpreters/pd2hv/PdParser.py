@@ -20,13 +20,14 @@ import re
 from collections import Counter
 from collections import OrderedDict
 from pathlib import Path
-from typing import List, Dict, Optional, Type, Any, Generator
+from typing import Optional, Type, Any, Generator
 
 from .HeavyObject import HeavyObject
 from .HeavyGraph import HeavyGraph              # pre-converted Heavy graphs
 from .HvSwitchcase import HvSwitchcase          # __switchcase
 from .PdAudioIoObject import PdAudioIoObject    # adc~/dac~
 from .PdBinopObject import PdBinopObject        # binary arithmatic operators
+from .PdExprObject import PdExprObject          # expr/expr~
 from .PdGraph import PdGraph                    # canvas
 from .PdLetObject import PdLetObject            # inlet/inlet~/outlet/outlet~
 from .PdMessageObject import PdMessageObject    # msg
@@ -71,10 +72,10 @@ class PdParser:
         self.obj_counter: Counter = Counter()
 
         # search paths at this graph level
-        self.__search_paths: List = []
+        self.search_paths: list = []
 
     @classmethod
-    def get_supported_objects(cls) -> List:
+    def get_supported_objects(cls) -> list:
         """ Returns a set of all pd objects names supported by the parser.
         """
         pd_objects = [os.path.splitext(f)[0] for f in os.listdir(cls.__PDLIB_DIR) if f.endswith(".pd")]
@@ -89,7 +90,7 @@ class PdParser:
         """
         num_canvas = -1
         hv_arg_dict = OrderedDict()
-        hv_arg_list: Optional[List] = None
+        hv_arg_list: Optional[list] = None
         with open(pd_path, "r") as f:
             for li in f:
                 if li.startswith("#N canvas"):
@@ -104,7 +105,7 @@ class PdParser:
         return hv_arg_dict
 
     @classmethod
-    def __get_pd_line(cls, pd_path: str) -> Generator:
+    def get_pd_line(cls, pd_path: str) -> Generator:
         concat = ""  # concatination state
         with open(pd_path, "r") as f:
             for li in f:
@@ -119,16 +120,27 @@ class PdParser:
                 else:
                     concat = (f'{concat} {li}') if len(concat) > 0 else f'{li}'
 
+    @classmethod
+    def split_line(cls, li: str) -> list[str]:
+        # remove width parameter
+        li = cls.RE_WIDTH.sub("", li)
+        # split on non-escaped spaces
+        line = cls.RE_SPACE.split(li)
+        # replace escaped spaces
+        line = [i.replace('\\ ', ' ') for i in line]
+
+        return line
+
     def add_absolute_search_directory(self, search_dir: str) -> bool:
         if os.path.isdir(search_dir):
-            self.__search_paths.append(search_dir)
+            self.search_paths.append(search_dir)
             return True
         else:
             return False
 
     def add_relative_search_directory(self, search_dir: str) -> bool:
         search_dir = os.path.abspath(os.path.join(
-            self.__search_paths[0],
+            self.search_paths[0],
             search_dir))
         return self.add_absolute_search_directory(search_dir)
 
@@ -137,7 +149,7 @@ class PdParser:
             Checks the local directory first, then all declared paths.
         """
 
-        abs_filename = f'{abs_name}.pd'
+        abs_filename = f"{abs_name}.pd"
 
         # check local directory first
         abs_path = os.path.join(os.path.abspath(local_dir), abs_filename)
@@ -145,7 +157,7 @@ class PdParser:
             return abs_path
 
         # check search paths in reverse order (last added search path first)
-        for d in reversed(self.__search_paths):
+        for d in reversed(self.search_paths):
             abs_path = os.path.join(d, abs_filename)
             if os.path.isfile(abs_path):
                 return abs_path
@@ -155,7 +167,7 @@ class PdParser:
     def graph_from_file(
         self,
         file_path: str,
-        obj_args: Optional[List] = None,
+        obj_args: Optional[list] = None,
         pos_x: int = 0,
         pos_y: int = 0,
         is_root: bool = True,
@@ -165,15 +177,15 @@ class PdParser:
             Note that obj_args does not include $0.
             @param pd_graph_class  The python class to handle specific graph types
         """
-        # add main patch directory. The first entry of self.__search_paths is
+        # add main patch directory. The first entry of self.search_paths is
         # assumed to be the root path of the whole system
 
         if is_root:
-            self.__search_paths.append(os.path.dirname(file_path))
+            self.search_paths.append(os.path.dirname(file_path))
 
         file_hv_arg_dict = self.__get_hv_args(file_path)
-        file_iterator = self.__get_pd_line(file_path)
-        canvas_line = file_iterator.__next__()
+        file_iterator = self.get_pd_line(file_path)
+        canvas_line: str = file_iterator.__next__()
 
         self.__DOLLAR_ZERO += 1  # increment $0
         graph_args = [self.__DOLLAR_ZERO] + (obj_args or [])
@@ -183,7 +195,7 @@ class PdParser:
             g_cls.add_error(f"Pd files must begin with \"#N canvas\": {canvas_line}")
             return g_cls
 
-        g = self.graph_from_canvas(
+        g: PdGraph = self.graph_from_canvas(
             file_iterator,
             file_hv_arg_dict,
             canvas_line,
@@ -205,9 +217,9 @@ class PdParser:
     def graph_from_canvas(
         self,
         file_iterator: Generator,
-        file_hv_arg_dict: Dict[str, List[Any]],
+        file_hv_arg_dict: dict[str, list[str]],
         canvas_line: str,
-        graph_args: List,
+        graph_args: list,
         pd_path: str,
         pos_x: int = 0,
         pos_y: int = 0,
@@ -225,9 +237,9 @@ class PdParser:
 
         g = pd_graph_class(graph_args, pd_path, pos_x, pos_y)
 
-        msg_send: Dict = {}
-        gui_send: Dict = {}
-        gui_recv: Dict = {}
+        msg_send: dict = {}
+        gui_send: dict = {}
+        gui_recv: dict = {}
 
         # parse and add all Heavy arguments to the graph
         for li in file_hv_arg_dict[canvas_line]:
@@ -244,12 +256,7 @@ class PdParser:
 
         try:  # this try will capture any critical errors
             for li in file_iterator:
-                # remove width parameter
-                li = self.RE_WIDTH.sub("", li)
-                # split on non-escaped spaces
-                line = self.RE_SPACE.split(li)
-                # replace escaped spaces
-                line = [i.replace('\\ ', ' ') for i in line]
+                line = self.split_line(li)
 
                 if line[0] == "#N":
                     if line[1] == "canvas":
@@ -267,7 +274,6 @@ class PdParser:
                     if line[1] == "restore":
                         if len(line) > 5 and line[5] == "@hv_obj":
                             obj_args = self.__resolve_object_args(
-                                obj_type=line[6],
                                 obj_args=line[7:],
                                 graph=g,
                                 raise_on_failure=False,
@@ -330,12 +336,10 @@ class PdParser:
                             obj_type = line[4]
                             # sometimes objects have $ arguments in them as well
                             obj_type = self.__resolve_object_args(
-                                obj_type=obj_type,
                                 obj_args=[obj_type],
                                 graph=g,
                                 is_root=is_root)[0]
                             obj_args = self.__resolve_object_args(
-                                obj_type=obj_type,
                                 obj_args=line[5:],
                                 graph=g,
                                 is_root=is_root)
@@ -347,6 +351,18 @@ class PdParser:
                             g.add_object(HeavyObject(
                                 obj_type="comment",
                                 obj_args=["null object placeholder"],
+                                pos_x=int(line[2]),
+                                pos_y=int(line[3])))
+                            continue
+
+                        if obj_type in ('block~',):
+                            # we ignore the object and continue
+                            g.add_warning(
+                                f"This graph contains a {obj_type} object that is ignored.",
+                                NotificationEnum.WARNING_USELESS_OBJECT)
+                            g.add_object(HeavyObject(
+                                obj_type="comment",
+                                obj_args=[f"{obj_type} object placeholder"],
                                 pos_x=int(line[2]),
                                 pos_y=int(line[3])))
                             continue
@@ -481,60 +497,69 @@ class PdParser:
 
                         # add gui send/receive objects
                         arg_index = {
-                            'nbx':       (6, 7),
-                            'vsl':       (6, 7),
-                            'hsl':       (6, 7),
-                            'vradio':    (4, 5),
-                            'hradio':    (4, 5),
-                            'bng':       (4, 5),
-                            'tgl':       (2, 3),
-                            'knob':      (5, 6),
-                            'else/knob': (5, 6),
+                            "nbx":       (6, 7),
+                            "vsl":       (6, 7),
+                            "hsl":       (6, 7),
+                            "vradio":    (4, 5),
+                            "hradio":    (4, 5),
+                            "bng":       (4, 5),
+                            "tgl":       (2, 3),
+                            "knob":      (5, 6),
+                            "else/knob": (5, 6),
                         }
 
                         if obj_type in arg_index.keys():
                             send_index = arg_index[obj_type][0]
                             recv_index = arg_index[obj_type][1]
 
-                            if obj_args[send_index] != 'empty':
+                            if obj_args[send_index] != "empty":
                                 gui_send[index] = obj_args[send_index]
 
-                            if obj_args[recv_index] != 'empty':
+                            if obj_args[recv_index] != "empty":
                                 gui_recv[index] = obj_args[recv_index]
 
                     elif line[1] in ("floatatom", "symbolatom"):
                         self.obj_counter[line[1]] += 1
+                        obj_args = self.__resolve_object_args(
+                                obj_args=line[1:],
+                                graph=g,
+                                is_root=is_root)
                         x = self.graph_from_file(
                             file_path=os.path.join(self.__PDLIB_DIR, f"{line[1]}.pd"),
-                            obj_args=[],
+                            obj_args=obj_args,
                             pos_x=int(line[2]), pos_y=int(line[3]),
                             is_root=False)
                         index = g.add_object(x)
 
                         # symbolatom is not supported
                         # due to symbol/__var implementation
-                        if line[1] == 'floatatom':
-                            if line[10] != '-':
-                                gui_send[index] = line[10]
+                        if line[1] == "floatatom":
+                            if obj_args[9] != "-":
+                                gui_send[index] = obj_args[9]
 
-                            if line[9] != '-':
-                                gui_recv[index] = line[9]
+                            if obj_args[8] != "-":
+                                gui_recv[index] = obj_args[8]
 
                     elif line[1] == "array":
                         assert obj_array is None, "#X array object is already being parsed."
                         # array names can have dollar arguments in them.
                         # ensure that they are resolved
-                        table_name = self.__resolve_object_args(
-                            obj_type="array",
+                        table_def = self.__resolve_object_args(
                             obj_args=[line[2]],
-                            graph=g)[0]
+                            graph=g)[0].split(" ")
+                        table_name = table_def[0]
+                        # check if we need to extern the table
+                        if len(table_def) > 1:
+                            table_extern = table_def[1] == "@hv_table"
+                        else:
+                            table_extern = False
                         # Pd encodes arrays with length greater than 999,999 with
                         # scientific notatation (e.g. 1e6) which Python's int() can't parse
                         table_size = int(decimal.Decimal(line[3]))
                         obj_array = HeavyObject(
                             obj_type="table",
                             # ensure that obj_array has its own values instance
-                            obj_args=[table_name, table_size, []])
+                            obj_args=[table_name, table_size, [], table_extern])
                         # TODO(mhroth): position information
                         g.add_object(obj_array)
 
@@ -551,7 +576,7 @@ class PdParser:
                         if len(msg.obj_dict) > 0:
                             msg_send[index] = []
 
-                            for remote in msg.obj_dict['remote']:
+                            for remote in msg.obj_dict["remote"]:
                                 msg_send[index].append(remote)
 
                     elif line[1] == "connect":
@@ -615,15 +640,15 @@ class PdParser:
 
             for remote in msg_send[index]:
                 self.obj_counter["msg"] += 1
-                msg = PdMessageObject('msg', [' '.join(msg for msg in remote['message'])])
+                msg = PdMessageObject("msg", [" ".join(msg for msg in remote["message"])])
                 msg_index = g.add_object(msg)
 
                 self.obj_counter["send"] += 1
-                send = PdSendObject('send', [remote['receiver']])
+                send = PdSendObject("send", [remote["receiver"]])
                 send_index = g.add_object(send)
 
                 # connect new message to upstream objects of first message
-                for conn in conns['0']:
+                for conn in conns["0"]:
                     up_obj = conn.from_obj
                     up_index = g.get_objects().index(up_obj)
                     g.add_parsed_connection(up_index, 0, msg_index, 0)
@@ -651,8 +676,7 @@ class PdParser:
     @classmethod
     def __resolve_object_args(
         cls,
-        obj_type: str,
-        obj_args: List,
+        obj_args: list,
         graph: PdGraph,
         raise_on_failure: bool = True,
         is_root: bool = False
@@ -669,6 +693,7 @@ class PdParser:
         resolved_obj_args = list(obj_args)  # make a copy of the original obj_args
         for i, a in enumerate(obj_args):
             for m in set(cls.RE_DOLLAR.findall(a)):
+                assert isinstance(a, str)
                 x = int(m)  # the dollar index (i.e. $x)
                 if len(graph.obj_args) > x:
                     a = a.replace(fr"\${m}", str(graph.obj_args[x]))
@@ -709,6 +734,8 @@ class PdParser:
     __PD_CLASSES = {
         "adc~": PdAudioIoObject,
         "dac~": PdAudioIoObject,
+        "expr": PdExprObject,
+        "expr~": PdExprObject,
         "inlet": PdLetObject,
         "inlet~": PdLetObject,
         "outlet": PdLetObject,
