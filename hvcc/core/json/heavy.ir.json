@@ -1037,6 +1037,56 @@
 
     ]
   },
+  "__expr": {
+    "inlets": [],
+    "ir": {
+      "control": true,
+      "signal": false,
+      "init": true
+    },
+    "outlets": [
+      "-->"
+    ],
+    "args": [{
+        "name": "expressions",
+        "value_type": "stringarray",
+        "description": "The expression to evaluate",
+        "default": "",
+        "required": true
+    },
+    {
+      "name": "num_inlets",
+      "value_type": "int",
+      "description": "Number of inlets for this instance",
+      "default": "",
+      "required": true
+    }]
+  },
+  "__expr~": {
+    "inlets": [],
+    "ir": {
+      "control": false,
+      "signal": true,
+      "init": false
+    },
+    "outlets": [
+      "~f>"
+    ],
+    "args": [{
+      "name": "expressions",
+      "value_type": "stringarray",
+      "description": "The expression to evaluate",
+      "default": "",
+      "required": true
+    },
+    {
+      "name": "num_inlets",
+      "value_type": "int",
+      "description": "Number of inlets for this instance",
+      "default": "",
+      "required": true
+    }]
+  },
   "__floor": {
     "inlets": [
       "-->"
@@ -1049,9 +1099,7 @@
     "outlets": [
       "-->"
     ],
-    "args": [
-
-    ]
+    "args": []
   },
   "__floor~f": {
     "args": [
@@ -2071,7 +2119,7 @@
     ],
     "args": [{
       "name": "values",
-      "value_type": "floatarray",
+      "value_type": "mixedarray",
       "description": "The preset values to this pack object.",
       "default": [0.0, 0.0],
       "required": false

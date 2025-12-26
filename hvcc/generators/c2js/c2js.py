@@ -80,7 +80,8 @@ class c2js(Generator):
         """Run the emcc command to compile C source files to a javascript library.
         """
 
-        if os.name == 'nt':
+        # Detect Windows OS, but ignore if running in MingW
+        if os.name == 'nt' and os.environ.get('MSYSTEM') is None:
             emcc_path = which("emcc.bat")
         else:
             emcc_path = which("emcc")
@@ -91,6 +92,7 @@ class c2js(Generator):
         c_flags = [
             f"-I {c_src_dir}",
             "-DHV_SIMD_NONE",
+            "-DHV_BARE_METAL",
             "-ffast-math",
             "-DNDEBUG",
             "-Wall"
@@ -126,12 +128,13 @@ class c2js(Generator):
             "-s", "RESERVED_FUNCTION_POINTERS=2",
             "-s", "DEFAULT_LIBRARY_FUNCS_TO_INCLUDE=$addFunction",
             "-s", f"EXPORTED_FUNCTIONS=[{hv_api_defs.format(patch_name)}]",
+            "-s", "EXPORTED_RUNTIME_METHODS=HEAPF32",
             "-s", f"MODULARIZE={should_modularize}",
-            '-s', 'ASSERTIONS=1',
-            '-s', f'ENVIRONMENT={environment}',
-            '-s', 'SINGLE_FILE=1',
-            '-s', 'ALLOW_TABLE_GROWTH=1',
-            '-s', f'BINARYEN_ASYNC_COMPILATION={binaryen_async}',  # Set this to 0 for the worklet so we don't
+            "-s", "ASSERTIONS=1",
+            "-s", f"ENVIRONMENT={environment}",
+            "-s", "SINGLE_FILE=1",
+            "-s", "ALLOW_TABLE_GROWTH=1",
+            "-s", f"BINARYEN_ASYNC_COMPILATION={binaryen_async}",  # Set this to 0 for the worklet so we don't
                                                                    # wait for promises when instantiating
             "--post-js", post_js_path
         ]
