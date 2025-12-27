@@ -37,9 +37,8 @@ class SignalRFFT(HeavyObject):
     @classmethod
     def get_C_init(cls, obj_type: str, obj_id: str, args: Dict) -> List[str]:
         return [
-            "sRFFT_init(&sRFFT_{0}, &hTable_{1}, {2});".format(
+            "sRFFT_init(&sRFFT_{0}, {1});".format(
                 obj_id,
-                args["table_id"],
                 args["block_size"])
         ]
 
@@ -62,9 +61,44 @@ class SignalRFFT(HeavyObject):
                     cls._c_buffer(process_dict.outputBuffers[1])
                 )
             ]
-        elif obj_type == "__rifft~f":
+        else:
+            raise Exception
+
+
+class SignalRIFFT(HeavyObject):
+
+    c_struct = "SignalRIFFT"
+    preamble = "sRIFFT"
+
+    @classmethod
+    def get_C_header_set(cls) -> set:
+        return {"HvSignalRFFT.h"}
+
+    @classmethod
+    def get_C_file_set(cls) -> set:
+        return {"HvSignalRFFT.h", "HvSignalRFFT.c"}
+
+    @classmethod
+    def get_C_init(cls, obj_type: str, obj_id: str, args: Dict) -> List[str]:
+        return [
+            "sRIFFT_init(&sRIFFT_{0}, {1});".format(
+                obj_id,
+                args["block_size"])
+        ]
+
+    @classmethod
+    def get_C_onMessage(cls, obj_type: str, obj_id: str, inlet_index: int, args: Dict) -> List[str]:
+        return [
+            "sRIFFT_onMessage(_c, &Context(_c)->sRIFFT_{0}, {1}, m, NULL);".format(
+                obj_id,
+                inlet_index)
+        ]
+
+    @classmethod
+    def get_C_process(cls, process_dict: IRSignalList, obj_type: str, obj_id: str, args: Dict) -> List[str]:
+        if obj_type == "__rifft~f":
             return [
-                "__hv_rifft_f(&sRFFT_{0}, VIf({1}), VIf({2}), VOf({3}));".format(
+                "__hv_rifft_f(&sRIFFT_{0}, VIf({1}), VIf({2}), VOf({3}));".format(
                     process_dict.id,
                     cls._c_buffer(process_dict.inputBuffers[0]),
                     cls._c_buffer(process_dict.inputBuffers[1]),

@@ -2273,9 +2273,7 @@
   },
   "__rfft~f": {
     "inlets": [
-      "~f>",
-      "-->",
-      "-->"
+      "~f>"
     ],
     "ir": {
       "control": false,
@@ -2286,13 +2284,7 @@
       "~f>",
       "~f>"
     ],
-    "args": [{
-      "name": "table",
-      "value_type": "string",
-      "description": "",
-      "default": "",
-      "required": true
-    }],
+    "args": [],
     "perf": {
       "avx": 0,
       "sse": 0
@@ -2301,9 +2293,7 @@
   "__rifft~f": {
     "inlets": [
       "~f>",
-      "~f>",
-      "-->",
-      "-->"
+      "~f>"
     ],
     "ir": {
       "control": false,
@@ -2313,13 +2303,7 @@
     "outlets": [
       "~f>"
     ],
-    "args": [{
-      "name": "table",
-      "value_type": "string",
-      "description": "",
-      "default": "",
-      "required": true
-    }],
+    "args": [],
     "perf": {
       "avx": 0,
       "sse": 0

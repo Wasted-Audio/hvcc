@@ -115,7 +115,7 @@ class HeavyParser:
         """
         # resolve default graph arguments
         graph_args = graph_args or {}
-        if(json_heavy["block_size"] is not None):
+        if json_heavy["block_size"] is not None:
             graph_args["block_size"] = int(json_heavy["block_size"])
         for a in json_heavy["args"]:
             if a["name"] not in graph_args:

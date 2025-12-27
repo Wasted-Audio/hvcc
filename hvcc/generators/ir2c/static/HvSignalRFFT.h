@@ -25,20 +25,26 @@ extern "C" {
 
 
 typedef struct SignalRFFT {
-  struct HvTable *table;
-  struct HvTable inputs;
+  struct HvTable input;
+  struct HvTable outputReal;
+  struct HvTable outputImagin;
 } SignalRFFT;
 
-hv_size_t sRFFT_init(SignalRFFT *o, struct HvTable *table, const int size);
-
+hv_size_t sRFFT_init(SignalRFFT *o, const int size);
 void sRFFT_free(SignalRFFT *o);
-
-void sRFFT_onMessage(HeavyContextInterface *_c, SignalRFFT *o, int letIndex,
-    const HvMessage *m, void *sendMessage);
-
+void sRFFT_onMessage(HeavyContextInterface *_c, SignalRFFT *o, int letIndex, const HvMessage *m, void *sendMessage);
 void __hv_rfft_f(SignalRFFT *o, hv_bInf_t bIn, hv_bOutf_t bOut0, hv_bOutf_t bOut1);
 
-void __hv_rifft_f(SignalRFFT *o, hv_bInf_t bIn0, hv_bInf_t bIn1, hv_bOutf_t bOut);
+typedef struct SignalRIFFT {
+  struct HvTable inputReal;
+  struct HvTable inputImagin;
+  struct HvTable output;
+} SignalRIFFT;
+
+hv_size_t sRIFFT_init(SignalRIFFT *o, const int size);
+void sRIFFT_free(SignalRIFFT *o);
+void sRIFFT_onMessage(HeavyContextInterface *_c, SignalRIFFT *o, int letIndex, const HvMessage *m, void *sendMessage);
+void __hv_rifft_f(SignalRIFFT *o, hv_bInf_t bIn0, hv_bInf_t bIn1, hv_bOutf_t bOut);
 
 #ifdef __cplusplus
 } // extern "C"

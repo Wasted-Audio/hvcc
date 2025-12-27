@@ -59,7 +59,7 @@ from hvcc.generators.ir2c.SignalLine import SignalLine
 from hvcc.generators.ir2c.SignalLorenz import SignalLorenz
 from hvcc.generators.ir2c.SignalMath import SignalMath
 from hvcc.generators.ir2c.SignalPhasor import SignalPhasor
-from hvcc.generators.ir2c.SignalRFFT import SignalRFFT
+from hvcc.generators.ir2c.SignalRFFT import SignalRFFT, SignalRIFFT
 from hvcc.generators.ir2c.SignalRPole import SignalRPole
 from hvcc.generators.ir2c.SignalSample import SignalSample
 from hvcc.generators.ir2c.SignalSamphold import SignalSamphold
@@ -107,7 +107,7 @@ class ir2c:
         "__phasor~f": SignalPhasor,
         "__phasor_k~f": SignalPhasor,
         "__rfft~f": SignalRFFT,
-        "__rifft~f": SignalRFFT,
+        "__rifft~f": SignalRIFFT,
         "__sample~f": SignalSample,
         "__samphold~f": SignalSamphold,
         "__slice": ControlSlice,

@@ -37,13 +37,6 @@ class HIrRFFT(HeavyIrObject):
     def reduce(self) -> Optional[tuple]:
         if self.graph is not None:
             self.args["block_size"] = self.graph.args["block_size"]
-            table_obj = self.graph.resolve_object_for_name(
-                self.args["table"],
-                ["table", "__table"])
-            if table_obj is not None:
-                self.args["table_id"] = table_obj.id
-                return ({self}, [])
-            else:
-                self.add_error(f"Cannot find table named \"{self.args['table']}\" for object {self}.")
+            return ({self}, [])
 
         return None

@@ -16,109 +16,50 @@
 
 #include "HvSignalRFFT.h"
 
-hv_size_t sRFFT_init(SignalRFFT *o, struct HvTable *table, const int size) {
-  o->table = table;
-  hv_size_t numBytes = hTable_init(&o->inputs, size);
+hv_size_t sRFFT_init(SignalRFFT *o, const int size) {
+  hv_size_t numBytes = hTable_init(&o->input, size);
+  numBytes += hTable_init(&o->outputReal, size/2+1);
+  numBytes += hTable_init(&o->outputImagin, size/2+1);
   return numBytes;
 }
 
 void sRFFT_free(SignalRFFT *o) {
-  o->table = NULL;
-  hTable_free(&o->inputs);
+  hTable_free(&o->input);
+  hTable_free(&o->outputReal);
+  hTable_free(&o->outputImagin);
+}
+
+void __hv_rfft_f(SignalRFFT *o, hv_bInf_t bIn, hv_bOutf_t bOut0, hv_bOutf_t bOut1) {
+  // do fft stuff
 }
 
 void sRFFT_onMessage(HeavyContextInterface *_c, SignalRFFT *o, int letIndex,
     const HvMessage *m, void *sendMessage) {
   switch (letIndex) {
-    case 1: {
-      if (msg_isHashLike(m,0)) {
-        HvTable *table = hv_table_get(_c, msg_getHash(m,0));
-        if (table != NULL) {
-          o->table = table;
-          if (hTable_getSize(&o->inputs) != hTable_getSize(table)) {
-            hTable_resize(&o->inputs,
-                (hv_uint32_t) hv_min_ui(hTable_getSize(&o->inputs), hTable_getSize(table)));
-          }
-        }
-      }
-      break;
-    }
-    case 2: {
-      if (msg_isFloat(m,0)) {
-        // rfft size should never exceed the coefficient table size
-        hTable_resize(&o->inputs, (hv_uint32_t) msg_getFloat(m,0));
-      }
-      break;
-    }
     default: return;
   }
 }
 
-
-static inline int wrap(const int i, const int n) {
-  if (i < 0) return (i+n);
-  if (i >= n) return (i-n);
-  return i;
+hv_size_t sRIFFT_init(SignalRIFFT *o, const int size) {
+  hv_size_t numBytes = hTable_init(&o->inputReal, size/2+1);
+  numBytes += hTable_init(&o->inputImagin, size/2+1);
+  numBytes += hTable_init(&o->output, size);
+  return numBytes;
 }
 
-
-void __hv_rfft_f(SignalRFFT *o, hv_bInf_t bIn, hv_bOutf_t bOut0, hv_bOutf_t bOut1) {
-  hv_assert(o->table != NULL);
-  float *const work = hTable_getBuffer(o->table);
-  hv_assert(work != NULL);
-  const int n = hTable_getSize(o->table); // length fir filter
-  hv_assert((n&HV_N_SIMD_MASK) == 0); // n is a multiple of HV_N_SIMD
-
-  float *const inputs = hTable_getBuffer(&o->inputs);
-  hv_assert(inputs != NULL);
-  const int m = hTable_getSize(&o->inputs); // length of input buffer.
-  hv_assert(m >= n);
-  const int h_orig = hTable_getHead(&o->inputs);
-
-  // float *const bOut = (float *)(hv_alloca(2*n*sizeof(float)));
-  float *const bOut = (float *)(hv_alloca(sizeof(bIn)));
-
-  // do fft stuff
-
-  // uninterleave result into the output buffers
-  for (int j = 0; j < n; ++j) {
-    bOut0[n+j] = bOut[0+2*j];
-    bOut1[n+j] = bOut[1+2*j];
-  }
-
-  __hv_store_f(inputs+h_orig, bIn); // store the new input to the inputs buffer
-  hTable_setHead(&o->inputs, wrap(h_orig+HV_N_SIMD, m));
+void sRIFFT_free(SignalRIFFT *o) {
+  hTable_free(&o->inputReal);
+  hTable_free(&o->inputImagin);
+  hTable_free(&o->output);
 }
 
+void __hv_rifft_f(SignalRIFFT *o, hv_bInf_t bIn0, hv_bInf_t bIn1, hv_bOutf_t bOut) {
+   // do ifft stuff
+}
 
-void __hv_rifft_f(SignalRFFT *o, hv_bInf_t bIn0, hv_bInf_t bIn1, hv_bOutf_t bOut) {
-  hv_assert(o->table != NULL);
-  float *const work = hTable_getBuffer(o->table);
-  hv_assert(work != NULL);
-  const int n = hTable_getSize(o->table); // length fir filter
-  hv_assert((n&HV_N_SIMD_MASK) == 0); // n is a multiple of HV_N_SIMD
-
-  float *const inputs = hTable_getBuffer(&o->inputs);
-  hv_assert(inputs != NULL);
-  const int m = hTable_getSize(&o->inputs); // length of input buffer.
-  hv_assert(m >= n);
-  const int h_orig = hTable_getHead(&o->inputs);
-
-  float *bIn00 = &bIn0;
-  float *bIn10 = &bIn1;
-  // float *const bIn = (float *)(hv_alloca(2*n*sizeof(float)));
-  float *const bIn = (float *)(hv_alloca(sizeof(bOut)));
-
-  // interleave the input buffers into the transform buffer
-  for (int i = 0; i < 2; ++i) {
-    for (int j = 0; j < n; ++j) {
-      bIn[0+2*j] = bIn00[n+j];
-      bIn[1+2*j] = bIn10[n+j];
-    }
+void sRIFFT_onMessage(HeavyContextInterface *_c, SignalRIFFT *o, int letIndex,
+    const HvMessage *m, void *sendMessage) {
+  switch (letIndex) {
+    default: return;
   }
-
-  // do ifft stuff
-
-  // __hv_store_f(inputs+h_orig, bIn); // store the new input to the inputs buffer
-  hTable_setHead(&o->inputs, wrap(h_orig+HV_N_SIMD, m));
 }
