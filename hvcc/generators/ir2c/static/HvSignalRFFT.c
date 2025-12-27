@@ -117,16 +117,9 @@ static void __hv_rfft_perform_fft(SignalRFFT *o) {
   const hv_size_t hopSize = size / 2;
   float *input_buffer = hTable_getBuffer(&o->input);
 
-  // Apply window
-  float *windowed_input = (float *) hv_alloca(size * sizeof(float));
-  for (int j = 0; j < size; j++) {
-    // Hann window
-    float window = 0.5f * (1.0f - cosf(2.0f * (float) M_PI * j / (size - 1)));
-    windowed_input[j] = input_buffer[j] * window;
-  }
-
-  // Perform RFFT
-  rfft_forward(o, windowed_input);
+  // Perform RFFT on the raw, unwindowed data.
+  // rfft_forward is non-destructive, so we can pass the buffer directly.
+  rfft_forward(o, input_buffer);
 
   // Shift buffer for overlap
   memmove(input_buffer, input_buffer + hopSize, hopSize * sizeof(float));
