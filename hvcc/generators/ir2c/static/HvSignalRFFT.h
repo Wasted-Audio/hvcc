@@ -18,7 +18,6 @@
 #define _SIGNAL_RFFT_H_
 
 #include "HvHeavyInternal.h"
-#include "pffft.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -28,7 +27,6 @@ extern "C" {
 typedef struct SignalRFFT {
   struct HvTable *table;
   struct HvTable inputs;
-  struct PFFFT_Setup *setup;
 } SignalRFFT;
 
 hv_size_t sRFFT_init(SignalRFFT *o, struct HvTable *table, const int size);

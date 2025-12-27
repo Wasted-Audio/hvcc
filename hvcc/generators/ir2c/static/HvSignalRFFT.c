@@ -15,11 +15,9 @@
  */
 
 #include "HvSignalRFFT.h"
-#include "pffft.h"
 
 hv_size_t sRFFT_init(SignalRFFT *o, struct HvTable *table, const int size) {
   o->table = table;
-  o->setup = pffft_new_setup(size, PFFFT_REAL);
   hv_size_t numBytes = hTable_init(&o->inputs, size);
   return numBytes;
 }
@@ -27,7 +25,6 @@ hv_size_t sRFFT_init(SignalRFFT *o, struct HvTable *table, const int size) {
 void sRFFT_free(SignalRFFT *o) {
   o->table = NULL;
   hTable_free(&o->inputs);
-  pffft_destroy_setup(o->setup);
 }
 
 void sRFFT_onMessage(HeavyContextInterface *_c, SignalRFFT *o, int letIndex,
@@ -81,7 +78,7 @@ void __hv_rfft_f(SignalRFFT *o, hv_bInf_t bIn, hv_bOutf_t bOut0, hv_bOutf_t bOut
   // float *const bOut = (float *)(hv_alloca(2*n*sizeof(float)));
   float *const bOut = (float *)(hv_alloca(sizeof(bIn)));
 
-  pffft_transform_ordered(o->setup, &bIn, bOut, work, PFFFT_FORWARD);
+  // do fft stuff
 
   // uninterleave result into the output buffers
   for (int j = 0; j < n; ++j) {
@@ -120,7 +117,7 @@ void __hv_rifft_f(SignalRFFT *o, hv_bInf_t bIn0, hv_bInf_t bIn1, hv_bOutf_t bOut
     }
   }
 
-  pffft_transform_ordered(o->setup, bIn, bOut, work, PFFFT_BACKWARD);
+  // do ifft stuff
 
   // __hv_store_f(inputs+h_orig, bIn); // store the new input to the inputs buffer
   hTable_setHead(&o->inputs, wrap(h_orig+HV_N_SIMD, m));

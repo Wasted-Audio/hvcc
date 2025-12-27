@@ -32,7 +32,7 @@ class SignalRFFT(HeavyObject):
 
     @classmethod
     def get_C_file_set(cls) -> set:
-        return {"HvSignalRFFT.h", "HvSignalRFFT.c", "pffft.h", "pffft.c"}
+        return {"HvSignalRFFT.h", "HvSignalRFFT.c"}
 
     @classmethod
     def get_C_init(cls, obj_type: str, obj_id: str, args: Dict) -> List[str]:
@@ -40,7 +40,7 @@ class SignalRFFT(HeavyObject):
             "sRFFT_init(&sRFFT_{0}, &hTable_{1}, {2});".format(
                 obj_id,
                 args["table_id"],
-                64)
+                args["block_size"])
         ]
 
     @classmethod
