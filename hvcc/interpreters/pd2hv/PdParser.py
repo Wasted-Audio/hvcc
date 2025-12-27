@@ -356,6 +356,10 @@ class PdParser:
                             continue
 
                         if obj_type in ('block~',):
+                            if obj_type == 'block~':
+                                # grab the block size for this graph
+                                g.block_size = obj_args[0]
+
                             # we ignore the object and continue
                             g.add_warning(
                                 f"This graph contains a {obj_type} object that is ignored.",

@@ -26,6 +26,7 @@ from .HIrInlet import HIrInlet
 from .HIrLorenz import HIrLorenz
 from .HIrOutlet import HIrOutlet
 from .HIrPack import HIrPack
+from .HIrRFFT import HIrRFFT
 from .HIrSwitchcase import HIrSwitchcase
 from .HIrTabhead import HIrTabhead
 from .HIrTabread import HIrTabread
@@ -114,6 +115,8 @@ class HeavyParser:
         """
         # resolve default graph arguments
         graph_args = graph_args or {}
+        if json_heavy["block_size"] is not None:
+            graph_args["block_size"] = int(json_heavy["block_size"])
         for a in json_heavy["args"]:
             if a["name"] not in graph_args:
                 if a["required"]:
@@ -307,6 +310,8 @@ LANG_CLASS_DICT = {
     "__tabwrite~f": HIrTabwrite,
     "__tabwrite_stoppable~f": HIrTabwrite,
     "__tabwrite": HIrTabwrite,
+    "__rfft~f": HIrRFFT,
+    "__rifft~f": HIrRFFT,
     "receive": HLangReceive,
     "send": HLangSend,
     "__switchcase": HIrSwitchcase,
