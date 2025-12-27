@@ -42,6 +42,7 @@ typedef struct SignalRIFFT {
   struct HvTable inputImagin;
   struct HvTable output;
   int pos;
+  int read_pos;
 } SignalRIFFT;
 
 hv_size_t sRIFFT_init(SignalRIFFT *o, const int size);

@@ -141,7 +141,13 @@ void __hv_rfft_f(SignalRFFT *o, hv_bInf_t bIn, hv_bOutf_t bOut0, hv_bOutf_t bOut
   float *outReal = hTable_getBuffer(&o->outputReal);
   float *outImag = hTable_getBuffer(&o->outputImagin);
 
-#if HV_SIMD_NONE
+#if HV_SIMD_AVX
+  hv_assert(0); // __hv_rfft_f() not implemented
+#elif HV_SIMD_SSE
+  hv_assert(0); // __hv_rfft_f() not implemented
+#elif HV_SIMD_NEON
+  hv_assert(0); // __hv_rfft_f() not implemented
+#else // HV_SIMD_NONE
   inputBuffer[o->pos] = bIn;
   o->pos++;
   if (o->pos >= size) {
@@ -152,19 +158,6 @@ void __hv_rfft_f(SignalRFFT *o, hv_bInf_t bIn, hv_bOutf_t bOut0, hv_bOutf_t bOut
   *bOut1 = outImag[o->read_pos];
   o->read_pos++;
   if (o->read_pos >= outSize) o->read_pos = 0;
-#else // ghetto implementation
-  for (int i = 0; i < HV_N_SIMD; ++i) {
-    inputBuffer[o->pos] = bIn[i];
-    o->pos++;
-    if (o->pos >= size) {
-      __hv_rfft_perform_fft(o);
-    }
-
-    bOut0[i] = outReal[o->read_pos];
-    bOut1[i] = outImag[o->read_pos];
-    o->read_pos++;
-    if (o->read_pos >= outSize) o->read_pos = 0;
-  }
 #endif
 }
 
@@ -175,8 +168,77 @@ void sRFFT_onMessage(HeavyContextInterface *_c, SignalRFFT *o, int letIndex,
   }
 }
 
+static void cifft_inplace(float data[], const int n) {
+  const int num_points = n << 1;
+  int j = 1;
+  for (int i = 1; i < num_points; i += 2) {
+    if (j > i) {
+      float tempr = data[j-1]; data[j-1] = data[i-1]; data[i-1] = tempr;
+      float tempi = data[j]; data[j] = data[i]; data[i] = tempi;
+    }
+    int m = n;
+    while (m >= 2 && j > m) { j -= m; m >>= 1; }
+    j += m;
+  }
+
+  int mmax = 2;
+  while (num_points > mmax) {
+    int istep = mmax << 1;
+    float theta = 2.0f * (float) M_PI / mmax; // sign change for inverse
+    float wpr = -2.0f * sinf(0.5f * theta) * sinf(0.5f * theta);
+    float wpi = sinf(theta);
+    float wr = 1.0f;
+    float wi = 0.0f;
+    for (int m = 1; m < mmax; m += 2) {
+      for (int i = m; i <= num_points; i += istep) {
+        j = i + mmax;
+        float tempr = wr * data[j-1] - wi * data[j];
+        float tempi = wr * data[j] + wi * data[j-1];
+        data[j-1] = data[i-1] - tempr;
+        data[j] = data[i] - tempi;
+        data[i-1] += tempr;
+        data[i] += tempi;
+      }
+      float wtemp = wr;
+      wr = wr * wpr - wi * wpi + wr;
+      wi = wi * wpr + wtemp * wpi + wi;
+    }
+    mmax = istep;
+  }
+}
+
+static void rifft_forward(SignalRIFFT *o) {
+  const int n = hTable_getSize(&o->output);
+  const int half_n = n/2;
+  float *in_real = hTable_getBuffer(&o->inputReal);
+  float *in_imag = hTable_getBuffer(&o->inputImagin);
+  float *out_time = hTable_getBuffer(&o->output);
+
+  // Allocate buffer for full complex spectrum
+  float *complex_spectrum = (float *) hv_alloca(2 * n * sizeof(float));
+
+  // Reconstruct full spectrum from half spectrum
+  for (int i = 0; i <= half_n; ++i) {
+    complex_spectrum[2*i] = in_real[i];
+    complex_spectrum[2*i+1] = in_imag[i];
+  }
+  for (int i = 1; i < half_n; ++i) {
+    complex_spectrum[2*(n-i)] = in_real[i];
+    complex_spectrum[2*(n-i)+1] = -in_imag[i]; // Conjugate
+  }
+
+  // Perform IFFT
+  cifft_inplace(complex_spectrum, n);
+
+  // Copy real part to output table. No 1/N scaling to match Pd.
+  for (int i=0; i<n; ++i) {
+    out_time[i] = complex_spectrum[2*i];
+  }
+}
+
 hv_size_t sRIFFT_init(SignalRIFFT *o, const int size) {
   o->pos = 0;
+  o->read_pos = 0;
   hv_size_t numBytes = hTable_init(&o->inputReal, size/2+1);
   numBytes += hTable_init(&o->inputImagin, size/2+1);
   numBytes += hTable_init(&o->output, size);
@@ -190,7 +252,37 @@ void sRIFFT_free(SignalRIFFT *o) {
 }
 
 void __hv_rifft_f(SignalRIFFT *o, hv_bInf_t bIn0, hv_bInf_t bIn1, hv_bOutf_t bOut) {
-   // do ifft stuff
+  const hv_size_t size = hTable_getSize(&o->output);
+  const hv_size_t inSize = hTable_getSize(&o->inputReal);
+
+  float *inReal = hTable_getBuffer(&o->inputReal);
+  float *inImag = hTable_getBuffer(&o->inputImagin);
+  float *output = hTable_getBuffer(&o->output);
+
+#if HV_SIMD_AVX
+  hv_assert(0); // __hv_rifft_f() not implemented
+#elif HV_SIMD_SSE
+  hv_assert(0); // __hv_rifft_f() not implemented
+#elif HV_SIMD_NEON
+  hv_assert(0); // __hv_rifft_f() not implemented
+#else // HV_SIMD_NONE
+  // buffer input spectrum
+  inReal[o->pos] = bIn0;
+  inImag[o->pos] = bIn1;
+  o->pos++;
+
+  if (o->pos >= inSize) {
+    rifft_forward(o);
+    o->pos = 0;
+  }
+
+  // output time-domain signal
+  *bOut = output[o->read_pos];
+  o->read_pos++;
+  if (o->read_pos >= size) {
+    o->read_pos = 0;
+  }
+#endif
 }
 
 void sRIFFT_onMessage(HeavyContextInterface *_c, SignalRIFFT *o, int letIndex,
