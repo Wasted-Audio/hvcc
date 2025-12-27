@@ -28,6 +28,8 @@ typedef struct SignalRFFT {
   struct HvTable input;
   struct HvTable outputReal;
   struct HvTable outputImagin;
+  int pos;
+  int read_pos;
 } SignalRFFT;
 
 hv_size_t sRFFT_init(SignalRFFT *o, const int size);
@@ -39,6 +41,7 @@ typedef struct SignalRIFFT {
   struct HvTable inputReal;
   struct HvTable inputImagin;
   struct HvTable output;
+  int pos;
 } SignalRIFFT;
 
 hv_size_t sRIFFT_init(SignalRIFFT *o, const int size);
