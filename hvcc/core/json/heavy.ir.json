@@ -2350,6 +2350,51 @@
       "sse": 1
     }
   },
+  "__schmitt~f": {
+    "inlets": [
+      "~f>",
+      "-->",
+      "-->"
+    ],
+    "ir": {
+      "control": true,
+      "signal": true,
+      "init": true
+    },
+    "outlets": [
+      "-->",
+      "-->"
+    ],
+    "args": [{
+      "name": "trigValue",
+      "value_type": "float",
+      "description": "",
+      "default": 0,
+      "required": false
+    }, {
+      "name": "trigDebounce",
+      "value_type": "float",
+      "description": "",
+      "default": 0,
+      "required": false
+    }, {
+      "name": "restValue",
+      "value_type": "float",
+      "description": "",
+      "default": 0,
+      "required": false
+    }, {
+      "name": "restDebounce",
+      "value_type": "float",
+      "description": "",
+      "default": 0,
+      "required": false
+    }],
+    "perf": {
+      "avx": 0,
+      "sse": 0
+    }
+  },
   "__send": {
     "inlets": [
       "-->"

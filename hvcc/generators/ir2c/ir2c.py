@@ -62,6 +62,7 @@ from hvcc.generators.ir2c.SignalPhasor import SignalPhasor
 from hvcc.generators.ir2c.SignalRPole import SignalRPole
 from hvcc.generators.ir2c.SignalSample import SignalSample
 from hvcc.generators.ir2c.SignalSamphold import SignalSamphold
+from hvcc.generators.ir2c.SignalSchmitt import SignalSchmitt
 from hvcc.generators.ir2c.SignalTabhead import SignalTabhead
 from hvcc.generators.ir2c.SignalTabread import SignalTabread
 from hvcc.generators.ir2c.SignalTabwrite import SignalTabwrite
@@ -107,6 +108,7 @@ class ir2c:
         "__phasor_k~f": SignalPhasor,
         "__sample~f": SignalSample,
         "__samphold~f": SignalSamphold,
+        "__schmitt~f": SignalSchmitt,
         "__slice": ControlSlice,
         "__send": ControlSend,
         "__tabhead": ControlTabhead,
