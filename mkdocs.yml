@@ -1,0 +1,49 @@
+site_name: Heavy Compiler Collection
+repo_url: https://github.com/Wasted-Audio/hvcc
+repo_name: Wasted-Audio/hvcc
+theme:
+  name: material
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - search.suggest
+    - content.code.copy
+  palette:
+    scheme: slate  # Dark mode support
+
+hooks:
+  - mkdocs_hooks.py
+
+nav:
+  - Home: index.md
+  - Getting Started:
+    - Introduction: getting-started/index.md
+    - Patching Guide: getting-started/patching.md
+  - Generators:
+    - Overview: generators/index.md
+    - Unity: generators/unity.md
+    - Wwise: generators/wwise.md
+    - Daisy: 
+      - Basics: generators/daisy.md
+      - JSON Params: generators/daisy_json.md
+    - DPF: generators/dpf.md
+    - Javascript: generators/javascript.md
+    - FMOD: generators/fmod.md
+    - OWL: generators/owl.md
+    - Pdext: generators/pdext.md
+    - Custom: generators/custom.md
+  - Reference:
+    - MIDI: reference/midi.md
+    - C API: reference/c.md
+    - C++ API: reference/cpp.md
+    - Supported Objects: reference/objects/supported.md
+    - Unsupported Objects: reference/objects/unsupported.md
+    - Heavy Lang: reference/ir/heavy_lang.md
+    - Heavy IR: reference/ir/heavy_ir.md
+    - Heavy GUI IR: reference/ir/heavy_gui_ir.md
+  - ADRs: 
+    - Overview: adr/index.md
+    - GUI Send/Receive: adr/ADR-001-GUI-Send-Receive.md
+    - pd2gui Parser: adr/ADR-002-pd2gui-Parser.md
+    - Control Rate Expr: adr/ADR-003-Control-Rate-Expr.md
+    - Signal Rate Expr: adr/ADR-004-Signal-Rate-Expr.md

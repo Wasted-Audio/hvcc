@@ -20,36 +20,36 @@ However it's important to note that Pd is merely used as a front-end authoring e
 
 Heavy can interpret and convert a subset of features from Pure Data patches:
 
-* [Supported Pd objects](09.supported_vanilla_objects.md)
-* [Unsupported Pd objects](10.unsupported_vanilla_objects.md)
+- [Supported Pd objects](../reference/objects/supported.md)
+- [Unsupported Pd objects](../reference/objects/unsupported.md)
 
 ## Supported Platforms
 
-* Windows 10, 11 and WSA
-* Mac OSX
-* Linux
-* PS4
-* Xbox One
-* iOS
-* Android
-* [Bela](http://bela.io)
-* [Hoxton OWL](https://www.rebeltech.org/product/owl-modular/)
-* [Daisy](https://www.electro-smith.com/daisy)
-* Raspberry Pi
-* Web (Javascript)
+- Windows 10, 11 and WSA
+- Mac OSX
+- Linux
+- PS4
+- Xbox One
+- iOS
+- Android
+- [Bela](http://bela.io)
+- [Hoxton OWL](https://www.rebeltech.org/product/owl-modular/)
+- [Daisy](https://www.electro-smith.com/daisy)
+- Raspberry Pi
+- Web (Javascript)
 
 ## Supported Frameworks
 
-* [Unity 5](https://unity3d.com)
-* [Distrho Plugin Framework](https://distrho.github.io/DPF)
-  * [LV2](https://lv2plug.in)
-  * [VST2](https://www.steinberg.net/technology/)
-  * [VST3](https://www.steinberg.net/technology/)
-  * [CLAP](https://cleveraudio.org/)
-  * [JACK](https://jackaudio.org)
-* [Wwise](https://www.audiokinetic.com)
-* [FMOD](https://www.fmod.com)
-* [Web Audio API (AudioWorkletProcessor)](https://developer.mozilla.org/en-US/docs/Web/API/AudioWorkletProcessor)
+- [Unity 5](https://unity3d.com)
+- [Distrho Plugin Framework](https://distrho.github.io/DPF)
+  - [LV2](https://lv2plug.in)
+  - [VST2](https://www.steinberg.net/technology/)
+  - [VST3](https://www.steinberg.net/technology/)
+  - [CLAP](https://cleveraudio.org/)
+  - [JACK](https://jackaudio.org)
+- [Wwise](https://www.audiokinetic.com)
+- [FMOD](https://www.fmod.com)
+- [Web Audio API (AudioWorkletProcessor)](https://developer.mozilla.org/en-US/docs/Web/API/AudioWorkletProcessor)
 
 ## Optimisations
 
@@ -63,10 +63,10 @@ All the `hvcc` python compiler code is [GPLv3](https://github.com/Wasted-Audio/h
 
 The files that `hvcc` generates are split into two types:
 
-* [Static](https://github.com/Wasted-Audio/hvcc/tree/master/hvcc/generators/ir2c/static): this code is independent of the input patch contents and provides the basic DSP functionality with which generated output can link against. It has a liberal [ISC](https://github.com/Wasted-Audio/hvcc/blob/master/hvcc/generators/ir2c/static/HeavyContext.hpp#L2) licence.
+- [Static](https://github.com/Wasted-Audio/hvcc/tree/master/hvcc/generators/ir2c/static): this code is independent of the input patch contents and provides the basic DSP functionality with which generated output can link against. It has a liberal [ISC](https://github.com/Wasted-Audio/hvcc/blob/master/hvcc/generators/ir2c/static/HeavyContext.hpp#L2) licence.
 
-* Generated: this relates to all the source files that use information about the input patch, for example `Heavy_{{name}}.cpp`. By default all these files will have a `Copyright (c) 2018 Enzien Audio, Ltd` header, but this can be modified with the [user copyright argument](../README.md#--copyright-user-copyright).
+- Generated: this relates to all the source files that use information about the input patch, for example `Heavy_{{name}}.cpp`. By default all these files will have a `Copyright (c) 2018 Enzien Audio, Ltd` header, but this can be modified with the [user copyright argument](../index.md#--copyright-user-copyright).
 
 ## How to start patching for heavy
 
-See the [Getting started](02.getting_started.md)  page on more information about how to construct compatible pure data patches.
+See the [Getting started](patching.md) page on more information about how to construct compatible pure data patches.

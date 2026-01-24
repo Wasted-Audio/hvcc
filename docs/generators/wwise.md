@@ -14,17 +14,17 @@ Heavy currently supports the following Wwise features:
 - Output parameters can set RTPC in Wwise
 - Output events can post arbitrary events in Wwise from the plugin
 
-![Feature overview](img/docs_wwise_overview.png)
+![Feature overview](../img/docs_wwise_overview.png)
 
 ## Source Generator or FX Unit
 
-The type of plugin that **heavy** generates is dynamically determined depending on the [I/O channel configuration](02.getting_started.md#audio-input-output). If an `[adc~]` object exists in the patch the generated plugin with be an FX unit. Otherwise it'll be a source generator plugin.
+The type of plugin that **heavy** generates is dynamically determined depending on the [I/O channel configuration](../getting-started/patching.md#audio-input-output). If an `[adc~]` object exists in the patch the generated plugin with be an FX unit. Otherwise it'll be a source generator plugin.
 
 ## RTPCs
 
-The Wwise target supports both [input and output parameters](02.getting_started.md#exposing-parameters).
+The Wwise target supports both [input and output parameters](../getting-started/patching.md#exposing-parameters).
 
-![Send param](img/docs_wwise_params.png)
+![Send param](../img/docs_wwise_params.png)
 
 ### Input Parameters
 
@@ -36,7 +36,7 @@ Sending a `single float value` to an output parameters will in turn cause the co
 
 The example patch below describes a simple envelope follower that can be used to modulate other parameters of the same voice:
 
-![Envelope follower with an output RTPC](img/docs_wwise_env.png)
+![Envelope follower with an output RTPC](../img/docs_wwise_env.png)
 
 ### Posting Wwise Events from the Plugin
 

@@ -2,9 +2,9 @@
 
 These are all the objects that hvcc is able to parse.
 
-You can read more about limitations in the [getting started](02.getting_started.md#known-limitations) guide.
+You can read more about limitations in the [getting started](../../getting-started/patching.md#known-limitations) guide.
 
-Here is a list of [unsupported Pd objects](10.unsupported_vanilla_objects.md).
+Here is a list of [unsupported Pd objects](unsupported.md).
 
 ## Message Objects
 
@@ -119,8 +119,8 @@ Here is a list of [unsupported Pd objects](10.unsupported_vanilla_objects.md).
 | vsl | converted to `[f ]` <sup>2</sup> |
 | wrap | |
 
-1. Midi i/o objects are currently only supported for [dpf](03.gen.dpf.md), [daisy](03.gen.daisy.md) and [owl](03.gen.owl.md)
-2. Supports setting send/receive configuration, see [Getting Started](02.getting_started.md#gui-objects)
+1. Midi i/o objects are currently only supported for [dpf](../../generators/dpf.md), [daisy](../../generators/daisy.md) and [owl](../../generators/owl.md)
+2. Supports setting send/receive configuration, see [Getting Started](../../getting-started/patching.md#gui-objects)
 3. Does not support: `size()`, `sum()`, `Sum()`, `avg()`, `Avg()`, `mtof()`, `ftom()`, `dbtorms()`, `rmstodb()`, `powtodb()`, `dbtopow()`
 
 ## Signal Objects

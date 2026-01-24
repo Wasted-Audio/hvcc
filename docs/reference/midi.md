@@ -44,7 +44,7 @@ The same principle applies for sending MIDI data out of the heavy context. If yo
 * The `[ctlin]` object is currently unable to match CC message 0. One can of course still filter for this message in the patch itself.
 * The `[midiout]` object currently does not respond to port numbers.
 
-Some framework targets like [DPF](03.gen.dpf.md) already have implementations available. However, if you're integrating the C/C++ code on a custom platform then you'll need to provide your own conversion process.
+Some framework targets like [DPF](../generators/dpf.md) already have implementations available. However, if you're integrating the C/C++ code on a custom platform then you'll need to provide your own conversion process.
 
 Here's the `DPF` implementation as an example.
 
