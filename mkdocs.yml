@@ -23,6 +23,10 @@ markdown_extensions:
       check_paths: true
   - pymdownx.superfences
 
+extra:
+  version:
+    provider: mike
+
 hooks:
   - docs/mkdocs_hooks.py
 

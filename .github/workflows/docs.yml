@@ -10,6 +10,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - name: Configure Git Credentials
         run: |
           git config user.name github-actions[bot]
@@ -24,5 +26,12 @@ jobs:
           path: .cache
           restore-keys: |
             mkdocs-material-
-      - run: pip install mkdocs-material
-      - run: mkdocs gh-deploy --force
+      - run: pip install mkdocs-material mike
+      - name: Deploy Documentation
+        run: |
+          # Extract version from pyproject.toml
+          VERSION=$(grep -m 1 '^version = ' pyproject.toml | cut -d '"' -f 2)
+          # Deploy version and update 'latest' alias
+          mike deploy $VERSION latest --push
+          # Set 'latest' as the default version (root redirect)
+          mike set-default latest --push
