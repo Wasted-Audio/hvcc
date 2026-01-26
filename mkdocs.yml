@@ -10,9 +10,20 @@ theme:
     - content.code.copy
   palette:
     scheme: slate  # Dark mode support
+  logo: img/logo-compressed.svg
+  favicon: img/favicon.ico
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
 
 hooks:
-  - mkdocs_hooks.py
+  - docs/mkdocs_hooks.py
 
 nav:
   - Home: index.md
@@ -23,14 +34,14 @@ nav:
     - Overview: generators/index.md
     - Unity: generators/unity.md
     - Wwise: generators/wwise.md
-    - Daisy: 
+    - Daisy:
       - Basics: generators/daisy.md
       - JSON Params: generators/daisy_json.md
     - DPF: generators/dpf.md
     - Javascript: generators/javascript.md
     - FMOD: generators/fmod.md
     - OWL: generators/owl.md
-    - Pdext: generators/pdext.md
+    - Pd External: generators/pdext.md
     - Custom: generators/custom.md
   - Reference:
     - MIDI: reference/midi.md
@@ -41,7 +52,7 @@ nav:
     - Heavy Lang: reference/ir/heavy_lang.md
     - Heavy IR: reference/ir/heavy_ir.md
     - Heavy GUI IR: reference/ir/heavy_gui_ir.md
-  - ADRs: 
+  - ADRs:
     - Overview: adr/index.md
     - GUI Send/Receive: adr/ADR-001-GUI-Send-Receive.md
     - pd2gui Parser: adr/ADR-002-pd2gui-Parser.md

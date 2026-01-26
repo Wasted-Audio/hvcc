@@ -27,16 +27,16 @@ from hvcc.types.meta import Meta
 class ExampleHvccGenerator(Generator):
     @classmethod
     def compile(
-            cls,
-            c_src_dir: str,
-            out_dir: str,
-            externs: ExternInfo,
-            patch_name: Optional[str] = None,
-            patch_meta: Meta = Meta(),
-            num_input_channels: int = 0,
-            num_output_channels: int = 0,
-            copyright: Optional[str] = None,
-            verbose: Optional[bool] = False
+        cls,
+        c_src_dir: str,
+        out_dir: str,
+        externs: ExternInfo,
+        patch_name: Optional[str] = None,
+        patch_meta: Meta = Meta(),
+        num_input_channels: int = 0,
+        num_output_channels: int = 0,
+        copyright: Optional[str] = None,
+        verbose: Optional[bool] = False
     ) -> CompilerResp:
         begin_time = time.time()
         print("--> Invoking ExampleHvccGenerator")
