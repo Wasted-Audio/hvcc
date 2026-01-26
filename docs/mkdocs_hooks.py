@@ -2,6 +2,11 @@ import os
 import re
 
 
+def python_indent(content):
+    # Pattern: classic markdown indent (2 spaces) to Python-Markdown indent (4 spaces)
+    return re.sub(r'^(\ \ -\ .*)', r'  \1', content, flags=re.MULTILINE)
+
+
 def on_page_markdown(markdown, page, config, files):
     if page.file.src_path == 'index.md':
         readme_path = os.path.join(os.path.dirname(config['config_file_path']), 'README.md')
@@ -16,11 +21,12 @@ def on_page_markdown(markdown, page, config, files):
             # Pattern: parenthesis, docs/, everything else
             content = content.replace('](docs/', '](')
 
-            # Pattern: classic markdown indent (2 spaces) to Python-Markdown indent (4 spaces)
-            content = re.sub(r'^(\ \ -\ .*)', r'  \1', content, flags=re.MULTILINE)
+            content = python_indent(content)
 
             return content
         except Exception as e:
             print(f"Error including README.md: {e}")
             return markdown
+
+    markdown = python_indent(markdown)
     return markdown
