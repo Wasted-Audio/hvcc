@@ -65,7 +65,6 @@ void {{class_name}}::initAudioPort(bool input, uint32_t index, AudioPort& port)
       port.groupId = kPortGroupStereo;
   {%- endif %}
 {%- endif %}
-      }
     }
 }
 
