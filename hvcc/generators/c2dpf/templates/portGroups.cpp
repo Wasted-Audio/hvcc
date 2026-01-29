@@ -61,10 +61,10 @@ void {{class_name}}::initAudioPort(bool input, uint32_t index, AudioPort& port)
         port.name   = "Output Right";
         port.symbol = "out_right";
         break;
-      }
       port.groupId = kPortGroupStereo;
   {%- endif %}
 {%- endif %}
+      }
     }
 }
 
