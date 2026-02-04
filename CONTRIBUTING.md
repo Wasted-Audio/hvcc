@@ -43,3 +43,9 @@ Not only the core project can use contributions, but there are also several repo
 This starts with the [hvcc-examples](https://github.com/Wasted-Audio/hvcc-examples) project which contains some general abstractions and requirements. There are links to several dedicated generator projects that are based on this repository.
 
 If you want to create a new generator example project open an [Issue](https://github.com/Wasted-Audio/hvcc-examples/issues) so it can be set up for you.
+
+## Use of AI and LLMs
+
+It is not allowed to create issues, documentation or pull requests made entirely using an LLM. When it becomes aparent that no real effort was put into creating such contributions these will be removed.
+
+You can of course use LLM tools for private research and features like auto-complete in your IDE. PRs are required to be fully understood by their creator, adhere to the project style and have suitable tests included.
