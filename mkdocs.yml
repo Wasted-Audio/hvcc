@@ -19,7 +19,8 @@ markdown_extensions:
       line_spans: __span
       pygments_lang_class: true
   - pymdownx.inlinehilite
-  - pymdownx.snippets
+  - pymdownx.snippets:
+      check_paths: true
   - pymdownx.superfences
 
 hooks:
@@ -58,3 +59,4 @@ nav:
     - pd2gui Parser: adr/ADR-002-pd2gui-Parser.md
     - Control Rate Expr: adr/ADR-003-Control-Rate-Expr.md
     - Signal Rate Expr: adr/ADR-004-Signal-Rate-Expr.md
+  - Contributing: contributing.md

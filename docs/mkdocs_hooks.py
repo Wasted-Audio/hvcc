@@ -28,5 +28,14 @@ def on_page_markdown(markdown, page, config, files):
             print(f"Error including README.md: {e}")
             return markdown
 
+    if page.file.src_path == 'contributing.md':
+        repo_url = config.get('repo_url', '').rstrip('/')
+        markdown = markdown.replace(
+            '](CHANGELOG.md)',
+            f']({repo_url}/blob/develop/CHANGELOG.md)'
+        )
+        markdown = markdown.replace('](/docs/)', '](index.md)')
+        markdown = markdown.replace('](/docs/ADRs/)', '](adr/index.md)')
+
     markdown = python_indent(markdown)
     return markdown
