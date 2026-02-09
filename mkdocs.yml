@@ -33,16 +33,16 @@ nav:
     - Patching Guide: getting-started/patching.md
   - Generators:
     - Overview: generators/index.md
-    - Unity: generators/unity.md
-    - Wwise: generators/wwise.md
     - Daisy:
       - Basics: generators/daisy.md
       - JSON Params: generators/daisy_json.md
     - DPF: generators/dpf.md
-    - Javascript: generators/javascript.md
     - FMOD: generators/fmod.md
+    - Javascript: generators/javascript.md
     - OWL: generators/owl.md
     - Pd External: generators/pdext.md
+    - Unity: generators/unity.md
+    - Wwise: generators/wwise.md
     - Custom: generators/custom.md
   - Reference:
     - MIDI: reference/midi.md
@@ -59,4 +59,6 @@ nav:
     - pd2gui Parser: adr/ADR-002-pd2gui-Parser.md
     - Control Rate Expr: adr/ADR-003-Control-Rate-Expr.md
     - Signal Rate Expr: adr/ADR-004-Signal-Rate-Expr.md
+  - Changelog: changelog.md
   - Contributing: contributing.md
+  - Code of Conduct: code_of_conduct.md

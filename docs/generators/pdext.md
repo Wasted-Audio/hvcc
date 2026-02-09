@@ -1,4 +1,4 @@
-# Pdext
+# Pd External
 
 Pure Data externals allow you to reuse compiled Heavy code in subsequent Pd patches. Because of how Heavy runs its process we will always create a signal object that only runs with DSP turned on (although it is possible to only have control i/o). Therefore the created external will always have the signal `~` appended after the name.
 

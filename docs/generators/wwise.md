@@ -18,7 +18,7 @@ Heavy currently supports the following Wwise features:
 
 ## Source Generator or FX Unit
 
-The type of plugin that **heavy** generates is dynamically determined depending on the [I/O channel configuration](../getting-started/patching.md#audio-input-output). If an `[adc~]` object exists in the patch the generated plugin with be an FX unit. Otherwise it'll be a source generator plugin.
+The type of plugin that **heavy** generates is dynamically determined depending on the [I/O channel configuration](../getting-started/patching.md#audio-inputoutput). If an `[adc~]` object exists in the patch the generated plugin with be an FX unit. Otherwise it'll be a source generator plugin.
 
 ## RTPCs
 

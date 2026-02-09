@@ -74,7 +74,7 @@ cd hvcc/
 pip3 install -e .
 ```
 
-Also review our [Contribution Guide](/CONTRIBUTING.md) before opening a pull request.
+Also review our [Contribution Guide](CONTRIBUTING.md) before opening a pull request.
 
 ## Usage
 
@@ -168,7 +168,7 @@ Displays all the available parameters and options for hvcc.
 
 ## Contact
 
-The Heavy community aims to be safe and inclusive, please read our [Code of Conduct](/CODE_OF_CONDUCT.md) before engaging.
+The Heavy community aims to be safe and inclusive, please read our [Code of Conduct](CODE_OF_CONDUCT.md) before engaging.
 
 There are several places where heavy/hvcc conversation is happening:
 
