@@ -35,7 +35,7 @@ nav:
     - Overview: generators/index.md
     - Daisy:
       - Basics: generators/daisy.md
-      - JSON Params: generators/daisy_json.md
+      - Board JSON: generators/daisy_json.md
     - DPF: generators/dpf.md
     - FMOD: generators/fmod.md
     - Javascript: generators/javascript.md

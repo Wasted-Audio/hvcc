@@ -1,8 +1,8 @@
-## Custom JSON
+## Board JSON
 
 JSON is a human-readable file format for data storage, and it's what json2daisy uses to help translate your Pd patch into something that will run on a Daisy-based board. If you haven't worked with something like it before, it might look a little strange, but don't worry! We'll cover enough here to get you on your way to custom hardware in no time.
 
-### JSON Basics
+### Basics
 
 For most hardware descriptions, there are only three JSON concepts you need to know: numbers, strings, and objects.
 
@@ -120,6 +120,7 @@ So, a very simple but viable board description might look like:
 | RgbLed | _red | Expects a floating point value from 0-1. Sets the brightness of the red LED only. |
 | RgbLed | _green | Expects a floating point value from 0-1. Sets the brightness of the green LED only. |
 | RgbLed | _blue | Expects a floating point value from 0-1. Sets the brightness of the blue LED only. |
+| UserLed| --- | Sets the Daisy onboard LED. Expects a boolean floating point value of 0 or 1. |
 
 ### Built-in descriptions
 
