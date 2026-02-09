@@ -6,15 +6,15 @@ Some [examples](https://github.com/Wasted-Audio/hvcc-examples-dpf) are built for
 
 ## Defining Parameters
 
-Each [exposed parameter](02.getting_started.md#exposing-parameters) will automatically generate a slider in the plugin interface.
+Each [exposed parameter](../getting-started/patching.md#exposing-parameters) will automatically generate a slider in the plugin interface.
 
 ## MIDI Control
 
 In order to receive MIDI note on and off events, as well as control change messages, the `[notein]` and `[ctlin]` objects should be used, respectively.
 
-DPF supports all note/ctl/pgm/touch/bend I/O events. The implementation is further discussed in the [midi docs](04.midi.md)
+DPF supports all note/ctl/pgm/touch/bend I/O events. The implementation is further discussed in the [midi docs](../reference/midi.md)
 
-![notein](img/docs_notein.png)
+![notein](../img/docs_notein.png)
 
 ## Host Transport Events
 
@@ -30,7 +30,7 @@ In DPF a parameter can get an optional type configured. The default type is `flo
 
 Other assignable types are `int` - or whole numbers, `bool` - for toggling a value, and `trig` - for momentary signals.
 
-![dpf](img/docs_param_type.png)
+![dpf](../img/docs_param_type.png)
 
 Using jinja the `v.attributes.type` can be evaluated for a specific string and different templating applied to the parameter. In DPF the extra types `bool` and `trig` result in the following plugin code:
 

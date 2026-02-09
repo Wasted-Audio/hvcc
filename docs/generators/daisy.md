@@ -20,7 +20,7 @@ Which can be configured using the `-m` metadata.json `daisy.board` setting:
 }
 ```
 
-However one can also create custom board layouts. See [the Daisy Component documentation](03.gen.daisy.components.md) for more information.
+However one can also create custom board layouts. See [the Daisy Component documentation](daisy_json.md) for more information.
 
 The custom layout can be passed on via the meta.json as such:
 

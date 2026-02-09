@@ -4,7 +4,7 @@ These are all the objects that hvcc is not able to parse. It will give errors if
 
 Do note this list in non-exhaustive and not fully up to date. Please report any missing pd-vanilla objects.
 
-Here is a list of [supported Pd objects](09.supported_vanilla_objects.md).
+Here is a list of [supported Pd objects](supported.md).
 
 ## Message Objects
 

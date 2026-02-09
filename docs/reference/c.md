@@ -2,7 +2,7 @@
 
 The Heavy C API is the lowest-level programming interface to a Heavy patch. It allows a high degree of control over all aspects of its function, and its performance and debugging can be greatly influenced by use of platform-specific compiler options. This is the place to be for the maximum amount of control over how the patch executes on a device.
 
-The C API is functionally equivalent to the [C++ API](06.cpp.md).
+The C API is functionally equivalent to the [C++ API](cpp.md).
 
 ## Patch names
 
@@ -66,7 +66,7 @@ Use of hardware SIMD operations can dramatically speed up the processing of Heav
 
 Expected buffer format is as an array of float sample arrays:
 
-![process](img/docs_c_process.svg)
+![process](../img/docs_c_process.svg)
 
 ```c
 #include "Heavy_example.h"
@@ -99,7 +99,7 @@ int main(int argc, const char *argv[]) {
 ### hv_processInline()
 
 Expected buffer format is as contiguous uninterleaved float sample arrays:
-![process_inline](img/docs_c_process_inline.svg)
+![process_inline](../img/docs_c_process_inline.svg)
 
 ```c
 #include "Heavy_example.h"

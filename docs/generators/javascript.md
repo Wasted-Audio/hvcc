@@ -128,7 +128,7 @@ The initial set up should look something like this:
 
 ### Sending Events or Parameters
 
-The JS target supports [exposing event and parameter](02.getting_started#exposing-parameters) interfaces from the patch.
+The JS target supports [exposing event and parameter](../getting-started/patching.md#exposing-parameters) interfaces from the patch.
 
 ```html
 <script type="text/javascript">
