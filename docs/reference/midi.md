@@ -1,0 +1,89 @@
+# MIDI I/O
+
+In PureData there are several objects to handle interfacing with MIDI.
+
+**heavy** doesn't provide cross-platform implementation for MIDI I/O as the requirements tend to change depending on the platform or framework being used.
+
+Instead, it provides wrappers around these objects that route the data to specific hard-coded receivers/parameters in the patch context. For example a `[notein]` object will be replaced by a `[r __hv_notein]` receiver with input data split into its constituent parts and routed to the appropriate outlet.
+
+## Inputs
+
+The following Pd objects are mapped to their corresponding heavy parameter and internal hash.
+
+|     Pd object     |     heavy param     | heavy hash |
+| ----------------- | ------------------- | ---------- |
+| [notein]          | __hv_notein         | 0x67E37CA3 |
+| [ctlin]           | __hv_ctlin          | 0x41BE0f9C |
+| [polytouchin]     | __hv_polytouchin    | 0xBC530F59 |
+| [pgmin]           | __hv_pgmin          | 0x2E1EA03D |
+| [touchin]         | __hv_touchin        | 0x553925BD |
+| [bendin]          | __hv_bendin         | 0x3083F0F7 |
+| [midiin]          | __hv_midiin         | 0x149631bE |
+| [midirealtimein]  | __hv_midirealtimein | 0x6FFF0BCF |
+
+## Outputs
+
+The same principle applies for sending MIDI data out of the heavy context. If you add a [noteout] object there'll be a corresponding sendhook callback with a message containing the MIDI data sent by the patch.
+
+| Pd object      | heavy sendhook    | heavy hash |
+| -------------  | ----------------- |------------|
+| [noteout]      | __hv_noteout      | 0xD1D4AC2  |
+| [ctlout]       | __hv_ctlout       | 0xE5e2A040 |
+| [polytouchout] | __hv_polytouchout | 0xD5ACA9D1 |
+| [pgmout]       | __hv_pgmout       | 0x8753E39E |
+| [touchout]     | __hv_touchout     | 0x476D4387 |
+| [bendout]      | __hv_bendout      | 0xE8458013 |
+| [midiout]      | __hv_midiout      | 0x6511DE55 |
+| [midiout]      | __hv_midioutport  | 0x165707E4 |
+
+## Note
+
+* Channel numbering in the generator is expect to start at 0. For this reason the midi wrapper objects internally `[+ 1]` and `[- 1]` since Pure Data starts channel numbering at 1 and this keeps some expected patch compatibility in place.
+* Also for compatibility reasons `[bendout]` uses -8192 to 8191 range (and resets the offset with an internal `[+ 8192]`). This ensures expected behaviour with pd-vanilla patches.
+* It is generally the users responsibility to convert to and from the MIDI byte data to the float values used by heavy.
+* The `[ctlin]` object is currently unable to match CC message 0. One can of course still filter for this message in the patch itself.
+* The `[midiout]` object currently does not respond to port numbers.
+
+Some framework targets like [DPF](../generators/dpf.md) already have implementations available. However, if you're integrating the C/C++ code on a custom platform then you'll need to provide your own conversion process.
+
+Here's the `DPF` implementation as an example.
+
+## Handling MIDI Input
+
+The MIDI input is called during the DPF `run()` loop where it receives `MidiEvent` messages.
+
+[Source code (run loop)](https://github.com/Wasted-Audio/hvcc/blob/develop/hvcc/generators/c2dpf/templates/HeavyDPF.cpp#L201-L205)
+
+[Source code (handleMidiInput)](https://github.com/Wasted-Audio/hvcc/blob/develop/hvcc/generators/c2dpf/templates/midiInput.cpp)
+
+## Handling MIDI Output
+
+For MIDI output you will need to set a heavy sendhook function that will trigger `DPF` MIDI output events from the heavy context:
+
+```cpp
+static void hvSendHookFunc(HeavyContextInterface *c, const char *sendName, uint32_t sendHash, const HvMessage *m)
+{
+  {{class_name}}* plugin = ({{class_name}}*)c->getUserData();
+  if (plugin != nullptr)
+  {
+#if DISTRHO_PLUGIN_WANT_MIDI_OUTPUT
+    plugin->handleMidiSend(sendHash, m);
+#endif
+  }
+}
+```
+
+That can then be attached to the heavy context in the constructor:
+
+```cpp
+  _context->setUserData(this);
+  _context->setSendHook(&hvSendHookFunc);
+```
+
+This will prepare the DPF MidiEvents and needs to take special care for Note Off messages.
+
+Pd does not have specific Note Off events, so velocity 0 is assumed to be Note Off in this case. And because DPF only supports a single midi port we do a `% 16` to reduce them to only one.
+
+Bend assumes input values ranged `0 - 16383` for `[bendin]` (normal bend range), however as mentioned before `[bendout]` uses `-8192 to 8191` to stay compatible with pd-vanilla.
+
+[Source code (handleMidiSend)](https://github.com/Wasted-Audio/hvcc/blob/develop/hvcc/generators/c2dpf/templates/midiOutput.cpp)

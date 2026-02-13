@@ -321,6 +321,11 @@ class TestPdControlPatches(TestPdControlBase):
     def test_wrap(self):
         self._test_control_patch("test-wrap.pd")
 
+    # edge cases
+
+    def test_extern_table(self):
+        self._test_control_patch("test-extern_table.pd")
+
 
 def main():
     # TODO(mhroth): make this work
