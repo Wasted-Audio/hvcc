@@ -22,6 +22,7 @@ from typing import List, Optional
 
 from hvcc.interpreters.pd2hv.PdParser import PdParser
 from hvcc.types.compiler import CompilerResp, CompilerNotif
+from .PdGraph import PdGraph
 
 
 class Colours:
@@ -60,7 +61,7 @@ class pd2hv:
             for p in search_paths:
                 parser.add_absolute_search_directory(p)
 
-        pd_graph = parser.graph_from_file(pd_path)
+        pd_graph: PdGraph = parser.graph_from_file(pd_path)
         notices = pd_graph.get_notices()
 
         # check for errors
