@@ -1,0 +1,29 @@
+{
+  "objects": [
+    {
+      "type": "vslider",
+      "position": {
+        "x": 119,
+        "y": 78
+      },
+      "size": {
+        "x": 17,
+        "y": 128
+      },
+      "parameter": "1001_vol",
+      "label": null,
+      "min": 0.0,
+      "max": 127.0,
+      "fg_color": "white",
+      "bg_color": "#191919",
+      "logarithmic": false,
+      "steady": true
+    }
+  ],
+  "graphs": [],
+  "size": {
+    "x": 734,
+    "y": 565
+  },
+  "version": "0.14.0"
+}

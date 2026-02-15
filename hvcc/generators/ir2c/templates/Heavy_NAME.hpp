@@ -55,22 +55,22 @@ class Heavy_{{name}} : public HeavyContext {
 
   int getParameterInfo(int index, HvParameterInfo *info) override;
 
-  {%- if externs.parameters.in|length > 0 or externs.parameters.out|length > 0 %}
+  {%- if externs.parameters.inParam|length > 0 or externs.parameters.outParam|length > 0 %}
   struct Parameter {
-    {% if externs.parameters.in|length > 0 -%}
+    {% if externs.parameters.inParam|length > 0 -%}
     struct In {
       enum ParameterIn : hv_uint32_t {
-        {%- for k,v in externs.parameters.in %}
+        {%- for k,v in externs.parameters.inParam %}
         {{k|upper}} = {{v.hash}}, // {{v.display}}
         {%- endfor %}
       };
     };
     {%- endif %}
 
-    {%- if externs.parameters.out|length > 0 %}
+    {%- if externs.parameters.outParam|length > 0 %}
     struct Out {
       enum ParameterOut : hv_uint32_t {
-        {%- for k,v in externs.parameters.out %}
+        {%- for k,v in externs.parameters.outParam %}
         {{k|upper}} = {{v.hash}}, // {{v.display}}
         {%- endfor %}
       };
@@ -79,22 +79,22 @@ class Heavy_{{name}} : public HeavyContext {
   };
   {%- endif %}
 
-  {%- if externs.events.in|length > 0 or externs.events.out|length > 0 %}
+  {%- if externs.events.inEvent|length > 0 or externs.events.outEvent|length > 0 %}
   struct Event {
-    {%- if externs.events.in|length > 0 %}
+    {%- if externs.events.inEvent|length > 0 %}
     struct In {
       enum EventIn : hv_uint32_t {
-        {%- for k,v in externs.events.in %}
+        {%- for k,v in externs.events.inEvent %}
         {{k|upper}} = {{v.hash}}, // {{v.display}}
         {%- endfor %}
       };
     };
     {%- endif %}
 
-    {%- if externs.events.out|length > 0 %}
+    {%- if externs.events.outEvent|length > 0 %}
     struct Out {
       enum EventOut : hv_uint32_t {
-        {%- for k,v in externs.events.out %}
+        {%- for k,v in externs.events.outEvent %}
         {{k|upper}} = {{v.hash}}, // {{v.display}}
         {%- endfor %}
       };
@@ -114,6 +114,23 @@ class Heavy_{{name}} : public HeavyContext {
  private:
   HvTable *getTableForHash(hv_uint32_t tableHash) override;
   void scheduleMessageForReceiver(hv_uint32_t receiverHash, HvMessage *m) override;
+
+
+  /*
+  * Code for expr~ implementation
+  * Write out the generic header code
+  */
+
+  // per class code
+  {%- for line in class_header_lines %}
+  {{line}}
+  {%- endfor %}
+
+  // per object code
+  {%- for line in obj_header_lines %}
+  {{line}}
+  {%- endfor %}
+
 
   // static sendMessage functions
   {%- for d in decl_list %}

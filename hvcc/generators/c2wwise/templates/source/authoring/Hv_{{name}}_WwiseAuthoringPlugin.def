@@ -1,6 +1,0 @@
-; Hv_{{name}}_Wwise{{plugin_type}}AuthPlugin.def : Declares the module parameters for the DLL.
-
-LIBRARY      "Hv_{{name}}_Wwise{{plugin_type}}AuthPlugin"
-
-EXPORTS
-    AkCreatePlugin

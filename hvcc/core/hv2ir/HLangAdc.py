@@ -1,5 +1,5 @@
 # Copyright (C) 2014-2018 Enzien Audio, Ltd.
-# Copyright (C) 2023 Wasted Audio
+# Copyright (C) 2023-2024 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,6 +20,8 @@ from .HeavyIrObject import HeavyIrObject
 from .HeavyLangObject import HeavyLangObject
 from .HeavyGraph import HeavyGraph
 
+from hvcc.types.Lang import LangLetType
+
 
 class HLangAdc(HeavyLangObject):
     """ adc
@@ -35,10 +37,10 @@ class HLangAdc(HeavyLangObject):
         assert obj_type == "adc"
         super().__init__(obj_type, args, graph,
                          num_inlets=0,
-                         num_outlets=len(args[HeavyLangObject._HEAVY_LANG_DICT[obj_type]["args"][0]["name"]]),
+                         num_outlets=len(args[self._HEAVY_LANG_DICT[obj_type].args[0].name]),
                          annotations=annotations)
 
-    def _resolved_outlet_type(self, outlet_index: int = 0) -> str:
+    def _resolved_outlet_type(self, outlet_index: int = 0) -> LangLetType:
         return "~f>"
 
     def reduce(self) -> tuple:

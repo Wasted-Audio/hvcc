@@ -1,6 +1,6 @@
 CC=clang
 CXX=clang++
-COMMONFLAGS=-Werror -Wno-unused-function -Wno-\#warnings {{" ".join(simd_flags)}}
+COMMONFLAGS=-Werror -Wno-unused-function -gdwarf-4 -Wno-\#warnings {{" ".join(simd_flags)}}
 CFLAGS=-std=c11 $(COMMONFLAGS)
 CXXFLAGS=-std=c++11 -fno-exceptions -fno-rtti $(COMMONFLAGS)
 

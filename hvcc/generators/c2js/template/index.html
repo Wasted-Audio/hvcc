@@ -10,9 +10,11 @@
     {% endfor -%}
 
     <style>
+      .horizontal { display: flex; justify-content: space-evenly; align-items: center; }
       .widget { max-width: 900px; margin: auto; }
       .row { width: 100%; margin-bottom: 10px; }
       .col { display: inline-block; }
+      .events { vertical-align: top; margin: 10px; }
       .title { width: 80%; margin: 0 auto; }
       .transport { padding-left: 10px; }
       .parameter-name { width: 35%; text-align: right; }
@@ -26,6 +28,7 @@
     <script type="text/javascript">
       var heavyModule = null;
       var loader = null;
+      midioutPort = null;
 
       window.onload = function() {
         {{name}}_Module().then(loadedModule => {
@@ -48,7 +51,8 @@
             // optional: provide a callback handler for [print] messages
             printHook: onPrint,
             // optional: provide a callback handler for [s {sendName} @hv_param] messages
-            sendHook: onFloatMessage,
+            // sendName "midiOutMessage" is reserved for MIDI output messages!
+            sendHook: onSendMessage,
             // optional: pass an existing web audio context, otherwise a new one
             // will be constructed.
             webAudioContext: null
@@ -58,6 +62,7 @@
             {% endfor -%}
           });
         }
+        
         loader.start();
       }
 
@@ -72,44 +77,156 @@
       function onPrint(message) {
         console.log(message);
       }
+    {%- if midi | length or midi_out | length %}
 
-      function onFloatMessage(sendName, floatValue) {
-        console.log(sendName, floatValue);
+      if (navigator.requestMIDIAccess) {
+        navigator.requestMIDIAccess()
+        .then(onMIDISuccess, onMIDIFailure);
+      }
+
+      function onMIDISuccess(midiAccess) {
+
+        {%- if midi | length %}
+        
+          var midiInputs = [];
+          var inputs = midiAccess.inputs.values();
+          midiInputs = Array.from(midiAccess.inputs.values());
+          var midiInputsSelect = document.getElementById("midiInputs");
+
+          midiInputs.forEach((input, index) => {
+            var option = document.createElement("option");
+            option.value = index;
+            option.text = input.name;
+            midiInputsSelect.add(option);
+          });
+
+          // Preselect the first MIDI input and output
+          if (midiInputs.length > 0) {
+            midiInputsSelect.selectedIndex = 0;
+            midiInputs[0].onmidimessage = onMIDIMessage;
+          }
+
+          midiInputsSelect.onchange = function() {
+            var selectedInput = midiInputs[midiInputsSelect.value];
+            midiInputs.forEach(input => input.onmidimessage = null); // Clear previous handlers
+            selectedInput.onmidimessage = onMIDIMessage;
+          };
+        {%- endif %}
+
+        {%- if midi_out | length %}
+          var midiOutputs = [];
+          var outputs = midiAccess.outputs.values();
+          midiOutputs = Array.from(midiAccess.outputs.values());
+          var midiOutputsSelect = document.getElementById("midiOutputs");
+
+          midiOutputs.forEach((output, index) => {
+            var option = document.createElement("option");
+            option.value = index;
+            option.text = output.name;
+            midiOutputsSelect.add(option);
+          });
+
+          if (midiOutputs.length > 0) {
+            midiOutputsSelect.selectedIndex = 0;
+            midioutPort = midiOutputs[0];
+          }
+
+          midiOutputsSelect.onchange = function() {
+            midioutPort = midiOutputs[midiOutputsSelect.value];
+          };
+        {%- endif %}
+      }
+
+      function onMIDIFailure(msg) {
+        console.error(`Failed to get MIDI access - ${msg}`);
+      }
+
+      function onMIDIMessage(message) {
+        if(loader.webAudioWorklet) {
+          loader.sendMidi(message.data);
+        } else {
+          loader.audiolib.sendMidi(message.data);
+        }
+      }
+    {%- endif %}
+      
+      
+
+      function onMidiOutMessage(message) {
+        if (midioutPort !== null) {
+          midioutPort.send(message);
+        }
+        else {
+          console.error("No MIDI output port available.");
+        }
+      }
+
+      function onSendMessage(sendName, message) {
+
+        switch (sendName) {
+          {%- if parameters_out | length %}
+            {%- for k, v in parameters_out %}
+                case "{{k}}":
+                  document.getElementById("parameter_{{k}}").value = message;
+                  document.getElementById("value_{{k}}").textContent = Number(floatValue).toFixed(2);
+                  break;
+            {%- endfor %}
+          {%- endif %}
+          {%- if events_out | length %}
+            {%- for k, v in events_out %}
+                case "{{k}}":
+                  {{k}}_counter += 1;
+                  document.getElementById("{{k}}_counter").innerHTML = {{k}}_counter;
+                  break;
+            {%- endfor %}
+          {%- endif %}
+          case "midiOutMessage":
+            onMidiOutMessage(message);
+            break;
+          default:
+            console.log(sendName, message);
+        }
       }
 
       {%- if events | length %}
-
       // Generated Event Update Methods
-{%- for k, v in events %}
-      function sendEvent_{{k}}() {
-        if(loader.webAudioWorklet) {
-          loader.sendEvent("{{v.display}}");
-        } else {
-          loader.audiolib.sendEvent("{{v.display}}");
-        }
-      }
-{% endfor %}
-      {%- endif %}
+        {%- for k, v in events %}
+              function sendEvent_{{k}}() {
+                if(loader.webAudioWorklet) {
+                  loader.sendEvent("{{v.display}}");
+                } else {
+                  loader.audiolib.sendEvent("{{v.display}}");
+                }
+              }
+        {% endfor %}
+              {%- endif %}
 
-      // randomizer
-      function randomiseParameters() {
-{%- for k, v in parameters %}
-        updateSlider_{{k}}(Math.random());
-{% endfor %}
-      }
-      {%- if parameters | length %}
-      // Generated Parameter Update Methods
-{%- for k, v in parameters %}
-      function updateSlider_{{k}}(value) {
-        document.getElementById("value_{{k}}").textContent = Number(value).toFixed(2);
-        document.getElementById("parameter_{{k}}").value = value;
-        if(loader.webAudioWorklet) {
-          loader.sendFloatParameterToWorklet("{{v.display}}", value);
-        } else {
-          loader.audiolib.setFloatParameter("{{v.display}}", value);
-        }
-      }
-{% endfor %}
+          {%- if events_out | length %}
+            {%- for k, v in events_out %}
+              var {{k}}_counter = 0;
+            {%- endfor %}
+          {%- endif %}
+
+
+              // randomizer
+              function randomiseParameters() {
+        {%- for k, v in parameters %}
+                updateSlider_{{k}}(Math.random());
+        {% endfor %}
+              }
+              {%- if parameters | length %}
+              // Generated Parameter Update Methods
+        {%- for k, v in parameters %}
+              function updateSlider_{{k}}(value) {
+                document.getElementById("value_{{k}}").textContent = Number(value).toFixed(2);
+                document.getElementById("parameter_{{k}}").value = value;
+                if(loader.webAudioWorklet) {
+                  loader.sendFloatParameterToWorklet("{{v.display}}", value);
+                } else {
+                  loader.audiolib.setFloatParameter("{{v.display}}", value);
+                }
+              }
+        {% endfor %}
       {%- endif %}
     </script>
   </head>
@@ -127,16 +244,31 @@
           <button style="padding: 10px;" type="button" id="randomiseButton" onclick="randomiseParameters();">Randomise</button>
         </div>
       </div>
+
+      <div class="row events" style="text-align: center;">
       {%- if events | length %}
-      <div class="row events">
-      {%- for k, v in events %}
-        <div class="col">
-          <button type="button" id="trigger_{{k}}" onclick="sendEvent_{{k}}();">{{k}}</button>
+        <div class="col events">
+          Input Events:<br>
+        {%- for k, v in events %}
+          <button type="button" id="trigger_{{k}}" onclick="sendEvent_{{k}}();">{{k}}</button><br>
+        {%- endfor %}
         </div>
-      {%- endfor %}
-      </div>
+        {%- endif %}
+
+      {%- if events_out | length %}
+        <div class="col events">
+          Output Events:<br>
+        {%- for k, v in events_out %}
+          {{k}}: <a id="{{k}}_counter">0</a><br>
+        {%- endfor %}
+        </div>
       {%- endif %}
+      </div>
+
       {%- if parameters | length %}
+      <div class="row" style="text-align: center;">
+        Input Parameters:
+      </div>
       {%- for k, v in parameters %}
       <div class="row">
         <div class="col parameter-name">{{k}}</div>
@@ -146,6 +278,38 @@
         <div class="col parameter-value" id="value_{{k}}">{{v.attributes.default}}</div>
       </div>
       {%- endfor %}
+      {%- endif %}
+
+      {%- if parameters_out | length %}
+      <div class="row" style="text-align: center;">
+        Output Parameters:
+      </div>
+      {%- for k, v in parameters_out %}
+      <div class="row">
+        <div class="col parameter-name">{{k}}</div>
+        <div class="col parameter-slider">
+          <input id="parameter_{{k}}" type="range" min="{{v.attributes.min}}" max="{{v.attributes.max}}" step="0.01" value="{{v.attributes.default}}">
+        </div>
+        <div class="col parameter-value" id="value_{{k}}">{{v.attributes.default}}</div>
+      </div>
+      {%- endfor %}
+      {%- endif %}
+
+      {%- if midi | length or midi_out | length%}
+      <div class="horizontal" style="text-align: center;">
+        {%- if midi | length %}
+        <div>
+          <div>MIDI inputs:</div>
+          <select id="midiInputs" onchange="console.log(this.value)"></select>
+        </div>
+        {%- endif %}
+        {%- if midi_out | length %}
+        <div>
+          <div>MIDI outputs:</div>
+          <select id="midiOutputs" onchange="console.log(this.value)"></select>
+        </div>
+        {%- endif %}
+      </div>
       {%- endif %}
       <div class="row">
         <span class="link"><em>powered by <a href="https://github.com/Wasted-Audio/hvcc"><strong>heavy</strong></em></a></span>

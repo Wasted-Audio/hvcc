@@ -1,5 +1,5 @@
 # Copyright (C) 2014-2018 Enzien Audio, Ltd.
-# Copyright (C) 2023 Wasted Audio
+# Copyright (C) 2023-2024 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,6 +20,8 @@ from .HeavyException import HeavyException
 from .HeavyIrObject import HeavyIrObject
 from .HeavyGraph import HeavyGraph
 
+from hvcc.types.Lang import LangLetType
+
 
 class HIrInlet(HeavyIrObject):
     """ A specific implementation of the inlet object.
@@ -34,7 +36,7 @@ class HIrInlet(HeavyIrObject):
     ) -> None:
         super().__init__("__inlet", args=args, graph=graph, annotations=annotations)
 
-    def _resolved_outlet_type(self, outlet_index: int = 0) -> Optional[str]:
+    def _resolved_outlet_type(self, outlet_index: int = 0) -> Optional[LangLetType]:
         if self.graph is not None:
             connections = self.graph.inlet_connections[self.args["index"]]
             connection_type_set = {c.type for c in connections}

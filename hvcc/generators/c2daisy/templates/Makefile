@@ -8,8 +8,12 @@ LIBDAISY_DIR = {{libdaisy_path}}
 LDSCRIPT = {{linker_script}}
 {% endif %}
 
-{% if bootloader %}
-C_DEFS += -DBOOT_APP
+{% if bootloader != None %}
+APP_TYPE = {{bootloader}}
+{% endif %}
+
+{% if debug_printing is sameas true %}
+LDFLAGS += -u _printf_float
 {% endif %}
 
 # Project Source
@@ -19,3 +23,5 @@ CPP_SOURCES = $(wildcard *.cpp)
 # Core location, and generic makefile.
 SYSTEM_FILES_DIR = $(LIBDAISY_DIR)/core
 include $(SYSTEM_FILES_DIR)/Makefile
+
+CFLAGS += -DHV_BARE_METAL

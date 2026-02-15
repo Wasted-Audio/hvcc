@@ -169,6 +169,21 @@ void Heavy_{{name}}::{{x}}
 {%- endfor %}
 
 
+/*
+ * Code for expr~ implementation
+ * Write out the generic implementation code
+ */
+
+ // per class code
+ {%- for line in class_impl_lines %}
+ {{line}}
+ {%- endfor %}
+
+ // per object code
+ {%- for line in obj_impl_lines %}
+ {{line}}
+ {%- endfor %}
+
 
 /*
  * Context Process Implementation
@@ -183,7 +198,9 @@ int Heavy_{{name}}::process(float **inputBuffers, float **outputBuffers, int n) 
     hLp_consume(&inQueue);
   }
 
-  {%- if signal.numInputBuffers > 0 or signal.numOutputBuffers > 0 %}
+  sendBangToReceiver(0xDD21C0EB); // send to __hv_bang~ on next cycle
+
+  {%- if nodsp is sameas false %}
   const int n4 = n & ~HV_N_SIMD_MASK; // ensure that the block size is a multiple of HV_N_SIMD
 
   // temporary signal vars
@@ -260,6 +277,7 @@ int Heavy_{{name}}::process(float **inputBuffers, float **outputBuffers, int n) 
   blockStartTimestamp = nextBlock;
   return n;
   {%- endif %}
+
 }
 
 int Heavy_{{name}}::processInline(float *inputBuffers, float *outputBuffers, int n4) {

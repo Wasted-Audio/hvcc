@@ -1,4 +1,5 @@
 # Copyright (C) 2014-2018 Enzien Audio, Ltd.
+# Copyright (C) 2023-2024 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -33,7 +34,7 @@ class HLangDac(HeavyLangObject):
     ) -> None:
         assert obj_type == "dac"
         super().__init__(obj_type, args, graph,
-                         num_inlets=len(args[HeavyLangObject._HEAVY_LANG_DICT["dac"]["args"][0]["name"]]),
+                         num_inlets=len(args[self._HEAVY_LANG_DICT[obj_type].args[0].name]),
                          num_outlets=0,
                          annotations=annotations)
 

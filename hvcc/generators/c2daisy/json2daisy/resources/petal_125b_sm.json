@@ -1,0 +1,98 @@
+{
+  "name": "petal_125b_sm",
+  "som": "petal_125b_sm",
+  "audio": {
+    "channels": 2
+  },
+  "components": {
+    "knob_1": {
+      "component": "AnalogControl",
+      "index": 0,
+      "is_default": true
+    },
+    "knob_2": {
+      "component": "AnalogControl",
+      "index": 1,
+      "is_default": true
+    },
+    "knob_3": {
+      "component": "AnalogControl",
+      "index": 2,
+      "is_default": true
+    },
+    "knob_4": {
+      "component": "AnalogControl",
+      "index": 3,
+      "is_default": true
+    },
+    "knob_5": {
+      "component": "AnalogControl",
+      "index": 4,
+      "is_default": true
+    },
+    "knob_6": {
+      "component": "AnalogControl",
+      "index": 5,
+      "is_default": true
+    },
+    "expression": {
+      "component": "Expression",
+      "is_default": true
+    },
+    "toggle_1": {
+      "component": "Switch3",
+      "index": 0,
+      "is_default": true
+    },
+    "toggle_2": {
+      "component": "Switch3",
+      "index": 1,
+      "is_default": true
+    },
+    "toggle_3": {
+      "component": "Switch3",
+      "index": 2,
+      "is_default": true
+    },
+    "footswitch_1": {
+      "component": "Switch",
+      "index": 1,
+      "is_default": true
+    },
+    "footswitch_2": {
+      "component": "Switch",
+      "index": 2,
+      "is_default": true
+    },
+    "led1": {
+      "component": "RgbLed",
+      "index": {"r": 0, "g": 1, "b": 2},
+      "is_default": true
+    },
+    "led2": {
+      "component": "Led",
+      "index": 3,
+      "is_default": true
+    },
+    "led3": {
+      "component": "RgbLed",
+      "index": {"r": 4, "g": 5, "b": 6},
+      "is_default": true
+    },
+    "relay": {
+      "component": "Relay",
+      "is_default": true
+    }
+  },
+  "aliases": {
+    "knob1": "knob_1",
+    "knob2": "knob_2",
+    "knob3": "knob_3",
+    "knob4": "knob_4",
+    "knob5": "knob_5",
+    "knob6": "knob_6",
+    "sw1": "toggle_1",
+    "sw2": "toggle_2",
+    "sw3": "toggle_3"
+  }
+}

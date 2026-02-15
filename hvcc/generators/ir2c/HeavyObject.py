@@ -1,5 +1,5 @@
 # Copyright (C) 2014-2018 Enzien Audio, Ltd.
-# Copyright (C) 2023 Wasted Audio
+# Copyright (C) 2023-2025 Daniel Billotte, Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,6 +16,8 @@
 
 from struct import unpack, pack
 from typing import Callable, Dict, List, Union
+
+from hvcc.types.IR import IROnMessage, IRSignalList, IRBuffer, IRObjectdict
 
 
 class HeavyObject:
@@ -40,28 +42,32 @@ class HeavyObject:
         return cls.preamble
 
     @classmethod
-    def get_C_header_set(self) -> set:
+    def get_C_header_set(cls) -> set:
         return set()
 
     @classmethod
-    def get_C_file_set(self) -> set:
+    def get_C_file_set(cls) -> set:
         return set()
 
     @classmethod
-    def get_C_def(cls, obj_type: str, obj_id: int) -> List[str]:
+    def get_C_init(cls, obj_type: str, obj_id: str, args: Dict) -> List[str]:
+        raise NotImplementedError("method get_C_init not implemented")
+
+    @classmethod
+    def get_C_def(cls, obj_type: str, obj_id: str) -> List[str]:
         return ["{0} {1}_{2};".format(
             cls.get_C_struct(obj_type),
             cls.get_preamble(obj_type),
             obj_id)]
 
     @classmethod
-    def get_C_free(cls, obj_type: str, obj_id: int, args: Dict) -> List[str]:
+    def get_C_free(cls, obj_type: str, obj_id: str, args: Dict) -> List[str]:
         return ["{0}_free(&{0}_{1});".format(
             cls.get_preamble(obj_type),
             obj_id)]
 
     @classmethod
-    def get_C_decl(cls, obj_type: str, obj_id: int, args: Dict) -> List[str]:
+    def get_C_decl(cls, obj_type: str, obj_id: str, args: Dict) -> List[str]:
         return ["{0}_{1}_sendMessage(HeavyContextInterface *, int, const HvMessage *);".format(
                 cls.get_preamble(obj_type),
                 obj_id)]
@@ -70,10 +76,11 @@ class HeavyObject:
     def get_C_impl(
         cls,
         obj_type: str,
-        obj_id: int,
-        on_message_list: List,
+        obj_id: str,
+        on_message_list: List[List[IROnMessage]],
         get_obj_class: Callable,
-        objects: Dict
+        objects: Dict[str, IRObjectdict],
+        args: Dict
     ) -> List[str]:
         send_message_list = [
             "{0}_{1}_sendMessage(HeavyContextInterface *_c, int letIn, const HvMessage *m) {{".format(
@@ -97,43 +104,60 @@ class HeavyObject:
         return send_message_list
 
     @classmethod
-    def get_C_init(cls, obj_type: str, obj_id: int, args: Dict) -> List[str]:
-        raise NotImplementedError("method get_C_init not implemented")
+    def get_C_onMessage(cls, obj_type: str, obj_id: str, inlet_index: int, args: Dict) -> List[str]:
+        raise NotImplementedError("method get_C_onMessage not implemented", cls, obj_type)
 
     @classmethod
-    def get_C_onMessage(cls, obj_type: str, obj_id: int, inlet_index: int, args: Dict) -> List[str]:
-        raise NotImplementedError("method get_C_onMessage not implemented")
+    def get_C_obj_header_code(cls, obj_type: str, obj_id: str, args: Dict) -> List[str]:
+        return []
 
     @classmethod
-    def get_C_process(cls, process_dict: Dict, obj_type: str, obj_id: int, args: Dict) -> List[str]:
+    def get_C_obj_impl_code(cls, obj_type: str, obj_id: str, args: Dict) -> List[str]:
+        return []
+
+    @classmethod
+    def get_C_class_header_code(cls, obj_type: str, args: Dict) -> List[str]:
+        return []
+
+    @classmethod
+    def get_C_class_impl_code(cls, obj_type: str, args: Dict) -> List[str]:
+        return []
+
+    @classmethod
+    def get_C_process(cls, process_dict: IRSignalList, obj_type: str, obj_id: str, args: Dict) -> List[str]:
         raise NotImplementedError("method get_C_process not implemented")
 
     @classmethod
-    def get_table_data_decl(cls, obj_type: str, obj_id: int, args: Dict) -> List[str]:
+    def get_table_data_decl(cls, obj_type: str, obj_id: str, args: Dict) -> List[str]:
         raise NotImplementedError("method get_table_data_decl not implemented")
 
     @classmethod
-    def _get_on_message_list(cls, on_message_list: List, get_obj_class: Callable, objects: Dict) -> List:
+    def _get_on_message_list(
+        cls,
+        on_message_list: List[IROnMessage],
+        get_obj_class: Callable,
+        objects: Dict[str, IRObjectdict]
+    ) -> List:
         out_list = []
         for om in on_message_list:
             out_list.extend(
-                get_obj_class(objects[om["id"]]["type"]).get_C_onMessage(
-                    objects[om["id"]]["type"],
-                    om["id"],
-                    om["inletIndex"],
-                    objects[om["id"]]["args"]))
+                get_obj_class(objects[om.id].type).get_C_onMessage(
+                    objects[om.id].type,
+                    om.id,
+                    om.inletIndex,
+                    objects[om.id].args))
         return out_list
 
     @classmethod
-    def _c_buffer(cls, buffer_dict: Dict) -> str:
+    def _c_buffer(cls, buffer_dict: IRBuffer) -> str:
         """ Returns the C represenation of the given buffer.
         """
-        if buffer_dict["type"] == "zero":
-            return cls.__C_BUFFER_DICT[buffer_dict["type"]]
+        if buffer_dict.type == "zero":
+            return cls.__C_BUFFER_DICT[buffer_dict.type]
         else:
             return "{0}{1}".format(
-                cls.__C_BUFFER_DICT[buffer_dict["type"]],
-                buffer_dict["index"])
+                cls.__C_BUFFER_DICT[buffer_dict.type],
+                buffer_dict.index)
 
     @classmethod
     def get_hash(cls, x: Union[float, str]) -> int:

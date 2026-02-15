@@ -1,0 +1,9 @@
+#N canvas 320 37 549 254 12;
+#X obj 99 102 r __hv_bang~;
+#X obj 99 173 outlet;
+#X obj 99 71 inlet;
+#X text 151 69 inlet is inactive;
+#X text 255 111 because we only receive the first bang at the end of the first process() loop we first send a loadbang;
+#X obj 128 132 loadbang;
+#X connect 0 0 1 0;
+#X connect 5 0 1 0;

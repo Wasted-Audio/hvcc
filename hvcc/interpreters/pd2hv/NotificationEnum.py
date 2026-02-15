@@ -1,4 +1,5 @@
 # Copyright (C) 2014-2018 Enzien Audio, Ltd.
+# Copyright (C) 2024 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -21,6 +22,8 @@ from enum import Enum
 class NotificationEnum(Enum):
     """ These enumerations refer to all possible warnings and errors produced by pd2hv.
     """
+
+    EMPTY = -1
 
     # Warnings
 

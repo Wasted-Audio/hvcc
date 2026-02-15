@@ -1,5 +1,5 @@
 # Copyright (C) 2014-2018 Enzien Audio, Ltd.
-# Copyright (C) 2023 Wasted Audio
+# Copyright (C) 2023-2024 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -18,6 +18,8 @@ from typing import Dict, List
 
 from .HeavyObject import HeavyObject
 
+from hvcc.types.IR import IRSignalList
+
 
 class SignalPhasor(HeavyObject):
 
@@ -33,7 +35,7 @@ class SignalPhasor(HeavyObject):
         return {"HvSignalPhasor.h", "HvSignalPhasor.c"}
 
     @classmethod
-    def get_C_init(cls, obj_type: str, obj_id: int, args: Dict) -> List[str]:
+    def get_C_init(cls, obj_type: str, obj_id: str, args: Dict) -> List[str]:
         if obj_type == "__phasor~f":
             return [f"sPhasor_init(&sPhasor_{obj_id}, sampleRate);"]
         elif obj_type == "__phasor_k~f":
@@ -42,11 +44,11 @@ class SignalPhasor(HeavyObject):
             raise Exception()
 
     @classmethod
-    def get_C_free(cls, obj_type: str, obj_id: int, args: Dict) -> List[str]:
+    def get_C_free(cls, obj_type: str, obj_id: str, args: Dict) -> List[str]:
         return []
 
     @classmethod
-    def get_C_onMessage(cls, obj_type: str, obj_id: int, inlet_index: int, args: Dict) -> List[str]:
+    def get_C_onMessage(cls, obj_type: str, obj_id: str, inlet_index: int, args: Dict) -> List[str]:
         if obj_type == "__phasor~f":
             return [f"sPhasor_onMessage(_c, &Context(_c)->sPhasor_{obj_id}, {inlet_index}, m);"]
         elif obj_type == "__phasor_k~f":
@@ -55,20 +57,20 @@ class SignalPhasor(HeavyObject):
             raise Exception()
 
     @classmethod
-    def get_C_process(cls, process_dict: Dict, obj_type: str, obj_id: int, args: Dict) -> List[str]:
+    def get_C_process(cls, process_dict: IRSignalList, obj_type: str, obj_id: str, args: Dict) -> List[str]:
         if obj_type == "__phasor~f":
             return [
                 "__hv_phasor_f(&sPhasor_{0}, VIf({1}), VOf({2}));".format(
-                    process_dict["id"],
-                    cls._c_buffer(process_dict["inputBuffers"][0]),
-                    cls._c_buffer(process_dict["outputBuffers"][0])
+                    process_dict.id,
+                    cls._c_buffer(process_dict.inputBuffers[0]),
+                    cls._c_buffer(process_dict.outputBuffers[0])
                 )
             ]
         elif obj_type == "__phasor_k~f":
             return [
                 "__hv_phasor_k_f(&sPhasor_{0}, VOf({1}));".format(
-                    process_dict["id"],
-                    cls._c_buffer(process_dict["outputBuffers"][0])
+                    process_dict.id,
+                    cls._c_buffer(process_dict.outputBuffers[0])
                 )
             ]
         else:

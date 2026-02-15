@@ -37,6 +37,7 @@ class PdMessageObject(PdObject):
         super().__init__("msg", obj_args, pos_x, pos_y)
 
         self.obj_dict: Dict = {}
+        semi_split: List = []
 
         # parse messages
         # remove prepended slash from $. Heavy does not use that.
@@ -71,11 +72,6 @@ class PdMessageObject(PdObject):
                 "receiver": l_split[0],
                 "message": l_split[1:]
             })
-
-        if len(self.obj_dict["remote"]) > 0:
-            self.add_warning(
-                "Message boxes don't yet support remote messages. "
-                "These messages will be ignored.")
 
     def to_hv(self) -> Dict:
         return {

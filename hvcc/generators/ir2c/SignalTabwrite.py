@@ -1,5 +1,5 @@
 # Copyright (C) 2014-2018 Enzien Audio, Ltd.
-# Copyright (C) 2023 Wasted Audio
+# Copyright (C) 2023-2024 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -18,6 +18,8 @@ from typing import Dict, List
 
 from .HeavyObject import HeavyObject
 
+from hvcc.types.IR import IRSignalList
+
 
 class SignalTabwrite(HeavyObject):
     """Handles __tabwrite~f
@@ -35,30 +37,30 @@ class SignalTabwrite(HeavyObject):
         return {"HvSignalTabwrite.h", "HvSignalTabwrite.c"}
 
     @classmethod
-    def get_C_free(cls, obj_type: str, obj_id: int, args: Dict) -> List[str]:
+    def get_C_free(cls, obj_type: str, obj_id: str, args: Dict) -> List[str]:
         return []
 
     @classmethod
-    def get_C_init(cls, obj_type: str, obj_id: int, args: Dict) -> List[str]:
+    def get_C_init(cls, obj_type: str, obj_id: str, args: Dict) -> List[str]:
         return [f"sTabwrite_init(&sTabwrite_{obj_id}, &hTable_{args['table_id']});"]
 
     @classmethod
-    def get_C_onMessage(cls, obj_type: str, obj_id: int, inlet_index: int, args: Dict) -> List[str]:
+    def get_C_onMessage(cls, obj_type: str, obj_id: str, inlet_index: int, args: Dict) -> List[str]:
         return [f"sTabwrite_onMessage(_c, &Context(_c)->sTabwrite_{obj_id}, {inlet_index}, m, NULL);"]
 
     @classmethod
-    def get_C_process(cls, process_dict: Dict, obj_type: str, obj_id: int, args: Dict) -> List[str]:
+    def get_C_process(cls, process_dict: IRSignalList, obj_type: str, obj_id: str, args: Dict) -> List[str]:
         if obj_type == "__tabwrite~f":
             return [
                 "__hv_tabwrite_f(&sTabwrite_{0}, {1});".format(
-                    process_dict["id"],
-                    ", ".join([f"VIf({cls._c_buffer(b)})" for b in process_dict["inputBuffers"]])
+                    process_dict.id,
+                    ", ".join([f"VIf({cls._c_buffer(b)})" for b in process_dict.inputBuffers])
                 )]
         elif obj_type == "__tabwrite_stoppable~f":
             return [
                 "__hv_tabwrite_stoppable_f(&sTabwrite_{0}, {1});".format(
-                    process_dict["id"],
-                    ", ".join([f"VIf({cls._c_buffer(b)})" for b in process_dict["inputBuffers"]])
+                    process_dict.id,
+                    ", ".join([f"VIf({cls._c_buffer(b)})" for b in process_dict.inputBuffers])
                 )]
         else:
             raise Exception()

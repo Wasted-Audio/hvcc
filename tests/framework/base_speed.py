@@ -19,6 +19,8 @@ import json
 import shutil
 import subprocess
 
+from typing import List, Optional
+
 from tests.framework.base_test import HvBaseTest
 
 
@@ -26,12 +28,12 @@ class TestPdSpeedBase(HvBaseTest):
 
     def compile_and_run(
         self,
-        source_files,
-        out_dir,
-        sample_rate=None,
-        block_size=None,
-        num_iterations=None,
-        flag=None
+        source_files: List[str],
+        out_dir: str,
+        sample_rate: Optional[int] = None,
+        block_size: Optional[int] = None,
+        num_iterations: Optional[int] = None,
+        flag: Optional[str] = None
     ):
         exe_path = self._compile_and_run_clang(source_files, out_dir, flag)
 
@@ -44,7 +46,7 @@ class TestPdSpeedBase(HvBaseTest):
 
         return float(result)
 
-    def _test_speed_patch(self, pd_file):
+    def _test_speed_patch(self, pd_file: str):
         pd_path = os.path.join(self.TEST_DIR, pd_file)
         # out_dir = os.path.join(os.path.dirname(__file__), "build")
 
@@ -63,7 +65,7 @@ class TestPdSpeedBase(HvBaseTest):
         c_src_dir = os.path.join(out_dir, "c")
 
         # copy additional source
-        shutil.copy2(os.path.join(self.SCRIPT_DIR, "test_speed.c"), c_src_dir)
+        shutil.copy2(os.path.join(self.SCRIPT_DIR, "src/test_speed.c"), c_src_dir)
 
         c_sources = [os.path.join(c_src_dir, c) for c in os.listdir(c_src_dir) if c.endswith(".c")]
 

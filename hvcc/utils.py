@@ -19,6 +19,13 @@ import json
 
 from hvcc.core.hv2ir.HeavyLangObject import HeavyLangObject
 from hvcc.interpreters.pd2hv.PdParser import PdParser
+from hvcc.types.meta import Meta, DPF, Daisy
+
+
+gens = {
+    "dpf": DPF,
+    "daisy": Daisy
+}
 
 
 def main() -> None:
@@ -28,6 +35,8 @@ def main() -> None:
     subparsers.add_parser("pdobjects", help="list supported Pure Data objects")
     subparser_hvhash = subparsers.add_parser("hvhash", help="print the heavy hash of the input string")
     subparser_hvhash.add_argument("string")
+    subparser_meta = subparsers.add_parser("metaschema", help="show JSON Schema of the Meta() model")
+    subparser_meta.add_argument("-g", "--generator", help="Choose supported generator: DPF, Daisy")
 
     parsed_args = parser.parse_args(args=None if sys.argv[1:] else ['--help'])
     args = vars(parsed_args)
@@ -44,6 +53,13 @@ def main() -> None:
         print(json.dumps(obj_dict, indent=4))
     elif command == "hvhash":
         print("0x{0:X}".format(HeavyLangObject.get_hash(args['string'])))
+    elif command == "metaschema":
+        generator = args.get('generator')
+        if generator is not None:
+            model = gens[generator.lower()]()
+        else:
+            model = Meta
+        print(json.dumps(model.model_json_schema(), indent=4))
     else:
         pass
 

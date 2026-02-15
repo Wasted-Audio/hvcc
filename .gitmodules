@@ -1,3 +1,6 @@
 [submodule "tests/src/midifile"]
 	path = tests/src/midifile
 	url = https://github.com/craigsapp/midifile.git
+[submodule "tests/src/tinywav"]
+	path = tests/src/tinywav
+	url = https://github.com/mhroth/tinywav.git
