@@ -1,6 +1,13 @@
 CHANGELOG
 =====
 
+Next Release
+-----
+
+Bugfixes:
+
+* skip empty values when restoring tables (#348)
+
 0.15.0
 -----
 
