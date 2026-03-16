@@ -1,5 +1,5 @@
 # Heavy Compiler Collection
-# Copyright (C) 2025 Wasted Audio
+# Copyright (C) 2025-2026 Wasted Audio
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
@@ -384,6 +384,7 @@ class PdGUIParser(PdParser):
             ),
             parameter=param,
             label=label,
+            flash_time=int(line[6]),
             bg_color=Color(line[16]),
             fg_color=Color(line[17])
         )

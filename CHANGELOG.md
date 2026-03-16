@@ -4,6 +4,11 @@ CHANGELOG
 Next Release
 -----
 
+Features:
+
+* Add theme configuration to pd2gui model
+* Add `flash_time` to pd2gui Bang parser
+
 Bugfixes:
 
 * skip empty values when restoring tables (#348)

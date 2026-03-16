@@ -1,5 +1,5 @@
 # Heavy Compiler Collection
-# Copyright (C) 2025 Wasted Audio
+# Copyright (C) 2025-2026 Wasted Audio
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
@@ -74,6 +74,7 @@ class Canvas(Base):
 class Bang(BaseParam):
     type: Literal["bang"] = "bang"
     label: Optional[Label] = None
+    flash_time: int
     fg_color: Color
     bg_color: Color
 
@@ -165,6 +166,16 @@ class Float(BaseParam):
 GUIObjects = Union[Bang, Toggle, Radio, Slider, Knob, Number, Float, Comment, Canvas]
 
 
+class Theme(BaseModel):
+    obj_corner_radius: Optional[float] = None
+    cnv_color: Optional[Color] = None
+    text_color: Optional[Color] = None
+    io_color: Optional[Color] = None
+    bg_color: Optional[Color] = None
+    sel_color: Optional[Color] = None
+    out_color: Optional[Color] = None
+
+
 class GraphBase(BaseModel):
     objects: list[GUIObjects]
     graphs: list["Graph"]
@@ -178,4 +189,5 @@ class Graph(GraphBase):
 
 class GraphRoot(GraphBase):
     size: Size
+    theme: Optional[Theme] = Theme()
     version: str = VERSION
