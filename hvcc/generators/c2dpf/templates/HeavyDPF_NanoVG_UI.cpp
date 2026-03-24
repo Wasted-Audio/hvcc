@@ -1,7 +1,4 @@
-/*
- * Copyright (C) 2026 Wasted Audio
- * SPDX-License-Identifier: ISC
-*/
+{{copyright}}
 
 #include "DistrhoUI.hpp"
 #include "DistrhoPluginInfo.h"
