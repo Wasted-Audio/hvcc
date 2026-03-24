@@ -25,7 +25,7 @@ class PdGUIParser(PdParser):
         # the current global value of $0
         # Note(joe): set a high starting value to avoid potential user naming conflicts
         self.__DOLLAR_ZERO = 1000
-        self.object_counter = Counter()
+        self.object_counter: Counter = Counter()
 
         # search paths at this graph level
         self.search_paths: list[str] = []
@@ -111,7 +111,7 @@ class PdGUIParser(PdParser):
                         self.object_counter["graph"] += 1
 
                         return Graph(
-                            id=f"graph{self.object_counter["graph"]}",
+                            id=f"graph{self.object_counter['graph']}",
                             position=Coords(
                                 x=int(line[2]),
                                 y=int(line[3])
@@ -212,7 +212,7 @@ class PdGUIParser(PdParser):
             self.object_counter["graph"] += 1
 
             return Graph(
-                id=f"graph{self.object_counter["graph"]}",
+                id=f"graph{self.object_counter['graph']}",
                 position=Coords(
                     x=int(line[2]),
                     y=int(line[3])
@@ -355,7 +355,7 @@ class PdGUIParser(PdParser):
         ) if line[10] != "empty" else None
 
         return Canvas(
-            id=f"canvas{self.object_counter["canvas"]}",
+            id=f"canvas{self.object_counter['canvas']}",
             position=Coords(
                 x=int(line[2]),
                 y=int(line[3])
@@ -613,7 +613,7 @@ class PdGUIParser(PdParser):
             text = " ".join(line[4:])
 
         return Comment(
-            id=f"comment{self.object_counter["comment"]}",
+            id=f"comment{self.object_counter['comment']}",
             position=Coords(
                 x=int(line[2]),
                 y=int(line[3])
