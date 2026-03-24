@@ -101,25 +101,20 @@ class c2dpf(Generator):
                 "float": []
             }
 
-            def find_widgets(graph: GraphBase):
-                for w in graph.objects:
-                    widgets[w.type].append(w.id if isinstance(w, (Canvas, Comment)) else w.parameter)
-
-                for graph in graph.graphs:
-                    widgets["graph"].append(graph.id)
-                    find_widgets(graph)
-
-            find_widgets(gui_json)
-
             # render gui objects
             gui_objects_render = []
             def generate_gui_objects(graphs: list[Graph], objects: list[GUIObjects], parent: str):
+                for w in objects:
+                    widgets[w.type].append(w.id if isinstance(w, (Canvas, Comment)) else w.parameter)
+
                 gui_objects_render.append(env.get_template("gui_objects.cpp").render(
                     parent=parent,
                     gui_objects=objects
                 ))
 
                 for graph in graphs:
+                    widgets["graph"].append(graph.id)
+
                     gui_objects_render.append(
                         f"""
     // subpatch
