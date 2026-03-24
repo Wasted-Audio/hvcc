@@ -1,7 +1,9 @@
 {
+  "id": "mainPatch",
   "objects": [],
   "graphs": [
     {
+      "id": "graph1",
       "objects": [
         {
           "type": "vslider",

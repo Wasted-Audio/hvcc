@@ -17,6 +17,8 @@ import os
 import shutil
 import time
 import jinja2
+import json
+
 from typing import Optional
 
 from ..copyright import copyright_manager
@@ -24,7 +26,8 @@ from ..filters import filter_uniqueid
 
 from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
 from hvcc.types.compiler import Generator, CompilerResp, CompilerMsg, CompilerNotif, ExternInfo
-from hvcc.types.meta import Meta, DPF
+from hvcc.types.meta import Meta, DPF, DPFUIType
+from hvcc.types.GUI import Canvas, Comment, GraphBase, Graph, GUIObjects
 
 
 class c2dpf(Generator):
@@ -70,12 +73,65 @@ class c2dpf(Generator):
             source_dir = os.path.join(out_dir, "source")
             shutil.copytree(c_src_dir, source_dir)
 
+            # load GUI json
+            gui_json_path = os.path.join(c_src_dir, "../ir/", f"{patch_name}.heavy.gui.json")
+            with open(gui_json_path, "r") as f:
+                gui_json = GraphBase(**json.load(f))
+
             # initialize the jinja template environment
             env = jinja2.Environment()
             env.filters["uniqueid"] = filter_uniqueid
 
             env.loader = jinja2.FileSystemLoader(
                 os.path.join(os.path.dirname(os.path.abspath(__file__)), "templates"))
+
+            # widget overview
+            widgets: dict[str, list[str]] = {
+                "graph": [],
+                "canvas": [],
+                "comment": [],
+                "bang": [],
+                "toggle": [],
+                "vradio": [],
+                "hradio": [],
+                "vslider": [],
+                "hslider": [],
+                "knob": [],
+                "number": [],
+                "float": []
+            }
+
+            def find_widgets(graph: GraphBase):
+                for w in graph.objects:
+                    widgets[w.type].append(w.id if isinstance(w, (Canvas, Comment)) else w.parameter)
+
+                for graph in graph.graphs:
+                    widgets["graph"].append(graph.id)
+                    find_widgets(graph)
+
+            find_widgets(gui_json)
+
+            # render gui objects
+            gui_objects_render = []
+            def generate_gui_objects(graphs: list[Graph], objects: list[GUIObjects], parent: str):
+                gui_objects_render.append(env.get_template("gui_objects.cpp").render(
+                    parent=parent,
+                    gui_objects=objects
+                ))
+
+                for graph in graphs:
+                    gui_objects_render.append(
+                        f"""
+    // subpatch
+    {graph.id} = new PDSubpatch({parent});
+    {graph.id}->setSize({graph.gop_size.x} * scaleFactor, {graph.gop_size.y} * scaleFactor);
+    {graph.id}->setAbsolutePos({graph.position.x} * scaleFactor, {graph.position.y} * scaleFactor);
+    {parent}->addManagedChild({graph.id});
+                        """
+                    )
+                    generate_gui_objects(graph.graphs, graph.objects, graph.id)
+
+            generate_gui_objects(gui_json.graphs, gui_json.objects, "mainPatch")
 
             # generate DPF wrapper from template
             dpf_h_path = os.path.join(source_dir, f"HeavyDPF_{patch_name}.hpp")
@@ -101,16 +157,37 @@ class c2dpf(Generator):
                     senders=sender_list,
                     pool_sizes_kb=externs.memoryPoolSizesKb,
                     copyright=copyright_c))
-            if dpf_meta.enable_ui:
+            if dpf_meta.enable_ui == DPFUIType.IMGUI:
                 dpf_ui_path = os.path.join(source_dir, f"HeavyDPF_{patch_name}_UI.cpp")
                 with open(dpf_ui_path, "w") as f:
-                    f.write(env.get_template("HeavyDPF_UI.cpp").render(
+                    f.write(env.get_template("HeavyDPF_ImGui_UI.cpp").render(
                         name=patch_name,
                         meta=dpf_meta,
                         class_name=f"HeavyDPF_{patch_name}",
                         receivers=receiver_list,
                         senders=sender_list,
                         copyright=copyright_c))
+            elif dpf_meta.enable_ui == DPFUIType.NANOVG:
+                dpf_ui_header = os.path.join(source_dir, f"HeavyDPF_{patch_name}_UI.hpp")
+                with open(dpf_ui_header, "w") as f:
+                    f.write(env.get_template("HeavyDPF_NanoVG_UI.hpp").render(
+                        name=patch_name,
+                        meta=dpf_meta,
+                        class_name=f"HeavyDPF_{patch_name}_UI",
+                        gui_json=gui_json,
+                        widgets=widgets,
+                        copyright=copyright_c))
+                dpf_ui_path = os.path.join(source_dir, f"HeavyDPF_{patch_name}_UI.cpp")
+                with open(dpf_ui_path, "w") as f:
+                    f.write(env.get_template("HeavyDPF_NanoVG_UI.cpp").render(
+                        name=patch_name,
+                        meta=dpf_meta,
+                        class_name=f"HeavyDPF_{patch_name}_UI",
+                        gui_json=gui_json,
+                        widgets=widgets,
+                        gui_objects=gui_objects_render,
+                        copyright=copyright_c))
+
             dpf_h_path = os.path.join(source_dir, "DistrhoPluginInfo.h")
             with open(dpf_h_path, "w") as f:
                 f.write(env.get_template("DistrhoPluginInfo.h").render(

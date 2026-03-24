@@ -254,11 +254,14 @@ def compile_dataflow(
         search_paths=search_paths,
         verbose=verbose)
 
+    # ensure that the ir filenames have no funky characters in it
+    subst_name = re.sub(r'\W', '_', patch_name)
+
     if verbose:
         print("--> Generating GUI IR")
     results.root["pd2gui"] = pd2gui.pd2gui.compile(
         pd_path=in_path,
-        ir_dir=os.path.join(out_dir, "ir"),
+        ir_file=os.path.join(out_dir, "ir", f"{subst_name}.heavy.gui.json"),
         search_paths=search_paths,
         verbose=verbose)
 
@@ -268,10 +271,8 @@ def compile_dataflow(
     if response.notifs.has_error:
         return results
 
-    subst_name = re.sub(r'\W', '_', patch_name)
     results.root["hv2ir"] = hv2ir.hv2ir.compile(
         hv_file=os.path.join(response.out_dir, response.out_file),
-        # ensure that the ir filename has no funky characters in it
         ir_file=os.path.join(out_dir, "ir", f"{subst_name}.heavy.ir.json"),
         patch_name=patch_name,
         verbose=verbose)

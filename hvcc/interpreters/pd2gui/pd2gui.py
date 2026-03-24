@@ -33,7 +33,7 @@ class pd2gui:
     def compile(
         cls,
         pd_path: str,
-        ir_dir: str,
+        ir_file: str,
         search_paths: Optional[list] = None,
         verbose: bool = False
     ):
@@ -47,12 +47,11 @@ class pd2gui:
         try:
             gui_graph, _ = parser.gui_from_file(pd_path)
 
-            if not os.path.exists(ir_dir):
-                os.makedirs(ir_dir)
+            if not os.path.exists(os.path.dirname(ir_file)):
+                os.makedirs(os.path.dirname(ir_file))
 
-            gui_file = f"{os.path.splitext(os.path.basename(pd_path))[0]}.gui.json"
-            gui_path = os.path.join(ir_dir, gui_file)
-            with open(gui_path, "w") as f:
+            # gui_path = os.path.join(ir_file, ir_file)
+            with open(ir_file, "w") as f:
                 f.write(gui_graph.model_dump_json(indent=2) + "\n")
 
             return CompilerResp(
@@ -60,8 +59,8 @@ class pd2gui:
                 notifs=CompilerNotif(),
                 in_dir=os.path.dirname(pd_path),
                 in_file=os.path.basename(pd_path),
-                out_dir=ir_dir,
-                out_file=gui_file,
+                out_file=os.path.basename(ir_file),
+                out_dir=os.path.dirname(ir_file),
                 compile_time=(time.time() - tick)
             )
         except Exception as e:
@@ -100,7 +99,7 @@ def main() -> None:
 
     pd2gui.compile(
         pd_path=args.pd_path,
-        ir_dir=args.ir_dir,
+        ir_file=args.ir_dir,
         search_paths=None,
         verbose=args.verbose)
 

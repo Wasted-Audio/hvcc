@@ -4,7 +4,11 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 import os
+import random
+import re
+import string
 
+from collections import Counter
 from typing import Generator, Optional, Union
 
 from hvcc.interpreters.pd2hv.PdParser import PdParser
@@ -16,10 +20,14 @@ from hvcc.types.GUI import (
 
 
 class PdGUIParser(PdParser):
+    # retain width by overloading this regex
+    RE_WIDTH = re.compile(r"")
+
     def __init__(self) -> None:
         # the current global value of $0
         # Note(joe): set a high starting value to avoid potential user naming conflicts
         self.__DOLLAR_ZERO = 1000
+        self.object_counter = Counter()
 
         # search paths at this graph level
         self.search_paths: list[str] = []
@@ -102,8 +110,10 @@ class PdGUIParser(PdParser):
                     elif line[1] == "restore" and gop:
                         objects = self.filter_invisible_objects(objects, gop_start, gop_size)
                         graphs = self.filter_invisible_graphs(graphs, gop_start, gop_size)
+                        self.object_counter["graph"] += 1
 
                         return Graph(
+                            id=f"graph{self.object_counter["graph"]}",
                             position=Coords(
                                 x=int(line[2]),
                                 y=int(line[3])
@@ -201,8 +211,10 @@ class PdGUIParser(PdParser):
         else:
             objects = self.filter_invisible_objects(objects, gop_start, gop_size)
             graphs = self.filter_invisible_graphs(graphs, gop_start, gop_size)
+            self.object_counter["graph"] += 1
 
             return Graph(
+                id=f"graph{self.object_counter["graph"]}",
                 position=Coords(
                     x=int(line[2]),
                     y=int(line[3])
@@ -330,8 +342,9 @@ class PdGUIParser(PdParser):
             resolved_obj_args[i] = a
         return resolved_obj_args
 
-    @classmethod
-    def add_canvas(cls, line: list[str]) -> Canvas:
+    def add_canvas(self, line: list[str]) -> Canvas:
+        self.object_counter["canvas"] += 1
+
         label = Label(
             text=line[10],
             color=Color(line[16]),
@@ -344,6 +357,7 @@ class PdGUIParser(PdParser):
         ) if line[10] != "empty" else None
 
         return Canvas(
+            id=f"canvas{self.object_counter["canvas"]}",
             position=Coords(
                 x=int(line[2]),
                 y=int(line[3])
@@ -588,15 +602,26 @@ class PdGUIParser(PdParser):
             log_height=int(line[21])
         )
 
-    @classmethod
-    def add_comment(cls, line: list[str]) -> Comment:
-        text = " ".join(line[4:])
+    def add_comment(self, line: list[str]) -> Comment:
+        self.object_counter["comment"] += 1
+
+        # get width and clean up remaining text
+        if line[-2] == "f" \
+            and line[-3][-1] == ",":
+            width = int(line[-1])
+            text = " ".join(line[4:-2])[:-1]
+        else:
+            width = None
+            text = " ".join(line[4:])
+
         return Comment(
+            id=f"comment{self.object_counter["comment"]}",
             position=Coords(
                 x=int(line[2]),
                 y=int(line[3])
             ),
             text=text,
+            width=width,
             size=Size(
                 x=10*len(text), y=10
             )

@@ -48,6 +48,10 @@ class Base(BaseModel):
     size: Size
 
 
+class BaseUI(Base):
+    id: str = ""
+
+
 class BaseParam(Base):
     parameter: str
 
@@ -60,12 +64,13 @@ class Label(BaseModel):
     font_size: int
 
 
-class Comment(Base):
+class Comment(BaseUI):
     type: Literal["comment"] = "comment"
     text: str
+    width: Optional[int] = 0
 
 
-class Canvas(Base):
+class Canvas(BaseUI):
     type: Literal["canvas"] = "canvas"
     label: Optional[Label] = None
     bg_color: Color
@@ -177,6 +182,7 @@ class Theme(BaseModel):
 
 
 class GraphBase(BaseModel):
+    id: str = "mainPatch"
     objects: list[GUIObjects]
     graphs: list["Graph"]
 

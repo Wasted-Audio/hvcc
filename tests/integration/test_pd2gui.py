@@ -18,18 +18,17 @@ class TestPdGuiParser:
         path: str
     ) -> None:
         source_path = os.path.join(self.SCRIPT_DIR, "data", path)
-        ir_path = os.path.join(self.SCRIPT_DIR, "ir")
+        ir_file = os.path.join(self.SCRIPT_DIR, "ir", os.path.splitext(path)[0] + ".gui.json")
 
         response = pd2gui.compile(
             pd_path=source_path,
-            ir_dir=ir_path
+            ir_file=ir_file
         )
 
         if response.notifs.has_error:
             raise Exception(response.notifs.errors[0])
 
-        gui_path = os.path.join(self.SCRIPT_DIR, "ir", os.path.splitext(path)[0] + ".gui.json")
-        with open(gui_path, "r") as f:
+        with open(ir_file, "r") as f:
             gui = json.loads(f.read())
 
         expected_path = os.path.join(os.path.splitext(source_path)[0] + ".golden.json")
