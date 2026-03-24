@@ -103,6 +103,7 @@ class c2dpf(Generator):
 
             # render gui objects
             gui_objects_render = []
+
             def generate_gui_objects(graphs: list[Graph], objects: list[GUIObjects], parent: str):
                 for w in objects:
                     widgets[w.type].append(w.id if isinstance(w, (Canvas, Comment)) else w.parameter)

@@ -4,9 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 import os
-import random
 import re
-import string
 
 from collections import Counter
 from typing import Generator, Optional, Union
@@ -607,7 +605,7 @@ class PdGUIParser(PdParser):
 
         # get width and clean up remaining text
         if line[-2] == "f" \
-            and line[-3][-1] == ",":
+                and line[-3][-1] == ",":
             width = int(line[-1])
             text = " ".join(line[4:-2])[:-1]
         else:
