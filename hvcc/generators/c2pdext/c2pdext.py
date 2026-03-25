@@ -38,7 +38,7 @@ class c2pdext(Generator):
         c_src_dir: str,
         out_dir: str,
         externs: ExternInfo,
-        patch_name: Optional[str] = None,
+        patch_name: str,
         patch_meta: Meta = Meta(),
         num_input_channels: int = 0,
         num_output_channels: int = 0,

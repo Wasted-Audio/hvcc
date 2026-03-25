@@ -17,7 +17,6 @@ import os
 import shutil
 import time
 import jinja2
-import json
 
 from typing import Optional
 
@@ -27,7 +26,7 @@ from ..filters import filter_uniqueid
 from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
 from hvcc.types.compiler import Generator, CompilerResp, CompilerMsg, CompilerNotif, ExternInfo
 from hvcc.types.meta import Meta, DPF, DPFUIType
-from hvcc.types.GUI import Canvas, Comment, GraphBase, Graph, GUIObjects
+from .nanovg_render import nanovg_render
 
 
 class c2dpf(Generator):
@@ -40,7 +39,7 @@ class c2dpf(Generator):
         c_src_dir: str,
         out_dir: str,
         externs: ExternInfo,
-        patch_name: Optional[str] = None,
+        patch_name: str,
         patch_meta: Meta = Meta(),
         num_input_channels: int = 0,
         num_output_channels: int = 0,
@@ -73,61 +72,12 @@ class c2dpf(Generator):
             source_dir = os.path.join(out_dir, "source")
             shutil.copytree(c_src_dir, source_dir)
 
-            # load GUI json
-            gui_json_path = os.path.join(c_src_dir, "../ir/", f"{patch_name}.heavy.gui.json")
-            with open(gui_json_path, "r") as f:
-                gui_json = GraphBase(**json.load(f))
-
             # initialize the jinja template environment
             env = jinja2.Environment()
             env.filters["uniqueid"] = filter_uniqueid
 
             env.loader = jinja2.FileSystemLoader(
                 os.path.join(os.path.dirname(os.path.abspath(__file__)), "templates"))
-
-            # widget overview
-            widgets: dict[str, list[str]] = {
-                "graph": [],
-                "canvas": [],
-                "comment": [],
-                "bang": [],
-                "toggle": [],
-                "vradio": [],
-                "hradio": [],
-                "vslider": [],
-                "hslider": [],
-                "knob": [],
-                "number": [],
-                "float": []
-            }
-
-            # render gui objects
-            gui_objects_render = []
-
-            def generate_gui_objects(graphs: list[Graph], objects: list[GUIObjects], parent: str):
-                for w in objects:
-                    widgets[w.type].append(w.id if isinstance(w, (Canvas, Comment)) else w.parameter)
-
-                gui_objects_render.append(env.get_template("gui_objects.cpp").render(
-                    parent=parent,
-                    gui_objects=objects
-                ))
-
-                for graph in graphs:
-                    widgets["graph"].append(graph.id)
-
-                    gui_objects_render.append(
-                        f"""
-    // subpatch
-    {graph.id} = new PDSubpatch({parent});
-    {graph.id}->setSize({graph.gop_size.x} * scaleFactor, {graph.gop_size.y} * scaleFactor);
-    {graph.id}->setAbsolutePos({graph.position.x} * scaleFactor, {graph.position.y} * scaleFactor);
-    {parent}->addManagedChild({graph.id});
-                        """
-                    )
-                    generate_gui_objects(graph.graphs, graph.objects, graph.id)
-
-            generate_gui_objects(gui_json.graphs, gui_json.objects, "mainPatch")
 
             # generate DPF wrapper from template
             dpf_h_path = os.path.join(source_dir, f"HeavyDPF_{patch_name}.hpp")
@@ -164,6 +114,8 @@ class c2dpf(Generator):
                         senders=sender_list,
                         copyright=copyright_c))
             elif dpf_meta.enable_ui == DPFUIType.NANOVG:
+                gui_json, widgets, gui_objects_render = nanovg_render(patch_name, c_src_dir, env)
+
                 dpf_ui_header = os.path.join(source_dir, f"HeavyDPF_{patch_name}_UI.hpp")
                 with open(dpf_ui_header, "w") as f:
                     f.write(env.get_template("HeavyDPF_NanoVG_UI.hpp").render(
