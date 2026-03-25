@@ -31,8 +31,8 @@ class Font(IntEnum):
 class LabelShow(IntEnum):
     never = 0
     always = 1
-    when_active = 2
-    when_typing = 3
+    active = 2
+    typing = 3
 
 
 class LabelPos(IntEnum):
@@ -145,7 +145,7 @@ class Knob(BaseParam):
     circular: bool
     jump: bool
     square: bool
-    arc: Color
+    arc_color: Color
     arc_start: float
     arc_show: bool
 
@@ -157,6 +157,8 @@ class Number(BaseParam):
     bg_color: Color
     log_mode: bool
     log_height: int
+    min: float
+    max: float
 
 
 class Float(BaseParam):

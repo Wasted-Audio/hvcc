@@ -114,7 +114,7 @@ class c2dpf(Generator):
                         senders=sender_list,
                         copyright=copyright_c))
             elif dpf_meta.enable_ui == DPFUIType.NANOVG:
-                gui_json, widgets, gui_objects_render = nanovg_render(patch_name, c_src_dir, env)
+                gui_json, widgets, gui_objects_render = nanovg_render(patch_name, c_src_dir, env, receiver_list, sender_list)
 
                 dpf_ui_header = os.path.join(source_dir, f"HeavyDPF_{patch_name}_UI.hpp")
                 with open(dpf_ui_header, "w") as f:
@@ -134,6 +134,8 @@ class c2dpf(Generator):
                         gui_json=gui_json,
                         widgets=widgets,
                         gui_objects=gui_objects_render,
+                        receivers=receiver_list,
+                        senders=sender_list,
                         copyright=copyright_c))
 
             dpf_h_path = os.path.join(source_dir, "DistrhoPluginInfo.h")

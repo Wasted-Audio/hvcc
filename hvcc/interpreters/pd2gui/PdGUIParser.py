@@ -561,7 +561,7 @@ class PdGUIParser(PdParser):
             circular=bool(int(line[16])),
             jump=bool(0),
             square=bool(int(line[15])),
-            arc=Color(line[13]),
+            arc_color=Color(line[13]),
             arc_start=float(line[23]),
             arc_show=bool(int(line[19]))
         )
@@ -597,7 +597,9 @@ class PdGUIParser(PdParser):
             bg_color=Color(line[18]),
             fg_color=Color(line[19]),
             log_mode=bool(int(line[9])),
-            log_height=int(line[21])
+            log_height=int(line[21]),
+            min=float(line[7]),
+            max=float(line[8])
         )
 
     def add_comment(self, line: list[str]) -> Comment:

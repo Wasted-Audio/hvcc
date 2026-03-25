@@ -11,6 +11,15 @@ START_NAMESPACE_DISTRHO
 
 // -----------------------------------------------------------------------------------------------------------
 
+{%- if (receivers|length > 0) or (senders|length > 0) %}
+enum HeavyParams {
+    {%- for k, v in receivers + senders %}
+    k{{v.display|capitalize}},
+    {%- endfor %}
+    kParameterCount
+};
+{%- endif %}
+
 {{class_name}}::{{class_name}}()
     : UI(DISTRHO_UI_DEFAULT_WIDTH, DISTRHO_UI_DEFAULT_HEIGHT)
 {

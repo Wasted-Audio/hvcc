@@ -9,7 +9,9 @@ from hvcc.types.GUI import Canvas, Comment, GraphBase, Graph, GUIObjects
 def nanovg_render(
     patch_name: str,
     c_src_dir: str,
-    env: jinja2.Environment
+    env: jinja2.Environment,
+    recv_list: list,
+    send_list: list
 ) -> tuple[
     GraphBase,
     dict[str, list[str]],
@@ -48,7 +50,9 @@ def nanovg_render(
 
         gui_objects_render.append(env.get_template("gui_objects.cpp").render(
             parent=parent,
-            gui_objects=objects
+            gui_objects=objects,
+            receivers=recv_list,
+            senders=send_list
         ))
 
         for graph in graphs:
@@ -61,7 +65,7 @@ def nanovg_render(
     {graph.id}->setSize({graph.gop_size.x} * scaleFactor, {graph.gop_size.y} * scaleFactor);
     {graph.id}->setAbsolutePos({graph.position.x} * scaleFactor, {graph.position.y} * scaleFactor);
     {parent}->addManagedChild({graph.id});
-                        """
+                """
                     )
             generate_gui_objects(graph.graphs, graph.objects, graph.id)
 
