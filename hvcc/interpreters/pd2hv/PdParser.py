@@ -317,6 +317,7 @@ class PdParser:
 
                             # set the subpatch name
                             g.subpatch_name = " ".join(line[5:]) if len(line) > 5 else "subpatch"
+                            g = self.__create_send_recv(g, msg_send, gui_send, gui_recv)
                             return g  # pop the graph
 
                     elif line[1] == "text":
@@ -633,43 +634,7 @@ class PdParser:
                 # Sometimes it's all that we have, so perhaps it's a good idea.
                 g.add_error(str(e), NotificationEnum.ERROR_EXCEPTION)
 
-        # parse remote messages
-        for index in msg_send.keys():
-            first_msg = g.get_object(index)
-            conns = first_msg.get_inlet_connections()
-
-            for remote in msg_send[index]:
-                self.obj_counter["msg"] += 1
-                msg = PdMessageObject("msg", [" ".join(msg for msg in remote["message"])])
-                msg_index = g.add_object(msg)
-
-                self.obj_counter["send"] += 1
-                send = PdSendObject("send", [remote["receiver"]])
-                send_index = g.add_object(send)
-
-                # connect new message to upstream objects of first message
-                for conn in conns["0"]:
-                    up_obj = conn.from_obj
-                    up_index = g.get_objects().index(up_obj)
-                    g.add_parsed_connection(up_index, 0, msg_index, 0)
-
-                g.add_parsed_connection(msg_index, 0, send_index, 0)
-
-        # parse gui sends
-        for index in gui_send.keys():
-            self.obj_counter["send"] += 1
-            send = PdSendObject('send', gui_send[index].split())
-            send_index = g.add_object(send)
-
-            g.add_parsed_connection(index, 0, send_index, 0)
-
-        # parse gui receives
-        for index in gui_recv.keys():
-            self.obj_counter["receive"] += 1
-            recv = PdReceiveObject('receive', gui_recv[index].split())
-            recv_index = g.add_object(recv)
-
-            g.add_parsed_connection(recv_index, 0, index, 0)
+        g = self.__create_send_recv(g, msg_send, gui_send, gui_recv)
 
         return g
 
@@ -774,3 +739,50 @@ class PdParser:
             return True
         except Exception:
             return False
+
+    def __create_send_recv(
+        self,
+        g: PdGraph,
+        msg_send: dict,
+        gui_send: dict,
+        gui_recv: dict
+    ) -> PdGraph:
+        # parse remote messages
+        for index in msg_send.keys():
+            first_msg = g.get_object(index)
+            conns = first_msg.get_inlet_connections()
+
+            for remote in msg_send[index]:
+                self.obj_counter["msg"] += 1
+                msg = PdMessageObject("msg", [" ".join(msg for msg in remote["message"])])
+                msg_index = g.add_object(msg)
+
+                self.obj_counter["send"] += 1
+                send = PdSendObject("send", [remote["receiver"]])
+                send_index = g.add_object(send)
+
+                # connect new message to upstream objects of first message
+                for conn in conns["0"]:
+                    up_obj = conn.from_obj
+                    up_index = g.get_objects().index(up_obj)
+                    g.add_parsed_connection(up_index, 0, msg_index, 0)
+
+                g.add_parsed_connection(msg_index, 0, send_index, 0)
+
+        # parse gui sends
+        for index in gui_send.keys():
+            self.obj_counter["send"] += 1
+            send = PdSendObject('send', gui_send[index].split())
+            send_index = g.add_object(send)
+
+            g.add_parsed_connection(index, 0, send_index, 0)
+
+        # parse gui receives
+        for index in gui_recv.keys():
+            self.obj_counter["receive"] += 1
+            recv = PdReceiveObject('receive', gui_recv[index].split())
+            recv_index = g.add_object(recv)
+
+            g.add_parsed_connection(recv_index, 0, index, 0)
+
+        return g
