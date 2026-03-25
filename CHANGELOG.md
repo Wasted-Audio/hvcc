@@ -12,6 +12,7 @@ Features:
 Bugfixes:
 
 * skip empty values when restoring tables (#348)
+* GUI send/receive config for objects in subpatches
 
 0.15.0
 -----
