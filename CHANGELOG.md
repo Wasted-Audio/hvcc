@@ -1,12 +1,19 @@
 CHANGELOG
 =====
 
-Next
+Next Release
 -----
 
 Features:
 
+* Add theme configuration to pd2gui model
+* Add `flash_time` to pd2gui Bang parser
 * Objects: support `[soundfiler]` (DPF only)
+
+Bugfixes:
+
+* skip empty values when restoring tables (#348)
+* GUI send/receive config for objects in subpatches
 
 0.15.0
 -----

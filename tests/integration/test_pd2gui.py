@@ -1,5 +1,5 @@
 # Heavy Compiler Collection
-# Copyright (C) 2025 Wasted Audio
+# Copyright (C) 2025-2026 Wasted Audio
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
@@ -20,10 +20,13 @@ class TestPdGuiParser:
         source_path = os.path.join(self.SCRIPT_DIR, "data", path)
         ir_path = os.path.join(self.SCRIPT_DIR, "ir")
 
-        pd2gui.compile(
+        response = pd2gui.compile(
             pd_path=source_path,
             ir_dir=ir_path
         )
+
+        if response.notifs.has_error:
+            raise Exception(response.notifs.errors[0])
 
         gui_path = os.path.join(self.SCRIPT_DIR, "ir", os.path.splitext(path)[0] + ".gui.json")
         with open(gui_path, "r") as f:
