@@ -1,92 +1,103 @@
 void sndFileOperator(uint32_t sendHash, const HvMessage *m)
 {
   switch (sendHash) {
-    case HV_HASH_SND_READ: // __hv_snd_read
+    case HV_HASH_SND_READ:     // __hv_snd_read
+    case HV_HASH_SND_READ_RES: // __hv_snd_read_resize
     {
-      float sndID = hv_msg_getFloat(m, 0);
+      const float sndID = hv_msg_getFloat(m, 0);
       const char *fileName = hv_msg_getSymbol(m, 1);
       const char *tableName = hv_msg_getSymbol(m, 2);
 
       char sndRecInfo[32];
       char sndRecSamples[32];
-      char *bufInfo = sndRecInfo;
-      char *bufSamples = sndRecSamples;
+      snprintf(sndRecInfo, 32, "%d__hv_snd_info", (int) sndID);
+      snprintf(sndRecSamples, 32, "%d__hv_snd_samples", (int) sndID);
 
-      snprintf(bufInfo, 31, "%d__hv_snd_info", (int) sndID);
-      snprintf(bufSamples, 31, "%d__hv_snd_samples", (int) sndID);
-
-      hv_uint32_t tableHash = hv_string_to_hash(tableName);
-      float *table = hv->getBufferForTable(tableHash);
-      int tableSize = hv->getLengthForTable(tableHash);
-
-      auto sta = f_open(&file, fileName, (FA_OPEN_EXISTING | FA_READ));
-
+      FRESULT sta = f_open(&file, fileName, (FA_OPEN_EXISTING | FA_READ));
       if (sta != FR_OK) {
-        hardware.som.PrintLine("Failed to open file");
+        hardware.som.PrintLine("Failed to open file: %s", fileName);
+        return;
       }
 
       FileReader reader(&file);
       WavParser parser;
-
-      if(!parser.parse(reader))
-      {
-          hardware.som.PrintLine("Error parsing file: %s", fileName);
+      if (!parser.parse(reader)) {
+        hardware.som.PrintLine("Error parsing file: %s", fileName);
+        f_close(&file);
+        return;
       }
+
       const auto& info = parser.info();
-      static int w_start = parser.dataOffset() * 8;
-      static int data_size = parser.dataSize();
+      const hv_uint32_t tableHash = hv_string_to_hash(tableName);
 
-      hardware.som.PrintLine("Data start: %d", w_start);
-      hardware.som.PrintLine("Data size: %d", data_size);
-      hardware.som.PrintLine("Buffer size: %d", FILE_BUF_SIZE);
-      hardware.som.PrintLine("Buffer size: %d", sizeof(file_buf));
+      const int bitsPerSample = info.bitsPerSample;
+      const int bytesPerSample = bitsPerSample / 8;
+      const int framesInFile = parser.dataSize() / bytesPerSample;
 
-      UINT br = 0;
-      int chunk = 0;
+      if (sendHash == HV_HASH_SND_READ_RES) {
+        hv->setLengthForTable(tableHash, (hv_uint32_t)framesInFile);
+      }
+
+      float *table = hv->getBufferForTable(tableHash);
+      const int tableSize = hv->getLengthForTable(tableHash);
 
       f_lseek(&file, parser.dataOffset());
 
-      int to_read = tableSize * sizeof(float);
+      int framesToRead = (framesInFile > tableSize) ? tableSize : framesInFile;
+      int framesRead = 0;
+      UINT br = 0;
 
-      while( to_read > 0 ) {
-        FRESULT fres = f_read(&file, file_buf, 512, &br);
-        if (fres != FR_OK) {
-          hardware.som.PrintLine("Error reading file: %s", fileName);
-        } else {
+      while (framesRead < framesToRead) {
+        uint32_t bytesToReadThisChunk = sizeof(file_buf);
+        uint32_t framesLeft = framesToRead - framesRead;
 
-          int values = br / sizeof(float);
+        if (bytesToReadThisChunk > framesLeft * bytesPerSample) {
+          bytesToReadThisChunk = framesLeft * bytesPerSample;
+        }
 
-          // hardware.som.PrintLine("Values: %d", values);
+        if (bytesToReadThisChunk == 0) break;
 
-          for (int i = 0; i < values; i++) {
-            if (chunk < tableSize) {
-              table[chunk] = file_buf[i];
-              chunk++;
-            } else {
-              break;
+        FRESULT fres = f_read(&file, file_buf, bytesToReadThisChunk, &br);
+        if (fres != FR_OK || br == 0) break;
+
+        const int framesInChunk = br / bytesPerSample;
+        uint8_t *ptr = (uint8_t *)file_buf;
+
+        for (int i = 0; i < framesInChunk; ++i) {
+          float sample = 0.0f;
+          if (bitsPerSample == 16) {
+            sample = (float)(*((int16_t *)ptr)) / 32768.0f;
+          } else if (bitsPerSample == 24) {
+            // 24-bit PCM is little-endian signed integer
+            int32_t val = (ptr[0] << 8) | (ptr[1] << 16) | (ptr[2] << 24);
+            sample = (float)val / 2147483648.0f;
+          } else if (bitsPerSample == 32) {
+            if (info.audioFormat == 3) { // IEEE Float
+              sample = *((float *)ptr);
+            } else { // 32-bit PCM
+              sample = (float)(*((int32_t *)ptr)) / 2147483648.0f;
             }
           }
-          to_read -= br;
+          table[framesRead++] = sample;
+          ptr += bytesPerSample;
         }
       }
 
-
       hv->sendMessageToReceiverV(
         hv_string_to_hash(sndRecInfo), 0, "ffffs",
-        (float) info.sampleRate,    // sample rate
-        44.0,                       // header size
-        1.0,                        // channels
-        (float) info.bitsPerSample, // bytes per sample
-        "l"                         // endianness
+        (float) info.sampleRate,  // sample rate
+        44.0,                     // header size
+        1.0,                      // channels (tables are single buffer)
+        (float) bytesPerSample,   // bytes per sample
+        "l"                       // endianness
       );
 
       hv->sendFloatToReceiver(
         hv_string_to_hash(sndRecSamples),
-        float(tableSize)
+        (float) framesRead
       );
 
       f_close(&file);
-
       break;
     }
     default: break;
