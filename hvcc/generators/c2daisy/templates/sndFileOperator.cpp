@@ -1,34 +1,30 @@
-void sndFileOperator(uint32_t sendHash, const HvMessage *m)
+void sndFileOperator(uint32_t sendHash)
 {
   switch (sendHash) {
     case HV_HASH_SND_READ:     // __hv_snd_read
     case HV_HASH_SND_READ_RES: // __hv_snd_read_resize
     {
-      const float sndID = hv_msg_getFloat(m, 0);
-      const char *fileName = hv_msg_getSymbol(m, 1);
-      const char *tableName = hv_msg_getSymbol(m, 2);
-
-      char sndRecInfo[32];
+        char sndRecInfo[32];
       char sndRecSamples[32];
-      snprintf(sndRecInfo, 32, "%d__hv_snd_info", (int) sndID);
-      snprintf(sndRecSamples, 32, "%d__hv_snd_samples", (int) sndID);
+      snprintf(sndRecInfo, 32, "%d__hv_snd_info", (int) sndID_stored);
+      snprintf(sndRecSamples, 32, "%d__hv_snd_samples", (int) sndID_stored);
 
-      FRESULT sta = f_open(&file, fileName, (FA_OPEN_EXISTING | FA_READ));
+      FRESULT sta = f_open(&file, sndFileName, (FA_OPEN_EXISTING | FA_READ));
       if (sta != FR_OK) {
-        hardware.som.PrintLine("Failed to open file: %s", fileName);
+        hardware.som.PrintLine("Failed to open file: %s", sndFileName);
         return;
       }
 
       FileReader reader(&file);
       WavParser parser;
       if (!parser.parse(reader)) {
-        hardware.som.PrintLine("Error parsing file: %s", fileName);
+        hardware.som.PrintLine("Error parsing file: %s", sndFileName);
         f_close(&file);
         return;
       }
 
       const auto& info = parser.info();
-      const hv_uint32_t tableHash = hv_string_to_hash(tableName);
+      const hv_uint32_t tableHash = hv_string_to_hash(sndTableName);
 
       const int bitsPerSample = info.bitsPerSample;
       const int bytesPerSample = bitsPerSample / 8;
@@ -51,6 +47,7 @@ void sndFileOperator(uint32_t sendHash, const HvMessage *m)
         uint32_t bytesToReadThisChunk = sizeof(file_buf);
         uint32_t framesLeft = framesToRead - framesRead;
 
+        // read min of either the buffer size or the remaining frames
         if (bytesToReadThisChunk > framesLeft * bytesPerSample) {
           bytesToReadThisChunk = framesLeft * bytesPerSample;
         }
@@ -98,6 +95,48 @@ void sndFileOperator(uint32_t sendHash, const HvMessage *m)
       );
 
       f_close(&file);
+      break;
+    }
+    case HV_HASH_SND_WRITE: // __hv_snd_write
+    {
+      char sndRecInfo[32];
+      char sndRecSamples[32];
+      snprintf(sndRecInfo, 32, "%d__hv_snd_info", (int) sndID_stored);
+      snprintf(sndRecSamples, 32, "%d__hv_snd_samples", (int) sndID_stored);
+
+      const hv_uint32_t tableHash = hv_string_to_hash(sndTableName);
+      float *table = hv->getBufferForTable(tableHash);
+      const int tableSize = hv->getLengthForTable(tableHash);
+
+      wav_writer.OpenFile(sndFileName);
+
+      if (!wav_writer.IsRecording()) {
+        hardware.som.PrintLine("Failed to open wav for writing: %s", sndFileName);
+        return;
+      }
+
+      for (int i = 0; i < tableSize; i++) {
+          wav_writer.Sample(&table[i]);
+          wav_writer.Write();
+      }
+
+      wav_writer.SaveFile();
+      hardware.som.PrintLine("wrote %lu samps", wav_writer.GetLengthSamps());
+
+      hv->sendMessageToReceiverV(
+        hv_string_to_hash(sndRecInfo), 0, "ffffs",
+        (float) hv->getSampleRate(),  // sample rate
+        44.0,                         // header size
+        1.0,                          // channels
+        2.0,                          // bytes per sample
+        "l"                           // endianness
+      );
+
+      hv->sendFloatToReceiver(
+        hv_string_to_hash(sndRecSamples),
+        (float) tableSize
+      );
+
       break;
     }
     default: break;

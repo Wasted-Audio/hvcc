@@ -68,10 +68,12 @@ FIFO<uint8_t, MIDI_OUT_FIFO_SIZE> midi_tx_fifo;
 // int midiOutCount;
 // uint8_t* midiOutData;
 
+static constexpr size_t kTransferSize = 16384;
 /** SDMMC Configuration */
 SdmmcHandler sdmmc;
 /** FatFS Interface for libDaisy */
 DSY_TEXT FatFSInterface fsi;
+WavWriter<kTransferSize> wav_writer;
 /** Global File object */
 DSY_TEXT FIL file;
 const int FILE_BUF_SIZE = 1024;
@@ -79,7 +81,9 @@ DSY_TEXT float file_buf[FILE_BUF_SIZE];
 
 bool sndfile_action;
 uint32_t sndHash;
-const HvMessage *sndMsg;
+float sndID_stored;
+char sndFileName[64];
+char sndTableName[64];
 
 void CallbackWriteIn(Heavy_{{patch_name}}* hv);
 void LoopWriteIn(Heavy_{{patch_name}}* hv);
@@ -87,7 +91,7 @@ void CallbackWriteOut();
 void LoopWriteOut();
 void PostProcess();
 void Display();
-void sndFileOperator(uint32_t sendHash, const HvMessage *m);
+void sndFileOperator(uint32_t sendHash);
 
 {% if  output_parameters|length > 0 %}
 constexpr int DaisyNumOutputParameters = {{output_parameters|length}};
@@ -182,6 +186,13 @@ int main(void)
   fsi_config.media = FatFSInterface::Config::MEDIA_SD;
   fsi.Init(fsi_config);
 
+  /** Configure WaveWriter */
+  WavWriter<kTransferSize>::Config cfg;
+  cfg.bitspersample = 16;
+  cfg.channels = 1;
+  cfg.samplerate = (uint32_t) hv->getSampleRate();
+  wav_writer.Init(cfg);
+
   /** Get the reference to the FATFS Filesystem for use in mounting the hardware. */
   FATFS& fs = fsi.GetSDFileSystem();
 
@@ -261,7 +272,7 @@ int main(void)
 
     if (sndfile_action)
     {
-      sndFileOperator(sndHash, sndMsg);
+      sndFileOperator(sndHash);
       sndfile_action = false;
     }
   }
@@ -338,7 +349,9 @@ static void sendHook(HeavyContextInterface *c, const char *receiverName, uint32_
     case HV_HASH_SND_READ:
     case HV_HASH_SND_READ_RES:
       sndHash = receiverHash;
-      sndMsg = m;
+      sndID_stored = hv_msg_getFloat(m, 0);
+      strncpy(sndFileName,  hv_msg_getSymbol(m, 1), sizeof(sndFileName) - 1);
+      strncpy(sndTableName, hv_msg_getSymbol(m, 2), sizeof(sndTableName) - 1);
       sndfile_action = true;
       break;
   }
