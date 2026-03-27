@@ -85,6 +85,19 @@ float sndID_stored;
 char sndFileName[64];
 char sndTableName[64];
 
+// State for progressive write
+struct SndWriteState {
+    bool     active     = false;
+    float   *table      = nullptr;
+    int      tableSize  = 0;
+    int      written    = 0;
+    double   sampleRate = 0;
+    char     recInfo[32];
+    char     recSamples[32];
+    static constexpr int CHUNK_SAMPLES = 16; // tune this
+} snd_write_state;
+
+
 void CallbackWriteIn(Heavy_{{patch_name}}* hv);
 void LoopWriteIn(Heavy_{{patch_name}}* hv);
 void CallbackWriteOut();
@@ -274,6 +287,40 @@ int main(void)
     {
       sndFileOperator(sndHash);
       sndfile_action = false;
+    }
+
+    // Progressive write - one chunk per loop iteration
+    if (snd_write_state.active) {
+      SndWriteState &s = snd_write_state;
+      int remaining = s.tableSize - s.written;
+      int n = (remaining > SndWriteState::CHUNK_SAMPLES)
+                         ? SndWriteState::CHUNK_SAMPLES
+                         : remaining;
+
+      uint32_t t0 = System::GetNow();
+      for (int i = 0; i < n; i++) {
+        wav_writer.Sample(&s.table[s.written + i]);
+        wav_writer.Write();
+      }
+      uint32_t t1 = System::GetNow();
+      hardware.som.PrintLine("write: %lu ms", t1-t0);
+
+      s.written += n;
+
+      if (s.written >= s.tableSize) {
+        wav_writer.SaveFile();
+        s.active = false;
+
+        hardware.som.PrintLine("write done: %d samples", s.written);
+
+        hv->sendMessageToReceiverV(
+            hv_string_to_hash(s.recInfo), 0, "ffffs",
+            (float)s.sampleRate, 44.0, 1.0, 2.0, "l"
+        );
+        hv->sendFloatToReceiver(
+            hv_string_to_hash(s.recSamples), (float)s.written
+        );
+      }
     }
   }
 }

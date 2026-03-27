@@ -4,7 +4,7 @@ void sndFileOperator(uint32_t sendHash)
     case HV_HASH_SND_READ:     // __hv_snd_read
     case HV_HASH_SND_READ_RES: // __hv_snd_read_resize
     {
-        char sndRecInfo[32];
+      char sndRecInfo[32];
       char sndRecSamples[32];
       snprintf(sndRecInfo, 32, "%d__hv_snd_info", (int) sndID_stored);
       snprintf(sndRecSamples, 32, "%d__hv_snd_samples", (int) sndID_stored);
@@ -99,14 +99,15 @@ void sndFileOperator(uint32_t sendHash)
     }
     case HV_HASH_SND_WRITE: // __hv_snd_write
     {
-      char sndRecInfo[32];
-      char sndRecSamples[32];
-      snprintf(sndRecInfo, 32, "%d__hv_snd_info", (int) sndID_stored);
-      snprintf(sndRecSamples, 32, "%d__hv_snd_samples", (int) sndID_stored);
-
       const hv_uint32_t tableHash = hv_string_to_hash(sndTableName);
-      float *table = hv->getBufferForTable(tableHash);
-      const int tableSize = hv->getLengthForTable(tableHash);
+      SndWriteState &s = snd_write_state;
+
+      s.table      = hv->getBufferForTable(tableHash);
+      s.tableSize  = hv->getLengthForTable(tableHash);
+      s.sampleRate = hv->getSampleRate();
+      s.written    = 0;
+      snprintf(s.recInfo,    32, "%d__hv_snd_info",    (int)sndID_stored);
+      snprintf(s.recSamples, 32, "%d__hv_snd_samples", (int)sndID_stored);
 
       wav_writer.OpenFile(sndFileName);
 
@@ -115,28 +116,8 @@ void sndFileOperator(uint32_t sendHash)
         return;
       }
 
-      for (int i = 0; i < tableSize; i++) {
-          wav_writer.Sample(&table[i]);
-          wav_writer.Write();
-      }
-
-      wav_writer.SaveFile();
-      hardware.som.PrintLine("wrote %lu samps", wav_writer.GetLengthSamps());
-
-      hv->sendMessageToReceiverV(
-        hv_string_to_hash(sndRecInfo), 0, "ffffs",
-        (float) hv->getSampleRate(),  // sample rate
-        44.0,                         // header size
-        1.0,                          // channels
-        2.0,                          // bytes per sample
-        "l"                           // endianness
-      );
-
-      hv->sendFloatToReceiver(
-        hv_string_to_hash(sndRecSamples),
-        (float) tableSize
-      );
-
+      s.active = true;
+      hardware.som.PrintLine("write started, %d samples", s.tableSize);
       break;
     }
     default: break;
