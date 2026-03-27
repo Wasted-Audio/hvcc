@@ -7,6 +7,7 @@ GUI elements and objects in PD patchers are translated into an intermediate repr
 The top level `GraphRoot` is a dictionary that consists of four keys:
 
 - **version**
+- **theme**
 - **size**
 - **graphs**
 - **objects**
@@ -14,6 +15,22 @@ The top level `GraphRoot` is a dictionary that consists of four keys:
 ### version
 
 The version, e.g. `0.14.0`, indicates the format of the IR file. The version is tied to the release of heavy. It is only stored in the root graph.
+
+### theme
+
+The theme can override the object corner radius and several default colors:
+
+```json
+  "theme": {
+    "obj_corner_radius": 2.75,
+    "cnv_color": "#383838",
+    "text_color": "#ffffff",
+    "io_color": "#626262",
+    "bg_color": "#191919",
+    "sel_color": "#ffacab",
+    "out_color": "#383838"
+  }
+```
 
 ### size
 
@@ -155,6 +172,7 @@ Bang or `bng` object.
     "font": 0,
     "font_size": 10
   },
+  "flash_time": 250,
   "fg_color": "white",
   "bg_color": "#191919"
 }
