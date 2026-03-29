@@ -90,6 +90,7 @@ class TestPdSignalBase(HvBaseTest):
 
         try:
             out_dir = self._run_hvcc(pd_path)
+            assert out_dir is not None
         except Exception as e:
             self.fail(str(e))
 

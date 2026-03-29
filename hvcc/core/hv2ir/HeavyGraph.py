@@ -301,7 +301,6 @@ class HeavyGraph(HeavyIrObject):
             from this graph. Returns None if no objects are available.
             This is a convenience method.
         """
-
         objs = self.resolve_objects_for_name(name, obj_types, local_graph)
         return objs[0] if len(objs) > 0 else None
 
