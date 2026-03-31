@@ -77,7 +77,14 @@ WavWriter<kTransferSize> wav_writer;
 /** Global File object */
 DSY_TEXT FIL file;
 const int FILE_BUF_SIZE = 1024;
-DSY_TEXT float file_buf[FILE_BUF_SIZE];
+// DSY_TEXT float file_buf[FILE_BUF_SIZE];
+// float file_buf[FILE_BUF_SIZE];
+// static __attribute__((aligned(32))) uint8_t file_buf[4096];
+// __attribute__((section(".sram1_bss"), aligned(32))) static uint8_t file_buf[4096];
+// DSY_TEXT uint8_t file_buf[4096];
+uint8_t file_buf[4096] DSY_SDRAM_BSS;
+// __attribute__((aligned(32))) uint8_t file_buf[4096] DSY_SDRAM_BSS;
+
 
 bool sndfile_action;
 uint32_t sndHash;
