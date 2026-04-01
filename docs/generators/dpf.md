@@ -49,6 +49,11 @@ Other special types can give additional information to the host:
 * `log` - hints `kParameterIsLogarithmic`
 * `log_hz` - unit `Hz` - hints `kParameterIsLogarithmic`
 
+### Events
+
+If you want to receive a bang use `@hv_event` instead of `@hv_param` like `[r banger @hv_event]`.
+On the plugin side this behaves like the `trig` type.
+
 ## Metadata
 
 An accompanying metadata.json file can be included to set additional plugin settings.

@@ -296,7 +296,7 @@ class PdGUIParser(PdParser):
         """ Only allow externed parameters
         """
 
-        if "@hv_param" in param:
+        if "@hv_param" in param or "@hv_event" in param:
             return param.split(" ")[0]
         else:
             return None

@@ -52,6 +52,8 @@ class c2dpf(Generator):
         out_dir = os.path.join(out_dir, "plugin")
         receiver_list = externs.parameters.inParam
         sender_list = externs.parameters.outParam
+        event_list = externs.events.inEvent
+        out_event_list = externs.events.outEvent
 
         dpf_meta: DPF = patch_meta.dpf
         dpf_path = dpf_meta.dpf_path
@@ -90,6 +92,8 @@ class c2dpf(Generator):
                     num_output_channels=num_output_channels,
                     receivers=receiver_list,
                     senders=sender_list,
+                    events=event_list,
+                    out_events=out_event_list,
                     copyright=copyright_c))
             dpf_cpp_path = os.path.join(source_dir, f"HeavyDPF_{patch_name}.cpp")
             with open(dpf_cpp_path, "w") as f:
@@ -101,6 +105,8 @@ class c2dpf(Generator):
                     num_output_channels=num_output_channels,
                     receivers=receiver_list,
                     senders=sender_list,
+                    events=event_list,
+                    out_events=out_event_list,
                     pool_sizes_kb=externs.memoryPoolSizesKb,
                     copyright=copyright_c))
             if dpf_meta.enable_ui == DPFUIType.IMGUI:
@@ -138,6 +144,7 @@ class c2dpf(Generator):
                         gui_objects=gui_objects_render,
                         receivers=receiver_list,
                         senders=sender_list,
+                        events=event_list,
                         copyright=copyright_c))
 
             dpf_h_path = os.path.join(source_dir, "DistrhoPluginInfo.h")
