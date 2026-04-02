@@ -5,6 +5,9 @@
     {{object.id}}->setSize({{object.size.x}} * scaleFactor, {{object.size.y}} * scaleFactor);
     {{object.id}}->setAbsolutePos({{object.position.x}} * scaleFactor, {{object.position.y}} * scaleFactor);
     {{object.id}}->setColors(nvgRGB{{object.bg_color.as_rgb_tuple()}});
+            {%- if object.label != None %}
+    {{object.id}}->setLabel("{{object.label.text}}", nvgRGB{{object.label.color.as_rgb_tuple()}}, {{object.label.position.x}} * scaleFactor, {{object.label.position.y}} * scaleFactor, {{object.label.font_size}} * scaleFactor);
+            {%- endif %}
         {%- elif object.type == 'comment' %}
     // comment
     {{object.id}} = new PDComment({{parent}});

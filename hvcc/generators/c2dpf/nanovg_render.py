@@ -3,7 +3,20 @@ import os
 
 import jinja2
 
-from hvcc.types.GUI import Canvas, Comment, GraphBase, Graph, GUIObjects
+from hvcc.types.GUI import Canvas, Comment, GraphRoot, Graph, GUIObjects
+
+
+def open_gui_json(
+    patch_name: str,
+    c_src_dir: str,
+) -> GraphRoot:
+
+    # load GUI from json file
+    gui_json_path = os.path.join(c_src_dir, "../ir/", f"{patch_name}.heavy.gui.json")
+    with open(gui_json_path, "r") as f:
+        gui_json = GraphRoot(**json.load(f))
+
+    return gui_json
 
 
 def nanovg_render(
@@ -13,17 +26,13 @@ def nanovg_render(
     recv_list: list,
     send_list: list
 ) -> tuple[
-    GraphBase,
+    GraphRoot,
     dict[str, list[str]],
     list[str]
 ]:
     """ Generate nanovg components from the GUI json
     """
-
-    # load GUI json
-    gui_json_path = os.path.join(c_src_dir, "../ir/", f"{patch_name}.heavy.gui.json")
-    with open(gui_json_path, "r") as f:
-        gui_json = GraphBase(**json.load(f))
+    gui_json = open_gui_json(patch_name, c_src_dir)
 
     # widget overview
     widgets: dict[str, list[str]] = {

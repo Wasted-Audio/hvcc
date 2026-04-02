@@ -25,8 +25,8 @@ from ..filters import filter_uniqueid
 
 from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
 from hvcc.types.compiler import Generator, CompilerResp, CompilerMsg, CompilerNotif, ExternInfo
-from hvcc.types.meta import Meta, DPF, DPFUIType
-from .nanovg_render import nanovg_render
+from hvcc.types.meta import Meta, DPF, DPFUIType, DPFUISize
+from .nanovg_render import open_gui_json, nanovg_render
 
 
 class c2dpf(Generator):
@@ -73,6 +73,13 @@ class c2dpf(Generator):
             # copy over generated C source files
             source_dir = os.path.join(out_dir, "source")
             shutil.copytree(c_src_dir, source_dir)
+
+            if dpf_meta.enable_ui == DPFUIType.NANOVG:
+                gui_json = open_gui_json(patch_name, c_src_dir)
+                dpf_meta.ui_size = DPFUISize(
+                    width=gui_json.size.x,
+                    height=gui_json.size.y
+                )
 
             # initialize the jinja template environment
             env = jinja2.Environment()
