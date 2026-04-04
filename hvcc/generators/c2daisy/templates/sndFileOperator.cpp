@@ -37,7 +37,8 @@ void sndFileOperator(uint32_t sendHash)
       float *table = hv->getBufferForTable(tableHash);
       const int tableSize = hv->getLengthForTable(tableHash);
 
-      // hardware.som.PrintLine("table ptr: %p", (void*)table);
+      hardware.som.PrintLine("table ptr: %p", (void*)table);
+      hardware.som.PrintLine("table size: %d", tableSize);
 
       f_lseek(&file, parser.dataOffset());
 
@@ -126,7 +127,8 @@ void sndFileOperator(uint32_t sendHash)
             }
           }
           int idx = framesRead; // save before increment
-          table[framesRead++] = sample;
+          framesRead++;
+          table[framesRead] = sample;
           if (idx == 500) {
               hardware.som.PrintLine("table[500] during load=%f", (double)table[500]);
           }
@@ -156,6 +158,8 @@ void sndFileOperator(uint32_t sendHash)
           s24_carry[0] = ((uint8_t*)file_buf)[br - 2]; // data[chunk_end + 0]
           s24_carry[1] = ((uint8_t*)file_buf)[br - 1]; // data[chunk_end + 1]
         }
+
+        hardware.som.PrintLine("framesRead=%d framesToRead=%d", framesRead, framesToRead);
       }
 
       // hardware.som.PrintLine("table[1023]=%f table[1024]=%f",
@@ -237,8 +241,8 @@ void sndFileOperator(uint32_t sendHash)
         hardware.som.PrintLine("Failed to open wav for writing: %s", sndFileName);
         return;
       }
+      s.state = State::Recording;
 
-      s.active = true;
       hardware.som.PrintLine("write started, %d samples", s.tableSize);
       break;
     }
