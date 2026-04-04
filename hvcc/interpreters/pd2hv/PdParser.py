@@ -619,7 +619,12 @@ class PdParser:
                         g.add_error(f"Don't know how to parse line: {' '.join(line)}")
 
                 elif line[0] == "#A" and obj_array is not None:
-                    obj_array.obj_dict["values"].extend([float(f) for f in line[2:] if f != ""])
+                    # Test that we have an array continuation and extend the array values.
+                    try:
+                        float(line[1])
+                        obj_array.obj_dict["values"].extend([float(f) for f in line[2:] if f != ""])
+                    except ValueError:
+                        continue
 
                 else:
                     g.add_error(f"Don't know how to parse line: {' '.join(line)}")
