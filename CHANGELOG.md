@@ -13,6 +13,7 @@ Features:
 Bugfixes:
 
 * skip empty values when restoring tables (#348)
+* only append to table when first value is a float
 * GUI send/receive config for objects in subpatches
 
 0.15.0
