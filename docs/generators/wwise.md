@@ -62,18 +62,15 @@ An appropriate configuration will be selected at compile time based on the numbe
 
 To build Authoring and Engine plugins on Windows you’ll need:
 
-- If using Visual Studio 2019:
+- Visual Studio 2022 with the following components:
   - Desktop development with C++ workload
-  - MSVC v142 - VS 2019 C++ x64/x86 build tools
-  - C++ ATL for latest v142 build tools (x86 & x64)
-  - C++ MFC for latest v142 build tools (x86 & x64)
+  - MSVC v143 - VS 2022 C++ x64/x86 build tools
+  - C++ ATL for latest v143 build tools (x86 & x64)
+  - C++ MFC for latest v143 build tools (x86 & x64)
   - Windows Universal CRT SDK
-  - Windows 10 SDK (10.0.19041.0)
-    - Different version can be specified in a generated
-      PremakePlugin.lua file
-- If using Visual Studio 2022
-  - Requirements are the same as for 2019, but components of version v143 must be installed instead
-  - *Note:* Wwise of version at least 2022.1.5 is required to build plugins with this version of Visual Studio
+  - Windows SDK
+    - Any version that's not "out of support" should work
+    - Different version can be specified in a generated PremakePlugin.lua file
 - Wwise 2022 or later
   - Version 2021 should work, too, but it wasn't tested
   - SDKs with required deployment platforms must be installed through
@@ -102,14 +99,14 @@ Generate Visual Studio project files; note, WWISEROOT environment variable can b
 
 ```cmd
 python "%WWISEROOT%\Scripts\Build\Plugins\wp.py" premake Authoring
-python "%WWISEROOT%\Scripts\Build\Plugins\wp.py" premake Windows_vc160
+python "%WWISEROOT%\Scripts\Build\Plugins\wp.py" premake Windows_vc170
 ```
 
-Build Authoring and Engine plugins in Release configurations; for Visual Studio 2022 replace vc160 with vc170:
+Build Authoring and Engine plugins in Release configurations with for Visual Studio 2022 (vc170):
 
 ```cmd
-python "%WWISEROOT%\Scripts\Build\Plugins\wp.py" build -c Release -x x64 -t vc160 Authoring
-python "%WWISEROOT%\Scripts\Build\Plugins\wp.py" build -c Release -x x64 -t vc160 Windows_vc160
+python "%WWISEROOT%\Scripts\Build\Plugins\wp.py" build -c Release -x x64 -t vc170 Authoring
+python "%WWISEROOT%\Scripts\Build\Plugins\wp.py" build -c Release -x x64 -t vc170 Windows_vc170
 ```
 
 At this point, the plugins should be placed in correct SDK directories and be ready for use in the Authoring app.
@@ -120,7 +117,7 @@ We can go a step further and package the plugins into a bundle that can be insta
 
 ```cmd
 python "%WWISEROOT%\Scripts\Build\Plugins\wp.py" package --version 2022.1.0.1 Authoring
-python "%WWISEROOT%\Scripts\Build\Plugins\wp.py" package --version 2022.1.0.1 Windows_vc160
+python "%WWISEROOT%\Scripts\Build\Plugins\wp.py" package --version 2022.1.0.1 Windows_vc170
 python "%WWISEROOT%\Scripts\Build\Plugins\wp.py" generate-bundle --version 2022.1.0.1
 mkdir Bundle
 copy /y bundle.json Bundle
