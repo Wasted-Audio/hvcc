@@ -227,7 +227,7 @@ void {{class_name}}::run(const float** inputs, float** outputs, uint32_t frames)
   const ScopedDenormalDisable sdd;
 {% endif %}
   const TimePosition& timePos(getTimePosition());
-  if (timePos.playing && timePos.bbt.valid)
+  if (timePos.bbt.valid)
     _context->sendMessageToReceiverV(HV_HASH_DPF_BPM, 0, "f", timePos.bbt.beatsPerMinute);
 
   _context->process((float**)inputs, outputs, frames);

@@ -12,8 +12,11 @@ Features:
 
 Bugfixes:
 
-* skip empty values when restoring tables (#348)
+* Skip empty values when restoring tables (#348)
+* Only append to table when first value is a float
 * GUI send/receive config for objects in subpatches
+* DPF: also send BPM value to `__hv_dpf_bpm` when transport is not playing
+* Wwise: use latest Windows SDK available locally instead of hardcoded version
 
 0.15.0
 -----
