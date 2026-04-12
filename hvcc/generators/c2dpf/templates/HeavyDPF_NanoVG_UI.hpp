@@ -4,18 +4,8 @@
 #include "DistrhoPluginInfo.h"
 #include "nanovg.h"
 
-#include "ExtraEventHandlers.hpp"
-#include "Mainpatch.hpp"
-#include "Subpatch.hpp"
-#include "Canvas.hpp"
-#include "Slider.hpp"
-#include "Toggle.hpp"
-#include "Radio.hpp"
-#include "Comment.hpp"
-#include "Number.hpp"
-#include "Float.hpp"
-#include "Knob.hpp"
-#include "Bang.hpp"
+#include "pdvg.hpp"
+
 
 START_NAMESPACE_DISTRHO
 

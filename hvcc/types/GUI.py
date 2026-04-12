@@ -163,7 +163,7 @@ class Number(BaseParam):
 
 class Float(BaseParam):
     type: Literal["float"] = "float"
-    font_size: int
+    font_height: int
     label_text: str
     label_pos: LabelPos
     min: float

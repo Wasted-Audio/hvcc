@@ -4,7 +4,6 @@
 #include "DistrhoPluginInfo.h"
 #include "nanovg.h"
 
-#include "Common.hpp"
 #include "{{class_name}}.hpp"
 
 START_NAMESPACE_DISTRHO

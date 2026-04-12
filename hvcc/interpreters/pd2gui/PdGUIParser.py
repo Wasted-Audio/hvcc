@@ -639,12 +639,12 @@ class PdGUIParser(PdParser):
                 y=int(line[3])
             ),
             size=Size(
-                x=int(line[4]) * int(line[11]),
+                x=int(line[4]) * (int(line[11]) - 4),
                 y=int(line[11])
             ),
             parameter=param,
             label_text=line[8],
-            font_size=int(line[11]),
+            font_height=int(line[11]),
             label_pos=LabelPos(int(line[7])),
             min=float(line[5]),
             max=float(line[6])

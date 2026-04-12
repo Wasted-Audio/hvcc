@@ -150,7 +150,7 @@
     // float
     {{object.parameter}} = new PDFloat({{parent}}, this);
     {{object.parameter}}->setId(k{{object.parameter|capitalize}});
-    {{object.parameter}}->setSize({{object.size.x}} * scaleFactor, {{object.size.y}} * scaleFactor);
+    {{object.parameter}}->setSize({{object.size.x}} * scaleFactor, ({{object.size.y}} * 1.5f) * scaleFactor);
     {{object.parameter}}->setAbsolutePos({{object.position.x}} * scaleFactor, {{object.position.y}} * scaleFactor);
     {{object.parameter}}->setRange({{object.min}}f, {{object.max}}f);
         {%- for k, v in receivers + senders %}
@@ -158,7 +158,7 @@
     {{object.parameter}}->setDefault({{v.attributes.default}}f);
             {%- endif %}
         {%- endfor %}
-    {{object.parameter}}->setLabel("{{object.label_text}}", {{object.font_size}} * scaleFactor, LabelPos::{{object.label_pos.name|capitalize}});
+    {{object.parameter}}->setLabel("{{object.label_text}}", {{object.font_height}} * scaleFactor, LabelPos::{{object.label_pos.name|capitalize}});
     {{parent}}->addManagedChild({{object.parameter}});
         {%- endif %}
     {%- endfor %}
