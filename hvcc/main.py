@@ -85,6 +85,11 @@ def main() -> bool:
         help="Disable DSP. Run as control-only patch."
     )
     parser.add_argument(
+        "--gui",
+        action='store_false',
+        help="Parse GUI objects into IR."
+    )
+    parser.add_argument(
         "-v",
         "--verbose",
         help="Show debugging information.",
@@ -112,7 +117,8 @@ def main() -> bool:
         ext_generators=args.ext_gen,
         verbose=args.verbose,
         copyright=args.copyright,
-        nodsp=args.nodsp
+        nodsp=args.nodsp,
+        gui=args.gui
     )
 
     errorCount = 0
