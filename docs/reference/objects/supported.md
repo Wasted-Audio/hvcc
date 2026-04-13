@@ -209,6 +209,9 @@ Objects ported from [cyclone](https://github.com/porres/pd-cyclone) library.
 | atan2~ | |
 | atanh~ | |
 | atan~ | |
+| bitand~ | only supports mode 1 |
+| bitor~ | only supports mode 1 |
+| bitnot~ | only supports mode 1 |
 | bitsafe~ | |
 | bitxor~ | only supports mode 1 |
 | cosh~ | |

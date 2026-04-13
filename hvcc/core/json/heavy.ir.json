@@ -3376,7 +3376,48 @@
       "~f>"
     ]
   },
-    "__bitsafe~f": {
+  "__bit_and~f": {
+    "inlets": [
+      "~f>",
+      "~f>"
+    ],
+    "ir": {
+      "control": false,
+      "signal": true,
+      "init": false
+    },
+    "outlets": [
+      "~f>"
+    ]
+  },
+  "__bit_or~f": {
+    "inlets": [
+      "~f>",
+      "~f>"
+    ],
+    "ir": {
+      "control": false,
+      "signal": true,
+      "init": false
+    },
+    "outlets": [
+      "~f>"
+    ]
+  },
+    "__bit_not~f": {
+    "inlets": [
+      "~f>"
+    ],
+    "ir": {
+      "control": false,
+      "signal": true,
+      "init": false
+    },
+    "outlets": [
+      "~f>"
+    ]
+  },
+  "__bitsafe~f": {
     "inlets": [
       "~f>"
     ],

@@ -78,10 +78,13 @@ class SignalMath(HeavyObject):
         "__ceil~f": "__hv_ceil_f",
         "__cast~fi": "__hv_cast_fi",
         "__cast~if": "__hv_cast_if",
-        "__and~f": "__hv_and_f",  # binary and
-        "__andnot~f": "__hv_andnot_f",
-        "__or~f": "__hv_or_f",  # binary or
-        "__bitsafe~f": "__hv_bitsafe_f",  # make inf and nan safe
+        "__and~f": "__hv_and_f",            # binary and
+        "__andnot~f": "__hv_andnot_f",      # binary andnot
+        "__or~f": "__hv_or_f",              # binary or
+        "__bitsafe~f": "__hv_bitsafe_f",    # make inf and nan safe
+        "__bit_or~f": "__hv_bit_or_f",      # bitwise or
+        "__bit_and~f": "__hv_bit_and_f",    # bitwise and
+        "__bit_not~f": "__hv_bit_not_f",    # bitwise not
     }
 
     @classmethod

@@ -36,15 +36,12 @@ class TestPdSignalCyclonePatches(TestPdControlBase):
     def test_eq_neq(self):
         self._test_control_patch("test-eq-neq.pd")
 
-    @unittest.skip("Needs work for selecting modes")
     def test_bit_and(self):
         self._test_control_patch("test-bit-and.pd")
 
-    @unittest.skip("Needs work for selecting modes")
     def test_bit_not(self):
         self._test_control_patch("test-bit-not.pd")
 
-    @unittest.skip("Needs work for selecting modes")
     def test_bit_or(self):
         self._test_control_patch("test-bit-or.pd")
 
@@ -52,7 +49,6 @@ class TestPdSignalCyclonePatches(TestPdControlBase):
     def test_bit_shift(self):
         self._test_control_patch("test-bit-shift.pd")
 
-    @unittest.skip("Needs work for selecting modes")
     def test_exc_or(self):
         self._test_control_patch("test-exc-or.pd")
 
