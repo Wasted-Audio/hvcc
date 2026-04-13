@@ -50,6 +50,7 @@ class SignalMath(HeavyObject):
         "__tanh~f": "__hv_tanh_f",
         "__atanh~f": "__hv_atanh_f",
         "__exp~f": "__hv_exp_f",
+        "__exc_or~f": "__hv_exc_or_f",
         "__pow~f": "__hv_pow_f",
         "__pow~i": "__hv_pow_i",
         "__sqrt~f": "__hv_sqrt_f",
@@ -80,6 +81,7 @@ class SignalMath(HeavyObject):
         "__and~f": "__hv_and_f",  # binary and
         "__andnot~f": "__hv_andnot_f",
         "__or~f": "__hv_or_f",  # binary or
+        "__bitsafe~f": "__hv_bitsafe_f",  # make inf and nan safe
     }
 
     @classmethod
