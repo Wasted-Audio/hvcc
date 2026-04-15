@@ -214,6 +214,7 @@ Objects ported from [cyclone](https://github.com/porres/pd-cyclone) library.
 | bitnot~ | only supports mode 1 |
 | bitsafe~ | |
 | bitxor~ | only supports mode 1 |
+| cartopol~ | |
 | cosh~ | |
 | cosx~ | |
 | equals~ | alias: ==~ |
@@ -222,6 +223,7 @@ Objects ported from [cyclone](https://github.com/porres/pd-cyclone) library.
 | lessthaneq~ | alias: <=~ |
 | lessthan~ | alias: <~ |
 | notequals~ | alias: !=~ |
+| poltocar~ | |
 | sinh~ | |
 | sinx~ | |
 | tanh~ | |

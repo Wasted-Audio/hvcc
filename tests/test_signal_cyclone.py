@@ -71,6 +71,9 @@ class TestPdSignalCyclonePatches(TestPdControlBase):
     def test_bitsafe(self):
         self._test_control_patch("test-bitsafe.pd")
 
+    def test_poltocar_cartopol(self):
+        self._test_control_patch("test-poltocar-cartopol.pd")
+
 
 def main():
     # TODO(mhroth): make this work
