@@ -1,8 +1,8 @@
-#N canvas 739 321 412 319 12;
+#N canvas 756 224 412 319 12;
 #X obj 68 48 inlet~;
 #X obj 224 48 inlet~;
 #X obj 68 109 *~;
-#X obj 224 110 *~;
+#X obj 102 110 *~;
 #N canvas 0 459 450 300 @hv_obj 0;
 #X obj 31 15 inlet~;
 #X obj 30 87 outlet~;
@@ -17,10 +17,10 @@
 #X obj 223 254 outlet~;
 #X connect 0 0 2 0;
 #X connect 0 0 2 1;
-#X connect 0 0 7 0;
+#X connect 0 0 7 1;
 #X connect 1 0 3 0;
 #X connect 1 0 3 1;
-#X connect 1 0 7 1;
+#X connect 1 0 7 0;
 #X connect 2 0 5 0;
 #X connect 3 0 5 1;
 #X connect 4 0 6 0;
