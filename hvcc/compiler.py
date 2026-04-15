@@ -223,7 +223,8 @@ def compile_dataflow(
     ext_generators: Optional[List[str]] = None,
     verbose: bool = False,
     copyright: Optional[str] = None,
-    nodsp: Optional[bool] = False
+    nodsp: Optional[bool] = False,
+    gui: Optional[bool] = False
 ) -> CompilerResults:
     results = CompilerResults(root={})
     patch_meta = Meta()
@@ -259,13 +260,14 @@ def compile_dataflow(
         search_paths=search_paths,
         verbose=verbose)
 
-    if verbose:
-        print("--> Generating GUI IR")
-    results.root["pd2gui"] = pd2gui.pd2gui.compile(
-        pd_path=in_path,
-        ir_dir=os.path.join(out_dir, "ir"),
-        search_paths=search_paths,
-        verbose=verbose)
+    if gui:
+        if verbose:
+            print("--> Generating GUI IR")
+        results.root["pd2gui"] = pd2gui.pd2gui.compile(
+            pd_path=in_path,
+            ir_dir=os.path.join(out_dir, "ir"),
+            search_paths=search_paths,
+            verbose=verbose)
 
     # check for errors
     response: CompilerResp = list(results.root.values())[0]
