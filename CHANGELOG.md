@@ -9,6 +9,7 @@ Features:
 * Add theme configuration to pd2gui model
 * Add `flash_time` to pd2gui Bang parser
 * Only parse GUI with `--gui` flag
+* Port objects from cyclone
 
 Bugfixes:
 

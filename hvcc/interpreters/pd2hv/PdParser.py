@@ -52,6 +52,7 @@ class PdParser:
     __HVLIB_CONVERTED_DIR = os.path.join(os.path.dirname(__file__), "libs", "heavy_converted")
     __PDLIB_DIR = os.path.join(os.path.dirname(__file__), "libs", "pd")
     __ELSELIB_DIR = os.path.join(os.path.dirname(__file__), "libs", "else")
+    __CYCLONE_DIR = os.path.join(os.path.dirname(__file__), "libs", "cyclone")
     __PDLIB_CONVERTED_DIR = os.path.join(os.path.dirname(__file__), "libs", "pd_converted")
 
     # detect a dollar argument in a string
@@ -80,6 +81,7 @@ class PdParser:
         """
         pd_objects = [os.path.splitext(f)[0] for f in os.listdir(cls.__PDLIB_DIR) if f.endswith(".pd")]
         pd_objects += [f"else/{os.path.splitext(f)[0]}" for f in os.listdir(cls.__ELSELIB_DIR) if f.endswith(".pd")]
+        pd_objects += [f"cyclone/{os.path.splitext(f)[0]}" for f in os.listdir(cls.__CYCLONE_DIR) if f.endswith(".pd")]
         pd_objects.extend(cls.__PD_CLASSES.keys())
         return pd_objects
 
