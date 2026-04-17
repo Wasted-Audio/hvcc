@@ -22,14 +22,14 @@ import unittest
 
 from pathlib import Path
 
-SCRIPT_DIR = os.path.dirname(__file__)
+SCRIPT_DIR = Path(__file__).parent
 
 raise unittest.SkipTest()
 
 
 def compile_and_run_patch(pd_file):
     # setup
-    patch_name = os.path.splitext(os.path.basename(pd_file))[0]
+    patch_name = pd_file.stem
 
     # clean any existing output directories
     out_dir = Path(SCRIPT_DIR, "./build").absolute()
@@ -38,9 +38,9 @@ def compile_and_run_patch(pd_file):
 
     # create new output directories and copy over assets
     c_src_dir = Path(out_dir, "src")
-    os.makedirs(c_src_dir)
+    c_src_dir.mkdir(parents=True)
     asm_dir = Path(out_dir, "asm")
-    os.makedirs(asm_dir)
+    asm_dir.mkdir(parents=True)
     shutil.copy2(Path(SCRIPT_DIR, "test_speed.c"), c_src_dir)
 
     # pd2hv
@@ -80,7 +80,7 @@ def compile_and_run_patch(pd_file):
     # generate assembly
     print(f"Assembly output directory: {asm_dir}/")
     for c_src in c_sources:
-        asm_out = Path(asm_dir, f"{os.path.splitext(os.path.basename(c_src))[0]}.s")
+        asm_out = Path(asm_dir, f"{Path(c_src).stem}.s")
         cmd = ["clang"] + flags + ["-S", "-O3", "-mllvm", "--x86-asm-syntax=intel", c_src, "-o", asm_out]
         subprocess.check_output(cmd)
 
@@ -97,7 +97,7 @@ def compile_and_run_patch(pd_file):
     result = subprocess.check_output([exe_file]).split("\n")
 
     # # clean up
-    # if os.path.exists(out_dir):
+    # if out_dir.exists():
     #     shutil.rmtree(out_dir)
 
     return result

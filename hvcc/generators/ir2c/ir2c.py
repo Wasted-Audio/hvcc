@@ -17,7 +17,6 @@
 import argparse
 import jinja2
 import json
-import os
 import shutil
 import time
 
@@ -181,7 +180,7 @@ class ir2c:
         env.filters["hvhash"] = cls.filter_hvhash
         env.filters["extern"] = cls.filter_extern
         env.loader = jinja2.FileSystemLoader(
-            Path(os.path.dirname(__file__), "templates"))
+            Path(Path(__file__).parent, "templates"))
 
         # read the hv.ir.json file
         with open(hv_ir_path, "r") as f:
@@ -299,8 +298,8 @@ class ir2c:
         #
 
         # make the output directory if necessary
-        if not os.path.exists(output_dir):
-            os.makedirs(output_dir)
+        if not output_dir.exists():
+            output_dir.mkdir(parents=True)
 
         # ensure that send_receive dictionary is alphabetised by the receiver key
         send_receive = OrderedDict(sorted([(k, v) for k, v in ir.control.receivers.items()], key=lambda x: x[0]))
