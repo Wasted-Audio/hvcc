@@ -4,7 +4,6 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 import argparse
-import os
 import time
 
 from typing import Optional
@@ -51,7 +50,7 @@ class pd2gui:
             if not ir_dir.exists():
                 Path.mkdir(ir_dir)
 
-            gui_file = f"{os.path.splitext(pd_path.name)[0]}.gui.json"
+            gui_file = f"{pd_path.stem}.gui.json"
             gui_path = Path(ir_dir, gui_file)
             with open(gui_path, "w") as f:
                 f.write(gui_graph.model_dump_json(indent=2) + "\n")
@@ -96,12 +95,12 @@ def main() -> None:
         action="count")
     args = parser.parse_args()
 
-    args.pd_path = os.path.abspath(os.path.expanduser(args.pd_path))
-    args.ir_dir = os.path.abspath(os.path.expanduser(args.ir_dir))
+    pd_path = Path(args.pd_path).expanduser().absolute()
+    ir_dir = Path(args.ir_dir).expanduser().absolute()
 
     pd2gui.compile(
-        pd_path=args.pd_path,
-        ir_dir=args.ir_dir,
+        pd_path=pd_path,
+        ir_dir=ir_dir,
         search_paths=None,
         verbose=args.verbose)
 

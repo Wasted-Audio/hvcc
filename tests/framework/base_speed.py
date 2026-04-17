@@ -49,10 +49,9 @@ class TestPdSpeedBase(HvBaseTest):
 
     def _test_speed_patch(self, pd_file: str):
         pd_path = Path(self.TEST_DIR, pd_file)
-        # out_dir = Path(os.path.dirname(__file__), "build")
 
-        json_path = Path(os.path.dirname(pd_path), f"{os.path.basename(pd_path)[:-3]}.golden.json")
-        if os.path.exists(json_path):
+        json_path = Path(pd_path.parent, f"{pd_path.name[:-3]}.golden.json")
+        if json_path.exists():
             with open(json_path, "r") as f:
                 golden = json.load(f)
         else:
@@ -81,8 +80,8 @@ class TestPdSpeedBase(HvBaseTest):
             tock = golden["usPerBlock"]["HV_SIMD_SSE"]
             percent_difference = 100.0 * (tick - tock) / tock
             self.assertTrue(percent_difference < self.__PERCENT_THRESHOLD,
-                            f"{os.path.basename(pd_path)} has become {percent_difference:g}% slower @ {tick}us/block.")
+                            f"{pd_path.name} has become {percent_difference:g}% slower @ {tick}us/block.")
             if (percent_difference < -self.__PERCENT_THRESHOLD):
-                print(f"{os.path.basename(pd_path)} has become significantly faster: {percent_difference:g}%")
+                print(f"{pd_path.name} has become significantly faster: {percent_difference:g}%")
         else:
             print(tick)

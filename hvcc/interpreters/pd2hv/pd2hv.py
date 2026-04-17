@@ -16,7 +16,6 @@
 
 import argparse
 import json
-import os
 import time
 
 from typing import List, Optional
@@ -81,10 +80,10 @@ class pd2hv:
                 compile_time=(time.time() - tick)
             )
 
-        if not os.path.exists(hv_dir):
-            os.makedirs(hv_dir)
+        if not hv_dir.exists():
+            hv_dir.mkdir(parents=True)
 
-        hv_file = f"{os.path.splitext(os.path.basename(pd_path))[0]}.hv.json"
+        hv_file = f"{pd_path.stem}.hv.json"
         hv_path = Path(hv_dir, hv_file)
         with open(hv_path, "w") as f:
             json.dump(pd_graph.to_hv(export_args=export_args), f, indent=4)

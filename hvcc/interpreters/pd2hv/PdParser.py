@@ -48,13 +48,13 @@ from .NotificationEnum import NotificationEnum
 class PdParser:
 
     # library search paths
-    __LIB_DIR = Path(os.path.dirname(__file__), "libs")
-    __HVLIB_DIR = Path(os.path.dirname(__file__), "libs", "heavy")
-    __HVLIB_CONVERTED_DIR = Path(os.path.dirname(__file__), "libs", "heavy_converted")
-    __PDLIB_DIR = Path(os.path.dirname(__file__), "libs", "pd")
-    __ELSELIB_DIR = Path(os.path.dirname(__file__), "libs", "else")
-    __CYCLONE_DIR = Path(os.path.dirname(__file__), "libs", "cyclone")
-    __PDLIB_CONVERTED_DIR = Path(os.path.dirname(__file__), "libs", "pd_converted")
+    __LIB_DIR = Path(Path(__file__).parent, "libs")
+    __HVLIB_DIR = Path(Path(__file__).parent, "libs", "heavy")
+    __HVLIB_CONVERTED_DIR = Path(Path(__file__).parent, "libs", "heavy_converted")
+    __PDLIB_DIR = Path(Path(__file__).parent, "libs", "pd")
+    __ELSELIB_DIR = Path(Path(__file__).parent, "libs", "else")
+    __CYCLONE_DIR = Path(Path(__file__).parent, "libs", "cyclone")
+    __PDLIB_CONVERTED_DIR = Path(Path(__file__).parent, "libs", "pd_converted")
 
     # detect a dollar argument in a string
     RE_DOLLAR = re.compile(r"\$(\d+)")
@@ -318,7 +318,7 @@ class PdParser:
                                                                              range(new_size - declared_size)])
                                 obj_array = None  # done parsing the array
 
-                            # set the subpatch name)
+                            # set the subpatch name
                             g.subpatch_name = " ".join(line[5:]) if len(line) > 5 else "subpatch"
                             g = self.__create_send_recv(g, msg_send, gui_send, gui_recv)
                             return g  # pop the graph

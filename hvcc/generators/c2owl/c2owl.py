@@ -1,5 +1,3 @@
-# import datetime
-import os
 import shutil
 import time
 import jinja2
@@ -101,13 +99,12 @@ class c2owl(Generator):
             shutil.copytree(c_src_dir, out_dir)
 
             # copy over deps
-            shutil.copytree(Path(os.path.dirname(__file__), "deps"), out_dir, dirs_exist_ok=True)
+            shutil.copytree(Path(Path(__file__).parent, "deps"), out_dir, dirs_exist_ok=True)
 
             # initialize the jinja template environment
             env = jinja2.Environment()
 
-            env.loader = jinja2.FileSystemLoader(
-                Path(os.path.dirname(os.path.abspath(__file__)), "templates"))
+            env.loader = jinja2.FileSystemLoader(Path(Path(__file__).parent), "templates")
 
             # construct jdata from ir
             ir_dir = Path(c_src_dir, "../ir")

@@ -14,7 +14,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
 import platform
 import shutil
 import subprocess
@@ -85,9 +84,9 @@ class TestPdSignalBase(HvBaseTest):
         pd_path = Path(self.TEST_DIR, pd_file)
 
         # setup
-        patch_name = os.path.splitext(os.path.basename(pd_path))[0]
+        patch_name = pd_path.stem
         golden_path = Path(self.TEST_DIR, f"{patch_name}.golden.wav")
-        self.assertTrue(os.path.exists(golden_path), f"File not found: {golden_path}")
+        self.assertTrue(golden_path.exists(), f"File not found: {golden_path}")
 
         try:
             out_dir = self._run_hvcc(pd_path)

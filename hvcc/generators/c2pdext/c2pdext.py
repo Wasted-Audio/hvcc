@@ -14,7 +14,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
 import shutil
 import time
 import jinja2
@@ -61,7 +60,7 @@ class c2pdext(Generator):
 
         # ensure that the output directory does not exist
         out_dir = out_dir.absolute()
-        if os.path.exists(out_dir):
+        if out_dir.exists():
             shutil.rmtree(out_dir)
 
         # copy over generated C source files

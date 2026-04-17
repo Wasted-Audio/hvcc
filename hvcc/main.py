@@ -16,7 +16,6 @@
 
 import argparse
 import json
-import os
 import sys
 import time
 
@@ -148,11 +147,11 @@ def main() -> bool:
                 r.stage, warning.message, Colours.yellow, Colours.end, i + 1))
 
     if args.results_path:
-        results_path = os.path.realpath(os.path.abspath(args.results_path))
-        results_dir = os.path.dirname(results_path)
+        results_path = Path(args.results_path).absolute().resolve()
+        results_dir = results_path.parent
 
-        if not os.path.exists(results_dir):
-            os.makedirs(results_dir)
+        if not results_dir.exists():
+            results_dir.mkdir(parents=True)
 
         with open(results_path, "w") as f:
             json.dump(results.model_dump(), f)

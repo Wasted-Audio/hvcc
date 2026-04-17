@@ -46,12 +46,12 @@ class c2fmod(Generator):
 
         copyright_c = copyright_manager.get_copyright_for_c(copyright)
 
-        templates_dir = Path(os.path.dirname(__file__), "templates")
+        templates_dir = Path(Path(__file__).parent, "templates")
         is_source_plugin = num_input_channels == 0
 
         out_dir = Path(out_dir, "fmod")
-        if not os.path.exists(out_dir):
-            os.makedirs(out_dir)
+        if not out_dir.exists():
+            out_dir.mkdir(parents=True)
 
         env = jinja2.Environment()
         env.loader = jinja2.FileSystemLoader(
@@ -78,7 +78,7 @@ class c2fmod(Generator):
                 file_path = Path(file_dir, file_name)
 
                 if not file_path.parent.exists():
-                    os.makedirs(file_path.parent)
+                    file_path.parent.mkdir(parents=True)
 
                 with open(file_path, "w") as g:
                     g.write(env.get_template(f).render(
