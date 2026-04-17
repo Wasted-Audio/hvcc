@@ -58,6 +58,7 @@ from hvcc.generators.ir2c.SignalEnvelope import SignalEnvelope
 from hvcc.generators.ir2c.SignalExpr import SignalExpr
 from hvcc.generators.ir2c.SignalLine import SignalLine
 from hvcc.generators.ir2c.SignalLorenz import SignalLorenz
+from hvcc.generators.ir2c.SignalNam import SignalNam
 from hvcc.generators.ir2c.SignalMath import SignalMath
 from hvcc.generators.ir2c.SignalPhasor import SignalPhasor
 from hvcc.generators.ir2c.SignalRPole import SignalRPole
@@ -96,6 +97,7 @@ class ir2c:
         "__env~f": SignalEnvelope,
         "__line~f": SignalLine,
         "__lorenz~f": SignalLorenz,
+        "__nam~f": SignalNam,
         "__del1~f": SignalDel1,
         "__tabread~if": SignalTabread,
         "__tabread~f": SignalTabread,

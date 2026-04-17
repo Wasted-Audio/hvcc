@@ -1982,6 +1982,27 @@
       "required": false
     }]
   },
+  "__nam~f": {
+    "inlets": [
+      "~f>"
+    ],
+    "ir": {
+      "control": false,
+      "signal": true,
+      "init": false
+    },
+    "outlets": [
+      "~f>"
+    ],
+    "args": [{
+      "name": "nam",
+      "value_type": "string",
+      "description": "path to NAM file",
+      "default": "",
+      "required": true
+    }],
+    "perf": {}
+  },
   "__neq": {
     "inlets": [
       "-->",
