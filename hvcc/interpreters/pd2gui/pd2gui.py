@@ -8,6 +8,7 @@ import os
 import time
 
 from typing import Optional
+from pathlib import Path
 
 from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
 from hvcc.interpreters.pd2gui.PdGUIParser import PdGUIParser
@@ -32,8 +33,8 @@ class pd2gui:
     @classmethod
     def compile(
         cls,
-        pd_path: str,
-        ir_dir: str,
+        pd_path: Path,
+        ir_dir: Path,
         search_paths: Optional[list] = None,
         verbose: bool = False
     ):
@@ -47,21 +48,21 @@ class pd2gui:
         try:
             gui_graph, _ = parser.gui_from_file(pd_path)
 
-            if not os.path.exists(ir_dir):
-                os.makedirs(ir_dir)
+            if not ir_dir.exists():
+                Path.mkdir(ir_dir)
 
-            gui_file = f"{os.path.splitext(os.path.basename(pd_path))[0]}.gui.json"
-            gui_path = os.path.join(ir_dir, gui_file)
+            gui_file = f"{os.path.splitext(pd_path.name)[0]}.gui.json"
+            gui_path = Path(ir_dir, gui_file)
             with open(gui_path, "w") as f:
                 f.write(gui_graph.model_dump_json(indent=2) + "\n")
 
             return CompilerResp(
                 stage="pd2gui",
                 notifs=CompilerNotif(),
-                in_dir=os.path.dirname(pd_path),
-                in_file=os.path.basename(pd_path),
+                in_dir=pd_path.parent,
+                in_file=pd_path,
                 out_dir=ir_dir,
-                out_file=gui_file,
+                out_file=gui_path,
                 compile_time=(time.time() - tick)
             )
         except Exception as e:

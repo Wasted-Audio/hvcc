@@ -20,6 +20,8 @@ import os
 import sys
 import time
 
+from pathlib import Path
+
 from hvcc.version import VERSION
 from hvcc.compiler import compile_dataflow
 
@@ -54,6 +56,7 @@ def main() -> bool:
         "-p",
         "--search_paths",
         nargs="+",
+        default=[],
         help="Add a list of directories to search through for abstractions.")
     parser.add_argument(
         "-n",
@@ -106,13 +109,13 @@ def main() -> bool:
     )
     args = parser.parse_args()
 
-    in_path = os.path.abspath(args.in_path)
+    in_path = Path(args.in_path).absolute()
     results = compile_dataflow(
         in_path=in_path,
-        out_dir=args.out_dir or os.path.dirname(in_path),
+        out_dir=Path(args.out_dir) or in_path.parent,
         patch_name=args.name,
         patch_meta_file=args.meta,
-        search_paths=args.search_paths,
+        search_paths=[Path(path) for path in args.search_paths],
         generators=args.gen,
         ext_generators=args.ext_gen,
         verbose=args.verbose,

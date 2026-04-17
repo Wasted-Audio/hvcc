@@ -4,7 +4,9 @@ import shutil
 import time
 import jinja2
 import json
+
 from typing import List, Optional
+from pathlib import Path
 
 import hvcc.core.hv2ir.HeavyLangObject as HeavyLangObject
 from ..copyright import copyright_manager
@@ -24,7 +26,7 @@ class c2owl(Generator):
     """
 
     @classmethod
-    def make_jdata(cls, patch_ir: str) -> List:
+    def make_jdata(cls, patch_ir: Path) -> List:
         jdata = list()
 
         with open(patch_ir, mode="r") as f:
@@ -72,8 +74,8 @@ class c2owl(Generator):
     @classmethod
     def compile(
         cls,
-        c_src_dir: str,
-        out_dir: str,
+        c_src_dir: Path,
+        out_dir: Path,
         externs: ExternInfo,
         patch_name: Optional[str] = None,
         patch_meta: Meta = Meta(),
@@ -85,41 +87,41 @@ class c2owl(Generator):
 
         tick = time.time()
 
-        out_dir = os.path.join(out_dir, "Source")
+        out_dir = Path(out_dir, "Source")
         patch_name = patch_name or "heavy"
         copyright_c = copyright_manager.get_copyright_for_c(copyright)
 
         try:
             # ensure that the output directory does not exist
-            out_dir = os.path.abspath(out_dir)
-            if os.path.exists(out_dir):
+            out_dir = out_dir.absolute()
+            if out_dir.exists():
                 shutil.rmtree(out_dir)
 
             # copy over generated C source files
             shutil.copytree(c_src_dir, out_dir)
 
             # copy over deps
-            shutil.copytree(os.path.join(os.path.dirname(__file__), "deps"), out_dir, dirs_exist_ok=True)
+            shutil.copytree(Path(os.path.dirname(__file__), "deps"), out_dir, dirs_exist_ok=True)
 
             # initialize the jinja template environment
             env = jinja2.Environment()
 
             env.loader = jinja2.FileSystemLoader(
-                os.path.join(os.path.dirname(os.path.abspath(__file__)), "templates"))
+                Path(os.path.dirname(os.path.abspath(__file__)), "templates"))
 
             # construct jdata from ir
-            ir_dir = os.path.join(c_src_dir, "../ir")
-            patch_ir = os.path.join(ir_dir, f"{patch_name}.heavy.ir.json")
+            ir_dir = Path(c_src_dir, "../ir")
+            patch_ir = Path(ir_dir, f"{patch_name}.heavy.ir.json")
             jdata = cls.make_jdata(patch_ir)
 
             # generate OWL wrapper from template
-            owl_hpp_path = os.path.join(out_dir, f"HeavyOWL_{patch_name}.hpp")
+            owl_hpp_path = Path(out_dir, f"HeavyOWL_{patch_name}.hpp")
             with open(owl_hpp_path, "w") as f:
                 f.write(env.get_template("HeavyOwl.hpp").render(
                     jdata=jdata,
                     name=patch_name,
                     copyright=copyright_c))
-            owl_h_path = os.path.join(out_dir, "HeavyOwlConstants.h")
+            owl_h_path = Path(out_dir, "HeavyOwlConstants.h")
             with open(owl_h_path, "w") as f:
                 f.write(env.get_template("HeavyOwlConstants.h").render(
                     jdata=jdata,
@@ -131,7 +133,7 @@ class c2owl(Generator):
                 stage="c2owl",
                 in_dir=c_src_dir,
                 out_dir=out_dir,
-                out_file=os.path.basename(owl_h_path),
+                out_file=owl_h_path,
                 compile_time=time.time() - tick
             )
 

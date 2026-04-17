@@ -21,6 +21,7 @@ import jinja2
 
 from shutil import which
 from typing import Optional
+from pathlib import Path
 
 from hvcc.core.hv2ir.HeavyException import HeavyException
 from ..copyright import copyright_manager
@@ -67,16 +68,16 @@ class c2js(Generator):
     @classmethod
     def run_emscripten(
         cls,
-        c_src_dir: str,
-        out_dir: str,
+        c_src_dir: Path,
+        out_dir: Path,
         patch_name: str,
         output_name: str,
-        post_js_path: str,
+        post_js_path: Path,
         should_modularize: int,
         environment: str,
-        pre_js_path: str = "",
+        pre_js_path: Path = Path(),
         binaryen_async: int = 1
-    ) -> str:
+    ) -> Path:
         """Run the emcc command to compile C source files to a javascript library.
         """
 
@@ -98,8 +99,8 @@ class c2js(Generator):
             "-Wall"
         ]
 
-        c_src_paths = [os.path.join(c_src_dir, c) for c in os.listdir(c_src_dir) if c.endswith((".c"))]
-        cpp_src_paths = [os.path.join(c_src_dir, cpp) for cpp in os.listdir(c_src_dir) if cpp.endswith((".cpp"))]
+        c_src_paths = [Path(c_src_dir, c) for c in os.listdir(c_src_dir) if c.endswith((".c"))]
+        cpp_src_paths = [Path(c_src_dir, cpp) for cpp in os.listdir(c_src_dir) if cpp.endswith((".cpp"))]
         obj_paths = []
         cmd = ""
 
@@ -121,7 +122,7 @@ class c2js(Generator):
         hv_api_defs = ", ".join([f"\"{x.format(patch_name)}\"" for x in cls.__HV_API])
 
         # output path
-        wasm_js_path = os.path.join(out_dir, f"{output_name}.js")
+        wasm_js_path = Path(out_dir, f"{output_name}.js")
 
         linker_flags = [
             "-O3",
@@ -139,7 +140,7 @@ class c2js(Generator):
             "--post-js", post_js_path
         ]
 
-        if len(pre_js_path):
+        if pre_js_path != Path():
             linker_flags = linker_flags + [
                 "--pre-js", pre_js_path
             ]
@@ -162,8 +163,8 @@ class c2js(Generator):
     @classmethod
     def compile(
         cls,
-        c_src_dir: str,
-        out_dir: str,
+        c_src_dir: Path,
+        out_dir: Path,
         externs: ExternInfo,
         patch_name: Optional[str] = None,
         patch_meta: Meta = Meta(),
@@ -183,27 +184,27 @@ class c2js(Generator):
         midi_list = externs.midi.inMidi
         midi_out_list = externs.midi.outMidi
 
-        out_dir = os.path.join(out_dir, "js")
+        out_dir = Path(out_dir, "js")
         patch_name = patch_name or "heavy"
 
         copyright_js = copyright_manager.get_copyright_for_c(copyright)
         copyright_html = copyright_manager.get_copyright_for_xml(copyright)
 
-        if not os.path.exists(out_dir):
+        if not out_dir.exists():
             os.makedirs(out_dir)
-        out_dir = os.path.abspath(out_dir)
+        out_dir = out_dir.absolute()
 
         try:
             # initialise the jinja template environment
             env = jinja2.Environment()
-            env.loader = jinja2.FileSystemLoader(os.path.join(
-                os.path.dirname(__file__),
+            env.loader = jinja2.FileSystemLoader(Path(
+                Path(__file__).parent,
                 "template"))
 
             # generate heavy js wrapper from template
             # Note: this file will be incorporated into the emscripten output
             # and removed afterwards
-            post_js_path = os.path.join(out_dir, "hv_wrapper.js")
+            post_js_path = Path(out_dir, "hv_wrapper.js")
             with open(post_js_path, "w") as f:
                 f.write(env.get_template("hv_wrapper.js").render(
                     name=patch_name,
@@ -222,10 +223,10 @@ class c2js(Generator):
             # delete temporary files
             os.remove(post_js_path)
 
-            js_out_file = os.path.basename(js_path)
+            js_out_file = js_path
 
             # generate index.html from template
-            with open(os.path.join(out_dir, "index.html"), "w") as f:
+            with open(Path(out_dir, "index.html"), "w") as f:
                 f.write(env.get_template("index.html").render(
                     name=patch_name,
                     includes=[f"./{js_out_file}"],
@@ -240,7 +241,7 @@ class c2js(Generator):
             # generate heavy js worklet from template
             # Note: this file will be incorporated into the emscripten output
             # and removed afterwards
-            post_js_path = os.path.join(out_dir, "hv_worklet.js")
+            post_js_path = Path(out_dir, "hv_worklet.js")
             with open(post_js_path, "w") as f:
                 f.write(env.get_template("hv_worklet.js").render(
                     name=patch_name,
@@ -248,7 +249,7 @@ class c2js(Generator):
                     externs=externs,
                     pool_sizes_kb=externs.memoryPoolSizesKb))
 
-            pre_js_path = os.path.join(out_dir, "hv_worklet_start.js")
+            pre_js_path = Path(out_dir, "hv_worklet_start.js")
             with open(pre_js_path, "w") as f:
                 f.write(env.get_template("hv_worklet_start.js").render(
                     name=patch_name,

@@ -1,9 +1,9 @@
 import jinja2
-import os
 import shutil
 import time
 
 from typing import Any, Dict, Optional
+from pathlib import Path
 
 from ..copyright import copyright_manager
 from .parameters import parse_parameters, display_parameters, display_processor
@@ -33,8 +33,8 @@ class c2daisy(Generator):
     @classmethod
     def compile(
         cls,
-        c_src_dir: str,
-        out_dir: str,
+        c_src_dir: Path,
+        out_dir: Path,
         externs: ExternInfo,
         patch_name: Optional[str] = None,
         patch_meta: Meta = Meta(),
@@ -47,7 +47,7 @@ class c2daisy(Generator):
         tick = time.time()
         warnings = []
 
-        out_dir = os.path.join(out_dir, "daisy")
+        out_dir = Path(out_dir, "daisy")
 
         daisy_meta: Daisy = patch_meta.daisy
         board = daisy_meta.board
@@ -56,19 +56,19 @@ class c2daisy(Generator):
 
         try:
             # ensure that the output directory does not exist
-            out_dir = os.path.abspath(out_dir)
-            if os.path.exists(out_dir):
+            out_dir = out_dir.absolute()
+            if out_dir.exists():
                 shutil.rmtree(out_dir)
 
             # copy over static files
-            shutil.copytree(os.path.join(os.path.dirname(__file__), "static"), out_dir)
+            shutil.copytree(Path(Path(__file__).parent, "static"), out_dir)
 
             # copy over generated C source files
-            source_dir = os.path.join(out_dir, "source")
+            source_dir = Path(out_dir, "source")
             shutil.copytree(c_src_dir, source_dir)
 
             if daisy_meta.board_file is not None:
-                header, board_info = generate_header_from_file(daisy_meta.board_file)
+                header, board_info = generate_header_from_file(Path(daisy_meta.board_file))
                 display_params = display_parameters(daisy_meta.board_file)
             else:
                 header, board_info = generate_header_from_name(board)
@@ -134,13 +134,13 @@ class c2daisy(Generator):
 
             component_glue['copyright'] = copyright_c
 
-            daisy_h_path = os.path.join(source_dir, f"HeavyDaisy_{patch_name}.hpp")
+            daisy_h_path = Path(source_dir, f"HeavyDaisy_{patch_name}.hpp")
             with open(daisy_h_path, "w") as f:
                 f.write(header)
 
-            loader = jinja2.FileSystemLoader(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates'))
+            loader = jinja2.FileSystemLoader(Path(Path(__file__).parent, 'templates'))
             env = jinja2.Environment(loader=loader, trim_blocks=True, lstrip_blocks=True)
-            daisy_cpp_path = os.path.join(source_dir, f"HeavyDaisy_{patch_name}.cpp")
+            daisy_cpp_path = Path(source_dir, f"HeavyDaisy_{patch_name}.cpp")
 
             rendered_cpp = env.get_template('HeavyDaisy.cpp').render(component_glue)
             with open(daisy_cpp_path, 'w') as f:
@@ -160,7 +160,7 @@ class c2daisy(Generator):
             makefile_replacements['debug_printing'] = daisy_meta.debug_printing
 
             rendered_makefile = env.get_template('Makefile').render(makefile_replacements)
-            with open(os.path.join(source_dir, "Makefile"), "w") as f:
+            with open(Path(source_dir, "Makefile"), "w") as f:
                 f.write(rendered_makefile)
 
             # ======================================================================================
@@ -172,7 +172,7 @@ class c2daisy(Generator):
                 ),
                 in_dir=c_src_dir,
                 out_dir=out_dir,
-                out_file=os.path.basename(daisy_h_path),
+                out_file=daisy_h_path,
                 compile_time=time.time() - tick
             )
 

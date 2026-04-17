@@ -13,8 +13,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
 import unittest
+
+from pathlib import Path
 
 from tests.framework.base_speed import TestPdSpeedBase
 
@@ -23,8 +24,8 @@ raise unittest.SkipTest()
 
 class TestPdPatches(TestPdSpeedBase):
 
-    SCRIPT_DIR = os.path.dirname(__file__)
-    TEST_DIR = os.path.join(os.path.dirname(__file__), "pd", "speed")
+    SCRIPT_DIR = Path(__file__).parent
+    TEST_DIR = Path(Path(__file__).parent, "pd", "speed")
     # test results cannot be more than 2% slower than the golden value
     __PERCENT_THRESHOLD = 2.0
 

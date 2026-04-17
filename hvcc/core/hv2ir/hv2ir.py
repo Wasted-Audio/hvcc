@@ -20,6 +20,7 @@ import os
 import time
 
 from typing import Optional
+from pathlib import Path
 
 from hvcc.core.hv2ir.HeavyException import HeavyException
 from hvcc.core.hv2ir.HeavyParser import HeavyParser
@@ -32,8 +33,8 @@ class hv2ir:
     @classmethod
     def compile(
         cls,
-        hv_file: str,
-        ir_file: str,
+        hv_file: Path,
+        ir_file: Path,
         patch_name: Optional[str] = None,
         verbose: bool = False
     ) -> CompilerResp:
@@ -45,8 +46,8 @@ class hv2ir:
         # keep track of the total compile time
         tick = time.time()
 
-        hv_file = os.path.abspath(os.path.expanduser(hv_file))
-        ir_file = os.path.abspath(os.path.expanduser(ir_file))
+        hv_file = hv_file.expanduser().absolute()
+        ir_file = ir_file.expanduser().absolute()
 
         try:
             # parse heavy file
@@ -61,10 +62,10 @@ class hv2ir:
                     errors=[CompilerMsg(message=e.message)],
                     warnings=[]
                 ),
-                in_file=os.path.basename(hv_file),
-                in_dir=os.path.dirname(hv_file),
-                out_file=os.path.basename(ir_file),
-                out_dir=os.path.dirname(ir_file)
+                in_file=hv_file,
+                in_dir=hv_file.parent,
+                out_file=ir_file,
+                out_dir=ir_file.parent
             )
 
         try:
@@ -75,8 +76,8 @@ class hv2ir:
             hv_graph.prepare()
 
             # ensure that the output directory exists
-            if not os.path.exists(os.path.dirname(ir_file)):
-                os.makedirs(os.path.dirname(ir_file))
+            if not ir_file.parent.exists():
+                os.makedirs(ir_file.parent)
 
             # generate Heavy.IR
             ir = hv_graph.to_ir()
@@ -90,10 +91,10 @@ class hv2ir:
                     errors=[CompilerMsg(message=e.message)],
                     warnings=[]
                 ),
-                in_file=os.path.basename(hv_file),
-                in_dir=os.path.dirname(hv_file),
-                out_file=os.path.basename(ir_file),
-                out_dir=os.path.dirname(ir_file),
+                in_file=hv_file,
+                in_dir=hv_file.parent,
+                out_file=ir_file,
+                out_dir=ir_file.parent,
                 obj_counter=hv_counter
             )
 
@@ -119,10 +120,10 @@ class hv2ir:
             stage="hv2ir",
             compile_time=time.time() - tick,  # record the total compile time
             notifs=hv_graph.get_notices(),
-            in_file=os.path.basename(hv_file),
-            in_dir=os.path.dirname(hv_file),
-            out_file=os.path.basename(ir_file),
-            out_dir=os.path.dirname(ir_file),
+            in_file=hv_file,
+            in_dir=hv_file.parent,
+            out_file=ir_file,
+            out_dir=ir_file.parent,
             obj_counter=hv_counter,
             ir=ir
         )

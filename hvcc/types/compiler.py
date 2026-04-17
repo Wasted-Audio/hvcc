@@ -6,6 +6,7 @@
 from abc import ABC, abstractmethod
 from collections import Counter, defaultdict
 from typing import Dict, List, Optional, Tuple
+from pathlib import Path
 
 from pydantic import BaseModel, RootModel
 
@@ -29,10 +30,10 @@ class CompilerNotif(BaseModel, arbitrary_types_allowed=True):
 class CompilerResp(BaseModel):
     stage: str
     notifs: CompilerNotif = CompilerNotif()
-    in_dir: str = ""
-    in_file: str = ""
-    out_dir: str = ""
-    out_file: str = ""
+    in_dir: Path = Path()
+    in_file: Path = Path()
+    out_dir: Path = Path()
+    out_file: Path = Path()
     compile_time: float = 0.0
     obj_counter: Counter = Counter()
     obj_perf: Dict[str, Dict[str, float]] = defaultdict(lambda: defaultdict(float))
@@ -78,8 +79,8 @@ class Generator(ABC):
     @abstractmethod
     def compile(
         cls,
-        c_src_dir: str,
-        out_dir: str,
+        c_src_dir: Path,
+        out_dir: Path,
         externs: ExternInfo,
         patch_name: Optional[str] = None,
         patch_meta: Meta = Meta(),

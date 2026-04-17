@@ -23,6 +23,7 @@ import time
 
 from collections import Counter
 from collections import OrderedDict
+from pathlib import Path
 from typing import Dict, List, Optional, Type, Union
 
 from hvcc.generators.ir2c.PrettyfyC import PrettyfyC
@@ -160,9 +161,9 @@ class ir2c:
     @classmethod
     def compile(
         cls,
-        hv_ir_path: str,
-        static_dir: str,
-        output_dir: str,
+        hv_ir_path: Path,
+        static_dir: Path,
+        output_dir: Path,
         externs: ExternInfo,
         copyright: Optional[str] = None,
         nodsp: Optional[bool] = False
@@ -180,7 +181,7 @@ class ir2c:
         env.filters["hvhash"] = cls.filter_hvhash
         env.filters["extern"] = cls.filter_extern
         env.loader = jinja2.FileSystemLoader(
-            os.path.join(os.path.dirname(__file__), "templates"))
+            Path(os.path.dirname(__file__), "templates"))
 
         # read the hv.ir.json file
         with open(hv_ir_path, "r") as f:
@@ -305,7 +306,7 @@ class ir2c:
         send_receive = OrderedDict(sorted([(k, v) for k, v in ir.control.receivers.items()], key=lambda x: x[0]))
 
         # write HeavyContext.h
-        with open(os.path.join(output_dir, f"Heavy_{name}.hpp"), "w") as f:
+        with open(Path(output_dir, f"Heavy_{name}.hpp"), "w") as f:
             f.write(env.get_template("Heavy_NAME.hpp").render(
                 name=name,
                 include_set=include_set,
@@ -318,7 +319,7 @@ class ir2c:
                 obj_header_lines=obj_header_lines))
 
         # write C++ implementation
-        with open(os.path.join(output_dir, f"Heavy_{name}.cpp"), "w") as f:
+        with open(Path(output_dir, f"Heavy_{name}.cpp"), "w") as f:
             f.write(env.get_template("Heavy_NAME.cpp").render(
                 name=name,
                 signal=ir.signal,
@@ -335,7 +336,7 @@ class ir2c:
                 nodsp=nodsp))
 
         # write C API, hv_NAME.h
-        with open(os.path.join(output_dir, f"Heavy_{name}.h"), "w") as f:
+        with open(Path(output_dir, f"Heavy_{name}.h"), "w") as f:
             f.write(env.get_template("Heavy_NAME.h").render(
                 name=name,
                 copyright=copyright,
@@ -343,17 +344,23 @@ class ir2c:
 
         # copy static files to output directory
         for f in file_set:
-            shutil.copy2(
-                src=os.path.join(static_dir, str(f)),
-                dst=os.path.join(output_dir, str(f)))
+            try:
+                shutil.copy2(
+                    src=Path(static_dir, str(f)),
+                    dst=Path(output_dir, str(f)))
+            except IOError:
+                Path.mkdir(Path(output_dir, str(f)).parent, parents=True)
+                shutil.copy2(
+                    src=Path(static_dir, str(f)),
+                    dst=Path(output_dir, str(f)))
 
         # generate HeavyIR object counter
         ir_counter = Counter([obj.type for obj in ir.objects.values()])
 
         return CompilerResp(
             stage="ir2c",
-            in_dir=os.path.dirname(hv_ir_path),
-            in_file=os.path.basename(hv_ir_path),
+            in_dir=hv_ir_path.parent,
+            in_file=hv_ir_path,
             out_dir=output_dir,
             compile_time=(time.time() - tick),
             obj_counter=ir_counter

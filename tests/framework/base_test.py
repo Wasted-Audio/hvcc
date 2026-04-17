@@ -15,12 +15,12 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import jinja2
-import os
 import shutil
 import subprocess
 import unittest
 
 from typing import List, Optional
+from pathlib import Path
 
 import hvcc
 
@@ -42,23 +42,23 @@ class HvBaseTest(unittest.TestCase):
 
     def setUp(self):
         self.env = jinja2.Environment()
-        self.env.loader = jinja2.FileSystemLoader(os.path.join(
-            os.path.dirname(__file__),
+        self.env.loader = jinja2.FileSystemLoader(Path(
+            Path(__file__).parent,
             "template"))
 
     def _run_hvcc(
         self,
-        pd_path: str,
+        pd_path: Path,
         expect_warning: bool = False,
         expect_fail: bool = False,
         expected_enum: NotificationEnum = NotificationEnum.EMPTY
-    ) -> Optional[str]:
+    ) -> Optional[Path]:
         """Run hvcc on a Pd file. Returns the output directory.
         """
 
         # clean default output directories
-        out_dir = os.path.join(self.SCRIPT_DIR, "build")
-        if os.path.exists(out_dir):
+        out_dir = Path(self.SCRIPT_DIR, "build")
+        if out_dir.exists():
             shutil.rmtree(out_dir)
 
         hvcc_results = hvcc.compile_dataflow(pd_path, out_dir, verbose=False)
@@ -97,30 +97,30 @@ class HvBaseTest(unittest.TestCase):
 
     def _compile_and_run(
         self,
-        source_files: List[str],
-        out_dir: str,
+        source_files: List[Path],
+        out_dir: Path,
         flag: Optional[str] = None
     ):
-        exe_path = os.path.join(out_dir, "heavy")
+        exe_path = Path(out_dir, "heavy")
 
         # template Makefile
         # NOTE(mhroth): assertions are NOT turned off (help to catch errors)
-        makefile_path = os.path.join(out_dir, "c", "Makefile")
+        makefile_path = Path(out_dir, "c", "Makefile")
         with open(makefile_path, "w") as f:
             f.write(self.env.get_template("Makefile").render(
                 simd_flags=simd_flags[flag or "HV_SIMD_NONE"],
-                source_files=source_files,
+                source_files=[str(f) for f in source_files],
                 out_path=exe_path))
 
         # run the compile command
-        subprocess.check_output(["make", "-C", os.path.dirname(makefile_path), "-j"])
+        subprocess.check_output(["make", "-C", Path(makefile_path).parent, "-j"])
 
         return exe_path
 
     def _compile_and_run_clang(
         self,
-        source_files: List[str],
-        out_dir: str,
+        source_files: List[Path],
+        out_dir: Path,
         flag: Optional[str] = None,
     ):
         flag = flag or "HV_SIMD_NONE"
@@ -136,7 +136,7 @@ class HvBaseTest(unittest.TestCase):
             "-Werror", "-Wno-#warnings", "-Wno-unused-function",
             "-lm"]
 
-        exe_path = os.path.join(out_dir, "heavy")
+        exe_path = Path(out_dir, "heavy")
 
         # run the compile command
         cmd = ["clang"] + c_flags + source_files + ["-o", exe_path]  # + ['-v']

@@ -20,6 +20,7 @@ import shutil
 import subprocess
 
 from typing import List, Optional
+from pathlib import Path
 
 from tests.framework.base_test import HvBaseTest
 
@@ -28,8 +29,8 @@ class TestPdSpeedBase(HvBaseTest):
 
     def compile_and_run(
         self,
-        source_files: List[str],
-        out_dir: str,
+        source_files: List[Path],
+        out_dir: Path,
         sample_rate: Optional[int] = None,
         block_size: Optional[int] = None,
         num_iterations: Optional[int] = None,
@@ -47,10 +48,10 @@ class TestPdSpeedBase(HvBaseTest):
         return float(result)
 
     def _test_speed_patch(self, pd_file: str):
-        pd_path = os.path.join(self.TEST_DIR, pd_file)
-        # out_dir = os.path.join(os.path.dirname(__file__), "build")
+        pd_path = Path(self.TEST_DIR, pd_file)
+        # out_dir = Path(os.path.dirname(__file__), "build")
 
-        json_path = os.path.join(os.path.dirname(pd_path), f"{os.path.basename(pd_path)[:-3]}.golden.json")
+        json_path = Path(os.path.dirname(pd_path), f"{os.path.basename(pd_path)[:-3]}.golden.json")
         if os.path.exists(json_path):
             with open(json_path, "r") as f:
                 golden = json.load(f)
@@ -62,12 +63,13 @@ class TestPdSpeedBase(HvBaseTest):
         except Exception as e:
             self.fail(str(e))
 
-        c_src_dir = os.path.join(out_dir, "c")
+        assert out_dir
+        c_src_dir = Path(out_dir, "c")
 
         # copy additional source
-        shutil.copy2(os.path.join(self.SCRIPT_DIR, "src/test_speed.c"), c_src_dir)
+        shutil.copy2(Path(self.SCRIPT_DIR, "src/test_speed.c"), c_src_dir)
 
-        c_sources = [os.path.join(c_src_dir, c) for c in os.listdir(c_src_dir) if c.endswith(".c")]
+        c_sources = [Path(c_src_dir, c) for c in os.listdir(c_src_dir) if c.endswith(".c")]
 
         tick = self.compile_and_run(c_sources, out_dir,
                                     golden.get("samplerate", 48000.0),

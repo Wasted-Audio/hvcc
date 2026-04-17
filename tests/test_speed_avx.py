@@ -20,6 +20,8 @@ import subprocess
 import time
 import unittest
 
+from pathlib import Path
+
 SCRIPT_DIR = os.path.dirname(__file__)
 
 raise unittest.SkipTest()
@@ -30,43 +32,43 @@ def compile_and_run_patch(pd_file):
     patch_name = os.path.splitext(os.path.basename(pd_file))[0]
 
     # clean any existing output directories
-    out_dir = os.path.abspath(os.path.join(SCRIPT_DIR, "./build"))
-    if os.path.exists(out_dir):
+    out_dir = Path(SCRIPT_DIR, "./build").absolute()
+    if out_dir.exists():
         shutil.rmtree(out_dir)
 
     # create new output directories and copy over assets
-    c_src_dir = os.path.join(out_dir, "src")
+    c_src_dir = Path(out_dir, "src")
     os.makedirs(c_src_dir)
-    asm_dir = os.path.join(out_dir, "asm")
+    asm_dir = Path(out_dir, "asm")
     os.makedirs(asm_dir)
-    shutil.copy2(os.path.join(SCRIPT_DIR, "test_speed.c"), c_src_dir)
+    shutil.copy2(Path(SCRIPT_DIR, "test_speed.c"), c_src_dir)
 
     # pd2hv
-    py_script = os.path.join(SCRIPT_DIR, "../hvcc/interpreters/pd2hv/pd2hv.py")
+    py_script = Path(SCRIPT_DIR, "../hvcc/interpreters/pd2hv/pd2hv.py")
     cmd = (["python", py_script, pd_file, out_dir, "-v"])
     print(subprocess.check_output(cmd))
 
     # hv2ir
-    py_script = os.path.join(SCRIPT_DIR, "../hvcc/core/hv2ir/hv2ir.py")
-    hv_file = os.path.join(out_dir, f"{patch_name}.hv.json")
-    ir_file = os.path.join(out_dir, f"{patch_name}.ir.hv.json")
+    py_script = Path(SCRIPT_DIR, "../hvcc/core/hv2ir/hv2ir.py")
+    hv_file = Path(out_dir, f"{patch_name}.hv.json")
+    ir_file = Path(out_dir, f"{patch_name}.ir.hv.json")
     cmd = (["python", py_script, hv_file, "--hv_ir_path", ir_file])
     print(subprocess.check_output(cmd))
 
     # ir2c
-    ir2c_dir = os.path.join(SCRIPT_DIR, "../hvcc/generators/ir2c/")
-    cmd = (["python", os.path.join(ir2c_dir, "ir2c.py"), ir_file,
-            "--static_dir", os.path.join(ir2c_dir, "static"),
-            # "--template_path", os.path.join(ir2c_dir, "template"),
+    ir2c_dir = Path(SCRIPT_DIR, "../hvcc/generators/ir2c/")
+    cmd = (["python", Path(ir2c_dir, "ir2c.py"), ir_file,
+            "--static_dir", Path(ir2c_dir, "static"),
+            # "--template_path", Path(ir2c_dir, "template"),
             "--output_dir", c_src_dir,
             "--verbose"])
     print(subprocess.check_output(cmd))
 
     # ir2c-perf
-    cmd = (["python", os.path.join(ir2c_dir, "ir2c_perf.py"), ir_file])
+    cmd = (["python", Path(ir2c_dir, "ir2c_perf.py"), ir_file])
     print(subprocess.check_output(cmd))
 
-    c_sources = [os.path.join(c_src_dir, c) for c in os.listdir(c_src_dir) if c.endswith(".c")]
+    c_sources = [Path(c_src_dir, c) for c in os.listdir(c_src_dir) if c.endswith(".c")]
     flags = [
         "-msse", "-msse2", "-msse3", "-mssse3", "-msse4.1", "-msse4.2", "-mavx",
         "-O3", "-march=native",
@@ -78,12 +80,12 @@ def compile_and_run_patch(pd_file):
     # generate assembly
     print(f"Assembly output directory: {asm_dir}/")
     for c_src in c_sources:
-        asm_out = os.path.join(asm_dir, f"{os.path.splitext(os.path.basename(c_src))[0]}.s")
+        asm_out = Path(asm_dir, f"{os.path.splitext(os.path.basename(c_src))[0]}.s")
         cmd = ["clang"] + flags + ["-S", "-O3", "-mllvm", "--x86-asm-syntax=intel", c_src, "-o", asm_out]
         subprocess.check_output(cmd)
 
     # compile app
-    exe_file = os.path.join(out_dir, "heavy")
+    exe_file = Path(out_dir, "heavy")
     cmd = ["clang", "-Werror"] + flags + c_sources + ["-o", exe_file, "-lm"]
 
     start_time = time.time()
@@ -106,11 +108,11 @@ class TestPdPatches(unittest.TestCase):
     def test_speed_avx(self):
         self.maxDiff = None
         # collect all test patches in script directory
-        patches_dir = os.path.join(SCRIPT_DIR, "pd", "speed")
+        patches_dir = Path(SCRIPT_DIR, "pd", "speed")
         test_patches = []
         for f in os.listdir(patches_dir):
             if f.startswith("test-") and f.endswith(".pd"):
-                test_patches.append(os.path.join(patches_dir, f))
+                test_patches.append(Path(patches_dir, f))
 
         # compile, run and compare patches
         for pd_file in test_patches:

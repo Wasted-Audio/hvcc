@@ -16,9 +16,8 @@
 
 # moved to HeavyParser.py because of circular dependency
 
-
-# import os
 # import random
+# from pathlib import Path
 
 # from .HeavyLangObject import HeavyLangObject
 # from .HeavyParser import HeavyParser
@@ -28,16 +27,19 @@
 #     """ Handles the HeavyLang "noise" object.
 #     """
 
-#     def __init__(self, obj_type, args, graph, annotations=None):
+#     def __init__(
+#         self,
+#         obj_type: str,
+#         args: Dict,
+#         graph: HeavyGraph,
+#         annotations: Optional[Dict] = None
+#     ) -> None:
 #         assert obj_type == "noise"
-#         HeavyLangObject.__init__(self, "noise", args, graph,
-#                                  num_inlets=1,
-#                                  num_outlets=1,
-#                                  annotations=annotations)
+#         super().__init__("noise", args, graph, num_inlets=1, num_outlets=1, annotations=annotations)
 
-#     def reduce(self):
+#     def reduce(self) -> Tuple[Set, List]:
 #         seed = int(random.uniform(1, 2147483647))  # assign a random 32-bit seed
-#         noise_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "./hvlib/noise.hv.json")
+#         noise_path = Path(Path(__file__).parent, "./hvlib/noise.hv.json")
 #         x = HeavyParser.graph_from_file(noise_path, graph_args={"seed": seed})
 #         x.reduce()
 #         # TODO(mhroth): deal with control input

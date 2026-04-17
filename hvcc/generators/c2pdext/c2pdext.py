@@ -18,7 +18,9 @@ import os
 import shutil
 import time
 import jinja2
+
 from typing import Optional
+from pathlib import Path
 
 from ..copyright import copyright_manager
 from ..filters import filter_max
@@ -35,8 +37,8 @@ class c2pdext(Generator):
     @classmethod
     def compile(
         cls,
-        c_src_dir: str,
-        out_dir: str,
+        c_src_dir: Path,
+        out_dir: Path,
         externs: ExternInfo,
         patch_name: Optional[str] = None,
         patch_meta: Meta = Meta(),
@@ -48,7 +50,7 @@ class c2pdext(Generator):
 
         tick = time.time()
 
-        out_dir = os.path.join(out_dir, "pdext")
+        out_dir = Path(out_dir, "pdext")
         receiver_list = externs.parameters.inParam
 
         copyright = copyright_manager.get_copyright_for_c(copyright)
@@ -58,7 +60,7 @@ class c2pdext(Generator):
         struct_name = f"{patch_name}_tilde"
 
         # ensure that the output directory does not exist
-        out_dir = os.path.abspath(out_dir)
+        out_dir = out_dir.absolute()
         if os.path.exists(out_dir):
             shutil.rmtree(out_dir)
 
@@ -67,10 +69,10 @@ class c2pdext(Generator):
 
         # copy over static files
         shutil.copy(
-            os.path.join(os.path.dirname(os.path.abspath(__file__)), "static", "m_pd.h"),
+            Path(Path(__file__).parent, "static", "m_pd.h"),
             f"{out_dir}/")
         shutil.copy(
-            os.path.join(os.path.dirname(os.path.abspath(__file__)), "static", "Makefile.pdlibbuilder"),
+            Path(Path(__file__).parent, "static", "Makefile.pdlibbuilder"),
             f"{out_dir}/../")
 
         try:
@@ -78,10 +80,10 @@ class c2pdext(Generator):
             env = jinja2.Environment()
             env.filters["max"] = filter_max
             env.loader = jinja2.FileSystemLoader(
-                os.path.join(os.path.dirname(os.path.abspath(__file__)), "templates"))
+                Path(Path(__file__).parent, "templates"))
 
             # generate Pd external wrapper from template
-            pdext_path = os.path.join(out_dir, f"{ext_name}.c")
+            pdext_path = Path(out_dir, f"{ext_name}.c")
             with open(pdext_path, "w") as f:
                 f.write(env.get_template("pd_external.c").render(
                     name=patch_name,
@@ -93,7 +95,7 @@ class c2pdext(Generator):
                     copyright=copyright))
 
             # generate Makefile from template
-            pdext_path = os.path.join(out_dir, "../Makefile")
+            pdext_path = Path(out_dir, "../Makefile")
             with open(pdext_path, "w") as f:
                 f.write(env.get_template("Makefile").render(
                     name=patch_name))
@@ -102,7 +104,7 @@ class c2pdext(Generator):
                 stage="c2pdext",
                 in_dir=c_src_dir,
                 out_dir=out_dir,
-                out_file=os.path.basename(pdext_path),
+                out_file=pdext_path,
                 compile_time=time.time() - tick
             )
 

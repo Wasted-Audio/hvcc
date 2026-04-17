@@ -20,6 +20,7 @@ import shutil
 import subprocess
 
 from typing import List, Optional
+from pathlib import Path
 
 from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
 from tests.framework.base_test import HvBaseTest
@@ -29,8 +30,8 @@ class TestPdControlBase(HvBaseTest):
 
     def compile_and_run(
         self,
-        source_files: List[str],
-        out_dir: str,
+        source_files: List[Path],
+        out_dir: Path,
         num_iterations: int,
         flag: Optional[str] = None
     ) -> List[str]:
@@ -60,7 +61,7 @@ class TestPdControlBase(HvBaseTest):
         pd_file: str,
         expected_enum: NotificationEnum
     ) -> None:
-        pd_path = os.path.join(self.TEST_DIR, pd_file)
+        pd_path = Path(self.TEST_DIR, pd_file)
 
         try:
             self._run_hvcc(pd_path, expect_fail=True, expected_enum=expected_enum)
@@ -73,7 +74,7 @@ class TestPdControlBase(HvBaseTest):
         expected_enum: NotificationEnum
     ) -> None:
         # setup
-        pd_path = os.path.join(self.TEST_DIR, pd_file)
+        pd_path = Path(self.TEST_DIR, pd_file)
 
         try:
             self._run_hvcc(pd_path, expect_warning=True, expected_enum=expected_enum)
@@ -93,7 +94,7 @@ class TestPdControlBase(HvBaseTest):
         """
 
         # setup
-        pd_path = os.path.join(self.TEST_DIR, pd_file)
+        pd_path = Path(self.TEST_DIR, pd_file)
         patch_name = os.path.splitext(os.path.basename(pd_path))[0]
 
         try:
@@ -102,16 +103,17 @@ class TestPdControlBase(HvBaseTest):
             self.fail(str(e))
 
         # copy over additional C assets
-        c_src_dir = os.path.join(out_dir, "c")
-        shutil.copy2(os.path.join(self.SCRIPT_DIR, "src/test_control.c"), c_src_dir)
+        assert out_dir
+        c_src_dir = Path(out_dir, "c")
+        shutil.copy2(Path(self.SCRIPT_DIR, "src/test_control.c"), c_src_dir)
 
         # prepare the clang command
-        c_sources = os.listdir(c_src_dir)
+        c_sources = [Path(child) for child in Path(c_src_dir).iterdir()]
 
         # don't delete the output dir
         # if the test fails, we can examine the output
 
-        golden_path = os.path.join(os.path.dirname(pd_path), f"{patch_name.split('.')[0]}.golden.txt")
+        golden_path = Path(os.path.dirname(pd_path), f"{patch_name.split('.')[0]}.golden.txt")
         if os.path.exists(golden_path):
             with open(golden_path, "r") as f:
                 golden = "".join(f.readlines()).splitlines()

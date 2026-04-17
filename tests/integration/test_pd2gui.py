@@ -6,6 +6,8 @@
 import os
 import json
 
+from pathlib import Path
+
 from hvcc.interpreters.pd2gui.pd2gui import pd2gui
 from hvcc.version import VERSION
 
@@ -17,8 +19,8 @@ class TestPdGuiParser:
         self,
         path: str
     ) -> None:
-        source_path = os.path.join(self.SCRIPT_DIR, "data", path)
-        ir_path = os.path.join(self.SCRIPT_DIR, "ir")
+        source_path = Path(self.SCRIPT_DIR, "data", path)
+        ir_path = Path(self.SCRIPT_DIR, "ir")
 
         response = pd2gui.compile(
             pd_path=source_path,
@@ -28,11 +30,11 @@ class TestPdGuiParser:
         if response.notifs.has_error:
             raise Exception(response.notifs.errors[0])
 
-        gui_path = os.path.join(self.SCRIPT_DIR, "ir", os.path.splitext(path)[0] + ".gui.json")
+        gui_path = Path(self.SCRIPT_DIR, "ir", os.path.splitext(path)[0] + ".gui.json")
         with open(gui_path, "r") as f:
             gui = json.loads(f.read())
 
-        expected_path = os.path.join(os.path.splitext(source_path)[0] + ".golden.json")
+        expected_path = Path(os.path.splitext(source_path)[0] + ".golden.json")
         with open(expected_path, "r") as f:
             expected = json.loads(f.read())
             expected['version'] = VERSION

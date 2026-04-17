@@ -16,9 +16,9 @@
 
 import json
 import random
-import os
 
 from typing import Any, Dict, List, Optional, Set, Tuple
+from pathlib import Path
 
 from .HIrConvolution import HIrConvolution
 from .HIrExpr import HIrExpr
@@ -65,7 +65,7 @@ class HeavyParser:
     @classmethod
     def graph_from_file(
         cls,
-        hv_file: str,
+        hv_file: Path,
         graph: Optional[HeavyGraph] = None,
         graph_args: Optional[Dict] = None,
         path_stack: Optional[set] = None,
@@ -80,7 +80,7 @@ class HeavyParser:
             It prevents infinite recursion when reading many abstractions deep.
         """
         # ensure that we have an absolute path to the hv_file
-        hv_file = os.path.abspath(os.path.expanduser(hv_file))
+        hv_file = hv_file.expanduser().absolute()
 
         # copy the path stack such that no changes are made to the calling stack
         path_stack = path_stack or set()
@@ -98,7 +98,7 @@ class HeavyParser:
     @classmethod
     def graph_from_object(
         cls,
-        hv_file: str,
+        hv_file: Path,
         json_heavy: Dict,
         path_stack: set,
         graph: Optional[HeavyGraph] = None,
@@ -134,7 +134,7 @@ class HeavyParser:
         # add the import paths to the global vars
         g.local_vars.add_import_paths(json_heavy.get("imports", []))
         # add the file's relative directory to global vars
-        g.local_vars.add_import_paths([os.path.dirname(hv_file)])
+        g.local_vars.add_import_paths([hv_file.parent])
 
         # instantiate all objects
         try:
@@ -239,10 +239,10 @@ class HLangIf(HeavyLangObject):
             x = HeavyIrObject("__if", self.args)
         elif self.has_inlet_connection_format("ff"):
             # TODO(mhroth): implement this
-            x = HeavyParser.graph_from_file("./hvlib/if~f.hv.json")
+            x = HeavyParser.graph_from_file(Path("./hvlib/if~f.hv.json"))
         elif self.has_inlet_connection_format("ii"):
             # TODO(mhroth): implement this
-            x = HeavyParser.graph_from_file("./hvlib/if~i.hv.json")
+            x = HeavyParser.graph_from_file(Path("./hvlib/if~i.hv.json"))
         else:
             fmt = self._get_connection_format(self.inlet_connections)
             raise HeavyException(f"Unhandled connection configuration to object [if]: {fmt}")
@@ -266,7 +266,7 @@ class HLangNoise(HeavyLangObject):
 
     def reduce(self) -> Tuple[Set, List]:
         seed = int(random.uniform(1, 2147483647))  # assign a random 32-bit seed
-        noise_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "./hvlib/noise.hv.json")
+        noise_path = Path(Path(__file__).parent, "./hvlib/noise.hv.json")
         x = HeavyParser.graph_from_file(noise_path, graph_args={"seed": seed})
         x.reduce()
         # TODO(mhroth): deal with control input

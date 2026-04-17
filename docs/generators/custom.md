@@ -19,6 +19,7 @@ This is `example_hvcc_generator.py`:
 import time
 
 from typing import Dict, Optional
+from pathlib import Path
 
 from hvcc.types.compiler import CompilerResp, ExternInfo, Generator
 from hvcc.types.meta import Meta
@@ -28,8 +29,8 @@ class ExampleHvccGenerator(Generator):
     @classmethod
     def compile(
         cls,
-        c_src_dir: str,
-        out_dir: str,
+        c_src_dir: Path,
+        out_dir: Path,
         externs: ExternInfo,
         patch_name: Optional[str] = None,
         patch_meta: Meta = Meta(),

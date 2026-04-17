@@ -1,5 +1,6 @@
-import os
 import re
+
+from pathlib import Path
 
 
 def python_indent(content):
@@ -9,7 +10,7 @@ def python_indent(content):
 
 def on_page_markdown(markdown, page, config, files):
     if page.file.src_path == 'index.md':
-        readme_path = os.path.join(os.path.dirname(config['config_file_path']), 'README.md')
+        readme_path = Path(Path(config['config_file_path']).parent, 'README.md')
         try:
             with open(readme_path, 'r', encoding='utf-8') as f:
                 content = f.read()

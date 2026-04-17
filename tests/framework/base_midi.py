@@ -20,6 +20,7 @@ import shutil
 import subprocess
 
 from typing import List, Optional
+from pathlib import Path
 
 from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
 from tests.framework.base_test import HvBaseTest
@@ -29,8 +30,8 @@ class TestPdMIDIBase(HvBaseTest):
 
     def compile_and_run(
         self,
-        source_files: List[str],
-        out_dir: str,
+        source_files: List[Path],
+        out_dir: Path,
         num_iterations: int,
         flag: Optional[str] = None
     ) -> List[str]:
@@ -40,7 +41,7 @@ class TestPdMIDIBase(HvBaseTest):
         output = subprocess.check_output([
             exe_path,
             # str(num_iterations),
-            os.path.join(out_dir, '../src/test_midi.mid')]
+            Path(out_dir, '../src/test_midi.mid')]
         ).splitlines()
 
         return [x.decode('utf-8') for x in output]
@@ -61,7 +62,7 @@ class TestPdMIDIBase(HvBaseTest):
         pd_file: str,
         expected_enum: NotificationEnum
     ) -> None:
-        pd_path = os.path.join(self.TEST_DIR, pd_file)
+        pd_path = Path(self.TEST_DIR, pd_file)
 
         try:
             self._run_hvcc(pd_path, expect_fail=True, expected_enum=expected_enum)
@@ -74,7 +75,7 @@ class TestPdMIDIBase(HvBaseTest):
         expected_enum: NotificationEnum
     ) -> None:
         # setup
-        pd_path = os.path.join(self.TEST_DIR, pd_file)
+        pd_path = Path(self.TEST_DIR, pd_file)
 
         try:
             self._run_hvcc(pd_path, expect_warning=True, expected_enum=expected_enum)
@@ -94,8 +95,8 @@ class TestPdMIDIBase(HvBaseTest):
         """
 
         # setup
-        pd_path = os.path.join(self.TEST_DIR, pd_file)
-        patch_name = os.path.splitext(os.path.basename(pd_path))[0]
+        pd_path = Path(self.TEST_DIR, pd_file)
+        patch_name = os.path.splitext(pd_path)[0]
 
         try:
             out_dir = self._run_hvcc(pd_path)
@@ -103,27 +104,28 @@ class TestPdMIDIBase(HvBaseTest):
             self.fail(str(e))
 
         # copy over additional C assets
-        c_src_dir = os.path.join(out_dir, "c")
-        shutil.copy2(os.path.join(self.SCRIPT_DIR, "src/test_midi.cpp"), c_src_dir)
-        shutil.copy2(os.path.join(self.SCRIPT_DIR, "src/midifile/include/MidiFile.h"), c_src_dir)
-        shutil.copy2(os.path.join(self.SCRIPT_DIR, "src/midifile/include/MidiEventList.h"), c_src_dir)
-        shutil.copy2(os.path.join(self.SCRIPT_DIR, "src/midifile/include/MidiEvent.h"), c_src_dir)
-        shutil.copy2(os.path.join(self.SCRIPT_DIR, "src/midifile/include/MidiMessage.h"), c_src_dir)
-        shutil.copy2(os.path.join(self.SCRIPT_DIR, "src/midifile/include/Binasc.h"), c_src_dir)
-        shutil.copy2(os.path.join(self.SCRIPT_DIR, "src/midifile/src/MidiFile.cpp"), c_src_dir)
-        shutil.copy2(os.path.join(self.SCRIPT_DIR, "src/midifile/src/MidiEventList.cpp"), c_src_dir)
-        shutil.copy2(os.path.join(self.SCRIPT_DIR, "src/midifile/src/MidiEvent.cpp"), c_src_dir)
-        shutil.copy2(os.path.join(self.SCRIPT_DIR, "src/midifile/src/MidiMessage.cpp"), c_src_dir)
-        shutil.copy2(os.path.join(self.SCRIPT_DIR, "src/midifile/src/Binasc.cpp"), c_src_dir)
+        assert out_dir
+        c_src_dir = Path(out_dir, "c")
+        shutil.copy2(Path(self.SCRIPT_DIR, "src/test_midi.cpp"), c_src_dir)
+        shutil.copy2(Path(self.SCRIPT_DIR, "src/midifile/include/MidiFile.h"), c_src_dir)
+        shutil.copy2(Path(self.SCRIPT_DIR, "src/midifile/include/MidiEventList.h"), c_src_dir)
+        shutil.copy2(Path(self.SCRIPT_DIR, "src/midifile/include/MidiEvent.h"), c_src_dir)
+        shutil.copy2(Path(self.SCRIPT_DIR, "src/midifile/include/MidiMessage.h"), c_src_dir)
+        shutil.copy2(Path(self.SCRIPT_DIR, "src/midifile/include/Binasc.h"), c_src_dir)
+        shutil.copy2(Path(self.SCRIPT_DIR, "src/midifile/src/MidiFile.cpp"), c_src_dir)
+        shutil.copy2(Path(self.SCRIPT_DIR, "src/midifile/src/MidiEventList.cpp"), c_src_dir)
+        shutil.copy2(Path(self.SCRIPT_DIR, "src/midifile/src/MidiEvent.cpp"), c_src_dir)
+        shutil.copy2(Path(self.SCRIPT_DIR, "src/midifile/src/MidiMessage.cpp"), c_src_dir)
+        shutil.copy2(Path(self.SCRIPT_DIR, "src/midifile/src/Binasc.cpp"), c_src_dir)
 
         # prepare the clang command
-        c_sources = os.listdir(c_src_dir)
+        c_sources = [Path(child) for child in Path(c_src_dir).iterdir()]
 
         # don't delete the output dir
         # if the test fails, we can examine the output
 
-        golden_path = os.path.join(os.path.dirname(pd_path), f"{patch_name.split('.')[0]}.golden.txt")
-        if os.path.exists(golden_path):
+        golden_path = Path(Path(pd_path).parent, f"{patch_name.split('.')[0]}.golden.txt")
+        if golden_path.exists():
             with open(golden_path, "r") as f:
                 golden = "".join(f.readlines()).splitlines()
 

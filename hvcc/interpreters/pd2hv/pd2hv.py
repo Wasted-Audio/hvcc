@@ -1,5 +1,5 @@
 # Copyright (C) 2014-2018 Enzien Audio, Ltd.
-# Copyright (C) 2023-2024 Wasted Audio
+# Copyright (C) 2023-2026 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -18,7 +18,9 @@ import argparse
 import json
 import os
 import time
+
 from typing import List, Optional
+from pathlib import Path
 
 from hvcc.interpreters.pd2hv.PdParser import PdParser
 from hvcc.types.compiler import CompilerResp, CompilerNotif
@@ -47,8 +49,8 @@ class pd2hv:
     @classmethod
     def compile(
         cls,
-        pd_path: str,
-        hv_dir: str,
+        pd_path: Path,
+        hv_dir: Path,
         search_paths: Optional[List] = None,
         verbose: bool = False,
         export_args: bool = False
@@ -74,8 +76,8 @@ class pd2hv:
                     errors=notices.errors,
                     warnings=notices.warnings
                 ),
-                in_dir=os.path.dirname(pd_path),
-                in_file=os.path.basename(pd_path),
+                in_dir=pd_path.parent,
+                in_file=pd_path,
                 compile_time=(time.time() - tick)
             )
 
@@ -83,7 +85,7 @@ class pd2hv:
             os.makedirs(hv_dir)
 
         hv_file = f"{os.path.splitext(os.path.basename(pd_path))[0]}.hv.json"
-        hv_path = os.path.join(hv_dir, hv_file)
+        hv_path = Path(hv_dir, hv_file)
         with open(hv_path, "w") as f:
             json.dump(pd_graph.to_hv(export_args=export_args), f, indent=4)
 
@@ -93,10 +95,10 @@ class pd2hv:
             notifs=CompilerNotif(
                 warnings=notices.warnings
             ),
-            in_dir=os.path.dirname(pd_path),
-            in_file=os.path.basename(pd_path),
+            in_dir=pd_path.parent,
+            in_file=pd_path,
             out_dir=hv_dir,
-            out_file=hv_file,
+            out_file=Path(hv_file),
             compile_time=(time.time() - tick)
         )
 
@@ -121,8 +123,8 @@ def main() -> None:
         action="count")
     args = parser.parse_args()
 
-    args.pd_path = os.path.abspath(os.path.expanduser(args.pd_path))
-    args.hv_dir = os.path.abspath(os.path.expanduser(args.hv_dir))
+    args.pd_path = Path(args.pd_path).expanduser().absolute()
+    args.hv_dir = Path(args.hv_dir).expanduser().absolute()
 
     result = pd2hv.compile(
         pd_path=args.pd_path,
@@ -148,7 +150,7 @@ def main() -> None:
 
     if args.verbose:
         if len(result.notifs.errors) == 0:
-            print("Heavy file written to", os.path.join(result.out_dir, result.out_file))
+            print("Heavy file written to", Path(result.out_dir, result.out_file))
         print("Total pd2hv compile time: {0:.2f}ms".format(result.compile_time * 1000))
 
 

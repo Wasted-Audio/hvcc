@@ -14,12 +14,13 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import datetime
-import os
+
 from typing import Optional
+from pathlib import Path
 
 
 def get_default_copyright_text() -> str:
-    with open(os.path.join(os.path.dirname(__file__), "default_template.txt"), "r") as f:
+    with open(Path(Path(__file__).parent, "default_template.txt"), "r") as f:
         copyright = f.read().format(datetime.datetime.now().year)
     return copyright
 
