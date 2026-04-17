@@ -1,6 +1,5 @@
 import unittest
 
-from os import path
 from pathlib import Path
 
 from hvcc.generators.c2daisy.json2daisy import generate_header_from_name
