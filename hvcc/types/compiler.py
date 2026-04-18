@@ -1,5 +1,5 @@
 # Heavy Compiler Collection
-# Copyright (C) 2024 Wasted Audio
+# Copyright (C) 2024-2026 Wasted Audio
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
