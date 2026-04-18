@@ -1,4 +1,4 @@
-# Copyright (C) 2021-2024 Wasted Audio
+# Copyright (C) 2021-2026 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -13,11 +13,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
+import jinja2
 import shutil
 import time
-import jinja2
+
 from typing import Optional
+from pathlib import Path
 
 from ..copyright import copyright_manager
 from ..filters import filter_uniqueid
@@ -34,8 +35,8 @@ class c2dpf(Generator):
     @classmethod
     def compile(
         cls,
-        c_src_dir: str,
-        out_dir: str,
+        c_src_dir: Path,
+        out_dir: Path,
         externs: ExternInfo,
         patch_name: Optional[str] = None,
         patch_meta: Meta = Meta(),
@@ -47,7 +48,7 @@ class c2dpf(Generator):
 
         tick = time.time()
 
-        out_dir = os.path.join(out_dir, "plugin")
+        out_dir = Path(out_dir, "plugin")
         receiver_list = externs.parameters.inParam
         sender_list = externs.parameters.outParam
 
@@ -58,16 +59,16 @@ class c2dpf(Generator):
 
         try:
             # ensure that the output directory does not exist
-            out_dir = os.path.abspath(out_dir)
-            if os.path.exists(out_dir):
+            out_dir = out_dir.absolute()
+            if out_dir.exists():
                 shutil.rmtree(out_dir)
 
             # copy over static files
-            shutil.copytree(os.path.join(os.path.dirname(__file__), "static"), out_dir)
-            shutil.copy(os.path.join(os.path.dirname(__file__), "static/README.md"), f'{out_dir}/../')
+            shutil.copytree(Path(Path(__file__).parent, "static"), out_dir)
+            shutil.copy(Path(Path(__file__).parent, "static/README.md"), f'{out_dir}/../')
 
             # copy over generated C source files
-            source_dir = os.path.join(out_dir, "source")
+            source_dir = Path(out_dir, "source")
             shutil.copytree(c_src_dir, source_dir)
 
             # initialize the jinja template environment
@@ -75,10 +76,10 @@ class c2dpf(Generator):
             env.filters["uniqueid"] = filter_uniqueid
 
             env.loader = jinja2.FileSystemLoader(
-                os.path.join(os.path.dirname(os.path.abspath(__file__)), "templates"))
+                Path(Path(__file__).parent, "templates"))
 
             # generate DPF wrapper from template
-            dpf_h_path = os.path.join(source_dir, f"HeavyDPF_{patch_name}.hpp")
+            dpf_h_path = Path(source_dir, f"HeavyDPF_{patch_name}.hpp")
             with open(dpf_h_path, "w") as f:
                 f.write(env.get_template("HeavyDPF.hpp").render(
                     name=patch_name,
@@ -89,7 +90,7 @@ class c2dpf(Generator):
                     receivers=receiver_list,
                     senders=sender_list,
                     copyright=copyright_c))
-            dpf_cpp_path = os.path.join(source_dir, f"HeavyDPF_{patch_name}.cpp")
+            dpf_cpp_path = Path(source_dir, f"HeavyDPF_{patch_name}.cpp")
             with open(dpf_cpp_path, "w") as f:
                 f.write(env.get_template("HeavyDPF.cpp").render(
                     name=patch_name,
@@ -102,7 +103,7 @@ class c2dpf(Generator):
                     pool_sizes_kb=externs.memoryPoolSizesKb,
                     copyright=copyright_c))
             if dpf_meta.enable_ui:
-                dpf_ui_path = os.path.join(source_dir, f"HeavyDPF_{patch_name}_UI.cpp")
+                dpf_ui_path = Path(source_dir, f"HeavyDPF_{patch_name}_UI.cpp")
                 with open(dpf_ui_path, "w") as f:
                     f.write(env.get_template("HeavyDPF_UI.cpp").render(
                         name=patch_name,
@@ -111,7 +112,7 @@ class c2dpf(Generator):
                         receivers=receiver_list,
                         senders=sender_list,
                         copyright=copyright_c))
-            dpf_h_path = os.path.join(source_dir, "DistrhoPluginInfo.h")
+            dpf_h_path = Path(source_dir, "DistrhoPluginInfo.h")
             with open(dpf_h_path, "w") as f:
                 f.write(env.get_template("DistrhoPluginInfo.h").render(
                     name=patch_name,
@@ -123,7 +124,7 @@ class c2dpf(Generator):
                     copyright=copyright_c))
 
             # plugin makefile
-            with open(os.path.join(source_dir, "Makefile"), "w") as f:
+            with open(Path(source_dir, "Makefile"), "w") as f:
                 f.write(env.get_template("Makefile_plugin").render(
                     name=patch_name,
                     meta=dpf_meta,
@@ -131,7 +132,7 @@ class c2dpf(Generator):
                     dpf_path=dpf_path))
 
             # project makefile
-            with open(os.path.join(source_dir, "../../Makefile"), "w") as f:
+            with open(Path(source_dir, "../../Makefile"), "w") as f:
                 f.write(env.get_template("Makefile_project").render(
                     name=patch_name,
                     meta=dpf_meta,
@@ -141,7 +142,7 @@ class c2dpf(Generator):
                 stage="c2dpf",
                 in_dir=c_src_dir,
                 out_dir=out_dir,
-                out_file=os.path.basename(dpf_h_path),
+                out_file=dpf_h_path,
                 compile_time=time.time() - tick
             )
 

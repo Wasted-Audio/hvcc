@@ -3,9 +3,9 @@
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
-import os
 
 from typing import Generator, Optional, Union
+from pathlib import Path
 
 from hvcc.interpreters.pd2hv.PdParser import PdParser
 from hvcc.types.GUI import (
@@ -22,16 +22,16 @@ class PdGUIParser(PdParser):
         self.__DOLLAR_ZERO = 1000
 
         # search paths at this graph level
-        self.search_paths: list[str] = []
+        self.search_paths: list[Path] = []
 
     def gui_from_file(
         self,
-        file_path: str,
+        file_path: Path,
         obj_args: Optional[list] = None,
         is_root: bool = True
     ) -> tuple[Union[Graph, GraphRoot], bool]:
         if is_root:
-            self.search_paths.append(os.path.dirname(file_path))
+            self.search_paths.append(file_path)
 
         file_iterator = self.get_pd_line(file_path)
         canvas_line: str = file_iterator.__next__()
@@ -57,7 +57,7 @@ class PdGUIParser(PdParser):
         file_iterator: Generator,
         canvas_line: str,
         graph_args: list,
-        pd_path: str,
+        pd_path: Path,
         is_root: bool = False
     ) -> tuple[Union[Graph, GraphRoot], bool]:
 
@@ -145,7 +145,7 @@ class PdGUIParser(PdParser):
                             # replace args with resolved args
                             line = line[:5] + obj_args
 
-                        abs_path = self.find_abstraction_path(os.path.dirname(pd_path), obj_type)
+                        abs_path = self.find_abstraction_path(pd_path.parent, obj_type)
 
                         if abs_path is not None:
                             g, gop = self.gui_from_file(abs_path, obj_args=obj_args, is_root=False)

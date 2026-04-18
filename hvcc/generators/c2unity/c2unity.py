@@ -1,5 +1,5 @@
 # Copyright (C) 2014-2018 Enzien Audio, Ltd.
-# Copyright (C) 2021-2024 Wasted Audio
+# Copyright (C) 2021-2026 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -18,7 +18,9 @@ import jinja2
 import os
 import shutil
 import time
+
 from typing import Optional
+from pathlib import Path
 
 from ..copyright import copyright_manager
 from ..filters import filter_templates
@@ -35,8 +37,8 @@ class c2unity(Generator):
     @classmethod
     def compile(
         cls,
-        c_src_dir: str,
-        out_dir: str,
+        c_src_dir: Path,
+        out_dir: Path,
         externs: ExternInfo,
         patch_name: Optional[str] = None,
         patch_meta: Meta = Meta(),
@@ -54,12 +56,12 @@ class c2unity(Generator):
         out_event_list = externs.events.outEvent
         table_list = externs.tables
 
-        out_dir = os.path.join(out_dir, "unity")
+        out_dir = Path(out_dir, "unity")
         patch_name = patch_name.lower() if patch_name is not None else "heavy"
 
         copyright_c = copyright_manager.get_copyright_for_c(copyright)
 
-        templates_dir = os.path.join(os.path.dirname(__file__), "templates")
+        templates_dir = Path(Path(__file__).parent, "templates")
 
         # initialise the jinja template environment
         env = jinja2.Environment()
@@ -70,12 +72,12 @@ class c2unity(Generator):
 
         try:
             # ensure that the output directory does not exist
-            out_dir = os.path.abspath(out_dir)
-            if os.path.exists(out_dir):
+            out_dir = out_dir.absolute()
+            if out_dir.exists():
                 shutil.rmtree(out_dir)
 
-            patch_src_dir = os.path.join(out_dir, "include", "Heavy")
-            if os.path.exists(patch_src_dir):
+            patch_src_dir = Path(out_dir, "include", "Heavy")
+            if patch_src_dir.exists():
                 shutil.rmtree(patch_src_dir)
             shutil.copytree(c_src_dir, patch_src_dir)
 
@@ -83,11 +85,11 @@ class c2unity(Generator):
 
             # generate files from templates
             for f in env.list_templates(filter_func=filter_templates):
-                file_path = os.path.join(out_dir, f)
-                file_path = file_path.replace("{{name}}", patch_name)
+                file_path = Path(out_dir, f)
+                file_path = Path(str(file_path).replace("{{name}}", patch_name))
 
-                if not os.path.exists(os.path.dirname(file_path)):
-                    os.makedirs(os.path.dirname(file_path))
+                if not file_path.parent.exists():
+                    os.makedirs(file_path.parent)
 
                 with open(file_path, "w") as g:
                     g.write(env.get_template(f).render(
