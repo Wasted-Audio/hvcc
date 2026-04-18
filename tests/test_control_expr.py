@@ -1,4 +1,5 @@
-# Copyright (C) 2022-2025 Daniel Billotte, Wasted Audio
+# Copyright (C) 2022-2025 Daniel Billotte
+# Copyright (C) 2022-2026 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by

@@ -1,5 +1,5 @@
 # Copyright (C) 2014-2018 Enzien Audio, Ltd.
-# Copyright (C) 2021-2024 Wasted Audio
+# Copyright (C) 2021-2026 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -113,7 +113,7 @@ def main() -> bool:
         in_path=in_path,
         out_dir=Path(args.out_dir) or in_path.parent,
         patch_name=args.name,
-        patch_meta_file=args.meta,
+        patch_meta_file=Path(args.meta) if args.meta is not None else Path(),
         search_paths=[Path(path) for path in args.search_paths],
         generators=args.gen,
         ext_generators=args.ext_gen,
