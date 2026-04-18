@@ -1989,7 +1989,7 @@
     "ir": {
       "control": false,
       "signal": true,
-      "init": false
+      "init": true
     },
     "outlets": [
       "~f>"

@@ -217,6 +217,8 @@ class ir2c:
         obj_impl_lines = []
         class_header_lines = []
         class_impl_lines = []
+        gen_header_files: list[tuple[str, str]] = []
+
         for obj_id in ir.init.order:
             o = ir.objects[obj_id]
             obj_class = ir2c.get_class(o.type)
@@ -284,6 +286,11 @@ class ir2c:
                 o.type, obj_id, o.args
             ))
 
+            header = obj_cls.get_C_gen_header_code(o.type, obj_id, o.args)
+            if header is not None:
+                gen_header_files.append(header)
+                include_set.add(header[0])
+
         # Render name into Expr~ impls
         obj_impl_lines = [env.from_string(line).render(name=name) for line in obj_impl_lines]
 
@@ -295,6 +302,7 @@ class ir2c:
             class_impl_lines.extend(prc_cls.get_C_class_impl_code(
                 o.type, o.args
             ))
+
         #
         # Load the C-language template files and use the parsed strings to fill them in.
         #
@@ -342,6 +350,11 @@ class ir2c:
                 name=name,
                 copyright=copyright,
                 externs=externs))
+
+        # write extra headers
+        for file, header in gen_header_files:
+            with open(Path(output_dir, file), "w") as f:
+                f.write(header)
 
         # copy static files to output directory
         for f in file_set:
