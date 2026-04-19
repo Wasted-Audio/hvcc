@@ -19,6 +19,10 @@ Bugfixes:
 * DPF: also send BPM value to `__hv_dpf_bpm` when transport is not playing
 * Wwise: use latest Windows SDK available locally instead of hardcoded version
 
+Refactor:
+
+* Migrate to Pathlib
+
 0.15.0
 -----
 
