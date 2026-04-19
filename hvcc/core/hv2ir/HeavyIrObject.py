@@ -250,10 +250,6 @@ class HeavyIrObject(HeavyLangObject):
         # we assume that this method will only be called on signal objects
         assert self.__obj_desc.ir.signal
 
-        # for i, b in enumerate(self.inlet_buffers):
-        #     if self.inlet_requires_signal(i):
-        #         print("inlet_signal: ", b[0], b[1])
-
         return [IRSignalList(
             id=self.id,
             inputBuffers=[

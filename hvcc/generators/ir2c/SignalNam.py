@@ -55,9 +55,8 @@ class SignalNam(HeavyObject):
 
     @classmethod
     def get_C_process(cls, process_dict: IRSignalList, obj_type: str, obj_id: str, args: dict) -> list[str]:
-        # print(process_dict)
         return [
-            "__hv_nam_f(&sNam_{0}, {1}, {2});".format(
+            "__hv_nam_f(&sNam_{0}, VIf({1}), VOf({2}));".format(
                 process_dict.id,
                 cls._c_buffer(process_dict.inputBuffers[0]),
                 cls._c_buffer(process_dict.outputBuffers[0]))

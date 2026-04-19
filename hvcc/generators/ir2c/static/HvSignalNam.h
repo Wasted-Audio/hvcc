@@ -18,7 +18,7 @@
 #define _SIGNAL_LORENZ_H_
 
 #include "HvHeavyInternal.h"
-#include "MicroNam/MicroNAM_C.h"
+#include "MicroNAM_C.h"
 
 #ifdef __cplusplus
 extern "C" {

@@ -144,7 +144,8 @@ class PdParser:
     def add_relative_search_directory(self, search_dir: Path) -> bool:
         search_dir = Path(
             self.search_paths[0],
-            search_dir)
+            search_dir
+        ).absolute()
         return self.add_absolute_search_directory(search_dir)
 
     def find_abstraction_path(self, local_dir: Path, abs_name: str) -> Optional[Path]:
