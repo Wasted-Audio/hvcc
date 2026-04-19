@@ -352,9 +352,9 @@ class ir2c:
                 externs=externs))
 
         # write extra headers
-        for file, header in gen_header_files:
+        for file, head in gen_header_files:
             with open(Path(output_dir, file), "w") as f:
-                f.write(header)
+                f.write(head)
 
         # copy static files to output directory
         for f in file_set:

@@ -93,7 +93,6 @@ def convert_nam_to_header(nam_file: Path) -> tuple[str, ModelNet]:
     else:
         raise ValueError(f"Invalid weights length: {weights_len}")
 
-
     lines = [
         "#pragma once",
         "",

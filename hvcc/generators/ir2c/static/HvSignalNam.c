@@ -20,5 +20,5 @@ hv_size_t sNam_init(SignalNam *o, const float* weights) {
   MicroNAM_NanoNet* nanonet = MicroNAM_NanoNet_Create();
   MicroNAM_NanoNet_LoadWeights(nanonet, weights);
   o->nanonet = nanonet;
-  return 0;
+  return sizeof(float) * 842;
 }

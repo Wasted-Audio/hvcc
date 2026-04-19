@@ -35,8 +35,8 @@ class SignalNam(HeavyObject):
         return {
             "HvSignalNam.h",
             "HvSignalNam.c",
-            "MicroNam/MicroNAM_C.h",
-            "MicroNam/MicroNAM_C.cpp",
+            "MicroNAM_C.h",
+            "MicroNAM_C.cpp",
             "MicroNam/MicroNAM.h",
             "MicroNam/include/StandardNet.h",
             "MicroNam/include/NanoNet.h",
@@ -54,15 +54,8 @@ class SignalNam(HeavyObject):
         return []  # nothing to free
 
     @classmethod
-    def get_C_onMessage(cls, obj_type: str, obj_id: str, inlet_index: int, args: dict) -> list[str]:
-        return [
-            "sNam_onMessage(_c, &Context(_c)->sNam_{0}, {1}, m);".format(
-                obj_id,
-                inlet_index)
-        ]
-
-    @classmethod
     def get_C_process(cls, process_dict: IRSignalList, obj_type: str, obj_id: str, args: dict) -> list[str]:
+        # print(process_dict)
         return [
             "__hv_nam_f(&sNam_{0}, {1}, {2});".format(
                 process_dict.id,
