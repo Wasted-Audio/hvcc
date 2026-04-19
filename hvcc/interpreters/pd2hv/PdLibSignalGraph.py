@@ -14,7 +14,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
 from typing import List
 from pathlib import Path
 
@@ -84,5 +83,5 @@ class PdLibSignalGraph(PdGraph):
 
     def __repr__(self) -> str:
         return "[{0} {1}]".format(
-            os.path.splitext(os.path.basename(self._PdGraph__pd_path))[0],
+            self._PdGraph__pd_path.stem,
             " ".join(self.obj_args[1:]))

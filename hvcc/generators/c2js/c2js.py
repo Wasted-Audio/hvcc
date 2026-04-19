@@ -223,7 +223,7 @@ class c2js(Generator):
             # delete temporary files
             os.remove(post_js_path)
 
-            js_out_file = js_path
+            js_out_file = js_path.name
 
             # generate index.html from template
             with open(Path(out_dir, "index.html"), "w") as f:

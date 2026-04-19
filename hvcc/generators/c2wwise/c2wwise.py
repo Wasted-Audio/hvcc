@@ -14,7 +14,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
 import shutil
 import time
 import jinja2
@@ -66,7 +65,7 @@ class c2wwise(Generator):
 
         out_dir = Path(out_dir, "wwise")
         if not out_dir.exists():
-            os.makedirs(out_dir)
+            out_dir.mkdir()
 
         env = jinja2.Environment()
         env.loader = jinja2.FileSystemLoader(
@@ -104,15 +103,15 @@ class c2wwise(Generator):
 
             src_ext_list = ["h", "hpp", "c", "cpp", "xml", "def", "rc", "lua", "json"]
             for f in env.list_templates(extensions=src_ext_list):
-                file_dir = Path(out_dir, os.path.dirname(f))
-                file_name = os.path.basename(f)
+                file = Path(f)
+                file_dir = Path(out_dir, file.parent)
 
-                file_name = file_name.replace("{{name}}", patch_name)
+                file_name = file.name.replace("{{name}}", patch_name)
                 file_name = file_name.replace("{{plugin_type}}", plugin_type)
                 file_path = Path(file_dir, file_name)
 
                 if not file_path.parent.exists():
-                    os.makedirs(file_path.parent)
+                    file_path.parent.mkdir(parents=True)
 
                 with open(file_path, "w") as g:
                     g.write(env.get_template(f).render(

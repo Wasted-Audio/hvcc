@@ -72,9 +72,8 @@ class c2fmod(Generator):
             for f in env.list_templates(extensions=src_ext_list):
                 file = Path(f)
                 file_dir = Path(out_dir, file.parent)
-                file_name = f
 
-                file_name = file_name.replace("{{name}}", patch_name)
+                file_name = file.name.replace("{{name}}", patch_name)
                 file_path = Path(file_dir, file_name)
 
                 if not file_path.parent.exists():

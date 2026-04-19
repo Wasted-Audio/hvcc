@@ -37,7 +37,7 @@ class PdGraph(PdObject):
         super().__init__("graph", obj_args, pos_x, pos_y)
 
         # file location of this graph
-        self.__pd_path = pd_path
+        self.__pd_path: Path = pd_path
 
         self.__objs: List[PdObject] = []
         self.__connections: List[Connection] = []
@@ -57,7 +57,7 @@ class PdGraph(PdObject):
 
         # TODO(dromer) these are virtual attributes that are only instantiated with internal representation
         self._PdGraph__connections: List[Connection] = []
-        self._PdGraph__pd_path: str = ""
+        self._PdGraph__pd_path: Path = Path()
 
     @property
     def dollar_zero(self) -> str:
@@ -238,4 +238,4 @@ class PdGraph(PdObject):
         }
 
     def __repr__(self) -> str:
-        return self.subpatch_name or str(self.__pd_path)
+        return self.subpatch_name or self.__pd_path.name
