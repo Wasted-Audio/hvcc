@@ -21,7 +21,11 @@ Bugfixes:
 
 Refactor:
 
-* Migrate to Pathlib
+* Migrate to Pathlib (note: Generator signature has changed!)
+
+Docs:
+
+* Versioning
 
 0.15.0
 -----
