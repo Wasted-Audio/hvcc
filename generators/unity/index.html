@@ -1,0 +1,2162 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../pdext/">
+      
+      
+        <link rel="next" href="../wwise/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../img/favicon.ico">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Unity - Heavy Compiler Collection</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#unity" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Heavy Compiler Collection" class="md-header__button md-logo" aria-label="Heavy Compiler Collection" data-md-component="logo">
+      
+  <img src="../../img/logo-compressed.svg" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Heavy Compiler Collection
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Unity
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/Wasted-Audio/hvcc" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    Wasted-Audio/hvcc
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../getting-started/" class="md-tabs__link">
+          
+  
+  
+  Getting Started
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../" class="md-tabs__link">
+          
+  
+  
+  Generators
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../reference/midi/" class="md-tabs__link">
+          
+  
+  
+  Reference
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../adr/" class="md-tabs__link">
+          
+  
+  
+  ADRs
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../changelog/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Changelog
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../contributing/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Contributing
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../code_of_conduct/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Code of Conduct
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Heavy Compiler Collection" class="md-nav__button md-logo" aria-label="Heavy Compiler Collection" data-md-component="logo">
+      
+  <img src="../../img/logo-compressed.svg" alt="logo">
+
+    </a>
+    Heavy Compiler Collection
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/Wasted-Audio/hvcc" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    Wasted-Audio/hvcc
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Getting Started
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Introduction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/patching/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Patching Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Generators
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Generators
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Daisy
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Daisy
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../daisy/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Basics
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../daisy_json/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Board JSON
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dpf/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    DPF
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../fmod/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    FMOD
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../javascript/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Javascript
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../owl/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    OWL
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../pdext/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pd External
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Unity
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Unity
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#getting-started" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Getting Started
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#audio-libs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Audio Libs
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#audio-plugins" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Audio Plugins
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#installing-a-plugin" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Installing a plugin
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#exposing-and-setting-parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exposing and Setting Parameters
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#exposing-and-sending-events" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exposing and Sending Events
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sending-messages-back-to-unity" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sending messages back to Unity
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#accessing-audio-tables" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Accessing Audio Tables
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Accessing Audio Tables">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#from-an-audioclip" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        From an AudioClip
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#from-a-float-buffer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        From a float buffer
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#compiling-the-plugin" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Compiling the Plugin
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Compiling the Plugin">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cmake" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CMake
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#vscode" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        VSCode
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#android" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Android
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#building-for-ios" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Building for iOS
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../wwise/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Wwise
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../custom/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Custom
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/midi/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MIDI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/c/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    C API
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/cpp/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    C++ API
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/objects/supported/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Supported Objects
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/objects/unsupported/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Unsupported Objects
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/ir/heavy_lang/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Heavy Lang
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/ir/heavy_ir/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Heavy IR
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/ir/heavy_gui_ir/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Heavy GUI IR
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADRs
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    ADRs
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../adr/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../adr/ADR-001-GUI-Send-Receive/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GUI Send/Receive
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../adr/ADR-002-pd2gui-Parser/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    pd2gui Parser
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../adr/ADR-003-Control-Rate-Expr/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Control Rate Expr
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../adr/ADR-004-Signal-Rate-Expr/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Signal Rate Expr
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../changelog/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Changelog
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../code_of_conduct/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Code of Conduct
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#getting-started" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Getting Started
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#audio-libs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Audio Libs
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#audio-plugins" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Audio Plugins
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#installing-a-plugin" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Installing a plugin
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#exposing-and-setting-parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exposing and Setting Parameters
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#exposing-and-sending-events" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exposing and Sending Events
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sending-messages-back-to-unity" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sending messages back to Unity
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#accessing-audio-tables" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Accessing Audio Tables
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Accessing Audio Tables">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#from-an-audioclip" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        From an AudioClip
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#from-a-float-buffer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        From a float buffer
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#compiling-the-plugin" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Compiling the Plugin
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Compiling the Plugin">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cmake" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CMake
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#vscode" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        VSCode
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#android" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Android
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#building-for-ios" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Building for iOS
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="unity">Unity</h1>
+<h2 id="getting-started">Getting Started</h2>
+<p>Heavy can generate both Native Unity Audio Libraries with a C# scripting interface and Unity 6 Audio Mixer Plugins. Both have the same sound output but slightly different use cases within Unity.</p>
+<h2 id="audio-libs">Audio Libs</h2>
+<p>Audio Libs are platform-specific native libraries. The C code generated by the patch is compiled into a binary and a C# interface is provided for access. You can attach this C# script to GameObjects within your scene in order for the sound to be spatially processed within the game world. These plugins can also act as a filter for AudioSource components when stacked together on a particular GameObject.</p>
+<p>The below image shows an example of a Heavy generated plugin <code>Hv_sine_AudioLib</code> attached to a cube object.</p>
+<p><img alt="files" src="../../img/docs_unity_audiolib.png" /></p>
+<h2 id="audio-plugins">Audio Plugins</h2>
+<p>The Audio Mixer in Unity allows you to bus audio sources for mixing, effects processing and mastering. Plugins for the Audio Mixer have the filename prefix AudioPlugin. Any that exist within the Assets folder and its subdirectories will be found by Unity. They are available to add to the mixer group, taking the patch name that is passed when generated.</p>
+<p>In the image below the <code>AudioPlugin_Hv_Modal</code> has been added and the parameters are shown on the right hand side.</p>
+<p><img alt="files" src="../../img/docs_unity_audioplug.png" /></p>
+<p>For more information on exposing parameters to audio mixer plugins and accessing them in scripts check out <a href="https://www.youtube.com/watch?v=9tqi1aXlcpE">this Unity tutorial</a>.</p>
+<h2 id="installing-a-plugin">Installing a plugin</h2>
+<p>When it comes to adding plugins to your project the best practice is to create a folder within the Assets directory called Plugins. For cross-platform games it might also be useful to create platform specific subdirectories to organise each binary, for example: <code>Assets/Plugins/x86</code>, <code>Assets/Plugins/x64</code>, <code>Assets/Plugins/WSA/x86</code>, etc...</p>
+<p>Each compiled target will contain the following files (OSX plugins have the <code>.dylib</code> extension, on Windows it's <code>.dll</code> and on Linux <code>.so</code>):</p>
+<ul>
+<li><code>Hv_{PATCH_NAME}_AudioLib.cs</code> - Native Plugin C# interface</li>
+<li><code>Hv_{PATCH_NAME}_AudioLib</code> - Native Plugin dll / bundle</li>
+<li><code>AudioPlugin_Hv_{PATCH_NAME}</code> - Audio Mixer Plugin dll / bundle</li>
+</ul>
+<p><img alt="files" src="../../img/docs_unity_audiolib_loading.png" /></p>
+<p>Ensure that the platform settings have been applied to each plugin binary you wish to use and that paths are correct. <code>x86</code> corresponds to 32-bit platforms and <code>x86_x64</code> is for 64-bit platforms.</p>
+<p>When building for mobile devices it's generally best to download the plugin target for your development platform (windows/macos) <em>and</em> the device platform (ios/android). The development platform plugins will allow testing in the Unity editor and standalone builds. See the Android/iOS specific instructions below for more information.</p>
+<p><strong>Note:</strong> Unity has to be restarted each time the plugin file changes on the local hard disk.</p>
+<h2 id="exposing-and-setting-parameters">Exposing and Setting Parameters</h2>
+<p>Each <a href="../../getting-started/patching/#exposing-parameters">exposed parameter</a> will automatically generate a parameter in the Unity Editor interface. These parameters can be scripted easily from elsewhere in your project.</p>
+<div class="language-c# highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">public</span><span class="w"> </span><span class="k">class</span><span class="w"> </span><span class="nc">MyAudioLibController</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">MonoBehaviour</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">    </span><span class="k">void</span><span class="w"> </span><span class="nf">Start</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">        </span><span class="n">Hv_example_AudioLib</span><span class="w"> </span><span class="n">script</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">GetComponent</span><span class="o">&lt;</span><span class="n">Hv_example_AudioLib</span><span class="o">&gt;</span><span class="p">();</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">        </span><span class="c1">// Get and set a parameter</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">        </span><span class="kt">float</span><span class="w"> </span><span class="n">freq</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">script</span><span class="p">.</span><span class="n">GetFloatParameter</span><span class="p">(</span><span class="n">Hv_example_AudioLib</span><span class="p">.</span><span class="n">Parameter</span><span class="p">.</span><span class="n">Freq</span><span class="p">);</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">        </span><span class="n">script</span><span class="p">.</span><span class="n">SetFloatParameter</span><span class="p">(</span><span class="n">Hv_example_AudioLib</span><span class="p">.</span><span class="n">Parameter</span><span class="p">.</span><span class="n">Freq</span><span class="p">,</span><span class="w"> </span><span class="n">freq</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mf">0.1f</span><span class="p">);</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="p">}</span>
+</span></code></pre></div>
+<h2 id="exposing-and-sending-events">Exposing and Sending Events</h2>
+<p><a href="../../getting-started/patching/#exposing-events">Exposed events</a> are a way to generate triggers or 'bangs' into your patch. Adding one will automatically generate a button in the Unity Editor interface. These events can be scripted easily from elsewhere in your project.</p>
+<p>The event receiver in the patch will generate a 'bang' message each time it is fired. These can be useful for example, triggering synth notes from a Unity based sequencer or aligning a procedural gunshot sound to point at when it is fired.</p>
+<div class="language-c# highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">public</span><span class="w"> </span><span class="k">class</span><span class="w"> </span><span class="nc">MyAudioLibController</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">MonoBehaviour</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">    </span><span class="k">void</span><span class="w"> </span><span class="nf">Start</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">        </span><span class="n">Hv_example_AudioLib</span><span class="w"> </span><span class="n">script</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">GetComponent</span><span class="o">&lt;</span><span class="n">Hv_example_AudioLib</span><span class="o">&gt;</span><span class="p">();</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">        </span><span class="n">script</span><span class="p">.</span><span class="n">SendEvent</span><span class="p">(</span><span class="n">Hv_example_AudioLib</span><span class="p">.</span><span class="n">Event</span><span class="p">.</span><span class="n">Bang</span><span class="p">);</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="p">}</span>
+</span></code></pre></div>
+<h2 id="sending-messages-back-to-unity">Sending messages back to Unity</h2>
+<p>Any output parameter in the patch can be routed back into Unity.</p>
+<p>A C# delegate can be attached to the native plugin wrapper script that listens for callbacks when these messages are triggered.</p>
+<p>The <code>FloatMessage</code> object contains a property <code>receiverName</code> to determine the origin and the <code>value</code> property contains the actual float value contained in the message.</p>
+<p>For example, if <code>0.5</code> is sent to <code>[s #toUnity @hv_param]</code>, then <code>message.receiverName</code> will contain <code>#toUnity</code> and <code>message.value</code> will contain <code>0.5</code>.</p>
+<p>Example:</p>
+<div class="language-c# highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">public</span><span class="w"> </span><span class="k">class</span><span class="w"> </span><span class="nc">MyMessageDelegate</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">MonoBehaviour</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">    </span><span class="k">void</span><span class="w"> </span><span class="nf">Start</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">        </span><span class="n">Hv_sine_AudioLib</span><span class="w"> </span><span class="n">script</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">GetComponent</span><span class="o">&lt;</span><span class="n">Hv_sine_AudioLib</span><span class="o">&gt;</span><span class="p">();</span>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">        </span><span class="n">script</span><span class="p">.</span><span class="n">RegisterSendHook</span><span class="p">();</span>
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">        </span><span class="n">script</span><span class="p">.</span><span class="n">FloatReceivedCallback</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">OnFloatMessage</span><span class="p">;</span>
+</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>
+</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="w">    </span><span class="k">void</span><span class="w"> </span><span class="nf">OnFloatMessage</span><span class="p">(</span><span class="n">Hv_sine_AudioLib</span><span class="p">.</span><span class="n">FloatMessage</span><span class="w"> </span><span class="n">message</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="w">        </span><span class="n">Debug</span><span class="p">.</span><span class="n">Log</span><span class="p">(</span><span class="n">message</span><span class="p">.</span><span class="n">receiverName</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">&quot;: &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">message</span><span class="p">.</span><span class="k">value</span><span class="p">);</span>
+</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="p">}</span>
+</span></code></pre></div>
+<h2 id="accessing-audio-tables">Accessing Audio Tables</h2>
+<p>For Native Plugins, audio tables can be accessed externally from scripts in the Unity engine to set sample buffers within the patch.</p>
+<p>There are two methods in the C# interface to facilitate this:</p>
+<h3 id="from-an-audioclip">From an <a href="http://docs.unity3d.com/ScriptReference/AudioClip.html">AudioClip</a></h3>
+<div class="language-c# highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="cm">/**</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="cm"> * Fill a table with sample data contained in the left (or mono) channel of a</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="cm"> * Unity AudioClip object.</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="cm"> *</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="cm"> * This function is NOT thread-safe. It is assumed that only the audio thread will</span>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="cm"> * execute this function.</span>
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="cm"> */</span>
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="k">void</span><span class="w"> </span><span class="nf">FillTableWithMonoAudioClip</span><span class="p">(</span><span class="kt">string</span><span class="w"> </span><span class="n">tableName</span><span class="p">,</span><span class="w"> </span><span class="n">AudioClip</span><span class="w"> </span><span class="n">clip</span><span class="p">)</span>
+</span></code></pre></div>
+<p>Example:</p>
+<div class="language-c# highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">public</span><span class="w"> </span><span class="k">class</span><span class="w"> </span><span class="nc">MySampleLoader</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">MonoBehaviour</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">    </span><span class="k">public</span><span class="w"> </span><span class="n">AudioClip</span><span class="w"> </span><span class="n">_clip</span><span class="p">;</span><span class="w"> </span><span class="c1">// attach a sample in the editor</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">    </span><span class="k">private</span><span class="w"> </span><span class="n">Hv_sine_AudioLib</span><span class="w"> </span><span class="n">_audio</span><span class="p">;</span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="w">    </span><span class="k">void</span><span class="w"> </span><span class="nf">Start</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="w">        </span><span class="n">_audio</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">GetComponent</span><span class="o">&lt;</span><span class="n">Hv_sine_AudioLib</span><span class="o">&gt;</span><span class="p">();</span>
+</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="w">        </span><span class="c1">// ensure that there is a table in the patch called &#39;sample-1&#39;</span>
+</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="w">        </span><span class="n">_audio</span><span class="p">.</span><span class="n">FillTableWithMonoAudioClip</span><span class="p">(</span><span class="s">&quot;sample-1&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">_clip</span><span class="p">);</span>
+</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="p">}</span>
+</span></code></pre></div>
+<h3 id="from-a-float-buffer">From a float buffer</h3>
+<div class="language-c# highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="cm">/**</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="cm"> * Fill a table with sample data contained in a float array.</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="cm"> *</span>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="cm"> * This function is NOT thread-safe. It is assumed that only the audio thread will</span>
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="cm"> * execute this function.</span>
+</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="cm"> */</span>
+</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="k">void</span><span class="w"> </span><span class="nf">FillTableWithFloatBuffer</span><span class="p">(</span><span class="kt">string</span><span class="w"> </span><span class="n">tableName</span><span class="p">,</span><span class="w"> </span><span class="kt">float</span><span class="p">[]</span><span class="w"> </span><span class="n">buffer</span><span class="p">)</span>
+</span></code></pre></div>
+<h2 id="compiling-the-plugin">Compiling the Plugin</h2>
+<p>The plugin folder contains a <code>CMakeLists.txt</code> file which will generate one shared library that can be used as mixer plugin and one to use with the provided c# script.</p>
+<h3 id="cmake">CMake</h3>
+<p>From within the directory containing the <code>CMakeLists.txt</code> use.</p>
+<div class="language-shell highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>cmake<span class="w"> </span>-S<span class="w"> </span>.<span class="w"> </span>-B<span class="w"> </span>cmake-build-debug<span class="w"> </span>-DCMAKE_BUILD_TYPE<span class="o">=</span>Release
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>cmake<span class="w"> </span>--build<span class="w"> </span>cmake-build-debug
+</span></code></pre></div>
+<h3 id="vscode">VSCode</h3>
+<p>Install <a href="https://marketplace.visualstudio.com/items?itemName=ms-vscode.cmake-tools">CMake Tools</a> and open the <code>unity</code> folder containing the <code>CMakeLists.txt</code> in VSCode.</p>
+<p>Check that the <code>[all]</code> target is selected and run <code>&gt; cmake build</code>. The resulting binaries will be placed in <code>build\&lt;CONFIG&gt;</code>.</p>
+<h3 id="android">Android</h3>
+<p>The android NDK comes with a <code>&lt;NDK&gt;/build/cmake/android.toolchain.cmake</code> file that allows to cross-compile using cmake.</p>
+<p>From the hvcc export <code>unity</code> directory containing the <code>CMakeLists.txt</code>.</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>cmake -S . -B cmake-build-android -G Ninja \
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>    -DCMAKE_TOOLCHAIN_FILE=$NDK/build/cmake/android.toolchain.cmake \
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>    -DANDROID_ABI=arm64-v8a \
+</span></code></pre></div>
+<p>The easiest method for installing Android plugins is to place them in this specific folder <code>/Assets/Plugins/Android/</code>. Doing this will ensure Unity copies over the plugin into the APK correctly.</p>
+<p>See the Unity documentation for more information:</p>
+<p>https://docs.unity3d.com/Manual/PluginInspector.html</p>
+<h3 id="building-for-ios">Building for iOS</h3>
+<p>iOS builds are unique in that the source code is needed when compiling the Unity game for the device.</p>
+<p>Once the game is working as expected in the Unity editor (the macos plugins are required for that) and the heavy C# scripts are correctly attached to the gameobjects, go to <code>File</code> &gt; <code>Build Settings</code> in the Unity menu. Then generate the Xcode project by selecting iOS platform, adding the required scenes and clicking <code>Build</code>.</p>
+<p>Open the Xcode project from the directory previously selected in Unity's build menu.</p>
+<p>Create a new group in the left-hand side Project explorer section, the group name is not important but in this case we'll called it <code>heavy</code>.</p>
+<p>Download the Unity source target from the patch compile page and copy the contents of the <code>source/heavy/</code> folder into the <code>heavy</code> Xcode group that was created previously. Make sure to copy every file.</p>
+<p><img alt="unity_ios_xcode" src="../../img/docs_unity_ios_xcode.png" /></p>
+<p>That's all that is needed when using <a href="./#audio-libs">Audio Libs</a>.</p>
+<p>For <a href="./#audio-plugins">Audio Plugins</a> the additional files from <code>unity/src/</code> will also need to be copied into the Xcode project, though ignore the C# (.cs) file.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.sections", "search.suggest", "content.code.copy"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>
