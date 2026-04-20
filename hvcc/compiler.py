@@ -237,7 +237,7 @@ def compile_dataflow(
         return add_error(results, f"Unknown input path {in_path}")
 
     # meta-data file
-    if patch_meta_file:
+    if patch_meta_file is not None:
         if patch_meta_file.is_file():
             with open(patch_meta_file) as json_file:
                 try:

@@ -18,7 +18,7 @@ This is `example_hvcc_generator.py`:
 ```python
 import time
 
-from typing import Dict, Optional
+from typing import Optional
 from pathlib import Path
 
 from hvcc.types.compiler import CompilerResp, ExternInfo, Generator
