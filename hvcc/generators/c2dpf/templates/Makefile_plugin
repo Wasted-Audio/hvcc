@@ -3,11 +3,11 @@ NAME = {{name}}
 MODGUI_CLASS_NAME = hv_{{name}}
 {%- endif %}
 {%- if meta.enable_ui is sameas true %}
-FILES_DSP = $(filter-out HeavyDPF_{{name}}_UI.cpp, $(wildcard *.cpp) $(wildcard */*.cpp))
+FILES_DSP = $(filter-out HeavyDPF_{{name}}_UI.cpp, $(wildcard *.cpp))
 {%- else %}
-FILES_DSP = $(wildcard *.cpp) $(wildcard */*.cpp)
+FILES_DSP = $(wildcard *.cpp)
 {%- endif %}
-FILES_DSP += $(wildcard *.c) $(wildcard */*.c)
+FILES_DSP += $(wildcard *.c)
 
 {%- if meta.enable_ui is sameas true %}
 FILES_UI = HeavyDPF_{{name}}_UI.cpp
