@@ -1,6 +1,8 @@
 name: Publish Docs
 on:
   push:
+    branches:
+      - develop
     tags:
       - "v*"
   workflow_dispatch:
@@ -50,8 +52,11 @@ jobs:
           elif [ "${GITHUB_REF_TYPE}" = "tag" ]; then
             VERSION="${GITHUB_REF_NAME#v}"
             ALIAS="latest"
+          elif [ "${GITHUB_REF_NAME}" = "develop" ]; then
+            VERSION="develop"
+            ALIAS=""
           else
-            echo "No version provided and ref is not a tag; aborting."
+            echo "No version provided and ref is not a tag or develop; aborting."
             exit 1
           fi
 
