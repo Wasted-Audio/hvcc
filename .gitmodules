@@ -6,4 +6,4 @@
 	url = https://github.com/mhroth/tinywav.git
 [submodule "hvcc/generators/ir2c/static/MicroNam"]
 	path = hvcc/generators/ir2c/static/MicroNam
-	url = https://github.com/Wasted-Audio/MicroNAM.git
+	url = https://github.com/jaffco/MicroNAM.git
