@@ -24,19 +24,82 @@
 extern "C" {
 #endif
 
-typedef struct SignalNam {
+typedef struct SignalNamNano {
   MicroNAM_NanoNet* nanonet;
-} SignalNam;
+} SignalNamNano;
 
-hv_size_t sNam_init(SignalNam *o, const float* weights);
+hv_size_t sNam_nano_init(SignalNamNano *o, const float* weights);
+void sNam_nano_free(SignalNamNano *o);
 
-
-static inline void __hv_nam_f(SignalNam *o, hv_bInf_t bIn0, hv_bOutf_t bOut) {
+static inline void __hv_nam_nano_f(SignalNamNano *o, hv_bInf_t bIn0, hv_bOutf_t bOut) {
 #if HV_SIMD_AVX
+  hv_assert(0);
 #elif HV_SIMD_SSE
+  hv_assert(0);
 #elif HV_SIMD_NEON
+  hv_assert(0);
 #else // HV_SIMD_NONE
-    MicroNAM_NanoNet_Process(o->nanonet, &bIn0, bOut);
+  MicroNAM_NanoNet_Process(o->nanonet, &bIn0, bOut);
+#endif
+}
+
+
+typedef struct SignalNamFeather {
+  MicroNAM_FeatherNet* feathernet;
+} SignalNamFeather;
+
+hv_size_t sNam_feather_init(SignalNamFeather *o, const float* weights);
+void sNam_feather_free(SignalNamFeather *o);
+
+static inline void __hv_nam_feather_f(SignalNamFeather *o, hv_bInf_t bIn0, hv_bOutf_t bOut) {
+#if HV_SIMD_AVX
+  hv_assert(0);
+#elif HV_SIMD_SSE
+  hv_assert(0);
+#elif HV_SIMD_NEON
+  hv_assert(0);
+#else // HV_SIMD_NONE
+  MicroNAM_FeatherNet_Process(o->feathernet, &bIn0, bOut);
+#endif
+}
+
+
+typedef struct SignalNamLite {
+  MicroNAM_LiteNet* litenet;
+} SignalNamLite;
+
+hv_size_t sNam_lite_init(SignalNamLite *o, const float* weights);
+void sNam_lite_free(SignalNamLite *o);
+
+static inline void __hv_nam_lite_f(SignalNamLite *o, hv_bInf_t bIn0, hv_bOutf_t bOut) {
+#if HV_SIMD_AVX
+  hv_assert(0);
+#elif HV_SIMD_SSE
+  hv_assert(0);
+#elif HV_SIMD_NEON
+  hv_assert(0);
+#else // HV_SIMD_NONE
+    MicroNAM_LiteNet_Process(o->litenet, &bIn0, bOut);
+#endif
+}
+
+
+typedef struct SignalNamStandard {
+  MicroNAM_StandardNet* standardnet;
+} SignalNamStandard;
+
+hv_size_t sNam_standard_init(SignalNamStandard *o, const float* weights);
+void sNam_standard_free(SignalNamStandard *o);
+
+static inline void __hv_nam_standard_f(SignalNamStandard *o, hv_bInf_t bIn0, hv_bOutf_t bOut) {
+#if HV_SIMD_AVX
+  hv_assert(0);
+#elif HV_SIMD_SSE
+  hv_assert(0);
+#elif HV_SIMD_NEON
+  hv_assert(0);
+#else // HV_SIMD_NONE
+  MicroNAM_StandardNet_Process(o->standardnet, &bIn0, bOut);
 #endif
 }
 

@@ -14,9 +14,12 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from typing import Dict, Optional
+from pathlib import Path
 
 from .HeavyIrObject import HeavyIrObject
 from .HeavyGraph import HeavyGraph
+
+from hvcc.generators.ir2c.SignalNamHeader import ModelNet, load_nam_file
 
 
 class HIrNam(HeavyIrObject):
@@ -31,4 +34,19 @@ class HIrNam(HeavyIrObject):
         annotations: Optional[Dict] = None
     ) -> None:
         assert obj_type == "__nam~f"
+
+        # load the nam file to retreive the model type
+        assert args is not None
+        model_net, _, _ = load_nam_file(Path(args["nam"]))
+
+        # overload the object type based on the model
+        if model_net == ModelNet.Nano:
+            obj_type = "__nam_nano~f"
+        elif model_net == ModelNet.Feather:
+            obj_type = "__nam_feather~f"
+        elif model_net == ModelNet.Lite:
+            obj_type = "__nam_lite~f"
+        elif model_net == ModelNet.Standard:
+            obj_type = "__nam_standard~f"
+
         super().__init__(obj_type, args=args, graph=graph, annotations=annotations)

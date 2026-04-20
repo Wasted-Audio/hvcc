@@ -64,7 +64,7 @@ def format_float(value: float) -> str:
     return f"{format(value, '.17g')}f"
 
 
-def convert_nam_to_header(nam_file: Path) -> tuple[str, ModelNet]:
+def load_nam_file(nam_file: Path) -> tuple[ModelNet, int, dict]:
     with nam_file.open("r", encoding="utf-8") as f:
         payload = json.load(f)
 
@@ -75,10 +75,6 @@ def convert_nam_to_header(nam_file: Path) -> tuple[str, ModelNet]:
     for idx, value in enumerate(weights):
         if not isinstance(value, (int, float)):
             raise ValueError(f"weights[{idx}] is not numeric")
-
-    symbol_stem = to_symbol_stem(nam_file)
-    count_name = f"{symbol_stem}WeightsCount"
-    weights_name = f"{symbol_stem}Weights"
 
     weights_len = len(weights)
 
@@ -92,6 +88,16 @@ def convert_nam_to_header(nam_file: Path) -> tuple[str, ModelNet]:
         model_net = ModelNet.Standard
     else:
         raise ValueError(f"Invalid weights length: {weights_len}")
+
+    return model_net, weights_len, weights
+
+
+def convert_nam_to_header(nam_file: Path) -> str:
+    symbol_stem = to_symbol_stem(nam_file)
+    count_name = f"{symbol_stem}WeightsCount"
+    weights_name = f"{symbol_stem}Weights"
+
+    model_net, weights_len, weights = load_nam_file(nam_file)
 
     lines = [
         "#pragma once",
@@ -113,4 +119,4 @@ def convert_nam_to_header(nam_file: Path) -> tuple[str, ModelNet]:
     lines.append("};")
     lines.append("")
 
-    return "\n".join(lines), model_net
+    return "\n".join(lines)

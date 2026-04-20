@@ -16,9 +16,49 @@
 
 #include "HvSignalNam.h"
 
-hv_size_t sNam_init(SignalNam *o, const float* weights) {
+hv_size_t sNam_nano_init(SignalNamNano *o, const float* weights) {
   MicroNAM_NanoNet* nanonet = MicroNAM_NanoNet_Create();
   MicroNAM_NanoNet_LoadWeights(nanonet, weights);
   o->nanonet = nanonet;
   return sizeof(float) * 842;
+}
+
+void sNam_nano_free(SignalNamNano *o) {
+  MicroNAM_NanoNet_Destroy(o->nanonet);
+}
+
+
+hv_size_t sNam_feather_init(SignalNamFeather *o, const float* weights) {
+  MicroNAM_FeatherNet* feathernet = MicroNAM_FeatherNet_Create();
+  MicroNAM_FeatherNet_LoadWeights(feathernet, weights);
+  o->feathernet = feathernet;
+  return sizeof(float) * 3026;
+}
+
+void sNam_feather_free(SignalNamFeather *o) {
+  MicroNAM_FeatherNet_Destroy(o->feathernet);
+}
+
+
+hv_size_t sNam_lite_init(SignalNamLite *o, const float* weights) {
+  MicroNAM_LiteNet* litenet = MicroNAM_LiteNet_Create();
+  MicroNAM_LiteNet_LoadWeights(litenet, weights);
+  o->litenet = litenet;
+  return sizeof(float) * 6554;
+}
+
+void sNam_lite_free(SignalNamLite *o) {
+  MicroNAM_LiteNet_Destroy(o->litenet);
+}
+
+
+hv_size_t sNam_standard_init(SignalNamStandard *o, const float* weights) {
+  MicroNAM_StandardNet* standardnet = MicroNAM_StandardNet_Create();
+  MicroNAM_StandardNet_LoadWeights(standardnet, weights);
+  o->standardnet = standardnet;
+  return sizeof(float) * 13802;
+}
+
+void sNam_standard_free(SignalNamStandard *o) {
+  MicroNAM_StandardNet_Destroy(o->standardnet);
 }

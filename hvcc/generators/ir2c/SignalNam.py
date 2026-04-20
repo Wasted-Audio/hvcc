@@ -27,6 +27,19 @@ class SignalNam(HeavyObject):
     preamble = "sNam"
 
     @classmethod
+    def get_C_struct(cls, obj_type: str = "") -> str:
+        if obj_type == '__nam_nano~f':
+            return "SignalNamNano"
+        elif obj_type == '__nam_feather~f':
+            return "SignalNamFeather"
+        elif obj_type == '__nam_lite~f':
+            return "SignalNamLite"
+        elif obj_type == '__nam_standard~f':
+            return "SignalNamStandard"
+        else:
+            raise Exception()
+
+    @classmethod
     def get_C_header_set(cls) -> set:
         return {"HvSignalNam.h"}
 
@@ -47,16 +60,45 @@ class SignalNam(HeavyObject):
     @classmethod
     def get_C_init(cls, obj_type: str, obj_id: str, args: dict) -> list[str]:
         nam_file = Path(args["nam"])
-        return [f"sNam_init(&sNam_{obj_id}, {to_symbol_stem(nam_file)}Weights);"]
+        weights = to_symbol_stem(nam_file)
+
+        if obj_type == '__nam_nano~f':
+            return [f"sNam_nano_init(&sNam_{obj_id}, {weights}Weights);"]
+        elif obj_type == '__nam_feather~f':
+            return [f"sNam_feather_init(&sNam_{obj_id}, {weights}Weights);"]
+        elif obj_type == '__nam_lite~f':
+            return [f"sNam_lite_init(&sNam_{obj_id}, {weights}Weights);"]
+        elif obj_type == '__nam_standard~f':
+            return [f"sNam_standard_init(&sNam_{obj_id}, {weights}Weights);"]
+        else:
+            raise Exception()
 
     @classmethod
     def get_C_free(cls, obj_type: str, obj_id: str, args: dict) -> list[str]:
-        return []  # nothing to free
+        if obj_type == '__nam_nano~f':
+            return [f"sNam_nano_free(&sNam_{obj_id});"]
+        elif obj_type == '__nam_feather~f':
+            return [f"sNam_feather_free(&sNam_{obj_id});"]
+        elif obj_type == '__nam_lite~f':
+            return [f"sNam_lite_free(&sNam_{obj_id});"]
+        elif obj_type == '__nam_standard~f':
+            return [f"sNam_standard_free(&sNam_{obj_id});"]
+        else:
+            raise Exception()
 
     @classmethod
     def get_C_process(cls, process_dict: IRSignalList, obj_type: str, obj_id: str, args: dict) -> list[str]:
+        if obj_type == '__nam_nano~f':
+            function = "__hv_nam_nano_f(&sNam_{0}, VIf({1}), VOf({2}));"
+        elif obj_type == '__nam_feather~f':
+            function = "__hv_nam_feather_f(&sNam_{0}, VIf({1}), VOf({2}));"
+        elif obj_type == '__nam_lite~f':
+            function = "__hv_nam_lite_f(&sNam_{0}, VIf({1}), VOf({2}));"
+        elif obj_type == '__nam_standard~f':
+            function = "__hv_nam_standard_f(&sNam_{0}, VIf({1}), VOf({2}));"
+
         return [
-            "__hv_nam_f(&sNam_{0}, VIf({1}), VOf({2}));".format(
+            function.format(
                 process_dict.id,
                 cls._c_buffer(process_dict.inputBuffers[0]),
                 cls._c_buffer(process_dict.outputBuffers[0]))
@@ -67,6 +109,6 @@ class SignalNam(HeavyObject):
         nam_file = Path(args["nam"])
         header_name = f"{to_symbol_stem(nam_file)}.h"
 
-        header_str, _ = convert_nam_to_header(nam_file)
+        header_str = convert_nam_to_header(nam_file)
 
         return header_name, header_str
