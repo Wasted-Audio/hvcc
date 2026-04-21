@@ -23,7 +23,6 @@ from hvcc.types.IR import IRSignalList
 
 class SignalNam(HeavyObject):
 
-    c_struct = "SignalNam"
     preamble = "sNam"
 
     @classmethod

@@ -35,7 +35,7 @@ class HIrNam(HeavyIrObject):
     ) -> None:
         assert obj_type == "__nam~f"
 
-        # load the nam file to retreive the model type
+        # load the nam file to retrieve the model type
         assert args is not None
         model_net, _, _ = load_nam_file(Path(args["nam"]))
 
