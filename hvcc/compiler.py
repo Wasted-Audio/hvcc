@@ -265,7 +265,7 @@ def compile_dataflow(
             print("--> Generating GUI IR")
         results.root["pd2gui"] = pd2gui.pd2gui.compile(
             pd_path=in_path,
-            ir_dir=Path(out_dir, "ir"),
+            ir_file=Path(out_dir, "ir", f"{subst_name}.heavy.gui.json"),
             search_paths=search_paths,
             verbose=verbose)
 

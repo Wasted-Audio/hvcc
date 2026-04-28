@@ -351,7 +351,7 @@ class PdGUIParser(PdParser):
                 y=int(line[12])
             ),
             font=Font(int(line[13])),
-            font_size=int(line[14])
+            font_size=int(line[14]) + 2
         ) if line[10] != "empty" else None
 
         return Canvas(
@@ -382,7 +382,7 @@ class PdGUIParser(PdParser):
                 y=int(line[13])
             ),
             font=Font(int(line[14])),
-            font_size=int(line[15])
+            font_size=int(line[15]) + 2
         ) if line[11] != "empty" else None
 
         return Bang(
@@ -415,7 +415,7 @@ class PdGUIParser(PdParser):
                 y=int(line[11])
             ),
             font=Font(int(line[12])),
-            font_size=int(line[13])
+            font_size=int(line[13]) + 2
         ) if line[9] != "empty" else None
 
         return Toggle(
@@ -455,7 +455,7 @@ class PdGUIParser(PdParser):
                 y=int(line[13])
             ),
             font=Font(int(line[14])),
-            font_size=int(line[15])
+            font_size=int(line[15]) + 2
         ) if line[11] != "empty" else None
 
         return radio_obj[radio_type](
@@ -493,7 +493,7 @@ class PdGUIParser(PdParser):
                 y=int(line[15])
             ),
             font=Font(int(line[16])),
-            font_size=int(line[17])
+            font_size=int(line[17]) + 2
         ) if line[13] != "empty" else None
 
         return slider[line[4]](
@@ -580,7 +580,7 @@ class PdGUIParser(PdParser):
                 y=int(line[15])
             ),
             font=Font(0),
-            font_size=int(line[17])
+            font_size=int(line[17]) + 2
         ) if line[13] != "empty" else None
 
         return Number(
@@ -589,7 +589,7 @@ class PdGUIParser(PdParser):
                 y=int(line[3])
             ),
             size=Size(
-                x=int(line[5])*int(line[17]),
+                x=int(line[5])*int(line[17])+8,
                 y=int(line[6])
             ),
             parameter=param,
@@ -646,7 +646,7 @@ class PdGUIParser(PdParser):
             ),
             parameter=param,
             label_text=line[8] if line[8] != "-" else "",
-            font_height=font_height,
+            font_height=font_height + 4,
             label_pos=LabelPos(int(line[7])),
             min=float(line[5]),
             max=float(line[6])

@@ -35,7 +35,7 @@
             "y": 0
           },
           "parameter": "float_vol",
-          "font_height": 8,
+          "font_height": 12,
           "label_text": "",
           "label_pos": 0,
           "min": 0.0,
