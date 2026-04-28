@@ -196,6 +196,39 @@ Here is a list of [unsupported Pd objects](unsupported.md).
 
 1. Does not support: `size()`, `sum()`, `Sum()`, `avg()`, `Avg()`, `mtof()`, `ftom()`, `dbtorms()`, `rmstodb()`, `powtodb()`, `dbtopow()`
 
+## Cyclone
+
+Objects ported from [cyclone](https://github.com/porres/pd-cyclone) library.
+
+| object | remarks |
+| --- | --- |
+| acosh~ | |
+| acos~ | |
+| asinh~ | |
+| asin~ | |
+| atan2~ | |
+| atanh~ | |
+| atan~ | |
+| bitand~ | only supports mode 1 |
+| bitor~ | only supports mode 1 |
+| bitnot~ | only supports mode 1 |
+| bitsafe~ | |
+| bitxor~ | only supports mode 1 |
+| cartopol~ | |
+| cosh~ | |
+| cosx~ | |
+| equals~ | alias: ==~ |
+| greaterthaneq~ | alias: >=~ |
+| greaterthan~ | alias: >~ |
+| lessthaneq~ | alias: <=~ |
+| lessthan~ | alias: <~ |
+| notequals~ | alias: !=~ |
+| poltocar~ | |
+| sinh~ | |
+| sinx~ | |
+| tanh~ | |
+| tanx~ | |
+
 ## Supported Abstractions
 
 These are commonly used - or built in - abstractions that consist of compatible vanilla objects.

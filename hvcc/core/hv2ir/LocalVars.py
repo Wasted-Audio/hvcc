@@ -1,5 +1,5 @@
 # Copyright (C) 2014-2018 Enzien Audio, Ltd.
-# Copyright (C) 2023 Wasted Audio
+# Copyright (C) 2023-2026 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,6 +17,7 @@
 import os
 from collections import defaultdict
 from typing import Optional, Union, Dict, List
+from pathlib import Path
 
 from .HeavyException import HeavyException
 from .HeavyLangObject import HeavyLangObject
@@ -36,14 +37,14 @@ class LocalVars:
         # the list of globally declared paths
         self.declared_paths = [stdlib_dir]  # initialise with the standard library directory
 
-    def find_path_for_abstraction(self, name: str) -> Optional[str]:
+    def find_path_for_abstraction(self, name: str) -> Optional[Path]:
         # the file name based on the abstraction name
         file_name = f"{name}.hv.json"
 
         # iterate in order through the declared paths in order to find the file
         for d in self.declared_paths:
-            file_path = os.path.join(d, file_name)
-            if os.path.exists(file_path):
+            file_path = Path(d, file_name)
+            if file_path.exists():
                 return file_path  # if a matching abstraction is found, return the path
         return None  # otherwise return None
 

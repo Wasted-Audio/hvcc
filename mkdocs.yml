@@ -1,6 +1,7 @@
 site_name: Heavy Compiler Collection
 repo_url: https://github.com/Wasted-Audio/hvcc
 repo_name: Wasted-Audio/hvcc
+site_url: https://wasted-audio.github.io/hvcc/
 theme:
   name: material
   features:
@@ -12,6 +13,10 @@ theme:
     scheme: slate  # Dark mode support
   logo: img/logo-compressed.svg
   favicon: img/favicon.ico
+
+extra:
+  version:
+    provider: mike
 
 markdown_extensions:
   - pymdownx.highlight:

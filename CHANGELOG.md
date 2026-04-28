@@ -8,11 +8,24 @@ Features:
 
 * Add theme configuration to pd2gui model
 * Add `flash_time` to pd2gui Bang parser
+* Only parse GUI with `--gui` flag
+* Port objects from cyclone
 
 Bugfixes:
 
-* skip empty values when restoring tables (#348)
+* Skip empty values when restoring tables (#348)
+* Only append to table when first value is a float
 * GUI send/receive config for objects in subpatches
+* DPF: also send BPM value to `__hv_dpf_bpm` when transport is not playing
+* Wwise: use latest Windows SDK available locally instead of hardcoded version
+
+Refactor:
+
+* Migrate to Pathlib (note: Generator signature has changed!)
+
+Docs:
+
+* Versioning
 
 0.15.0
 -----

@@ -1,5 +1,5 @@
 # Copyright (C) 2014-2018 Enzien Audio, Ltd.
-# Copyright (C) 2021-2024 Wasted Audio
+# Copyright (C) 2021-2026 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,7 +20,9 @@ import json
 import os
 import re
 import sys
+
 from typing import Any, List, Dict, Optional
+from pathlib import Path
 
 from hvcc.interpreters.pd2gui import pd2gui
 from hvcc.interpreters.pd2hv import pd2hv
@@ -209,33 +211,34 @@ def load_ext_generator(module_name: str, verbose: bool) -> Optional[Generator]:
 
 
 def compile_dataflow(
-    in_path: str,
-    out_dir: str,
+    in_path: Path,
+    out_dir: Path,
     patch_name: str = "heavy",
-    patch_meta_file: Optional[str] = None,
-    search_paths: Optional[List[str]] = None,
+    patch_meta_file: Optional[Path] = None,
+    search_paths: Optional[List[Path]] = None,
     generators: Optional[List[str]] = None,
     ext_generators: Optional[List[str]] = None,
     verbose: bool = False,
     copyright: Optional[str] = None,
-    nodsp: Optional[bool] = False
+    nodsp: Optional[bool] = False,
+    gui: Optional[bool] = False
 ) -> CompilerResults:
     results = CompilerResults(root={})
     patch_meta = Meta()
 
     # basic error checking on input
-    if os.path.isfile(in_path):
-        if not in_path.endswith((".pd")):
+    if in_path.is_file():
+        if not str(in_path).endswith((".pd")):
             return add_error(results, "Can only process Pd files.")
-    elif os.path.isdir(in_path):
+    elif in_path.is_dir():
         if not os.path.basename("c"):
             return add_error(results, "Can only process c directories.")
     else:
         return add_error(results, f"Unknown input path {in_path}")
 
     # meta-data file
-    if patch_meta_file:
-        if os.path.isfile(patch_meta_file):
+    if patch_meta_file is not None:
+        if patch_meta_file.is_file():
             with open(patch_meta_file) as json_file:
                 try:
                     patch_meta_json = json.load(json_file)
@@ -250,20 +253,21 @@ def compile_dataflow(
         print("--> Generating C")
     results.root["pd2hv"] = pd2hv.pd2hv.compile(
         pd_path=in_path,
-        hv_dir=os.path.join(out_dir, "hv"),
+        hv_dir=Path(out_dir, "hv"),
         search_paths=search_paths,
         verbose=verbose)
 
     # ensure that the ir filenames have no funky characters in it
     subst_name = re.sub(r'\W', '_', patch_name)
 
-    if verbose:
-        print("--> Generating GUI IR")
-    results.root["pd2gui"] = pd2gui.pd2gui.compile(
-        pd_path=in_path,
-        ir_file=os.path.join(out_dir, "ir", f"{subst_name}.heavy.gui.json"),
-        search_paths=search_paths,
-        verbose=verbose)
+    if gui:
+        if verbose:
+            print("--> Generating GUI IR")
+        results.root["pd2gui"] = pd2gui.pd2gui.compile(
+            pd_path=in_path,
+            ir_dir=Path(out_dir, "ir"),
+            search_paths=search_paths,
+            verbose=verbose)
 
     # check for errors
     response: CompilerResp = list(results.root.values())[0]
@@ -272,8 +276,9 @@ def compile_dataflow(
         return results
 
     results.root["hv2ir"] = hv2ir.hv2ir.compile(
-        hv_file=os.path.join(response.out_dir, response.out_file),
-        ir_file=os.path.join(out_dir, "ir", f"{subst_name}.heavy.ir.json"),
+        hv_file=Path(response.out_dir, response.out_file),
+        # ensure that the ir filename has no funky characters in it
+        ir_file=Path(out_dir, "ir", f"{subst_name}.heavy.ir.json"),
         patch_name=patch_name,
         verbose=verbose)
 
@@ -289,14 +294,14 @@ def compile_dataflow(
 
     # get application path
     if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
-        application_path = os.path.join(sys._MEIPASS, 'hvcc')
+        application_path = Path(sys._MEIPASS, 'hvcc')
     elif __file__:
-        application_path = os.path.dirname(__file__)
+        application_path = Path(__file__).parent
 
-    c_src_dir = os.path.join(out_dir, "c")
+    c_src_dir = Path(out_dir, "c")
     results.root["ir2c"] = ir2c.ir2c.compile(
-        hv_ir_path=os.path.join(results.root["hv2ir"].out_dir, results.root["hv2ir"].out_file),
-        static_dir=os.path.join(application_path, "generators/ir2c/static"),
+        hv_ir_path=Path(results.root["hv2ir"].out_dir, results.root["hv2ir"].out_file),
+        static_dir=Path(application_path, "generators/ir2c/static"),
         output_dir=c_src_dir,
         externs=externs,
         copyright=copyright,

@@ -31,12 +31,12 @@
             "y": 81
           },
           "size": {
-            "x": 0,
+            "x": 20,
             "y": 0
           },
           "parameter": "float_vol",
-          "font_size": 0,
-          "label_text": "-",
+          "font_height": 8,
+          "label_text": "",
           "label_pos": 0,
           "min": 0.0,
           "max": 0.0

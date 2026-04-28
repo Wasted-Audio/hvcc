@@ -1,5 +1,5 @@
 # Copyright (C) 2014-2018 Enzien Audio, Ltd.
-# Copyright (C) 2023 Wasted Audio
+# Copyright (C) 2023-2026 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,8 +14,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
 from typing import List
+from pathlib import Path
 
 from .Connection import Connection
 from .HeavyObject import HeavyObject
@@ -27,7 +27,7 @@ class PdLibSignalGraph(PdGraph):
     def __init__(
         self,
         obj_args: List,
-        pd_path: str,
+        pd_path: Path,
         pos_x: int = 0,
         pos_y: int = 0
     ) -> None:
@@ -83,5 +83,5 @@ class PdLibSignalGraph(PdGraph):
 
     def __repr__(self) -> str:
         return "[{0} {1}]".format(
-            os.path.splitext(os.path.basename(self._PdGraph__pd_path))[0],
+            self._PdGraph__pd_path.stem,
             " ".join(self.obj_args[1:]))

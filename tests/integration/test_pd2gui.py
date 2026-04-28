@@ -3,35 +3,37 @@
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
-import os
 import json
+
+from pathlib import Path
 
 from hvcc.interpreters.pd2gui.pd2gui import pd2gui
 from hvcc.version import VERSION
 
 
 class TestPdGuiParser:
-    SCRIPT_DIR = os.path.dirname(__file__)
+    SCRIPT_DIR = Path(__file__).parent
 
     def _test_gui_patch(
         self,
         path: str
     ) -> None:
-        source_path = os.path.join(self.SCRIPT_DIR, "data", path)
-        ir_file = os.path.join(self.SCRIPT_DIR, "ir", os.path.splitext(path)[0] + ".gui.json")
+        source_path = Path(self.SCRIPT_DIR, "data", path)
+        ir_path = Path(self.SCRIPT_DIR, "ir")
 
         response = pd2gui.compile(
             pd_path=source_path,
-            ir_file=ir_file
+            ir_dir=ir_path
         )
 
         if response.notifs.has_error:
             raise Exception(response.notifs.errors[0])
 
-        with open(ir_file, "r") as f:
+        gui_path = Path(ir_path, Path(path).stem + ".gui.json")
+        with open(gui_path, "r") as f:
             gui = json.loads(f.read())
 
-        expected_path = os.path.join(os.path.splitext(source_path)[0] + ".golden.json")
+        expected_path = Path(source_path.parent, source_path.stem + ".golden.json")
         with open(expected_path, "r") as f:
             expected = json.loads(f.read())
             expected['version'] = VERSION

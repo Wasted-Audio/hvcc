@@ -3,11 +3,11 @@
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
-import os
 import re
 
 from collections import Counter
 from typing import Generator, Optional, Union
+from pathlib import Path
 
 from hvcc.interpreters.pd2hv.PdParser import PdParser
 from hvcc.types.GUI import (
@@ -28,16 +28,16 @@ class PdGUIParser(PdParser):
         self.object_counter: Counter = Counter()
 
         # search paths at this graph level
-        self.search_paths: list[str] = []
+        self.search_paths: list[Path] = []
 
     def gui_from_file(
         self,
-        file_path: str,
+        file_path: Path,
         obj_args: Optional[list] = None,
         is_root: bool = True
     ) -> tuple[Union[Graph, GraphRoot], bool]:
         if is_root:
-            self.search_paths.append(os.path.dirname(file_path))
+            self.search_paths.append(file_path)
 
         file_iterator = self.get_pd_line(file_path)
         canvas_line: str = file_iterator.__next__()
@@ -63,7 +63,7 @@ class PdGUIParser(PdParser):
         file_iterator: Generator,
         canvas_line: str,
         graph_args: list,
-        pd_path: str,
+        pd_path: Path,
         is_root: bool = False
     ) -> tuple[Union[Graph, GraphRoot], bool]:
 
@@ -153,7 +153,7 @@ class PdGUIParser(PdParser):
                             # replace args with resolved args
                             line = line[:5] + obj_args
 
-                        abs_path = self.find_abstraction_path(os.path.dirname(pd_path), obj_type)
+                        abs_path = self.find_abstraction_path(pd_path.parent, obj_type)
 
                         if abs_path is not None:
                             g, gop = self.gui_from_file(abs_path, obj_args=obj_args, is_root=False)
@@ -633,18 +633,20 @@ class PdGUIParser(PdParser):
         if param is None:
             return None
 
+        font_height = int(line[11]) if line[11] != "0" else 8
+
         return Float(
             position=Coords(
                 x=int(line[2]),
                 y=int(line[3])
             ),
             size=Size(
-                x=int(line[4]) * (int(line[11]) - 4),
+                x=int(line[4]) * (font_height - 4),
                 y=int(line[11])
             ),
             parameter=param,
-            label_text=line[8],
-            font_height=int(line[11]),
+            label_text=line[8] if line[8] != "-" else "",
+            font_height=font_height,
             label_pos=LabelPos(int(line[7])),
             min=float(line[5]),
             max=float(line[6])

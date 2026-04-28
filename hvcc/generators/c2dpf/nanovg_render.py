@@ -1,5 +1,6 @@
 import json
-import os
+
+from pathlib import Path
 
 import jinja2
 
@@ -8,11 +9,11 @@ from hvcc.types.GUI import Canvas, Comment, GraphRoot, Graph, GUIObjects
 
 def open_gui_json(
     patch_name: str,
-    c_src_dir: str,
+    c_src_dir: Path,
 ) -> GraphRoot:
 
     # load GUI from json file
-    gui_json_path = os.path.join(c_src_dir, "../ir/", f"{patch_name}.heavy.gui.json")
+    gui_json_path = Path(c_src_dir, "../ir/", f"{patch_name}.heavy.gui.json")
     with open(gui_json_path, "r") as f:
         gui_json = GraphRoot(**json.load(f))
 
@@ -21,7 +22,7 @@ def open_gui_json(
 
 def nanovg_render(
     patch_name: str,
-    c_src_dir: str,
+    c_src_dir: Path,
     env: jinja2.Environment,
     recv_list: list,
     send_list: list

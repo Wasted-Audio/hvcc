@@ -1,13 +1,13 @@
 # Heavy Compiler Collection
-# Copyright (C) 2025 Wasted Audio
+# Copyright (C) 2025-2026 Wasted Audio
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
 import argparse
-import os
 import time
 
 from typing import Optional
+from pathlib import Path
 
 from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
 from hvcc.interpreters.pd2gui.PdGUIParser import PdGUIParser
@@ -32,8 +32,8 @@ class pd2gui:
     @classmethod
     def compile(
         cls,
-        pd_path: str,
-        ir_file: str,
+        pd_path: Path,
+        ir_dir: Path,
         search_paths: Optional[list] = None,
         verbose: bool = False
     ):
@@ -47,20 +47,21 @@ class pd2gui:
         try:
             gui_graph, _ = parser.gui_from_file(pd_path)
 
-            if not os.path.exists(os.path.dirname(ir_file)):
-                os.makedirs(os.path.dirname(ir_file))
+            if not ir_dir.exists():
+                Path.mkdir(ir_dir)
 
-            # gui_path = os.path.join(ir_file, ir_file)
-            with open(ir_file, "w") as f:
+            gui_file = f"{pd_path.stem}.gui.json"
+            gui_path = Path(ir_dir, gui_file)
+            with open(gui_path, "w") as f:
                 f.write(gui_graph.model_dump_json(indent=2) + "\n")
 
             return CompilerResp(
                 stage="pd2gui",
                 notifs=CompilerNotif(),
-                in_dir=os.path.dirname(pd_path),
-                in_file=os.path.basename(pd_path),
-                out_file=os.path.basename(ir_file),
-                out_dir=os.path.dirname(ir_file),
+                in_dir=pd_path.parent,
+                in_file=pd_path,
+                out_dir=ir_dir,
+                out_file=gui_path,
                 compile_time=(time.time() - tick)
             )
         except Exception as e:
@@ -94,12 +95,12 @@ def main() -> None:
         action="count")
     args = parser.parse_args()
 
-    args.pd_path = os.path.abspath(os.path.expanduser(args.pd_path))
-    args.ir_dir = os.path.abspath(os.path.expanduser(args.ir_dir))
+    pd_path = Path(args.pd_path).expanduser().absolute()
+    ir_dir = Path(args.ir_dir).expanduser().absolute()
 
     pd2gui.compile(
-        pd_path=args.pd_path,
-        ir_file=args.ir_dir,
+        pd_path=pd_path,
+        ir_dir=ir_dir,
         search_paths=None,
         verbose=args.verbose)
 

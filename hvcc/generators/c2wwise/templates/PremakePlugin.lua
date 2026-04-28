@@ -28,7 +28,7 @@ Plugin.sdk.static.libdirs = {}
 Plugin.sdk.static.defines = {}
 Plugin.sdk.static.custom = function()
    filter "system:Windows"
-      systemversion "10.0.19041.0"
+      systemversion "latest"
 end
 
 Plugin.sdk.shared.includedirs = {}
@@ -43,7 +43,7 @@ Plugin.sdk.shared.libdirs = {}
 Plugin.sdk.shared.defines = {}
 Plugin.sdk.shared.custom = function()
    filter "system:Windows"
-      systemversion "10.0.19041.0"
+      systemversion "latest"
 end
 
 Plugin.authoring.includedirs =
@@ -67,7 +67,7 @@ Plugin.authoring.libdirs = {}
 Plugin.authoring.defines = {}
 Plugin.authoring.custom = function()
    filter "system:Windows"
-      systemversion "10.0.19041.0"
+      systemversion "latest"
 end
 
 return Plugin

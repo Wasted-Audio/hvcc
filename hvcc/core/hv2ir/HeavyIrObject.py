@@ -1,5 +1,5 @@
 # Copyright (C) 2014-2018 Enzien Audio, Ltd.
-# Copyright (C) 2023-2024 Wasted Audio
+# Copyright (C) 2023-2026 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,9 +15,10 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import json
-import os
 
 from typing import Dict, List, Optional, TYPE_CHECKING
+from pathlib import Path
+
 
 from .Connection import Connection
 from .HeavyException import HeavyException
@@ -39,7 +40,7 @@ class HeavyIrObject(HeavyLangObject):
     """
 
     # load the HeavyIR object definitions
-    with open(os.path.join(os.path.dirname(__file__), "../json/heavy.ir.json"), "r") as f:
+    with open(Path(Path(__file__).parent, "../json/heavy.ir.json"), "r") as f:
         __HEAVY_OBJS_IR_DICT = HeavyIRType(**json.load(f)).root
 
     def __init__(

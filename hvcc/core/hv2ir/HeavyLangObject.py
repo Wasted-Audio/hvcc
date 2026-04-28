@@ -1,5 +1,5 @@
 # Copyright (C) 2014-2018 Enzien Audio, Ltd.
-# Copyright (C) 2023-2024 Wasted Audio
+# Copyright (C) 2023-2026 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,12 +16,12 @@
 
 import decimal
 import json
-import os
 import random
 import string
 
 from struct import unpack, pack
 from typing import Optional, Union, List, Dict, Any, TYPE_CHECKING
+from pathlib import Path
 
 from .Connection import Connection
 from .HeavyException import HeavyException
@@ -42,7 +42,7 @@ class HeavyLangObject:
     __ID_CHARS = string.ascii_letters + string.digits
 
     # load the Heavy object definitions
-    with open(os.path.join(os.path.dirname(__file__), "../json/heavy.lang.json"), "r") as f:
+    with open(Path(Path(__file__).parent, "../json/heavy.lang.json"), "r") as f:
         _HEAVY_LANG_DICT = HeavyLangType(**json.load(f)).root
 
     def __init__(

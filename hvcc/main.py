@@ -1,5 +1,5 @@
 # Copyright (C) 2014-2018 Enzien Audio, Ltd.
-# Copyright (C) 2021-2024 Wasted Audio
+# Copyright (C) 2021-2026 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,9 +16,10 @@
 
 import argparse
 import json
-import os
 import sys
 import time
+
+from pathlib import Path
 
 from hvcc.version import VERSION
 from hvcc.compiler import compile_dataflow
@@ -54,6 +55,7 @@ def main() -> bool:
         "-p",
         "--search_paths",
         nargs="+",
+        default=[],
         help="Add a list of directories to search through for abstractions.")
     parser.add_argument(
         "-n",
@@ -85,6 +87,11 @@ def main() -> bool:
         help="Disable DSP. Run as control-only patch."
     )
     parser.add_argument(
+        "--gui",
+        action='store_false',
+        help="Parse GUI objects into IR."
+    )
+    parser.add_argument(
         "-v",
         "--verbose",
         help="Show debugging information.",
@@ -101,18 +108,19 @@ def main() -> bool:
     )
     args = parser.parse_args()
 
-    in_path = os.path.abspath(args.in_path)
+    in_path = Path(args.in_path).absolute()
     results = compile_dataflow(
         in_path=in_path,
-        out_dir=args.out_dir or os.path.dirname(in_path),
+        out_dir=Path(args.out_dir) or in_path.parent,
         patch_name=args.name,
-        patch_meta_file=args.meta,
-        search_paths=args.search_paths,
+        patch_meta_file=Path(args.meta) if args.meta is not None else Path(),
+        search_paths=[Path(path) for path in args.search_paths],
         generators=args.gen,
         ext_generators=args.ext_gen,
         verbose=args.verbose,
         copyright=args.copyright,
-        nodsp=args.nodsp
+        nodsp=args.nodsp,
+        gui=args.gui
     )
 
     errorCount = 0
@@ -139,11 +147,11 @@ def main() -> bool:
                 r.stage, warning.message, Colours.yellow, Colours.end, i + 1))
 
     if args.results_path:
-        results_path = os.path.realpath(os.path.abspath(args.results_path))
-        results_dir = os.path.dirname(results_path)
+        results_path = Path(args.results_path).absolute().resolve()
+        results_dir = results_path.parent
 
-        if not os.path.exists(results_dir):
-            os.makedirs(results_dir)
+        if not results_dir.exists():
+            results_dir.mkdir(parents=True)
 
         with open(results_path, "w") as f:
             json.dump(results.model_dump(), f)
