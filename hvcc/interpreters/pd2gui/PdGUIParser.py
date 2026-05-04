@@ -614,6 +614,12 @@ class PdGUIParser(PdParser):
             width = None
             text = " ".join(line[4:])
 
+        # escape characters
+        text = text.translate(str.maketrans({
+            "\"": "\\\"",
+            # "\\": "\\\\",  # backslash is already removed by self.split_line()
+        }))
+
         return Comment(
             id=f"comment{self.object_counter['comment']}",
             position=Coords(
