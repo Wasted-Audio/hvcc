@@ -158,7 +158,7 @@
     {{object.parameter}}->setDefault({{v.attributes.default}}f);
             {%- endif %}
         {%- endfor %}
-    {{object.parameter}}->setLabel("{{object.label_text}}", {{object.font_height}} * scaleFactor, LabelPos::{{object.label_pos.name|capitalize}});
+    {{object.parameter}}->setLabel("{{object.label_text}}", ({{object.font_height}} + 2) * scaleFactor, LabelPos::{{object.label_pos.name|capitalize}});
     {{parent}}->addManagedChild({{object.parameter}});
         {%- endif %}
     {%- endfor %}

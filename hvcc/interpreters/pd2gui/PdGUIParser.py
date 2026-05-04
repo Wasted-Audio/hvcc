@@ -646,11 +646,11 @@ class PdGUIParser(PdParser):
             ),
             size=Size(
                 x=int(line[4]) * (font_height - 4),
-                y=int(line[11])
+                y=font_height
             ),
             parameter=param,
             label_text=line[8] if line[8] != "-" else "",
-            font_height=font_height + 4,
+            font_height=font_height,
             label_pos=LabelPos(int(line[7])),
             min=float(line[5]),
             max=float(line[6])
