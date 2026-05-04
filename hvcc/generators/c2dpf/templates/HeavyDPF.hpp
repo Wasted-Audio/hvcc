@@ -139,7 +139,7 @@ protected:
   // -------------------------------------------------------------------
 
 private:
-  {%- if (receivers|length > 0) or senders|length > 0 %}
+  {%- if (receivers|length > 0) or (senders|length > 0) or (events|length > 0) %}
   // parameters
   float _parameters[HV_DPF_NUM_PARAMETER];
   {%- endif %}

@@ -140,9 +140,11 @@ void {{class_name}}::setParameterValue(uint32_t index, float value)
 {
   {%- if (receivers|length > 0) or (events|length > 0) %}
   switch (index) {
-    {%- for k, v  in receivers + events %}
+    {%- for k, v  in receivers + senders + events %}
     case {{loop.index-1}}: {
-      {%- if v.extern == "event" %}
+      {%- if v.type == "send" %}
+      // do nothing for {{k|upper}}
+      {%- elif v.extern == "event" %}
       if (value == 1)
         _context->sendBangToReceiver(Heavy_{{name}}::Event::In::{{k|upper}});
       {%- else %}
