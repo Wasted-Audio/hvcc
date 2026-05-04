@@ -18,8 +18,8 @@ from hvcc.types.GUI import (
 
 
 class PdGUIParser(PdParser):
-    # retain width by overloading this regex
-    RE_WIDTH = re.compile(r"")
+    # retain width by overriding this regex with a pattern that never matches
+    RE_WIDTH = re.compile(r"$^")
 
     def __init__(self) -> None:
         # the current global value of $0
@@ -615,10 +615,8 @@ class PdGUIParser(PdParser):
             text = " ".join(line[4:])
 
         # escape characters
-        text = text.translate(str.maketrans({
-            "\"": "\\\"",
-            # "\\": "\\\\",  # backslash is already removed by self.split_line()
-        }))
+        text = text.replace("\"", "\\\"")
+        # text = text.replace("\\": "\\\\")  # backslash is already removed by self.split_line()
 
         return Comment(
             id=f"comment{self.object_counter['comment']}",
