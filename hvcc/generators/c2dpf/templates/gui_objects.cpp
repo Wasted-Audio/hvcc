@@ -16,9 +16,9 @@
     {{object.id}}->setFontSize(15 * scaleFactor);
     {{object.id}}->setAbsolutePos({{object.position.x}} * scaleFactor, {{object.position.y}} * scaleFactor);
             {%- if object.width != None %}
-    {{object.id}}->setSize((7 * {{object.width}}) * scaleFactor, 15 * scaleFactor);
+    {{object.id}}->setSize((7.4 * {{object.width}}) * scaleFactor, 15 * scaleFactor);
             {%- else %}
-    {{object.id}}->setSize((7 * {{object.id}}String.length()) * scaleFactor, 15 * scaleFactor);
+    {{object.id}}->setSize((7.4 * {{object.id}}String.length()) * scaleFactor, 15 * scaleFactor);
             {%- endif -%}
         {%- elif object.type == 'bang' %}
     // bang
