@@ -88,7 +88,7 @@ def main() -> bool:
     )
     parser.add_argument(
         "--gui",
-        action='store_false',
+        action='store_true',
         help="Parse GUI objects into IR."
     )
     parser.add_argument(
