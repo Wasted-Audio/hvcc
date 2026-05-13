@@ -36,16 +36,16 @@ class c2wwise(Generator):
 
     @classmethod
     def compile(
-            cls,
-            c_src_dir: Path,
-            out_dir: Path,
-            externs: ExternInfo,
-            patch_name: Optional[str] = None,
-            patch_meta: Meta = Meta(),
-            num_input_channels: int = 0,
-            num_output_channels: int = 0,
-            copyright: Optional[str] = None,
-            verbose: Optional[bool] = False
+        cls,
+        c_src_dir: Path,
+        out_dir: Path,
+        externs: ExternInfo,
+        patch_name: Optional[str] = None,
+        patch_meta: Meta = Meta(),
+        num_input_channels: int = 0,
+        num_output_channels: int = 0,
+        copyright: Optional[str] = None,
+        verbose: Optional[bool] = False
     ) -> CompilerResp:
         tick = time.time()
 

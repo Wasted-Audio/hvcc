@@ -1,10 +1,13 @@
 {
+  "id": "mainPatch",
   "objects": [],
   "graphs": [
     {
+      "id": "graph1",
       "objects": [
         {
           "type": "canvas",
+          "id": "canvas1",
           "position": {
             "x": -52,
             "y": -29

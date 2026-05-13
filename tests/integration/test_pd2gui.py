@@ -20,16 +20,16 @@ class TestPdGuiParser:
     ) -> None:
         source_path = Path(self.SCRIPT_DIR, "data", path)
         ir_path = Path(self.SCRIPT_DIR, "ir")
+        gui_path = Path(ir_path, Path(path).stem + ".gui.json")
 
         response = pd2gui.compile(
             pd_path=source_path,
-            ir_dir=ir_path
+            ir_file=gui_path
         )
 
         if response.notifs.has_error:
             raise Exception(response.notifs.errors[0])
 
-        gui_path = Path(self.SCRIPT_DIR, "ir", Path(path).stem + ".gui.json")
         with open(gui_path, "r") as f:
             gui = json.loads(f.read())
 

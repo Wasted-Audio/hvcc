@@ -30,7 +30,7 @@
 #define DISTRHO_PLUGIN_NUM_INPUTS           {{num_input_channels}}
 #define DISTRHO_PLUGIN_NUM_OUTPUTS          {{num_output_channels}}
 #define DISTRHO_PLUGIN_IS_SYNTH             {{1 if num_output_channels > 0 and meta.midi_input > 0 else 0}}
-#define DISTRHO_PLUGIN_HAS_UI               {{1 if meta.enable_ui is sameas true else 0}}
+#define DISTRHO_PLUGIN_HAS_UI               {{1 if meta.enable_ui > 0 else 0}}
 #define DISTRHO_PLUGIN_IS_RT_SAFE           1
 #define DISTRHO_PLUGIN_WANT_PROGRAMS        0
 #define DISTRHO_PLUGIN_WANT_STATE           0
@@ -51,11 +51,16 @@
 // for level monitoring
 #define DISTRHO_PLUGIN_WANT_DIRECT_ACCESS   0
 
-{% if meta.enable_ui is sameas true %}
+{% if meta.enable_ui > 0 %}
 // if you are using a UI you'll probably want to modify these settings to your needs
+    {%- if meta.enable_ui == 1 %}
 #define DISTRHO_UI_USE_CUSTOM               1
 #define DISTRHO_UI_CUSTOM_INCLUDE_PATH      "DearImGui.hpp"
 #define DISTRHO_UI_CUSTOM_WIDGET_TYPE       DGL_NAMESPACE::ImGuiTopLevelWidget
+    {%- elif meta.enable_ui == 2 %}
+#define DISTRHO_UI_USE_NANOVG               1
+    {%- endif %}
+
     {%- if meta.ui_size != None %}
 #define DISTRHO_UI_DEFAULT_WIDTH            {{meta.ui_size.width}}
 #define DISTRHO_UI_DEFAULT_HEIGHT           {{meta.ui_size.height}}

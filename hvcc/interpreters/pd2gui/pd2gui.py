@@ -33,7 +33,7 @@ class pd2gui:
     def compile(
         cls,
         pd_path: Path,
-        ir_dir: Path,
+        ir_file: Path,
         search_paths: Optional[list] = None,
         verbose: bool = False
     ):
@@ -47,12 +47,11 @@ class pd2gui:
         try:
             gui_graph, _ = parser.gui_from_file(pd_path)
 
+            ir_dir = ir_file.parent
             if not ir_dir.exists():
                 Path.mkdir(ir_dir)
 
-            gui_file = f"{pd_path.stem}.gui.json"
-            gui_path = Path(ir_dir, gui_file)
-            with open(gui_path, "w") as f:
+            with open(ir_file, "w") as f:
                 f.write(gui_graph.model_dump_json(indent=2) + "\n")
 
             return CompilerResp(
@@ -61,7 +60,7 @@ class pd2gui:
                 in_dir=pd_path.parent,
                 in_file=pd_path,
                 out_dir=ir_dir,
-                out_file=gui_path,
+                out_file=ir_file,
                 compile_time=(time.time() - tick)
             )
         except Exception as e:
@@ -100,7 +99,7 @@ def main() -> None:
 
     pd2gui.compile(
         pd_path=pd_path,
-        ir_dir=ir_dir,
+        ir_file=Path(ir_dir, f"{pd_path.stem}.heavy.gui.json"),
         search_paths=None,
         verbose=args.verbose)
 

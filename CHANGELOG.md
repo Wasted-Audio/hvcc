@@ -11,6 +11,8 @@ Features:
 * Only parse GUI with `--gui` flag
 * Port objects from cyclone
 * Port `pdnam~` external using `MicroNAM`
+* DPF: support `@hv_event` parameters
+* DPF: Generate optional NanoVG UI code from `pd2gui` parser
 
 Bugfixes:
 
@@ -23,6 +25,7 @@ Bugfixes:
 Refactor:
 
 * Migrate to Pathlib (note: Generator signature has changed!)
+* GUI IR: stable IDs for graphs/canvas/comments; updated float/number fields; use specific GUI IR filename
 
 Docs:
 

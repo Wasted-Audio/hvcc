@@ -25,7 +25,8 @@ from ..filters import filter_uniqueid
 
 from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
 from hvcc.types.compiler import Generator, CompilerResp, CompilerMsg, CompilerNotif, ExternInfo
-from hvcc.types.meta import Meta, DPF
+from hvcc.types.meta import Meta, DPF, DPFUIType, DPFUISize
+from .nanovg_render import open_gui_json, nanovg_render
 
 
 class c2dpf(Generator):
@@ -38,7 +39,7 @@ class c2dpf(Generator):
         c_src_dir: Path,
         out_dir: Path,
         externs: ExternInfo,
-        patch_name: Optional[str] = None,
+        patch_name: str,
         patch_meta: Meta = Meta(),
         num_input_channels: int = 0,
         num_output_channels: int = 0,
@@ -51,6 +52,8 @@ class c2dpf(Generator):
         out_dir = Path(out_dir, "plugin")
         receiver_list = externs.parameters.inParam
         sender_list = externs.parameters.outParam
+        event_list = externs.events.inEvent
+        out_event_list = externs.events.outEvent
 
         dpf_meta: DPF = patch_meta.dpf
         dpf_path = dpf_meta.dpf_path
@@ -71,6 +74,13 @@ class c2dpf(Generator):
             source_dir = Path(out_dir, "source")
             shutil.copytree(c_src_dir, source_dir)
 
+            if dpf_meta.enable_ui == DPFUIType.NANOVG:
+                gui_json = open_gui_json(patch_name, c_src_dir)
+                dpf_meta.ui_size = DPFUISize(
+                    width=gui_json.size.x,
+                    height=gui_json.size.y
+                )
+
             # initialize the jinja template environment
             env = jinja2.Environment()
             env.filters["uniqueid"] = filter_uniqueid
@@ -89,6 +99,8 @@ class c2dpf(Generator):
                     num_output_channels=num_output_channels,
                     receivers=receiver_list,
                     senders=sender_list,
+                    events=event_list,
+                    out_events=out_event_list,
                     copyright=copyright_c))
             dpf_cpp_path = Path(source_dir, f"HeavyDPF_{patch_name}.cpp")
             with open(dpf_cpp_path, "w") as f:
@@ -100,18 +112,48 @@ class c2dpf(Generator):
                     num_output_channels=num_output_channels,
                     receivers=receiver_list,
                     senders=sender_list,
+                    events=event_list,
+                    out_events=out_event_list,
                     pool_sizes_kb=externs.memoryPoolSizesKb,
                     copyright=copyright_c))
-            if dpf_meta.enable_ui:
+            if dpf_meta.enable_ui == DPFUIType.IMGUI:
                 dpf_ui_path = Path(source_dir, f"HeavyDPF_{patch_name}_UI.cpp")
                 with open(dpf_ui_path, "w") as f:
-                    f.write(env.get_template("HeavyDPF_UI.cpp").render(
+                    f.write(env.get_template("HeavyDPF_ImGui_UI.cpp").render(
                         name=patch_name,
                         meta=dpf_meta,
                         class_name=f"HeavyDPF_{patch_name}",
                         receivers=receiver_list,
                         senders=sender_list,
                         copyright=copyright_c))
+            elif dpf_meta.enable_ui == DPFUIType.NANOVG:
+                gui_json, widgets, gui_objects_render = nanovg_render(
+                    patch_name, c_src_dir, env, receiver_list, sender_list
+                )
+
+                dpf_ui_header = Path(source_dir, f"HeavyDPF_{patch_name}_UI.hpp")
+                with open(dpf_ui_header, "w") as f:
+                    f.write(env.get_template("HeavyDPF_NanoVG_UI.hpp").render(
+                        name=patch_name,
+                        meta=dpf_meta,
+                        class_name=f"HeavyDPF_{patch_name}_UI",
+                        gui_json=gui_json,
+                        widgets=widgets,
+                        copyright=copyright_c))
+                dpf_ui_path = Path(source_dir, f"HeavyDPF_{patch_name}_UI.cpp")
+                with open(dpf_ui_path, "w") as f:
+                    f.write(env.get_template("HeavyDPF_NanoVG_UI.cpp").render(
+                        name=patch_name,
+                        meta=dpf_meta,
+                        class_name=f"HeavyDPF_{patch_name}_UI",
+                        gui_json=gui_json,
+                        widgets=widgets,
+                        gui_objects=gui_objects_render,
+                        receivers=receiver_list,
+                        senders=sender_list,
+                        events=event_list,
+                        copyright=copyright_c))
+
             dpf_h_path = Path(source_dir, "DistrhoPluginInfo.h")
             with open(dpf_h_path, "w") as f:
                 f.write(env.get_template("DistrhoPluginInfo.h").render(

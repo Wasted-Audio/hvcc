@@ -82,7 +82,7 @@ class Generator(ABC):
         c_src_dir: Path,
         out_dir: Path,
         externs: ExternInfo,
-        patch_name: Optional[str] = None,
+        patch_name: str,
         patch_meta: Meta = Meta(),
         num_input_channels: int = 0,
         num_output_channels: int = 0,

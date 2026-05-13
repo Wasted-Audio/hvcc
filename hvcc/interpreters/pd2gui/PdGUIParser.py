@@ -3,7 +3,9 @@
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
+import re
 
+from collections import Counter
 from typing import Generator, Optional, Union
 from pathlib import Path
 
@@ -16,10 +18,14 @@ from hvcc.types.GUI import (
 
 
 class PdGUIParser(PdParser):
+    # retain width by overriding this regex with a pattern that never matches
+    RE_WIDTH = re.compile(r"$^")
+
     def __init__(self) -> None:
         # the current global value of $0
         # Note(joe): set a high starting value to avoid potential user naming conflicts
         self.__DOLLAR_ZERO = 1000
+        self.object_counter: Counter = Counter()
 
         # search paths at this graph level
         self.search_paths: list[Path] = []
@@ -102,8 +108,10 @@ class PdGUIParser(PdParser):
                     elif line[1] == "restore" and gop:
                         objects = self.filter_invisible_objects(objects, gop_start, gop_size)
                         graphs = self.filter_invisible_graphs(graphs, gop_start, gop_size)
+                        self.object_counter["graph"] += 1
 
                         return Graph(
+                            id=f"graph{self.object_counter['graph']}",
                             position=Coords(
                                 x=int(line[2]),
                                 y=int(line[3])
@@ -201,8 +209,10 @@ class PdGUIParser(PdParser):
         else:
             objects = self.filter_invisible_objects(objects, gop_start, gop_size)
             graphs = self.filter_invisible_graphs(graphs, gop_start, gop_size)
+            self.object_counter["graph"] += 1
 
             return Graph(
+                id=f"graph{self.object_counter['graph']}",
                 position=Coords(
                     x=int(line[2]),
                     y=int(line[3])
@@ -286,7 +296,7 @@ class PdGUIParser(PdParser):
         """ Only allow externed parameters
         """
 
-        if "@hv_param" in param:
+        if "@hv_param" in param or "@hv_event" in param:
             return param.split(" ")[0]
         else:
             return None
@@ -330,8 +340,9 @@ class PdGUIParser(PdParser):
             resolved_obj_args[i] = a
         return resolved_obj_args
 
-    @classmethod
-    def add_canvas(cls, line: list[str]) -> Canvas:
+    def add_canvas(self, line: list[str]) -> Canvas:
+        self.object_counter["canvas"] += 1
+
         label = Label(
             text=line[10],
             color=Color(line[16]),
@@ -340,10 +351,11 @@ class PdGUIParser(PdParser):
                 y=int(line[12])
             ),
             font=Font(int(line[13])),
-            font_size=int(line[14])
+            font_size=int(line[14]) + 2
         ) if line[10] != "empty" else None
 
         return Canvas(
+            id=f"canvas{self.object_counter['canvas']}",
             position=Coords(
                 x=int(line[2]),
                 y=int(line[3])
@@ -370,7 +382,7 @@ class PdGUIParser(PdParser):
                 y=int(line[13])
             ),
             font=Font(int(line[14])),
-            font_size=int(line[15])
+            font_size=int(line[15]) + 2
         ) if line[11] != "empty" else None
 
         return Bang(
@@ -403,7 +415,7 @@ class PdGUIParser(PdParser):
                 y=int(line[11])
             ),
             font=Font(int(line[12])),
-            font_size=int(line[13])
+            font_size=int(line[13]) + 2
         ) if line[9] != "empty" else None
 
         return Toggle(
@@ -443,7 +455,7 @@ class PdGUIParser(PdParser):
                 y=int(line[13])
             ),
             font=Font(int(line[14])),
-            font_size=int(line[15])
+            font_size=int(line[15]) + 2
         ) if line[11] != "empty" else None
 
         return radio_obj[radio_type](
@@ -481,7 +493,7 @@ class PdGUIParser(PdParser):
                 y=int(line[15])
             ),
             font=Font(int(line[16])),
-            font_size=int(line[17])
+            font_size=int(line[17]) + 2
         ) if line[13] != "empty" else None
 
         return slider[line[4]](
@@ -549,7 +561,7 @@ class PdGUIParser(PdParser):
             circular=bool(int(line[16])),
             jump=bool(0),
             square=bool(int(line[15])),
-            arc=Color(line[13]),
+            arc_color=Color(line[13]),
             arc_start=float(line[23]),
             arc_show=bool(int(line[19]))
         )
@@ -568,7 +580,7 @@ class PdGUIParser(PdParser):
                 y=int(line[15])
             ),
             font=Font(0),
-            font_size=int(line[17])
+            font_size=int(line[17]) + 2
         ) if line[13] != "empty" else None
 
         return Number(
@@ -577,7 +589,7 @@ class PdGUIParser(PdParser):
                 y=int(line[3])
             ),
             size=Size(
-                x=int(line[5])*int(line[17]),
+                x=int(line[5])*int(line[17])+8,
                 y=int(line[6])
             ),
             parameter=param,
@@ -585,18 +597,35 @@ class PdGUIParser(PdParser):
             bg_color=Color(line[18]),
             fg_color=Color(line[19]),
             log_mode=bool(int(line[9])),
-            log_height=int(line[21])
+            log_height=int(line[21]),
+            min=float(line[7]),
+            max=float(line[8])
         )
 
-    @classmethod
-    def add_comment(cls, line: list[str]) -> Comment:
-        text = " ".join(line[4:])
+    def add_comment(self, line: list[str]) -> Comment:
+        self.object_counter["comment"] += 1
+
+        # get width and clean up remaining text
+        if line[-2] == "f" \
+                and line[-3][-1] == ",":
+            width = int(line[-1])
+            text = " ".join(line[4:-2])[:-1]
+        else:
+            width = None
+            text = " ".join(line[4:])
+
+        # escape characters
+        text = text.replace("\"", "\\\"")
+        # text = text.replace("\\": "\\\\")  # backslash is already removed by self.split_line()
+
         return Comment(
+            id=f"comment{self.object_counter['comment']}",
             position=Coords(
                 x=int(line[2]),
                 y=int(line[3])
             ),
             text=text,
+            width=width,
             size=Size(
                 x=10*len(text), y=10
             )
@@ -608,18 +637,20 @@ class PdGUIParser(PdParser):
         if param is None:
             return None
 
+        font_height = int(line[11]) if line[11] != "0" else 8
+
         return Float(
             position=Coords(
                 x=int(line[2]),
                 y=int(line[3])
             ),
             size=Size(
-                x=int(line[4]) * int(line[11]),
-                y=int(line[11])
+                x=int(line[4]) * (font_height - 4),
+                y=font_height
             ),
             parameter=param,
-            label_text=line[8],
-            font_size=int(line[11]),
+            label_text=line[8] if line[8] != "-" else "",
+            font_height=font_height,
             label_pos=LabelPos(int(line[7])),
             min=float(line[5]),
             max=float(line[6])
