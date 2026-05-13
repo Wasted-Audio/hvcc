@@ -15,7 +15,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from struct import unpack, pack
-from typing import Callable, Dict, List, Union
+from typing import Callable, Dict, List, Union, Optional
 
 from hvcc.types.IR import IROnMessage, IRSignalList, IRBuffer, IRObjectdict
 
@@ -122,6 +122,10 @@ class HeavyObject:
     @classmethod
     def get_C_class_impl_code(cls, obj_type: str, args: Dict) -> List[str]:
         return []
+
+    @classmethod
+    def get_C_gen_header_code(cls, obj_type: str, obj_id: str, args: Dict) -> Optional[tuple[str, str]]:
+        return None
 
     @classmethod
     def get_C_process(cls, process_dict: IRSignalList, obj_type: str, obj_id: str, args: Dict) -> List[str]:

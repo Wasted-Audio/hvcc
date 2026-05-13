@@ -10,6 +10,7 @@ Features:
 * Add `flash_time` to pd2gui Bang parser
 * Only parse GUI with `--gui` flag
 * Port objects from cyclone
+* Port `pdnam~` external using `MicroNAM`
 * DPF: support `@hv_event` parameters
 * DPF: Generate optional NanoVG UI code from `pd2gui` parser
 

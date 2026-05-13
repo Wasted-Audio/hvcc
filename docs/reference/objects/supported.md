@@ -229,6 +229,14 @@ Objects ported from [cyclone](https://github.com/porres/pd-cyclone) library.
 | tanh~ | |
 | tanx~ | |
 
+## Other externals
+
+Objects ported from other PD externals
+
+| object | limitations |
+| --- | --- |
+| pdnam~ | only supports WaveNet models Nano, Feather, Lite, and Standard |
+
 ## Supported Abstractions
 
 These are commonly used - or built in - abstractions that consist of compatible vanilla objects.
