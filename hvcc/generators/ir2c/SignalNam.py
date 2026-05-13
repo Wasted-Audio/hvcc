@@ -21,6 +21,11 @@ from .SignalNamHeader import convert_nam_to_header, to_symbol_stem
 from hvcc.types.IR import IRSignalList
 
 
+class UnknownModelException(Exception):
+    def __str__(self):
+        return "Unknown NAM model used."
+
+
 class SignalNam(HeavyObject):
 
     preamble = "sNam"
@@ -36,7 +41,7 @@ class SignalNam(HeavyObject):
         elif obj_type == '__nam_standard~f':
             return "SignalNamStandard"
         else:
-            raise Exception()
+            raise UnknownModelException()
 
     @classmethod
     def get_C_header_set(cls) -> set:
@@ -70,7 +75,7 @@ class SignalNam(HeavyObject):
         elif obj_type == '__nam_standard~f':
             return [f"sNam_standard_init(&sNam_{obj_id}, {weights}Weights);"]
         else:
-            raise Exception()
+            raise UnknownModelException()
 
     @classmethod
     def get_C_free(cls, obj_type: str, obj_id: str, args: dict) -> list[str]:
@@ -83,7 +88,7 @@ class SignalNam(HeavyObject):
         elif obj_type == '__nam_standard~f':
             return [f"sNam_standard_free(&sNam_{obj_id});"]
         else:
-            raise Exception()
+            raise UnknownModelException()
 
     @classmethod
     def get_C_process(cls, process_dict: IRSignalList, obj_type: str, obj_id: str, args: dict) -> list[str]:
@@ -95,6 +100,8 @@ class SignalNam(HeavyObject):
             function = "__hv_nam_lite_f(&sNam_{0}, VIf({1}), VOf({2}));"
         elif obj_type == '__nam_standard~f':
             function = "__hv_nam_standard_f(&sNam_{0}, VIf({1}), VOf({2}));"
+        else:
+            raise UnknownModelException()
 
         return [
             function.format(
