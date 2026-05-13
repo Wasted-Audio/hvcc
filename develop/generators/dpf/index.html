@@ -848,6 +848,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Parameter Types">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#events" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Events
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -1715,6 +1732,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Parameter Types">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#events" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Events
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -1790,6 +1824,9 @@
 <li><code>log</code> - hints <code>kParameterIsLogarithmic</code></li>
 <li><code>log_hz</code> - unit <code>Hz</code> - hints <code>kParameterIsLogarithmic</code></li>
 </ul>
+<h3 id="events">Events</h3>
+<p>If you want to receive a bang use <code>@hv_event</code> instead of <code>@hv_param</code> like <code>[r banger @hv_event]</code>.
+On the plugin side this behaves like the <code>trig</code> type.</p>
 <h2 id="metadata">Metadata</h2>
 <p>An accompanying metadata.json file can be included to set additional plugin settings.</p>
 <p>The <code>project</code> flag creates a <code>README.md</code> and <code>Makefile</code> in the root of the project output, but may conflict with other generators.</p>
