@@ -68,8 +68,8 @@ class HeavyIrObject(HeavyLangObject):
 
         # the list of signal buffers at the inlets and outlets
         # these are filled in by HeavyGraph.assign_signal_buffers()
-        self.inlet_buffers = [("zero", 0)] * self.num_inlets
-        self.outlet_buffers = [("zero", 0)] * self.num_outlets
+        self.inlet_buffers: list[tuple[str, int]] = [("zero", 0)] * self.num_inlets
+        self.outlet_buffers: list[tuple[str, int]] = [("zero", 0)] * self.num_outlets
 
         # True if this object has already been ordered in the signal chain
         self.__is_ordered = False
@@ -152,7 +152,7 @@ class HeavyIrObject(HeavyLangObject):
                 if len(cc) == 0:
                     continue
                 if len(cc) == 1:
-                    c = cc[0]  # get the connection
+                    c: Connection = cc[0]  # get the connection
 
                     # get the buffer at the outlet of the connected object
                     buf = c.from_object.outlet_buffers[c.outlet_index]

@@ -24,6 +24,7 @@ from .HIrConvolution import HIrConvolution
 from .HIrExpr import HIrExpr
 from .HIrInlet import HIrInlet
 from .HIrLorenz import HIrLorenz
+from .HIrNam import HIrNam
 from .HIrOutlet import HIrOutlet
 from .HIrPack import HIrPack
 from .HIrSwitchcase import HIrSwitchcase
@@ -293,6 +294,7 @@ LANG_CLASS_DICT = {
     "system": HLangSystem,
     "phasor": HLangPhasor,
     "line": HLangLine,
+    "__nam~f": HIrNam,
     "random": HLangRandom,
     "delay": HLangDelay,
     "table": HLangTable,

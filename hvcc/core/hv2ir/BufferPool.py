@@ -75,7 +75,7 @@ class BufferPool:
                     return k + count  # return the new retain count
             raise HeavyException(f"{b} not found in BufferPool!")
 
-    def release_buffer(self, b: List, count: int = 1) -> int:
+    def release_buffer(self, b: tuple[str, int], count: int = 1) -> int:
         """ Reduces the retain count of the buffer. Returns the new count.
         """
         # adc~, ZERO_BUFFER, send~ buffers are special. They can not be released.
