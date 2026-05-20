@@ -111,7 +111,7 @@ def main() -> bool:
     in_path = Path(args.in_path).absolute()
     results = compile_dataflow(
         in_path=in_path,
-        out_dir=Path(args.out_dir) or in_path.parent,
+        out_dir=Path(args.out_dir) if args.out_dir is not None else in_path.parent,
         patch_name=args.name,
         patch_meta_file=Path(args.meta) if args.meta is not None else Path(),
         search_paths=[Path(path) for path in args.search_paths],
