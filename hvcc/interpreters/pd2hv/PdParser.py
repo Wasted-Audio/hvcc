@@ -239,6 +239,25 @@ class PdParser:
         """
         obj_array: Optional[HeavyObject] = None  # an #A (table) object which is currently being parsed
 
+        def finalize_array(array: HeavyObject) -> None:
+            declared_size = array.obj_dict["size"]
+            values_size = len(array.obj_dict["values"])
+            if declared_size != values_size:
+                new_size = max(declared_size, values_size)
+                array.add_warning(
+                    "Table \"{0}\" was declared as having {1} values, "
+                    "but {2} were supplied. It will be resized to {3} "
+                    "values (any unsupplied values will be zeroed).".format(
+                        array.obj_dict["name"],
+                        declared_size,
+                        values_size,
+                        new_size))
+                array.obj_dict["size"] = new_size
+                if new_size < declared_size:
+                    array.obj_dict["values"] = obj_args["values"][:new_size]
+                else:
+                    array.obj_dict["values"].extend([0.0 for _ in range(new_size - declared_size)])
+
         g = pd_graph_class(graph_args, pd_path, pos_x, pos_y)
 
         msg_send: dict = {}
@@ -299,24 +318,8 @@ class PdParser:
                             # are we restoring an array object?
                             # do some final sanity checks
                             if obj_array is not None:
-                                declared_size = obj_array.obj_dict["size"]
-                                values_size = len(obj_array.obj_dict["values"])
-                                if declared_size != values_size:
-                                    new_size = max(declared_size, values_size)
-                                    obj_array.add_warning(
-                                        "Table \"{0}\" was declared as having {1} values, "
-                                        "but {2} were supplied. It will be resized to {3} "
-                                        "values (any unsupplied values will be zeroed).".format(
-                                            obj_array.obj_dict["name"],
-                                            declared_size,
-                                            values_size,
-                                            new_size))
-                                    obj_array.obj_dict["size"] = new_size
-                                    if new_size < declared_size:
-                                        obj_array.obj_dict["values"] = obj_args["values"][:new_size]
-                                    else:
-                                        obj_array.obj_dict["values"].extend([0.0 for _ in
-                                                                             range(new_size - declared_size)])
+                                finalize_array(obj_array)
+
                                 obj_array = None  # done parsing the array
 
                             # set the subpatch name
@@ -556,7 +559,10 @@ class PdParser:
                                 gui_recv[index] = obj_args[8]
 
                     elif line[1] == "array":
-                        assert obj_array is None, "#X array object is already being parsed."
+                        # are we still parsing a previous array? finalize it.
+                        if obj_array is not None:
+                            finalize_array(obj_array)
+
                         # array names can have dollar arguments in them.
                         # ensure that they are resolved
                         table_def = self.__resolve_object_args(
