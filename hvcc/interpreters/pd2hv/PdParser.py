@@ -239,10 +239,7 @@ class PdParser:
         """
         obj_array: Optional[HeavyObject] = None  # an #A (table) object which is currently being parsed
 
-        def finalize_array(array: Optional[HeavyObject]) -> None:
-            if array is None:
-                return
-
+        def finalize_array(array: HeavyObject) -> None:
             declared_size = array.obj_dict["size"]
             values_size = len(array.obj_dict["values"])
             if declared_size != values_size:
@@ -560,6 +557,8 @@ class PdParser:
 
                     elif line[1] == "array":
                         if obj_array is not None:
+                            # A new array starts before "#X restore", so finish
+                            # the current table before parsing the next one.
                             finalize_array(obj_array)
                         # array names can have dollar arguments in them.
                         # ensure that they are resolved
