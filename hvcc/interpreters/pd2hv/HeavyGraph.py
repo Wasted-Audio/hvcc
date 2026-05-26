@@ -1,5 +1,5 @@
 # Copyright (C) 2014-2018 Enzien Audio, Ltd.
-# Copyright (C) 2023 Wasted Audio
+# Copyright (C) 2023-2026 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,8 +15,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import json
-import os
+
 from typing import Optional, List, Dict
+from pathlib import Path
 
 from .PdObject import PdObject
 from .HeavyObject import HeavyObject
@@ -25,12 +26,12 @@ from .HeavyObject import HeavyObject
 class HeavyGraph(PdObject):
     def __init__(
         self,
-        hv_path: str,
+        hv_path: Path,
         obj_args: Optional[List] = None,
         pos_x: int = 0,
         pos_y: int = 0
     ) -> None:
-        super().__init__(os.path.basename(hv_path).split(".")[0], obj_args, pos_x, pos_y)
+        super().__init__(hv_path.name.split(".")[0], obj_args, pos_x, pos_y)
 
         # read the heavy graph
         with open(hv_path, "r") as f:

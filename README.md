@@ -16,47 +16,47 @@ It has since then been expanded to provide further support for many different pl
 
 ## Documentation
 
-* [Introduction](/docs/01.introduction.md)
-  * [What is heavy?](/docs/01.introduction.md#what-is-heavy)
-  * [Supported patch formats](/docs/01.introduction.md#supported-patch-formats)
-  * [Supported platforms](/docs/01.introduction.md#supported-platforms)
-  * [Supported frameworks](/docs/01.introduction.md#supported-frameworks)
-  * [Licensing](/docs/01.introduction.md#licensing)
-* [Getting Started](/docs/02.getting_started.md)
-* [Generators](/docs/03.generators.md)
-* [MIDI](/docs/04.midi.md)
-* [C API](/docs/05.c.md)
-* [C++ API](/docs/06.cpp.md)
-* [Heavy Lang Info](/docs/07.heavy_lang.md)
-* [Heavy IR Info](/docs/08.heavy_ir_lang.md)
-* [Heavy GUI IR Info](/docs/11.heavy_gui_ir.md)
-* [Supported vanilla objects](/docs/09.supported_vanilla_objects.md)
-* [Unsupported vanilla objects](/docs/10.unsupported_vanilla_objects.md)
+- [Introduction](docs/getting-started/index.md)
+  - [What is heavy?](docs/getting-started/index.md#what-is-heavy)
+  - [Supported patch formats](docs/getting-started/index.md#supported-patch-formats)
+  - [Supported platforms](docs/getting-started/index.md#supported-platforms)
+  - [Supported frameworks](docs/getting-started/index.md#supported-frameworks)
+  - [Licensing](docs/getting-started/index.md#licensing)
+- [Getting Started](docs/getting-started/patching.md)
+- [Generators](docs/generators/index.md)
+- [MIDI](docs/reference/midi.md)
+- [C API](docs/reference/c.md)
+- [C++ API](docs/reference/cpp.md)
+- [Heavy Lang Info](docs/reference/ir/heavy_lang.md)
+- [Heavy IR Info](docs/reference/ir/heavy_ir.md)
+- [Heavy GUI IR Info](docs/reference/ir/heavy_gui_ir.md)
+- [Supported vanilla objects](docs/reference/objects/supported.md)
+- [Unsupported vanilla objects](docs/reference/objects/unsupported.md)
 
 ## Integrations
 
 hvcc has been integrated into several projects and services. This allows to easily compile patches without having to install hvcc manually.
 
-* [plugdata](https://plugdata.org/) - Modern interface for Pure Data. Includes a full cross-platform toolchain and targets Daisy, DPF and PD Externals.
-* [mod-cloud-builder](https://github.com/moddevices/mod-cloud-builder) - Online service for building LV2 plugins for the MOD platform.
-* [OWL Patch Library](https://www.rebeltech.org/patch-library) - Online service for building OWL plugins (uses an old fork).
+- [plugdata](https://plugdata.org/) - Modern interface for Pure Data. Includes a full cross-platform toolchain and targets Daisy, DPF and PD Externals.
+- [mod-cloud-builder](https://github.com/moddevices/mod-cloud-builder) - Online service for building LV2 plugins for the MOD platform.
+- [OWL Patch Library](https://www.rebeltech.org/patch-library) - Online service for building OWL plugins (uses an old fork).
 
 ## Requirements
 
 Python 3.9 up to 3.14
 
-* `jinja2` (for generator templating)
-* `pydantic` (for data types)
-* `pydantic-extra-types` (for data types)
-* `arpeggio` (for `expr~` translation)
+- `jinja2` (for generator templating)
+- `pydantic` (for data types)
+- `pydantic-extra-types` (for data types)
+- `arpeggio` (for `expr~` translation)
 
 For tests:
 
-* `tox` (python install)
-* `numpy/scipy` (dev dependencies)
-* `midifile` (git submodule)
-* `tinywav` (git submodule)
-* `clang/clang++` (system install)
+- `tox` (python install)
+- `numpy/scipy` (dev dependencies)
+- `midifile` (git submodule)
+- `tinywav` (git submodule)
+- `clang/clang++` (system install)
 
 ## Installation
 
@@ -74,7 +74,7 @@ cd hvcc/
 pip3 install -e .
 ```
 
-Also review our [Contribution Guide](/CONTRIBUTING.md) before opening a pull request.
+Also review our [Contribution Guide](CONTRIBUTING.md) before opening a pull request.
 
 ## Usage
 
@@ -88,9 +88,9 @@ hvcc ~/myProject/_main.pd
 
 This command will generate the following directories:
 
-* `~/myProject/hv` heavylang representation of the input pd patch(es)
-* `~/myProject/ir` heavyir representation of the heavylang patch
-* `~/myProject/c` final generated C/C++ source files (this is what you would use in your project)
+- `~/myProject/hv` heavylang representation of the input pd patch(es)
+- `~/myProject/ir` heavyir representation of the heavylang patch
+- `~/myProject/c` final generated C/C++ source files (this is what you would use in your project)
 
 ### `-o` Select output directory
 
@@ -132,7 +132,7 @@ It is also possible to pass a list of generators:
 hvcc ~/myProject/_main.pd -o ~/Desktop/somewhere/else/ -n mySynth -g unity wwise js
 ```
 
-A list of available generator options can be found [here](/docs/03.generators.md)
+A list of available generator options can be found [here](docs/generators/index.md)
 
 ### `-p` Search Paths
 
@@ -168,17 +168,17 @@ Displays all the available parameters and options for hvcc.
 
 ## Contact
 
-The Heavy community aims to be safe and inclusive, please read our [Code of Conduct](/CODE_OF_CONDUCT.md) before engaging.
+The Heavy community aims to be safe and inclusive, please read our [Code of Conduct](CODE_OF_CONDUCT.md) before engaging.
 
 There are several places where heavy/hvcc conversation is happening:
 
-* [Discord](https://discord.gg/fmxJveg)
-* [IRC](https://web.libera.chat/#hvcc)
-* A number of forums:
-  * [Bela](https://forum.bela.io/?q=hvcc)
-  * [Rebel Technology](https://community.rebeltech.org/tags/puredata)
-  * [Daisy](https://forum.electro-smith.com/c/integrations/pure-data/32)
-  * [MOD](https://forum.moddevices.com/c/developers/pure-data/56)
+- [Discord](https://discord.gg/fmxJveg)
+- [IRC](https://web.libera.chat/#hvcc)
+- A number of forums:
+  - [Bela](https://forum.bela.io/?q=hvcc)
+  - [Rebel Technology](https://community.rebeltech.org/tags/puredata)
+  - [Daisy](https://forum.electro-smith.com/c/integrations/pure-data/32)
+  - [MOD](https://forum.moddevices.com/c/developers/pure-data/56)
 
 Or you can use the [discussions](https://github.com/Wasted-Audio/hvcc/discussions) tab of this repository
 

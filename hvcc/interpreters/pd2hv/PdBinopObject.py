@@ -51,7 +51,19 @@ class PdBinopObject(PdObject):
         "pow": "pow",
         "pow~": "pow",
         ">>": ">>",
-        "<<": "<<"
+        "<<": "<<",
+        "cyclone/>~": ">",
+        "cyclone/greaterthan~": ">",
+        "cyclone/>=~": ">=",
+        "cyclone/greaterthaneq~": ">=",
+        "cyclone/<~": "<",
+        "cyclone/lessthan~": "<",
+        "cyclone/<=~": "<=",
+        "cyclone/lessthaneq~": "<=",
+        "cyclone/==~": "==",
+        "cyclone/equals~": "==",
+        "cyclone/!=~": "!=",
+        "cyclone/notequals~": "!="
     }
 
     def __init__(

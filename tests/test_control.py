@@ -1,5 +1,5 @@
 # Copyright (C) 2014-2018 Enzien Audio, Ltd.
-# Copyright (C) 2022 Wasted Audio
+# Copyright (C) 2022-2026 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,16 +15,17 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import argparse
-import os
 import unittest
+
+from pathlib import Path
 
 from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
 from tests.framework.base_control import TestPdControlBase
 
 
 class TestPdControlPatches(TestPdControlBase):
-    SCRIPT_DIR = os.path.dirname(__file__)
-    TEST_DIR = os.path.join(os.path.dirname(__file__), "pd", "control")
+    SCRIPT_DIR = Path(__file__).parent
+    TEST_DIR = Path(Path(__file__).parent, "pd", "control")
 
     def test_abs(self):
         self._test_control_patch("test-abs.pd")
@@ -103,7 +104,7 @@ class TestPdControlPatches(TestPdControlBase):
         self._test_control_patch("test-exp.pd")
 
     def test_extern_names_capitals(self):
-        self._test_control_patch_expect_error("test-extern_names_capitals.pd", None)
+        self._test_control_patch_expect_error("test-extern_names_capitals.pd", NotificationEnum.EMPTY)
 
     def test_empty_patch(self):
         self._test_control_patch("test-empty_patch.pd")
@@ -335,7 +336,7 @@ def main():
         "pd_path",
         help="The path to the Pd file to read.")
     args = parser.parse_args()
-    if os.path.exists(args.pd_path):
+    if Path(args.pd_path).exists():
         test_control = TestPdControlPatches()
         result = test_control._test_control_patch(pd_file=args.pd_path)
         print(result)

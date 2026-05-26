@@ -13,16 +13,22 @@
       {%- endif %}
       {%- if v.attributes.type == 'bool': %}
         | kParameterIsBoolean
-      {%- elif v.attributes.type == 'trig': -%}
+      {%- elif v.attributes.type == 'trig' or v.extern == "event": -%}
         | kParameterIsTrigger
       {%- elif v.attributes.type == 'int': -%}
         | kParameterIsInteger
       {%- elif v.attributes.type in ['log', 'log_hz']: -%}
         | kParameterIsLogarithmic
       {%- endif %};
+      {%- if v.attributes %}
         parameter.ranges.min = {{v.attributes.min}}f;
         parameter.ranges.max = {{v.attributes.max}}f;
         parameter.ranges.def = {{v.attributes.default}}f;
+      {%- else %}
+        parameter.ranges.min = 0.0f;
+        parameter.ranges.max = 1.0f;
+        parameter.ranges.def = 0.0f;
+      {%- endif %}
       {%- if v.attributes.type == 'db' and not (meta.enumerators != None and meta.enumerators[v.display] is defined): %}
         {
           ParameterEnumerationValue* const enumValues = new ParameterEnumerationValue[1];

@@ -1037,6 +1037,22 @@
 
     ]
   },
+  "__exc_or~f": {
+    "inlets": [
+      "~f>",
+      "~f>"
+    ],
+    "ir": {
+      "control": false,
+      "signal": true,
+      "init": false
+    },
+    "outlets": [
+      "~f>"
+    ],
+    "args": [],
+    "perf": {}
+  },
   "__expr": {
     "inlets": [],
     "ir": {
@@ -1965,6 +1981,111 @@
       "default": 0,
       "required": false
     }]
+  },
+  "__nam~f": {
+    "inlets": [
+      "~f>"
+    ],
+    "ir": {
+      "control": false,
+      "signal": true,
+      "init": true
+    },
+    "outlets": [
+      "~f>"
+    ],
+    "args": [{
+      "name": "nam",
+      "value_type": "string",
+      "description": "path to NAM file",
+      "default": "",
+      "required": true
+    }],
+    "perf": {}
+  },
+  "__nam_nano~f": {
+    "inlets": [
+      "~f>"
+    ],
+    "ir": {
+      "control": false,
+      "signal": true,
+      "init": true
+    },
+    "outlets": [
+      "~f>"
+    ],
+    "args": [{
+      "name": "nam",
+      "value_type": "string",
+      "description": "path to NAM file",
+      "default": "",
+      "required": true
+    }],
+    "perf": {}
+  },
+  "__nam_feather~f": {
+    "inlets": [
+      "~f>"
+    ],
+    "ir": {
+      "control": false,
+      "signal": true,
+      "init": true
+    },
+    "outlets": [
+      "~f>"
+    ],
+    "args": [{
+      "name": "nam",
+      "value_type": "string",
+      "description": "path to NAM file",
+      "default": "",
+      "required": true
+    }],
+    "perf": {}
+  },
+  "__nam_lite~f": {
+    "inlets": [
+      "~f>"
+    ],
+    "ir": {
+      "control": false,
+      "signal": true,
+      "init": true
+    },
+    "outlets": [
+      "~f>"
+    ],
+    "args": [{
+      "name": "nam",
+      "value_type": "string",
+      "description": "path to NAM file",
+      "default": "",
+      "required": true
+    }],
+    "perf": {}
+  },
+  "__nam_standard~f": {
+    "inlets": [
+      "~f>"
+    ],
+    "ir": {
+      "control": false,
+      "signal": true,
+      "init": true
+    },
+    "outlets": [
+      "~f>"
+    ],
+    "args": [{
+      "name": "nam",
+      "value_type": "string",
+      "description": "path to NAM file",
+      "default": "",
+      "required": true
+    }],
+    "perf": {}
   },
   "__neq": {
     "inlets": [
@@ -3305,9 +3426,9 @@
       "neon": 0
     }
   },
-  "asinh~": {
+  "__asinh~f": {
     "inlets": [
-      "signal"
+      "~f>"
     ],
     "ir": {
       "control": false,
@@ -3315,15 +3436,15 @@
       "init": false
     },
     "outlets": [
-      "signal"
+      "~f>"
     ],
     "args": [
 
     ]
   },
-  "asin~": {
+  "__asin~f": {
     "inlets": [
-      "signal"
+      "~f>"
     ],
     "ir": {
       "control": false,
@@ -3331,12 +3452,12 @@
       "init": false
     },
     "outlets": [
-      "signal"
+      "~f>"
     ]
   },
-  "atanh~": {
+  "__atanh~f": {
     "inlets": [
-      "signal"
+      "~f>"
     ],
     "ir": {
       "control": false,
@@ -3344,12 +3465,12 @@
       "init": false
     },
     "outlets": [
-      "signal"
+      "~f>"
     ]
   },
-  "atan~": {
+  "__atan~f": {
     "inlets": [
-      "signal"
+      "~f>"
     ],
     "ir": {
       "control": false,
@@ -3357,7 +3478,61 @@
       "init": false
     },
     "outlets": [
-      "signal"
+      "~f>"
+    ]
+  },
+  "__bit_and~f": {
+    "inlets": [
+      "~f>",
+      "~f>"
+    ],
+    "ir": {
+      "control": false,
+      "signal": true,
+      "init": false
+    },
+    "outlets": [
+      "~f>"
+    ]
+  },
+  "__bit_or~f": {
+    "inlets": [
+      "~f>",
+      "~f>"
+    ],
+    "ir": {
+      "control": false,
+      "signal": true,
+      "init": false
+    },
+    "outlets": [
+      "~f>"
+    ]
+  },
+    "__bit_not~f": {
+    "inlets": [
+      "~f>"
+    ],
+    "ir": {
+      "control": false,
+      "signal": true,
+      "init": false
+    },
+    "outlets": [
+      "~f>"
+    ]
+  },
+  "__bitsafe~f": {
+    "inlets": [
+      "~f>"
+    ],
+    "ir": {
+      "control": false,
+      "signal": true,
+      "init": false
+    },
+    "outlets": [
+      "~f>"
     ]
   },
   "__exp~f": {
@@ -3379,9 +3554,9 @@
       "neon": 0
     }
   },
-  "sinh~": {
+  "__sinh~f": {
     "inlets": [
-      "signal"
+      "~f>"
     ],
     "ir": {
       "control": false,
@@ -3389,15 +3564,15 @@
       "init": false
     },
     "outlets": [
-      "signal"
+      "~f>"
     ],
     "args": [
 
     ]
   },
-  "tanh~": {
+  "__tanh~f": {
     "inlets": [
-      "signal"
+      "~f>"
     ],
     "ir": {
       "control": false,
@@ -3405,12 +3580,12 @@
       "init": false
     },
     "outlets": [
-      "signal"
+      "~f>"
     ]
   },
-  "tan~": {
+  "__tan~f": {
     "inlets": [
-      "signal"
+      "~f>"
     ],
     "ir": {
       "control": false,
@@ -3418,7 +3593,7 @@
       "init": false
     },
     "outlets": [
-      "signal"
+      "~f>"
     ]
   }
 }

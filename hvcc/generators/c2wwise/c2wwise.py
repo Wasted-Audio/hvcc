@@ -1,5 +1,5 @@
 # Copyright (C) 2014-2018 Enzien Audio, Ltd.
-# Copyright (C) 2021-2024 Wasted Audio
+# Copyright (C) 2021-2026 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,11 +14,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
 import shutil
 import time
 import jinja2
+
 from typing import Optional
+from pathlib import Path
 
 from ..copyright import copyright_manager
 from ..filters import filter_plugin_id
@@ -35,16 +36,16 @@ class c2wwise(Generator):
 
     @classmethod
     def compile(
-            cls,
-            c_src_dir: str,
-            out_dir: str,
-            externs: ExternInfo,
-            patch_name: Optional[str] = None,
-            patch_meta: Meta = Meta(),
-            num_input_channels: int = 0,
-            num_output_channels: int = 0,
-            copyright: Optional[str] = None,
-            verbose: Optional[bool] = False
+        cls,
+        c_src_dir: Path,
+        out_dir: Path,
+        externs: ExternInfo,
+        patch_name: Optional[str] = None,
+        patch_meta: Meta = Meta(),
+        num_input_channels: int = 0,
+        num_output_channels: int = 0,
+        copyright: Optional[str] = None,
+        verbose: Optional[bool] = False
     ) -> CompilerResp:
         tick = time.time()
 
@@ -57,14 +58,14 @@ class c2wwise(Generator):
         copyright_c = copyright_manager.get_copyright_for_c(copyright)
         copyright_xml = copyright_manager.get_copyright_for_xml(copyright)
 
-        templates_dir = os.path.join(os.path.dirname(__file__), "templates")
+        templates_dir = Path(Path(__file__).parent, "templates")
         is_source_plugin = num_input_channels == 0
         plugin_type = "Source" if is_source_plugin else "FX"
         plugin_id = filter_plugin_id(patch_name)
 
-        out_dir = os.path.join(out_dir, "wwise")
-        if not os.path.exists(out_dir):
-            os.makedirs(out_dir)
+        out_dir = Path(out_dir, "wwise")
+        if not out_dir.exists():
+            out_dir.mkdir()
 
         env = jinja2.Environment()
         env.loader = jinja2.FileSystemLoader(
@@ -95,22 +96,22 @@ class c2wwise(Generator):
                     raise Exception("Wwise FX plugins require the same input/output channel"
                                     "configuration (i.e. [adc~ 1] -> [dac~ 1]).")
 
-            patch_src_dir = os.path.join(out_dir, "SoundEnginePlugin", "Heavy")
-            if os.path.exists(patch_src_dir):
+            patch_src_dir = Path(out_dir, "SoundEnginePlugin", "Heavy")
+            if patch_src_dir.exists():
                 shutil.rmtree(patch_src_dir)
             shutil.copytree(c_src_dir, patch_src_dir)
 
             src_ext_list = ["h", "hpp", "c", "cpp", "xml", "def", "rc", "lua", "json"]
             for f in env.list_templates(extensions=src_ext_list):
-                file_dir = os.path.join(out_dir, os.path.dirname(f))
-                file_name = os.path.basename(f)
+                file = Path(f)
+                file_dir = Path(out_dir, file.parent)
 
-                file_name = file_name.replace("{{name}}", patch_name)
+                file_name = file.name.replace("{{name}}", patch_name)
                 file_name = file_name.replace("{{plugin_type}}", plugin_type)
-                file_path = os.path.join(file_dir, file_name)
+                file_path = Path(file_dir, file_name)
 
-                if not os.path.exists(os.path.dirname(file_path)):
-                    os.makedirs(os.path.dirname(file_path))
+                if not file_path.parent.exists():
+                    file_path.parent.mkdir(parents=True)
 
                 with open(file_path, "w") as g:
                     g.write(env.get_template(f).render(
