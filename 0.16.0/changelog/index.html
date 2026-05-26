@@ -1,0 +1,2573 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://wasted-audio.github.io/hvcc/0.16.0/changelog/">
+      
+      
+        <link rel="prev" href="../adr/ADR-004-Signal-Rate-Expr/">
+      
+      
+        <link rel="next" href="../contributing/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../img/favicon.ico">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Changelog - Heavy Compiler Collection</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#changelog" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+      </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Heavy Compiler Collection" class="md-header__button md-logo" aria-label="Heavy Compiler Collection" data-md-component="logo">
+      
+  <img src="../img/logo-compressed.svg" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Heavy Compiler Collection
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Changelog
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/Wasted-Audio/hvcc" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    Wasted-Audio/hvcc
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../getting-started/" class="md-tabs__link">
+          
+  
+  
+  Getting Started
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../generators/" class="md-tabs__link">
+          
+  
+  
+  Generators
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../reference/midi/" class="md-tabs__link">
+          
+  
+  
+  Reference
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../adr/" class="md-tabs__link">
+          
+  
+  
+  ADRs
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    <li class="md-tabs__item md-tabs__item--active">
+      <a href="./" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Changelog
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../contributing/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Contributing
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../code_of_conduct/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Code of Conduct
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Heavy Compiler Collection" class="md-nav__button md-logo" aria-label="Heavy Compiler Collection" data-md-component="logo">
+      
+  <img src="../img/logo-compressed.svg" alt="logo">
+
+    </a>
+    Heavy Compiler Collection
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/Wasted-Audio/hvcc" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    Wasted-Audio/hvcc
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Getting Started
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../getting-started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Introduction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../getting-started/patching/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Patching Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Generators
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Generators
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../generators/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Daisy
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Daisy
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../generators/daisy/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Basics
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../generators/daisy_json/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Board JSON
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../generators/dpf/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    DPF
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../generators/fmod/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    FMOD
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../generators/javascript/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Javascript
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../generators/owl/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    OWL
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../generators/pdext/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pd External
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../generators/unity/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Unity
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../generators/wwise/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Wwise
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../generators/custom/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Custom
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/midi/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MIDI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/c/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    C API
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/cpp/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    C++ API
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/objects/supported/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Supported Objects
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/objects/unsupported/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Unsupported Objects
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/ir/heavy_lang/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Heavy Lang
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/ir/heavy_ir/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Heavy IR
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/ir/heavy_gui_ir/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Heavy GUI IR
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADRs
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    ADRs
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/ADR-001-GUI-Send-Receive/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GUI Send/Receive
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/ADR-002-pd2gui-Parser/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    pd2gui Parser
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/ADR-003-Control-Rate-Expr/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Control Rate Expr
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/ADR-004-Signal-Rate-Expr/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Signal Rate Expr
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Changelog
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Changelog
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#0160" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.16.0
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0150" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.15.0
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0140" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.14.0
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0134" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.13.4
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0133" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.13.3
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0132" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.13.2
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0131" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.13.1
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0130" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.13.0
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0121" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.12.1
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0120" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.12.0
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0110" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.11.0
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0100" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.10.0
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#090" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.9.0
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#080" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.8.0
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#070" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.7.0
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#063" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.6.3
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#062" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.6.2
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#061" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.6.1
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#060" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.6.0
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#050" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.5.0
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#040" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.4.0
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#030" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.3.0
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#020" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.2.0
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#012" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.1.2
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#010" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.1.0
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#001" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.0.1
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#000" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.0.0
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../code_of_conduct/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Code of Conduct
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#0160" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.16.0
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0150" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.15.0
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0140" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.14.0
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0134" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.13.4
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0133" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.13.3
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0132" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.13.2
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0131" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.13.1
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0130" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.13.0
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0121" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.12.1
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0120" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.12.0
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0110" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.11.0
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0100" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.10.0
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#090" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.9.0
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#080" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.8.0
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#070" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.7.0
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#063" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.6.3
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#062" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.6.2
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#061" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.6.1
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#060" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.6.0
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#050" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.5.0
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#040" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.4.0
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#030" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.3.0
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#020" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.2.0
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#012" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.1.2
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#010" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.1.0
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#001" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.0.1
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#000" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.0.0
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="changelog">CHANGELOG</h1>
+<h2 id="0160">0.16.0</h2>
+<p>Features:</p>
+<ul>
+<li>Add theme configuration to pd2gui model</li>
+<li>Add <code>flash_time</code> to pd2gui Bang parser</li>
+<li>Only parse GUI with <code>--gui</code> flag</li>
+<li>Port objects from cyclone</li>
+<li>Port <code>pdnam~</code> external using <code>MicroNAM</code></li>
+<li>DPF: support <code>@hv_event</code> parameters</li>
+<li>DPF: Generate optional NanoVG UI code from <code>pd2gui</code> parser</li>
+</ul>
+<p>Bugfixes:</p>
+<ul>
+<li>Skip empty values when restoring tables (#348)</li>
+<li>Only append to table when first value is a float</li>
+<li>Fix parsing multi-array objects (#373)</li>
+<li>GUI send/receive config for objects in subpatches</li>
+<li>DPF: also send BPM value to <code>__hv_dpf_bpm</code> when transport is not playing</li>
+<li>Wwise: use latest Windows SDK available locally instead of hardcoded version</li>
+</ul>
+<p>Refactor:</p>
+<ul>
+<li>Migrate to Pathlib (note: Generator signature has changed!)</li>
+<li>GUI IR: stable IDs for graphs/canvas/comments; updated float/number fields; use specific GUI IR filename</li>
+</ul>
+<p>Docs:</p>
+<ul>
+<li>Versioning</li>
+</ul>
+<h2 id="0150">0.15.0</h2>
+<p>Features:</p>
+<ul>
+<li>Unity Generator: change build system to use CMake - thanks to @michaelhartung</li>
+<li>Allow externing graphical arrays using <code>@hv_table</code></li>
+<li>DPF: support and documentation for Audio Unit format (macOS)</li>
+<li>Daisy: support display parameters using <code>@hv_param</code></li>
+<li>New pd2gui parser that creates an Intermediate Representation JSON with exposed UI objects</li>
+<li>Support for <code>expr</code> and most of its functions - thanks to @dgbillotte</li>
+<li>Support for <code>expr~</code> and most of its functions - thanks to @dgbillotte</li>
+<li>Add <code>HV_BARE_METAL</code> compiler macro for suppressing <code>HvUtils.h</code> warning</li>
+</ul>
+<p>Cleanup:</p>
+<ul>
+<li>Daisy: allow more generic <code>HAS_MIDI</code> in the board.json</li>
+</ul>
+<p>Docs:</p>
+<ul>
+<li>Add: Code Of Conduct</li>
+<li>Add: Contributing Guide</li>
+</ul>
+<h2 id="0140">0.14.0</h2>
+<p>Features:</p>
+<ul>
+<li>Metadata: optional Dict for external generators</li>
+<li>JS: audio inputs now work - thanks to @ZXMushroom63</li>
+<li>Generator: new FMOD generator - thanks to @michaelhartung</li>
+<li>Objects: support symbol in <code>[pack]</code> (not on first inlet!)</li>
+<li>Objects: support receive/send configuration for GUI objects</li>
+</ul>
+<p>Bugfixes:</p>
+<ul>
+<li>Core: dereferencing type-punned pointer warning - thanks to @grrr</li>
+<li>Core: signed/unsigned mismatch in HvSignalTabwrite.h - thanks to @grrr</li>
+<li>c2dpf: portGroup template fix with i/o port 0 as CV</li>
+<li>c2wwise: use correct SDK header paths and allow any platform in the xml - thanks to @eu-ch</li>
+</ul>
+<p>Updates:</p>
+<ul>
+<li>drop py3.8 - add py3.13</li>
+<li>integrate json2daisy library, tests and documentation</li>
+<li>move to libDaisy 8.x pin definitions</li>
+</ul>
+<h2 id="0134">0.13.4</h2>
+<p>Bugfixes:</p>
+<ul>
+<li>sending <code>[stop(</code> to <code>[line~]</code> when it's not running no longer jumps the current value (#188)</li>
+<li>JS: emsdk 4.0.7 EXPORTED_RUNTIME_METHODS</li>
+<li>Typing: move obj_perf to defaultdict()</li>
+<li>Documentation: corrections</li>
+<li>CI: move to ubuntu-22.04</li>
+<li>Dependency updates</li>
+</ul>
+<h2 id="0133">0.13.3</h2>
+<p>Bugfixes:</p>
+<ul>
+<li>Daisy: add ScopedIrqBlocker to several functions. Should fix midi input issues and potentially others.</li>
+<li>Daisy: use FIFO to buffer midi TX messages and call them in the main loop instead of during process()</li>
+<li>JS: Ignore windows batch if inside of MingW environment</li>
+</ul>
+<h2 id="0132">0.13.2</h2>
+<p>Bugfixes:</p>
+<ul>
+<li>Incorrect use of new extern formatting in ir2c and c2js templates</li>
+</ul>
+<h2 id="0131">0.13.1</h2>
+<p>Bugfixes:</p>
+<ul>
+<li>Intermediate Result performance counter</li>
+<li>OWL: MIDI Aftertouch fixes; Context name fix</li>
+</ul>
+<p>Refactor:</p>
+<ul>
+<li>split <code>__init__.py</code> in to separate main and compiler sections</li>
+<li>CI: install tox requirements via poetry</li>
+</ul>
+<h2 id="0130">0.13.0</h2>
+<p>Features:</p>
+<ul>
+<li>Migrating to poetry for project management</li>
+<li>Standalone binary (only Linux for now)</li>
+<li>DPF: Allow modgui on desktop</li>
+<li>DPF: Enable host transport events without midi input</li>
+<li>JS: midi out and device select by @Reinissance</li>
+<li>Docs: general updates/corrections and improvements</li>
+<li>Allow loading external generator python module @eu-ch</li>
+<li>Meta: additional global setting to automatically set <code>HV_SIMD_NONE</code></li>
+<li>Add version info to cli and IR result.</li>
+</ul>
+<p>Bugfixes:</p>
+<ul>
+<li>Daisy template newline</li>
+</ul>
+<p>Typing:</p>
+<ul>
+<li>HeavyLang and HeavyIR objects</li>
+<li>Compiler results</li>
+<li>Extern info</li>
+<li>Heavy IR Graph</li>
+</ul>
+<h2 id="0121">0.12.1</h2>
+<p>Features:</p>
+<ul>
+<li>Only disable DSP with new <code>--nodsp</code> flag</li>
+<li>Use pydantic types to define metadata objects</li>
+<li>DPF: CV flag in portgroups</li>
+<li>DPF: flag to disable scoped denormals</li>
+</ul>
+<p>Bugfixes:</p>
+<ul>
+<li>wwise: allow Bang messages in OnSendMessageCallback()</li>
+<li>Improve <code>[cos~]</code> precision.</li>
+</ul>
+<h2 id="0120">0.12.0</h2>
+<ul>
+<li>Core: parse remote/send messages</li>
+<li>Core: MIDI i/o added to memoryPool</li>
+<li>Core: support <code>[else/knob]</code> as <code>[float]</code></li>
+<li>Daisy: set heavy context after hw.init()</li>
+<li>OWL: add Polytouchin and Polytouchout</li>
+<li>JS: webmidi input</li>
+<li>Docs: add instructions for loading custom samples in JS</li>
+<li>Small Bugfixes:</li>
+<li>MIDI out objects in output Paremeters</li>
+<li>JS: AudioWorklet fillTableWithFloatBuffer</li>
+</ul>
+<h2 id="0110">0.11.0</h2>
+<ul>
+<li>Core: add attributes and send type to send params</li>
+<li>DPF: add "read only" outputParameter type based on send params</li>
+<li>JS: add output Parameter and output Event to generator and html template</li>
+<li>Daisy: update <code>wstd2daisy</code> and allow for setting <code>displayprocess</code> code into the template</li>
+<li>Testing: move <code>tinywav</code> to git submodule</li>
+<li>JS Bugfix: printHook and sendHook for AudioWorklet; mention emsdk limitations in docs</li>
+<li>Object Bugfix: <code>[stripnote]</code> missing right inlet</li>
+<li>Small Bugfixes:</li>
+<li>set default name argument</li>
+<li><code>emcc</code> call on Windows - thanks to @vulcu</li>
+<li>deallocation in test_signal - thanks to @eu-ch</li>
+<li>quotes around WWISE paths - thanks to @eu-ch</li>
+</ul>
+<h2 id="0100">0.10.0</h2>
+<ul>
+<li>Objects: <code>[bang~]</code></li>
+<li>Object improvements: support <code>[clear(</code> message for <code>[delwrite~]</code></li>
+<li>Documentation fixes/additions</li>
+<li>Daisy: ability to set samplerate and blocksize</li>
+<li>Daisy: adding midirealtimein, polytouchin/out, midiin (midiout WIP)</li>
+<li>Daisy: use <code>libdaisy_path</code> in meta config; both string/path and int/depth possible</li>
+<li>DPF: enum for UI parameter IDs</li>
+<li>DPF bugfixes: correct input PortGroup names; correct UI slider updates; midiout reimplementation</li>
+<li>Wwise: complete rewrite/refactor - now uses SDK build tools - thanks to @eu-ch !!</li>
+<li>Bugfix: correct alignment in AVX pow~ implementation</li>
+<li>Cleanup: remove deprecated build.json</li>
+<li>Deprecate py37, enable py312</li>
+</ul>
+<h2 id="090">0.9.0</h2>
+<ul>
+<li>Daisy: set bootloader type in Makefile</li>
+<li>Daisy: MIDI i/o for NoteOn/Off, ControlChange, ProgramChange, ChannelPressure, and PitchBend</li>
+<li>Daisy: USB MIDI toggle (disabled by debug printing)</li>
+<li>Daisy: allow for debug printing (off by default, increases program size due to formatting)</li>
+<li>DPF bugfixes: broken midi template include; MIDI_RT_CLOCK fails under certain conditions</li>
+<li>Pdext bugfixes: Windows library linking</li>
+</ul>
+<h2 id="080">0.8.0</h2>
+<ul>
+<li>DPF: enumerated parameters</li>
+<li>DPF: special <code>__hv_dpf_bpm</code> receiver of transport BPM value</li>
+<li>Pdext: migrate to <code>pd-lib-builder</code> and newer <code>m_pd.h</code> and add some initial documentation.</li>
+<li>deprecated: Fabric generator - no longer supported</li>
+<li>docs: updates on missing objects and limitations</li>
+<li>bugfix: issues #24, #50, #100, #106</li>
+</ul>
+<h2 id="070">0.7.0</h2>
+<ul>
+<li>improvements: add type annotations to all methods; run mypy over the whole library</li>
+<li>DPF: basic UI generation using dpf-widgets (imgui + modgui)</li>
+<li>DPF: basic port groups support</li>
+<li>abstractions: use duplicate of delread4~.pd for vd~.pd</li>
+<li>deprecated: internal Bela implementation (use downstream instead)</li>
+<li>docs: add notes</li>
+<li>docs: fix markdown syntax</li>
+<li>bugfixes: issues #86, #87 and #93</li>
+</ul>
+<h2 id="063">0.6.3</h2>
+<ul>
+<li>add polytouchin and polytouchout</li>
+<li>add tests for midi input objects</li>
+<li>bugfixes for midi objects bendin, ctlin, notein, pgmin, pgmout, touchin</li>
+</ul>
+<h2 id="062">0.6.2</h2>
+<ul>
+<li>dpf: add CLAP to docs; cleanup templates</li>
+<li>dpf: bugfix -&gt; wrong frame count used for sendMessageToReceiverV()</li>
+<li>general: style fixes</li>
+<li>general: py311 support</li>
+<li>general: un/supported objects</li>
+</ul>
+<h2 id="061">0.6.1</h2>
+<ul>
+<li>bugfix: missing parameter in named arguments</li>
+<li>update: json2daisy</li>
+</ul>
+<h2 id="060">0.6.0</h2>
+<ul>
+<li>aligned memory and freed patch instance</li>
+<li>js: WASM AudioWorklet</li>
+<li>js: deprecate asm.js</li>
+<li>dpf: configurable subpath</li>
+<li>midi: add stripnote</li>
+<li>deprecate max2hv</li>
+<li>documentation updates</li>
+<li>code cleanup</li>
+<li>tests: refactor and deprecate test_uploader</li>
+</ul>
+<h2 id="050">0.5.0</h2>
+<ul>
+<li>c2owl generator</li>
+<li>migrate @owl to @raw</li>
+<li>c2daisy json2daisy integration</li>
+<li>enable control and signal tests</li>
+<li>push f-string usage</li>
+</ul>
+<h2 id="040">0.4.0</h2>
+<ul>
+<li>Midi realtime messages</li>
+<li>Host transport to midi-rt</li>
+<li>Midi message scheduling improvements</li>
+<li>Bugfix: minimum midi channel</li>
+<li>Bugfix: windows console_script</li>
+</ul>
+<h2 id="030">0.3.0</h2>
+<ul>
+<li>Midi I/O extensions for DPF</li>
+<li>Midi bugfixes for [notein], [pgmin], [touchin], [bendin], [midiin]</li>
+<li>Midi bugfixes for [noteout], [pgmout], [touchout], [bendout], [midiout]</li>
+<li>Midi docs update</li>
+<li>DPF minimal Midi examples</li>
+</ul>
+<h2 id="020">0.2.0</h2>
+<ul>
+<li>metadata json for generator config</li>
+<li>add trig attribute type</li>
+<li>Daisy platform support</li>
+<li>DPF cleanup + meta + trig</li>
+<li>documentation update</li>
+<li>DPF makefiles + meaningful values + docs</li>
+</ul>
+<h2 id="012">0.1.2</h2>
+<ul>
+<li>bump versions for pypi</li>
+</ul>
+<h2 id="010">0.1.0</h2>
+<ul>
+<li>python3 package</li>
+<li>pep8 checks</li>
+<li>update docs</li>
+<li>bundle utils into executable package</li>
+<li>add bool attribute type</li>
+<li>improve pd search paths</li>
+</ul>
+<h2 id="001">0.0.1</h2>
+<ul>
+<li>python3 fixes</li>
+<li>replace VST2 with DPF builds</li>
+</ul>
+<h2 id="000">0.0.0</h2>
+<ul>
+<li>code dump by enzienaudio</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.sections", "search.suggest", "content.code.copy"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>
