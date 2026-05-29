@@ -64,6 +64,8 @@ nav:
     - pd2gui Parser: adr/ADR-002-pd2gui-Parser.md
     - Control Rate Expr: adr/ADR-003-Control-Rate-Expr.md
     - Signal Rate Expr: adr/ADR-004-Signal-Rate-Expr.md
+    - PDNAM External: adr/ADR-005-PDNAM-External.md
+    - gui2dpf Templates: adr/ADR-006-gui2dpf-Templates.md
   - Changelog: changelog.md
   - Contributing: contributing.md
   - Code of Conduct: code_of_conduct.md
