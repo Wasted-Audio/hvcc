@@ -1,6 +1,13 @@
 CHANGELOG
 =====
 
+Next Release
+-----
+
+Bugfixes:
+
+* Resolve absolute nam path (#377)
+
 0.16.0
 -----
 
