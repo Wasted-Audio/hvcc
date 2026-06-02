@@ -2,8 +2,8 @@ import jinja2
 import json
 
 from importlib import resources
-from typing import Optional
 from pathlib import Path
+from typing import Optional
 
 
 def map_load(pair: list, json_defs_file: Path):
@@ -321,7 +321,7 @@ def generate_header(board_description_dict: dict) -> 'tuple[str, dict]':
         'aliases': target['aliases'],
         'channels': audio_channels,
         'has_midi': target.get('has_midi', False),
-        'displayprocess': target.get('displayprocess', '')
+        'displayprocess': target.get('displayprocess', '') if 'display' in target else None
       }
 
     return rendered_header, board_info
