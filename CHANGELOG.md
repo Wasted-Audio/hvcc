@@ -8,6 +8,7 @@ Bugfixes:
 
 * Allow diacritics in send/receive (#344)
 * Resolve absolute nam path (#377)
+* Fix issue with Path in jinja2 environment
 * Daisy: Don't show warning if board doesn't have display section (#349)
 
 0.16.0

@@ -67,10 +67,8 @@ class c2pdext(Generator):
         shutil.copytree(c_src_dir, out_dir)
 
         # copy over static files
-        shutil.copy(
-            Path(__file__).parent / "static" / "m_pd.h") / f"{out_dir}/"
-        shutil.copy(
-            Path(__file__).parent / "static" / "Makefile.pdlibbuilder") / f"{out_dir}/../"
+        shutil.copy(Path(__file__).parent / "static" / "m_pd.h", f"{out_dir}/")
+        shutil.copy(Path(__file__).parent / "static" / "Makefile.pdlibbuilder", f"{out_dir}/../")
 
         try:
             # initialise the jinja template environment
