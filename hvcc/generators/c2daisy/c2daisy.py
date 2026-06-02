@@ -88,24 +88,19 @@ class c2daisy(Generator):
             else:
                 header, board_info = generate_header_from_name(board)
                 display_params = {}
-                warnings.append(
-                    CompilerMsg(
-                        enum=NotificationEnum.WARNING_GENERIC,
-                        message=f"Unable to load board description from {daisy_meta.board_file}. Using fallback."
-                    )
-                )
 
             # inject display process code
             try:
                 display_process = display_processor(daisy_meta.board_file)
             except (FileNotFoundError, KeyError, ValueError):
                 display_process = board_info['displayprocess']
-                warnings.append(
-                    CompilerMsg(
-                        enum=NotificationEnum.WARNING_GENERIC,
-                        message=f"Unable to load display code from {daisy_meta.board_file}. Using fallback."
+                if display_process is not None:
+                    warnings.append(
+                        CompilerMsg(
+                            enum=NotificationEnum.WARNING_GENERIC,
+                            message=f"Unable to load display code from {board_info['name']}. Using fallback."
+                        )
                     )
-                )
 
             # remove heavy out params from externs
             externs.parameters.outParam = [
