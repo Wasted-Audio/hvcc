@@ -148,7 +148,7 @@ class c2daisy(Generator):
             with open(daisy_h_path, "w") as f:
                 f.write(header)
 
-            loader = jinja2.FileSystemLoader(Path(Path(__file__).parent, 'templates'))
+            loader = jinja2.FileSystemLoader(Path(__file__).parent / 'templates')
             env = jinja2.Environment(loader=loader, trim_blocks=True, lstrip_blocks=True)
             daisy_cpp_path = Path(source_dir, f"HeavyDaisy_{patch_name}.cpp")
 

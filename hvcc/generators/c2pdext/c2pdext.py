@@ -68,18 +68,15 @@ class c2pdext(Generator):
 
         # copy over static files
         shutil.copy(
-            Path(Path(__file__).parent, "static", "m_pd.h"),
-            f"{out_dir}/")
+            Path(__file__).parent / "static" / "m_pd.h") / f"{out_dir}/"
         shutil.copy(
-            Path(Path(__file__).parent, "static", "Makefile.pdlibbuilder"),
-            f"{out_dir}/../")
+            Path(__file__).parent / "static" / "Makefile.pdlibbuilder") / f"{out_dir}/../"
 
         try:
             # initialise the jinja template environment
             env = jinja2.Environment()
             env.filters["max"] = filter_max
-            env.loader = jinja2.FileSystemLoader(
-                Path(Path(__file__).parent, "templates"))
+            env.loader = jinja2.FileSystemLoader(Path(__file__).parent / "templates")
 
             # generate Pd external wrapper from template
             pdext_path = Path(out_dir, f"{ext_name}.c")

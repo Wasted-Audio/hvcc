@@ -46,7 +46,7 @@ class c2fmod(Generator):
 
         copyright_c = copyright_manager.get_copyright_for_c(copyright)
 
-        templates_dir = Path(Path(__file__).parent, "templates")
+        templates_dir = Path(__file__).parent / "templates"
         is_source_plugin = num_input_channels == 0
 
         out_dir = Path(out_dir, "fmod")

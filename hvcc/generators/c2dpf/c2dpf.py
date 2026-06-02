@@ -85,8 +85,7 @@ class c2dpf(Generator):
             env = jinja2.Environment()
             env.filters["uniqueid"] = filter_uniqueid
 
-            env.loader = jinja2.FileSystemLoader(
-                Path(Path(__file__).parent, "templates"))
+            env.loader = jinja2.FileSystemLoader(Path(__file__).parent / "templates")
 
             # generate DPF wrapper from template
             dpf_h_path = Path(source_dir, f"HeavyDPF_{patch_name}.hpp")
