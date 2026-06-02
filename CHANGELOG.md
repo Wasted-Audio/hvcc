@@ -6,6 +6,7 @@ Next Release
 
 Bugfixes:
 
+* Allow diacritics in send/receive (#344)
 * Resolve absolute nam path (#377)
 
 0.16.0
