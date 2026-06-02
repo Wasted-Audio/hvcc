@@ -164,11 +164,10 @@ class HeavyObject:
                 buffer_dict.index)
 
     @classmethod
-    def get_hash(cls, x: Union[float, str]) -> int:
-        """ Compute the message element hash used by msg_getHash().
-        Returns a 32-bit integer.
+    def get_hash(cls, x: Union[float, str, int]) -> int:
+        """ Compute the message element hash used by msg_getHash(). Returns a 32-bit integer.
         """
-        if isinstance(x, float) or isinstance(x, int):
+        if isinstance(x, (float, int)) and not isinstance(x, str):
             # interpret the float bytes as an unsigned integer
             return unpack("@I", pack("@f", float(x)))[0]
         elif x == "bang":
@@ -177,13 +176,13 @@ class HeavyObject:
             # this hash is based MurmurHash2
             # http://en.wikipedia.org/wiki/MurmurHash
             # https://sites.google.com/site/murmurhash/
-            x = str(x)
+            data = x.encode("utf-8")
             m = 0x5bd1e995
             r = 24
-            h = len(x)
+            h = len(data)
             i = 0
-            while i < len(x) & ~0x3:
-                k = unpack("@I", bytes(x[i:i + 4], encoding='utf-8'))[0]
+            while i <= len(data) - 4:
+                k = unpack("@I", data[i:i + 4])[0]
                 k = (k * m) & 0xFFFFFFFF
                 k ^= k >> r
                 k = (k * m) & 0xFFFFFFFF
@@ -191,14 +190,13 @@ class HeavyObject:
                 h ^= k
                 i += 4
 
-            n = len(x) & 0x3
-            x = x[i:i + n]
+            n = len(data) - i
             if n >= 3:
-                h ^= (ord(x[2]) << 16) & 0xFFFFFFFF
+                h ^= (data[i + 2] << 16) & 0xFFFFFFFF
             if n >= 2:
-                h ^= (ord(x[1]) << 8) & 0xFFFFFFFF
+                h ^= (data[i + 1] << 8) & 0xFFFFFFFF
             if n >= 1:
-                h ^= ord(x[0])
+                h ^= data[i]
                 h = (h * m) & 0xFFFFFFFF
 
             h ^= h >> 13
