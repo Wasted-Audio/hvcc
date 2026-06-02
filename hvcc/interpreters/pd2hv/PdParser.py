@@ -447,6 +447,14 @@ class PdParser:
                         elif Path(self.__HVLIB_DIR, f"{obj_type}.pd").is_file():
                             self.obj_counter[obj_type] += 1
                             hvlib_path = Path(self.__HVLIB_DIR, f"{obj_type}.pd")
+
+                            # make sure that the nam file argument is an absolute path
+                            if obj_type == "pdnam~":
+                                path = Path(obj_args[0])
+                                if not path.is_absolute():
+                                    path = pd_path.parent / path
+                                obj_args = [str(path)]
+
                             x = self.graph_from_file(
                                 file_path=hvlib_path,
                                 obj_args=obj_args,
