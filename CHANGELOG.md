@@ -1,7 +1,7 @@
 CHANGELOG
 =====
 
-Next Release
+0.16.1
 -----
 
 Bugfixes:
