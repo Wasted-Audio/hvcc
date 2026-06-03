@@ -104,7 +104,7 @@ class c2owl(Generator):
             # initialize the jinja template environment
             env = jinja2.Environment()
 
-            env.loader = jinja2.FileSystemLoader(Path(Path(__file__).parent), "templates")
+            env.loader = jinja2.FileSystemLoader(Path(__file__).parent / "templates")
 
             # construct jdata from ir
             ir_dir = Path(c_src_dir, "../ir")

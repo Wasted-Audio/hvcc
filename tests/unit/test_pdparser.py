@@ -84,3 +84,17 @@ def test_multi_line_arrays(tmp_path: Path):
         [0.0, 1.0, 2.0, 3.0],
         [4.0, 5.0, 6.0, 7.0],
     ]
+
+
+def test_nam_path(tmp_path: Path):
+    pd_path = tmp_path / "nam_path.pd"
+    pd_path.write_text(
+        """#N canvas 827 239 734 565 12;
+#X obj 86 129 pdnam~ test.nam;
+""")
+
+    graph = PdParser().graph_from_file(pd_path)
+    assert not graph.get_notices().has_error
+
+    nam_object = graph.get_objects()[0].get_objects()[1]
+    assert Path(nam_object.obj_dict["nam"]) == tmp_path / "test.nam"

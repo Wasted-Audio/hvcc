@@ -197,9 +197,7 @@ class c2js(Generator):
         try:
             # initialise the jinja template environment
             env = jinja2.Environment()
-            env.loader = jinja2.FileSystemLoader(Path(
-                Path(__file__).parent,
-                "template"))
+            env.loader = jinja2.FileSystemLoader(Path(__file__).parent / "template")
 
             # generate heavy js wrapper from template
             # Note: this file will be incorporated into the emscripten output

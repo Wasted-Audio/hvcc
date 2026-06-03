@@ -58,7 +58,7 @@ class c2wwise(Generator):
         copyright_c = copyright_manager.get_copyright_for_c(copyright)
         copyright_xml = copyright_manager.get_copyright_for_xml(copyright)
 
-        templates_dir = Path(Path(__file__).parent, "templates")
+        templates_dir = Path(__file__).parent / "templates"
         is_source_plugin = num_input_channels == 0
         plugin_type = "Source" if is_source_plugin else "FX"
         plugin_id = filter_plugin_id(patch_name)

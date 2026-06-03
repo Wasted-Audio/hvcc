@@ -88,24 +88,19 @@ class c2daisy(Generator):
             else:
                 header, board_info = generate_header_from_name(board)
                 display_params = {}
-                warnings.append(
-                    CompilerMsg(
-                        enum=NotificationEnum.WARNING_GENERIC,
-                        message=f"Unable to load board description from {daisy_meta.board_file}. Using fallback."
-                    )
-                )
 
             # inject display process code
             try:
                 display_process = display_processor(daisy_meta.board_file)
             except (FileNotFoundError, KeyError, ValueError):
                 display_process = board_info['displayprocess']
-                warnings.append(
-                    CompilerMsg(
-                        enum=NotificationEnum.WARNING_GENERIC,
-                        message=f"Unable to load display code from {daisy_meta.board_file}. Using fallback."
+                if display_process is not None:
+                    warnings.append(
+                        CompilerMsg(
+                            enum=NotificationEnum.WARNING_GENERIC,
+                            message=f"Unable to load display code from {board_info['name']}. Using fallback."
+                        )
                     )
-                )
 
             # remove heavy out params from externs
             externs.parameters.outParam = [
@@ -153,7 +148,7 @@ class c2daisy(Generator):
             with open(daisy_h_path, "w") as f:
                 f.write(header)
 
-            loader = jinja2.FileSystemLoader(Path(Path(__file__).parent, 'templates'))
+            loader = jinja2.FileSystemLoader(Path(__file__).parent / 'templates')
             env = jinja2.Environment(loader=loader, trim_blocks=True, lstrip_blocks=True)
             daisy_cpp_path = Path(source_dir, f"HeavyDaisy_{patch_name}.cpp")
 
