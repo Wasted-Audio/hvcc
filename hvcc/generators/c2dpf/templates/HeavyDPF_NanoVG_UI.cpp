@@ -45,6 +45,22 @@ void {{class_name}}::onNanoDisplay()
     const float height = getHeight();
     const double scaleFactor = getScaleFactor();
 
+    {%- for k, col in gui_json.theme -%}
+        {%- if k == "cnv_color" and col != None %}
+    Colors::cnvColor = nvgRGB({{col.as_rgb_tuple()}});
+        {%- elif k == "text_color" and col != None%}
+    Colors::bgColor = nvgRGB({{col.as_rgb_tuple()}});
+        {%- elif k == "io_color" and col != None %}
+    Colors::textColor = nvgRGB({{col.as_rgb_tuple()}});
+        {%- elif k == "bg_color" and col != None %}
+    Colors::ioColor = nvgRGB({{col.as_rgb_tuple()}});
+        {%- elif k == "sel_color" and col != None %}
+    Colors::selColor = nvgRGB({{col.as_rgb_tuple()}});
+        {%- elif k == "out_color" and col != None %}
+    Colors::outColor = nvgRGB({{col.as_rgb_tuple()}});
+        {%- endif %}
+    {%- endfor %}
+
     NVGcontext* nvg = getContext();
 
     nvgFillColor(nvg, Colors::cnvColor);

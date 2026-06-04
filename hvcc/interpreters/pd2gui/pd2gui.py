@@ -4,6 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 import argparse
+import json
 import time
 
 from typing import Optional
@@ -12,6 +13,7 @@ from pathlib import Path
 from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
 from hvcc.interpreters.pd2gui.PdGUIParser import PdGUIParser
 from hvcc.types.compiler import CompilerResp, CompilerNotif, CompilerMsg
+from hvcc.types.GUI import Theme
 
 
 class Colours:
@@ -50,6 +52,11 @@ class pd2gui:
             ir_dir = ir_file.parent
             if not ir_dir.exists():
                 Path.mkdir(ir_dir)
+
+            theme_file = ir_file.with_suffix(".pdtheme")
+            if theme_file.exists():
+                with open(theme_file) as f:
+                    gui_graph.theme = Theme(**json.load(f))
 
             with open(ir_file, "w") as f:
                 f.write(gui_graph.model_dump_json(indent=2) + "\n")
