@@ -335,6 +335,9 @@ class TestPdControlPatches(TestPdControlBase):
     def test_list_prepend(self):
         self._test_control_patch("test-list_prepend.pd")
 
+    def test_list_length(self):
+        self._test_control_patch("test-list_length.pd")
+
 
 def main():
     # TODO(mhroth): make this work

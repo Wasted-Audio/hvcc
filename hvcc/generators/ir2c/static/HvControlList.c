@@ -64,36 +64,52 @@ void cList_onMessage(HeavyContextInterface *_c, ControlList *o, int letIn, const
   void (*sendMessage)(HeavyContextInterface *, int, const HvMessage *)) {
 
   switch (letIn) {
-  case 0: {
-    HvMessage* n;
-    switch (o->type) {
-      case HV_LIST_APPEND: n = cList_combine_lists(m, o->list); break;
-      case HV_LIST_PREPEND: n = cList_combine_lists(o->list, m); break;
-      default: break;
-    }
-
-    if (n != NULL) {
-      sendMessage(_c, 0, n);
-      hv_free(n);
-    }
-    break;
-  }
-  case 1: {
-    const int numElements = msg_getNumElements(m);
-    o->list->numElements = numElements;
-    for (int i = 0; i < numElements; i++) {
-      switch(msg_getType(m, i)) {
-        case HV_MSG_FLOAT:
-          msg_setFloat(o->list, i, msg_getFloat(m, i)); break;
-        case HV_MSG_SYMBOL:
-          msg_setSymbol(o->list, i, msg_getSymbol(m, i)); break;
+    case 0: {
+      switch (o->type) {
+        case HV_LIST_APPEND: {
+          HvMessage *n = cList_combine_lists(m, o->list);
+          sendMessage(_c, 0, n);
+          hv_free(n);
+          break;
+        }
+        case HV_LIST_PREPEND: {
+          HvMessage *n = cList_combine_lists(o->list, m);
+          sendMessage(_c, 0, n);
+          hv_free(n);
+          break;
+        }
+        case HV_LIST_LENGTH: {
+          HvMessage *n = HV_MESSAGE_ON_STACK(1);
+          float numElements = (float) msg_getNumElements(m);
+          if (msg_isSymbol(m, 0)) {
+            if (!hv_strcmp(msg_getSymbol(m, 0), "list")) {
+              numElements -= 1;
+            }
+          }
+          msg_initWithFloat(n, msg_getTimestamp(m), numElements);
+          sendMessage(_c, 0, n);
+          break;
+        }
         default: break;
       }
+      break;
     }
-    break;
-  }
-  default: {
-    break;
-  }
+    case 1: {
+      const int numElements = msg_getNumElements(m);
+      o->list->numElements = numElements;
+      for (int i = 0; i < numElements; i++) {
+        switch(msg_getType(m, i)) {
+          case HV_MSG_FLOAT:
+            msg_setFloat(o->list, i, msg_getFloat(m, i)); break;
+          case HV_MSG_SYMBOL:
+            msg_setSymbol(o->list, i, msg_getSymbol(m, i)); break;
+          default: break;
+        }
+      }
+      break;
+    }
+    default: {
+      break;
+    }
   }
 }
