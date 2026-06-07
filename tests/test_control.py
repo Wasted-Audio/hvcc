@@ -327,6 +327,14 @@ class TestPdControlPatches(TestPdControlBase):
     def test_extern_table(self):
         self._test_control_patch("test-extern_table.pd")
 
+    # list operations
+
+    def test_list_append(self):
+        self._test_control_patch("test-list_append.pd")
+
+    def test_list_prepend(self):
+        self._test_control_patch("test-list_prepend.pd")
+
 
 def main():
     # TODO(mhroth): make this work

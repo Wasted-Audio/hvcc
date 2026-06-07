@@ -1,0 +1,15 @@
+#N canvas 827 239 118 248 12;
+#X obj 25 31 loadbang;
+#X obj 25 57 bng 25 250 50 0 empty empty empty 0 -10 0 10 #191919 #ffffff #ffffff;
+#X obj 25 89 t b b;
+#X obj 25 200 print;
+#X msg 25 142 1 a 3;
+#X msg 39 118 4 b 6;
+#X obj 25 174 list prepend;
+#X connect 0 0 1 0;
+#X connect 1 0 2 0;
+#X connect 2 0 4 0;
+#X connect 2 1 5 0;
+#X connect 4 0 6 0;
+#X connect 5 0 6 1;
+#X connect 6 0 3 0;

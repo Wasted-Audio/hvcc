@@ -1382,6 +1382,31 @@
       "required": false
     }]
   },
+    "__list": {
+    "inlets": [
+      "-->",
+      "-->"
+    ],
+    "ir": {
+      "control": true,
+      "signal": false,
+      "init": true
+    },
+    "outlets": [
+      "-->",
+      "-->",
+      "-->"
+    ],
+    "args": [
+      {
+        "name": "type",
+        "value_type": "string",
+        "description": "type of list operation",
+        "default": "append",
+        "required": false
+      }
+    ]
+  },
   "__line~f": {
     "inlets": [
       "-->",
