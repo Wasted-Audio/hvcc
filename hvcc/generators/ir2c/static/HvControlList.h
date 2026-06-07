@@ -39,6 +39,8 @@ typedef struct ControlList {
 
 hv_size_t cList_init(ControlList *o, hvListType type);
 
+void cList_free(ControlList *o);
+
 void cList_onMessage(HeavyContextInterface *_c, ControlList *o, int letIn, const HvMessage *m,
     void (*sendMessage)(HeavyContextInterface *, int, const HvMessage *));
 
