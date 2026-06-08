@@ -69,18 +69,39 @@ void cList_onMessage(HeavyContextInterface *_c, ControlList *o, int letIn, const
         case HV_LIST_APPEND: {
           HvMessage *n = cList_combine_lists(m, o->list);
           sendMessage(_c, 0, n);
-          hv_free(n);
           break;
         }
         case HV_LIST_PREPEND: {
           HvMessage *n = cList_combine_lists(o->list, m);
           sendMessage(_c, 0, n);
-          hv_free(n);
+          break;
+        }
+        case HV_LIST_TRIM: {
+          int numElements = msg_getNumElements(m);
+          if (msg_isSymbol(m, 0)) {
+            if (!hv_strcmp(msg_getSymbol(m, 0), "list")) {
+              hv_size_t numBytes = msg_getCoreSize(numElements-1);
+              HvMessage* n = (HvMessage *) hv_malloc(numBytes);
+              hv_assert(n != NULL);
+              msg_init(n, numElements-1, msg_getTimestamp(m));
+
+              for (int i = 1; i < numElements; i++) {
+                switch(msg_getType(m, i)) {
+                  case HV_MSG_FLOAT: msg_setFloat(n, i-1, msg_getFloat(m, i)); break;
+                  case HV_MSG_SYMBOL: msg_setSymbol(n, i-1, msg_getSymbol(m, i)); break;
+                  default: break;
+                }
+              }
+              sendMessage(_c, 0, n);
+              break;
+            }
+          }
+          sendMessage(_c, 0, m);
           break;
         }
         case HV_LIST_LENGTH: {
           HvMessage *n = HV_MESSAGE_ON_STACK(1);
-          float numElements = (float) msg_getNumElements(m);
+          int numElements = msg_getNumElements(m);
           if (msg_isSymbol(m, 0)) {
             if (!hv_strcmp(msg_getSymbol(m, 0), "list")) {
               numElements -= 1;
