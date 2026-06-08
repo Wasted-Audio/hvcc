@@ -60,30 +60,25 @@ HvMessage *cList_combine_lists(const HvMessage *a, const HvMessage *b) {
 }
 
 
-HvMessage *cList_trim(const HvMessage *m) {
-  int numElements = msg_getNumElements(m);
-  hv_size_t numBytes = msg_getCoreSize(numElements-1);
-  HvMessage *n = (HvMessage *) hv_malloc(numBytes);
-  hv_assert(n != NULL);
-  msg_init(n, numElements-1, msg_getTimestamp(m));
-
-  for (int i = 1; i < numElements; i++) {
-    switch(msg_getType(m, i)) {
-      case HV_MSG_FLOAT: msg_setFloat(n, i-1, msg_getFloat(m, i)); break;
-      case HV_MSG_SYMBOL: msg_setSymbol(n, i-1, msg_getSymbol(m, i)); break;
-      default: break;
-    }
-  }
-
-  return n;
-}
-
-
-static HvMessage *cList_trim_if_selector(const HvMessage *m) {
+static HvMessage *cList_trim(const HvMessage *m) {
   if (msg_isSymbol(m, 0)) {
     const char *s = msg_getSymbol(m, 0);
     if (!hv_strcmp(s, "list") || !hv_strcmp(s, "symbol")) {
-      return cList_trim(m);
+      int numElements = msg_getNumElements(m);
+      hv_size_t numBytes = msg_getCoreSize(numElements-1);
+      HvMessage *n = (HvMessage *) hv_malloc(numBytes);
+      hv_assert(n != NULL);
+      msg_init(n, numElements-1, msg_getTimestamp(m));
+
+      for (int i = 1; i < numElements; i++) {
+        switch(msg_getType(m, i)) {
+          case HV_MSG_FLOAT: msg_setFloat(n, i-1, msg_getFloat(m, i)); break;
+          case HV_MSG_SYMBOL: msg_setSymbol(n, i-1, msg_getSymbol(m, i)); break;
+          default: break;
+        }
+      }
+
+      return n;
     }
   }
   return (HvMessage *) m;
@@ -152,7 +147,7 @@ void cList_onMessage(HeavyContextInterface *_c, ControlList *o, int letIn, const
           break;
         }
         case HV_LIST_SPLIT: {
-          HvMessage *m1 = cList_trim_if_selector(m);
+          HvMessage *m1 = cList_trim(m);
           bool trimmed = (m1 != m);
           int numElements = msg_getNumElements(m1);
           int split = (int) msg_getFloat(o->list, 0);
@@ -178,15 +173,8 @@ void cList_onMessage(HeavyContextInterface *_c, ControlList *o, int letIn, const
           break;
         }
         case HV_LIST_TRIM: {
-          if (msg_isSymbol(m, 0)) {
-            const char *s = msg_getSymbol(m, 0);
-            if (!hv_strcmp(s, "list") || !hv_strcmp(s, "symbol")) {
-              HvMessage *n = cList_trim(m);
-              sendMessage(_c, 0, n);
-              break;
-            }
-          }
-          sendMessage(_c, 0, m);
+          HvMessage *n = cList_trim(m);
+          sendMessage(_c, 0, n);
           break;
         }
         case HV_LIST_LENGTH: {

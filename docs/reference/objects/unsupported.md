@@ -32,7 +32,6 @@ glist
 key
 keyname
 keyup
-list
 makefilename
 namecanvas
 netreceive
