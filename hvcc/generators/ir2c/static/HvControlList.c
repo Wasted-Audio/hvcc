@@ -65,6 +65,12 @@ static HvMessage *cList_trim(const HvMessage *m) {
     const char *s = msg_getSymbol(m, 0);
     if (!hv_strcmp(s, "list") || !hv_strcmp(s, "symbol")) {
       int numElements = msg_getNumElements(m);
+      if (numElements <= 1) {
+        HvMessage *n = (HvMessage *) hv_malloc(msg_getCoreSize(1));
+        hv_assert(n != NULL);
+        msg_initWithBang(n, msg_getTimestamp(m));
+        return n;
+      }
       hv_size_t numBytes = msg_getCoreSize(numElements-1);
       HvMessage *n = (HvMessage *) hv_malloc(numBytes);
       hv_assert(n != NULL);
@@ -139,11 +145,13 @@ void cList_onMessage(HeavyContextInterface *_c, ControlList *o, int letIn, const
         case HV_LIST_APPEND: {
           HvMessage *n = cList_combine_lists(m, o->list);
           sendMessage(_c, 0, n);
+          hv_free(n);
           break;
         }
         case HV_LIST_PREPEND: {
           HvMessage *n = cList_combine_lists(o->list, m);
           sendMessage(_c, 0, n);
+          hv_free(n);
           break;
         }
         case HV_LIST_SPLIT: {
@@ -175,6 +183,7 @@ void cList_onMessage(HeavyContextInterface *_c, ControlList *o, int letIn, const
         case HV_LIST_TRIM: {
           HvMessage *n = cList_trim(m);
           sendMessage(_c, 0, n);
+          if (n != m) hv_free(n);
           break;
         }
         case HV_LIST_LENGTH: {

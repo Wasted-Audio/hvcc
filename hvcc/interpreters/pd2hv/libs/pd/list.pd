@@ -1,4 +1,4 @@
-#N canvas 1059 285 395 250 12;
+#N canvas 334 1538 395 250 12;
 #X obj 55 47 inlet;
 #X obj 55 102 outlet;
 #X obj 192 47 inlet;
@@ -11,7 +11,7 @@
 #X restore 55 73 pd @hv_obj __list \$1;
 #X obj 123 102 outlet;
 #X obj 192 102 outlet;
-#X text 52 146 @hv_arg \$1 type string list false;
+#X text 52 146 @hv_arg \$1 type string append false;
 #X connect 0 0 3 0;
 #X connect 2 0 3 1;
 #X connect 3 0 1 0;
