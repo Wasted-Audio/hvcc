@@ -341,6 +341,9 @@ class TestPdControlPatches(TestPdControlBase):
     def test_list_trim(self):
         self._test_control_patch("test-list_trim.pd")
 
+    def test_list_split(self):
+        self._test_control_patch("test-list_split.pd")
+
 
 def main():
     # TODO(mhroth): make this work

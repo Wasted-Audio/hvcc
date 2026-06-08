@@ -33,7 +33,7 @@ class ControlList(HeavyObject):
 
     @classmethod
     def get_C_init(cls, obj_type: str, obj_id: str, args: Dict) -> List[str]:
-        size = 1 if args["type"] in ["trim", "length"] else "MP_LIST_NUM_ITEMS"
+        size = 1 if args["type"] in ["trim", "length", "split"] else "MP_LIST_NUM_ITEMS"
 
         return ["{0}_init(&{0}_{1}, HV_LIST_{2}, {3});".format(
             cls.preamble, obj_id, args["type"].upper(), size
