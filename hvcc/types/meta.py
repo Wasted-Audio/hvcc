@@ -8,6 +8,8 @@ from typing import Dict, Literal, List, Optional, Tuple, Union
 from typing_extensions import Self
 from pydantic import BaseModel, HttpUrl, model_validator
 
+from hvcc.types.GUI import Theme
+
 
 DaisyBoards = Literal['pod', 'petal', 'patch', 'patch_init', 'field']
 DaisyBootloader = Literal['BOOT_NONE', 'BOOT_SRAM', 'BOOT_QSPI']
@@ -49,6 +51,8 @@ class DPF(BaseModel):
     enable_ui:          Optional[DPFUIType] = DPFUIType.NONE
     enable_modgui:      bool = False
     ui_size:            Optional[DPFUISize] = None
+    ui_theme:           Optional[str] = None
+    ui_themes:          Optional[Dict[str, Theme]] = None
     midi_input:         bool = False
     midi_output:        bool = False
     port_groups:        Optional[DPFPortGroups] = None

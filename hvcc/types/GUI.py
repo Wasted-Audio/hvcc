@@ -176,10 +176,11 @@ GUIObjects = Union[Bang, Toggle, Radio, Slider, Knob, Number, Float, Comment, Ca
 class Theme(BaseModel):
     obj_corner_radius: Optional[float] = None
     cnv_color: Optional[Color] = None
-    text_color: Optional[Color] = None
+    cnv_txt_color: Optional[Color] = None
     io_color: Optional[Color] = None
     bg_color: Optional[Color] = None
     sel_color: Optional[Color] = None
+    com_txt_color: Optional[Color] = None
     out_color: Optional[Color] = None
 
 
