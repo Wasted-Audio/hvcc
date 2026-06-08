@@ -18,10 +18,10 @@
 
 hv_size_t cList_init(ControlList *o, hvListType type) {
   o->type = type;
-  hv_size_t numBytes = msg_getCoreSize(32);
+  hv_size_t numBytes = msg_getCoreSize(MP_LIST_NUM_ITEMS);
   o->list = (HvMessage *) hv_malloc(numBytes);
   hv_assert(o->list != NULL);
-  msg_init(o->list, 32, 0);
+  msg_init(o->list, MP_LIST_NUM_ITEMS, 0);
   return numBytes;
 }
 

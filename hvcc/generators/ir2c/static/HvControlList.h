@@ -19,6 +19,12 @@
 
 #include "HvHeavyInternal.h"
 
+#ifdef HV_MP_LIST_NUM_ITEMS
+#define MP_LIST_NUM_ITEMS HV_MP_LIST_NUM_ITEMS
+#else // HV_MP_LIST_NUM_ITEMS
+#define MP_LIST_NUM_ITEMS 32
+#endif // HV_MP_LIST_NUM_ITEMS
+
 #ifdef __cplusplus
 extern "C" {
 #endif
