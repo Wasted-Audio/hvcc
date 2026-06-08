@@ -1,6 +1,13 @@
 CHANGELOG
 =====
 
+Next Release
+-----
+
+Features:
+
+* Support `list` object. Only has append/prepend/split/trim/length operations.
+
 0.16.1
 -----
 
