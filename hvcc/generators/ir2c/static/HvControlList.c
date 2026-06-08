@@ -179,7 +179,8 @@ void cList_onMessage(HeavyContextInterface *_c, ControlList *o, int letIn, const
         }
         case HV_LIST_TRIM: {
           if (msg_isSymbol(m, 0)) {
-            if (!hv_strcmp(msg_getSymbol(m, 0), "list")) {
+            const char *s = msg_getSymbol(m, 0);
+            if (!hv_strcmp(s, "list") || !hv_strcmp(s, "symbol")) {
               HvMessage *n = cList_trim(m);
               sendMessage(_c, 0, n);
               break;
@@ -192,7 +193,8 @@ void cList_onMessage(HeavyContextInterface *_c, ControlList *o, int letIn, const
           HvMessage *n = HV_MESSAGE_ON_STACK(1);
           int numElements = msg_getNumElements(m);
           if (msg_isSymbol(m, 0)) {
-            if (!hv_strcmp(msg_getSymbol(m, 0), "list")) {
+            const char *s = msg_getSymbol(m, 0);
+            if (!hv_strcmp(s, "list") || !hv_strcmp(s, "symbol")) {
               numElements -= 1;
             }
           }
