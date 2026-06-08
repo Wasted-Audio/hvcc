@@ -19,12 +19,6 @@
 
 #include "HvHeavyInternal.h"
 
-#ifdef HV_MP_LIST_NUM_ITEMS
-#define MP_LIST_NUM_ITEMS HV_MP_LIST_NUM_ITEMS
-#else // HV_MP_LIST_NUM_ITEMS
-#define MP_LIST_NUM_ITEMS 32
-#endif // HV_MP_LIST_NUM_ITEMS
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -43,7 +37,7 @@ typedef struct ControlList {
   HvMessage* list;
 } ControlList;
 
-hv_size_t cList_init(ControlList *o, hvListType type, int size);
+hv_size_t cList_init(ControlList *o, hvListType type);
 
 void cList_free(ControlList *o);
 

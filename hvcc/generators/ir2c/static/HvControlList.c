@@ -16,12 +16,12 @@
 
 #include "HvControlList.h"
 
-hv_size_t cList_init(ControlList *o, hvListType type, int size) {
+hv_size_t cList_init(ControlList *o, hvListType type) {
   o->type = type;
-  hv_size_t numBytes = msg_getCoreSize(size);
+  hv_size_t numBytes = msg_getCoreSize(1);
   o->list = (HvMessage *) hv_malloc(numBytes);
   hv_assert(o->list != NULL);
-  msg_init(o->list, size, 0);
+  msg_init(o->list, 1, 0);
   return numBytes;
 }
 
@@ -207,15 +207,19 @@ void cList_onMessage(HeavyContextInterface *_c, ControlList *o, int letIn, const
       switch (o->type) {
         case HV_LIST_APPEND:
         case HV_LIST_PREPEND: {
-          const int numElements = msg_getNumElements(m);
-          o->list->numElements = numElements;
-          for (int i = 0; i < numElements; i++) {
-            switch(msg_getType(m, i)) {
-              case HV_MSG_FLOAT: msg_setFloat(o->list, i, msg_getFloat(m, i)); break;
-              case HV_MSG_SYMBOL: msg_setSymbol(o->list, i, msg_getSymbol(m, i)); break;
+          const int num = msg_getNumElements(m);
+          HvMessage *tmp = HV_MESSAGE_ON_STACK(num);
+          msg_init(tmp, num, 0);
+
+          for (int i = 0; i < num; i++) {
+            switch (msg_getType(m, i)) {
+              case HV_MSG_FLOAT:  msg_setFloat(tmp, i, msg_getFloat(m, i));  break;
+              case HV_MSG_SYMBOL: msg_setSymbol(tmp, i, msg_getSymbol(m, i)); break;
               default: break;
             }
           }
+          msg_free(o->list);
+          o->list = msg_copy(tmp);
           break;
         }
         case HV_LIST_SPLIT: {

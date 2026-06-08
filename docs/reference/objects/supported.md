@@ -123,7 +123,7 @@ Here is a list of [unsupported Pd objects](unsupported.md).
 1. Midi i/o objects are currently only supported for [dpf](../../generators/dpf.md), [daisy](../../generators/daisy.md) and [owl](../../generators/owl.md)
 2. Supports setting send/receive configuration, see [Getting Started](../../getting-started/patching.md#gui-objects)
 3. Does not support: `size()`, `sum()`, `Sum()`, `avg()`, `Avg()`, `mtof()`, `ftom()`, `dbtorms()`, `rmstodb()`, `powtodb()`, `dbtopow()`, `symbol()`, `sym()`, `tolower()`, `toupper()`, `strcat()`, `strncat()`, `strlen()`, `strcspn()`, `strbrk()`, `strcmp()`, `strcasecmp()`, `strncmp()`,`strncasecmp()`, `var()`
-4. Only supports append/prepend/split/trim/length operations. By default it allows manipulation of up to 32 elements (list on right inlet). This can be overridden at compile-time using `HV_MP_LIST_NUM_ITEMS` variable.
+4. Only supports append/prepend/split/trim/length operations.
 
 ## Signal Objects
 
