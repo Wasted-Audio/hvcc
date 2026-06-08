@@ -43,7 +43,7 @@ typedef struct ControlList {
   HvMessage* list;
 } ControlList;
 
-hv_size_t cList_init(ControlList *o, hvListType type);
+hv_size_t cList_init(ControlList *o, hvListType type, int size);
 
 void cList_free(ControlList *o);
 

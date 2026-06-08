@@ -16,12 +16,12 @@
 
 #include "HvControlList.h"
 
-hv_size_t cList_init(ControlList *o, hvListType type) {
+hv_size_t cList_init(ControlList *o, hvListType type, int size) {
   o->type = type;
-  hv_size_t numBytes = msg_getCoreSize(MP_LIST_NUM_ITEMS);
+  hv_size_t numBytes = msg_getCoreSize(size);
   o->list = (HvMessage *) hv_malloc(numBytes);
   hv_assert(o->list != NULL);
-  msg_init(o->list, MP_LIST_NUM_ITEMS, 0);
+  msg_init(o->list, size, 0);
   return numBytes;
 }
 
