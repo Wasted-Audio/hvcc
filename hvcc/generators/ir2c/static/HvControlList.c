@@ -143,13 +143,23 @@ void cList_onMessage(HeavyContextInterface *_c, ControlList *o, int letIn, const
     case 0: {
       switch (o->type) {
         case HV_LIST_APPEND: {
-          HvMessage *n = cList_combine_lists(m, o->list);
+          HvMessage *a = cList_trim(m);
+          HvMessage *b = cList_trim(o->list);
+          bool freeA = (a != m);
+          bool freeB = (b != o->list);
+          HvMessage *n = cList_combine_lists(a, b);
           sendMessage(_c, 0, n);
           hv_free(n);
+          if (freeA) hv_free(a);
+          if (freeB) hv_free(b);
           break;
         }
         case HV_LIST_PREPEND: {
-          HvMessage *n = cList_combine_lists(o->list, m);
+          HvMessage *a = cList_trim(o->list);
+          HvMessage *b = cList_trim(m);
+          bool freeA = (a != o->list);
+          bool freeB = (b != m);
+          HvMessage *n = cList_combine_lists(a, b);
           sendMessage(_c, 0, n);
           hv_free(n);
           break;
@@ -231,6 +241,7 @@ void cList_onMessage(HeavyContextInterface *_c, ControlList *o, int letIn, const
         }
         default: break;
       }
+      break;
     }
     default: break;
   }
