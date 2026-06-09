@@ -21,12 +21,22 @@ hv_size_t cList_init(ControlList *o, hvListType type) {
   hv_size_t numBytes = msg_getCoreSize(1);
   o->list = (HvMessage *) hv_malloc(numBytes);
   hv_assert(o->list != NULL);
-  msg_init(o->list, 1, 0);
+  msg_initWithBang(o->list, 1);
   return numBytes;
 }
 
 void cList_free(ControlList *o) {
   msg_free(o->list);
+}
+
+void cList_copy_message(const HvMessage *m, int i, HvMessage *tmp, int j) {
+  switch (msg_getType(m, i)) {
+    case HV_MSG_FLOAT: msg_setFloat(tmp, j, msg_getFloat(m, i)); break;
+    case HV_MSG_SYMBOL: msg_setSymbol(tmp, j, msg_getSymbol(m, i)); break;
+    case HV_MSG_BANG: msg_setBang(tmp, j); break;
+    case HV_MSG_HASH: msg_setHash(tmp, j, msg_getHash(m, i)); break;
+    default: break;
+  }
 }
 
 
@@ -41,19 +51,11 @@ HvMessage *cList_combine_lists(const HvMessage *a, const HvMessage *b) {
   msg_init(n, numElemTot, msg_getTimestamp(a));
 
   for (int i = 0; i < numElem1; i++) {
-    switch(msg_getType(a, i)) {
-      case HV_MSG_FLOAT: msg_setFloat(n, i, msg_getFloat(a, i)); break;
-      case HV_MSG_SYMBOL: msg_setSymbol(n, i, msg_getSymbol(a, i)); break;
-      default: break;
-    }
+    cList_copy_message(a, i, n, i);
   }
 
   for (int i = 0; i < numElem2; i++) {
-    switch(msg_getType(b, i)) {
-      case HV_MSG_FLOAT: msg_setFloat(n, numElem1 + i, msg_getFloat(b, i)); break;
-      case HV_MSG_SYMBOL: msg_setSymbol(n, numElem1 + i, msg_getSymbol(b, i)); break;
-      default: break;
-    }
+    cList_copy_message(b, i, n, numElem1 + i);
   }
 
   return n;
@@ -77,11 +79,7 @@ static HvMessage *cList_trim(const HvMessage *m) {
       msg_init(n, numElements-1, msg_getTimestamp(m));
 
       for (int i = 1; i < numElements; i++) {
-        switch(msg_getType(m, i)) {
-          case HV_MSG_FLOAT: msg_setFloat(n, i-1, msg_getFloat(m, i)); break;
-          case HV_MSG_SYMBOL: msg_setSymbol(n, i-1, msg_getSymbol(m, i)); break;
-          default: break;
-        }
+        cList_copy_message(m, i, n, i-1);
       }
 
       return n;
@@ -126,11 +124,7 @@ static HvMessage *cList_slice(const HvMessage *m1, int start, int end) {
   }
 
   for (int i = start; i < end; i++) {
-    switch (msg_getType(m1, i)) {
-      case HV_MSG_FLOAT:  msg_setFloat(n,  i - start + tag, msg_getFloat(m1, i));  break;
-      case HV_MSG_SYMBOL: msg_setSymbol(n, i - start + tag, msg_getSymbol(m1, i)); break;
-      default: break;
-    }
+    cList_copy_message(m1, i, n, i - start + tag);
   }
 
   return n;
@@ -229,11 +223,7 @@ void cList_onMessage(HeavyContextInterface *_c, ControlList *o, int letIn, const
           msg_init(tmp, num, 0);
 
           for (int i = 0; i < num; i++) {
-            switch (msg_getType(m, i)) {
-              case HV_MSG_FLOAT:  msg_setFloat(tmp, i, msg_getFloat(m, i));  break;
-              case HV_MSG_SYMBOL: msg_setSymbol(tmp, i, msg_getSymbol(m, i)); break;
-              default: break;
-            }
+            cList_copy_message(m, i, tmp, i);
           }
           msg_free(o->list);
           o->list = msg_copy(tmp);
@@ -241,11 +231,7 @@ void cList_onMessage(HeavyContextInterface *_c, ControlList *o, int letIn, const
           break;
         }
         case HV_LIST_SPLIT: {
-          switch(msg_getType(m, 0)) {
-            case HV_MSG_FLOAT: msg_setFloat(o->list, 0, msg_getFloat(m, 0)); break;
-            case HV_MSG_SYMBOL: msg_setFloat(o->list, 0, 0); break;
-            default: break;
-          }
+          cList_copy_message(m, 0, o->list, 0);
         }
         default: break;
       }
