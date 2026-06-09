@@ -26,7 +26,7 @@ hv_size_t cList_init(ControlList *o, hvListType type) {
 }
 
 void cList_free(ControlList *o) {
-  hv_free(o->list);
+  msg_free(o->list);
 }
 
 
@@ -149,9 +149,9 @@ void cList_onMessage(HeavyContextInterface *_c, ControlList *o, int letIn, const
           bool freeB = (b != o->list);
           HvMessage *n = cList_combine_lists(a, b);
           sendMessage(_c, 0, n);
-          hv_free(n);
-          if (freeA) hv_free(a);
-          if (freeB) hv_free(b);
+          msg_free(n);
+          if (freeA) msg_free(a);
+          if (freeB) msg_free(b);
           break;
         }
         case HV_LIST_PREPEND: {
@@ -161,7 +161,9 @@ void cList_onMessage(HeavyContextInterface *_c, ControlList *o, int letIn, const
           bool freeB = (b != m);
           HvMessage *n = cList_combine_lists(a, b);
           sendMessage(_c, 0, n);
-          hv_free(n);
+          msg_free(n);
+          if (freeA) msg_free(a);
+          if (freeB) msg_free(b);
           break;
         }
         case HV_LIST_SPLIT: {
@@ -179,7 +181,7 @@ void cList_onMessage(HeavyContextInterface *_c, ControlList *o, int letIn, const
             if (numElements == 1 && msg_getType(m1, 0) == HV_MSG_SYMBOL) {
               HvMessage *wrapped = cList_wrap_symbol(m1);
               sendMessage(_c, 2, wrapped);
-              hv_free(wrapped);
+              msg_free(wrapped);
             } else {
               sendMessage(_c, 2, m1);
             }
@@ -188,17 +190,17 @@ void cList_onMessage(HeavyContextInterface *_c, ControlList *o, int letIn, const
             HvMessage *n2 = cList_slice(m1, split, numElements);
             sendMessage(_c, 1, n2);
             sendMessage(_c, 0, n1);
-            hv_free(n1);
-            hv_free(n2);
+            msg_free(n1);
+            msg_free(n2);
           }
 
-          if (trimmed) hv_free(m1);
+          if (trimmed) msg_free(m1);
           break;
         }
         case HV_LIST_TRIM: {
           HvMessage *n = cList_trim(m);
           sendMessage(_c, 0, n);
-          if (n != m) hv_free(n);
+          if (n != m) msg_free(n);
           break;
         }
         case HV_LIST_LENGTH: {
@@ -223,7 +225,7 @@ void cList_onMessage(HeavyContextInterface *_c, ControlList *o, int letIn, const
         case HV_LIST_APPEND:
         case HV_LIST_PREPEND: {
           const int num = msg_getNumElements(m);
-          HvMessage *tmp = HV_MESSAGE_ON_STACK(num);
+          HvMessage *tmp = (HvMessage *) hv_malloc(msg_getCoreSize(num));
           msg_init(tmp, num, 0);
 
           for (int i = 0; i < num; i++) {
@@ -235,6 +237,7 @@ void cList_onMessage(HeavyContextInterface *_c, ControlList *o, int letIn, const
           }
           msg_free(o->list);
           o->list = msg_copy(tmp);
+          msg_free(tmp);
           break;
         }
         case HV_LIST_SPLIT: {
