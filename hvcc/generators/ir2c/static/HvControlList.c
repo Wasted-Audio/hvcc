@@ -165,6 +165,11 @@ void cList_onMessage(HeavyContextInterface *_c, ControlList *o, int letIn, const
           break;
         }
         case HV_LIST_SPLIT: {
+          if (msg_isBang(m, 0)) {
+            sendMessage(_c, 2, m);
+            break;
+          }
+
           HvMessage *m1 = cList_trim(m);
           bool trimmed = (m1 != m);
           int numElements = msg_getNumElements(m1);
