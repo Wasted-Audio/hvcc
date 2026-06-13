@@ -16,6 +16,8 @@ APP_TYPE = {{bootloader}}
 LDFLAGS += -u _printf_float
 {% endif %}
 
+USE_FATFS=1
+
 # Project Source
 C_SOURCES = $(wildcard *.c)
 CPP_SOURCES = $(wildcard *.cpp)

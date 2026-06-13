@@ -3,6 +3,8 @@
 #include "Heavy_{{patch_name}}.h"
 #include "Heavy_{{patch_name}}.hpp"
 #include "HeavyDaisy_{{patch_name}}.hpp"
+#include <string>
+#include "fatfs.h"
 
 #define SAMPLE_RATE {{samplerate}}.f
 
@@ -35,6 +37,12 @@
 #define MIDI_OUT_FIFO_SIZE      128
 {% endif %}
 
+#define DSY_TEXT __attribute__((section(".text")))
+
+#define HV_HASH_SND_WRITE       0x74140F5F
+#define HV_HASH_SND_READ        0xEB5BD581
+#define HV_HASH_SND_READ_RES    0x280AFD69
+
 {% for k, v in display_params.items() %}
 #define HV_HASH_{{k|upper}}     {{v}}
 {% endfor %}
@@ -59,12 +67,60 @@ FIFO<uint8_t, MIDI_OUT_FIFO_SIZE> midi_tx_fifo;
 {% endif %}
 // int midiOutCount;
 // uint8_t* midiOutData;
+
+static constexpr const size_t kTransferSize = 16384;
+/** SDMMC Configuration */
+SdmmcHandler sdmmc;
+/** FatFS Interface for libDaisy */
+DSY_TEXT FatFSInterface fsi;
+WavWriter<kTransferSize> wav_writer;
+/** Global File object */
+DSY_TEXT FIL file;
+const int FILE_BUF_SIZE = 1024;
+// DSY_TEXT float file_buf[FILE_BUF_SIZE];
+// float file_buf[FILE_BUF_SIZE];
+// static __attribute__((aligned(32))) uint8_t file_buf[4096];
+// __attribute__((section(".sram1_bss"), aligned(32))) static uint8_t file_buf[4096];
+// DSY_TEXT uint8_t file_buf[4096];
+uint8_t file_buf[4096] DSY_SDRAM_BSS;
+// __attribute__((aligned(32))) uint8_t file_buf[4096] DSY_SDRAM_BSS;
+
+
+bool sndfile_action;
+uint32_t sndHash;
+float sndID_stored;
+char sndFileName[64];
+char sndTableName[64];
+
+enum class State
+{
+    Startup,
+    Recording,
+    Finalize,
+    Done,
+};
+
+
+// State for progressive write
+struct SndWriteState {
+    State    state      = State::Done;
+    float   *table      = nullptr;
+    int      tableSize  = 0;
+    int      written    = 0;
+    double   sampleRate = 0;
+    char     recInfo[32];
+    char     recSamples[32];
+    static constexpr int CHUNK_SAMPLES = 48; // tune this
+} snd_write_state;
+
+
 void CallbackWriteIn(Heavy_{{patch_name}}* hv);
 void LoopWriteIn(Heavy_{{patch_name}}* hv);
 void CallbackWriteOut();
 void LoopWriteOut();
 void PostProcess();
 void Display();
+void sndFileOperator(uint32_t sendHash);
 
 {% if  output_parameters|length > 0 %}
 constexpr int DaisyNumOutputParameters = {{output_parameters|length}};
@@ -109,107 +165,7 @@ float f{{k}};
 {% endfor %}
 
 {% if (has_midi is sameas true) or (usb_midi is sameas true) %}
-// Typical Switch case for Message Type.
-void HandleMidiMessage(MidiEvent m)
-{
-  ScopedIrqBlocker block; //< Disables interrupts while in scope
-
-  for (int i = 0; i <= 2; ++i) {
-    hv->sendMessageToReceiverV(HV_HASH_MIDIIN, 0, "ff",
-    (float) m.data[i],
-    (float) m.channel);
-  }
-
-  switch(m.type)
-  {
-    case SystemRealTime: {
-      float srtType;
-
-      switch(m.srt_type)
-      {
-        case TimingClock:
-          srtType = MIDI_RT_CLOCK;
-          break;
-        case Start:
-          srtType = MIDI_RT_START;
-          break;
-        case Continue:
-          srtType = MIDI_RT_CONTINUE;
-          break;
-        case Stop:
-          srtType = MIDI_RT_STOP;
-          break;
-        case ActiveSensing:
-          srtType = MIDI_RT_ACTIVESENSE;
-          break;
-        case Reset:
-          srtType = MIDI_RT_RESET;
-          break;
-      }
-
-      hv->sendMessageToReceiverV(HV_HASH_MIDIREALTIMEIN, 0, "ff",
-        (float) srtType);
-      break;
-    }
-    case NoteOff: {
-      NoteOnEvent p = m.AsNoteOn();
-      hv->sendMessageToReceiverV(HV_HASH_NOTEIN, 0, "fff",
-        (float) p.note, // pitch
-        (float) 0, // velocity
-        (float) p.channel);
-      break;
-    }
-    case NoteOn: {
-      NoteOnEvent p = m.AsNoteOn();
-      hv->sendMessageToReceiverV(HV_HASH_NOTEIN, 0, "fff",
-        (float) p.note, // pitch
-        (float) p.velocity, // velocity
-        (float) p.channel);
-      break;
-    }
-    case PolyphonicKeyPressure: { // polyphonic aftertouch
-      PolyphonicKeyPressureEvent p = m.AsPolyphonicKeyPressure();
-      hv->sendMessageToReceiverV(HV_HASH_POLYTOUCHIN, 0, "fff",
-        (float) p.pressure, // pressure
-        (float) p.note, // note
-        (float) p.channel);
-      break;
-    }
-    case ControlChange: {
-      ControlChangeEvent p = m.AsControlChange();
-      hv->sendMessageToReceiverV(HV_HASH_CTLIN, 0, "fff",
-        (float) p.value, // value
-        (float) p.control_number, // cc number
-        (float) p.channel);
-      break;
-    }
-    case ProgramChange: {
-      ProgramChangeEvent p = m.AsProgramChange();
-      hv->sendMessageToReceiverV(HV_HASH_PGMIN, 0, "ff",
-        (float) p.program,
-        (float) p.channel);
-      break;
-    }
-    case ChannelPressure: {
-      ChannelPressureEvent p = m.AsChannelPressure();
-      hv->sendMessageToReceiverV(HV_HASH_TOUCHIN, 0, "ff",
-        (float) p.pressure,
-        (float) p.channel);
-      break;
-    }
-    case PitchBend: {
-      PitchBendEvent p = m.AsPitchBend();
-      // combine 7bit lsb and msb into 32bit int
-      hv_uint32_t value = (((hv_uint32_t) m.data[1]) << 7) | ((hv_uint32_t) m.data[0]);
-      hv->sendMessageToReceiverV(HV_HASH_BENDIN, 0, "ff",
-        (float) value,
-        (float) p.channel);
-      break;
-    }
-
-    default: break;
-  }
-}
+{%- include 'midi_in.cpp' %}
 {% endif %}
 
 int main(void)
@@ -243,6 +199,43 @@ int main(void)
   uint32_t log_time = System::GetNow();
   {% endif %}
   hv->setSendHook(sendHook);
+
+  /** Initialize the SDMMC Hardware
+   *  For this example we'll use:
+   *  Medium (25MHz), 4-bit, w/out power save settings
+   */
+  SdmmcHandler::Config sd_cfg;
+  sd_cfg.Defaults();
+  sd_cfg.speed = SdmmcHandler::Speed::STANDARD;
+  sd_cfg.width = SdmmcHandler::BusWidth::BITS_1;
+  sdmmc.Init(sd_cfg);
+
+  /** Setup our interface to the FatFS middleware */
+  FatFSInterface::Config fsi_config;
+  fsi_config.media = FatFSInterface::Config::MEDIA_SD;
+  fsi.Init(fsi_config);
+
+  /** Configure WaveWriter */
+  WavWriter<kTransferSize>::Config cfg;
+  cfg.bitspersample = 16;
+  cfg.channels = 1;
+  cfg.samplerate = (uint32_t) hv->getSampleRate();
+  wav_writer.Init(cfg);
+
+  /** Get the reference to the FATFS Filesystem for use in mounting the hardware. */
+  FATFS& fs = fsi.GetSDFileSystem();
+
+  /** mount the filesystem to the root directory
+   *  fsi.GetSDPath can be used when mounting multiple filesystems on different media
+   */
+  auto mounted = f_mount(&fs, "/", 1);
+
+  if(mounted != FR_OK)
+  {
+      hardware.som.PrintLine("Failed to mount filesystem");
+  } else {
+      hardware.som.PrintLine("Filesystem mounted");
+  }
 
   for(;;)
   {
@@ -305,6 +298,36 @@ int main(void)
       }
     }
     {% endif %}
+
+    if (sndfile_action)
+    {
+      sndFileOperator(sndHash);
+      sndfile_action = false;
+    }
+
+    SndWriteState &s = snd_write_state;
+
+    switch (s.state) {
+      case State::Recording:
+        wav_writer.Write();
+        break;
+      case State::Finalize:
+        wav_writer.SaveFile();
+        s.state = State::Done;
+
+        hardware.som.PrintLine("write done: %d samples", s.written);
+
+        hv->sendMessageToReceiverV(
+            hv_string_to_hash(s.recInfo), 0, "ffffs",
+            (float)s.sampleRate, 44.0, 1.0, 2.0, "l"
+        );
+        hv->sendFloatToReceiver(
+            hv_string_to_hash(s.recSamples), (float)s.written
+        );
+        break;
+      default:
+        break;
+    }
   }
 }
 
@@ -330,139 +353,27 @@ void audiocallback(daisy::AudioHandle::InputBuffer in, daisy::AudioHandle::Outpu
   CallbackWriteOut();
   {% endif %}
   hardware.PostProcess();
+
+  SndWriteState &s = snd_write_state;
+  if (s.state == State::Recording) {
+    int remaining = s.tableSize - s.written;
+    int n = (remaining > SndWriteState::CHUNK_SAMPLES)
+                       ? SndWriteState::CHUNK_SAMPLES
+                       : remaining;
+
+    for (int i = 0; i < n; i++) {
+      wav_writer.Sample(&s.table[s.written + i]);
+    }
+    s.written += n;
+
+    if (s.written >= s.tableSize) {
+      s.state = State::Finalize;
+    }
+  }
 }
 
 {% if (has_midi is sameas true) or (usb_midi is sameas true) %}
-void HandleMidiOut(uint8_t *midiData, const uint8_t numElements)
-{
-  for (int i = 0; i < numElements; i++) {
-    midi_tx_fifo.PushBack(midiData[i]);
-  }
-}
-
-void HandleMidiSend(uint32_t sendHash, const HvMessage *m)
-{
-  switch(sendHash){
-    case HV_HASH_NOTEOUT: // __hv_noteout
-    {
-      uint8_t note = hv_msg_getFloat(m, 0);
-      uint8_t velocity = hv_msg_getFloat(m, 1);
-      uint8_t ch = hv_msg_getFloat(m, 2);
-      ch %= 16;  // drop any pd "ports"
-
-      const uint8_t numElements = 3;
-      uint8_t midiData[numElements];
-
-      if (velocity > 0){
-        midiData[0] = 0x90 | ch; // noteon
-      } else {
-        midiData[0] = 0x80 | ch; // noteoff
-      }
-      midiData[1] = note;
-      midiData[2] = velocity;
-
-      HandleMidiOut(midiData, numElements);
-      break;
-    }
-    case HV_HASH_POLYTOUCHOUT:
-    {
-      uint8_t value = hv_msg_getFloat(m, 0);
-      uint8_t note = hv_msg_getFloat(m, 1);
-      uint8_t ch = hv_msg_getFloat(m, 2);
-      ch %= 16; // drop any pd "ports"
-
-      const uint8_t numElements = 3;
-      uint8_t midiData[numElements];
-      midiData[0] = 0xA0 | ch; // send Poly Aftertouch
-      midiData[1] = note;
-      midiData[2] = value;
-
-      HandleMidiOut(midiData, numElements);
-      break;
-    }
-    case HV_HASH_CTLOUT:
-    {
-      uint8_t value = hv_msg_getFloat(m, 0);
-      uint8_t cc = hv_msg_getFloat(m, 1);
-      uint8_t ch = hv_msg_getFloat(m, 2);
-      ch %= 16;
-
-      const uint8_t numElements = 3;
-      uint8_t midiData[numElements];
-      midiData[0] = 0xB0 | ch; // send CC
-      midiData[1] = cc;
-      midiData[2] = value;
-
-      HandleMidiOut(midiData, numElements);
-      break;
-    }
-    case HV_HASH_PGMOUT:
-    {
-      uint8_t pgm = hv_msg_getFloat(m, 0);
-      uint8_t ch = hv_msg_getFloat(m, 1);
-      ch %= 16;
-
-      const uint8_t numElements = 2;
-      uint8_t midiData[numElements];
-      midiData[0] = 0xC0 | ch; // send Program Change
-      midiData[1] = pgm;
-
-      HandleMidiOut(midiData, numElements);
-      break;
-    }
-    case HV_HASH_TOUCHOUT:
-    {
-      uint8_t value = hv_msg_getFloat(m, 0);
-      uint8_t ch = hv_msg_getFloat(m, 1);
-      ch %= 16;
-
-      const uint8_t numElements = 2;
-      uint8_t midiData[numElements];
-      midiData[0] = 0xD0 | ch; // send Touch
-      midiData[1] = value;
-
-      HandleMidiOut(midiData, numElements);
-      break;
-    }
-    case HV_HASH_BENDOUT:
-    {
-      uint16_t value = hv_msg_getFloat(m, 0);
-      uint8_t lsb  = value & 0x7F;
-      uint8_t msb  = (value >> 7) & 0x7F;
-      uint8_t ch = hv_msg_getFloat(m, 1);
-      ch %= 16;
-
-      const uint8_t numElements = 3;
-      uint8_t midiData[numElements];
-      midiData[0] = 0xE0 | ch; // send Bend
-      midiData[1] = lsb;
-      midiData[2] = msb;
-
-      HandleMidiOut(midiData, numElements);
-      break;
-    }
-    // not functional yet
-    // case HV_HASH_MIDIOUT: // __hv_midiout
-    // {
-    //   if (midiOutCount == 0 ) {
-    //     uint8_t midiOutData[3];
-    //   }
-
-    //   midiOutData[midiOutCount] = hv_msg_getFloat(m, 0);
-
-    //   if (midiOutCount < 2) {
-    //     midiOutCount++;
-    //     break;
-    //   }
-
-    //   HandleMidiOut(midiOutData, 3);
-    //   midiOutCount = 0;
-    //   break;
-    // }
-    default:
-      break;
-  }
-}
+{%- include 'midi_out.cpp' %}
 {% endif %}
 
 {% if display_params|length > 0 %}
@@ -479,6 +390,8 @@ void HandleDisplayParams(uint32_t sendHash, const HvMessage *m)
   }
 }
 {% endif %}
+
+{% include 'sndFileOperator.cpp' %}
 
 /** Receives messages from PD and writes them to the appropriate
  *  index in the `output_data` array, to be written later.
@@ -500,6 +413,18 @@ static void sendHook(HeavyContextInterface *c, const char *receiverName, uint32_
   {% if display_params|length > 0 %}
   HandleDisplayParams(receiverHash, m);
   {% endif %}
+  switch (receiverHash)
+  {
+    case HV_HASH_SND_WRITE:
+    case HV_HASH_SND_READ:
+    case HV_HASH_SND_READ_RES:
+      sndHash = receiverHash;
+      sndID_stored = hv_msg_getFloat(m, 0);
+      strncpy(sndFileName,  hv_msg_getSymbol(m, 1), sizeof(sndFileName) - 1);
+      strncpy(sndTableName, hv_msg_getSymbol(m, 2), sizeof(sndTableName) - 1);
+      sndfile_action = true;
+      break;
+  }
 }
 
 {% if debug_printing is sameas true %}
