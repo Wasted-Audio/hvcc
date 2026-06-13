@@ -2,7 +2,7 @@ NAME = {{name}}
 {%- if meta.enable_modgui is sameas true %}
 MODGUI_CLASS_NAME = hv_{{name}}
 {%- endif %}
-{%- if meta.enable_ui is sameas true %}
+{%- if meta.enable_ui > 0 %}
 FILES_DSP = $(filter-out HeavyDPF_{{name}}_UI.cpp, $(wildcard *.cpp))
 {%- else %}
 FILES_DSP = $(wildcard *.cpp)
@@ -10,9 +10,14 @@ FILES_DSP = $(wildcard *.cpp)
 FILES_DSP += $(wildcard *.c)
 FILES_DSP += ../../tinywav/tinywav.c
 
-{%- if meta.enable_ui is sameas true %}
+{%- if meta.enable_ui > 0 %}
 FILES_UI = HeavyDPF_{{name}}_UI.cpp
+	{%- if meta.enable_ui == 1 %}
 FILES_UI += ../../{{dpf_path}}dpf-widgets/opengl/DearImGui.cpp
+	{%- elif meta.enable_ui == 2 %}
+FILES_UI += $(wildcard ../../{{dpf_path}}pdvg/src/*.cpp)
+FILES_UI += ../../{{dpf_path}}pdvg/src/Fonts/*.cpp
+	{%- endif %}
 {%- endif %}
 
 DPF_TARGET_DIR = ../../bin
@@ -21,9 +26,12 @@ DPF_PATH = ../../{{dpf_path}}dpf
 
 include ../../{{dpf_path}}dpf/Makefile.plugins.mk
 
-{%- if meta.enable_ui is sameas true %}
+{%- if meta.enable_ui == 1 %}
 BUILD_CXX_FLAGS += -I ../../{{dpf_path}}dpf-widgets/generic
 BUILD_CXX_FLAGS += -I ../../{{dpf_path}}dpf-widgets/opengl
+{%- elif meta.enable_ui == 2 %}
+BUILD_CXX_FLAGS += -I ../../{{dpf_path}}dpf/dgl/src/nanovg
+BUILD_CXX_FLAGS += -I ../../{{dpf_path}}pdvg
 {%- endif %}
 
 {%- if meta.makefile_dep|length > 0 %}

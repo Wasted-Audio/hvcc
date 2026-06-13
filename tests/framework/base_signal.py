@@ -1,5 +1,5 @@
 # Copyright (C) 2014-2018 Enzien Audio, Ltd.
-# Copyright (C) 2022 Wasted Audio
+# Copyright (C) 2022-2026 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,13 +14,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
 import platform
 import shutil
 import subprocess
 import numpy
 
 from typing import List, Optional
+from pathlib import Path
 
 from scipy.io import wavfile
 
@@ -31,8 +31,8 @@ class TestPdSignalBase(HvBaseTest):
 
     def compile_and_run(
         self,
-        source_files: List[str],
-        out_dir: str,
+        source_files: List[Path],
+        out_dir: Path,
         sample_rate: Optional[int] = None,
         block_size: Optional[int] = None,
         num_iterations: Optional[int] = None,
@@ -42,7 +42,7 @@ class TestPdSignalBase(HvBaseTest):
 
         # run executable
         # e.g. $ /path/heavy /path/heavy.wav 48000 480 1000
-        wav_path = os.path.join(out_dir, f"heavy.{flag}.wav")
+        wav_path = Path(out_dir, f"heavy.{flag}.wav")
         subprocess.check_output([
             exe_path,
             wav_path,
@@ -54,9 +54,9 @@ class TestPdSignalBase(HvBaseTest):
 
     def _compare_wave_output(
         self,
-        out_dir: str,
-        c_sources: List[str],
-        golden_path: str,
+        out_dir: Path,
+        c_sources: List[Path],
+        golden_path: Path,
         flag: Optional[str] = None
     ):
         # http://stackoverflow.com/questions/10580676/comparing-two-numpy-arrays-for-equality-element-wise
@@ -64,7 +64,7 @@ class TestPdSignalBase(HvBaseTest):
 
         self.compile_and_run(c_sources, out_dir, flag=flag)
 
-        [r_fs, result] = wavfile.read(os.path.join(out_dir, f"heavy.{flag}.wav"))
+        [r_fs, result] = wavfile.read(Path(out_dir, f"heavy.{flag}.wav"))
         [g_fs, golden] = wavfile.read(golden_path)
         self.assertEqual(g_fs, r_fs, f"Expected WAV sample rate of {g_fs}Hz, got {r_fs}Hz.")
         try:
@@ -81,12 +81,12 @@ class TestPdSignalBase(HvBaseTest):
         """Compiles, runs, and tests a signal patch.
         """
 
-        pd_path = os.path.join(self.TEST_DIR, pd_file)
+        pd_path = Path(self.TEST_DIR, pd_file)
 
         # setup
-        patch_name = os.path.splitext(os.path.basename(pd_path))[0]
-        golden_path = os.path.join(self.TEST_DIR, f"{patch_name}.golden.wav")
-        self.assertTrue(os.path.exists(golden_path), f"File not found: {golden_path}")
+        patch_name = pd_path.stem
+        golden_path = Path(self.TEST_DIR, f"{patch_name}.golden.wav")
+        self.assertTrue(golden_path.exists(), f"File not found: {golden_path}")
 
         try:
             out_dir = self._run_hvcc(pd_path)
@@ -94,13 +94,14 @@ class TestPdSignalBase(HvBaseTest):
             self.fail(str(e))
 
         # copy over additional C assets
-        c_src_dir = os.path.join(out_dir, "c")
-        shutil.copy2(os.path.join(self.SCRIPT_DIR, "src/test_signal.c"), c_src_dir)
-        shutil.copy2(os.path.join(self.SCRIPT_DIR, "src/tinywav/tinywav.h"), c_src_dir)
-        shutil.copy2(os.path.join(self.SCRIPT_DIR, "src/tinywav/tinywav.c"), c_src_dir)
+        assert out_dir
+        c_src_dir = Path(out_dir, "c")
+        shutil.copy2(Path(self.SCRIPT_DIR, "src/test_signal.c"), c_src_dir)
+        shutil.copy2(Path(self.SCRIPT_DIR, "src/tinywav/tinywav.h"), c_src_dir)
+        shutil.copy2(Path(self.SCRIPT_DIR, "src/tinywav/tinywav.c"), c_src_dir)
 
         # prepare the clang command
-        source_files = os.listdir(c_src_dir)
+        source_files = [Path(child) for child in Path(c_src_dir).iterdir()]
 
         # always test HV_SIMD_NONE
         self._compare_wave_output(out_dir, source_files, golden_path, "HV_SIMD_NONE")

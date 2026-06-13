@@ -8,7 +8,7 @@ START_NAMESPACE_DISTRHO
 // --------------------------------------------------------------------------------------------------------------------
 {%- if (receivers|length > 0) or (senders|length > 0) %}
 enum HeavyParams {
-    {%- for k, v in receivers + senders -%}
+    {%- for k, v in receivers + senders %}
     {{v.display|upper}},
     {%- endfor %}
 };

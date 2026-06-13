@@ -1,5 +1,5 @@
 # Copyright (C) 2014-2018 Enzien Audio, Ltd.
-# Copyright (C) 2023-2024 Wasted Audio
+# Copyright (C) 2023-2026 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,8 +14,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
 from typing import Optional, List, Dict, Any
+from pathlib import Path
 
 from .Connection import Connection
 from .NotificationEnum import NotificationEnum
@@ -29,7 +29,7 @@ class PdGraph(PdObject):
     def __init__(
         self,
         obj_args: List,
-        pd_path: str,
+        pd_path: Path,
         pos_x: int = 0,
         pos_y: int = 0
     ) -> None:
@@ -37,7 +37,7 @@ class PdGraph(PdObject):
         super().__init__("graph", obj_args, pos_x, pos_y)
 
         # file location of this graph
-        self.__pd_path = pd_path
+        self.__pd_path: Path = pd_path
 
         self.__objs: List[PdObject] = []
         self.__connections: List[Connection] = []
@@ -46,7 +46,7 @@ class PdGraph(PdObject):
         self.__outlet_objects: List = []
 
         # the first search path is always the directory of this graph
-        self.__declared_paths: List = [os.path.dirname(pd_path)]
+        self.__declared_paths: List[Path] = [pd_path.parent]
 
         # heavy graph arguments (added via @hv_arg flag in #X text)
         self.hv_args: List = []
@@ -57,7 +57,7 @@ class PdGraph(PdObject):
 
         # TODO(dromer) these are virtual attributes that are only instantiated with internal representation
         self._PdGraph__connections: List[Connection] = []
-        self._PdGraph__pd_path: str = ""
+        self._PdGraph__pd_path: Path = Path()
 
     @property
     def dollar_zero(self) -> str:
@@ -171,7 +171,7 @@ class PdGraph(PdObject):
         for o in self.__objs:
             o.validate_configuration()
 
-    def is_abstraction_on_call_stack(self, abs_path: str) -> bool:
+    def is_abstraction_on_call_stack(self, abs_path: Path) -> bool:
         """ Returns True if the given abstraction name is already on the call
             stack (i.e. it is currently being parsed). This function is used to
             detect recursion within abstractions.
@@ -238,4 +238,4 @@ class PdGraph(PdObject):
         }
 
     def __repr__(self) -> str:
-        return self.subpatch_name or os.path.basename(self.__pd_path)
+        return self.subpatch_name or self.__pd_path.name

@@ -66,7 +66,7 @@ An intermediate result GUI json is created containing these objects with their l
 
 ## Exposing Events
 
-All (control) `[receive]` and `[r]` objects annotated with `@hv_event` will be exposed as events in the Unity and Javascript targets only.
+All (control) `[receive]` and `[r]` objects annotated with `@hv_event` will be exposed as events in the Unity, Javascript and DPF targets only.
 
 ![events](../img/docs_exposed_events.png)
 
