@@ -10,6 +10,8 @@
 
 START_NAMESPACE_DISTRHO
 
+#define HV_DPF_NUM_PARAMETER {{receivers|length + senders|length + events|length}}
+
 static void hvSendHookFunc(HeavyContextInterface *c, const char *sendName, uint32_t sendHash, const HvMessage *m);
 static void hvPrintHookFunc(HeavyContextInterface *c, const char *printLabel, const char *msgString, const HvMessage *m);
 
@@ -18,12 +20,9 @@ class {{class_name}} : public Plugin
 public:
   enum Parameters
   {
-    {% for k, v in receivers -%}
+    {%- for k, v in receivers + senders + events %}
       param{{v.display}},
-    {% endfor %}
-    {% for k, v in senders -%}
-      param{{v.display}},
-    {% endfor %}
+    {%- endfor %}
   };
 
 {% if meta.port_groups != None %}
@@ -142,9 +141,9 @@ protected:
   // -------------------------------------------------------------------
 
 private:
-  {%- if (receivers|length > 0) or senders|length > 0 %}
+  {%- if (receivers|length > 0) or (senders|length > 0) or (events|length > 0) %}
   // parameters
-  float _parameters[{{receivers|length + senders|length}}]; // in range of [0,1]
+  float _parameters[HV_DPF_NUM_PARAMETER];
   {%- endif %}
 
   // transport values

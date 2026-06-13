@@ -49,6 +49,11 @@ Other special types can give additional information to the host:
 * `log` - hints `kParameterIsLogarithmic`
 * `log_hz` - unit `Hz` - hints `kParameterIsLogarithmic`
 
+### Events
+
+If you want to receive a bang use `@hv_event` instead of `@hv_param` like `[r banger @hv_event]`.
+On the plugin side this behaves like the `trig` type.
+
 ## Metadata
 
 An accompanying metadata.json file can be included to set additional plugin settings.
@@ -87,7 +92,10 @@ Other fields that the DPF metadata supports are:
 
 * `port_groups` - If your plugin has more audio i/o that need to be grouped together or given Control Voltage status
 * `enumerators` - Configure a set of parameters that cycle over `<key>: <value>`
-* `enable_ui` - Boolean that creates a generic GUI. Requires `dpf-widgets` on the same level as `dpf`.
+* `enable_ui` - Integer value that can generate different plugin UIs.
+  * 0 - The same as disabling the UI, creates nothing.
+  * 1 - A generic DearImgui UI. Requires `dpf-widgets` on the same level as `dpf`.
+  * 2 - A NanoVG based UI that emulates [Plugdata](https://plugdata.org/) graphics. Requires `PDVG` on the same level as `dpf`. It also requires the use of `@hv_param` [receive config](../getting-started/patching.md#gui-objects) on the UI objects. An example project using this can be found [here](https://github.com/Wasted-Audio/pdvg-example-plugin/).
 * `enable_modgui` - Boolean for use in MOD audio based systems.
 * `ui_size` - Dict of `width` & `height` that sets the size of the UI.
 * `brand_id` - A 4-character symbol that identifies a brand or manufacturer, with at least one non-lower case character. Plugins from the same brand should use the same symbol. _Required when using AU._

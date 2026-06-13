@@ -1,5 +1,5 @@
 # Copyright (C) 2014-2018 Enzien Audio, Ltd.
-# Copyright (C) 2023-2024 Wasted Audio
+# Copyright (C) 2023-2026 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,9 +15,10 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import json
-import os
 
 from typing import Dict, List, Optional, TYPE_CHECKING
+from pathlib import Path
+
 
 from .Connection import Connection
 from .HeavyException import HeavyException
@@ -39,7 +40,7 @@ class HeavyIrObject(HeavyLangObject):
     """
 
     # load the HeavyIR object definitions
-    with open(os.path.join(os.path.dirname(__file__), "../json/heavy.ir.json"), "r") as f:
+    with open(Path(Path(__file__).parent, "../json/heavy.ir.json"), "r") as f:
         __HEAVY_OBJS_IR_DICT = HeavyIRType(**json.load(f)).root
 
     def __init__(
@@ -67,8 +68,8 @@ class HeavyIrObject(HeavyLangObject):
 
         # the list of signal buffers at the inlets and outlets
         # these are filled in by HeavyGraph.assign_signal_buffers()
-        self.inlet_buffers = [("zero", 0)] * self.num_inlets
-        self.outlet_buffers = [("zero", 0)] * self.num_outlets
+        self.inlet_buffers: list[tuple[str, int]] = [("zero", 0)] * self.num_inlets
+        self.outlet_buffers: list[tuple[str, int]] = [("zero", 0)] * self.num_outlets
 
         # True if this object has already been ordered in the signal chain
         self.__is_ordered = False
@@ -151,7 +152,7 @@ class HeavyIrObject(HeavyLangObject):
                 if len(cc) == 0:
                     continue
                 if len(cc) == 1:
-                    c = cc[0]  # get the connection
+                    c: Connection = cc[0]  # get the connection
 
                     # get the buffer at the outlet of the connected object
                     buf = c.from_object.outlet_buffers[c.outlet_index]
