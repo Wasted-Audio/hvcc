@@ -6,7 +6,7 @@ Next Release
 
 Features:
 
-* Objects: support `[soundfiler]` (DPF only)
+* Objects: support `[soundfiler]` (DPF and Daisy only)
 
 0.16.1
 -----
