@@ -14,16 +14,18 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from typing import Optional, List, Dict
+from typing import Optional
 
 from .PdObject import PdObject
+
+from hvcc.types.Heavy import Heavy, HvPos, HvConn, HvConnFrom, HvConnTo
 
 
 class PdUnpackObject(PdObject):
     def __init__(
         self,
         obj_type: str,
-        obj_args: Optional[List] = None,
+        obj_args: Optional[list] = None,
         pos_x: int = 0,
         pos_y: int = 0
     ) -> None:
@@ -35,7 +37,7 @@ class PdUnpackObject(PdObject):
         if not (set(self.obj_args) <= set(["f", "s"])):
             self.add_warning("Heavy only supports arguments 'f' and 's' to unpack.")
 
-    def to_hv(self) -> Dict:
+    def to_hv(self) -> Heavy:
         """ Creates a graph dynamically based on the number of arguments.
 
             [inlet                                                ]
@@ -45,59 +47,57 @@ class PdUnpackObject(PdObject):
             [outlet_0]               ...    [outlet_N-1]
         """
 
-        hv_graph: Dict = {
-            "type": "graph",
-            "imports": [],
-            "args": [],
-            "objects": {
-                "inlet": {
-                    "type": "inlet",
-                    "args": {
+        hv_graph = Heavy(
+            type="graph",
+            objects={
+                "inlet": Heavy(
+                    type="inlet",
+                    args={
                         "type": "-->",
                         "index": 0
-                    },
-                    "properties": {"x": 0, "y": 0}
-                }
+                    }
+                )
             },
-            "connections": [],
-            "properties": {"x": self.pos_x, "y": self.pos_y}
-        }
+            properties=HvPos(x=self.pos_x, y=self.pos_y)
+        )
 
         # NOTE(mhroth): reverse the iteration such that connections are
         # added in the correct order
         for i in reversed(range(len(self.obj_args))):
             # add slices to graph
-            hv_graph["objects"][f"slice_{i}"] = {
-                "type": "slice",
-                "args": {
+            hv_graph.objects[f"slice_{i}"] = Heavy(
+                type="slice",
+                args={
                     "index": i,
                     "length": 1
-                },
-                "properties": {"x": 0, "y": 0}
-            }
+                }
+            )
 
             # add outlets to graph
-            hv_graph["objects"][f"outlet_{i}"] = {
-                "type": "outlet",
-                "args": {
+            hv_graph.objects[f"outlet_{i}"] = Heavy(
+                type="outlet",
+                args={
                     "type": "-->",
                     "index": i
-                },
-                "properties": {"x": 0, "y": 0}
-            }
+                }
+            )
 
             # add connection from inlet to slice
-            hv_graph["connections"].append({
-                "from": {"id": "inlet", "outlet": 0},
-                "to": {"id": f"slice_{i}", "inlet": 0},
-                "type": "-->"
-            })
+            hv_graph.connections.append(
+                HvConn(
+                    type="-->",
+                    conn_from=HvConnFrom(id="inlet", outlet=0),
+                    conn_to=HvConnTo(id=f"slice_{i}", inlet=0)
+                )
+            )
 
             # add connection from slice to outlet
-            hv_graph["connections"].append({
-                "from": {"id": f"slice_{i}", "outlet": 0},
-                "to": {"id": f"outlet_{i}", "inlet": 0},
-                "type": "-->"
-            })
+            hv_graph.connections.append(
+                HvConn(
+                    type="-->",
+                    conn_from=HvConnFrom(id=f"slice_{i}", outlet=0),
+                    conn_to=HvConnTo(id=f"outlet_{i}", inlet=0)
+                )
+            )
 
         return hv_graph

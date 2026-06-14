@@ -14,17 +14,19 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from typing import Optional, List, Dict
+from typing import Optional
 
 from .NotificationEnum import NotificationEnum
 from .PdObject import PdObject
+
+from hvcc.types.Heavy import Heavy, HvPos
 
 
 class PdTriggerObject(PdObject):
     def __init__(
         self,
         obj_type: str,
-        obj_args: Optional[List] = None,
+        obj_args: Optional[list] = None,
         pos_x: int = 0,
         pos_y: int = 0
     ) -> None:
@@ -43,17 +45,14 @@ class PdTriggerObject(PdObject):
                 "Heavy only supports arguments 'a', 'f', 's', and 'b'.",
                 NotificationEnum.ERROR_TRIGGER_ABFS)
 
-    def to_hv(self) -> Dict:
-        return {
-            "type": "sequence",
-            "args": {
+    def to_hv(self) -> Heavy:
+        return Heavy(
+            type="sequence",
+            args={
                 "casts": self.obj_args
             },
-            "properties": {
-                "x": self.pos_x,
-                "y": self.pos_y
-            }
-        }
+            properties=HvPos(x=self.pos_x, y=self.pos_y)
+        )
 
     @classmethod
     def __is_float(cls, x: int) -> bool:
