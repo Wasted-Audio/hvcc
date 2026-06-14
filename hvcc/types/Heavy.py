@@ -33,9 +33,9 @@ class HvConn(BaseModel):
 
 class Heavy(BaseModel):
     type: str
-    imports: list = []
-    args: Union[list, dict] = {}  # we should make this more specific
-    objects: dict[str, "Heavy"] = {}
-    connections: list[HvConn] = []
-    properties: HvPos = HvPos(x=0, y=0)
-    annotations: dict = {}
+    imports: list = Field(default_factory=list)
+    args: Union[list, dict] = Field(default_factory=dict)  # we should make this more specific
+    objects: dict[str, "Heavy"] = Field(default_factory=dict)
+    connections: list[HvConn] = Field(default_factory=list)
+    properties: HvPos = Field(default_factory=lambda: HvPos(x=0, y=0))
+    annotations: dict = Field(default_factory=dict)
