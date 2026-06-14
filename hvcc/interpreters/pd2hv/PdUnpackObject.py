@@ -49,6 +49,7 @@ class PdUnpackObject(PdObject):
 
         hv_graph = Heavy(
             type="graph",
+            args=[],
             objects={
                 "inlet": Heavy(
                     type="inlet",

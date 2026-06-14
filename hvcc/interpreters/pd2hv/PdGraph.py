@@ -228,7 +228,7 @@ class PdGraph(PdObject):
         assert all(a is not None for a in self.hv_args), "Graph is missing a @hv_arg."
         return Heavy(
             type="graph",
-            args=self.hv_args if export_args else {},
+            args=self.hv_args if export_args else [],
             objects={o.obj_id: o.to_hv() for o in self.__objs},
             connections=[c.to_hv() for c in self.__connections],
             properties=HvPos(x=self.pos_x, y=self.pos_y)

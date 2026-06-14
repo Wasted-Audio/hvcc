@@ -41,8 +41,8 @@ class HeavyGraph(PdObject):
 
         # parse the heavy data structure to determine the outlet connection type
         outlets = [o for o in self.hv_json.objects.values() if o.type == "outlet"]
-        sorted(outlets, key=lambda o: o.args["index"])
-        self.__outlet_connection_types = [o.args["type"] for o in outlets]
+        outlets = sorted(outlets, key=lambda o: o.args["index"] if isinstance(o.args, dict) else o.args[0])
+        self.__outlet_connection_types: list[str] = [o.args["type"] for o in outlets if isinstance(o.args, dict)]
 
         # resolve the arguments
         for i, a in enumerate(self.hv_json.args):
@@ -63,6 +63,7 @@ class HeavyGraph(PdObject):
 
             # resolve all arguments for each object in the graph
             for o in self.hv_json.objects.values():
+                assert isinstance(o.args, dict)
                 for k, v in o.args.items():
                     # TODO(mhroth): make resolution more robust
                     if v == "$" + a["name"]:
@@ -71,7 +72,7 @@ class HeavyGraph(PdObject):
         # reset all arguments, as they have all been resolved
         # any required arguments would break hv2ir as they will no longer
         # be supplied (because they are resolved)
-        self.hv_json.args = {}
+        self.hv_json.args = []
 
     def get_outlet_connection_type(self, outlet_index: int) -> str:
         return self.__outlet_connection_types[outlet_index]

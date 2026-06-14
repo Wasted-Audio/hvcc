@@ -72,7 +72,7 @@ class PdSelectObject(PdObject):
 
         route_graph = Heavy(
             type="graph",
-            args={},
+            args=[],
             objects={
                 "inlet": Heavy(
                     type="inlet",

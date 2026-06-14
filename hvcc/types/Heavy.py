@@ -3,6 +3,7 @@
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
+from typing import Union
 
 from pydantic import BaseModel, Field, ConfigDict
 
@@ -33,7 +34,7 @@ class HvConn(BaseModel):
 class Heavy(BaseModel):
     type: str
     imports: list = []
-    args: dict = {}
+    args: Union[list, dict] = {}  # we should make this more specific
     objects: dict[str, "Heavy"] = {}
     connections: list[HvConn] = []
     properties: HvPos = HvPos(x=0, y=0)
