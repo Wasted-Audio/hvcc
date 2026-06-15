@@ -4,6 +4,10 @@ CHANGELOG
 Next Release
 -----
 
+Bugfixes:
+
+* Daisy: fix None in template
+
 Refactor:
 
 * Add pydantic type to pd2hv exports
