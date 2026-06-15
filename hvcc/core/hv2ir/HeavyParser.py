@@ -71,7 +71,7 @@ class HeavyParser:
         hv_file: Path,
         graph: Optional[HeavyGraph] = None,
         graph_args: Optional[Dict] = None,
-        path_stack: Optional[set] = None,
+        path_stack: Optional[set[Path]] = None,
         xname: Optional[str] = None
     ) -> HeavyGraph:
         """ Read a graph object from a file.
@@ -103,7 +103,7 @@ class HeavyParser:
         cls,
         hv_file: Path,
         json_heavy: Heavy,
-        path_stack: set,
+        path_stack: set[Path],
         graph: Optional[HeavyGraph] = None,
         graph_args: Optional[Dict] = None,
         xname: Optional[str] = None
