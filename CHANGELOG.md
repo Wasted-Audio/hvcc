@@ -1,6 +1,13 @@
 CHANGELOG
 =====
 
+Next Release
+-----
+
+Refactor:
+
+* Add pydantic type to pd2hv exports
+
 0.16.1
 -----
 
