@@ -46,21 +46,23 @@ void {{class_name}}::onNanoDisplay()
     const double scaleFactor = getScaleFactor();
 
     {%- if meta.ui_theme != None %}
-        {%- for k, col in meta.ui_themes[meta.ui_theme] -%}
-            {%- if k == "cnv_color" and col != None %}
-    Colors::cnvColor = nvgRGB({{col.as_rgb_tuple()}});
-            {%- elif k == "cnv_txt_color" and col != None%}
-    Colors::cnvTextColor = nvgRGB({{col.as_rgb_tuple()}});
-            {%- elif k == "io_color" and col != None %}
-    Colors::ioColor = nvgRGB({{col.as_rgb_tuple()}});
-            {%- elif k == "bg_color" and col != None %}
-    Colors::bgColor = nvgRGB({{col.as_rgb_tuple()}});
-            {%- elif k == "sel_color" and col != None %}
-    Colors::selColor = nvgRGB({{col.as_rgb_tuple()}});
-            {%- elif k == "com_txt_color" and col != None %}
-    Colors::comTextColor = nvgRGB({{col.as_rgb_tuple()}});
-            {%- elif k == "out_color" and col != None %}
-    Colors::outColor = nvgRGB({{col.as_rgb_tuple()}});
+        {%- for k, set in meta.ui_themes[meta.ui_theme] -%}
+            {%- if k == "obj_corner_radius" and set != None %}
+    Corners::objectCornerRadius = {{set}};
+            {%- if k == "cnv_color" and set != None %}
+    Colors::cnvColor = nvgRGB({{set.as_rgb_tuple()}});
+            {%- elif k == "cnv_txt_color" and set != None%}
+    Colors::cnvTextColor = nvgRGB({{set.as_rgb_tuple()}});
+            {%- elif k == "io_color" and set != None %}
+    Colors::ioColor = nvgRGB({{set.as_rgb_tuple()}});
+            {%- elif k == "bg_color" and set != None %}
+    Colors::bgColor = nvgRGB({{set.as_rgb_tuple()}});
+            {%- elif k == "sel_color" and set != None %}
+    Colors::selColor = nvgRGB({{set.as_rgb_tuple()}});
+            {%- elif k == "com_txt_color" and set != None %}
+    Colors::comTextColor = nvgRGB({{set.as_rgb_tuple()}});
+            {%- elif k == "out_color" and set != None %}
+    Colors::outColor = nvgRGB({{set.as_rgb_tuple()}});
             {%- endif %}
         {%- endfor %}
     {%- endif %}
