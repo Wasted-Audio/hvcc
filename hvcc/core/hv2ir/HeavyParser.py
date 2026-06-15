@@ -118,7 +118,9 @@ class HeavyParser:
         # resolve default graph arguments
         graph_args = graph_args or {}
 
-        assert isinstance(json_heavy.args, list)
+        if not isinstance(json_heavy.args, list):
+            raise HeavyException("Graph arguments must be a list.")
+
         for a in json_heavy.args:
             if a["name"] not in graph_args:
                 if a["required"]:
