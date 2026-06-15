@@ -14,16 +14,17 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from collections import defaultdict
 import random
 import string
 
-from typing import Optional, List, Dict, TYPE_CHECKING
+from collections import defaultdict
+from typing import Optional, TYPE_CHECKING
 
 from .Connection import Connection
 from .NotificationEnum import NotificationEnum
 
 from hvcc.types.compiler import CompilerMsg, CompilerNotif
+from hvcc.types.Heavy import Heavy
 
 if TYPE_CHECKING:
     from .PdGraph import PdGraph
@@ -37,7 +38,7 @@ class PdObject:
     def __init__(
         self,
         obj_type: str,
-        obj_args: Optional[List] = None,
+        obj_args: Optional[list] = None,
         pos_x: int = 0,
         pos_y: int = 0
     ) -> None:
@@ -53,11 +54,11 @@ class PdObject:
         # this is set when the object is added to a graph
         self.parent_graph: Optional['PdGraph'] = None
 
-        self._inlet_connections: Dict = defaultdict(list)
-        self._outlet_connections: Dict = defaultdict(list)
+        self._inlet_connections: dict = defaultdict(list)
+        self._outlet_connections: dict = defaultdict(list)
 
-        self._warnings: List[CompilerMsg] = []
-        self._errors: List[CompilerMsg] = []
+        self._warnings: list[CompilerMsg] = []
+        self._errors: list[CompilerMsg] = []
 
     def add_warning(self, warning: str, enum: NotificationEnum = NotificationEnum.WARNING_GENERIC) -> None:
         """ Add a warning regarding this object.
@@ -112,10 +113,10 @@ class PdObject:
             ]
         )
 
-    def get_inlet_connections(self) -> Dict:
+    def get_inlet_connections(self) -> dict:
         return self._inlet_connections
 
-    def get_outlet_connections(self) -> Dict:
+    def get_outlet_connections(self) -> dict:
         return self._outlet_connections
 
     def get_inlet_connection_type(self, inlet_index: int) -> Optional[str]:
@@ -152,7 +153,7 @@ class PdObject:
         else:
             raise Exception(f"Connection {c} does not connect to this object {self}.")
 
-    def get_graph_heirarchy(self) -> List:
+    def get_graph_heirarchy(self) -> list:
         """ Returns an indication of the graph "path" of this object.
         It only includes unique graphs (not subpatches) E.g. _main/tabosc4~
         The check for None is in case the object is somehow not yet attached.
@@ -178,7 +179,7 @@ class PdObject:
         """
         raise NotImplementedError()
 
-    def to_hv(self) -> Dict:
+    def to_hv(self) -> Heavy:
         """ Returns the HeavyLang JSON representation of this object.
         """
         raise NotImplementedError()
