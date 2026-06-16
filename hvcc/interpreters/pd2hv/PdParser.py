@@ -263,6 +263,8 @@ class PdParser:
         msg_send: dict = {}
         gui_send: dict = {}
         gui_recv: dict = {}
+        pd_index_to_graph_indices: dict[int, list[int]] = {}
+        pd_obj_counter: int = 0
 
         # parse and add all Heavy arguments to the graph
         for li in file_hv_arg_dict[canvas_line]:
@@ -291,7 +293,9 @@ class PdParser:
                             pd_path=pd_path,
                             pos_x=int(line[2]),
                             pos_y=int(line[3]))
-                        g.add_object(x)
+                        index = g.add_object(x)
+                        pd_index_to_graph_indices[pd_obj_counter] = [index]
+                        pd_obj_counter += 1
 
                 elif line[0] == "#X":
                     if line[1] == "restore":
@@ -337,6 +341,7 @@ class PdParser:
                             obj_args=[" ".join(line[4:])],
                             pos_x=int(line[2]),
                             pos_y=int(line[3])))
+                        pd_obj_counter += 1
 
                     elif line[1] == "obj":
                         x = None  # a PdObject
@@ -361,6 +366,7 @@ class PdParser:
                                 obj_args=["null object placeholder"],
                                 pos_x=int(line[2]),
                                 pos_y=int(line[3])))
+                            pd_obj_counter += 1
                             continue
 
                         if obj_type in ('block~',):
@@ -373,6 +379,7 @@ class PdParser:
                                 obj_args=[f"{obj_type} object placeholder"],
                                 pos_x=int(line[2]),
                                 pos_y=int(line[3])))
+                            pd_obj_counter += 1
                             continue
 
                         # do we have an abstraction for this object?
@@ -493,20 +500,34 @@ class PdParser:
 
                         # is this an object that must be programatically parsed?
                         elif obj_type in self.__PD_CLASSES:
+
                             # split expressions into separate objects
                             if obj_type in ['expr', 'expr~']:
                                 expressions = [e.strip() for e in " ".join(obj_args).split("\\;")]
+                                if obj_type == 'expr':
+                                    expressions.sort(reverse=True)
+                                split_indices = []
+
+                                # find the highest inlet reference across all expressions
+                                all_args = " ".join(expressions)
+                                max_inlet = max(
+                                    (int(m[2:]) for m in re.findall(r'\$[fisv]\d+', all_args)),
+                                    default=1
+                                )
+
+                                if max_inlet > 100:
+                                    g.add_error("Heavy expr supports upto 100 variables")
 
                                 for i in expressions:
                                     self.obj_counter[obj_type] += 1
                                     obj_class = self.__PD_CLASSES[obj_type]
-                                    x = obj_class(
-                                        obj_type,
-                                        [i],
-                                        pos_x=int(line[2]), pos_y=int(line[3]))
-
+                                    x = obj_class(obj_type, [i], pos_x=int(line[2]), pos_y=int(line[3]))
+                                    x.num_inlets = max_inlet  # override with the shared inlet count
                                     assert x is not None
-                                    g.add_object(x)
+                                    split_indices.append(g.add_object(x))
+
+                                pd_index_to_graph_indices[pd_obj_counter] = split_indices
+                                pd_obj_counter += 1
                                 continue
                             else:
                                 self.obj_counter[obj_type] += 1
@@ -536,6 +557,8 @@ class PdParser:
 
                         assert x is not None
                         index = g.add_object(x)
+                        pd_index_to_graph_indices[pd_obj_counter] = [index]
+                        pd_obj_counter += 1
 
                         # add gui send/receive objects
                         arg_index = {
@@ -572,6 +595,8 @@ class PdParser:
                             pos_x=int(line[2]), pos_y=int(line[3]),
                             is_root=False)
                         index = g.add_object(x)
+                        pd_index_to_graph_indices[pd_obj_counter] = [index]
+                        pd_obj_counter += 1
 
                         # symbolatom is not supported
                         # due to symbol/__var implementation
@@ -617,6 +642,8 @@ class PdParser:
                             pos_y=int(line[3]))
 
                         index = g.add_object(msg)
+                        pd_index_to_graph_indices[pd_obj_counter] = [index]
+                        pd_obj_counter += 1
 
                         if len(msg.obj_dict) > 0:
                             msg_send[index] = []
@@ -625,11 +652,30 @@ class PdParser:
                                 msg_send[index].append(remote)
 
                     elif line[1] == "connect":
-                        g.add_parsed_connection(
-                            from_index=int(line[2]),
-                            from_outlet=int(line[3]),
-                            to_index=int(line[4]),
-                            to_inlet=int(line[5]))
+                        from_pd = int(line[2])
+                        from_outlet = int(line[3])
+                        to_pd = int(line[4])
+                        to_inlet = int(line[5])
+
+                        # remap outlet: outlet N -> split object N, outlet 0
+                        from_graph_indices = pd_index_to_graph_indices.get(from_pd)
+                        if from_graph_indices is not None and len(from_graph_indices) > 1:
+                            if from_outlet < len(from_graph_indices):
+                                from_index = from_graph_indices[from_outlet]
+                            else:
+                                from_graph_indices[0]
+                            from_outlet = 0
+                        else:
+                            from_index = from_graph_indices[0] if from_graph_indices else from_pd
+
+                        # fan out inlet connections to all split objects
+                        to_graph_indices = pd_index_to_graph_indices.get(to_pd)
+                        if to_graph_indices is not None and len(to_graph_indices) > 1:
+                            for to_index in to_graph_indices:
+                                g.add_parsed_connection(from_index, from_outlet, to_index, to_inlet)
+                        else:
+                            to_index = to_graph_indices[0] if to_graph_indices else to_pd
+                            g.add_parsed_connection(from_index, from_outlet, to_index, to_inlet)
 
                     elif line[1] == "declare":
                         if not is_root:
