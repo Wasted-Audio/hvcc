@@ -493,12 +493,28 @@ class PdParser:
 
                         # is this an object that must be programatically parsed?
                         elif obj_type in self.__PD_CLASSES:
-                            self.obj_counter[obj_type] += 1
-                            obj_class = self.__PD_CLASSES[obj_type]
-                            x = obj_class(
-                                obj_type,
-                                obj_args,
-                                pos_x=int(line[2]), pos_y=int(line[3]))
+                            # split expressions into separate objects
+                            if obj_type in ['expr', 'expr~']:
+                                expressions = [e.strip() for e in " ".join(obj_args).split("\\;")]
+
+                                for i in expressions:
+                                    self.obj_counter[obj_type] += 1
+                                    obj_class = self.__PD_CLASSES[obj_type]
+                                    x = obj_class(
+                                        obj_type,
+                                        [i],
+                                        pos_x=int(line[2]), pos_y=int(line[3]))
+
+                                    assert x is not None
+                                    g.add_object(x)
+                                continue
+                            else:
+                                self.obj_counter[obj_type] += 1
+                                obj_class = self.__PD_CLASSES[obj_type]
+                                x = obj_class(
+                                    obj_type,
+                                    obj_args,
+                                    pos_x=int(line[2]), pos_y=int(line[3]))
 
                         elif self.__is_float(obj_type):
                             # parse float literals
