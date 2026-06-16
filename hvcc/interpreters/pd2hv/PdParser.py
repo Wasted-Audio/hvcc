@@ -505,7 +505,8 @@ class PdParser:
                             if obj_type in ['expr', 'expr~']:
                                 expressions = [e.strip() for e in " ".join(obj_args).split("\\;")]
                                 if obj_type == 'expr':
-                                    expressions.sort(reverse=True)
+                                    # only expr seems to require this (see tests)
+                                    expressions.reverse()
                                 split_indices = []
 
                                 # find the highest inlet reference across all expressions
@@ -516,7 +517,7 @@ class PdParser:
                                 )
 
                                 if max_inlet > 100:
-                                    g.add_error("Heavy expr supports upto 100 variables")
+                                    g.add_error("Heavy expr supports up to 100 variables")
 
                                 for i in expressions:
                                     self.obj_counter[obj_type] += 1
@@ -663,7 +664,7 @@ class PdParser:
                             if from_outlet < len(from_graph_indices):
                                 from_index = from_graph_indices[from_outlet]
                             else:
-                                from_graph_indices[0]
+                                from_index = from_graph_indices[0]
                             from_outlet = 0
                         else:
                             from_index = from_graph_indices[0] if from_graph_indices else from_pd
