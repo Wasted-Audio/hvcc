@@ -4,6 +4,10 @@ CHANGELOG
 Next Release
 -----
 
+Features:
+
+* multi-line `expr`/`expr~`
+
 Bugfixes:
 
 * Daisy: fix None in template
