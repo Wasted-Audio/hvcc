@@ -1,4 +1,4 @@
-# Supported vanilla objects
+# Supported PD objects and abstractions
 
 These are all the objects that hvcc is able to parse.
 

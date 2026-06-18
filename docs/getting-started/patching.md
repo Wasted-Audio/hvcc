@@ -134,8 +134,7 @@ This list will be continuously epanded to document differences in object behavio
 - Right inlet for table onset of `[tabread4~]` does not do anything.
 - Right inlet for `[lop~]` does not support signal input.
 - Heavy does not support multichannel connections.
-- Arrays do not support spaces in the name.
+- Arrays and tables do not support spaces in the name.
 - It is allowed to use `[block~]`, but it will be completely ignored. Heavy runs with single sample processing by default.
 - Both `[expr]` and `expr~]` do not support `size()`, `sum()`, `Sum()`, `avg()`, `Avg()`, `mtof()`, `ftom()`, `dbtorms()`, `rmstodb()`, `powtodb()`, and `dbtopow()` functions. They do not support symbol input or symbol/string functions.
 - `[expr~]` only supports signal inputs.
-- Heavy does not support spaces in table names
