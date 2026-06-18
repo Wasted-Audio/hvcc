@@ -15,10 +15,12 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import re
-from typing import Optional, List, Dict
+from typing import Optional
 
 from .NotificationEnum import NotificationEnum
 from .PdObject import PdObject
+
+from hvcc.types.Heavy import Heavy, HvPos
 
 
 class PdMessageObject(PdObject):
@@ -29,15 +31,15 @@ class PdMessageObject(PdObject):
     def __init__(
         self,
         obj_type: str,
-        obj_args: Optional[List] = None,
+        obj_args: Optional[list] = None,
         pos_x: int = 0,
         pos_y: int = 0
     ) -> None:
         assert obj_type == "msg"
         super().__init__("msg", obj_args, pos_x, pos_y)
 
-        self.obj_dict: Dict = {}
-        semi_split: List = []
+        self.obj_dict: dict = {}
+        semi_split: list = []
 
         # parse messages
         # remove prepended slash from $. Heavy does not use that.
@@ -73,12 +75,9 @@ class PdMessageObject(PdObject):
                 "message": l_split[1:]
             })
 
-    def to_hv(self) -> Dict:
-        return {
-            "type": "message",
-            "args": self.obj_dict,
-            "properties": {
-                "x": self.pos_x,
-                "y": self.pos_y
-            }
-        }
+    def to_hv(self) -> Heavy:
+        return Heavy(
+            type="message",
+            args=self.obj_dict,
+            properties=HvPos(x=self.pos_x, y=self.pos_y)
+        )

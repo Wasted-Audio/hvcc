@@ -86,7 +86,10 @@ class pd2hv:
         hv_file = f"{pd_path.stem}.hv.json"
         hv_path = Path(hv_dir, hv_file)
         with open(hv_path, "w") as f:
-            json.dump(pd_graph.to_hv(export_args=export_args), f, indent=4)
+            json.dump(
+                pd_graph.to_hv(export_args=export_args).model_dump(by_alias=True, mode='json'),
+                f, indent=4
+            )
 
         return CompilerResp(
             stage="pd2hv",
