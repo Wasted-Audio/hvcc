@@ -14,11 +14,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from typing import Optional, List, Dict
+from typing import Optional
 
 from .Connection import Connection
 from .HeavyObject import HeavyObject
 from .PdObject import PdObject
+
+from hvcc.types.Heavy import Heavy, HvPos
 
 
 class PdBinopObject(PdObject):
@@ -69,7 +71,7 @@ class PdBinopObject(PdObject):
     def __init__(
         self,
         obj_type: str,
-        obj_args: Optional[List] = None,
+        obj_args: Optional[list] = None,
         pos_x: int = 0,
         pos_y: int = 0
     ) -> None:
@@ -121,7 +123,7 @@ class PdBinopObject(PdObject):
         else:
             self.__k = 0.0
 
-    def convert_ctrl_to_sig_connections_at_inlet(self, connection_list: List, inlet_index: int) -> None:
+    def convert_ctrl_to_sig_connections_at_inlet(self, connection_list: list, inlet_index: int) -> None:
         """ Auto insert heavy var object inbetween control connections.
         """
         sig_obj = HeavyObject(obj_type="var",
@@ -157,14 +159,11 @@ class PdBinopObject(PdObject):
                 from_obj.remove_connection(old_conn)
                 self.remove_connection(old_conn)
 
-    def to_hv(self) -> Dict:
-        return {
-            "type": self.__PD_HEAVY_DICT[self.obj_type],
-            "args": {
+    def to_hv(self) -> Heavy:
+        return Heavy(
+            type=self.__PD_HEAVY_DICT[self.obj_type],
+            args={
                 "k": self.__k
             },
-            "properties": {
-                "x": self.pos_x,
-                "y": self.pos_y
-            }
-        }
+            properties=HvPos(x=self.pos_x, y=self.pos_y)
+        )
