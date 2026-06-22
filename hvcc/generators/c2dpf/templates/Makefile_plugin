@@ -48,6 +48,11 @@ BUILD_C_FLAGS += -DHV_SIMD_NONE
 BUILD_CXX_FLAGS += -DHV_SIMD_NONE
 {%- endif %}
 
+ifeq ($(WINDOWS),true)
+	BUILD_CFLAGS += -mbig-obj
+	BUILD_CXX_FLAGS += -mbig-obj
+endif
+
 {% if meta.plugin_formats|length > 0 %}
 	{%- for format in meta.plugin_formats %}
 TARGETS += {{format}}
