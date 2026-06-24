@@ -1,6 +1,21 @@
 CHANGELOG
 =====
 
+0.16.2
+-----
+
+Features:
+
+* multi-line `expr`/`expr~`
+
+Bugfixes:
+
+* Daisy: fix None in template
+
+Refactor:
+
+* Add pydantic type to pd2hv exports
+
 0.16.1
 -----
 
