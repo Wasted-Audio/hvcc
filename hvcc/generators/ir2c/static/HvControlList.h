@@ -26,6 +26,7 @@ extern "C" {
 typedef enum {
     HV_LIST_APPEND,
     HV_LIST_PREPEND,
+    HV_LIST_STORE,
     HV_LIST_SPLIT,
     HV_LIST_TRIM,
     HV_LIST_LENGTH

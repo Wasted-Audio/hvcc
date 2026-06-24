@@ -160,6 +160,9 @@ void cList_onMessage(HeavyContextInterface *_c, ControlList *o, int letIn, const
           if (freeB) msg_free(b);
           break;
         }
+        case HV_LIST_STORE: {
+          break;
+        }
         case HV_LIST_SPLIT: {
           if (msg_isBang(m, 0)) {
             sendMessage(_c, 2, m);
@@ -230,8 +233,12 @@ void cList_onMessage(HeavyContextInterface *_c, ControlList *o, int letIn, const
           msg_free(tmp);
           break;
         }
+        case HV_LIST_STORE: {
+          break;
+        }
         case HV_LIST_SPLIT: {
           cList_copy_message(m, 0, o->list, 0);
+          break;
         }
         default: break;
       }
