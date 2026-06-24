@@ -26,6 +26,28 @@ enum HeavyParams {
     const float height = getHeight();
     const double scaleFactor = getScaleFactor();
 
+    {%- if meta.ui_theme is not none %}
+        {%- for k, set in meta.ui_themes[meta.ui_theme] -%}
+            {%- if k == "obj_corner_radius" and set is not none %}
+    Corners::objectCornerRadius = {{set}};
+            {%- elif k == "cnv_color" and set is not none %}
+    Colors::cnvColor = nvgRGB{{set.as_rgb_tuple()}};
+            {%- elif k == "cnv_txt_color" and set is not none%}
+    Colors::cnvTextColor = nvgRGB{{set.as_rgb_tuple()}};
+            {%- elif k == "io_color" and set is not none %}
+    Colors::ioColor = nvgRGB{{set.as_rgb_tuple()}};
+            {%- elif k == "bg_color" and set is not none %}
+    Colors::bgColor = nvgRGB{{set.as_rgb_tuple()}};
+            {%- elif k == "sel_color" and set is not none %}
+    Colors::selColor = nvgRGB{{set.as_rgb_tuple()}};
+            {%- elif k == "com_txt_color" and set is not none %}
+    Colors::comTextColor = nvgRGB{{set.as_rgb_tuple()}};
+            {%- elif k == "out_color" and set is not none %}
+    Colors::outColor = nvgRGB{{set.as_rgb_tuple()}};
+            {%- endif %}
+        {%- endfor %}
+    {%- endif %}
+
     // mainpatch
     mainPatch = new PDMainpatch(this);
     mainPatch->setSize(width * scaleFactor, height * scaleFactor);
@@ -44,28 +66,6 @@ void {{class_name}}::onNanoDisplay()
     const float width = getWidth();
     const float height = getHeight();
     const double scaleFactor = getScaleFactor();
-
-    {%- if meta.ui_theme != None %}
-        {%- for k, set in meta.ui_themes[meta.ui_theme] -%}
-            {%- if k == "obj_corner_radius" and set != None %}
-    Corners::objectCornerRadius = {{set}};
-            {%- if k == "cnv_color" and set != None %}
-    Colors::cnvColor = nvgRGB({{set.as_rgb_tuple()}});
-            {%- elif k == "cnv_txt_color" and set != None%}
-    Colors::cnvTextColor = nvgRGB({{set.as_rgb_tuple()}});
-            {%- elif k == "io_color" and set != None %}
-    Colors::ioColor = nvgRGB({{set.as_rgb_tuple()}});
-            {%- elif k == "bg_color" and set != None %}
-    Colors::bgColor = nvgRGB({{set.as_rgb_tuple()}});
-            {%- elif k == "sel_color" and set != None %}
-    Colors::selColor = nvgRGB({{set.as_rgb_tuple()}});
-            {%- elif k == "com_txt_color" and set != None %}
-    Colors::comTextColor = nvgRGB({{set.as_rgb_tuple()}});
-            {%- elif k == "out_color" and set != None %}
-    Colors::outColor = nvgRGB({{set.as_rgb_tuple()}});
-            {%- endif %}
-        {%- endfor %}
-    {%- endif %}
 
     NVGcontext* nvg = getContext();
 
