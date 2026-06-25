@@ -83,9 +83,9 @@ void {{class_name}}::parameterChanged(uint32_t index, float value)
 {%- for k, v in receivers %}
         case k{{v.display|capitalize}}:
     {%- if v.attributes.type == "bool" %}
-            {{v.display|lower}}->setDown(static_cast<bool>(value));
+            {{v.display}}->setDown(static_cast<bool>(value));
     {%- else %}
-            {{v.display|lower}}->setValue(value);
+            {{v.display}}->setValue(value);
     {%- endif %}
             break;
 {%- endfor %}
