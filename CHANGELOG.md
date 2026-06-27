@@ -6,7 +6,22 @@ Next Release
 
 Features:
 
-* Support `list` object. Only has append/prepend/split/trim/length operations.
+* Support `list` object. Does not support tosymbol/fromsymbol.
+
+0.16.2
+-----
+
+Features:
+
+* multi-line `expr`/`expr~`
+
+Bugfixes:
+
+* Daisy: fix None in template
+
+Refactor:
+
+* Add pydantic type to pd2hv exports
 
 0.16.1
 -----

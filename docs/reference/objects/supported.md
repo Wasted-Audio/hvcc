@@ -1,4 +1,4 @@
-# Supported vanilla objects
+# Supported PD objects and abstractions
 
 These are all the objects that hvcc is able to parse.
 
@@ -48,7 +48,7 @@ Here is a list of [unsupported Pd objects](unsupported.md).
 | delay | does not accept tempo messages or unit argument |
 | div | |
 | exp | |
-| expr | except some functions. <sup>3</sup> Only supports a single expression. Does not support symbol input. |
+| expr | except some functions. <sup>3</sup> Does not support symbol input. |
 | else/knob | converted to `[f ]` <sup>2</sup> |
 | f | |
 | float | |
@@ -123,7 +123,7 @@ Here is a list of [unsupported Pd objects](unsupported.md).
 1. Midi i/o objects are currently only supported for [dpf](../../generators/dpf.md), [daisy](../../generators/daisy.md) and [owl](../../generators/owl.md)
 2. Supports setting send/receive configuration, see [Getting Started](../../getting-started/patching.md#gui-objects)
 3. Does not support: `size()`, `sum()`, `Sum()`, `avg()`, `Avg()`, `mtof()`, `ftom()`, `dbtorms()`, `rmstodb()`, `powtodb()`, `dbtopow()`, `symbol()`, `sym()`, `tolower()`, `toupper()`, `strcat()`, `strncat()`, `strlen()`, `strcspn()`, `strbrk()`, `strcmp()`, `strcasecmp()`, `strncmp()`,`strncasecmp()`, `var()`
-4. Only supports append/prepend/split/trim/length operations.
+4. Does not support tosymbol/fromsymbol.
 
 ## Signal Objects
 
@@ -154,7 +154,7 @@ Here is a list of [unsupported Pd objects](unsupported.md).
 | delwrite~ | |
 | env~ | |
 | exp~ | |
-| expr~ | except some functions.<sup>1</sup> Only supports a single expression and signal inputs. Does not work with SIMD optimizations! |
+| expr~ | except some functions.<sup>1</sup> Only supports signal inputs. Does not work with SIMD optimizations! |
 | ftom~ | |
 | hilbert~ | |
 | hip~ | |

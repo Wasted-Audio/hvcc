@@ -184,6 +184,9 @@ class TestPdControlExprPatches(TestPdControlBase):
     def test_skip_var(self):
         self._test_control_patch("test-skip-var.pd")
 
+    def test_multi_line(self):
+        self._test_control_patch("test-multi-line.pd")
+
 
 def main():
     # TODO(mhroth): make this work

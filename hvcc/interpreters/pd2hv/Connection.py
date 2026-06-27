@@ -14,10 +14,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from typing import Dict, Optional, TYPE_CHECKING
+from typing import Optional, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from .PdObject import PdObject
+
+from hvcc.types.Heavy import HvConn, HvConnFrom, HvConnTo
 
 
 class Connection:
@@ -35,17 +37,12 @@ class Connection:
 
         self.__from_obj = from_obj
         self.__to_obj = to_obj
-        self.__hv_json: Dict = {
-            "from": {
-                "id": from_obj.obj_id,
-                "outlet": outlet_index
-            },
-            "to": {
-                "id": to_obj.obj_id,
-                "inlet": inlet_index
-            },
-            "type": conn_type
-        }
+
+        self.__hv_json = HvConn(
+            type=conn_type,
+            conn_from=HvConnFrom(id=from_obj.obj_id, outlet=outlet_index),
+            conn_to=HvConnTo(id=to_obj.obj_id, inlet=inlet_index)
+        )
 
     @property
     def from_obj(self) -> 'PdObject':
@@ -53,11 +50,11 @@ class Connection:
 
     @property
     def from_id(self) -> str:
-        return self.__hv_json["from"]["id"]
+        return self.__hv_json.conn_from.id
 
     @property
     def outlet_index(self) -> int:
-        return self.__hv_json["from"]["outlet"]
+        return self.__hv_json.conn_from.outlet
 
     @property
     def to_obj(self) -> 'PdObject':
@@ -65,17 +62,17 @@ class Connection:
 
     @property
     def to_id(self) -> str:
-        return self.__hv_json["to"]["id"]
+        return self.__hv_json.conn_to.id
 
     @property
     def inlet_index(self) -> int:
-        return self.__hv_json["to"]["inlet"]
+        return self.__hv_json.conn_to.inlet
 
     @property
     def conn_type(self) -> str:
-        return self.__hv_json["type"]
+        return self.__hv_json.type
 
-    def to_hv(self) -> Dict:
+    def to_hv(self) -> HvConn:
         return self.__hv_json
 
     def __repr__(self) -> str:
