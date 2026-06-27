@@ -126,7 +126,9 @@ static HvMessage *cList_wrap_symbol(const HvMessage *m) {
 
 static HvMessage *cList_slice(const HvMessage *m1, int start, int end) {
   const int numElements = msg_getNumElements(m1);
-  if (start == end || start < 0 || start >= numElements || numElements - end <= 0) {
+  if (end < 0) end = numElements + 1 + end; // negative index
+
+  if (start >= end || start < 0 || start >= numElements || end < 0 || end > numElements) {
     HvMessage *n = (HvMessage *) hv_malloc(msg_getCoreSize(1));
     hv_assert(n != NULL);
     msg_init(n, 1, msg_getTimestamp(m1));
@@ -216,28 +218,38 @@ void cList_onMessage(HeavyContextInterface *_c, ControlList *o, int letIn, const
           break;
         }
         case HV_LIST_STORE: {
+          // just output the stored list
           if (msg_isBang(m, 0)) {
             sendMessage(_c, 0, cList_untrim(o->list));
             break;
           }
 
-          int numElements = msg_getNumElements(m);
+          HvMessage *m1 = cList_trim(m); // trim before any checks
+          bool trimmed = (m1 != m);
+          int numElements = msg_getNumElements(m1);
 
-          if (msg_isSymbol(m, 0)) {
-            const char *s = msg_getSymbol(m, 0);
+          if (msg_isSymbol(m1, 0)) {
+            const char *s = msg_getSymbol(m1, 0);
             if (!hv_strcmp(s, "get")) {
-              const int index = (int) msg_getFloat(m, 1);
-              if (numElements > 3) {
-                const int end = (int) msg_getFloat(m, 2);
-                HvMessage *n = cList_slice(o->list, index, end);
+              const int index = (int) msg_getFloat(m1, 1);
+              if (numElements >= 3) {
+                int end = (int) msg_getFloat(m1, 2);
+                // detrimine correct end index
+                const int resolvedEnd = (end < 0) ? msg_getNumElements(o->list) + 1 | end : end + 1;
+                HvMessage *n = cList_slice(o->list, index, resolvedEnd);
                 if (msg_isBang(n, 0)) {
                   sendMessage(_c, 1, n);
+                  msg_free(n);
                   break;
                 }
                 sendMessage(_c, 0, n);
+                msg_free(n);
+                break;
               } else {
-                sendMessage(_c, 0, cList_slice(o->list, index, index+1));
+                sendMessage(_c, 0, cList_slice(o->list, index, index + 1));
+                break;
               }
+              if (trimmed) msg_free(m1);
               break;
             }
           }
@@ -245,7 +257,7 @@ void cList_onMessage(HeavyContextInterface *_c, ControlList *o, int letIn, const
           HvMessage *b = o->list;
           bool freeA = (a != m);
           bool freeB = (b != o->list);
-          HvMessage *n = cList_combine_lists(a, b);
+          HvMessage *n = cList_untrim(cList_combine_lists(a, b));
           sendMessage(_c, 0, n);
           msg_free(n);
           if (freeA) msg_free(a);
