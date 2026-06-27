@@ -119,33 +119,33 @@ class TestPdControlBase(HvBaseTest):
                 # NO SIMD (always test this case)
                 result = self.compile_and_run(c_sources, out_dir, num_iterations, "HV_SIMD_NONE")
                 message = fail_message or \
-                    self.create_fail_message("".join(result), "".join(golden), "HV_SIMD_NONE")
+                    self.create_fail_message(result, golden, "HV_SIMD_NONE")
                 self.assertEqual(result, golden, message)
 
                 if platform.machine().startswith("x86"):
                     # SSE
                     result = self.compile_and_run(c_sources, out_dir, num_iterations, "HV_SIMD_SSE")
                     message = fail_message or \
-                        self.create_fail_message("".join(result), "".join(golden), "HV_SIMD_SSE")
+                        self.create_fail_message(result, golden, "HV_SIMD_SSE")
                     self.assertEqual(result, golden, message)
 
                     # SSE with FMA
                     result = self.compile_and_run(c_sources, out_dir, num_iterations, "HV_SIMD_SSE_FMA")
                     message = fail_message or \
-                        self.create_fail_message("".join(result), "".join(golden), "HV_SIMD_SSE_FMA")
+                        self.create_fail_message(result, golden, "HV_SIMD_SSE_FMA")
                     self.assertEqual(result, golden, message)
 
                     # AVX (with FMA)
                     result = self.compile_and_run(c_sources, out_dir, num_iterations, "HV_SIMD_AVX")
                     message = fail_message or \
-                        self.create_fail_message("".join(result), "".join(golden), "HV_SIMD_AVX")
+                        self.create_fail_message(result, golden, "HV_SIMD_AVX")
                     self.assertEqual(result, golden, message)
 
                 elif platform.machine().startswith("arm"):
                     # NEON
                     result = self.compile_and_run(c_sources, out_dir, num_iterations, "HV_SIMD_NEON")
                     message = fail_message or \
-                        self.create_fail_message("".join(result), "".join(golden), "HV_SIMD_NEON")
+                        self.create_fail_message(result, golden, "HV_SIMD_NEON")
                     self.assertEqual(result, golden, message)
 
         else:

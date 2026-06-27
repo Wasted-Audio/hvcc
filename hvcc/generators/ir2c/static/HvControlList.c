@@ -191,6 +191,10 @@ void cList_onMessage(HeavyContextInterface *_c, ControlList *o, int letIn, const
           if (trimmed) msg_free(m1);
           break;
         }
+        case HV_LIST_STORE: {
+
+          break;
+        }
         case HV_LIST_TRIM: {
           HvMessage *n = cList_trim(m);
           sendMessage(_c, 0, n);
@@ -217,7 +221,8 @@ void cList_onMessage(HeavyContextInterface *_c, ControlList *o, int letIn, const
     case 1: {
       switch (o->type) {
         case HV_LIST_APPEND:
-        case HV_LIST_PREPEND: {
+        case HV_LIST_PREPEND:
+        case HV_LIST_STORE: {
           const int num = msg_getNumElements(m);
           HvMessage *tmp = (HvMessage *) hv_malloc(msg_getCoreSize(num));
           msg_init(tmp, num, 0);
