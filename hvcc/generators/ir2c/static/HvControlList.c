@@ -89,6 +89,29 @@ static HvMessage *cList_trim(const HvMessage *m) {
 }
 
 
+static HvMessage *cList_untrim(const HvMessage *m) {
+  if (msg_isSymbol(m, 0)) {
+    int numElements = msg_getNumElements(m);
+    if (numElements <= 1) {
+      return (HvMessage *) m;
+    }
+    hv_size_t numBytes = msg_getCoreSize(numElements+1);
+    HvMessage *n = (HvMessage *) hv_malloc(numBytes);
+    hv_assert(n != NULL);
+    msg_init(n, numElements+1, msg_getTimestamp(m));
+
+    msg_setSymbol(n, 0, "list");
+    for (int i = 0; i < numElements; i++) {
+      cList_copy_message(m, i, n, i+1);
+    }
+
+    return n;
+  }
+
+  return (HvMessage *) m;
+}
+
+
 static HvMessage *cList_wrap_symbol(const HvMessage *m) {
   // Turns a bare symbol element into ["symbol", <sym>]
   // Only valid when msg_getNumElements(m) == 1 && msg_isSymbol(m, 0)
@@ -102,7 +125,8 @@ static HvMessage *cList_wrap_symbol(const HvMessage *m) {
 
 
 static HvMessage *cList_slice(const HvMessage *m1, int start, int end) {
-  if (start == end) {
+  const int numElements = msg_getNumElements(m1);
+  if (start == end || start < 0 || start >= numElements || numElements - end <= 0) {
     HvMessage *n = (HvMessage *) hv_malloc(msg_getCoreSize(1));
     hv_assert(n != NULL);
     msg_init(n, 1, msg_getTimestamp(m1));
@@ -138,7 +162,7 @@ void cList_onMessage(HeavyContextInterface *_c, ControlList *o, int letIn, const
       switch (o->type) {
         case HV_LIST_APPEND: {
           HvMessage *a = cList_trim(m);
-          HvMessage *b = cList_trim(o->list);
+          HvMessage *b = o->list;
           bool freeA = (a != m);
           bool freeB = (b != o->list);
           HvMessage *n = cList_combine_lists(a, b);
@@ -149,7 +173,7 @@ void cList_onMessage(HeavyContextInterface *_c, ControlList *o, int letIn, const
           break;
         }
         case HV_LIST_PREPEND: {
-          HvMessage *a = cList_trim(o->list);
+          HvMessage *a = o->list;
           HvMessage *b = cList_trim(m);
           bool freeA = (a != o->list);
           bool freeB = (b != m);
@@ -192,7 +216,40 @@ void cList_onMessage(HeavyContextInterface *_c, ControlList *o, int letIn, const
           break;
         }
         case HV_LIST_STORE: {
+          if (msg_isBang(m, 0)) {
+            sendMessage(_c, 0, cList_untrim(o->list));
+            break;
+          }
 
+          int numElements = msg_getNumElements(m);
+
+          if (msg_isSymbol(m, 0)) {
+            const char *s = msg_getSymbol(m, 0);
+            if (!hv_strcmp(s, "get")) {
+              const int index = (int) msg_getFloat(m, 1);
+              if (numElements > 3) {
+                const int end = (int) msg_getFloat(m, 2);
+                HvMessage *n = cList_slice(o->list, index, end);
+                if (msg_isBang(n, 0)) {
+                  sendMessage(_c, 1, n);
+                  break;
+                }
+                sendMessage(_c, 0, n);
+              } else {
+                sendMessage(_c, 0, cList_slice(o->list, index, index+1));
+              }
+              break;
+            }
+          }
+          HvMessage *a = cList_trim(m);
+          HvMessage *b = o->list;
+          bool freeA = (a != m);
+          bool freeB = (b != o->list);
+          HvMessage *n = cList_combine_lists(a, b);
+          sendMessage(_c, 0, n);
+          msg_free(n);
+          if (freeA) msg_free(a);
+          if (freeB) msg_free(b);
           break;
         }
         case HV_LIST_TRIM: {
@@ -223,12 +280,13 @@ void cList_onMessage(HeavyContextInterface *_c, ControlList *o, int letIn, const
         case HV_LIST_APPEND:
         case HV_LIST_PREPEND:
         case HV_LIST_STORE: {
-          const int num = msg_getNumElements(m);
+          HvMessage *n = cList_trim(m);
+          const int num = msg_getNumElements(n);
           HvMessage *tmp = (HvMessage *) hv_malloc(msg_getCoreSize(num));
           msg_init(tmp, num, 0);
 
           for (int i = 0; i < num; i++) {
-            cList_copy_message(m, i, tmp, i);
+            cList_copy_message(n, i, tmp, i);
           }
           msg_free(o->list);
           o->list = msg_copy(tmp);
