@@ -251,16 +251,40 @@ void cList_onMessage(HeavyContextInterface *_c, ControlList *o, int letIn, const
               }
               if (trimmed) msg_free(m1);
               break;
+            } else if (!hv_strcmp(s, "set")) {
+              break;
+            } else if (!hv_strcmp(s, "insert")) {
+              break;
+            } else if (!hv_strcmp(s, "delete")) {
+              break;
+            } else if (!hv_strcmp(s, "append")) {
+              break;
+            } else if (!hv_strcmp(s, "prepend")) {
+              break;
+            } else if (!hv_strcmp(s, "send")) {
+              hv_uint32_t h = 0;
+              switch (msg_getType(m1, 1)) {
+                case HV_MSG_SYMBOL:
+                  h = hv_string_to_hash(msg_getSymbol(m1, 1));
+                  break;
+                case HV_MSG_HASH:
+                  h = msg_getHash(m1, 1);
+                  break;
+                case HV_MSG_FLOAT:
+                case HV_MSG_BANG:
+                  break;
+              }
+              hv_sendMessageToReceiver(_c, h, 0, o->list);
+              break;
             }
           }
-          HvMessage *a = cList_trim(m);
           HvMessage *b = o->list;
-          bool freeA = (a != m);
+          bool freeA = (m1 != m);
           bool freeB = (b != o->list);
-          HvMessage *n = cList_untrim(cList_combine_lists(a, b));
+          HvMessage *n = cList_untrim(cList_combine_lists(m1, b));
           sendMessage(_c, 0, n);
           msg_free(n);
-          if (freeA) msg_free(a);
+          if (freeA) msg_free(m1);
           if (freeB) msg_free(b);
           break;
         }
