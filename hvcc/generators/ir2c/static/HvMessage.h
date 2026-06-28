@@ -52,6 +52,7 @@ typedef struct ReceiverMessagePair {
 } ReceiverMessagePair;
 
 #define HV_MESSAGE_ON_STACK(_x) (HvMessage *) hv_alloca(msg_getCoreSize(_x))
+#define HV_MESSAGE_ON_HEAP(_x) (HvMessage *) hv_malloc(msg_getCoreSize(_x))
 
 /** Returns the number of bytes that this message consumes in memory, not including strings. */
 static inline hv_size_t msg_getCoreSize(hv_size_t numElements) {

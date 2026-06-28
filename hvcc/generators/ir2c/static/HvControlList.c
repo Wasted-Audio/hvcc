@@ -41,26 +41,31 @@ void cList_copy_message(const HvMessage *m, int i, HvMessage *tmp, int j) {
 
 
 HvMessage *cList_combine_lists(const HvMessage *a, const HvMessage *b) {
-  int numElem1 = msg_getNumElements(a);
-  int numElem2 = msg_getNumElements(b);
-  // Return a if b has only one element which is a bang
-  if (numElem2 == 1 && msg_isBang(b, 0)) return (HvMessage *) a;
+   const int aIsEmpty = (msg_getNumElements(a) == 1 && msg_isBang(a, 0));
+   const int bIsEmpty = (msg_getNumElements(b) == 1 && msg_isBang(b, 0));
 
-  int numElemTot = numElem1 + numElem2;
+   const int numElem1 = aIsEmpty ? 0 : msg_getNumElements(a);
+   const int numElem2 = bIsEmpty ? 0 : msg_getNumElements(b);
+   const int numElemTot = numElem1 + numElem2;
 
-  hv_size_t numBytes = msg_getCoreSize(numElemTot);
-  HvMessage *n = (HvMessage *) hv_malloc(numBytes);
-  hv_assert(n != NULL);
-  msg_init(n, numElemTot, msg_getTimestamp(a));
+   // Always return a heap-allocated message so callers can unconditionally msg_free().
+   HvMessage *n = HV_MESSAGE_ON_HEAP((numElemTot > 0) ? numElemTot : 1);
+   hv_assert(n != NULL);
 
-  for (int i = 0; i < numElem1; i++) {
-    cList_copy_message(a, i, n, i);
-  }
+   if (numElemTot == 0) {
+     msg_initWithBang(n, msg_getTimestamp(a));
+     return n;
+   }
 
-  for (int i = 0; i < numElem2; i++) {
-    cList_copy_message(b, i, n, numElem1 + i);
-  }
-  return n;
+   msg_init(n, numElemTot, msg_getTimestamp(a));
+   int j = 0;
+   if (!aIsEmpty) {
+     for (int i = 0; i < numElem1; i++) cList_copy_message(a, i, n, j++);
+   }
+   if (!bIsEmpty) {
+     for (int i = 0; i < numElem2; i++) cList_copy_message(b, i, n, j++);
+   }
+   return n;
 }
 
 
@@ -70,7 +75,7 @@ static HvMessage *cList_trim(const HvMessage *m) {
     if (!hv_strcmp(s, "list") || !hv_strcmp(s, "symbol")) {
       int numElements = msg_getNumElements(m);
       if (numElements <= 1) {
-        HvMessage *n = (HvMessage *) hv_malloc(msg_getCoreSize(1));
+        HvMessage *n = HV_MESSAGE_ON_HEAP(1);
         hv_assert(n != NULL);
         msg_initWithBang(n, msg_getTimestamp(m));
         return n;
@@ -93,7 +98,7 @@ static HvMessage *cList_trim(const HvMessage *m) {
 static HvMessage *cList_wrap_symbol(const HvMessage *m) {
   // Turns a bare symbol element into ["symbol", <sym>]
   // Only valid when msg_getNumElements(m) == 1 && msg_isSymbol(m, 0)
-  HvMessage *n = (HvMessage *) hv_malloc(msg_getCoreSize(2));
+  HvMessage *n = HV_MESSAGE_ON_HEAP(2);
   hv_assert(n != NULL);
   msg_init(n, 2, msg_getTimestamp(m));
   msg_setSymbol(n, 0, "symbol");
@@ -128,7 +133,7 @@ static HvMessage *cList_slice(const HvMessage *m1, int start, int end) {
   if (end < 0) end = numElements + 1 + end; // negative index
 
   if (start >= end || start < 0 || start >= numElements || end < 0 || end > numElements) {
-    HvMessage *n = (HvMessage *) hv_malloc(msg_getCoreSize(1));
+    HvMessage *n = HV_MESSAGE_ON_HEAP(1);
     hv_assert(n != NULL);
     msg_init(n, 1, msg_getTimestamp(m1));
     msg_setBang(n, 0);
@@ -140,7 +145,7 @@ static HvMessage *cList_slice(const HvMessage *m1, int start, int end) {
   int tag = firstIsSymbol ? 1 : 0;
   int allocLen = sliceLen + tag;
 
-  HvMessage *n = (HvMessage *) hv_malloc(msg_getCoreSize(allocLen));
+  HvMessage *n = HV_MESSAGE_ON_HEAP(allocLen);
   hv_assert(n != NULL);
   msg_init(n, allocLen, msg_getTimestamp(m1));
 
@@ -274,7 +279,7 @@ void cList_onMessage(HeavyContextInterface *_c, ControlList *o, int letIn, const
 
               // payload is m1 elements [2, numElements) - copied raw, no list/symbol tag
               const int payloadLen = numElements - 2;
-              HvMessage *payload = (HvMessage *) hv_malloc(msg_getCoreSize(payloadLen));
+              HvMessage *payload = HV_MESSAGE_ON_HEAP(payloadLen);
               hv_assert(payload != NULL);
               msg_init(payload, payloadLen, msg_getTimestamp(m));
               for (int i = 0; i < payloadLen; i++) {
@@ -334,7 +339,7 @@ void cList_onMessage(HeavyContextInterface *_c, ControlList *o, int letIn, const
                 newList = tail;
               } else {
                 // deleted everything - store an empty bang
-                newList = (HvMessage *) hv_malloc(msg_getCoreSize(1));
+                newList = HV_MESSAGE_ON_HEAP(1);
                 hv_assert(newList != NULL);
                 msg_initWithBang(newList, msg_getTimestamp(m));
               }
@@ -405,7 +410,7 @@ void cList_onMessage(HeavyContextInterface *_c, ControlList *o, int letIn, const
           break;
         }
         case HV_LIST_LENGTH: {
-          HvMessage *n = HV_MESSAGE_ON_STACK(1);
+          HvMessage *n = HV_MESSAGE_ON_HEAP(1);
           int numElements = msg_getNumElements(m);
           if (msg_isSymbol(m, 0)) {
             const char *s = msg_getSymbol(m, 0);
