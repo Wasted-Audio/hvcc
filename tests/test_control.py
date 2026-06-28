@@ -344,12 +344,14 @@ class TestPdControlPatches(TestPdControlBase):
     def test_list_split(self):
         self._test_control_patch("test-list_split.pd")
 
-    def test_list_store(self):
+    def test_list_store1(self):
         self._test_control_patch("test-list_store.pd")
 
     def test_list_store2(self):
         self._test_control_patch("test-list_store2.pd", num_iterations=11)
 
+    def test_list_store3(self):
+        self._test_control_patch("test-list_store3.pd")
 
 def main():
     # TODO(mhroth): make this work

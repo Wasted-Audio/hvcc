@@ -1,0 +1,18 @@
+#N canvas 827 239 734 565 12;
+#X obj 86 58 loadbang;
+#X obj 86 84 bng 25 250 50 0 empty empty empty 0 -10 0 10 #191919 #ffffff #ffffff;
+#X obj 86 116 t b b b;
+#X msg 115 155 go dog go;
+#X msg 100 192 delete 0 -1;
+#X msg 86 225 symbol bla;
+#X obj 86 259 list store;
+#X obj 86 285 print store-left;
+#X connect 0 0 1 0;
+#X connect 1 0 2 0;
+#X connect 2 0 5 0;
+#X connect 2 1 4 0;
+#X connect 2 2 3 0;
+#X connect 3 0 6 1;
+#X connect 4 0 6 0;
+#X connect 5 0 6 0;
+#X connect 6 0 7 0;

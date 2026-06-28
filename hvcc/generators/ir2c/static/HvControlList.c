@@ -43,6 +43,9 @@ void cList_copy_message(const HvMessage *m, int i, HvMessage *tmp, int j) {
 HvMessage *cList_combine_lists(const HvMessage *a, const HvMessage *b) {
   int numElem1 = msg_getNumElements(a);
   int numElem2 = msg_getNumElements(b);
+  // Return a if b has only one element which is a bang
+  if (numElem2 == 1 && msg_isBang(b, 0)) return (HvMessage *) a;
+
   int numElemTot = numElem1 + numElem2;
 
   hv_size_t numBytes = msg_getCoreSize(numElemTot);
@@ -57,7 +60,6 @@ HvMessage *cList_combine_lists(const HvMessage *a, const HvMessage *b) {
   for (int i = 0; i < numElem2; i++) {
     cList_copy_message(b, i, n, numElem1 + i);
   }
-
   return n;
 }
 
@@ -81,33 +83,9 @@ static HvMessage *cList_trim(const HvMessage *m) {
       for (int i = 1; i < numElements; i++) {
         cList_copy_message(m, i, n, i-1);
       }
-
       return n;
     }
   }
-  return (HvMessage *) m;
-}
-
-
-static HvMessage *cList_untrim(const HvMessage *m) {
-  if (msg_isSymbol(m, 0)) {
-    int numElements = msg_getNumElements(m);
-    if (numElements <= 1) {
-      return (HvMessage *) m;
-    }
-    hv_size_t numBytes = msg_getCoreSize(numElements+1);
-    HvMessage *n = (HvMessage *) hv_malloc(numBytes);
-    hv_assert(n != NULL);
-    msg_init(n, numElements+1, msg_getTimestamp(m));
-
-    msg_setSymbol(n, 0, "list");
-    for (int i = 0; i < numElements; i++) {
-      cList_copy_message(m, i, n, i+1);
-    }
-
-    return n;
-  }
-
   return (HvMessage *) m;
 }
 
@@ -121,6 +99,27 @@ static HvMessage *cList_wrap_symbol(const HvMessage *m) {
   msg_setSymbol(n, 0, "symbol");
   msg_setSymbol(n, 1, msg_getSymbol(m, 0));
   return n;
+}
+
+
+static HvMessage *cList_untrim(const HvMessage *m) {
+  if (msg_isSymbol(m, 0)) {
+    int numElements = msg_getNumElements(m);
+    if (numElements == 1) {
+      return cList_wrap_symbol(m);
+    }
+    hv_size_t numBytes = msg_getCoreSize(numElements + 1);
+    HvMessage *n = (HvMessage *) hv_malloc(numBytes);
+    hv_assert(n != NULL);
+    msg_init(n, numElements + 1, msg_getTimestamp(m));
+
+    msg_setSymbol(n, 0, "list");
+    for (int i = 0; i < numElements; i++) {
+      cList_copy_message(m, i, n, i + 1);
+    }
+    return n;
+  }
+  return (HvMessage *) m;
 }
 
 
@@ -152,7 +151,6 @@ static HvMessage *cList_slice(const HvMessage *m1, int start, int end) {
   for (int i = start; i < end; i++) {
     cList_copy_message(m1, i, n, i - start + tag);
   }
-
   return n;
 }
 

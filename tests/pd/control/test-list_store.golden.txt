@@ -4,6 +4,7 @@
 [@ 0.000] store-left: 4 5 6 and 7
 [@ 0.000] store-left: 0 4 5 6 and 7
 [@ 0.000] store-left: 1 2 3 4 5 6 and 7
+[@ 0.000] store-left: list bla 4 5 6 and 7
 [@ 0.000] store-left: list cis boom bah 4 5 6 and 7
 [@ 0.000] store-left: symbol z
 [@ 0.000] store-right: bang
@@ -11,6 +12,7 @@
 [@ 0.000] store-left: list x y z
 [@ 0.000] store-left: 0 x y z
 [@ 0.000] store-left: 1 2 3 x y z
+[@ 0.000] store-left: list bla x y z
 [@ 0.000] store-left: list cis boom bah x y z
 [@ 0.000] store-left: symbol go
 [@ 0.000] store-right: bang
@@ -18,4 +20,5 @@
 [@ 0.000] store-left: list go dog go
 [@ 0.000] store-left: 0 go dog go
 [@ 0.000] store-left: 1 2 3 go dog go
+[@ 0.000] store-left: list bla go dog go
 [@ 0.000] store-left: list cis boom bah go dog go
