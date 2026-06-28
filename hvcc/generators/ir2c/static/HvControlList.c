@@ -257,20 +257,59 @@ void cList_onMessage(HeavyContextInterface *_c, ControlList *o, int letIn, const
             } else if (!hv_strcmp(s, "insert")) {
               break;
             } else if (!hv_strcmp(s, "delete")) {
+              const int index = (int) msg_getFloat(m1, 1);
+              const int listLen = msg_getNumElements(o->list);
+              int end;
+              if (numElements >= 3) {
+                int count = (int) msg_getFloat(m1, 2);
+                end = (count < 0) ? listLen : index + count;
+              } else {
+                end = index + 1;
+              }
+              if (end > listLen) end = listLen;
+
+              // Build new list from [0, index) + [end, listLen)
+              HvMessage *head = (index > 0)    ? cList_slice(o->list, 0, index)      : NULL;
+              HvMessage *tail = (end < listLen) ? cList_slice(o->list, end, listLen) : NULL;
+
+              HvMessage *newList;
+              if (head && tail) {
+                newList = cList_combine_lists(head, tail);
+                msg_free(head);
+                msg_free(tail);
+              } else if (head) {
+                newList = head;
+              } else if (tail) {
+                newList = tail;
+              } else {
+                // deleted everything — store an empty bang
+                newList = (HvMessage *) hv_malloc(msg_getCoreSize(1));
+                hv_assert(newList != NULL);
+                msg_initWithBang(newList, msg_getTimestamp(m));
+              }
+
+              msg_free(o->list);
+              o->list = newList;
+              if (trimmed) msg_free(m1);
+
               break;
             } else if (!hv_strcmp(s, "append")) {
               HvMessage *a = o->list;
-              bool freeB = (a != o->list);
-              o->list = cList_combine_lists(cList_slice(m1, 1, numElements), a);
+              bool freeA = (a != o->list);
+              HvMessage *newList = cList_combine_lists(cList_slice(m1, 1, numElements), a);
+              msg_free(o->list);
+              o->list = newList;
               if (trimmed) msg_free(m1);
-              if (freeB) msg_free(a);
+              if (freeA) msg_free(a);
               break;
             } else if (!hv_strcmp(s, "prepend")) {
               HvMessage *a = o->list;
-              bool freeB = (a != o->list);
-              o->list = cList_combine_lists(a, cList_slice(m1, 1, numElements));
+              bool freeA = (a != o->list);
+              HvMessage *newList = cList_combine_lists(a, cList_slice(m1, 1, numElements));
+              msg_free(o->list);
+              o->list = newList;
               if (trimmed) msg_free(m1);
-              if (freeB) msg_free(a);
+              if (freeA) msg_free(a);
               break;
             } else if (!hv_strcmp(s, "send")) {
               hv_uint32_t h = 0;
