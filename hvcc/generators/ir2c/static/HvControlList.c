@@ -220,7 +220,9 @@ void cList_onMessage(HeavyContextInterface *_c, ControlList *o, int letIn, const
         case HV_LIST_STORE: {
           // just output the stored list
           if (msg_isBang(m, 0)) {
-            sendMessage(_c, 0, cList_untrim(o->list));
+            HvMessage *n = cList_untrim(o->list);
+            sendMessage(_c, 0, n);
+            if (n != o->list) msg_free(n);
             break;
           }
 
@@ -247,7 +249,10 @@ void cList_onMessage(HeavyContextInterface *_c, ControlList *o, int letIn, const
                 msg_free(n);
                 break;
               } else {
-                sendMessage(_c, 0, cList_slice(o->list, index, index + 1));
+                HvMessage *n = cList_slice(o->list, index, index + 1);
+                sendMessage(_c, 0, n);
+                msg_free(n);
+                if (trimmed) msg_free(m1);
                 break;
               }
               if (trimmed) msg_free(m1);
@@ -342,21 +347,21 @@ void cList_onMessage(HeavyContextInterface *_c, ControlList *o, int letIn, const
               break;
             } else if (!hv_strcmp(s, "append")) {
               HvMessage *a = o->list;
-              bool freeA = (a != o->list);
-              HvMessage *newList = cList_combine_lists(cList_slice(m1, 1, numElements), a);
+              HvMessage *slice = cList_slice(m1, 1, numElements);
+              HvMessage *newList = cList_combine_lists(slice, a);
+              msg_free(slice);
               msg_free(o->list);
               o->list = newList;
               if (trimmed) msg_free(m1);
-              if (freeA) msg_free(a);
               break;
             } else if (!hv_strcmp(s, "prepend")) {
               HvMessage *a = o->list;
-              bool freeA = (a != o->list);
-              HvMessage *newList = cList_combine_lists(a, cList_slice(m1, 1, numElements));
+              HvMessage *slice = cList_slice(m1, 1, numElements);
+              HvMessage *newList = cList_combine_lists(a, slice);
+              msg_free(slice);
               msg_free(o->list);
               o->list = newList;
               if (trimmed) msg_free(m1);
-              if (freeA) msg_free(a);
               break;
             } else if (!hv_strcmp(s, "send")) {
               hv_uint32_t h = 0;
@@ -373,19 +378,26 @@ void cList_onMessage(HeavyContextInterface *_c, ControlList *o, int letIn, const
                 case HV_MSG_BANG:
                   break;
               }
-              hv_sendMessageToReceiver(_c, h, 0, cList_untrim(o->list));
+              HvMessage *n = cList_untrim(o->list);
+              hv_sendMessageToReceiver(_c, h, 0, n);
+              if (n != o->list) msg_free(n);
+              break;
+            } else {
+              // No command matched - treat as data: prepend stored list
+              HvMessage *n = cList_combine_lists(m1, o->list);
+              HvMessage *out = cList_untrim(n);
+              sendMessage(_c, 0, out);
+              msg_free(n);
+              if (out != n) msg_free(out);
+              if (trimmed) msg_free(m1);
               break;
             }
             break;
           }
           HvMessage *b = o->list;
-          bool freeA = (m1 != m);
-          bool freeB = (b != o->list);
           HvMessage *n = cList_untrim(cList_combine_lists(m1, b));
           sendMessage(_c, 0, n);
           msg_free(n);
-          if (freeA) msg_free(m1);
-          if (freeB) msg_free(b);
           if (trimmed) msg_free(m1);
           break;
         }
@@ -418,16 +430,10 @@ void cList_onMessage(HeavyContextInterface *_c, ControlList *o, int letIn, const
         case HV_LIST_PREPEND:
         case HV_LIST_STORE: {
           HvMessage *n = cList_trim(m);
-          const int num = msg_getNumElements(n);
-          HvMessage *tmp = (HvMessage *) hv_malloc(msg_getCoreSize(num));
-          msg_init(tmp, num, 0);
-
-          for (int i = 0; i < num; i++) {
-            cList_copy_message(n, i, tmp, i);
-          }
+          HvMessage *newList = msg_copy(n);
+          if (n != m) msg_free(n);
           msg_free(o->list);
-          o->list = msg_copy(tmp);
-          msg_free(tmp);
+          o->list = newList;
           break;
         }
         case HV_LIST_SPLIT: {
