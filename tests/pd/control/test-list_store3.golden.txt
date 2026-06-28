@@ -1,1 +1,2 @@
-[@ 0.000] store-left: symbol bla
+[@ 0.000] store-bang: bang
+[@ 0.000] store-symbol: symbol bla
