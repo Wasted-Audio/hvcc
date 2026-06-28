@@ -262,7 +262,6 @@ void cList_onMessage(HeavyContextInterface *_c, ControlList *o, int letIn, const
                 cList_copy_message(m1, 2 + i, o->list, index + i);
               }
               if (trimmed) msg_free(m1);
-
               break;
             } else if (!hv_strcmp(s, "insert")) {
               // Split stored list at index, combine: head + payload + tail
@@ -340,7 +339,6 @@ void cList_onMessage(HeavyContextInterface *_c, ControlList *o, int letIn, const
               msg_free(o->list);
               o->list = newList;
               if (trimmed) msg_free(m1);
-
               break;
             } else if (!hv_strcmp(s, "append")) {
               HvMessage *a = o->list;
