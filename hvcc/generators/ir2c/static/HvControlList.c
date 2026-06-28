@@ -255,6 +255,45 @@ void cList_onMessage(HeavyContextInterface *_c, ControlList *o, int letIn, const
             } else if (!hv_strcmp(s, "set")) {
               break;
             } else if (!hv_strcmp(s, "insert")) {
+              // Split stored list at index, combine: head + payload + tail
+              const int index = (int) msg_getFloat(m1, 1);
+              const int listLen = msg_getNumElements(o->list);
+              const int clampedIndex = (index < 0) ? 0 : (index > listLen) ? listLen : index;
+
+              // payload is m1 elements [2, numElements) - copied raw, no list/symbol tag
+              const int payloadLen = numElements - 2;
+              HvMessage *payload = (HvMessage *) hv_malloc(msg_getCoreSize(payloadLen));
+              hv_assert(payload != NULL);
+              msg_init(payload, payloadLen, msg_getTimestamp(m));
+              for (int i = 0; i < payloadLen; i++) {
+                cList_copy_message(m1, 2 + i, payload, i);
+              }
+              HvMessage *head = (clampedIndex > 0)       ? cList_slice(o->list, 0, clampedIndex)           : NULL;
+              HvMessage *tail = (clampedIndex < listLen) ? cList_slice(o->list, clampedIndex, listLen) : NULL;
+
+              HvMessage *newList;
+              if (head && tail) {
+                HvMessage *tmp = cList_combine_lists(head, payload);
+                newList = cList_combine_lists(tmp, tail);
+                msg_free(tmp);
+                msg_free(head);
+                msg_free(tail);
+              } else if (head) {
+                newList = cList_combine_lists(head, payload);
+                msg_free(head);
+              } else if (tail) {
+                newList = cList_combine_lists(payload, tail);
+                msg_free(tail);
+              } else {
+                // list was empty, payload becomes the list
+                newList = payload;
+                payload = NULL; // transferred ownership, skip free below
+              }
+
+              if (payload) msg_free(payload);
+              msg_free(o->list);
+              o->list = newList;
+              if (trimmed) msg_free(m1);
               break;
             } else if (!hv_strcmp(s, "delete")) {
               const int index = (int) msg_getFloat(m1, 1);
@@ -282,7 +321,7 @@ void cList_onMessage(HeavyContextInterface *_c, ControlList *o, int letIn, const
               } else if (tail) {
                 newList = tail;
               } else {
-                // deleted everything — store an empty bang
+                // deleted everything - store an empty bang
                 newList = (HvMessage *) hv_malloc(msg_getCoreSize(1));
                 hv_assert(newList != NULL);
                 msg_initWithBang(newList, msg_getTimestamp(m));
@@ -326,7 +365,7 @@ void cList_onMessage(HeavyContextInterface *_c, ControlList *o, int letIn, const
                 case HV_MSG_BANG:
                   break;
               }
-              hv_sendMessageToReceiver(_c, h, 0, o->list);
+              hv_sendMessageToReceiver(_c, h, 0, cList_untrim(o->list));
               break;
             }
             break;
