@@ -235,7 +235,7 @@ void cList_onMessage(HeavyContextInterface *_c, ControlList *o, int letIn, const
               if (numElements >= 3) {
                 int end = (int) msg_getFloat(m1, 2);
                 if (trimmed) msg_free(m1);
-                // detrimine correct end index
+                // determine correct end index
                 const int resolvedEnd = (end < 0) ? (msg_getNumElements(o->list) + 1 + end) : end + 1;
                 HvMessage *n = cList_slice(o->list, index, resolvedEnd);
                 if (msg_isBang(n, 0)) {
@@ -344,6 +344,7 @@ void cList_onMessage(HeavyContextInterface *_c, ControlList *o, int letIn, const
               if (trimmed) msg_free(m1);
               break;
             } else if (!hv_strcmp(s, "append")) {
+              // append our stored list
               HvMessage *a = o->list;
               HvMessage *slice = cList_slice(m1, 1, numElements);
               HvMessage *newList = cList_combine_lists(slice, a);
@@ -353,6 +354,7 @@ void cList_onMessage(HeavyContextInterface *_c, ControlList *o, int letIn, const
               if (trimmed) msg_free(m1);
               break;
             } else if (!hv_strcmp(s, "prepend")) {
+              // prepend our stored list
               HvMessage *a = o->list;
               HvMessage *slice = cList_slice(m1, 1, numElements);
               HvMessage *newList = cList_combine_lists(a, slice);
@@ -362,23 +364,21 @@ void cList_onMessage(HeavyContextInterface *_c, ControlList *o, int letIn, const
               if (trimmed) msg_free(m1);
               break;
             } else if (!hv_strcmp(s, "send")) {
+              if (numElements < 2) {
+                // we technically should never get here
+                if (trimmed) msg_free(m1);
+                break;
+              }
               hv_uint32_t h = 0;
               switch (msg_getType(m1, 1)) {
-                case HV_MSG_SYMBOL:
-                  h = hv_string_to_hash(msg_getSymbol(m1, 1));
-                  if (trimmed) msg_free(m1);
-                  break;
-                case HV_MSG_HASH:
-                  h = msg_getHash(m1, 1);
-                  if (trimmed) msg_free(m1);
-                  break;
-                case HV_MSG_FLOAT:
-                case HV_MSG_BANG:
-                  break;
+                case HV_MSG_SYMBOL: h = hv_string_to_hash(msg_getSymbol(m1, 1)); break;
+                case HV_MSG_HASH: h = msg_getHash(m1, 1); break;
+                default: break;
               }
               HvMessage *n = cList_untrim(o->list);
               hv_sendMessageToReceiver(_c, h, 0, n);
               if (n != o->list) msg_free(n);
+              if (trimmed) msg_free(m1);
               break;
             } else {
               // No command matched - treat as data: prepend stored list

@@ -353,6 +353,7 @@ class TestPdControlPatches(TestPdControlBase):
     def test_list_store3(self):
         self._test_control_patch("test-list_store3.pd")
 
+
 def main():
     # TODO(mhroth): make this work
     parser = argparse.ArgumentParser(

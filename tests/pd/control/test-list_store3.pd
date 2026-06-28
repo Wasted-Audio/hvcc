@@ -1,4 +1,4 @@
-#N canvas 827 239 734 565 12;
+#N canvas 827 239 541 530 12;
 #X obj 86 58 loadbang;
 #X obj 86 84 bng 25 250 50 0 empty empty empty 0 -10 0 10 #191919 #ffffff #ffffff;
 #X obj 86 116 t b b b;
@@ -7,6 +7,7 @@
 #X msg 86 225 symbol bla;
 #X obj 86 259 list store;
 #X obj 86 285 print store-left;
+#X text 173 20 edge cases;
 #X connect 0 0 1 0;
 #X connect 1 0 2 0;
 #X connect 2 0 5 0;
