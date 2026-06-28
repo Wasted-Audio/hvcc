@@ -21,7 +21,7 @@ hv_size_t cList_init(ControlList *o, hvListType type) {
   hv_size_t numBytes = msg_getCoreSize(1);
   o->list = (HvMessage *) hv_malloc(numBytes);
   hv_assert(o->list != NULL);
-  msg_initWithBang(o->list, 1);
+  msg_initWithBang(o->list, 0);
   return numBytes;
 }
 
@@ -238,7 +238,7 @@ void cList_onMessage(HeavyContextInterface *_c, ControlList *o, int letIn, const
                 int end = (int) msg_getFloat(m1, 2);
                 if (trimmed) msg_free(m1);
                 // detrimine correct end index
-                const int resolvedEnd = (end < 0) ? msg_getNumElements(o->list) + 1 | end : end + 1;
+                const int resolvedEnd = (end < 0) ? (msg_getNumElements(o->list) + 1 + end) : end + 1;
                 HvMessage *n = cList_slice(o->list, index, resolvedEnd);
                 if (msg_isBang(n, 0)) {
                   sendMessage(_c, 1, n);
@@ -387,7 +387,6 @@ void cList_onMessage(HeavyContextInterface *_c, ControlList *o, int letIn, const
               HvMessage *n = cList_combine_lists(m1, o->list);
               HvMessage *out = cList_untrim(n);
               sendMessage(_c, 0, out);
-              msg_free(n);
               if (out != n) msg_free(out);
               if (trimmed) msg_free(m1);
               break;
