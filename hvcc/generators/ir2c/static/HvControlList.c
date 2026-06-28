@@ -253,6 +253,16 @@ void cList_onMessage(HeavyContextInterface *_c, ControlList *o, int letIn, const
               if (trimmed) msg_free(m1);
               break;
             } else if (!hv_strcmp(s, "set")) {
+              // Overwrite elements in o->list starting at index; superfluous payload items are ignored
+              const int index = (int) msg_getFloat(m1, 1);
+              const int listLen = msg_getNumElements(o->list);
+              const int payloadLen = numElements - 2;
+              const int count = (index + payloadLen > listLen) ? listLen - index : payloadLen;
+              for (int i = 0; i < count; i++) {
+                cList_copy_message(m1, 2 + i, o->list, index + i);
+              }
+              if (trimmed) msg_free(m1);
+
               break;
             } else if (!hv_strcmp(s, "insert")) {
               // Split stored list at index, combine: head + payload + tail
