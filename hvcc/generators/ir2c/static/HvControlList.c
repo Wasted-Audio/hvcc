@@ -19,7 +19,7 @@
 hv_size_t cList_init(ControlList *o, hvListType type) {
   o->type = type;
   hv_size_t numBytes = msg_getCoreSize(1);
-  o->list = HV_MESSAGE_ON_HEAP(numBytes);
+  o->list = HV_MESSAGE_ON_HEAP(1);
   hv_assert(o->list != NULL);
   msg_initWithBang(o->list, 0);
   return numBytes;
@@ -80,10 +80,9 @@ static HvMessage *cList_trim(const HvMessage *m) {
         msg_initWithBang(n, msg_getTimestamp(m));
         return n;
       }
-      hv_size_t numBytes = msg_getCoreSize(numElements-1);
-      HvMessage *n = HV_MESSAGE_ON_HEAP(numBytes);
+      HvMessage *n = HV_MESSAGE_ON_HEAP(numElements - 1);
       hv_assert(n != NULL);
-      msg_init(n, numElements-1, msg_getTimestamp(m));
+      msg_init(n, numElements - 1, msg_getTimestamp(m));
 
       for (int i = 1; i < numElements; i++) {
         cList_copy_message(m, i, n, i-1);
@@ -113,8 +112,7 @@ static HvMessage *cList_untrim(const HvMessage *m) {
     if (numElements == 1) {
       return cList_wrap_symbol(m);
     }
-    hv_size_t numBytes = msg_getCoreSize(numElements + 1);
-    HvMessage *n = HV_MESSAGE_ON_HEAP(numBytes);
+    HvMessage *n = HV_MESSAGE_ON_HEAP(numElements + 1);
     hv_assert(n != NULL);
     msg_init(n, numElements + 1, msg_getTimestamp(m));
 
@@ -165,22 +163,26 @@ static HvMessage *cList_slice(const HvMessage *m1, int start, int end) {
 static void cList_onAppend(HeavyContextInterface *_c, ControlList *o, const HvMessage *m,
   void (*sendMessage)(HeavyContextInterface *, int, const HvMessage *)) {
   HvMessage *a = cList_trim(m);
-  HvMessage *b = o->list;
-  HvMessage *combined = cList_combine_lists(a, b);
-  HvMessage *n = cList_untrim(combined);
-  sendMessage(_c, 0, n);
-  msg_free(n);
+  const bool trimmed = (a != m);
+  HvMessage *combined = cList_combine_lists(a, o->list);
+  HvMessage *out = cList_untrim(combined);
+  sendMessage(_c, 0, out);
+  if (out != combined) msg_free(combined);
+  msg_free(out);
+  if (trimmed) msg_free(a);
 }
 
 
 static void cList_onPrepend(HeavyContextInterface *_c, ControlList *o, const HvMessage *m,
   void (*sendMessage)(HeavyContextInterface *, int, const HvMessage *)) {
-  HvMessage *a = o->list;
   HvMessage *b = cList_trim(m);
-  HvMessage *combined = cList_combine_lists(a, b);
-  HvMessage *n = cList_untrim(combined);
-  sendMessage(_c, 0, n);
-  msg_free(n);
+  const bool trimmed = (b != m);
+  HvMessage *combined = cList_combine_lists(o->list, b);
+  HvMessage *out = cList_untrim(combined);
+  sendMessage(_c, 0, out);
+  if (out != combined) msg_free(combined);
+  msg_free(out);
+  if (trimmed) msg_free(b);
 }
 
 
@@ -215,6 +217,7 @@ static void cList_onSplit(HeavyContextInterface *_c, ControlList *o, const HvMes
 static void cList_onLength(HeavyContextInterface *_c, ControlList *o, const HvMessage *m, void
   (*sendMessage)(HeavyContextInterface *, int, const HvMessage *)) {
   HvMessage *n = HV_MESSAGE_ON_HEAP(1);
+  hv_assert(n != NULL);
   int numElements = msg_getNumElements(m);
   if (msg_isSymbol(m, 0)) {
     const char *s = msg_getSymbol(m, 0);
@@ -222,8 +225,9 @@ static void cList_onLength(HeavyContextInterface *_c, ControlList *o, const HvMe
       numElements -= 1;
     }
   }
-  msg_initWithFloat(n, msg_getTimestamp(m), numElements);
+  msg_initWithFloat(n, msg_getTimestamp(m), (float) numElements);
   sendMessage(_c, 0, n);
+  msg_free(n);
 }
 
 
@@ -292,6 +296,7 @@ static void cList_store_insert(ControlList *o, const HvMessage *m, const HvMessa
 
   // payload is m1 elements [2, numElements) - copied raw, no list/symbol tag
   const int payloadLen = numElements - 2;
+  if (payloadLen == 0) return;
   HvMessage *payload = HV_MESSAGE_ON_HEAP(payloadLen);
   hv_assert(payload != NULL);
   msg_init(payload, payloadLen, msg_getTimestamp(m));
