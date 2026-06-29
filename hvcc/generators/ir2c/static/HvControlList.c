@@ -166,7 +166,8 @@ static void cList_onAppend(HeavyContextInterface *_c, ControlList *o, const HvMe
   void (*sendMessage)(HeavyContextInterface *, int, const HvMessage *)) {
   HvMessage *a = cList_trim(m);
   HvMessage *b = o->list;
-  HvMessage *n = cList_combine_lists(a, b);
+  HvMessage *combined = cList_combine_lists(a, b);
+  HvMessage *n = cList_untrim(combined);
   sendMessage(_c, 0, n);
   msg_free(n);
 }
@@ -176,7 +177,8 @@ static void cList_onPrepend(HeavyContextInterface *_c, ControlList *o, const HvM
   void (*sendMessage)(HeavyContextInterface *, int, const HvMessage *)) {
   HvMessage *a = o->list;
   HvMessage *b = cList_trim(m);
-  HvMessage *n = cList_combine_lists(a, b);
+  HvMessage *combined = cList_combine_lists(a, b);
+  HvMessage *n = cList_untrim(combined);
   sendMessage(_c, 0, n);
   msg_free(n);
 }
