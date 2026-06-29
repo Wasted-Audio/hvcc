@@ -237,8 +237,9 @@ static void cList_store_get(HeavyContextInterface *_c, ControlList *o, const HvM
   void (*sendMessage)(HeavyContextInterface *, int, const HvMessage *)) {
   const int index = (int) msg_getFloat(m1, 1);
   if (numElements >= 3) {
-    int end = (int) msg_getFloat(m1, 2);
-    const int resolvedEnd = (end < 0) ? (msg_getNumElements(o->list) + 1 + end) : end + 1;
+    const int length = (int) msg_getFloat(m1, 2);
+    const int listLen = (int) msg_getNumElements(o->list);
+    const int resolvedEnd = (length < 0) ? listLen : index + length;
     HvMessage *n = cList_slice(o->list, index, resolvedEnd);
     if (msg_isBang(n, 0)) {
       sendMessage(_c, 1, n);
