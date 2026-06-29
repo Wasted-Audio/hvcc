@@ -19,7 +19,7 @@
 hv_size_t cList_init(ControlList *o, hvListType type) {
   o->type = type;
   hv_size_t numBytes = msg_getCoreSize(1);
-  o->list = (HvMessage *) hv_malloc(numBytes);
+  o->list = HV_MESSAGE_ON_HEAP(numBytes);
   hv_assert(o->list != NULL);
   msg_initWithBang(o->list, 0);
   return numBytes;
@@ -81,7 +81,7 @@ static HvMessage *cList_trim(const HvMessage *m) {
         return n;
       }
       hv_size_t numBytes = msg_getCoreSize(numElements-1);
-      HvMessage *n = (HvMessage *) hv_malloc(numBytes);
+      HvMessage *n = HV_MESSAGE_ON_HEAP(numBytes);
       hv_assert(n != NULL);
       msg_init(n, numElements-1, msg_getTimestamp(m));
 
@@ -114,7 +114,7 @@ static HvMessage *cList_untrim(const HvMessage *m) {
       return cList_wrap_symbol(m);
     }
     hv_size_t numBytes = msg_getCoreSize(numElements + 1);
-    HvMessage *n = (HvMessage *) hv_malloc(numBytes);
+    HvMessage *n = HV_MESSAGE_ON_HEAP(numBytes);
     hv_assert(n != NULL);
     msg_init(n, numElements + 1, msg_getTimestamp(m));
 
@@ -298,7 +298,7 @@ static void cList_store_insert(ControlList *o, const HvMessage *m, const HvMessa
   for (int i = 0; i < payloadLen; i++) {
     cList_copy_message(m1, 2 + i, payload, i);
   }
-  HvMessage *head = (clampedIndex > 0)       ? cList_slice(o->list, 0, clampedIndex)           : NULL;
+  HvMessage *head = (clampedIndex > 0)       ? cList_slice(o->list, 0, clampedIndex)       : NULL;
   HvMessage *tail = (clampedIndex < listLen) ? cList_slice(o->list, clampedIndex, listLen) : NULL;
 
   HvMessage *newList;
