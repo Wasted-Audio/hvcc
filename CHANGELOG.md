@@ -1,6 +1,13 @@
 CHANGELOG
 =====
 
+Next Release
+-----
+
+Features:
+
+* Support `list` object. Does not support tosymbol/fromsymbol.
+
 0.16.2
 -----
 

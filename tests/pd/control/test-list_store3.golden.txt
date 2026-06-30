@@ -1,0 +1,3 @@
+[@ 0.000] store-get: symbol a
+[@ 0.000] store-bang: bang
+[@ 0.000] store-symbol: symbol bla

@@ -33,6 +33,7 @@ from hvcc.generators.ir2c.ControlCast import ControlCast
 from hvcc.generators.ir2c.ControlDelay import ControlDelay
 from hvcc.generators.ir2c.ControlExpr import ControlExpr
 from hvcc.generators.ir2c.ControlIf import ControlIf
+from hvcc.generators.ir2c.ControlList import ControlList
 from hvcc.generators.ir2c.ControlMessage import ControlMessage
 from hvcc.generators.ir2c.ControlPack import ControlPack
 from hvcc.generators.ir2c.ControlPrint import ControlPrint
@@ -95,6 +96,7 @@ class ir2c:
         "__biquad_k~f": SignalBiquad,
         "__env~f": SignalEnvelope,
         "__line~f": SignalLine,
+        "__list": ControlList,
         "__lorenz~f": SignalLorenz,
         "__nam_nano~f": SignalNam,
         "__nam_feather~f": SignalNam,
