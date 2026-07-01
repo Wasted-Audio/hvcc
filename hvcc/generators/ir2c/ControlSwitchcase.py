@@ -70,7 +70,7 @@ class ControlSwitchcase(HeavyObject):
         cases = objects[obj_id].args["cases"]
 
         # special float case, if present route float messages
-        if "float" in cases:
+        if objects[obj_id].args.get("is_route", False) and "float" in cases:
             for i, c in enumerate(cases):
                 if c == "float":
                     out_list.append("if (msg_getNumElements(m) == 1 && msg_getType(m, 0) == HV_MSG_FLOAT) {")

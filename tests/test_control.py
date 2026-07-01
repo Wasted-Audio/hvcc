@@ -242,6 +242,9 @@ class TestPdControlPatches(TestPdControlBase):
     def test_select_min(self):
         self._test_control_patch("test-select-min.pd")
 
+    def test_select_float(self):
+        self._test_control_patch("test-select_float.pd")
+
     def test_send_receive(self):
         self._test_control_patch("test-send_receive.pd")
 
