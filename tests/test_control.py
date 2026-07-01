@@ -232,12 +232,18 @@ class TestPdControlPatches(TestPdControlBase):
     def test_route(self):
         self._test_control_patch("test-route.pd")
 
+    def test_route_float(self):
+        self._test_control_patch("test-route_float.pd")
+
     @unittest.skip("currently does not support right inlet")
     def test_select(self):
         self._test_control_patch("test-select.pd")
 
     def test_select_min(self):
         self._test_control_patch("test-select-min.pd")
+
+    def test_select_float(self):
+        self._test_control_patch("test-select_float.pd")
 
     def test_send_receive(self):
         self._test_control_patch("test-send_receive.pd")
