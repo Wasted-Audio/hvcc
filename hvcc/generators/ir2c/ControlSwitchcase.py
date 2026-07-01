@@ -69,23 +69,21 @@ class ControlSwitchcase(HeavyObject):
 
         cases = objects[obj_id].args["cases"]
 
-        # special float case, if present route float messages
-        if objects[obj_id].args.get("is_route", False) and "float" in cases:
-            for i, c in enumerate(cases):
-                if c == "float":
-                    out_list.append("if (msg_getNumElements(m) == 1 && msg_getType(m, 0) == HV_MSG_FLOAT) {")
-                    out_list.append("HvMessage *n = HV_MESSAGE_ON_STACK(2);")
-                    out_list.append("msg_init(n, 2, msg_getTimestamp(m));")
-                    out_list.append("msg_setSymbol(n, 0, \"float\");")
-                    out_list.append('msg_setElementToFrom(n, 1, m, 0);')
+        # special float case, if present route float messages on first switch
+        if objects[obj_id].args.get("is_route", False) and cases[0] == "float":
+            out_list.append("if (msg_getNumElements(m) == 1 && msg_getType(m, 0) == HV_MSG_FLOAT) {")
+            out_list.append("HvMessage *n = HV_MESSAGE_ON_STACK(2);")
+            out_list.append("msg_init(n, 2, msg_getTimestamp(m));")
+            out_list.append("msg_setSymbol(n, 0, \"float\");")
+            out_list.append('msg_setElementToFrom(n, 1, m, 0);')
 
-                    om_list = []
-                    for om in on_message_list[i]:
-                        om_list.append(f"cSlice_onMessage(_c, &Context(_c)->cSlice_{om.id}, {om.inletIndex}, "
-                                       f"n, &cSlice_{om.id}_sendMessage);")
-                    out_list.extend(om_list)
-                    out_list.append("return;")
-                    out_list.append("}")
+            om_list = []
+            for om in on_message_list[0]:
+                om_list.append(f"cSlice_onMessage(_c, &Context(_c)->cSlice_{om.id}, {om.inletIndex}, "
+                               f"n, &cSlice_{om.id}_sendMessage);")
+            out_list.extend(om_list)
+            out_list.append("return;")
+            out_list.append("}")
 
         out_list.append("switch (msg_getHash(m, msgIndex)) {")
         for i, c in enumerate(cases):

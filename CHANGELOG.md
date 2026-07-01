@@ -7,6 +7,8 @@ Next Release
 Features:
 
 * Support `list` object. Does not support tosymbol/fromsymbol.
+* Support `[route float]` for routing floats.
+
 
 0.16.2
 -----
