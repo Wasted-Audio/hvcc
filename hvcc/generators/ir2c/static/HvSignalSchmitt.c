@@ -16,7 +16,7 @@
 
 #include "HvSignalSchmitt.h"
 
-hv_size_t sSchmitt_init(SignalSchmitt *o, hv_bufferf_t tVal, hv_bufferf_t tDeb, hv_bufferf_t rVal, hv_bufferf_t rDeb) {
+hv_size_t sSchmitt_init(SignalSchmitt *o, float tVal, float tDeb, float rVal, float rDeb) {
   o->tVal = tVal;
   o->tDeb = tDeb;
   o->rVal = rVal;
