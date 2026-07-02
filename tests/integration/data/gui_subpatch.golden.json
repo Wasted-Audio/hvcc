@@ -1,10 +1,13 @@
 {
+  "id": "mainPatch",
   "objects": [],
   "graphs": [
     {
+      "id": "graph1",
       "objects": [
         {
           "type": "canvas",
+          "id": "canvas1",
           "position": {
             "x": -52,
             "y": -29
@@ -35,6 +38,15 @@
   "size": {
     "x": 734,
     "y": 565
+  },
+  "theme": {
+    "obj_corner_radius": null,
+    "cnv_color": null,
+    "text_color": null,
+    "io_color": null,
+    "bg_color": null,
+    "sel_color": null,
+    "out_color": null
   },
   "version": "0.14.0"
 }

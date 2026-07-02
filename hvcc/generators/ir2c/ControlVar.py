@@ -38,6 +38,10 @@ class ControlVar(HeavyObject):
 
     @classmethod
     def get_C_init(cls, obj_type: str, obj_id: str, args: Dict) -> List[str]:
+        # make sure we use floatatom as a float, not a symbol
+        if args['k'] == 'floatatom':
+            args['k'] = 0
+
         if isinstance(args["k"], str):
             return [
                 "cVar_init_s(&cVar_{0}, \"{1}\");".format(

@@ -15,17 +15,19 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from collections import Counter
-from typing import Optional, List, Dict
+from typing import Optional
 
 from .NotificationEnum import NotificationEnum
 from .PdObject import PdObject
+
+from hvcc.types.Heavy import Heavy, HvPos, HvConn, HvConnFrom, HvConnTo
 
 
 class PdRouteObject(PdObject):
     def __init__(
         self,
         obj_type: str,
-        obj_args: Optional[List] = None,
+        obj_args: Optional[list] = None,
         pos_x: int = 0,
         pos_y: int = 0
     ) -> None:
@@ -59,7 +61,7 @@ class PdRouteObject(PdObject):
         if len(self._inlet_connections.get("1", [])) > 0:
             self.add_warning("The right inlet of route is not supported. It will not do anything.")
 
-    def to_hv(self) -> Dict:
+    def to_hv(self) -> Heavy:
         """Creates a graph dynamically based on the number of arguments.
             An unconnected right inlet is added.
 
@@ -72,97 +74,96 @@ class PdRouteObject(PdObject):
             [outlet_0]                    [outlet_N-1]            [outlet_right]
         """
 
-        route_graph: Dict = {
-            "type": "graph",
-            "imports": [],
-            "args": [],
-            "objects": {
-                "inlet": {
-                    "type": "inlet",
-                    "args": {
+        route_graph = Heavy(
+            type="graph",
+            args=[],
+            objects={
+                "inlet": Heavy(
+                    type="inlet",
+                    args={
                         "type": "-->",
                         "index": 0
-                    },
-                    "properties": {"x": 0, "y": 0}
-                },
-                "inlet_right": {
-                    "type": "inlet",
-                    "args": {
+                    }
+                ),
+                "inlet_right": Heavy(
+                    type="inlet",
+                    args={
                         "type": "-->",
                         "index": 1
-                    },
-                    "properties": {"x": 0, "y": 0}
-                },
-                "switchcase": {
-                    "type": "__switchcase",
-                    "args": {
-                        "cases": self.obj_args
-                    },
-                    "properties": {"x": 0, "y": 0}
-                },
-                "outlet_right": {
-                    "type": "outlet",
-                    "args": {
+                    }
+                ),
+                "switchcase": Heavy(
+                    type="__switchcase",
+                    args={
+                        "cases": self.obj_args,
+                        "is_route": True
+                    }
+                ),
+                "outlet_right": Heavy(
+                    type="outlet",
+                    args={
                         "type": "-->",
                         "index": len(self.obj_args)
-                    },
-                    "properties": {"x": 0, "y": 0}
-                },
+                    }
+                )
             },
-            "connections": [
-                {
-                    "from": {"id": "inlet", "outlet": 0},
-                    "to": {"id": "switchcase", "inlet": 0},
-                    "type": "-->"
-                },
-                {
-                    "from": {"id": "switchcase", "outlet": len(self.obj_args)},
-                    "to": {"id": "outlet_right", "inlet": 0},
-                    "type": "-->"
-                }
+            connections=[
+                HvConn(
+                    type="-->",
+                    conn_from=HvConnFrom(id="inlet", outlet=0),
+                    conn_to=HvConnTo(id="switchcase", inlet=0)
+                ),
+                HvConn(
+                    type="-->",
+                    conn_from=HvConnFrom(id="switchcase", outlet=len(self.obj_args)),
+                    conn_to=HvConnTo(id="outlet_right", inlet=0)
+                )
             ],
-            "properties": {"x": self.pos_x, "y": self.pos_y}
-        }
+            properties=HvPos(x=self.pos_x, y=self.pos_y)
+        )
 
         # add slices to graph
         for i, a in enumerate(self.obj_args):
             # add slices to graph
-            route_graph["objects"][f"slice_{i}"] = {
-                "type": "slice",
-                "args": {
+            route_graph.objects[f"slice_{i}"] = Heavy(
+                type="slice",
+                args={
                     "index": 1,
                     "length": -1
-                },
-                "properties": {"x": 0, "y": 0}
-            }
+                }
+            )
 
             # add outlets to graph
-            route_graph["objects"][f"outlet_{i}"] = {
-                "type": "outlet",
-                "args": {
+            route_graph.objects[f"outlet_{i}"] = Heavy(
+                type="outlet",
+                args={
                     "type": "-->",
                     "index": i
-                },
-                "properties": {"x": 0, "y": 0}
-            }
-
+                }
+            )
             # add connection from switchcase to slice
-            route_graph["connections"].append({
-                "from": {"id": "switchcase", "outlet": i},
-                "to": {"id": f"slice_{i}", "inlet": 0},
-                "type": "-->"
-            })
+            route_graph.connections.append(
+                HvConn(
+                    type="-->",
+                    conn_from=HvConnFrom(id="switchcase", outlet=i),
+                    conn_to=HvConnTo(id=f"slice_{i}", inlet=0)
+                )
+            )
 
             # add connection from slice outlets 0 and 1 to outlet
-            route_graph["connections"].append({
-                "from": {"id": f"slice_{i}", "outlet": 0},
-                "to": {"id": f"outlet_{i}", "inlet": 0},
-                "type": "-->"
-            })
-            route_graph["connections"].append({
-                "from": {"id": f"slice_{i}", "outlet": 1},
-                "to": {"id": f"outlet_{i}", "inlet": 0},
-                "type": "-->"
-            })
+            route_graph.connections.append(
+                HvConn(
+                    type="-->",
+                    conn_from=HvConnFrom(id=f"slice_{i}", outlet=0),
+                    conn_to=HvConnTo(id=f"outlet_{i}", inlet=0)
+                )
+            )
+            route_graph.connections.append(
+                HvConn(
+                    type="-->",
+                    conn_from=HvConnFrom(id=f"slice_{i}", outlet=1),
+                    conn_to=HvConnTo(id=f"outlet_{i}", inlet=0)
+                )
+            )
 
         return route_graph

@@ -1,0 +1,10 @@
+#N canvas 710 529 382 224 12;
+#X obj 39 42 inlet~;
+#N canvas 1212 0 450 300 @hv_obj 0;
+#X obj 37 37 inlet~;
+#X obj 37 145 outlet~;
+#X restore 39 89 pd @hv_obj __nam~f \$1;
+#X obj 39 135 outlet~;
+#X text 39 176 @hv_arg \$1 nam string "" true;
+#X connect 0 0 1 0;
+#X connect 1 0 2 0;

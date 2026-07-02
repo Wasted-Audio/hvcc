@@ -1,0 +1,73 @@
+name: Publish Docs
+on:
+  push:
+    branches:
+      - develop
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version label to deploy (e.g. 0.15.0)"
+        required: true
+      alias:
+        description: "Optional alias (e.g. latest, rc)"
+        required: false
+permissions:
+  contents: write
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Configure Git Credentials
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+      - uses: actions/setup-python@v5
+        with:
+          python-version: 3.x
+      - run: echo "cache_id=$(date --utc '+%V')" >> $GITHUB_ENV
+      - uses: actions/cache@v4
+        with:
+          key: mkdocs-material-${{ env.cache_id }}
+          path: .cache
+          restore-keys: |
+            mkdocs-material-
+      - run: pip install mkdocs-material mike
+      - name: Deploy versioned docs
+        env:
+          VERSION_INPUT: ${{ github.event.inputs.version }}
+          ALIAS_INPUT: ${{ github.event.inputs.alias }}
+        run: |
+          if [ -n "${VERSION_INPUT}" ]; then
+            VERSION="${VERSION_INPUT}"
+            if [ -n "${ALIAS_INPUT}" ]; then
+              ALIAS="${ALIAS_INPUT}"
+            else
+              ALIAS="latest"
+            fi
+          elif [ "${GITHUB_REF_TYPE}" = "tag" ]; then
+            VERSION="${GITHUB_REF_NAME#v}"
+            ALIAS="latest"
+          elif [ "${GITHUB_REF_NAME}" = "develop" ]; then
+            VERSION="develop"
+            ALIAS=""
+          else
+            echo "No version provided and ref is not a tag or develop; aborting."
+            exit 1
+          fi
+
+          if [ -n "${ALIAS}" ] && [ "${ALIAS}" != "${VERSION}" ]; then
+            echo "Deploying docs version '${VERSION}' with alias '${ALIAS}'"
+            mike deploy --push --update-aliases "${VERSION}" "${ALIAS}"
+          else
+            echo "Deploying docs version '${VERSION}' without alias"
+            mike deploy --push "${VERSION}"
+          fi
+
+          if [ "${ALIAS}" = "latest" ]; then
+            mike set-default --push latest
+          fi

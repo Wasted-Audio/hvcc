@@ -1,0 +1,72 @@
+# Introduction
+
+## What is Heavy?
+
+Heavy is a framework for easily generating audio plugins for use in interactive sound and music applications such games, instruments or installations.
+
+It aims to reduce the dependency on low-level programming from a creative standpoint and bridge the gap from idea to production-ready implementation.
+
+Heavy makes use of modern software principles to generate highly optimised C/C++ code specifically targeting a wide variety of popular hardware architectures and software frameworks. It can also automatically build plugin binaries for these platforms.
+
+## Supported Patch Formats
+
+Currently Heavy supports compiling Pure Data (.pd) patch files.
+
+However it's important to note that Pd is merely used as a front-end authoring editor, Heavy does not make use of any Pure Data code, and it is entirely unrelated to the embeddable Pd engine, [libpd](https://github.com/libpd/libpd).
+
+## What is Pure Data?
+
+[Pure Data](http://msp.ucsd.edu/software.html) (Pd) is an open source visual programming environment for real-time time audio and music creation.
+
+Heavy can interpret and convert a subset of features from Pure Data patches:
+
+- [Supported Pd objects](../reference/objects/supported.md)
+- [Unsupported Pd objects](../reference/objects/unsupported.md)
+
+## Supported Platforms
+
+- Windows 10, 11 and WSA
+- Mac OSX
+- Linux
+- PS4
+- Xbox One
+- iOS
+- Android
+- [Bela](http://bela.io)
+- [Hoxton OWL](https://www.rebeltech.org/product/owl-modular/)
+- [Daisy](https://www.electro-smith.com/daisy)
+- Raspberry Pi
+- Web (Javascript)
+
+## Supported Frameworks
+
+- [Unity 5](https://unity3d.com)
+- [Distrho Plugin Framework](https://distrho.github.io/DPF)
+  - [LV2](https://lv2plug.in)
+  - [VST2](https://www.steinberg.net/technology/)
+  - [VST3](https://www.steinberg.net/technology/)
+  - [CLAP](https://cleveraudio.org/)
+  - [JACK](https://jackaudio.org)
+- [Wwise](https://www.audiokinetic.com)
+- [FMOD](https://www.fmod.com)
+- [Web Audio API (AudioWorkletProcessor)](https://developer.mozilla.org/en-US/docs/Web/API/AudioWorkletProcessor)
+
+## Optimisations
+
+Heavy-generated code comes pre-optimised for architectures that can take advantage of AVX, SSE or NEON instructions. For more bespoke platforms, Heavy also provides a basic implementation supporting single sample block sizes.
+
+## Licensing
+
+In general `hvcc` is free to use, though please be aware of the following licences applied to particular parts of the system.
+
+All the `hvcc` python compiler code is [GPLv3](https://github.com/Wasted-Audio/hvcc/blob/master/LICENSE).
+
+The files that `hvcc` generates are split into two types:
+
+- [Static](https://github.com/Wasted-Audio/hvcc/tree/master/hvcc/generators/ir2c/static): this code is independent of the input patch contents and provides the basic DSP functionality with which generated output can link against. It has a liberal [ISC](https://github.com/Wasted-Audio/hvcc/blob/master/hvcc/generators/ir2c/static/HeavyContext.hpp#L2) licence.
+
+- Generated: this relates to all the source files that use information about the input patch, for example `Heavy_{{name}}.cpp`. By default all these files will have a `Copyright (c) 2018 Enzien Audio, Ltd` header, but this can be modified with the [user copyright argument](../index.md#-copyright-user-copyright).
+
+## How to start patching for heavy
+
+See the [Getting started](patching.md) page on more information about how to construct compatible pure data patches.

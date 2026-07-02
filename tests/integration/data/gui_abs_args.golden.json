@@ -1,7 +1,9 @@
 {
+  "id": "mainPatch",
   "objects": [],
   "graphs": [
     {
+      "id": "graph1",
       "objects": [
         {
           "type": "vslider",
@@ -29,12 +31,12 @@
             "y": 81
           },
           "size": {
-            "x": 0,
-            "y": 0
+            "x": 20,
+            "y": 8
           },
           "parameter": "float_vol",
-          "font_size": 0,
-          "label_text": "-",
+          "font_height": 8,
+          "label_text": "",
           "label_pos": 0,
           "min": 0.0,
           "max": 0.0
@@ -58,6 +60,15 @@
   "size": {
     "x": 734,
     "y": 565
+  },
+  "theme": {
+    "obj_corner_radius": null,
+    "cnv_color": null,
+    "text_color": null,
+    "io_color": null,
+    "bg_color": null,
+    "sel_color": null,
+    "out_color": null
   },
   "version": "0.14.0"
 }
