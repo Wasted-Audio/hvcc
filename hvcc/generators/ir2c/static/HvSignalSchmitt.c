@@ -21,22 +21,29 @@ hv_size_t sSchmitt_init(SignalSchmitt *o, float tVal, float tDeb, float rVal, fl
   o->tDeb = tDeb;
   o->rVal = rVal;
   o->rDeb = rDeb;
-  o->state = 0;
+  o->state = 0.0f;
+  o->debounceCounter = 0;
+  o->processedSamples = 0;
+  o->lastBlockStart = 0xFFFFFFFF;
   return 0;
 }
 
 void sSchmitt_onMessage(HeavyContextInterface *_c, SignalSchmitt *o, int letIndex,
-    const HvMessage *m, void *sendMessage) {
+    const HvMessage *m) {
   switch (letIndex) {
-    case 2: {
-      if (msg_isFloat(m,0)) {
-        o->tVal = msg_getFloat(m,0);
+    case 1: {
+      if (msg_getNumElements(m) >= 4) {
+        o->tVal = msg_getFloat(m, 0);
+        o->tDeb = msg_getFloat(m, 1);
+        o->rVal = msg_getFloat(m, 2);
+        o->rDeb = msg_getFloat(m, 3);
       }
       break;
     }
-    case 3: {
-      if (msg_isFloat(m,0)) {
-        o->state = (int) msg_getFloat(m,0);
+    case 2: {
+      if (msg_isFloat(m, 0)) {
+        o->state = (msg_getFloat(m, 0) != 0.0f) ? 1.0f : 0.0f;
+        o->debounceCounter = 0;
       }
       break;
     }

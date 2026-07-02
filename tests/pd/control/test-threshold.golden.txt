@@ -1,0 +1,2 @@
+[@ 0.000] trigger: bang
+[@ 100.000] rest: bang

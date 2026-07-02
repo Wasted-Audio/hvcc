@@ -29,16 +29,55 @@ typedef struct SignalSchmitt {
   float rVal;
   float rDeb;
   float state;
+  int debounceCounter;
+  hv_uint32_t processedSamples;
+  hv_uint32_t lastBlockStart;
 } SignalSchmitt;
 
-hv_size_t sSchmitt_init(SignalSchmitt *o, hv_bufferf_t tVal, hv_bufferf_t tDeb, hv_bufferf_t rVal, hv_bufferf_t rDeb);
+hv_size_t sSchmitt_init(SignalSchmitt *o, float tVal, float tDeb, float rVal, float rDeb);
 
-static inline void __hv_schmitt_f(HeavyContextInterface *_c, SignalSchmitt *o, hv_bInf_t bIn0, hv_bInf_t bIn1, hv_bOutf_t bOut) {
-    // do schmitt triggering
+static inline void __hv_schmitt_f(HeavyContextInterface *_c, SignalSchmitt *o, hv_bInf_t bIn,
+    void (*sendMessage)(HeavyContextInterface *, int, const HvMessage *)) {
+  float bIn_array[HV_N_SIMD];
+  __hv_store_f(bIn_array, bIn);
+
+  hv_uint32_t blockStart = hv_getCurrentSample(_c);
+  if (o->lastBlockStart != blockStart) {
+    o->lastBlockStart = blockStart;
+    o->processedSamples = 0;
+  }
+
+  for (int i = 0; i < HV_N_SIMD; i++) {
+    float val = bIn_array[i];
+    hv_uint32_t currentSample = blockStart + o->processedSamples;
+
+    if (o->debounceCounter > 0) {
+      o->debounceCounter--;
+    }
+
+    if (o->state != 0.0f) {
+      if (val < o->rVal && o->debounceCounter == 0) {
+        o->state = 0.0f;
+        HvMessage *const m = HV_MESSAGE_ON_STACK(1);
+        msg_initWithBang(m, currentSample);
+        hv_scheduleMessageForObject(_c, m, sendMessage, 1);
+        o->debounceCounter = (int) (o->rDeb * hv_getSampleRate(_c) / 1000.0f);
+      }
+    } else {
+      if (val >= o->tVal && o->debounceCounter == 0) {
+        o->state = 1.0f;
+        HvMessage *const m = HV_MESSAGE_ON_STACK(1);
+        msg_initWithBang(m, currentSample);
+        hv_scheduleMessageForObject(_c, m, sendMessage, 0);
+        o->debounceCounter = (int) (o->tDeb * hv_getSampleRate(_c) / 1000.0f);
+      }
+    }
+    o->processedSamples++;
+  }
 }
 
 void sSchmitt_onMessage(HeavyContextInterface *_c, SignalSchmitt *o, int letIndex,
-    const HvMessage *m, void *sendMessage);
+    const HvMessage *m);
 
 #ifdef __cplusplus
 } // extern "C"

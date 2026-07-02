@@ -359,6 +359,11 @@ class TestPdControlPatches(TestPdControlBase):
     def test_list_store3(self):
         self._test_control_patch("test-list_store3.pd")
 
+    # Threshold
+
+    def test_threshold(self):
+        self._test_control_patch("test-threshold.pd", num_iterations=20)
+
 
 def main():
     # TODO(mhroth): make this work
