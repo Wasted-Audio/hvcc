@@ -9,6 +9,10 @@
 #X msg 109 161 -3.1;
 #X msg 76 161 2.3;
 #X obj 143 256 expr~ int($v1);
+#X obj 248 222 sig~;
+#X obj 248 256 expr~ trunc($v1);
+#X obj 248 345 print;
+#X obj 248 313 snapshot~;
 #X connect 0 0 1 0;
 #X connect 1 0 5 0;
 #X connect 3 0 9 0;
@@ -17,9 +21,12 @@
 #X connect 5 1 8 0;
 #X connect 5 2 4 0;
 #X connect 5 3 7 0;
-#X connect 5 4 4 0;
+#X connect 5 4 13 0;
 #X connect 5 5 6 0;
-#X connect 6 0 3 0;
+#X connect 6 0 10 0;
 #X connect 7 0 3 0;
 #X connect 8 0 3 0;
 #X connect 9 0 4 0;
+#X connect 10 0 11 0;
+#X connect 11 0 13 0;
+#X connect 13 0 12 0;
