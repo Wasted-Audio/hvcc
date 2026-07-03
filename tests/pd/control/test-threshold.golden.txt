@@ -1,2 +1,4 @@
 [@ 0.000] trigger: bang
 [@ 100.000] rest: bang
+[@ 200.000] trigger: bang
+[@ 300.000] rest: bang
