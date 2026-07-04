@@ -100,6 +100,7 @@ def f_name():   return [                                                        
                     # regex(r"\bSum(?=\()"),
                     regex(r"\btan(?=\()"),
                     regex(r"\btanh(?=\()"),
+                    regex(r"\btrunc(?=\()"),
                 ]
 
 
