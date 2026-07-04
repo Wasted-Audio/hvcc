@@ -362,7 +362,7 @@ class TestPdControlPatches(TestPdControlBase):
     # Threshold
 
     def test_threshold(self):
-        self._test_control_patch("test-threshold.pd", num_iterations=30)
+        self._test_control_patch("test-threshold.pd", num_iterations=120)
 
 
 def main():
