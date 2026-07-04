@@ -84,7 +84,6 @@ switch~
 slop~
 tabreceive~
 tabsend~
-threshold~
 vline~
 vsnapshot~
 writesf~
