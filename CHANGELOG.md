@@ -9,6 +9,7 @@ Features:
 * Support `list` object. Does not support tosymbol/fromsymbol.
 * Support `[route float]` for routing floats.
 * Support `trunc()` in `expr/expr~`.
+* Support `threshold~`.
 
 
 0.16.2

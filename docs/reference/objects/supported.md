@@ -191,6 +191,7 @@ Here is a list of [unsupported Pd objects](unsupported.md).
 | tabread4~ | right inlet does not do anything |
 | tabread~ | |
 | tabwrite~ | |
+| threshold~ | |
 | throw~ | |
 | vcf~ | |
 | vd~ | |
