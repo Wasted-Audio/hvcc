@@ -32,7 +32,6 @@ glist
 key
 keyname
 keyup
-list
 makefilename
 namecanvas
 netreceive
@@ -85,7 +84,6 @@ switch~
 slop~
 tabreceive~
 tabsend~
-threshold~
 vline~
 vsnapshot~
 writesf~
