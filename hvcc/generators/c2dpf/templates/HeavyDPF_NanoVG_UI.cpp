@@ -97,42 +97,36 @@ void {{class_name}}::parameterChanged(uint32_t index, float value)
 
 void {{class_name}}::sliderValueChanged(SubWidget *const widget, float value)
 {
-    // printf("value changed: %f\n", value);
     const uint id = widget->getId();
     setParameterValue(id, value);
 }
 
 void {{class_name}}::switchClicked(SubWidget *const widget, bool down)
 {
-    // printf("switch clicked: %d\n", down);
     const uint id = widget->getId();
     setParameterValue(id, static_cast<float>(down));
 }
 
 void {{class_name}}::bangClicked(SubWidget *const widget)
 {
-    // printf("bang clicked\n");
     const uint id = widget->getId();
     setParameterValue(id, 1.0f);
 }
 
 void {{class_name}}::radioValueChanged(SubWidget *const widget, uint index)
 {
-    // printf("radio clicked: %d\n", index);
     const uint id = widget->getId();
     setParameterValue(id, static_cast<float>(index));
 }
 
 void {{class_name}}::numberValueChanged(SubWidget *const widget, float value)
 {
-    // printf("number value changed: %f\n", value);
     const uint id = widget->getId();
     setParameterValue(id, value);
 }
 
 void {{class_name}}::knobValueChanged(SubWidget *const widget, float value)
 {
-    // printf("knob value changed: %f\n", value);
     const uint id = widget->getId();
     setParameterValue(id, value);
 }
