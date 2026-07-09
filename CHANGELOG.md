@@ -10,6 +10,7 @@ Features:
 * Support `[route float]` for routing floats.
 * Support `trunc()` in `expr/expr~`.
 * Support `threshold~`.
+* Support `soundfiler` object (DPF only)
 
 
 0.16.2
