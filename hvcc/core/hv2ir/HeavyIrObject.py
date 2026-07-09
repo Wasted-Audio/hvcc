@@ -210,7 +210,7 @@ class HeavyIrObject(HeavyLangObject):
         }
 
     def get_ir_init_list(self) -> List[str]:
-        """ Returns a list of all object id for obejcts that need initialisation.
+        """ Returns a list of all object id for objects that need initialisation.
         """
         return [self.id] if self.__obj_desc.ir.init else []
 

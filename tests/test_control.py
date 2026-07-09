@@ -232,12 +232,18 @@ class TestPdControlPatches(TestPdControlBase):
     def test_route(self):
         self._test_control_patch("test-route.pd")
 
+    def test_route_float(self):
+        self._test_control_patch("test-route_float.pd")
+
     @unittest.skip("currently does not support right inlet")
     def test_select(self):
         self._test_control_patch("test-select.pd")
 
     def test_select_min(self):
         self._test_control_patch("test-select-min.pd")
+
+    def test_select_float(self):
+        self._test_control_patch("test-select_float.pd")
 
     def test_send_receive(self):
         self._test_control_patch("test-send_receive.pd")
@@ -326,6 +332,37 @@ class TestPdControlPatches(TestPdControlBase):
 
     def test_extern_table(self):
         self._test_control_patch("test-extern_table.pd")
+
+    # list operations
+
+    def test_list_append(self):
+        self._test_control_patch("test-list_append.pd")
+
+    def test_list_prepend(self):
+        self._test_control_patch("test-list_prepend.pd")
+
+    def test_list_length(self):
+        self._test_control_patch("test-list_length.pd")
+
+    def test_list_trim(self):
+        self._test_control_patch("test-list_trim.pd")
+
+    def test_list_split(self):
+        self._test_control_patch("test-list_split.pd")
+
+    def test_list_store1(self):
+        self._test_control_patch("test-list_store.pd")
+
+    def test_list_store2(self):
+        self._test_control_patch("test-list_store2.pd", num_iterations=11)
+
+    def test_list_store3(self):
+        self._test_control_patch("test-list_store3.pd")
+
+    # Threshold
+
+    def test_threshold(self):
+        self._test_control_patch("test-threshold.pd", num_iterations=120)
 
 
 def main():

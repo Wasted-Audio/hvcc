@@ -14,10 +14,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from typing import Optional, List, Dict
+from typing import Optional
 
 from .PdObject import PdObject
 from .PdRaw import parse_pd_raw_args, PdRawException
+
+from hvcc.types.Heavy import Heavy, HvPos
 
 
 class PdReceiveObject(PdObject):
@@ -27,7 +29,7 @@ class PdReceiveObject(PdObject):
     def __init__(
         self,
         obj_type: str,
-        obj_args: Optional[List] = None,
+        obj_args: Optional[list] = None,
         pos_x: int = 0,
         pos_y: int = 0
     ) -> None:
@@ -36,7 +38,7 @@ class PdReceiveObject(PdObject):
 
         self.__receiver_name = ""
         self.__extern_type = None
-        self.__attributes: Dict = {}
+        self.__attributes: dict = {}
         self.__priority = None  # priority is not set
 
         PdReceiveObject.__INSTANCE_COUNTER += 1
@@ -103,7 +105,7 @@ class PdReceiveObject(PdObject):
             if len(self._inlet_connections.get("0", [])) > 0:
                 self.add_error("[receive~] inlet connections are not supported.")
 
-    def to_hv(self) -> Dict:
+    def to_hv(self) -> Heavy:
         # note: control rate send objects should not modify their name argument
         names = {
             "r": "",
@@ -119,19 +121,16 @@ class PdReceiveObject(PdObject):
                 ((self.__priority is None) or (self.__receiver_name == "__hv_init" and self.__priority == 0)):
             self.__priority = (self.parent_graph.get_depth() * 1000) - self.__instance
 
-        return {
-            "type": "receive",
-            "args": {
+        return Heavy(
+            type="receive",
+            args={
                 "name": f"{names[self.obj_type]}{self.__receiver_name}",
                 "extern": self.__extern_type,
                 "attributes": self.__attributes,
                 "priority": self.__priority
             },
-            "properties": {
-                "x": self.pos_x,
-                "y": self.pos_y
-            },
-            "annotations": {
+            properties=HvPos(x=self.pos_x, y=self.pos_y),
+            annotations={
                 "scope": "public"
             }
-        }
+        )

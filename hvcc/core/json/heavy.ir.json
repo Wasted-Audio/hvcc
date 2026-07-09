@@ -1382,6 +1382,31 @@
       "required": false
     }]
   },
+    "__list": {
+    "inlets": [
+      "-->",
+      "-->"
+    ],
+    "ir": {
+      "control": true,
+      "signal": false,
+      "init": true
+    },
+    "outlets": [
+      "-->",
+      "-->",
+      "-->"
+    ],
+    "args": [
+      {
+        "name": "type",
+        "value_type": "string",
+        "description": "type of list operation",
+        "default": "append",
+        "required": false
+      }
+    ]
+  },
   "__line~f": {
     "inlets": [
       "-->",
@@ -2471,6 +2496,51 @@
       "sse": 1
     }
   },
+  "__schmitt~f": {
+    "inlets": [
+      "~f>",
+      "-->",
+      "-->"
+    ],
+    "ir": {
+      "control": true,
+      "signal": true,
+      "init": true
+    },
+    "outlets": [
+      "-->",
+      "-->"
+    ],
+    "args": [{
+      "name": "trigValue",
+      "value_type": "float",
+      "description": "",
+      "default": 0,
+      "required": false
+    }, {
+      "name": "trigDebounce",
+      "value_type": "float",
+      "description": "",
+      "default": 0,
+      "required": false
+    }, {
+      "name": "restValue",
+      "value_type": "float",
+      "description": "",
+      "default": 0,
+      "required": false
+    }, {
+      "name": "restDebounce",
+      "value_type": "float",
+      "description": "",
+      "default": 0,
+      "required": false
+    }],
+    "perf": {
+      "avx": 0,
+      "sse": 0
+    }
+  },
   "__send": {
     "inlets": [
       "-->"
@@ -2793,6 +2863,12 @@
       ],
       "value_type": "mixedarray",
       "name": "cases",
+      "description": "",
+      "required": false
+    }, {
+      "default": false,
+      "value_type": "bool",
+      "name": "is_route",
       "description": "",
       "required": false
     }]

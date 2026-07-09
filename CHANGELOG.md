@@ -6,7 +6,27 @@ Next Release
 
 Features:
 
-* Objects: support `[soundfiler]` (DPF only)
+* Support `list` object. Does not support tosymbol/fromsymbol.
+* Support `[route float]` for routing floats.
+* Support `trunc()` in `expr/expr~`.
+* Support `threshold~`.
+* Support `soundfiler` object (DPF only)
+
+
+0.16.2
+-----
+
+Features:
+
+* multi-line `expr`/`expr~`
+
+Bugfixes:
+
+* Daisy: fix None in template
+
+Refactor:
+
+* Add pydantic type to pd2hv exports
 
 0.16.1
 -----

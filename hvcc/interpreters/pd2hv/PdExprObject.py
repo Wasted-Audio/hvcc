@@ -12,17 +12,19 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-import re
+
 
 from .PdObject import PdObject
 
-from typing import Optional, List
+from typing import Optional
+
+from hvcc.types.Heavy import Heavy, HvPos
 
 
 class PdExprObject(PdObject):
     """
     Limitations (compared to vanilla pd):
-    - only supports a single expression
+    - only supports a single expression, but we can split into multiple objects in PdParser
     - Available pd docs/examples say expr support up to 100 variables
       This version currently supports up to 100 variables as defined in HvControlExpr.h
     - I don't know what pd-expr does with strings, haven't experimented
@@ -32,7 +34,7 @@ class PdExprObject(PdObject):
     def __init__(
         self,
         obj_type: str,
-        obj_args: Optional[List] = None,
+        obj_args: Optional[list] = None,
         pos_x: int = 0,
         pos_y: int = 0
     ) -> None:
@@ -53,31 +55,20 @@ class PdExprObject(PdObject):
         else:
             self.expressions = expressions
 
-        # count the number of inlets
-        var_nums = {
-            int(var[2:]) for var in
-            # this should be checked separately for control vs. signal instances
-            # fis for control, v for signal
-            re.findall(r"\$[fisv]\d+", self.expressions[0])
-        }
-        self.num_inlets = max(var_nums) if len(var_nums) > 0 else 1
-        if self.num_inlets > 100:
-            self.add_error("Heavy expr supports upto 100 variables")
+        # this is overridden by PdParser
+        self.num_inlets = 1
 
-    def validate_configuration(self):
+    def validate_configuration(self) -> None:
         # things that could be validated:
         # - inlet count/types match variables in the expression(s)
         pass
 
-    def to_hv(self):
-        return {
-            "type": f"__{self.obj_type}",
-            "args": {
+    def to_hv(self) -> Heavy:
+        return Heavy(
+            type=f"__{self.obj_type}",
+            args={
                 "expressions": self.expressions,
                 "num_inlets": self.num_inlets
             },
-            "properties": {
-                "x": self.pos_x,
-                "y": self.pos_y
-            }
-        }
+            properties=HvPos(x=self.pos_x, y=self.pos_y)
+        )
