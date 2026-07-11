@@ -50,6 +50,7 @@ Here is a list of [unsupported Pd objects](unsupported.md).
 | exp | |
 | expr | except some functions. <sup>3</sup> Does not support symbol input. |
 | else/knob | converted to `[f ]` <sup>2</sup> |
+| else/popmenu | converted to `[f ]` <sup>2</sup> |
 | f | |
 | float | |
 | floatatom | converted to `[f ]` <sup>2</sup> |
