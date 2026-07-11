@@ -664,8 +664,6 @@ class PdGUIParser(PdParser):
         if param is None:
             return None
 
-        font_height = int(line[7])
-
         return Popmenu(
             position=Coords(
                 x=int(line[2]),
@@ -676,7 +674,7 @@ class PdGUIParser(PdParser):
                 y=int(line[6])
             ),
             parameter=param,
-            font_height=font_height,
+            font_height=int(line[7]),
             no_select=line[10],
             fg_color=Color(line[9]),
             bg_color=Color(line[8]),
