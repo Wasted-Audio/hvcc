@@ -13,7 +13,7 @@ from hvcc.interpreters.pd2hv.PdParser import PdParser
 from hvcc.types.GUI import (
     Size, Coords, Font, LabelShow, LabelPos, Label, Color, Canvas,
     Bang, Toggle, VRadio, HRadio, VSlider, HSlider, Knob,  Number, Float,
-    Comment, GUIObjects, Graph, GraphRoot
+    Comment, Popmenu, GUIObjects, Graph, GraphRoot
 )
 
 
@@ -181,6 +181,8 @@ class PdGUIParser(PdParser):
                             x = self.add_knob(line)
                         elif obj_type == "nbx":
                             x = self.add_number(line)
+                        elif obj_type == "popmenu" or obj_type == "else/popmenu":
+                            x = self.add_popmenu(line)
 
                     if x is not None:
                         objects.append(x)
@@ -654,4 +656,27 @@ class PdGUIParser(PdParser):
             label_pos=LabelPos(int(line[7])),
             min=float(line[5]),
             max=float(line[6])
+        )
+
+    @classmethod
+    def add_popmenu(cls, line: list[str]) -> Optional[Popmenu]:
+        param = cls.filter_params(line[11])
+        if param is None:
+            return None
+
+        return Popmenu(
+            position=Coords(
+                x=int(line[2]),
+                y=int(line[3])
+            ),
+            size=Size(
+                x=int(line[5]),
+                y=int(line[6])
+            ),
+            parameter=param,
+            font_height=int(line[7]),
+            no_select=line[10],
+            fg_color=Color(line[9]),
+            bg_color=Color(line[8]),
+            options=line[26:],
         )
