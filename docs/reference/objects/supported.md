@@ -49,8 +49,6 @@ Here is a list of [unsupported Pd objects](unsupported.md).
 | div | |
 | exp | |
 | expr | except some functions. <sup>3</sup> Does not support symbol input. |
-| else/knob | converted to `[f ]` <sup>2</sup> |
-| else/popmenu | converted to `[f ]` <sup>2</sup> |
 | f | |
 | float | |
 | floatatom | converted to `[f ]` <sup>2</sup> |
@@ -239,7 +237,11 @@ Objects ported from other PD externals
 
 | object | limitations |
 | --- | --- |
+| else/knob | converted to `[f ]` <sup>1</sup> |
+| else/popmenu | converted to `[f ]` <sup>1</sup> |
 | pdnam~ | only supports WaveNet models Nano, Feather, Lite, and Standard |
+
+1. Supports setting send/receive configuration, see [Getting Started](../../getting-started/patching.md#gui-objects)
 
 ## Supported Abstractions
 
