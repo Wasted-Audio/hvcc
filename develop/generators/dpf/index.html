@@ -1915,10 +1915,12 @@ On the plugin side this behaves like the <code>trig</code> type.</p>
 <ul>
 <li><code>port_groups</code> - If your plugin has more audio i/o that need to be grouped together or given Control Voltage status</li>
 <li><code>enumerators</code> - Configure a set of parameters that cycle over <code>&lt;key&gt;: &lt;value&gt;</code></li>
-<li><code>enable_ui</code> - Integer value that can generate different plugin UIs.</li>
+<li><code>enable_ui</code> - Integer value that can generate different plugin UIs.<ul>
 <li>0 - The same as disabling the UI, creates nothing.</li>
 <li>1 - A generic DearImgui UI. Requires <code>dpf-widgets</code> on the same level as <code>dpf</code>.</li>
 <li>2 - A NanoVG based UI that emulates <a href="https://plugdata.org/">Plugdata</a> graphics. Requires <code>PDVG</code> on the same level as <code>dpf</code>. It also requires the use of <code>@hv_param</code> <a href="../../getting-started/patching/#gui-objects">receive config</a> on the UI objects. An example project using this can be found <a href="https://github.com/Wasted-Audio/pdvg-example-plugin/">here</a>.</li>
+</ul>
+</li>
 <li><code>enable_modgui</code> - Boolean for use in MOD audio based systems.</li>
 <li><code>ui_size</code> - Dict of <code>width</code> &amp; <code>height</code> that sets the size of the UI.</li>
 <li><code>brand_id</code> - A 4-character symbol that identifies a brand or manufacturer, with at least one non-lower case character. Plugins from the same brand should use the same symbol. <em>Required when using AU.</em></li>
