@@ -1,5 +1,5 @@
 # Copyright (C) 2014-2018 Enzien Audio, Ltd.
-# Copyright (C) 2023-2024 Wasted Audio
+# Copyright (C) 2023-2026 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -27,6 +27,8 @@ class HIrReceive(HeavyIrObject):
     """ A specific implementation of the __receive object.
     """
 
+    RE_VALID_RECV = re.compile(r"(?:\[\d+\])?\w+")
+
     def __init__(
         self,
         obj_type: str,
@@ -37,8 +39,10 @@ class HIrReceive(HeavyIrObject):
         super().__init__("__receive", args=args, graph=graph, annotations=annotations)
         if args is not None and args["extern"]:
             # externed receivers must contain only alphanumeric characters or underscores,
-            # or use square brackets for ordering them (will de dropped for display),
+            # or use square brackets for ordering them (will be dropped for display),
             # so that the names can be easily and transparently turned into code
-            if re.search(r"\W,\[,\]", args["name"]):
-                self.add_error(f"Parameter and Event names may only contain \
-                                alphanumeric characters or underscore: '{args['name']}'")
+            if self.RE_VALID_RECV.fullmatch(args["name"]) is None:
+                self.add_error(
+                    "Parameter and Event names may only contain alphanumeric characters, underscores, "
+                    f"and optional numeric ordering tags like '[12]name': '{args['name']}'"
+                )

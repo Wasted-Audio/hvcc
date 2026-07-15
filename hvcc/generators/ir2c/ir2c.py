@@ -253,10 +253,6 @@ class ir2c:
         # the project name to be used as a part of file and function names
         name = ir.name.escaped
 
-        # ensure that send_receive dictionary is alphabetised by the receiver key
-        # send_receive = OrderedDict(sorted([(k, v) for k, v in ir.control.receivers.items()], key=lambda x: x[0]))
-        send_receive = ir.control.receivers
-
         # write HeavyContext.h
         with open(os.path.join(output_dir, f"Heavy_{name}.hpp"), "w") as f:
             f.write(env.get_template("Heavy_NAME.hpp").render(
@@ -276,7 +272,7 @@ class ir2c:
                 init_list=init_list,
                 free_list=free_list,
                 impl_list=impl_list,
-                send_receive=send_receive,
+                send_receive=ir.control.receivers,
                 send_table=ir.tables,
                 process_list=process_list,
                 table_data_list=table_data_list,

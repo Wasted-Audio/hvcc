@@ -965,21 +965,19 @@ class HeavyGraph(HeavyIrObject):
         # receivers into one logical receiver.
         # NOTE(mhroth): a code-compatible name is only necessary for externed receivers
 
-        # return {((f"_{k}") if re.match(r"\d", k) else k): IRReceiver(
-        #     display=re.sub(r"\[.+\]", "", k),  # drop ordering syntax for display
-        #     hash=f"0x{HeavyLangObject.get_hash(k):X}",
-        #     extern=v[0].args["extern"],
-        #     attributes=v[0].args["attributes"],
-        #     ids=[v[0].id]
-        # ) for k, v in self.local_vars.get_registered_objects_for_type("__receive").items()}
-
         ir_rec_dict = {}
 
-        for k, v in self.local_vars.get_registered_objects_for_type("__receive").items():
-            k = re.sub(r"\[.+\]", "", k)  # drop ordering syntax
-            ir_rec_dict[(f"_{k}") if re.match(r"\d", k) else k] = IRReceiver(
-                display=k,
-                hash=f"0x{HeavyLangObject.get_hash(k):X}",
+        for raw_k, v in self.local_vars.get_registered_objects_for_type("__receive").items():
+            display_k = re.sub(r"\[\d+\]", "", raw_k)  # drop ordering syntax for display/code
+            key = (f"_{display_k}") if re.match(r"\d", display_k) else display_k
+            if key in ir_rec_dict:
+                self.add_error(
+                    f"Conflicting receiver names after removing ordering tags: '{raw_k}' maps to '{display_k}', "
+                    "which is already used.")
+                continue
+            ir_rec_dict[key] = IRReceiver(
+                display=display_k,
+                hash=f"0x{HeavyLangObject.get_hash(display_k):X}",
                 extern=v[0].args["extern"],
                 attributes=v[0].args["attributes"],
                 ids=[v[0].id]
