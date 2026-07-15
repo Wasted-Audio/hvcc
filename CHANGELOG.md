@@ -10,7 +10,7 @@ Features:
 * Support `[route float]` for routing floats.
 * Support `trunc()` in `expr/expr~`.
 * Support `threshold~`.
-
+* DPF: Allow theme overrides in NanoVG UI.
 
 0.16.2
 -----
