@@ -90,21 +90,21 @@ Each of these are optional and have either a default value or are entirely optio
 
 Other fields that the DPF metadata supports are:
 
-* `port_groups` - If your plugin has more audio i/o that need to be grouped together or given Control Voltage status
-* `enumerators` - Configure a set of parameters that cycle over `<key>: <value>`
-* `enable_ui` - Integer value that can generate different plugin UIs.
-  * 0 - The same as disabling the UI, creates nothing.
-  * 1 - A generic DearImgui UI. Requires `dpf-widgets` on the same level as `dpf`.
-  * 2 - A NanoVG based UI that emulates [Plugdata](https://plugdata.org/) graphics. Requires `PDVG` on the same level as `dpf`. It also requires the use of `@hv_param` [receive config](../getting-started/patching.md#gui-objects) on the UI objects. An example project using this can be found [here](https://github.com/Wasted-Audio/pdvg-example-plugin/).
-* `enable_modgui` - Boolean for use in MOD audio based systems.
-* `ui_size` - Dict of `width` & `height` that sets the size of the UI.
-* `brand_id` - A 4-character symbol that identifies a brand or manufacturer, with at least one non-lower case character. Plugins from the same brand should use the same symbol. _Required when using AU._
-* `brand_id_no_vst3` - Boolean to ensure old VST3 behavior.
-* `unique_id` - A 4-character symbol which identifies a plugin. It must be unique within at least a set of plugins from the brand. _Required when using AU_
-* `plugin_clap_id` - A URI for use with CLAP format.
-* `lv2_info` - String describing the LV2 plugin type.
-* `vst3_info` - String describing the VST3 plugin type.
-* `clap_info` - List of strings describing the CLAP plugin type.
+- `port_groups` - If your plugin has more audio i/o that need to be grouped together or given Control Voltage status
+- `enumerators` - Configure a set of parameters that cycle over `<key>: <value>`
+- `enable_ui` - Integer value that can generate different plugin UIs.
+  - 0 - The same as disabling the UI, creates nothing.
+  - 1 - A generic DearImgui UI. Requires `dpf-widgets` on the same level as `dpf`.
+  - 2 - A NanoVG based UI that emulates [Plugdata](https://plugdata.org/) graphics. Requires `PDVG` on the same level as `dpf`. It also requires the use of `@hv_param` [receive config](../getting-started/patching.md#gui-objects) on the UI objects. An example project using this can be found [here](https://github.com/Wasted-Audio/pdvg-example-plugin/).
+- `enable_modgui` - Boolean for use in MOD audio based systems.
+- `ui_size` - Dict of `width` & `height` that sets the size of the UI.
+- `brand_id` - A 4-character symbol that identifies a brand or manufacturer, with at least one non-lower case character. Plugins from the same brand should use the same symbol. _Required when using AU._
+- `brand_id_no_vst3` - Boolean to ensure old VST3 behavior.
+- `unique_id` - A 4-character symbol which identifies a plugin. It must be unique within at least a set of plugins from the brand. _Required when using AU_
+- `plugin_clap_id` - A URI for use with CLAP format.
+- `lv2_info` - String describing the LV2 plugin type.
+- `vst3_info` - String describing the VST3 plugin type.
+- `clap_info` - List of strings describing the CLAP plugin type.
 
 You can also fully disable SIMD optimizations using the global `nosimd` flag:
 
@@ -123,6 +123,6 @@ An example plugin that uses some of these extended metadata is [WSTD 3Q](https:/
 
 ## Notes
 
-* The `[notein]` object is the only supported means of receiving MIDI note events (i.e. Note On and Note Off). Arguments to the object (e.g. to specify the channel number) will be ignored. Velocity of `0` will be assumed to mean Note Off
-* The `[ctlin]` object is the only supported means of receiving MIDI control change events. Arguments to the object (e.g. to filter which CC event is delivered) will be ignored.
-* If you are compiling from source, make sure to read the included `README.md` file in the root directory.
+- The `[notein]` object is the only supported means of receiving MIDI note events (i.e. Note On and Note Off). Arguments to the object (e.g. to specify the channel number) will be ignored. Velocity of `0` will be assumed to mean Note Off
+- The `[ctlin]` object is the only supported means of receiving MIDI control change events. Arguments to the object (e.g. to filter which CC event is delivered) will be ignored.
+- If you are compiling from source, make sure to read the included `README.md` file in the root directory.

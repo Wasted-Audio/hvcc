@@ -71,3 +71,18 @@ jobs:
           if [ "${ALIAS}" = "latest" ]; then
             mike set-default --push latest
           fi
+
+      - name: Publish .well-known at docs site root
+        run: |
+          git fetch origin gh-pages
+          git worktree add /tmp/gh-pages gh-pages
+          mkdir -p /tmp/gh-pages/.well-known
+          cp .well-known/funding-manifest-urls /tmp/gh-pages/.well-known/funding-manifest-urls
+          cd /tmp/gh-pages
+          git add .well-known/funding-manifest-urls
+          if ! git diff --cached --quiet; then
+            git commit -m "Update .well-known/funding-manifest-urls"
+            git push origin gh-pages
+          else
+            echo "No changes to .well-known file"
+          fi

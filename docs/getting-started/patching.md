@@ -60,6 +60,7 @@ The following objects are supported:
 - Bang (bng)
 - Toggle (tgl)
 - Knob (knob, else/knob)
+- Popmenu (popmenu, else/popmenu)
 - Float atom (floatatom)
 
 An intermediate result GUI json is created containing these objects with their location, size and style. More information about [the IR](../reference/ir/heavy_gui_ir.md).

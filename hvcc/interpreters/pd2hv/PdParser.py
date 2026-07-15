@@ -563,15 +563,17 @@ class PdParser:
 
                         # add gui send/receive objects
                         arg_index = {
-                            "nbx":       (6, 7),
-                            "vsl":       (6, 7),
-                            "hsl":       (6, 7),
-                            "vradio":    (4, 5),
-                            "hradio":    (4, 5),
-                            "bng":       (4, 5),
-                            "tgl":       (2, 3),
-                            "knob":      (5, 6),
-                            "else/knob": (5, 6),
+                            "nbx":          (6, 7),
+                            "vsl":          (6, 7),
+                            "hsl":          (6, 7),
+                            "vradio":       (4, 5),
+                            "hradio":       (4, 5),
+                            "bng":          (4, 5),
+                            "tgl":          (2, 3),
+                            "knob":         (5, 6),
+                            "else/knob":    (5, 6),
+                            "popmenu":      (7, 6),
+                            "else/popmenu": (7, 6),
                         }
 
                         if obj_type in arg_index.keys():
