@@ -1,0 +1,185 @@
+# Javascript
+
+> Emscripten versions 3.1.42 until 3.1.47 contain a bug that breaks our builds.
+>
+> Use a version earlier or later with this Generator for functional output.
+
+## Getting Started
+
+Heavy can provide a Javascript (JS) implementation of your patch using WebAssembly. The library provides a basic interface for processing audio, handling playback and sending or receiving messages. Both `AudioWorklet` and `ScriptProcessorNode` are supported. The old `asm.js` implementation has been deprecated.
+
+## Web Preview
+
+The quickest way to try out your patch in the web is to use the pre-generated widget.
+
+Alternatively if you want to use a custom HTML interface it is possible to link against just the javascript library, see below for more instructions on how to do that.
+
+Some [examples](https://github.com/Wasted-Audio/hvcc-examples-js) are hosted on [github pages](https://wasted-audio.github.io/hvcc-examples-js).
+
+## The JS Target
+
+For a more detailed example of running your patch in the web it can be more informative to inspect the JS target.
+
+Heavy provides the following:
+
+| File | Description |
+| --- | --- |
+| index.html | A simple web page similar to the pre-generated widget |
+| `{PATCH}`.js | The main javascript library to link against, contains the basic [web assembly](http://webassembly.org) compiled binary of the patch. |
+| `{PATCH}`_AudioLibWorklet.js | AudioWorklet implementation of the patch, used when AudioWorklet interface is available and provides low latency audio on a separate thread. |
+
+## AudioLibLoader
+
+The `AudioLibLoader` is a helper object that implements the boilerplate code for setting up the [WebAudio](https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API) context and making sure the heavy patch is processed correctly. It acts as a wrapper around the `AudioLib`.
+
+This object simplifies the set-up required and should be sufficient for most use cases. However, if you're creating something more specific, for example routing between multiple patches, it's probably best to look into loading the AudioLib manually.
+
+### Set Up
+
+The initial set up should look something like this:
+
+```html
+
+<script type="text/javascript">
+  // the AudioLibLoader object
+  var heavyModule = null;
+  var loader = null;
+
+  // construct a new patch module, this contains all the necessary libraries
+  // make sure to replace {PATCH} with the name of your patch
+  window.onload = function() {
+    {PANRT}_Module().then(loadedModule => {
+      heavyModule = loadedModule;
+      moduleLoaded();
+    });
+    document.getElementById("transportButton").style.visibility = "hidden";
+  }
+
+  // instantiate the AudioLibLoader object
+  function moduleLoaded() {
+    loader = new heavyModule.AudioLibLoader();
+    document.getElementById("transportButton").style.visibility = "visible";
+  }
+
+  // starting the processor
+  function start() {
+    if(!loader.webAudioContext) {
+
+      // this will set up the WebAudio context add a new audio node
+      loader.init({
+        blockSize: 2048, // number of samples on each audio processing block
+        printHook: onPrint, // callback for [print] messages, can be null
+        sendHook: onFloatMessage // callback for output parameters [s {name} @hv_param], can be null
+      }).then(() => {
+        // loader finished initialising
+        // optional input oscillator:
+        const sampleOscillator = loader.webAudioContext.createOscillator();
+        sampleOscillator.connect(loader.webAudioWorklet || loader.webAudioProcessor);
+        sampleOscillator.type = "square";
+        sampleOscillator.frequency.setValueAtTime(440, 0); // A4
+        sampleOscillator.start(0);
+      });
+    }
+    loader.start();
+  }
+
+  // stopping the processor
+  function stop() {
+    loader.stop();
+  }
+
+  // print callback
+  function onPrint(message) {
+    console.log(message);
+  }
+
+  // output parameter callback
+  function onFloatMessage(sendName, floatValue) {
+    console.log(sendName, floatValue);
+  }
+
+  // ...
+
+</script>
+```
+
+### Transport Controls
+
+```html
+<script type="text/javascript">
+  // ...
+
+  // starts processing the web audio context, will generate sound
+  loader.start();
+
+  // stop processing
+  loader.stop();
+
+  // can use this to check if the patch is currently processing
+  loader.isPlaying
+
+  // which can be used to toggle the processor
+  function toggleTransport(element) {
+    (loader.isPlaying) ? stop() : start();
+  }
+
+</script>
+```
+
+### Sending Events or Parameters
+
+The JS target supports [exposing event and parameter](../getting-started/patching.md#exposing-parameters) interfaces from the patch.
+
+```html
+<script type="text/javascript">
+  // ...
+
+  // send a bang to an event receiver called "Attack"
+    // for AudioWorklet:
+    loader.sendEvent("Attack");
+
+    // for ScriptProcessorNode:
+    loader.audiolib.sendEvent("Attack");
+
+  // send a float value to a parameter receiver called "Distance"
+    // for AudioWorklet:
+    loader.sendFloatParameterToWorklet("Distance", 10);
+
+    // for ScriptProcessorNode:
+    loader.audiolib.setFloatParameter("Distance", 10);
+
+</script>
+```
+
+Note: these are calls directly to the `AudioLib` so make sure to include `.audiolib` when sending events or messages.
+
+## Loading Custom Samples
+
+If you have a table that is externed, using the `@hv_table` annotation, it can be used to load audio files from the web page. The table will be resized to fit this sample data.
+
+`[table array1 100 @hv_table]`
+
+The webAudioContext can load any url, but typically this will be a local path. Modify your html using the following:
+
+```js
+      // Sample loading
+      function loadAudio(url) {
+        var rq = new XMLHttpRequest();
+        rq.open("GET", url, true);
+        rq.responseType = "arraybuffer";
+        rq.send();
+
+        rq.onload = function() {
+          var audioData = rq.response;
+          loader.webAudioContext.decodeAudioData(audioData, function(buffer){
+            loader.fillTableWithFloatBuffer("array1", buffer.getChannelData(0));
+          });
+        }
+      }
+```
+
+This can then be called from a user action or any other mechanism that works for you:
+
+```html
+<button style="padding: 10px;"  type="button" id="loadButton" onclick="loadAudio('custom_sample.wav');">Load Audio</button>
+```

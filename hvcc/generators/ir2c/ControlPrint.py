@@ -57,6 +57,7 @@ class ControlPrint(HeavyObject):
         obj_id: str,
         on_message_list: List[List[IROnMessage]],
         get_obj_class: Callable,
-        objects: Dict[str, IRObjectdict]
+        objects: Dict[str, IRObjectdict],
+        args: Dict
     ) -> List[str]:
         return []

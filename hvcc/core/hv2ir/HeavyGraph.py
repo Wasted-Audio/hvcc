@@ -1,5 +1,5 @@
 # Copyright (C) 2014-2018 Enzien Audio, Ltd.
-# Copyright (C) 2023-2024 Wasted Audio
+# Copyright (C) 2023-2026 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,10 +14,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
 import re
+
 from collections import Counter
 from typing import Optional, Union, Dict, List, Set, Tuple
+from pathlib import Path
 
 from .BufferPool import BufferPool
 from .Connection import Connection
@@ -45,7 +46,7 @@ class HeavyGraph(HeavyIrObject):
         self,
         graph: Optional['HeavyGraph'] = None,
         graph_args: Optional[Dict] = None,
-        file: str = "",
+        file: Path = Path(),
         xname: str = "heavy"
     ) -> None:
         # zero inlets and outlets until inlet/outlet objects are declared
@@ -321,7 +322,7 @@ class HeavyGraph(HeavyIrObject):
             # NOTE(dromer): we should never get here
             raise Exception
 
-    def find_path_for_abstraction(self, obj_type: str) -> Optional[str]:
+    def find_path_for_abstraction(self, obj_type: str) -> Optional[Path]:
         """ Travels up the graph heirarchy looking for a file path to an abstraction.
             Returns None if no abstraction is found.
         """
@@ -857,9 +858,9 @@ class HeavyGraph(HeavyIrObject):
     def __repr__(self) -> str:
         if self.xname is not None:
             # TODO(mhroth): does not handle nested subgraph
-            return f"__graph.{self.id}({os.path.basename(self.file)}/{self.xname})"
+            return f"__graph.{self.id}({self.file.name}/{self.xname})"
         else:
-            return f"__graph.{self.id}({os.path.basename(self.file)})"
+            return f"__graph.{self.id}({self.file.name})"
 
     #
     # Intermediate Representation generators

@@ -1,4 +1,4 @@
-# Copyright (C) 2022 Wasted Audio
+# Copyright (C) 2022-2026 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -13,16 +13,17 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
 import unittest
 import subprocess
+
+from pathlib import Path
 
 from tests.framework.base_midi import TestPdMIDIBase
 
 
 class TestPdMIDIPatches(TestPdMIDIBase):
-    SCRIPT_DIR = os.path.dirname(__file__)
-    TEST_DIR = os.path.join(os.path.dirname(__file__), "pd", "midi")
+    SCRIPT_DIR = Path(__file__).parent
+    TEST_DIR = Path(Path(__file__).parent, "pd", "midi")
 
     @classmethod
     def setUpClass(cls):

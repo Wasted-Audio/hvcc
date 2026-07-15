@@ -37,7 +37,8 @@ class ControlSend(HeavyObject):
         obj_id: str,
         on_message_list: List[List[IROnMessage]],
         get_obj_class: Callable,
-        objects: Dict[str, IRObjectdict]
+        objects: Dict[str, IRObjectdict],
+        args: Dict
     ) -> List[str]:
         # Note(joe): if no corresponding receivers exist and there's no extern indicator
         # then there is not much need to generate code stub

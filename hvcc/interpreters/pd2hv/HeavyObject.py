@@ -18,7 +18,7 @@ import decimal
 import json
 from importlib import resources
 from pathlib import Path
-from typing import Optional, List, Dict, Any, Union, cast
+from typing import Optional, Any, Union, cast
 
 from .Connection import Connection
 from .NotificationEnum import NotificationEnum
@@ -26,6 +26,7 @@ from .PdObject import PdObject
 
 from hvcc.types.IR import HeavyIRType, IRNode, IRArg
 from hvcc.types.Lang import HeavyLangType, LangNode, LangArg
+from hvcc.types.Heavy import Heavy, HvPos
 
 
 class HeavyObject(PdObject):
@@ -41,7 +42,7 @@ class HeavyObject(PdObject):
     def __init__(
         self,
         obj_type: str,
-        obj_args: Optional[List] = None,
+        obj_args: Optional[list] = None,
         pos_x: int = 0,
         pos_y: int = 0
     ) -> None:
@@ -60,6 +61,21 @@ class HeavyObject(PdObject):
         # resolve arguments
         obj_args = obj_args or []
         self.obj_dict = {}
+
+        # clean up externed tables
+        if obj_type in (
+            "__var",
+            "__tabwrite",
+            "__tabwrite~f",
+            "__tabwrite_stoppable~f",
+            "__tabread",
+            "__tabread~f",
+            "__tabread~if",
+            "__tabread_stoppable~f"
+        ):
+            for i, a in enumerate(obj_args):
+                if isinstance(a, str):
+                    obj_args[i] = a.split(" ")[0] if "@hv_table" in a else a
 
         for i, a in enumerate(self.__obj_dict.args):
             arg = cast(Union[IRArg, LangArg], a)
@@ -91,7 +107,7 @@ class HeavyObject(PdObject):
 
         # send/receive, table, etc. must have public scope
         # TODO(mhroth): dirty
-        if obj_type in ["table", "__table", "send", "__send", "receive", "__receive"]:
+        if obj_type in ("table", "__table", "send", "__send", "receive", "__receive"):
             self.__annotations["scope"] = "public"
 
     @classmethod
@@ -207,13 +223,10 @@ class HeavyObject(PdObject):
         else:
             raise Exception("Adding a connection to the wrong object!")
 
-    def to_hv(self) -> Dict:
-        return {
-            "type": self.obj_type,
-            "args": self.obj_dict,
-            "properties": {
-                "x": self.pos_x,
-                "y": self.pos_y
-            },
-            "annotations": self.__annotations
-        }
+    def to_hv(self) -> Heavy:
+        return Heavy(
+            type=self.obj_type,
+            args=self.obj_dict,
+            properties=HvPos(x=self.pos_x, y=self.pos_y),
+            annotations=self.__annotations
+        )

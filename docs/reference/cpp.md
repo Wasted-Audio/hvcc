@@ -1,0 +1,224 @@
+# C++ API
+
+The Heavy C++ API is equivalent to the [C API](c.md). Its usage is a matter of preference, but may make the organisation of systems with multiple context types and instances easier.
+
+The pure virtual interface class to all Heavy contexts is called `HeavyContextInterface` and is defined in [HeavyContextInterface.hpp](https://github.com/Wasted-Audio/hvcc/blob/develop/hvcc/generators/ir2c/static/HeavyContextInterface.hpp). The patch-specific header is `Heavy_example.hpp`.
+
+## Heavy C++ API
+
+```c++
+/** Returns the read-only user-assigned name of this patch. */
+const char *getName();
+
+/** Returns the number of input channels with which this context has been configured. */
+int getNumInputChannels();
+
+/** Returns the number of output channels with which this context has been configured. */
+int getNumOutputChannels();
+
+/**
+ * Returns the total size in bytes of the context.
+ * This value may change if tables are resized.
+ */
+int getSize();
+
+/** Returns the sample rate with which this context has been configured. */
+double getSampleRate();
+
+/** Returns the current patch time in samples. This value is always exact. */
+unsigned int getCurrentSample();
+
+/** Sets a user-definable value. This value is never manipulated by Heavy. */
+void setUserData(void *x);
+
+/** Returns the user-defined data. */
+void *getUserData();
+
+/**
+ * Set the send hook. The function is called whenever a message is sent to any send object.
+ * Messages returned by this function should NEVER be freed. If the message must persist, call
+ * hv_msg_copy() first.
+ */
+void setSendHook(
+    void (*f)(HeavyContextInterface *, const char *sendName, unsigned int sendHash, const HvMessage *));
+
+/** Returns the send hook, or NULL if unset. */
+void (*getSendHook())(HeavyContextInterface *, const char *, unsigned int, const HvMessage *);
+
+/** Set the print hook. The function is called whenever a message is sent to a print object. */
+void setPrintHook(
+    void (*f)(HeavyContextInterface *, const char *printName, const char *str, const HvMessage *));
+
+/** Returns the print hook, or NULL if unset. */
+void (*getPrintHook())(HeavyContextInterface *, const char *, const char *, const HvMessage *);
+
+/**
+ * Processes one block of samples for a patch instance. The buffer format is an array of float channel arrays.
+ * If the context has not input or output channels, the respective argument may be NULL.
+ * The number of samples to to tbe processed should be a multiple of 1, 4, or 8, depending on if
+ * no, SSE or NEON, or AVX optimisation is being used, respectively.
+ * e.g. [[LLLL][RRRR]]
+ *
+ * @return  The number of samples processed.
+ *
+ * This function is NOT thread-safe. It is assumed that only the audio thread will execute this function.
+ */
+int process(float **inputBuffers, float **outputBuffer, int n);
+
+/**
+ * Processes one block of samples for a patch instance. The buffer format is an uninterleaved float array of channels.
+ * If the context has not input or output channels, the respective argument may be NULL.
+ * The number of samples to to tbe processed should be a multiple of 1, 4, or 8, depending on if
+ * no, SSE or NEON, or AVX optimisation is being used, respectively.
+ * e.g. [LLLLRRRR]
+ *
+ * @return  The number of samples processed.
+ *
+ * This function is NOT thread-safe. It is assumed that only the audio thread will execute this function.
+ */
+int processInline(float *inputBuffers, float *outputBuffer, int n);
+
+/**
+ * Processes one block of samples for a patch instance. The buffer format is an interleaved float array of channels.
+ * If the context has not input or output channels, the respective argument may be NULL.
+ * The number of samples to to tbe processed should be a multiple of 1, 4, or 8, depending on if
+ * no, SSE or NEON, or AVX optimisation is being used, respectively.
+ * e.g. [LRLRLRLR]
+ *
+ * @return  The number of samples processed.
+ *
+ * This function is NOT thread-safe. It is assumed that only the audio thread will execute this function.
+ */
+int processInlineInterleaved(float *inputBuffers, float *outputBuffer, int n);
+
+/**
+ * Processes one block of samples for a patch instance. The buffer format is an interleaved short array of channels.
+ * If the context has not input or output channels, the respective argument may be NULL.
+ * The number of samples to to tbe processed should be a multiple of 1, 4, or 8, depending on if
+ * no, SSE or NEON, or AVX optimisation is being used, respectively.
+ * e.g. [LRLRLRLR]
+ *
+ * @return  The number of samples processed.
+ *
+ * This function is NOT thread-safe. It is assumed that only the audio thread will execute this function.
+ */
+int processInlineInterleavedShort(short *inputBuffers, short *outputBuffer, int n);
+
+/**
+ * Sends a formatted message to a receiver that can be scheduled for the future.
+ * The receiver is addressed with its hash, which can also be determined using hv_stringToHash().
+ * This function is thread-safe.
+ *
+ * @return  True if the message was accepted. False if the message could not fit onto
+ *          the message queue to be processed this block.
+ */
+bool sendMessageToReceiver(unsigned int receiverHash, double delayMs, HvMessage *m);
+
+/**
+ * Sends a formatted message to a receiver that can be scheduled for the future.
+ * The receiver is addressed with its hash, which can also be determined using hv_stringToHash().
+ * This function is thread-safe.
+ *
+ * @return  True if the message was accepted. False if the message could not fit onto
+ *          the message queue to be processed this block.
+ */
+bool sendMessageToReceiverV(unsigned int receiverHash, double delayMs, const char *fmt, ...);
+
+/**
+ * A convenience function to send a float to a receiver to be processed immediately.
+ * The receiver is addressed with its hash, which can also be determined using hv_stringToHash().
+ * This function is thread-safe.
+ *
+ * @return  True if the message was accepted. False if the message could not fit onto
+ *          the message queue to be processed this block.
+ */
+bool sendFloatToReceiver(unsigned int receiverHash, float f);
+
+/**
+ * A convenience function to send a bang to a receiver to be processed immediately.
+ * The receiver is addressed with its hash, which can also be determined using hv_stringToHash().
+ * This function is thread-safe.
+ *
+ * @return  True if the message was accepted. False if the message could not fit onto
+ *          the message queue to be processed this block.
+ */
+bool sendBangToReceiver(unsigned int receiverHash);
+
+/**
+ * A convenience function to send a symbol to a receiver to be processed immediately.
+ * The receiver is addressed with its hash, which can also be determined using hv_stringToHash().
+ * This function is thread-safe.
+ *
+ * @return  True if the message was accepted. False if the message could not fit onto
+ *          the message queue to be processed this block.
+ */
+bool sendSymbolToReceiver(unsigned int receiverHash, const char *symbol) ;
+
+/**
+ * Cancels a previously scheduled message.
+ *
+ * @param sendMessage  May be NULL.
+ */
+bool cancelMessage(
+    HvMessage *m, void (*sendMessage)(HeavyContextInterface *, int, const HvMessage *)=nullptr);
+
+/**
+ * Returns information about each parameter such as name, hash, and range.
+ *
+ * If info is null then the total number of parameters is returned.
+ * If info is not null, then the structure is filled in for the given parameter index.
+ *
+ * @param index  The parameter index.
+ * @param info  A pointer to a HvParameterInfo struct. May be null.
+ *
+ * @return  The total number of parameters, if info is null. 0 otherwise.
+ */
+int getParameterInfo(int index, HvParameterInfo *info);
+
+/** Returns a pointer to the raw buffer backing this table. DO NOT free it. */
+float *getBufferForTable(unsigned int tableHash);
+
+/** Returns the length of this table in samples. */
+int getLengthForTable(unsigned int tableHash);
+
+/**
+ * Resizes the table to the given length.
+ *
+ * Existing contents are copied to the new table. Remaining space is cleared
+ * if the table is longer than the original, truncated otherwise.
+ *
+ * @param tableHash  The table identifier.
+ * @param newSampleLength  The new length of the table, in samples.
+ *
+ * @return  False if the table could not be found. True otherwise.
+ */
+bool setLengthForTable(unsigned int tableHash, unsigned int newSampleLength);
+
+/**
+ * Acquire the message lock.
+ *
+ * This function will block until the message lock as been acquired.
+ * Typical applications will not require the use of this function.
+ */
+void lockAcquire();
+
+/**
+ * Try to acquire the message lock.
+ *
+ * If the lock has been acquired, lockRelease() must be called to release it.
+ * Typical applications will not require the use of this function.
+ *
+ * @return Returns true if the lock has been acquired, false otherwise.
+ */
+bool lockTry();
+
+/**
+ * Release the message lock.
+ *
+ * Typical applications will not require the use of this function.
+ */
+void lockRelease();
+
+/** Returns a 32-bit hash of any string. Returns 0 if string is NULL. */
+static unsigned int getHashForString(const char *str);
+```
