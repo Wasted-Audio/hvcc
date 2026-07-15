@@ -30,7 +30,10 @@ BUILD_CXX_FLAGS += -I ../../{{dpf_path}}dpf-widgets/generic
 BUILD_CXX_FLAGS += -I ../../{{dpf_path}}dpf-widgets/opengl
 {%- elif meta.enable_ui == 2 %}
 BUILD_CXX_FLAGS += -I ../../{{dpf_path}}dpf/dgl/src/nanovg
-BUILD_CXX_FLAGS += -I ../../{{dpf_path}}pdvg
+BUILD_CXX_FLAGS += -I ../../{{dpf_path}}pdvg -std=c++17
+ifeq ($(WINDOWS),true)
+	LINK_FLAGS += -lwinmm
+endif
 {%- endif %}
 
 {%- if meta.makefile_dep|length > 0 %}

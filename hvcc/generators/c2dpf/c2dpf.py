@@ -127,7 +127,12 @@ class c2dpf(Generator):
                         copyright=copyright_c))
             elif dpf_meta.enable_ui == DPFUIType.NANOVG:
                 gui_json, widgets, gui_objects_render = nanovg_render(
-                    patch_name, c_src_dir, env, receiver_list, sender_list
+                    patch_name=patch_name,
+                    c_src_dir=c_src_dir,
+                    env=env,
+                    recv_list=receiver_list,
+                    send_list=sender_list,
+                    meta=dpf_meta
                 )
 
                 dpf_ui_header = Path(source_dir, f"HeavyDPF_{patch_name}_UI.hpp")

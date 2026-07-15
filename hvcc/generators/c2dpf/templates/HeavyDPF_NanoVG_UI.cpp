@@ -26,6 +26,28 @@ enum HeavyParams {
     const float height = getHeight();
     const double scaleFactor = getScaleFactor();
 
+    {%- if meta.ui_theme is not none %}
+        {%- for k, set in meta.ui_themes[meta.ui_theme] -%}
+            {%- if k == "obj_corner_radius" and set is not none %}
+    Corners::objectCornerRadius = {{set}};
+            {%- elif k == "cnv_color" and set is not none %}
+    Colors::cnvColor = nvgRGB{{set.as_rgb_tuple()}};
+            {%- elif k == "cnv_txt_color" and set is not none%}
+    Colors::cnvTextColor = nvgRGB{{set.as_rgb_tuple()}};
+            {%- elif k == "io_color" and set is not none %}
+    Colors::ioColor = nvgRGB{{set.as_rgb_tuple()}};
+            {%- elif k == "bg_color" and set is not none %}
+    Colors::bgColor = nvgRGB{{set.as_rgb_tuple()}};
+            {%- elif k == "sel_color" and set is not none %}
+    Colors::selColor = nvgRGB{{set.as_rgb_tuple()}};
+            {%- elif k == "com_txt_color" and set is not none %}
+    Colors::comTextColor = nvgRGB{{set.as_rgb_tuple()}};
+            {%- elif k == "out_color" and set is not none %}
+    Colors::outColor = nvgRGB{{set.as_rgb_tuple()}};
+            {%- endif %}
+        {%- endfor %}
+    {%- endif %}
+
     // mainpatch
     mainPatch = new PDMainpatch(this);
     mainPatch->setSize(width * scaleFactor, height * scaleFactor);
@@ -61,9 +83,9 @@ void {{class_name}}::parameterChanged(uint32_t index, float value)
 {%- for k, v in receivers %}
         case k{{v.display|capitalize}}:
     {%- if v.attributes.type == "bool" %}
-            {{v.display|lower}}->setDown(static_cast<bool>(value));
+            {{v.display}}->setDown(static_cast<bool>(value));
     {%- else %}
-            {{v.display|lower}}->setValue(value);
+            {{v.display}}->setValue(value);
     {%- endif %}
             break;
 {%- endfor %}
@@ -75,42 +97,36 @@ void {{class_name}}::parameterChanged(uint32_t index, float value)
 
 void {{class_name}}::sliderValueChanged(SubWidget *const widget, float value)
 {
-    // printf("value changed: %f\n", value);
     const uint id = widget->getId();
     setParameterValue(id, value);
 }
 
 void {{class_name}}::switchClicked(SubWidget *const widget, bool down)
 {
-    // printf("switch clicked: %d\n", down);
     const uint id = widget->getId();
     setParameterValue(id, static_cast<float>(down));
 }
 
 void {{class_name}}::bangClicked(SubWidget *const widget)
 {
-    // printf("bang clicked\n");
     const uint id = widget->getId();
     setParameterValue(id, 1.0f);
 }
 
 void {{class_name}}::radioValueChanged(SubWidget *const widget, uint index)
 {
-    // printf("radio clicked: %d\n", index);
     const uint id = widget->getId();
     setParameterValue(id, static_cast<float>(index));
 }
 
 void {{class_name}}::numberValueChanged(SubWidget *const widget, float value)
 {
-    // printf("number value changed: %f\n", value);
     const uint id = widget->getId();
     setParameterValue(id, value);
 }
 
 void {{class_name}}::knobValueChanged(SubWidget *const widget, float value)
 {
-    // printf("knob value changed: %f\n", value);
     const uint id = widget->getId();
     setParameterValue(id, value);
 }
