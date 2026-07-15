@@ -4,6 +4,7 @@ from pathlib import Path
 
 import jinja2
 
+from hvcc.types.meta import DPF
 from hvcc.types.GUI import Canvas, Comment, GraphRoot, Graph, GUIObjects
 
 
@@ -25,7 +26,8 @@ def nanovg_render(
     c_src_dir: Path,
     env: jinja2.Environment,
     recv_list: list,
-    send_list: list
+    send_list: list,
+    meta: DPF
 ) -> tuple[
     GraphRoot,
     dict[str, list[str]],
@@ -62,7 +64,8 @@ def nanovg_render(
             parent=parent,
             gui_objects=objects,
             receivers=recv_list,
-            senders=send_list
+            senders=send_list,
+            meta=meta
         ))
 
         for graph in graphs:

@@ -6,7 +6,13 @@
     {{object.id}}->setAbsolutePos({{object.position.x}} * scaleFactor, {{object.position.y}} * scaleFactor);
     {{object.id}}->setColors(nvgRGB{{object.bg_color.as_rgb_tuple()}});
             {%- if object.label != None %}
-    {{object.id}}->setLabel("{{object.label.text}}", nvgRGB{{object.label.color.as_rgb_tuple()}}, {{object.label.position.x}} * scaleFactor, {{object.label.position.y}} * scaleFactor, {{object.label.font_size}} * scaleFactor);
+    {{object.id}}->setLabel("{{object.label.text}}",
+                {%- if meta.ui_theme is not none and meta.ui_themes[meta.ui_theme].cnv_text_color is not none %}
+        Colors::cnvTextColor,
+                {%- else %}
+        nvgRGB{{object.label.color.as_rgb_tuple()}},
+                {%- endif %}
+        {{object.label.position.x}} * scaleFactor, {{object.label.position.y}} * scaleFactor, {{object.label.font_size}} * scaleFactor);
             {%- endif %}
         {%- elif object.type == 'comment' %}
     // comment
@@ -27,13 +33,16 @@
     {{object.parameter}}->setSize({{object.size.x}} * scaleFactor, {{object.size.y}} * scaleFactor);
     {{object.parameter}}->setAbsolutePos({{object.position.x}} * scaleFactor, {{object.position.y}} * scaleFactor);
     {{object.parameter}}->setColors(
+            {%- if meta.ui_theme is not none and meta.ui_themes[meta.ui_theme].bg_color is not none and meta.ui_themes[meta.ui_theme].cnvTextColor is not none %}
+        Colors::bgColor,
+        Colors::cnvTextColor
+            {%- else %}
         nvgRGB{{object.bg_color.as_rgb_tuple()}},
         nvgRGB{{object.fg_color.as_rgb_tuple()}}
+            {%- endif %}
     );
     {{object.parameter}}->setInterval({{object.flash_time}});
-            {%- if object.label != None %}
-    {{object.parameter}}->setLabel("{{object.label.text}}", nvgRGB{{object.label.color.as_rgb_tuple()}}, {{object.label.position.x}} * scaleFactor, {{object.label.position.y}} * scaleFactor, {{object.label.font_size}} * scaleFactor);
-            {%- endif %}
+{% include 'gui_label.cpp' %}
     {{parent}}->addManagedChild({{object.parameter}});
         {%- elif object.type == 'toggle' %}
     // toggle
@@ -42,8 +51,13 @@
     {{object.parameter}}->setSize({{object.size.x}} * scaleFactor, {{object.size.y}} * scaleFactor);
     {{object.parameter}}->setAbsolutePos({{object.position.x}} * scaleFactor, {{object.position.y}} * scaleFactor);
     {{object.parameter}}->setColors(
+            {%- if meta.ui_theme is not none and meta.ui_themes[meta.ui_theme].bg_color is not none and meta.ui_themes[meta.ui_theme].cnvTextColor is not none %}
+        Colors::bgColor,
+        Colors::cnvTextColor
+            {%- else %}
         nvgRGB{{object.bg_color.as_rgb_tuple()}},
         nvgRGB{{object.fg_color.as_rgb_tuple()}}
+            {%- endif %}
     );
     {{parent}}->addManagedChild({{object.parameter}});
         {%- elif object.type in ['vradio', 'hradio'] %}
@@ -57,12 +71,15 @@
     {{object.parameter}}->setHorizontal();
             {%- endif %}
     {{object.parameter}}->setColors(
+            {%- if meta.ui_theme is not none and meta.ui_themes[meta.ui_theme].bg_color is not none and meta.ui_themes[meta.ui_theme].cnvTextColor is not none %}
+        Colors::bgColor,
+        Colors::cnvTextColor
+            {%- else %}
         nvgRGB{{object.bg_color.as_rgb_tuple()}},
         nvgRGB{{object.fg_color.as_rgb_tuple()}}
+            {%- endif %}
     );
-                {%- if object.label != None %}
-    {{object.parameter}}->setLabel("{{object.label.text}}", nvgRGB{{object.label.color.as_rgb_tuple()}}, {{object.label.position.x}} * scaleFactor, {{object.label.position.y}} * scaleFactor, {{object.label.font_size}} * scaleFactor);
-                {%- endif %}
+{% include 'gui_label.cpp' %}
     {{parent}}->addManagedChild({{object.parameter}});
         {%- elif object.type in ['vslider', 'hslider'] %}
     // {{object.type}}
@@ -89,12 +106,15 @@
     {{object.parameter}}->setUsingLogScale({{object.logarithmic|lower}});
     {{object.parameter}}->setSteadyOnClick({{object.steady|lower}});
     {{object.parameter}}->setColors(
+            {%- if meta.ui_theme is not none and meta.ui_themes[meta.ui_theme].bg_color is not none and meta.ui_themes[meta.ui_theme].cnvTextColor is not none %}
+        Colors::bgColor,
+        Colors::cnvTextColor
+            {%- else %}
         nvgRGB{{object.bg_color.as_rgb_tuple()}},
         nvgRGB{{object.fg_color.as_rgb_tuple()}}
+            {%- endif %}
     );
-                {%- if object.label != None %}
-    {{object.parameter}}->setLabel("{{object.label.text}}", nvgRGB{{object.label.color.as_rgb_tuple()}}, {{object.label.position.x}} * scaleFactor, {{object.label.position.y}} * scaleFactor, {{object.label.font_size}} * scaleFactor);
-                {%- endif %}
+{% include 'gui_label.cpp' %}
     {{parent}}->addManagedChild({{object.parameter}});
         {%- elif object.type == 'knob' %}
     // knob
@@ -119,9 +139,15 @@
     {{object.parameter}}->setDiscrete({{object.discrete|lower}});
     {{object.parameter}}->setUsingLogScale(PDKnobEventHandler::LogMode::{{object.log_mode|upper}});
     {{object.parameter}}->setColors(
+        {%- if meta.ui_theme is not none and meta.ui_themes[meta.ui_theme].bg_color is not none and meta.ui_themes[meta.ui_theme].cnvTextColor is not none and meta.ui_themes[meta.ui_theme].io_color is not none %}
+        Colors::bgColor,
+        Colors::cnvTextColor,
+        Colors::ioColor
+            {%- else %}
         nvgRGB{{object.bg_color.as_rgb_tuple()}},
         nvgRGB{{object.fg_color.as_rgb_tuple()}},
         nvgRGB{{object.arc_color.as_rgb_tuple()}}
+            {%- endif %}
     );
     {{object.parameter}}->setLabelStyle({{object.label_pos.x}} * scaleFactor, {{object.label_pos.y}} * scaleFactor, {{object.label_size}} * scaleFactor);
     {{object.parameter}}->setShowLabel(LabelShow::{{object.label_show.name|upper}});
@@ -139,12 +165,15 @@
             {%- endif %}
         {%- endfor %}
     {{object.parameter}}->setColors(
+            {%- if meta.ui_theme is not none and meta.ui_themes[meta.ui_theme].bg_color is not none and meta.ui_themes[meta.ui_theme].cnvTextColor is not none %}
+        Colors::bgColor,
+        Colors::cnvTextColor
+            {%- else %}
         nvgRGB{{object.bg_color.as_rgb_tuple()}},
         nvgRGB{{object.fg_color.as_rgb_tuple()}}
+            {%- endif %}
     );
-                {%- if object.label != None %}
-    {{object.parameter}}->setLabel("{{object.label.text}}", nvgRGB{{object.label.color.as_rgb_tuple()}}, {{object.label.position.x}} * scaleFactor, {{object.label.position.y}} * scaleFactor, {{object.label.font_size}} * scaleFactor);
-                {%- endif %}
+{% include 'gui_label.cpp' %}
     {{parent}}->addManagedChild({{object.parameter}});
         {%- elif object.type == 'float' %}
     // float
