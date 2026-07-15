@@ -1037,6 +1037,72 @@
 
     ]
   },
+  "__exc_or~f": {
+    "inlets": [
+      "~f>",
+      "~f>"
+    ],
+    "ir": {
+      "control": false,
+      "signal": true,
+      "init": false
+    },
+    "outlets": [
+      "~f>"
+    ],
+    "args": [],
+    "perf": {}
+  },
+  "__expr": {
+    "inlets": [],
+    "ir": {
+      "control": true,
+      "signal": false,
+      "init": true
+    },
+    "outlets": [
+      "-->"
+    ],
+    "args": [{
+        "name": "expressions",
+        "value_type": "stringarray",
+        "description": "The expression to evaluate",
+        "default": "",
+        "required": true
+    },
+    {
+      "name": "num_inlets",
+      "value_type": "int",
+      "description": "Number of inlets for this instance",
+      "default": "",
+      "required": true
+    }]
+  },
+  "__expr~": {
+    "inlets": [],
+    "ir": {
+      "control": false,
+      "signal": true,
+      "init": false
+    },
+    "outlets": [
+      "~f>"
+    ],
+    "args": [{
+      "name": "expressions",
+      "value_type": "stringarray",
+      "description": "The expression to evaluate",
+      "default": "",
+      "required": true
+    },
+    {
+      "name": "num_inlets",
+      "value_type": "int",
+      "description": "Number of inlets for this instance",
+      "default": "",
+      "required": true
+    }]
+  },
   "__floor": {
     "inlets": [
       "-->"
@@ -1049,9 +1115,7 @@
     "outlets": [
       "-->"
     ],
-    "args": [
-
-    ]
+    "args": []
   },
   "__floor~f": {
     "args": [
@@ -1317,6 +1381,31 @@
       "default": 1,
       "required": false
     }]
+  },
+    "__list": {
+    "inlets": [
+      "-->",
+      "-->"
+    ],
+    "ir": {
+      "control": true,
+      "signal": false,
+      "init": true
+    },
+    "outlets": [
+      "-->",
+      "-->",
+      "-->"
+    ],
+    "args": [
+      {
+        "name": "type",
+        "value_type": "string",
+        "description": "type of list operation",
+        "default": "append",
+        "required": false
+      }
+    ]
   },
   "__line~f": {
     "inlets": [
@@ -1918,6 +2007,111 @@
       "required": false
     }]
   },
+  "__nam~f": {
+    "inlets": [
+      "~f>"
+    ],
+    "ir": {
+      "control": false,
+      "signal": true,
+      "init": true
+    },
+    "outlets": [
+      "~f>"
+    ],
+    "args": [{
+      "name": "nam",
+      "value_type": "string",
+      "description": "path to NAM file",
+      "default": "",
+      "required": true
+    }],
+    "perf": {}
+  },
+  "__nam_nano~f": {
+    "inlets": [
+      "~f>"
+    ],
+    "ir": {
+      "control": false,
+      "signal": true,
+      "init": true
+    },
+    "outlets": [
+      "~f>"
+    ],
+    "args": [{
+      "name": "nam",
+      "value_type": "string",
+      "description": "path to NAM file",
+      "default": "",
+      "required": true
+    }],
+    "perf": {}
+  },
+  "__nam_feather~f": {
+    "inlets": [
+      "~f>"
+    ],
+    "ir": {
+      "control": false,
+      "signal": true,
+      "init": true
+    },
+    "outlets": [
+      "~f>"
+    ],
+    "args": [{
+      "name": "nam",
+      "value_type": "string",
+      "description": "path to NAM file",
+      "default": "",
+      "required": true
+    }],
+    "perf": {}
+  },
+  "__nam_lite~f": {
+    "inlets": [
+      "~f>"
+    ],
+    "ir": {
+      "control": false,
+      "signal": true,
+      "init": true
+    },
+    "outlets": [
+      "~f>"
+    ],
+    "args": [{
+      "name": "nam",
+      "value_type": "string",
+      "description": "path to NAM file",
+      "default": "",
+      "required": true
+    }],
+    "perf": {}
+  },
+  "__nam_standard~f": {
+    "inlets": [
+      "~f>"
+    ],
+    "ir": {
+      "control": false,
+      "signal": true,
+      "init": true
+    },
+    "outlets": [
+      "~f>"
+    ],
+    "args": [{
+      "name": "nam",
+      "value_type": "string",
+      "description": "path to NAM file",
+      "default": "",
+      "required": true
+    }],
+    "perf": {}
+  },
   "__neq": {
     "inlets": [
       "-->",
@@ -2302,6 +2496,51 @@
       "sse": 1
     }
   },
+  "__schmitt~f": {
+    "inlets": [
+      "~f>",
+      "-->",
+      "-->"
+    ],
+    "ir": {
+      "control": true,
+      "signal": true,
+      "init": true
+    },
+    "outlets": [
+      "-->",
+      "-->"
+    ],
+    "args": [{
+      "name": "trigValue",
+      "value_type": "float",
+      "description": "",
+      "default": 0,
+      "required": false
+    }, {
+      "name": "trigDebounce",
+      "value_type": "float",
+      "description": "",
+      "default": 0,
+      "required": false
+    }, {
+      "name": "restValue",
+      "value_type": "float",
+      "description": "",
+      "default": 0,
+      "required": false
+    }, {
+      "name": "restDebounce",
+      "value_type": "float",
+      "description": "",
+      "default": 0,
+      "required": false
+    }],
+    "perf": {
+      "avx": 0,
+      "sse": 0
+    }
+  },
   "__send": {
     "inlets": [
       "-->"
@@ -2624,6 +2863,12 @@
       ],
       "value_type": "mixedarray",
       "name": "cases",
+      "description": "",
+      "required": false
+    }, {
+      "default": false,
+      "value_type": "bool",
+      "name": "is_route",
       "description": "",
       "required": false
     }]
@@ -3257,9 +3502,9 @@
       "neon": 0
     }
   },
-  "asinh~": {
+  "__asinh~f": {
     "inlets": [
-      "signal"
+      "~f>"
     ],
     "ir": {
       "control": false,
@@ -3267,15 +3512,15 @@
       "init": false
     },
     "outlets": [
-      "signal"
+      "~f>"
     ],
     "args": [
 
     ]
   },
-  "asin~": {
+  "__asin~f": {
     "inlets": [
-      "signal"
+      "~f>"
     ],
     "ir": {
       "control": false,
@@ -3283,12 +3528,12 @@
       "init": false
     },
     "outlets": [
-      "signal"
+      "~f>"
     ]
   },
-  "atanh~": {
+  "__atanh~f": {
     "inlets": [
-      "signal"
+      "~f>"
     ],
     "ir": {
       "control": false,
@@ -3296,12 +3541,12 @@
       "init": false
     },
     "outlets": [
-      "signal"
+      "~f>"
     ]
   },
-  "atan~": {
+  "__atan~f": {
     "inlets": [
-      "signal"
+      "~f>"
     ],
     "ir": {
       "control": false,
@@ -3309,7 +3554,61 @@
       "init": false
     },
     "outlets": [
-      "signal"
+      "~f>"
+    ]
+  },
+  "__bit_and~f": {
+    "inlets": [
+      "~f>",
+      "~f>"
+    ],
+    "ir": {
+      "control": false,
+      "signal": true,
+      "init": false
+    },
+    "outlets": [
+      "~f>"
+    ]
+  },
+  "__bit_or~f": {
+    "inlets": [
+      "~f>",
+      "~f>"
+    ],
+    "ir": {
+      "control": false,
+      "signal": true,
+      "init": false
+    },
+    "outlets": [
+      "~f>"
+    ]
+  },
+    "__bit_not~f": {
+    "inlets": [
+      "~f>"
+    ],
+    "ir": {
+      "control": false,
+      "signal": true,
+      "init": false
+    },
+    "outlets": [
+      "~f>"
+    ]
+  },
+  "__bitsafe~f": {
+    "inlets": [
+      "~f>"
+    ],
+    "ir": {
+      "control": false,
+      "signal": true,
+      "init": false
+    },
+    "outlets": [
+      "~f>"
     ]
   },
   "__exp~f": {
@@ -3331,9 +3630,9 @@
       "neon": 0
     }
   },
-  "sinh~": {
+  "__sinh~f": {
     "inlets": [
-      "signal"
+      "~f>"
     ],
     "ir": {
       "control": false,
@@ -3341,15 +3640,15 @@
       "init": false
     },
     "outlets": [
-      "signal"
+      "~f>"
     ],
     "args": [
 
     ]
   },
-  "tanh~": {
+  "__tanh~f": {
     "inlets": [
-      "signal"
+      "~f>"
     ],
     "ir": {
       "control": false,
@@ -3357,12 +3656,12 @@
       "init": false
     },
     "outlets": [
-      "signal"
+      "~f>"
     ]
   },
-  "tan~": {
+  "__tan~f": {
     "inlets": [
-      "signal"
+      "~f>"
     ],
     "ir": {
       "control": false,
@@ -3370,7 +3669,7 @@
       "init": false
     },
     "outlets": [
-      "signal"
+      "~f>"
     ]
   }
 }

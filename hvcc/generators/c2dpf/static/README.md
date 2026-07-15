@@ -24,7 +24,7 @@ This will result in an `bin/` folder with all binary assets.
 
 ## Metadata
 
-You will likely want to add more configuration options to your project. Create a json file as described in the [documentation](https://wasted-audio.github.io/hvcc/docs/03.gen.dpf.html#metadata).
+You will likely want to add more configuration options to your project. Create a json file as described in the [documentation](https://wasted-audio.github.io/hvcc/latest/generators/dpf/#metadata).
 
 ## Jack
 

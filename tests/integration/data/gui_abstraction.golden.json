@@ -1,0 +1,52 @@
+{
+  "id": "mainPatch",
+  "objects": [],
+  "graphs": [
+    {
+      "id": "graph1",
+      "objects": [
+        {
+          "type": "canvas",
+          "id": "canvas1",
+          "position": {
+            "x": -89,
+            "y": -83
+          },
+          "size": {
+            "x": 521,
+            "y": 343
+          },
+          "label": null,
+          "bg_color": "#0daa00"
+        }
+      ],
+      "graphs": [],
+      "position": {
+        "x": 85,
+        "y": 83
+      },
+      "gop_start": {
+        "x": -2,
+        "y": 0
+      },
+      "gop_size": {
+        "x": 274,
+        "y": 166
+      }
+    }
+  ],
+  "size": {
+    "x": 734,
+    "y": 565
+  },
+  "theme": {
+    "obj_corner_radius": null,
+    "cnv_color": null,
+    "text_color": null,
+    "io_color": null,
+    "bg_color": null,
+    "sel_color": null,
+    "out_color": null
+  },
+  "version": "0.14.0"
+}

@@ -1,5 +1,5 @@
 # Copyright (C) 2014-2018 Enzien Audio, Ltd.
-# Copyright (C) 2023-2024 Wasted Audio
+# Copyright (C) 2023-2026 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,10 +16,10 @@
 
 import argparse
 import json
-import os
 
 from collections import Counter, defaultdict
 from typing import Dict
+from pathlib import Path
 
 from hvcc.types.IR import HeavyIRType, IRGraph
 
@@ -35,7 +35,7 @@ class ir2c_perf:
         verbose: bool = False
     ) -> Dict[str, Dict[str, float]]:
         # read the hv.ir.json file
-        with open(os.path.join(os.path.dirname(__file__), "../../core/json/heavy.ir.json"), "r") as f:
+        with open(Path(Path(__file__).parent, "../../core/json/heavy.ir.json"), "r") as f:
             HEAVY_IR_JSON = HeavyIRType(**json.load(f)).root
 
         objects: Counter = Counter()

@@ -4,7 +4,92 @@ CHANGELOG
 Next Release
 -----
 
+Features:
+
+* Support `list` object. Does not support tosymbol/fromsymbol.
+* Support `[route float]` for routing floats.
+* Support `trunc()` in `expr/expr~`.
+* Support `threshold~`.
+* Allow `else/popmenu` (converted to `[f ]`).
+
+0.16.2
+-----
+
+Features:
+
+* multi-line `expr`/`expr~`
+
+Bugfixes:
+
+* Daisy: fix None in template
+
+Refactor:
+
+* Add pydantic type to pd2hv exports
+
+0.16.1
+-----
+
+Bugfixes:
+
+* Allow diacritics in send/receive (#344)
+* Resolve absolute nam path (#377)
+* Fix issue with Path in jinja2 environment
+* Daisy: Don't show warning if board doesn't have display section (#349)
+
+0.16.0
+-----
+
+Features:
+
+* Add theme configuration to pd2gui model
+* Add `flash_time` to pd2gui Bang parser
+* Only parse GUI with `--gui` flag
+* Port objects from cyclone
+* Port `pdnam~` external using `MicroNAM`
+* DPF: support `@hv_event` parameters
+* DPF: Generate optional NanoVG UI code from `pd2gui` parser
+
+Bugfixes:
+
+* Skip empty values when restoring tables (#348)
+* Only append to table when first value is a float
+* Fix parsing multi-array objects (#373)
+* GUI send/receive config for objects in subpatches
+* DPF: also send BPM value to `__hv_dpf_bpm` when transport is not playing
+* Wwise: use latest Windows SDK available locally instead of hardcoded version
+
+Refactor:
+
+* Migrate to Pathlib (note: Generator signature has changed!)
+* GUI IR: stable IDs for graphs/canvas/comments; updated float/number fields; use specific GUI IR filename
+
+Docs:
+
+* Versioning
+
+0.15.0
+-----
+
+Features:
+
 * Unity Generator: change build system to use CMake - thanks to @michaelhartung
+* Allow externing graphical arrays using `@hv_table`
+* DPF: support and documentation for Audio Unit format (macOS)
+* Daisy: support display parameters using `@hv_param`
+* New pd2gui parser that creates an Intermediate Representation JSON with exposed UI objects
+* Support for `expr` and most of its functions - thanks to @dgbillotte
+* Support for `expr~` and most of its functions - thanks to @dgbillotte
+* Add `HV_BARE_METAL` compiler macro for suppressing `HvUtils.h` warning
+
+Cleanup:
+
+* Daisy: allow more generic `HAS_MIDI` in the board.json
+
+Docs:
+
+* Add: Code Of Conduct
+* Add: Contributing Guide
 
 0.14.0
 -----

@@ -1,5 +1,5 @@
 # Copyright (C) 2014-2018 Enzien Audio, Ltd.
-# Copyright (C) 2023-2024 Wasted Audio
+# Copyright (C) 2023-2026 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,11 +17,11 @@
 import argparse
 import jinja2
 import json
-import os
 import shutil
 import time
 
 from collections import Counter
+from pathlib import Path
 from typing import Dict, List, Optional, Type, Union
 
 from hvcc.generators.ir2c.PrettyfyC import PrettyfyC
@@ -30,7 +30,9 @@ from hvcc.generators.copyright import copyright_manager
 from hvcc.generators.ir2c.ControlBinop import ControlBinop
 from hvcc.generators.ir2c.ControlCast import ControlCast
 from hvcc.generators.ir2c.ControlDelay import ControlDelay
+from hvcc.generators.ir2c.ControlExpr import ControlExpr
 from hvcc.generators.ir2c.ControlIf import ControlIf
+from hvcc.generators.ir2c.ControlList import ControlList
 from hvcc.generators.ir2c.ControlMessage import ControlMessage
 from hvcc.generators.ir2c.ControlPack import ControlPack
 from hvcc.generators.ir2c.ControlPrint import ControlPrint
@@ -52,13 +54,16 @@ from hvcc.generators.ir2c.SignalBiquad import SignalBiquad
 from hvcc.generators.ir2c.SignalCPole import SignalCPole
 from hvcc.generators.ir2c.SignalDel1 import SignalDel1
 from hvcc.generators.ir2c.SignalEnvelope import SignalEnvelope
+from hvcc.generators.ir2c.SignalExpr import SignalExpr
 from hvcc.generators.ir2c.SignalLine import SignalLine
 from hvcc.generators.ir2c.SignalLorenz import SignalLorenz
+from hvcc.generators.ir2c.SignalNam import SignalNam
 from hvcc.generators.ir2c.SignalMath import SignalMath
 from hvcc.generators.ir2c.SignalPhasor import SignalPhasor
 from hvcc.generators.ir2c.SignalRPole import SignalRPole
 from hvcc.generators.ir2c.SignalSample import SignalSample
 from hvcc.generators.ir2c.SignalSamphold import SignalSamphold
+from hvcc.generators.ir2c.SignalSchmitt import SignalSchmitt
 from hvcc.generators.ir2c.SignalTabhead import SignalTabhead
 from hvcc.generators.ir2c.SignalTabread import SignalTabread
 from hvcc.generators.ir2c.SignalTabwrite import SignalTabwrite
@@ -80,6 +85,8 @@ class ir2c:
         "__cast_b": ControlCast,
         "__cast_f": ControlCast,
         "__cast_s": ControlCast,
+        "__expr": ControlExpr,
+        "__expr~": SignalExpr,
         "__message": ControlMessage,
         "__system": ControlSystem,
         "__receive": ControlReceive,
@@ -89,7 +96,12 @@ class ir2c:
         "__biquad_k~f": SignalBiquad,
         "__env~f": SignalEnvelope,
         "__line~f": SignalLine,
+        "__list": ControlList,
         "__lorenz~f": SignalLorenz,
+        "__nam_nano~f": SignalNam,
+        "__nam_feather~f": SignalNam,
+        "__nam_lite~f": SignalNam,
+        "__nam_standard~f": SignalNam,
         "__del1~f": SignalDel1,
         "__tabread~if": SignalTabread,
         "__tabread~f": SignalTabread,
@@ -102,6 +114,7 @@ class ir2c:
         "__phasor_k~f": SignalPhasor,
         "__sample~f": SignalSample,
         "__samphold~f": SignalSamphold,
+        "__schmitt~f": SignalSchmitt,
         "__slice": ControlSlice,
         "__send": ControlSend,
         "__tabhead": ControlTabhead,
@@ -155,9 +168,9 @@ class ir2c:
     @classmethod
     def compile(
         cls,
-        hv_ir_path: str,
-        static_dir: str,
-        output_dir: str,
+        hv_ir_path: Path,
+        static_dir: Path,
+        output_dir: Path,
         externs: ExternInfo,
         copyright: Optional[str] = None,
         nodsp: Optional[bool] = False
@@ -175,11 +188,14 @@ class ir2c:
         env.filters["hvhash"] = cls.filter_hvhash
         env.filters["extern"] = cls.filter_extern
         env.loader = jinja2.FileSystemLoader(
-            os.path.join(os.path.dirname(__file__), "templates"))
+            Path(Path(__file__).parent, "templates"))
 
         # read the hv.ir.json file
         with open(hv_ir_path, "r") as f:
             ir = IRGraph(**json.load(f))
+
+        # the project name to be used as a part of file and function names
+        name = ir.name.escaped
 
         # generate the copyright
         copyright = copyright_manager.get_copyright_for_c(copyright)
@@ -187,6 +203,9 @@ class ir2c:
         #
         # Parse the hv.ir data structure and generate C-language strings.
         #
+
+        # Reset the obj_eval_functions state
+        SignalExpr.obj_eval_functions = {}
 
         # generate set of header files to include
         include_set = set([x for o in ir.objects.values() for x in ir2c.get_class(o.type).get_C_header_set()])
@@ -200,25 +219,45 @@ class ir2c:
         free_list = []
         def_list = []
         decl_list = []
+        obj_header_lines = []
+        obj_impl_lines = []
+        class_header_lines = []
+        class_impl_lines = []
+        gen_header_files: list[tuple[str, str]] = []
+
         for obj_id in ir.init.order:
             o = ir.objects[obj_id]
             obj_class = ir2c.get_class(o.type)
-            init_list.extend(obj_class.get_C_init(o.type, obj_id, o.args))
+            init_raw = obj_class.get_C_init(o.type, obj_id, o.args)
+
+            for init in init_raw:
+                # render name into Expr inits
+                init_render = env.from_string(init).render(name=name)
+                init_list.append(init_render)
+
             def_list.extend(obj_class.get_C_def(o.type, obj_id))
             free_list.extend(obj_class.get_C_free(o.type, obj_id, o.args))
 
         impl_list = []
-        for msg in ir.control.sendMessage:
-            obj_id = msg.id
+        for x in ir.control.sendMessage:
+            obj_id = x.id
             o = ir.objects[obj_id]
             obj_class = ir2c.get_class(o.type)
             impl = obj_class.get_C_impl(
                 o.type,
                 obj_id,
-                msg.onMessage,
+                x.onMessage,
                 ir2c.get_class,
-                ir.objects)
-            impl_list.append("\n".join(PrettyfyC.prettyfy_list(impl)))
+                ir.objects,
+                o.args)
+
+            impl_render = []
+            for imp in impl:
+                # Render name into Expr impls
+                imp_render = env.from_string(imp).render(name=name)
+                impl_render.append(imp_render)
+
+            impl_list.append("\n".join(PrettyfyC.prettyfy_list(impl_render)))
             decl_list.extend(obj_class.get_C_decl(o.type, obj_id, o.args))
 
         # generate static table data initialisers
@@ -233,28 +272,53 @@ class ir2c:
 
         # generate the list of functions to process
         process_list: List = []
-        for sig in ir.signal.processOrder:
-            obj_id = sig.id
+        process_classes: set[Type[HeavyObject]] = set()
+        for y in ir.signal.processOrder:
+            obj_id = y.id
             o = ir.objects[obj_id]
-            process_list.extend(ir2c.get_class(o.type).get_C_process(
-                sig,
+            obj_cls = ir2c.get_class(o.type)
+            process_classes.add(obj_cls)
+            process_list.extend(obj_cls.get_C_process(
+                y,
                 o.type,
                 obj_id,
                 o.args))
+
+            # Add Expr~ header and impl lines
+            obj_header_lines.extend(obj_cls.get_C_obj_header_code(
+                o.type, obj_id, o.args
+            ))
+            obj_impl_lines.extend(obj_cls.get_C_obj_impl_code(
+                o.type, obj_id, o.args
+            ))
+
+            header = obj_cls.get_C_gen_header_code(o.type, obj_id, o.args)
+            if header is not None:
+                gen_header_files.append(header)
+                include_set.add(header[0])
+
+        # Render name into Expr~ impls
+        obj_impl_lines = [env.from_string(line).render(name=name) for line in obj_impl_lines]
+
+        # once for each class
+        for prc_cls in process_classes:
+            class_header_lines.extend(prc_cls.get_C_class_header_code(
+                o.type, o.args
+            ))
+            class_impl_lines.extend(prc_cls.get_C_class_impl_code(
+                o.type, o.args
+            ))
 
         #
         # Load the C-language template files and use the parsed strings to fill them in.
         #
 
         # make the output directory if necessary
-        if not os.path.exists(output_dir):
-            os.makedirs(output_dir)
-
-        # the project name to be used as a part of file and function names
-        name = ir.name.escaped
+        if not output_dir.exists():
+            output_dir.mkdir(parents=True)
 
         # write HeavyContext.h
-        with open(os.path.join(output_dir, f"Heavy_{name}.hpp"), "w") as f:
+        with open(Path(output_dir, f"Heavy_{name}.hpp"), "w") as f:
             f.write(env.get_template("Heavy_NAME.hpp").render(
                 name=name,
                 include_set=include_set,
@@ -262,10 +326,12 @@ class ir2c:
                 def_list=def_list,
                 signal=ir.signal,
                 copyright=copyright,
-                externs=externs))
+                externs=externs,
+                class_header_lines=class_header_lines,
+                obj_header_lines=obj_header_lines))
 
         # write C++ implementation
-        with open(os.path.join(output_dir, f"Heavy_{name}.cpp"), "w") as f:
+        with open(Path(output_dir, f"Heavy_{name}.cpp"), "w") as f:
             f.write(env.get_template("Heavy_NAME.cpp").render(
                 name=name,
                 signal=ir.signal,
@@ -277,28 +343,41 @@ class ir2c:
                 process_list=process_list,
                 table_data_list=table_data_list,
                 copyright=copyright,
+                class_impl_lines=class_impl_lines,
+                obj_impl_lines=obj_impl_lines,
                 nodsp=nodsp))
 
         # write C API, hv_NAME.h
-        with open(os.path.join(output_dir, f"Heavy_{name}.h"), "w") as f:
+        with open(Path(output_dir, f"Heavy_{name}.h"), "w") as f:
             f.write(env.get_template("Heavy_NAME.h").render(
                 name=name,
                 copyright=copyright,
                 externs=externs))
 
+        # write extra headers
+        for file, head in gen_header_files:
+            with open(Path(output_dir, file), "w") as f:
+                f.write(head)
+
         # copy static files to output directory
         for f in file_set:
-            shutil.copy2(
-                src=os.path.join(static_dir, str(f)),
-                dst=os.path.join(output_dir, str(f)))
+            try:
+                shutil.copy2(
+                    src=Path(static_dir, str(f)),
+                    dst=Path(output_dir, str(f)))
+            except IOError:
+                Path.mkdir(Path(output_dir, str(f)).parent, parents=True)
+                shutil.copy2(
+                    src=Path(static_dir, str(f)),
+                    dst=Path(output_dir, str(f)))
 
         # generate HeavyIR object counter
         ir_counter = Counter([obj.type for obj in ir.objects.values()])
 
         return CompilerResp(
             stage="ir2c",
-            in_dir=os.path.dirname(hv_ir_path),
-            in_file=os.path.basename(hv_ir_path),
+            in_dir=hv_ir_path.parent,
+            in_file=hv_ir_path,
             out_dir=output_dir,
             compile_time=(time.time() - tick),
             obj_counter=ir_counter

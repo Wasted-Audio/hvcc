@@ -14,17 +14,19 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from typing import Optional, List, Dict
+from typing import Optional
 
 from .NotificationEnum import NotificationEnum
 from .PdObject import PdObject
+
+from hvcc.types.Heavy import Heavy, HvPos
 
 
 class PdAudioIoObject(PdObject):
     def __init__(
         self,
         obj_type: str,
-        obj_args: Optional[List] = None,
+        obj_args: Optional[list] = None,
         pos_x: int = 0,
         pos_y: int = 0
     ) -> None:
@@ -39,14 +41,13 @@ class PdAudioIoObject(PdObject):
                     f"{self.obj_type} does not support control connections (inlet {i}). They should be removed.",
                     NotificationEnum.ERROR_UNSUPPORTED_CONNECTION)
 
-    def to_hv(self) -> Dict:
-        return {
-            "type": self.obj_type.strip("~"),
-            "args": {
-                "channels": [1, 2] if len(self.obj_args) == 0 else [int(a) for a in self.obj_args]
+    def to_hv(self) -> Heavy:
+        return Heavy(
+            type=self.obj_type.strip("~"),
+            args={
+                "channels": [1, 2]
+                if len(self.obj_args) == 0
+                else [int(a) for a in self.obj_args]
             },
-            "properties": {
-                "x": self.pos_x,
-                "y": self.pos_y
-            }
-        }
+            properties=HvPos(x=self.pos_x, y=self.pos_y)
+        )

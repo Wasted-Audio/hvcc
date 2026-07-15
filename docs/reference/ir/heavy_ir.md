@@ -1,0 +1,186 @@
+# The Heavy Audio Programming Language Specification - Intermediate Representation
+
+## Intermediate Representation
+
+Heavy patches are translated into an intermediate representation (IR) before they are converted to source code. All optimisations have been applied, and the IR translator must simply generate source code. The IR dictionary contains several keys which make the function of the Heavy graph explicit.
+
+* **version**
+* **name**
+* **objects**
+* **tables**
+* **init**
+* **control**
+* **signal**
+
+### version
+
+The version, e.g. `0.14.0`, indicates the format of the IR file. The version is tied to the release of heavy.
+
+### name
+
+The `name` key assigns a namespace to the patch. It's value is a dictionary containing both `escaped` and `display` versions of the patch name. The escaped version is suitable for embedding into code.
+
+```json
+{
+  "name": {
+    "escaped": "A_Cool_Patch_Name_",
+    "display": "A Cool Patch Name!"
+  }
+}
+```
+
+### objects
+
+A dictionary of all objects and their arguments, indexed by their ids. All other sections will refer to their objects by id, and this dictionary can be used to look up relevant parameters.
+
+```json
+{
+  "objects": {
+    "hY9Cy": {
+      "args": {
+        "k": 1.34,
+        "operation": "+"
+      },
+      "type": "binop"
+    }
+  }
+}
+```
+
+### tables
+
+The `tables` key lists all globally accessible (i.e. `public` at the root graph) tables and their ids. This information is used to refer to the tables from the external Heavy API.
+
+```json
+{
+  "tables": {
+    "rat": {
+      "extern": true,
+      "hash": "0x64D40CF4",
+      "id": "DJo1u",
+      "display": "rat"
+    },
+    "dog": {
+      "extern": false,
+      "hash": "0x62A20F7E",
+      "id": "iykjV",
+      "display": "dog"
+    }
+  }
+}
+```
+
+### init
+
+The `init` key indicates initialisation order. `order` provides an ordered list of ids for which objects must be initialised. The `loadbang` ordering indicates the order in which `loadbang` messages should be issued.
+
+```json
+{
+  "init": {
+    "order": [
+      "hY9Cy",
+      "oDhfS"
+    ]
+  }
+}
+```
+
+### control
+
+The `control` block contains information about receivers (`receivers`), and which functions to call when a message is sent to a receiver (`sendMessage`). The `receivers` key refers to a dictionary which is keyed with the escaped names of receivers (escaped names are suitable for embedding into code). The values are dictionaries which contain a `display` key indicating the original display name of the receiver.
+
+```json
+{
+  "receivers": {
+    "freq": {
+      "extern": "param",
+      "attributes": {
+        "default": 500.0,
+        "max": 1000.0,
+        "min": 0.0
+      },
+      "hash": "0x345FC008",
+      "display": "freq",
+      "ids": ["eWQFh"]
+    },
+    "bang": {
+      "extern": "event",
+      "attributes": {},
+      "hash": "0xFFFFFFFF",
+      "display": "bang",
+      "ids": ["bgPcP"]
+    },
+    "hello": {
+      "extern": false,
+      "ids": ["djf72"]
+    },
+    "__hv_init": {
+      "extern": false,
+      "ids": ["djf72"]
+    }
+  },
+  "sendMessage": [
+    {
+      "id": "kjhsd",
+      "extern": "param",
+      "hash": "0xFF035A1D",
+      "name": "env",
+      "onMessage": [
+        [
+          {
+            "id": "heRfJ",
+            "inletIndex": 0,
+          }
+        ]
+      ]
+    }
+  ]
+}
+```
+
+### signal
+
+The `signal` dictionary lists everything that is necessary to generate the process function of the patch. It indicates how many temporary stack buffers are required, whether or not a zeroed buffer is necessary, and the order of process functions as well as their buffer inputs.
+
+* **numTemporaryBuffers**: The number of temporary buffers needed by this patch.
+* **requiresZeroBuffer**: If a buffer of all zeros is needed at any signal input.
+* **processOrder**: A list of process dictionaries.
+  * **id**: The object id.
+  * **inputBuffers**: A list of dictionaries describing the input buffers at each inlet of this object.
+  * **outputBuffers**: A list of dictionaries describing the output buffers at each outlet of this object.
+    * **type**: The buffer type. Valid values are `input`, `output`, `~f>`, `~i>`, and `zero`.
+    * **index**: The index of the buffer (e.g. channel number)
+
+```json
+{
+  "signal": {
+    "numTemporaryBuffers": 4,
+    "requiresZeroBuffer": false,
+    "processOrder": [
+      {
+        "id": "kjsd7",
+        "inputBuffers": [
+          {
+            "type": "~f>",
+            "index": 1
+          },
+          {
+            "type": "input",
+            "index": 0
+          }
+        ],
+        "outputBuffers": [
+          {
+            "type": "~f>",
+            "index": 2
+          },
+          {
+            "type": "output",
+            "index": 1
+          }
+        ]
+      }
+    ]
+  }
+}
+```

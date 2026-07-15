@@ -1,19 +1,19 @@
 import jinja2
 import json
-import os
 
 from importlib import resources
+from pathlib import Path
 from typing import Optional
 
 
-def map_load(pair: list, json_defs_file: str):
+def map_load(pair: list, json_defs_file: Path):
     """
     Helper for loading and processing the definitions, component list, etc
     """
 
     # load the default components
-    comp_string = resources.files(__package__).joinpath(json_defs_file).read_text()
-    component_defs = json.loads(comp_string)
+    comp_string = Path(Path(__file__).parent, json_defs_file)
+    component_defs = json.loads(comp_string.read_bytes())
 
     pair[1]['name'] = pair[0]
 
@@ -165,9 +165,9 @@ def generate_header(board_description_dict: dict) -> 'tuple[str, dict]':
         parents[key]['is_parent'] = True
     components.update(parents)
 
-    seed_defs = os.path.join("resources", 'component_defs.json')
-    patchsm_defs = os.path.join("resources", 'component_defs_patchsm.json')
-    petalsm_defs = os.path.join("resources", 'component_defs_petalsm.json')
+    seed_defs = Path("resources", 'component_defs.json')
+    patchsm_defs = Path("resources", 'component_defs_patchsm.json')
+    petalsm_defs = Path("resources", 'component_defs_petalsm.json')
     definitions = {'seed': seed_defs, 'patch_sm': patchsm_defs, 'petal_125b_sm': petalsm_defs}
     som = target.get('som', 'seed')
 
@@ -197,11 +197,6 @@ def generate_header(board_description_dict: dict) -> 'tuple[str, dict]':
         target['display']['driver'] = target['display'].get('driver', "daisy::SSD130x4WireSpi128x64Driver")
         target['display']['config'] = target['display'].get('config', [])
         target['display']['dim'] = target['display'].get('dim', [128, 64])
-
-        target['defines']['OOPSY_TARGET_HAS_OLED'] = 1
-        target['defines']['OOPSY_OLED_DISPLAY_WIDTH'] = target['display']['dim'][0]
-        target['defines']['OOPSY_OLED_DISPLAY_HEIGHT'] = target['display']['dim'][1]
-
         target['displayprocess'] = target['display'].get('process', '')
 
     replacements = {}
@@ -232,8 +227,8 @@ def generate_header(board_description_dict: dict) -> 'tuple[str, dict]':
         components, 'component', ['AnalogControl', 'AnalogControlBipolar'],
         'map_init', key_exclude='default', match_exclude=True)
 
-    comp_string = resources.files(__package__).joinpath(json_defs_file).read_text()
-    definitions_dict = json.loads(comp_string)
+    comp_string = Path(Path(__file__).parent, json_defs_file)
+    definitions_dict = json.loads(comp_string.read_bytes())
 
     for name in definitions_dict:
         if name not in ('AnalogControl', 'AnalogControlBipolar', 'CD4051'):
@@ -254,7 +249,8 @@ def generate_header(board_description_dict: dict) -> 'tuple[str, dict]':
         replacements['display'] = ''
 
     if 'defines' in target:
-        if target['defines'].get('OOPSY_TARGET_HAS_MIDI_INPUT'):
+        # deprecate old oopsy syntax at some point
+        if target['defines'].get('HAS_MIDI') or target['defines'].get('OOPSY_TARGET_HAS_MIDI_INPUT'):
             target['has_midi'] = True
             replacements['midi'] = """daisy::MidiUartHandler midi;"""
 
@@ -296,7 +292,7 @@ def generate_header(board_description_dict: dict) -> 'tuple[str, dict]':
     # rendered_header = env.get_template('daisy.h').render(replacements)
 
     # This following works, but is really annoying
-    header_str = resources.files(__package__).joinpath(os.path.join('templates', 'daisy.h')).read_text()
+    header_str = Path(Path(__file__).parent, Path('templates', 'daisy.h')).read_text()
     header_env = jinja2.Environment(
         loader=jinja2.BaseLoader(),
         trim_blocks=True,
@@ -325,13 +321,13 @@ def generate_header(board_description_dict: dict) -> 'tuple[str, dict]':
         'aliases': target['aliases'],
         'channels': audio_channels,
         'has_midi': target.get('has_midi', False),
-        'displayprocess': target.get('displayprocess', '')
+        'displayprocess': target.get('displayprocess', '') if 'display' in target else None
       }
 
     return rendered_header, board_info
 
 
-def generate_header_from_file(description_file: str) -> 'tuple[str, dict]':
+def generate_header_from_file(description_file: Path) -> 'tuple[str, dict]':
     """
     Generate a C++ Daisy board header from a JSON description file.
 
@@ -362,9 +358,9 @@ def generate_header_from_name(board_name: str) -> 'tuple[str, dict]':
     """
 
     try:
-        description_file = os.path.join('resources', f'{board_name}.json')
-        daisy_description = resources.files(__package__).joinpath(description_file).read_text()
-        daisy_description_dict = json.loads(daisy_description)
+        description_file = Path('resources', f'{board_name}.json')
+        daisy_description = Path(Path(__file__).parent, description_file)
+        daisy_description_dict = json.loads(daisy_description.read_bytes())
     except FileNotFoundError:
         raise FileNotFoundError(f'Unknown Daisy board   "{board_name}"')
 
