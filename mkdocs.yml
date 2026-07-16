@@ -66,6 +66,7 @@ nav:
     - Signal Rate Expr: adr/ADR-004-Signal-Rate-Expr.md
     - PDNAM External: adr/ADR-005-PDNAM-External.md
     - gui2dpf Templates: adr/ADR-006-gui2dpf-Templates.md
+    - Parameter Ordering: adr/ADR-007-Parameter-Ordering.md
   - Changelog: changelog.md
   - Contributing: contributing.md
   - Code of Conduct: code_of_conduct.md

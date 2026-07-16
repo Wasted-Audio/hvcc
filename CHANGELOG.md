@@ -12,6 +12,7 @@ Features:
 * Support `threshold~`.
 * Allow `else/popmenu` (converted to `[f ]`).
 * DPF: Allow theme overrides in NanoVG UI.
+* Introduce syntax to order externed parameters and events (#57)
 
 0.16.2
 -----
