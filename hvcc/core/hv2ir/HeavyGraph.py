@@ -16,8 +16,8 @@
 
 import re
 
-from collections import Counter
-from typing import Optional, Union, Dict, List, Set, Tuple
+from collections import Counter, OrderedDict
+from typing import Any, Optional, Union, Dict, List, Set, Tuple
 from pathlib import Path
 
 from .BufferPool import BufferPool
@@ -960,15 +960,29 @@ class HeavyGraph(HeavyIrObject):
     def get_ir_control_list(self) -> List[IRSendMessage]:
         return [x for o in self.objs.values() for x in o.get_ir_control_list()]
 
+    @classmethod
+    def sort_ir_receiver_dict(cls, item: dict[str, Any]) -> tuple[int, int, int]:
+        key, _value = item
+        match = re.match(r'^\[(\d+)\](.*)', key)
+        if match:
+            number = int(match.group(1))
+            rest = match.group(2)
+            return (0, number, rest)
+        else:
+            return (1, 0, key)
+
     def get_ir_receiver_dict(self) -> Dict[str, IRReceiver]:
         # NOTE(mhroth): this code assumes that v is always an array of length 1,
         # as the grouping of control receivers should have grouped all same-named
         # receivers into one logical receiver.
         # NOTE(mhroth): a code-compatible name is only necessary for externed receivers
 
+        # Order receivers by ordering number
+        unordered_receiver_dict = self.local_vars.get_registered_objects_for_type("__receive")
+        ordered_receiver_dict = OrderedDict(sorted(unordered_receiver_dict.items(), key=self.sort_ir_receiver_dict))
         ir_rec_dict = {}
 
-        for raw_k, v in self.local_vars.get_registered_objects_for_type("__receive").items():
+        for raw_k, v in ordered_receiver_dict.items():
             # drop ordering syntax for externed receivers
             display_k = re.sub(r"\[\d+\]", "", raw_k) if v[0].args["extern"] else raw_k
             key = (f"_{display_k}") if re.match(r"\d", display_k) else display_k
