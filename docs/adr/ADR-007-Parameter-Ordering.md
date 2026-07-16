@@ -16,7 +16,7 @@ One suggestion was to use the same syntax as Faust, which is to optionally prepe
 
 We will adjust several compiled steps to allow, order and cleanup this additional syntax.
 
-- `core.hv2ir.HIRReceive` validates the new syntax and only string prepended with or without a number in brackets are allowed
+- `core.hv2ir.HIrReceive` validates the new syntax and only string prepended with or without a number in brackets are allowed
 - `core.hv2ir.HeavyGraph` sorts all the receivers based on the optional syntax and then drops it for externed parameters before returning the ir receiver dictionary
 - `ir2c` and `compiler` stages no longer force alphabetical ordering
 - `pd2gui` only needs to drop the syntax
@@ -33,7 +33,7 @@ Validation and sorting stages get unit tests to confirm their intended behavior.
 
 Tagged receivers will always sort before untagged ones, and untagged receivers fall back to the original alphabetical order. Non-extern receivers are not exempt from the tag syntax being present in their name. A bracketed prefix on a non-extern receiver becomes part of its literal identifier (and must match on the corresponding `[s ]`), rather than being stripped or treated specially. Ordering tags are only intended for use on `@hv_param`/`@hv_event` receivers.
 
-## MVP Definiton
+## MVP Definition
 
 The user should be able to, optionally, prepend their externed parameters using the bracket+number syntax and see their intended order used in the generator output.
 

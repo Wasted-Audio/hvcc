@@ -984,7 +984,7 @@ class HeavyGraph(HeavyIrObject):
 
         for raw_k, v in ordered_receiver_dict.items():
             # drop ordering syntax for externed receivers
-            display_k = re.sub(r"\[\d+\]", "", raw_k) if v[0].args["extern"] else raw_k
+            display_k = re.sub(r"^\[\d+\]", "", raw_k) if v[0].args["extern"] else raw_k
             key = (f"_{display_k}") if re.match(r"\d", display_k) else display_k
             if key in ir_rec_dict:
                 self.add_error(
