@@ -961,7 +961,7 @@ class HeavyGraph(HeavyIrObject):
         return [x for o in self.objs.values() for x in o.get_ir_control_list()]
 
     @classmethod
-    def sort_ir_receiver_dict(cls, item: dict[str, Any]) -> tuple[int, int, int]:
+    def sort_ir_receiver_dict(cls, item: tuple[Any, Any]) -> tuple[int, int, str]:
         key, _value = item
         match = re.match(r'^\[(\d+)\](.*)', key)
         if match:
