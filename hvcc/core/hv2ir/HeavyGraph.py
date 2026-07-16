@@ -969,7 +969,8 @@ class HeavyGraph(HeavyIrObject):
         ir_rec_dict = {}
 
         for raw_k, v in self.local_vars.get_registered_objects_for_type("__receive").items():
-            display_k = re.sub(r"\[\d+\]", "", raw_k)  # drop ordering syntax for display/code
+            # drop ordering syntax for externed receivers
+            display_k = re.sub(r"\[\d+\]", "", raw_k) if v[0].args["extern"] else raw_k
             key = (f"_{display_k}") if re.match(r"\d", display_k) else display_k
             if key in ir_rec_dict:
                 self.add_error(

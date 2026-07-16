@@ -36,9 +36,9 @@ def test_re_valid_recv():
     string5 = "[1][2]bla"
     string6 = ""
 
-    assert HIrReceive.RE_VALID_RECV.match(string1) is not None
-    assert HIrReceive.RE_VALID_RECV.match(string2) is not None
-    assert HIrReceive.RE_VALID_RECV.match(string3) is None
-    assert HIrReceive.RE_VALID_RECV.match(string4) is None
-    assert HIrReceive.RE_VALID_RECV.match(string5) is None
-    assert HIrReceive.RE_VALID_RECV.match(string6) is None
+    assert HIrReceive.RE_VALID_RECV.fullmatch(string1) is not None
+    assert HIrReceive.RE_VALID_RECV.fullmatch(string2) is not None
+    assert HIrReceive.RE_VALID_RECV.fullmatch(string3) is None
+    assert HIrReceive.RE_VALID_RECV.fullmatch(string4) is None
+    assert HIrReceive.RE_VALID_RECV.fullmatch(string5) is None
+    assert HIrReceive.RE_VALID_RECV.fullmatch(string6) is None
