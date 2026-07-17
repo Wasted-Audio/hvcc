@@ -143,11 +143,13 @@ def generate_extern_info(hvir: IRGraph, results: CompilerResults) -> ExternInfo:
     # remove duplicate output parameters/events
     # NOTE(joe): is the id argument important here? We'll only take the first one in this case.
     out_parameter_list = list(dict(out_parameter_list).items())
+    out_parameter_list.sort(key=lambda x: x[0])
     check_extern_name_conflicts("output parameter", out_parameter_list, results)
 
     # Exposed output events
     out_event_list = [(v.name, v) for v in hvir.control.sendMessage if v.extern == "event"]
     out_event_list = list(dict(out_event_list).items())
+    out_event_list.sort(key=lambda x: x[0])
     check_extern_name_conflicts("output event", out_event_list, results)
 
     # Exposed tables

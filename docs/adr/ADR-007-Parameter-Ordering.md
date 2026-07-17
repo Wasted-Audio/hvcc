@@ -23,6 +23,8 @@ We will adjust several compiled steps to allow, order and cleanup this additiona
 
 Validation and sorting stages get unit tests to confirm their intended behavior.
 
+This will only apply to input parameters and events. Output parameters and events are excluded as they are constructed individually and not as a list, which makes their sorting nearly impossible.
+
 ### Syntax rules
 
 - Only one bracketed tag, and only at the start of the name is allowed. `[1][2]bla` is rejected.
@@ -40,3 +42,5 @@ The user should be able to, optionally, prepend their externed parameters using 
 ## Future Improvements
 
 Unless there are unforeseen edge-cases we currently don't see any other extensions to this syntax and it should be kept minimal for this specific purpose.
+
+Potentially we can look at sorting output parameters/events in the future, but this is very low priority.

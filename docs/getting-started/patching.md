@@ -40,7 +40,7 @@ See the specific framework details for more information on output parameter supp
 
 ### Ordering parameters
 
-By default, exposed parameters (`@hv_param`) and events (`@hv_event`) are ordered
+By default, exposed input parameters (`@hv_param`) and events (`@hv_event`) are ordered
 alphabetically. To control the order explicitly, prepend the receiver name with
 a numeric tag in square brackets:
 
@@ -54,6 +54,7 @@ a numeric tag in square brackets:
 - The `[N]` tag is stripped from the generated parameter name — it's for ordering only.
 - Two parameters that collide once tags are stripped (e.g. `[1]Vol` and `[2]Vol`) will
   raise a compile error.
+- Output parameters (on send objects) are currently not supported for this syntax.
 
 ### Externed Tables
 
