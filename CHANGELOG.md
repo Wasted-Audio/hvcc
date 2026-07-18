@@ -16,6 +16,7 @@ Features:
 Bugfixes:
 
 * Packing values to midi-out objects now works (#206)
+* Packing values to makenote object fixed
 
 Tests:
 
