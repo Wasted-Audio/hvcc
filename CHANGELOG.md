@@ -15,7 +15,7 @@ Features:
 
 Bugfixes:
 
-* Packing values to midi-out objects now works.
+* Packing values to midi-out objects now works (#206)
 
 Tests:
 
