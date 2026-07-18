@@ -13,6 +13,14 @@ Features:
 * Allow `else/popmenu` (converted to `[f ]`).
 * DPF: Allow theme overrides in NanoVG UI.
 
+Bugfixes:
+
+* Packing values to midi-out objects now works.
+
+Tests:
+
+* Adding basic midi-out tests.
+
 0.16.2
 -----
 
