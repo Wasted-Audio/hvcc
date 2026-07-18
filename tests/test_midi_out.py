@@ -42,6 +42,10 @@ class TestPdMIDIOutPatches(TestPdMIDIBase):
     def test_noteout_pack(self):
         self._test_midi_patch("test-noteout-pack.pd")
 
+    # confirm that setting the channel on noteout works
+    def test_noteout_pack_chan(self):
+        self._test_midi_patch("test-noteout-pack-chan.pd")
+
     def test_ctlout(self):
         self._test_midi_patch("test-ctlout.pd")
 
