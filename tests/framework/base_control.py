@@ -17,12 +17,18 @@
 import platform
 import shutil
 import subprocess
+import re
 
 from typing import List, Optional
 from pathlib import Path
 
 from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
 from tests.framework.base_test import HvBaseTest
+
+
+def normalize_nan(s: str) -> str:
+    # replace -nan with nan
+    return re.sub(r'-?\bnan\b', 'nan', s, flags=re.IGNORECASE)
 
 
 class TestPdControlBase(HvBaseTest):
@@ -42,7 +48,7 @@ class TestPdControlBase(HvBaseTest):
             str(num_iterations)]
         ).splitlines()
 
-        return [x.decode('utf-8') for x in output]
+        return [normalize_nan(x.decode('utf-8')) for x in output]
 
     def create_fail_message(
         self,
