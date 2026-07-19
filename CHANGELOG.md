@@ -22,6 +22,7 @@ Bugfixes:
 Tests:
 
 * Adding basic midi-out tests.
+* Move to using `ruff`
 
 0.16.2
 -----
