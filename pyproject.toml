@@ -39,7 +39,7 @@ scipy = [
 ]
 
 pytest-cov = ">=5,<8"
-flake8 = "^7.1.1"
+ruff = "^0.15.22"
 mypy = "^1.11.2"
 pytest = "^8.3.3"
 
