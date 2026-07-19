@@ -1,5 +1,6 @@
 import pytest
 import subprocess
+import platform
 from pathlib import Path
 
 class CTestRunner:
@@ -22,7 +23,10 @@ class CTestRunner:
         elif simd == "SSE":
             cmd.extend(["-DHV_SIMD_SSE=1", "-msse", "-msse2", "-msse3", "-msse4.1"])
         elif simd == "NEON":
-            cmd.extend(["-DHV_SIMD_NEON=1", "-mfpu=neon"])
+            cmd.extend(["-DHV_SIMD_NEON=1"])
+            # Some clang versions need -mfpu=neon, others don't on aarch64
+            if "arm" in platform.machine().lower() and "64" not in platform.machine():
+                cmd.append("-mfpu=neon")
         else:
             cmd.append("-DHV_SIMD_NONE=1")
 
@@ -65,6 +69,13 @@ class CTestResult:
         if self.stderr:
             msg += f"--- STDERR ---\n{self.stderr}\n"
         return msg
+
+def get_available_simd():
+    machine = platform.machine().lower()
+    if "arm" in machine or "aarch64" in machine:
+        return ["NONE", "NEON"]
+    else:
+        return ["NONE", "SSE", "AVX"]
 
 @pytest.fixture
 def c_test(tmp_path, request):

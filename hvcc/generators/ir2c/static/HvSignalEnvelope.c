@@ -127,7 +127,29 @@ void sEnv_process(HeavyContextInterface *_c, SignalEnvelope *o, hv_bInf_t bIn,
   }
   o->samplesSinceLastPeriod += 4;
 #elif HV_SIMD_NEON
+  // Square the 4-float input block
+  hv_bInf_t bIn2 = vmulq_f32(bIn, bIn);
 
+  for (int a = 0; a < o->numAccumulators; a++) {
+    if (o->accOffsets[a] >= 0) {
+      // Load 4 Hanning weights (aligned)
+      hv_bInf_t w = vld1q_f32(o->hanningWeights + o->accOffsets[a]);
+      float32x4_t prod = vmulq_f32(bIn2, w);
+
+      // Horizontal sum of the 4 floats in 'prod'
+#if defined(__aarch64__) || defined(_M_ARM64)
+      // Optimized for ARM64
+      o->accumulators[a] += vaddvq_f32(prod);
+#else
+      // Fallback for 32-bit ARM (ARMv7)
+      float32x2_t res = vadd_f32(vget_low_f32(prod), vget_high_f32(prod));
+      float32x2_t final = vpadd_f32(res, res);
+      o->accumulators[a] += vget_lane_f32(final, 0);
+#endif
+    }
+    o->accOffsets[a] += 4;
+  }
+  o->samplesSinceLastPeriod += 4;
 #else // HV_SIMD_NONE
   const float bIn2 = bIn * bIn;
 
