@@ -50,7 +50,7 @@ jobs:
         run: tox
 
   dispatch:
-    needs: test
+    needs: [test, test-arm]
     strategy:
       matrix:
         repo: ['Wasted-Audio/hvcc-examples-dpf', 'Wasted-Audio/hvcc-examples-js']

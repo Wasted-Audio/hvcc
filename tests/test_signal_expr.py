@@ -29,7 +29,7 @@ class TestPdControlExprPatches(TestPdControlBase):
 
     SCRIPT_DIR = Path(__file__).parent
     TEST_DIR = Path(Path(__file__).parent, "pd", "signal_expr")
-    ARCH="x86"
+    ARCH = None
 
     @classmethod
     def setUpClass(cls):

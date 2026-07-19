@@ -4,7 +4,14 @@ on: [push, pull_request]
 
 jobs:
   build-linux:
-    runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-22.04
+            arch: x86_64
+          - os: ubuntu-22.04-arm
+            arch: aarch64
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3
         with:
@@ -27,8 +34,8 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: heavy-binary-linux-x86_64
-          path: dist/pyinstaller/manylinux_2_35_x86_64/Heavy
+          name: heavy-binary-linux-${{ matrix.arch }}
+          path: dist/pyinstaller/manylinux_2_35_${{ matrix.arch }}/Heavy
 
   build-windows:
     runs-on: windows-latest
