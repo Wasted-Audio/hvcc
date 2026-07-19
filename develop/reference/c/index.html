@@ -2832,7 +2832,7 @@
 </span><span id="__span-8-72"><a id="__codelineno-8-72" name="__codelineno-8-72" href="#__codelineno-8-72"></a><span class="cm"> */</span>
 </span><span id="__span-8-73"><a id="__codelineno-8-73" name="__codelineno-8-73" href="#__codelineno-8-73"></a><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="nf">hv_msg_toString</span><span class="p">(</span><span class="n">HvMessage</span><span class="w"> </span><span class="o">*</span><span class="n">msg</span><span class="p">);</span>
 </span><span id="__span-8-74"><a id="__codelineno-8-74" name="__codelineno-8-74" href="#__codelineno-8-74"></a>
-</span><span id="__span-8-75"><a id="__codelineno-8-75" name="__codelineno-8-75" href="#__codelineno-8-75"></a><span class="cm">/** Copy a message onto the stack. The message persists. */</span>
+</span><span id="__span-8-75"><a id="__codelineno-8-75" name="__codelineno-8-75" href="#__codelineno-8-75"></a><span class="cm">/** Copy a message onto the heap. The message persists and must be freed with hv_msg_free(). */</span>
 </span><span id="__span-8-76"><a id="__codelineno-8-76" name="__codelineno-8-76" href="#__codelineno-8-76"></a><span class="n">HvMessage</span><span class="w"> </span><span class="o">*</span><span class="nf">hv_msg_copy</span><span class="p">(</span><span class="n">HvMessage</span><span class="w"> </span><span class="o">*</span><span class="n">m</span><span class="p">);</span>
 </span><span id="__span-8-77"><a id="__codelineno-8-77" name="__codelineno-8-77" href="#__codelineno-8-77"></a>
 </span><span id="__span-8-78"><a id="__codelineno-8-78" name="__codelineno-8-78" href="#__codelineno-8-78"></a><span class="cm">/** Free a copied message. */</span>
