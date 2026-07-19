@@ -9,13 +9,23 @@ class CTestRunner:
         self.static_dir = self.root_dir / "hvcc" / "generators" / "ir2c" / "static"
         self.c_dir = Path(__file__).parent
 
-    def run(self, test_file, dependencies=None):
+    def run(self, test_file, dependencies=None, simd="NONE"):
         dependencies = dependencies or []
-        output_bin = self.tmp_path / "test.bin"
+        output_bin = self.tmp_path / f"test_{simd}.bin"
         
-        # 1. Compilation Stage
-        # Force HV_SIMD_NONE for stability in unit tests
-        cmd = ["gcc", "-g", "-DHV_SIMD_NONE=1"] 
+        # 1. Compilation Stage - Switching to Clang
+        cmd = ["clang", "-g"]
+        
+        # SIMD Flags
+        if simd == "AVX":
+            cmd.extend(["-DHV_SIMD_AVX=1", "-mavx"])
+        elif simd == "SSE":
+            cmd.extend(["-DHV_SIMD_SSE=1", "-msse", "-msse2", "-msse3", "-msse4.1"])
+        elif simd == "NEON":
+            cmd.extend(["-DHV_SIMD_NEON=1", "-mfpu=neon"])
+        else:
+            cmd.append("-DHV_SIMD_NONE=1")
+
         cmd.extend(["-I", str(self.c_dir / "unity" / "src")])
         cmd.extend(["-I", str(self.c_dir / "mocks")])
         cmd.extend(["-I", str(self.static_dir)])

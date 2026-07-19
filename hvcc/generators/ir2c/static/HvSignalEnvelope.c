@@ -81,9 +81,51 @@ static void sEnv_sendMessage(HeavyContextInterface *_c, float sum,
 void sEnv_process(HeavyContextInterface *_c, SignalEnvelope *o, hv_bInf_t bIn,
     void (*sendMessage)(HeavyContextInterface *, int, const HvMessage *)) {
 #if HV_SIMD_AVX
+  // Square the 8-float input block
+  __m256 bIn2 = _mm256_mul_ps(bIn, bIn);
+
+  for (int a = 0; a < o->numAccumulators; a++) {
+    if (o->accOffsets[a] >= 0) {
+      // Load 8 Hanning weights (aligned)
+      __m256 w = _mm256_load_ps(o->hanningWeights + o->accOffsets[a]);
+      // Multiply weights by squared input
+      __m256 prod = _mm256_mul_ps(bIn2, w);
+
+      // Horizontal sum of the 8 floats in 'prod' and add to accumulator
+      // Using the standard shuffle/add pattern for AVX horizontal sum
+      __m128 lo = _mm256_castps256_ps128(prod);
+      __m128 hi = _mm256_extractf128_ps(prod, 1);
+      __m128 sum128 = _mm_add_ps(lo, hi);
+      __m128 shuf = _mm_movehdup_ps(sum128);
+      __m128 sum2 = _mm_add_ps(sum128, shuf);
+      shuf = _mm_movehl_ps(shuf, sum2);
+      __m128 final = _mm_add_ss(sum2, shuf);
+      o->accumulators[a] += _mm_cvtss_f32(final);
+    }
+    o->accOffsets[a] += 8;
+  }
+  o->samplesSinceLastPeriod += 8;
 
 #elif HV_SIMD_SSE
+  // Square the 4-float input block
+  __m128 bIn2 = _mm_mul_ps(bIn, bIn);
 
+  for (int a = 0; a < o->numAccumulators; a++) {
+    if (o->accOffsets[a] >= 0) {
+      // Load 4 Hanning weights (aligned)
+      __m128 w = _mm_load_ps(o->hanningWeights + o->accOffsets[a]);
+      __m128 prod = _mm_mul_ps(bIn2, w);
+
+      // Horizontal sum of the 4 floats in 'prod'
+      __m128 shuf = _mm_movehdup_ps(prod);
+      __m128 sum2 = _mm_add_ps(prod, shuf);
+      shuf = _mm_movehl_ps(shuf, sum2);
+      __m128 final = _mm_add_ss(sum2, shuf);
+      o->accumulators[a] += _mm_cvtss_f32(final);
+    }
+    o->accOffsets[a] += 4;
+  }
+  o->samplesSinceLastPeriod += 4;
 #elif HV_SIMD_NEON
 
 #else // HV_SIMD_NONE
