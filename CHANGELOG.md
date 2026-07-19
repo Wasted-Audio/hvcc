@@ -23,6 +23,7 @@ Tests:
 
 * Adding basic midi-out tests.
 * Move to using `ruff`
+* Add tests and build for `arm`
 
 0.16.2
 -----

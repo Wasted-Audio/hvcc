@@ -25,6 +25,7 @@ from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
 from tests.framework.base_test import HvBaseTest
 
 
+
 class TestPdControlBase(HvBaseTest):
 
     def compile_and_run(
@@ -85,7 +86,8 @@ class TestPdControlBase(HvBaseTest):
         pd_file: str,
         num_iterations: int = 1,
         allow_warnings: bool = True,
-        fail_message: Optional[str] = None
+        fail_message: Optional[str] = None,
+        arch: Optional[str] = None
     ) -> None:
         """Compiles, runs, and tests a control patch.
         Allows warnings by default, always fails on errors.
@@ -111,7 +113,11 @@ class TestPdControlBase(HvBaseTest):
         # don't delete the output dir
         # if the test fails, we can examine the output
 
-        golden_path = Path(pd_path.parent, f"{pd_path.stem}.golden.txt")
+        if arch == "arm":
+            golden_path = Path(pd_path.parent, f"{pd_path.stem}-arm.golden.txt")
+        else:
+            golden_path = Path(pd_path.parent, f"{pd_path.stem}.golden.txt")
+
         if golden_path.exists():
             with open(golden_path, "r") as f:
                 golden = "".join(f.readlines()).splitlines()
