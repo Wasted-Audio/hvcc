@@ -16,6 +16,7 @@
 
 import argparse
 # import unittest
+import platform
 
 from pathlib import Path
 
@@ -29,6 +30,13 @@ class TestPdControlExprPatches(TestPdControlBase):
 
     SCRIPT_DIR = Path(__file__).parent
     TEST_DIR = Path(Path(__file__).parent, "pd", "control_expr")
+    ARCH="x86"
+
+    @classmethod
+    def setUpClass(cls):
+        machine = platform.machine().lower()
+        if "arm" in machine or "aarch64" in machine:
+            cls.ARCH = "arm"
 
     # Math operations
 
@@ -128,7 +136,7 @@ class TestPdControlExprPatches(TestPdControlBase):
         self._test_control_patch("test-pow.pd")
 
     def test_sqrt(self):
-        self._test_control_patch("test-sqrt.pd")
+        self._test_control_patch("test-sqrt.pd", arch=self.ARCH)
 
     def test_exp(self):
         self._test_control_patch("test-exp.pd")
@@ -137,7 +145,7 @@ class TestPdControlExprPatches(TestPdControlBase):
         self._test_control_patch("test-expm1.pd")
 
     def test_ln_log(self):
-        self._test_control_patch("test-ln-log.pd")
+        self._test_control_patch("test-ln-log.pd", arch=self.ARCH)
 
     def test_log10(self):
         self._test_control_patch("test-log10.pd")
@@ -152,7 +160,7 @@ class TestPdControlExprPatches(TestPdControlBase):
         self._test_control_patch("test-cbrt.pd")
 
     def test_log1p(self):
-        self._test_control_patch("test-log1p.pd")
+        self._test_control_patch("test-log1p.pd", arch=self.ARCH)
 
     def test_ldexp(self):
         self._test_control_patch("test-ldexp.pd")
@@ -163,10 +171,10 @@ class TestPdControlExprPatches(TestPdControlBase):
         self._test_control_patch("test-sin-asin-sinh-asinh.pd")
 
     def test_cos_acos_cosh_acosh(self):
-        self._test_control_patch("test-cos-acos-cosh-acosh.pd")
+        self._test_control_patch("test-cos-acos-cosh-acosh.pd", arch=self.ARCH)
 
     def test_tan_atan_tanh_atanh(self):
-        self._test_control_patch("test-tan-atan-tanh-atanh.pd")
+        self._test_control_patch("test-tan-atan-tanh-atanh.pd", arch=self.ARCH)
 
     def test_atan2(self):
         self._test_control_patch("test-atan2.pd")

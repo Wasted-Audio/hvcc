@@ -17,7 +17,6 @@
 import platform
 import shutil
 import subprocess
-import re
 
 from typing import List, Optional
 from pathlib import Path
@@ -25,10 +24,6 @@ from pathlib import Path
 from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
 from tests.framework.base_test import HvBaseTest
 
-
-def normalize_nan(s: str) -> str:
-    # replace -nan with nan
-    return re.sub(r'-?\bnan\b', 'nan', s, flags=re.IGNORECASE)
 
 
 class TestPdControlBase(HvBaseTest):
@@ -48,7 +43,7 @@ class TestPdControlBase(HvBaseTest):
             str(num_iterations)]
         ).splitlines()
 
-        return [normalize_nan(x.decode('utf-8')) for x in output]
+        return [x.decode('utf-8') for x in output]
 
     def create_fail_message(
         self,
@@ -91,7 +86,8 @@ class TestPdControlBase(HvBaseTest):
         pd_file: str,
         num_iterations: int = 1,
         allow_warnings: bool = True,
-        fail_message: Optional[str] = None
+        fail_message: Optional[str] = None,
+        arch: Optional[str] = None
     ) -> None:
         """Compiles, runs, and tests a control patch.
         Allows warnings by default, always fails on errors.
@@ -117,7 +113,11 @@ class TestPdControlBase(HvBaseTest):
         # don't delete the output dir
         # if the test fails, we can examine the output
 
-        golden_path = Path(pd_path.parent, f"{pd_path.stem}.golden.txt")
+        if arch == "arm":
+            golden_path = Path(pd_path.parent, f"{pd_path.stem}-arm.golden.txt")
+        else:
+            golden_path = Path(pd_path.parent, f"{pd_path.stem}.golden.txt")
+
         if golden_path.exists():
             with open(golden_path, "r") as f:
                 golden = "".join(f.readlines()).splitlines()
