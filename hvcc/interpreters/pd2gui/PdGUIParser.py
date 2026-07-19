@@ -299,7 +299,8 @@ class PdGUIParser(PdParser):
         """
 
         if "@hv_param" in param or "@hv_event" in param:
-            return param.split(" ")[0]
+            recv = param.split(" ")[0]
+            return re.sub(r"^\[\d+\]", "", recv)  # drop ordering syntax
         else:
             return None
 

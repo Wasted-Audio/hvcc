@@ -21,7 +21,6 @@ import shutil
 import time
 
 from collections import Counter
-from collections import OrderedDict
 from pathlib import Path
 from typing import Dict, List, Optional, Type, Union
 
@@ -318,9 +317,6 @@ class ir2c:
         if not output_dir.exists():
             output_dir.mkdir(parents=True)
 
-        # ensure that send_receive dictionary is alphabetised by the receiver key
-        send_receive = OrderedDict(sorted([(k, v) for k, v in ir.control.receivers.items()], key=lambda x: x[0]))
-
         # write HeavyContext.h
         with open(Path(output_dir, f"Heavy_{name}.hpp"), "w") as f:
             f.write(env.get_template("Heavy_NAME.hpp").render(
@@ -342,7 +338,7 @@ class ir2c:
                 init_list=init_list,
                 free_list=free_list,
                 impl_list=impl_list,
-                send_receive=send_receive,
+                send_receive=ir.control.receivers,
                 send_table=ir.tables,
                 process_list=process_list,
                 table_data_list=table_data_list,

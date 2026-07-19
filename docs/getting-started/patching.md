@@ -38,6 +38,24 @@ Messages passed to these send objects can be forwarded on to other parts of the 
 
 See the specific framework details for more information on output parameter support and integration details.
 
+### Ordering parameters
+
+By default, exposed input parameters (`@hv_param`) and events (`@hv_event`) are ordered
+alphabetically. To control the order explicitly, prepend the receiver name with
+a numeric tag in square brackets:
+
+```pd
+  [r [1]Volume @hv_param]
+  [r [2]Cutoff @hv_param]
+```
+
+- Tagged parameters are ordered numerically and always appear before untagged ones.
+- Untagged parameters keep their default alphabetical order.
+- The `[N]` tag is stripped from the generated parameter name — it's for ordering only.
+- Two parameters that collide once tags are stripped (e.g. `[1]Vol` and `[2]Vol`) will
+  raise a compile error.
+- Output parameters (on send objects) are currently not supported for this syntax.
+
 ### Externed Tables
 
 When externing a table using `@hv_table` annotation, or appending it after the name of a graphical array, it becomes accessible from the heavy context.

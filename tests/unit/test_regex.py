@@ -1,4 +1,10 @@
+# Heavy Compiler Collection
+# Copyright (C) 2025-2026 Wasted Audio
+#
+# SPDX-License-Identifier: GPL-3.0-only
+
 from hvcc.interpreters.pd2hv.PdParser import PdParser
+from hvcc.core.hv2ir.HIrReceive import HIrReceive
 
 
 def test_re_dollar():
@@ -20,3 +26,19 @@ def test_re_space():
     result = PdParser.RE_SPACE.split(string)
 
     assert result == ["some\\ thing", "else"]
+
+
+def test_re_valid_recv():
+    string1 = "some_name"
+    string2 = "[1]somename"
+    string3 = "[a]somename"
+    string4 = "[1]"
+    string5 = "[1][2]bla"
+    string6 = ""
+
+    assert HIrReceive.RE_VALID_RECV.fullmatch(string1) is not None
+    assert HIrReceive.RE_VALID_RECV.fullmatch(string2) is not None
+    assert HIrReceive.RE_VALID_RECV.fullmatch(string3) is None
+    assert HIrReceive.RE_VALID_RECV.fullmatch(string4) is None
+    assert HIrReceive.RE_VALID_RECV.fullmatch(string5) is None
+    assert HIrReceive.RE_VALID_RECV.fullmatch(string6) is None
