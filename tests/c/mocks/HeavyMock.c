@@ -34,6 +34,12 @@ HvMessage *hv_scheduleMessageForObject(HeavyContextInterface *c, const HvMessage
   lastSendCallback = sendMessage;
   lastSendLetIndex = letIndex;
   lastSendMessage = m;
+  
+  // For the mock, we execute the callback immediately so that tests can capture values
+  if (sendMessage != NULL) {
+    sendMessage(c, letIndex, m);
+  }
+  
   return (HvMessage *)m; 
 }
 
