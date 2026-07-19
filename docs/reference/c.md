@@ -556,7 +556,7 @@ bool hv_msg_hasFormat(HvMessage *m, const char *fmt);
  */
 char *hv_msg_toString(HvMessage *msg);
 
-/** Copy a message onto the stack. The message persists. */
+/** Copy a message onto the heap. The message persists and must be freed with hv_msg_free(). */
 HvMessage *hv_msg_copy(HvMessage *m);
 
 /** Free a copied message. */
