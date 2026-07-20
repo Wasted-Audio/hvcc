@@ -1728,21 +1728,26 @@
 
 
 <h1 id="owl">OWL</h1>
+<p>This generator targets <a href="https://www.openwarelab.org/">Open Ware Laberatory</a>.</p>
 <p>The main project output for this generator can be found in  <code>&lt;output_dir&gt;/owl/</code>.</p>
 <h2 id="implementation">implementation</h2>
-<p>This generator uses some separate "raw" code paths to link the DSP graph. Instead of <code>@hv_param</code> currently <code>@raw</code> and <code>@raw_param</code> are used.</p>
+<p>This generator uses some separate "raw" code paths to link the parameter controls. Instead of <code>@hv_param</code> currently <code>@raw</code> and <code>@raw_param</code> are used.</p>
 <p>Legacy <code>@owl</code> and <code>@owl_param</code> are still functional for backwards compatibility.</p>
 <p>It currently also overloads <code>HvMessage.c</code> and <code>HvUtils.h</code> with some different optimizations for this target.</p>
 <p>Relevant files:</p>
 <ul>
 <li>custom interpreter: <code>hvcc/interpreters/pd2hv/pdowl.py</code></li>
 <li>generator: <code>hvcc/generators/c2owl/c2owl.py</code></li>
-<li>custom deps:</li>
+<li>custom deps:<ul>
 <li><code>hvcc/generators/c2owl/deps/HvMessage.c</code></li>
 <li><code>hvcc/generators/c2owl/deps/HvUtils.h</code></li>
-<li>templates:</li>
+</ul>
+</li>
+<li>templates:<ul>
 <li><code>hvcc/generators/c2owl/templates/HeavyOwl.hpp</code></li>
 <li><code>hvcc/generators/c2owl/templates/HeavyOwlConstants.h</code></li>
+</ul>
+</li>
 </ul>
 <h2 id="debugging">Debugging</h2>
 <p>A very useful feature for debugging is the <code>[print]</code> object. If you send a message to <code>[print]</code> it will be sent out as an OWL patch message. This means that if you are using the patch library and are connected to the device then the messages will appear in the browser. You can add a string construction argument which will be concatenated with the received message. Messages are limited to maximum 62 characters long. If you have several <code>[print]</code> objects in your patch then only the most recently fired message will be sent. If you want to view several values simultaneously you can always <code>[pack]</code> them together into one message. On a device that has a screen (such as the Magus) the message will also appear in realtime on the screen.</p>

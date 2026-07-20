@@ -619,6 +619,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Licensing">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#generators" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Generators
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -1823,6 +1840,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Licensing">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#generators" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Generators
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -1909,11 +1943,23 @@
 <p>The files that <code>hvcc</code> generates are split into two types:</p>
 <ul>
 <li>
-<p><a href="https://github.com/Wasted-Audio/hvcc/tree/master/hvcc/generators/ir2c/static">Static</a>: this code is independent of the input patch contents and provides the basic DSP functionality with which generated output can link against. It has a liberal <a href="https://github.com/Wasted-Audio/hvcc/blob/master/hvcc/generators/ir2c/static/HeavyContext.hpp#L2">ISC</a> licence.</p>
+<p><a href="https://github.com/Wasted-Audio/hvcc/tree/main/hvcc/generators/ir2c/static">Static</a>: this code is independent of the input patch contents and provides the basic DSP functionality with which generated output can link against. It has a liberal <a href="https://github.com/Wasted-Audio/hvcc/blob/main/hvcc/generators/ir2c/static/HeavyContext.hpp#L2">ISC</a> licence.</p>
 </li>
 <li>
 <p>Generated: this relates to all the source files that use information about the input patch, for example <code>Heavy_{{name}}.cpp</code>. By default all these files will have a <code>Copyright (c) 2018 Enzien Audio, Ltd</code> header, but this can be modified with the <a href="../#-copyright-user-copyright">user copyright argument</a>.</p>
 </li>
+</ul>
+<h3 id="generators">Generators</h3>
+<p>Some generators use other libraries and SDKs with different licensing:</p>
+<ul>
+<li><a href="../generators/daisy/">Daisy</a> - requires <a href="https://github.com/electro-smith/libDaisy">libDaisy</a> and our internal <a href="https://github.com/Wasted-Audio/hvcc/tree/develop/hvcc/generators/c2daisy/json2daisy/">json2daisy</a> library, both using <code>MIT</code> license.</li>
+<li><a href="../generators/dpf/">DPF</a> - requires the <a href="https://github.com/DISTRHO/DPF">DPF</a> library and optionally the <a href="https://github.com/DISTRHO/DPF-Widgets">DPF-Widgets</a> or <a href="https://github.com/wasted-Audio/PDVG">PDVG</a> GUI libraries. These are all <code>ISC</code> licensed.</li>
+<li><a href="../generators/fmod/">FMOD</a> - no SDK required for building, but requires a <a href="https://www.fmod.com/licensing">license</a> for distribution.</li>
+<li><a href="../generators/javascript/">Javascript</a> - requires <a href="https://github.com/emscripten-core/emscripten">emscripten</a> which is dual licensed <code>MIT</code> and <code>University of Illinois/NCSA Open Source License</code>.</li>
+<li><a href="../generators/owl/">OWL</a> - requires <a href="https://github.com/RebelTechnology/OwlProgram/">OwlProgram</a> which uses <code>GPLv2</code>.</li>
+<li><a href="../generators/pdext/">PD External</a> - requires <code>pd.dll</code> for linking on Windows, which comes from Puredata and is <code>BSD3</code> license.</li>
+<li><a href="../generators/unity/">Unity</a> - no SDK required for building, but requires a Unity <a href="https://unity.com/products">license</a> to use.</li>
+<li><a href="../generators/wwise/">Wwise</a> - requires the <a href="https://www.audiokinetic.com/en/public-library/2025.1.9_9197/">Wwise SDK</a> and a proprietary <a href="https://www.audiokinetic.com/en/wwise/pricing/">license</a>.</li>
 </ul>
 <h2 id="how-to-start-patching-for-heavy">How to start patching for heavy</h2>
 <p>See the <a href="patching/">Getting started</a> page on more information about how to construct compatible pure data patches.</p>

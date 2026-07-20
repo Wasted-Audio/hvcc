@@ -5,6 +5,8 @@ from pathlib import Path
 
 def python_indent(content):
     # Pattern: classic markdown indent (2 spaces) to Python-Markdown indent (4 spaces)
+    # both for double and single indented lists
+    content = re.sub(r'^(\ \ \ \ -\ .*)', r'    \1', content, flags=re.MULTILINE)
     return re.sub(r'^(\ \ -\ .*)', r'  \1', content, flags=re.MULTILINE)
 
 
