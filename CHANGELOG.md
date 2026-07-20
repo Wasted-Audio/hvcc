@@ -6,12 +6,12 @@ Next Release
 
 Features:
 
-* Support `list` object. Does not support tosymbol/fromsymbol.
-* Support `[route float]` for routing floats.
-* Support `trunc()` in `expr/expr~`.
-* Support `threshold~`.
-* Allow `else/popmenu` (converted to `[f ]`).
-* DPF: Allow theme overrides in NanoVG UI.
+* Support `list` object. Does not support tosymbol/fromsymbol
+* Support `[route float]` for routing floats
+* Support `trunc()` in `expr/expr~`
+* Support `threshold~` object
+* Allow `else/popmenu` (converted to `[f ]`)
+* DPF: Allow theme overrides in NanoVG UI
 
 Bugfixes:
 
@@ -21,7 +21,7 @@ Bugfixes:
 
 Tests:
 
-* Adding basic midi-out tests.
+* Adding basic midi-out tests
 * Move to using `ruff`
 * Add tests and build for `arm`
 

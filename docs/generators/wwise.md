@@ -73,8 +73,7 @@ To build Authoring and Engine plugins on Windows you’ll need:
     - Different version can be specified in a generated PremakePlugin.lua file
 - Wwise 2022 or later
   - Version 2021 should work, too, but it wasn't tested
-  - SDKs with required deployment platforms must be installed through
-    Wwise Launcher
+  - SDKs with required deployment platforms must be installed through Wwise Launcher
 
 ### Converting a Pure Data Patch to C++ Code
 
