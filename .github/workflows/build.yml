@@ -32,7 +32,7 @@ jobs:
           pip install .
           poetry build
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: heavy-binary-linux-${{ matrix.arch }}
           path: dist/pyinstaller/manylinux_2_35_${{ matrix.arch }}/Heavy
@@ -59,7 +59,7 @@ jobs:
           pip install .
           poetry build
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: heavy-binary-windows-x86_64
           path: dist/pyinstaller/win_amd64/Heavy.exe
@@ -87,7 +87,7 @@ jobs:
           pip install .
           poetry build
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: heavy-binary-macos-x86_64
           path: dist/pyinstaller/macosx_15_0_x86_64/Heavy
