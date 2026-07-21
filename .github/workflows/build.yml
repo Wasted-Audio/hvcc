@@ -13,14 +13,14 @@ jobs:
             arch: aarch64
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v7
         with:
           lfs: true
           submodules: true
       - name: Initialize lfs
         run: git lfs pull
       - name: Set up Python 3.12
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: 3.12
       - name: Install dependencies
@@ -40,14 +40,14 @@ jobs:
   build-windows:
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v7
         with:
           lfs: true
           submodules: true
       - name: Initialize lfs
         run: git lfs pull
       - name: Set up Python 3.12
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: 3.12
       - name: Install dependencies
@@ -68,14 +68,14 @@ jobs:
   build-macos:
     runs-on: macos-15-intel
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v7
         with:
           lfs: true
           submodules: true
       - name: Initialize lfs
         run: git lfs pull
       - name: Set up Python 3.12
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: 3.12
       - name: Install dependencies

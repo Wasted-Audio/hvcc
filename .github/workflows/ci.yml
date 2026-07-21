@@ -11,14 +11,14 @@ jobs:
         python-version: ['3.9', '3.10', '3.11', '3.12', '3.13', '3.14']
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v7
         with:
           lfs: true
           submodules: true
       - name: Initialize lfs
         run: git lfs pull
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
@@ -32,14 +32,14 @@ jobs:
     runs-on: ubuntu-22.04-arm
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v7
         with:
           lfs: true
           submodules: true
       - name: Initialize lfs
         run: git lfs pull
       - name: Set up Python 3.12
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: 3.12
       - name: Install dependencies
@@ -57,7 +57,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Repository Dispatch
-        uses: peter-evans/repository-dispatch@v2
+        uses: peter-evans/repository-dispatch@v4
         with:
           token: ${{ secrets.HVCC_REPOSITORY_DISPATCH_TOKEN }}
           repository: ${{ matrix.repo }}
