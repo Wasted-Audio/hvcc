@@ -12,6 +12,7 @@ Features:
 * Support `threshold~` object
 * Allow `else/popmenu` (converted to `[f ]`)
 * DPF: Allow theme overrides in NanoVG UI
+* External Generator: Add current directory to search path
 
 Bugfixes:
 

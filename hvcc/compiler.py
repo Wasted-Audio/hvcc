@@ -197,6 +197,9 @@ def generate_extern_info(hvir: IRGraph, results: CompilerResults) -> ExternInfo:
 
 
 def load_ext_generator(module_name: str, verbose: bool) -> Optional[Generator]:
+    # add the current directory to the module search path
+    sys.path.insert(0, str(Path.cwd()))
+
     try:
         module = importlib.import_module(module_name)
         for _, member in inspect.getmembers(module):
