@@ -1,9 +1,30 @@
-[@ 0.000] 1001-x: 4 5 6 and 7
+[@ 0.000] recieve-x: 4 5 6 and 7
 [@ 0.000] foo: 4 5 6 and 7
+[@ 30.000] store-left: 1 2 3 4 5 6 and 7
+[@ 30.000] store-left: 1 2 3 4 5 6 and 7 9 8 7
+[@ 30.000] store-left: 1 2 3 4
+[@ 30.000] store-left: 1 2
+[@ 30.000] store-left: 1
+[@ 30.000] store-left: 1 foo bar
+[@ 30.000] store-left: 1 5 6
 [@ 30.000] store-left: 1 5 4
-[@ 85.333] 1001-x: list w x y z
+[@ 85.333] recieve-x: list w x y z
 [@ 85.333] foo: list w x y z
+[@ 130.000] store-left: 1 2 3 w x y z
+[@ 130.000] store-left: 1 2 3 w x y z 9 8 7
+[@ 130.000] store-left: 1 2 3 w
+[@ 130.000] store-left: 1 2
+[@ 130.000] store-left: 1
+[@ 130.000] store-left: 1 foo bar
+[@ 130.000] store-left: 1 5 6
 [@ 130.000] store-left: 1 5 4
-[@ 192.000] 1001-x: list go dog go cat
+[@ 192.000] recieve-x: list go dog go cat
 [@ 192.000] foo: list go dog go cat
+[@ 230.000] store-left: 1 2 3 go dog go cat
+[@ 230.000] store-left: 1 2 3 go dog go cat 9 8 7
+[@ 230.000] store-left: 1 2 3 go
+[@ 230.000] store-left: 1 2
+[@ 230.000] store-left: 1
+[@ 230.000] store-left: 1 foo bar
+[@ 230.000] store-left: 1 5 6
 [@ 230.000] store-left: 1 5 4

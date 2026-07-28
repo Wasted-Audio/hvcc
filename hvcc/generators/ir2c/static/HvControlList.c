@@ -275,7 +275,7 @@ static void cList_store_append(ControlList *o, const HvMessage *m1, int numEleme
   // append our stored list
   HvMessage *a = o->list;
   HvMessage *slice = cList_slice(m1, 1, numElements);
-  HvMessage *newList = cList_combine_lists(slice, a);
+  HvMessage *newList = cList_combine_lists(a, slice);
   msg_free(slice);
   msg_free(o->list);
   o->list = newList;
@@ -286,7 +286,7 @@ static void cList_store_prepend(ControlList *o, const HvMessage *m1, int numElem
   // prepend our stored list
   HvMessage *a = o->list;
   HvMessage *slice = cList_slice(m1, 1, numElements);
-  HvMessage *newList = cList_combine_lists(a, slice);
+  HvMessage *newList = cList_combine_lists(slice, a);
   msg_free(slice);
   msg_free(o->list);
   o->list = newList;
