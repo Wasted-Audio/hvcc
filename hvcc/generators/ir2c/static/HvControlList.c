@@ -249,7 +249,11 @@ static void cList_store_get(HeavyContextInterface *_c, ControlList *o, const HvM
     msg_free(n);
   } else {
     HvMessage *n = cList_slice(o->list, index, index + 1);
-    sendMessage(_c, 0, n);
+    if (msg_isBang(n, 0)) {
+      sendMessage(_c, 1, n);
+    } else {
+      sendMessage(_c, 0, n);
+    }
     msg_free(n);
   }
 }
@@ -271,7 +275,7 @@ static void cList_store_append(ControlList *o, const HvMessage *m1, int numEleme
   // append our stored list
   HvMessage *a = o->list;
   HvMessage *slice = cList_slice(m1, 1, numElements);
-  HvMessage *newList = cList_combine_lists(slice, a);
+  HvMessage *newList = cList_combine_lists(a, slice);
   msg_free(slice);
   msg_free(o->list);
   o->list = newList;
@@ -282,7 +286,7 @@ static void cList_store_prepend(ControlList *o, const HvMessage *m1, int numElem
   // prepend our stored list
   HvMessage *a = o->list;
   HvMessage *slice = cList_slice(m1, 1, numElements);
-  HvMessage *newList = cList_combine_lists(a, slice);
+  HvMessage *newList = cList_combine_lists(slice, a);
   msg_free(slice);
   msg_free(o->list);
   o->list = newList;
