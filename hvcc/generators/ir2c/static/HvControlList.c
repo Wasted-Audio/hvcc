@@ -249,7 +249,11 @@ static void cList_store_get(HeavyContextInterface *_c, ControlList *o, const HvM
     msg_free(n);
   } else {
     HvMessage *n = cList_slice(o->list, index, index + 1);
-    sendMessage(_c, 0, n);
+    if (msg_isBang(n, 0)) {
+      sendMessage(_c, 1, n);
+    } else {
+      sendMessage(_c, 0, n);
+    }
     msg_free(n);
   }
 }
