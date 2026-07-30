@@ -70,7 +70,13 @@ void cBinop_onMessage(HeavyContextInterface *_c, ControlBinop *o, BinopType op, 
         // of floats is likely to not be supported in the future.
         if (msg_isFloat(m, 1)) o->k = msg_getFloat(m, 1);
         HvMessage *n = HV_MESSAGE_ON_STACK(1);
-        float f = cBinop_perform_op(op, msg_getFloat(m, 0), o->k);
+        o->s = msg_getFloat(m, 0);
+        float f = cBinop_perform_op(op, o->s, o->k);
+        msg_initWithFloat(n, msg_getTimestamp(m), f);
+        sendMessage(_c, 0, n);
+      } else if (msg_isBang(m, 0)) {
+        HvMessage *n = HV_MESSAGE_ON_STACK(1);
+        float f = cBinop_perform_op(op, o->s, o->k);
         msg_initWithFloat(n, msg_getTimestamp(m), f);
         sendMessage(_c, 0, n);
       }

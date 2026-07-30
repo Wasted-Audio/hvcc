@@ -19,6 +19,7 @@ Bugfixes:
 * Packing values to midi-out objects now works (#206)
 * Packing values to makenote object fixed
 * Resolve `msg_hasFormat` and `hv_msg_copy` inconsistencies (#61, #64)
+* Missing bang to binary operations left inlet
 
 Tests:
 

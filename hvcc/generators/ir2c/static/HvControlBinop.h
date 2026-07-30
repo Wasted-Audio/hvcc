@@ -52,6 +52,7 @@ typedef enum BinopType {
 
 typedef struct ControlBinop {
   float k;
+  float s;
 } ControlBinop;
 
 hv_size_t cBinop_init(ControlBinop *o, float k);
