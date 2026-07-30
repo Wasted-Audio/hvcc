@@ -66,8 +66,6 @@ void cBinop_onMessage(HeavyContextInterface *_c, ControlBinop *o, BinopType op, 
   switch (letIn) {
     case 0: {
       if (msg_isFloat(m, 0)) {
-        // Note(joe): supporting Pd's ability to perform operations of packs
-        // of floats is likely to not be supported in the future.
         if (msg_isFloat(m, 1)) o->k = msg_getFloat(m, 1);
         HvMessage *n = HV_MESSAGE_ON_STACK(1);
         o->s = msg_getFloat(m, 0);
