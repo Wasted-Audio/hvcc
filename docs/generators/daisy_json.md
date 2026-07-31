@@ -143,6 +143,8 @@ Some boards like the [Patch](https://github.com/Wasted-Audio/hvcc/blob/develop/h
 An empty `"display": {}` section triggers inclusion via the default configuration. However by itself it doesn't do anything. You can add several optional settings to use the oled.
 
 - `driver` - Which oled driver to use.
+- `config` - Additional [OLED configuration](https://github.com/electro-smith/libDaisy/blob/master/src/dev/oled_ssd130x.h#L30-L35) options as a dictionary.
+- `dim` - Specific OLED dimensions (defaults to `[128, 64]`)
 - `process` - Inline C++ code for the `Display()` function.
 - `process_file` - External C++ file with `Display()` function. This overrides the inline code.
 - `params` - List of `@hv_param` sends meant for display. These can be float values and available in the code prepended with `f`, like `fcustom1` for instance.
