@@ -2161,6 +2161,8 @@
 <p>An empty <code>"display": {}</code> section triggers inclusion via the default configuration. However by itself it doesn't do anything. You can add several optional settings to use the oled.</p>
 <ul>
 <li><code>driver</code> - Which oled driver to use.</li>
+<li><code>config</code> - Additional <a href="https://github.com/electro-smith/libDaisy/blob/master/src/dev/oled_ssd130x.h#L30-L35">OLED configuration</a> options as a dictionary.</li>
+<li><code>dim</code> - Specific OLED dimensions (defaults to <code>[128, 64]</code>)</li>
 <li><code>process</code> - Inline C++ code for the <code>Display()</code> function.</li>
 <li><code>process_file</code> - External C++ file with <code>Display()</code> function. This overrides the inline code.</li>
 <li><code>params</code> - List of <code>@hv_param</code> sends meant for display. These can be float values and available in the code prepended with <code>f</code>, like <code>fcustom1</code> for instance.</li>
