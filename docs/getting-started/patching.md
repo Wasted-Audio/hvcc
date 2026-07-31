@@ -140,3 +140,4 @@ This list will be continuously epanded to document differences in object behavio
 - Both `[expr]` and `expr~]` do not support `size()`, `sum()`, `Sum()`, `avg()`, `Avg()`, `mtof()`, `ftom()`, `dbtorms()`, `rmstodb()`, `powtodb()`, and `dbtopow()` functions. They do not support symbol input or symbol/string functions.
 - `[expr~]` only supports signal inputs.
 - `[list]` only accepts operation argument. Does not support tosymbol/fromsymbol.
+- Control rate Binary operations - `+`, `-`, `/`, `*`, `div`, `<<`, `>>`, `&&`, `||`, `^`, `==`, `!=`, `mod`, `%`, `&`, `|`, `<`, `<=`, `>`, `>=`, `max`, `min`, `pow`, `atan2` - do not support banging the left inlet. Use a `[f ]` to store the left value and bang that instead.
