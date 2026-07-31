@@ -2094,6 +2094,7 @@
 <li>Both <code>[expr]</code> and <code>expr~]</code> do not support <code>size()</code>, <code>sum()</code>, <code>Sum()</code>, <code>avg()</code>, <code>Avg()</code>, <code>mtof()</code>, <code>ftom()</code>, <code>dbtorms()</code>, <code>rmstodb()</code>, <code>powtodb()</code>, and <code>dbtopow()</code> functions. They do not support symbol input or symbol/string functions.</li>
 <li><code>[expr~]</code> only supports signal inputs.</li>
 <li><code>[list]</code> only accepts operation argument. Does not support tosymbol/fromsymbol.</li>
+<li>Control rate Binary operations - <code>+</code>, <code>-</code>, <code>/</code>, <code>*</code>, <code>div</code>, <code>&lt;&lt;</code>, <code>&gt;&gt;</code>, <code>&amp;&amp;</code>, <code>||</code>, <code>^</code>, <code>==</code>, <code>!=</code>, <code>mod</code>, <code>%</code>, <code>&amp;</code>, <code>|</code>, <code>&lt;</code>, <code>&lt;=</code>, <code>&gt;</code>, <code>&gt;=</code>, <code>max</code>, <code>min</code>, <code>pow</code>, <code>atan2</code> - do not support banging the left inlet. Use a <code>[f ]</code> to store the left value and bang that instead.</li>
 </ul>
 
 
