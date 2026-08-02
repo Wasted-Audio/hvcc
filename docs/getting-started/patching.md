@@ -60,6 +60,7 @@ The following objects are supported:
 - Bang (bng)
 - Toggle (tgl)
 - Knob (knob, else/knob)
+- Popmenu (popmenu, else/popmenu)
 - Float atom (floatatom)
 
 An intermediate result GUI json is created containing these objects with their location, size and style. More information about [the IR](../reference/ir/heavy_gui_ir.md).
@@ -138,3 +139,5 @@ This list will be continuously epanded to document differences in object behavio
 - It is allowed to use `[block~]`, but it will be completely ignored. Heavy runs with single sample processing by default.
 - Both `[expr]` and `expr~]` do not support `size()`, `sum()`, `Sum()`, `avg()`, `Avg()`, `mtof()`, `ftom()`, `dbtorms()`, `rmstodb()`, `powtodb()`, and `dbtopow()` functions. They do not support symbol input or symbol/string functions.
 - `[expr~]` only supports signal inputs.
+- `[list]` only accepts operation argument. Does not support tosymbol/fromsymbol.
+- Control rate Binary operations - `+`, `-`, `/`, `*`, `div`, `<<`, `>>`, `&&`, `||`, `^`, `==`, `!=`, `mod`, `%`, `&`, `|`, `<`, `<=`, `>`, `>=`, `max`, `min`, `pow`, `atan2` - do not support banging the left inlet. Use a `[f ]` to store the left value and bang that instead.

@@ -1,10 +1,12 @@
 # OWL
 
+This generator targets [Open Ware Laberatory](https://www.openwarelab.org/).
+
 The main project output for this generator can be found in  `<output_dir>/owl/`.
 
 ## implementation
 
-This generator uses some separate "raw" code paths to link the DSP graph. Instead of `@hv_param` currently `@raw` and `@raw_param` are used.
+This generator uses some separate "raw" code paths to link the parameter controls. Instead of `@hv_param` currently `@raw` and `@raw_param` are used.
 
 Legacy `@owl` and `@owl_param` are still functional for backwards compatibility.
 
@@ -12,14 +14,14 @@ It currently also overloads `HvMessage.c` and `HvUtils.h` with some different op
 
 Relevant files:
 
-* custom interpreter: `hvcc/interpreters/pd2hv/pdowl.py`
-* generator: `hvcc/generators/c2owl/c2owl.py`
-* custom deps:
-  * `hvcc/generators/c2owl/deps/HvMessage.c`
-  * `hvcc/generators/c2owl/deps/HvUtils.h`
-* templates:
-  * `hvcc/generators/c2owl/templates/HeavyOwl.hpp`
-  * `hvcc/generators/c2owl/templates/HeavyOwlConstants.h`
+- custom interpreter: `hvcc/interpreters/pd2hv/pdowl.py`
+- generator: `hvcc/generators/c2owl/c2owl.py`
+- custom deps:
+  - `hvcc/generators/c2owl/deps/HvMessage.c`
+  - `hvcc/generators/c2owl/deps/HvUtils.h`
+- templates:
+  - `hvcc/generators/c2owl/templates/HeavyOwl.hpp`
+  - `hvcc/generators/c2owl/templates/HeavyOwlConstants.h`
 
 ## Debugging
 

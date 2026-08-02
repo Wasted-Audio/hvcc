@@ -95,7 +95,8 @@ class PdRouteObject(PdObject):
                 "switchcase": Heavy(
                     type="__switchcase",
                     args={
-                        "cases": self.obj_args
+                        "cases": self.obj_args,
+                        "is_route": True
                     }
                 ),
                 "outlet_right": Heavy(

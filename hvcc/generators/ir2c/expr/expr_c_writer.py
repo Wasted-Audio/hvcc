@@ -248,6 +248,7 @@ class ExprOpMap:
         # "Sum":          "hv_?_f",          # sum of elemnets of a specified boundary of a table
         "tan":          "hv_tan_f",
         "tanh":         "hv_tanh_f",
+        "trunc":        "hv_cast_fi_expr",
         "_load_f":      "hv_var_k_f",
         "_load_i":      "hv_var_k_i",
     }

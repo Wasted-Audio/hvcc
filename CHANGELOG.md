@@ -1,6 +1,31 @@
 CHANGELOG
 =====
 
+0.17.0
+-----
+
+Features:
+
+* Support `list` object. Does not support tosymbol/fromsymbol
+* Support `[route float]` for routing floats
+* Support `trunc()` in `expr/expr~`
+* Support `threshold~` object
+* Allow `else/popmenu` (converted to `[f ]`)
+* DPF: Allow theme overrides in NanoVG UI
+* External Generator: Add current directory to search path
+
+Bugfixes:
+
+* Packing values to midi-out objects now works (#206)
+* Packing values to makenote object fixed
+* Resolve `msg_hasFormat` and `hv_msg_copy` inconsistencies (#61, #64)
+
+Tests:
+
+* Adding basic midi-out tests
+* Move to using `ruff`
+* Add tests and build for `arm`
+
 0.16.2
 -----
 

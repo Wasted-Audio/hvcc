@@ -120,7 +120,7 @@ def filter_midi_from_out_parameters(output_parameter_list: List, midi_out_object
     new_out_list = []
 
     for item in output_parameter_list:
-        if not item[0] in midi_out_objects:
+        if item[0] not in midi_out_objects:
             new_out_list.append(item)
 
     return new_out_list
@@ -197,6 +197,9 @@ def generate_extern_info(hvir: IRGraph, results: CompilerResults) -> ExternInfo:
 
 
 def load_ext_generator(module_name: str, verbose: bool) -> Optional[Generator]:
+    # add the current directory to the module search path
+    sys.path.insert(0, str(Path.cwd()))
+
     try:
         module = importlib.import_module(module_name)
         for _, member in inspect.getmembers(module):

@@ -10,37 +10,37 @@ Here is a list of [unsupported Pd objects](unsupported.md).
 
 | object | limitations |
 | --- | --- |
-| != | |
-| % | |
-| & | |
-| && | |
-| \| | |
-| \|\| | |
-| * | |
-| + | |
-| - | |
-| / | |
-| < | |
-| << | |
-| <= | |
-| == | |
-| > | |
-| >= | |
-| >> | |
+| != | <sup>1</sup> |
+| % | <sup>1</sup> |
+| & | <sup>1</sup> |
+| && | <sup>1</sup> |
+| \| | <sup>1</sup> |
+| \|\| | <sup>1</sup> |
+| * | <sup>1</sup> |
+| + | <sup>1</sup> |
+| - | <sup>1</sup> |
+| / | <sup>1</sup> |
+| < | <sup>1</sup> |
+| << | <sup>1</sup> |
+| <= | <sup>1</sup> |
+| == | <sup>1</sup> |
+| > | <sup>1</sup> |
+| >= | <sup>1</sup> |
+| >> | <sup>1</sup> |
 | abs | |
 | atan | |
-| atan2 | |
+| atan2 | <sup>1</sup> |
 | b | |
 | bang | |
-| bendin | only some generators <sup>1</sup> |
-| bendout | only some generators <sup>1</sup> |
-| bng | <sup>2</sup> |
+| bendin | only some generators <sup>2</sup> |
+| bendout | only some generators <sup>2</sup> |
+| bng | <sup>3</sup> |
 | change | |
 | clip | |
 | cnv | |
 | cos | |
-| ctlin | only some generators <sup>1</sup> |
-| ctlout | only some generators <sup>1</sup> |
+| ctlin | only some generators <sup>2</sup> |
+| ctlout | only some generators <sup>2</sup> |
 | dbtopow | |
 | dbtorms | |
 | declare | |
@@ -48,43 +48,43 @@ Here is a list of [unsupported Pd objects](unsupported.md).
 | delay | does not accept tempo messages or unit argument |
 | div | |
 | exp | |
-| expr | except some functions. <sup>3</sup> Does not support symbol input. |
-| else/knob | converted to `[f ]` <sup>2</sup> |
+| expr | except some functions. <sup>4</sup> Does not support symbol input. |
 | f | |
 | float | |
-| floatatom | converted to `[f ]` <sup>2</sup> |
+| floatatom | converted to `[f ]` <sup>3</sup> |
 | ftom | |
-| hradio | converted to `[f ]` <sup>2</sup> |
-| hsl | converted to `[f ]` <sup>2</sup> |
+| hradio | converted to `[f ]` <sup>3</sup> |
+| hsl | converted to `[f ]` <sup>3</sup> |
 | i | |
 | inlet | |
 | int | |
 | line | |
+| list | only accepts operation argument <sup>5</sup> |
 | loadbang | |
 | log | |
 | makenote | |
-| max | |
+| max | <sup>1</sup> |
 | metro | does not accept tempo messages or unit argument |
-| min | |
-| midiin | only some generators <sup>1</sup> |
-| midiout | only some generators <sup>1</sup> |
-| midirealtimein | only some generators <sup>1</sup> |
+| min | <sup>1</sup> |
+| midiin | only some generators <sup>2</sup> |
+| midiout | only some generators <sup>2</sup> |
+| midirealtimein | only some generators <sup>2</sup> |
 | mod | |
 | moses | |
 | mtof | |
-| nbx | converted to `[f ]` <sup>2</sup> |
-| notein | only some generators <sup>1</sup> |
-| noteout | only some generators <sup>1</sup> |
+| nbx | converted to `[f ]` <sup>3</sup> |
+| notein | only some generators <sup>2</sup> |
+| noteout | only some generators <sup>2</sup> |
 | outlet | |
 | pack | no symbol on first inlet |
-| pgmin | only some generators <sup>1</sup> |
-| pgmout | only some generators <sup>1</sup> |
+| pgmin | only some generators <sup>2</sup> |
+| pgmout | only some generators <sup>2</sup> |
 | pd | |
 | pipe | |
 | poly | |
-| polytouchin | only some generators <sup>1</sup> |
-| polytouchout | only some generators <sup>1</sup> |
-| pow | |
+| polytouchin | only some generators <sup>2</sup> |
+| polytouchout | only some generators <sup>2</sup> |
+| pow | <sup>1</sup> |
 | powtodb | |
 | print | |
 | r | |
@@ -108,20 +108,22 @@ Here is a list of [unsupported Pd objects](unsupported.md).
 | tabread | |
 | tabwrite | |
 | tan | |
-| tgl | <sup>2</sup> |
+| tgl | <sup>3</sup> |
 | timer | does not accept tempo messages or unit argument |
-| touchin | only some generators <sup>1</sup> |
-| touchout | only some generators <sup>1</sup> |
+| touchin | only some generators <sup>2</sup> |
+| touchout | only some generators <sup>2</sup> |
 | trigger | |
 | unpack | no initialization e.g. `[unpack 0 0]` |
 | until | |
-| vradio | converted to `[f ]` <sup>2</sup> |
-| vsl | converted to `[f ]` <sup>2</sup> |
+| vradio | converted to `[f ]` <sup>3</sup> |
+| vsl | converted to `[f ]` <sup>3</sup> |
 | wrap | |
 
-1. Midi i/o objects are currently only supported for [dpf](../../generators/dpf.md), [daisy](../../generators/daisy.md) and [owl](../../generators/owl.md)
-2. Supports setting send/receive configuration, see [Getting Started](../../getting-started/patching.md#gui-objects)
-3. Does not support: `size()`, `sum()`, `Sum()`, `avg()`, `Avg()`, `mtof()`, `ftom()`, `dbtorms()`, `rmstodb()`, `powtodb()`, `dbtopow()`, `symbol()`, `sym()`, `tolower()`, `toupper()`, `strcat()`, `strncat()`, `strlen()`, `strcspn()`, `strbrk()`, `strcmp()`, `strcasecmp()`, `strncmp()`,`strncasecmp()`, `var()`
+1. Does not support banging the left inlet. Use a `[f ]` to store the left value and bang that instead.
+2. Midi i/o objects are currently only supported for [dpf](../../generators/dpf.md), [daisy](../../generators/daisy.md) and [owl](../../generators/owl.md)
+3. Supports setting send/receive configuration, see [Getting Started](../../getting-started/patching.md#gui-objects)
+4. Does not support: `size()`, `sum()`, `Sum()`, `avg()`, `Avg()`, `mtof()`, `ftom()`, `dbtorms()`, `rmstodb()`, `powtodb()`, `dbtopow()`, `symbol()`, `sym()`, `tolower()`, `toupper()`, `strcat()`, `strncat()`, `strlen()`, `strcspn()`, `strbrk()`, `strcmp()`, `strcasecmp()`, `strncmp()`,`strncasecmp()`, `var()`
+5. Does not support tosymbol/fromsymbol.
 
 ## Signal Objects
 
@@ -189,6 +191,7 @@ Here is a list of [unsupported Pd objects](unsupported.md).
 | tabread4~ | right inlet does not do anything |
 | tabread~ | |
 | tabwrite~ | |
+| threshold~ | |
 | throw~ | |
 | vcf~ | |
 | vd~ | |
@@ -235,7 +238,11 @@ Objects ported from other PD externals
 
 | object | limitations |
 | --- | --- |
+| else/knob | converted to `[f ]` <sup>1</sup> |
+| else/popmenu | converted to `[f ]` <sup>1</sup> |
 | pdnam~ | only supports WaveNet models Nano, Feather, Lite, and Standard |
+
+1. Supports setting send/receive configuration, see [Getting Started](../../getting-started/patching.md#gui-objects)
 
 ## Supported Abstractions
 

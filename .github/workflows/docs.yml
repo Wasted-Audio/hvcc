@@ -19,14 +19,14 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - name: Configure Git Credentials
         run: |
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with:
           python-version: 3.x
       - run: echo "cache_id=$(date --utc '+%V')" >> $GITHUB_ENV
@@ -70,4 +70,19 @@ jobs:
 
           if [ "${ALIAS}" = "latest" ]; then
             mike set-default --push latest
+          fi
+
+      - name: Publish .well-known at docs site root
+        run: |
+          git fetch origin gh-pages
+          git worktree add /tmp/gh-pages gh-pages
+          mkdir -p /tmp/gh-pages/.well-known
+          cp .well-known/funding-manifest-urls /tmp/gh-pages/.well-known/funding-manifest-urls
+          cd /tmp/gh-pages
+          git add .well-known/funding-manifest-urls
+          if ! git diff --cached --quiet; then
+            git commit -m "Update .well-known/funding-manifest-urls"
+            git push origin gh-pages
+          else
+            echo "No changes to .well-known file"
           fi

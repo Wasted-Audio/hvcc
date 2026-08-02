@@ -33,6 +33,7 @@ from hvcc.generators.ir2c.ControlCast import ControlCast
 from hvcc.generators.ir2c.ControlDelay import ControlDelay
 from hvcc.generators.ir2c.ControlExpr import ControlExpr
 from hvcc.generators.ir2c.ControlIf import ControlIf
+from hvcc.generators.ir2c.ControlList import ControlList
 from hvcc.generators.ir2c.ControlMessage import ControlMessage
 from hvcc.generators.ir2c.ControlPack import ControlPack
 from hvcc.generators.ir2c.ControlPrint import ControlPrint
@@ -63,6 +64,7 @@ from hvcc.generators.ir2c.SignalPhasor import SignalPhasor
 from hvcc.generators.ir2c.SignalRPole import SignalRPole
 from hvcc.generators.ir2c.SignalSample import SignalSample
 from hvcc.generators.ir2c.SignalSamphold import SignalSamphold
+from hvcc.generators.ir2c.SignalSchmitt import SignalSchmitt
 from hvcc.generators.ir2c.SignalTabhead import SignalTabhead
 from hvcc.generators.ir2c.SignalTabread import SignalTabread
 from hvcc.generators.ir2c.SignalTabwrite import SignalTabwrite
@@ -95,6 +97,7 @@ class ir2c:
         "__biquad_k~f": SignalBiquad,
         "__env~f": SignalEnvelope,
         "__line~f": SignalLine,
+        "__list": ControlList,
         "__lorenz~f": SignalLorenz,
         "__nam_nano~f": SignalNam,
         "__nam_feather~f": SignalNam,
@@ -112,6 +115,7 @@ class ir2c:
         "__phasor_k~f": SignalPhasor,
         "__sample~f": SignalSample,
         "__samphold~f": SignalSamphold,
+        "__schmitt~f": SignalSchmitt,
         "__slice": ControlSlice,
         "__send": ControlSend,
         "__tabhead": ControlTabhead,

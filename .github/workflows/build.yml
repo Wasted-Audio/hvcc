@@ -4,16 +4,23 @@ on: [push, pull_request]
 
 jobs:
   build-linux:
-    runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-22.04
+            arch: x86_64
+          - os: ubuntu-22.04-arm
+            arch: aarch64
+    runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v7
         with:
           lfs: true
           submodules: true
       - name: Initialize lfs
         run: git lfs pull
       - name: Set up Python 3.12
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: 3.12
       - name: Install dependencies
@@ -25,22 +32,22 @@ jobs:
           pip install .
           poetry build
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
-          name: heavy-binary-linux-x86_64
-          path: dist/pyinstaller/manylinux_2_35_x86_64/Heavy
+          name: heavy-binary-linux-${{ matrix.arch }}
+          path: dist/pyinstaller/manylinux_2_35_${{ matrix.arch }}/Heavy
 
   build-windows:
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v7
         with:
           lfs: true
           submodules: true
       - name: Initialize lfs
         run: git lfs pull
       - name: Set up Python 3.12
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: 3.12
       - name: Install dependencies
@@ -52,7 +59,7 @@ jobs:
           pip install .
           poetry build
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: heavy-binary-windows-x86_64
           path: dist/pyinstaller/win_amd64/Heavy.exe
@@ -61,14 +68,14 @@ jobs:
   build-macos:
     runs-on: macos-15-intel
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v7
         with:
           lfs: true
           submodules: true
       - name: Initialize lfs
         run: git lfs pull
       - name: Set up Python 3.12
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: 3.12
       - name: Install dependencies
@@ -80,7 +87,7 @@ jobs:
           pip install .
           poetry build
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: heavy-binary-macos-x86_64
           path: dist/pyinstaller/macosx_15_0_x86_64/Heavy

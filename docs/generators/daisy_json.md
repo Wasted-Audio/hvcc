@@ -143,6 +143,8 @@ Some boards like the [Patch](https://github.com/Wasted-Audio/hvcc/blob/develop/h
 An empty `"display": {}` section triggers inclusion via the default configuration. However by itself it doesn't do anything. You can add several optional settings to use the oled.
 
 - `driver` - Which oled driver to use.
+- `config` - Additional [OLED configuration](https://github.com/electro-smith/libDaisy/blob/master/src/dev/oled_ssd130x.h#L30-L35) options as a dictionary.
+- `dim` - Specific OLED dimensions (defaults to `[128, 64]`)
 - `process` - Inline C++ code for the `Display()` function.
 - `process_file` - External C++ file with `Display()` function. This overrides the inline code.
 - `params` - List of `@hv_param` sends meant for display. These can be float values and available in the code prepended with `f`, like `fcustom1` for instance.
@@ -173,4 +175,19 @@ Example:
   hardware.display.WriteString(tmp, Font_6x8, true);
 
   hardware.display.Update();
+```
+
+You can also display a table from your patch. Here the name of the table is `scope`:
+
+```cpp
+    hardware.display.Fill(0);
+    
+    float* table_buffer = hv->getBufferForTable(hv->getHashForString("scope"));
+    for (int i=0; i<128; i++)
+    {
+        int pixel = (int) ((table_buffer[i] * -1.0f + 1.0f) * 32.0f);
+        hardware.display.DrawPixel(i, pixel, true);
+    }
+
+    hardware.display.Update();
 ```
