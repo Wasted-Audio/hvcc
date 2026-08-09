@@ -31,6 +31,7 @@ from hvcc.generators.ir2c import ir2c, ir2c_perf
 from hvcc.generators.c2js import c2js
 from hvcc.generators.c2daisy import c2daisy
 from hvcc.generators.c2dpf import c2dpf
+from hvcc.generators.c2meta import c2meta
 from hvcc.generators.c2owl import c2owl
 from hvcc.generators.c2pdext import c2pdext
 from hvcc.generators.c2wwise import c2wwise
@@ -352,6 +353,11 @@ def compile_dataflow(
         if verbose:
             print("--> Generating DPF plugin")
         results.root["c2dpf"] = c2dpf.c2dpf.compile(**gen_args)
+
+    if "meta" in generators:
+        if verbose:
+            print("--> Generating Meta module")
+        results.root["c2meta"] = c2meta.c2meta.compile(**gen_args)
 
     if "owl" in generators:
         if verbose:

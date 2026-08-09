@@ -82,9 +82,27 @@ class DPF(BaseModel):
         return self
 
 
+class metaPlugin(BaseModel):
+    slug: str = "plugin-slug"
+    name: str = "Plugin Name"
+    description: str = "Description of the plugin"
+    tags: list[str] = []
+
+
+class MetaModule(BaseModel):
+    slug: str = "plugin-slug"
+    name: str = "Plugin Name"
+    version: str = "1.0.0"
+    license: str = "GPL-3.0-only"
+    brand: str = "Heavy"
+    author: str = "Heavy"
+    description: str = "Description of the plugin"
+    modules: list[metaPlugin] = [metaPlugin()]
+
 class Meta(BaseModel):
     name: Optional[str] = None
     nosimd: Optional[bool] = False
     daisy: Daisy = Daisy()
     dpf: DPF = DPF()
+    meta: MetaModule = MetaModule()
     external: Optional[Dict] = None

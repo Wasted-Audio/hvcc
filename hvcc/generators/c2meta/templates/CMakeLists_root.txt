@@ -1,0 +1,10 @@
+cmake_minimum_required(VERSION 3.22)
+include(../metamodule-plugin-sdk/plugin.cmake)
+
+project({{ name }}
+    VERSION {{ meta.version }}
+    DESCRIPTION "{{ meta.description }}"
+    LANGUAGES C CXX ASM
+)
+
+add_subdirectory(plugin)
