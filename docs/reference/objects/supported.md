@@ -103,7 +103,7 @@ Here is a list of [unsupported Pd objects](unsupported.md).
 | swap | |
 | symbol | |
 | symbolatom | |
-| t | |
+| t | does not support `l/list` or `p/pointer` arguments |
 | table | |
 | tabread | |
 | tabwrite | |
@@ -112,7 +112,7 @@ Here is a list of [unsupported Pd objects](unsupported.md).
 | timer | does not accept tempo messages or unit argument |
 | touchin | only some generators <sup>2</sup> |
 | touchout | only some generators <sup>2</sup> |
-| trigger | |
+| trigger | does not support `l/list` or `p/pointer` arguments |
 | unpack | no initialization e.g. `[unpack 0 0]` |
 | until | |
 | vradio | converted to `[f ]` <sup>3</sup> |
