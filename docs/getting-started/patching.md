@@ -141,3 +141,4 @@ This list will be continuously epanded to document differences in object behavio
 - `[expr~]` only supports signal inputs.
 - `[list]` only accepts operation argument. Does not support tosymbol/fromsymbol.
 - Control rate Binary operations - `+`, `-`, `/`, `*`, `div`, `<<`, `>>`, `&&`, `||`, `^`, `==`, `!=`, `mod`, `%`, `&`, `|`, `<`, `<=`, `>`, `>=`, `max`, `min`, `pow`, `atan2` - do not support banging the left inlet. Use a `[f ]` to store the left value and bang that instead.
+- `[t]`/`[trigger]` does not support `l/list` or `p/pointer` arguments.
