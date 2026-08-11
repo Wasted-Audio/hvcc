@@ -8,7 +8,7 @@ void {{name}}MM::hvSendHook(HeavyContextInterface *c, const char *sendName, uint
     switch (sendHash) {
         {% for k, v in senders -%}
         case {{v.hash}}: // {{v.display}}
-            _leds[{{v.display|capitalize}}ID] = hv_msg_getFloat(m, 0);
+            _leds[{{v.display|capitalize}}ID] = (hv_msg_getFloat(m, 0) - {{v.attributes.min}}f) / ({{v.attributes.max}}f - {{v.attributes.min}}f);
             break;
         {% endfor %}
         default:
@@ -22,7 +22,7 @@ void {{name}}MM::hvSendHook(HeavyContextInterface *c, const char *sendName, uint
     hv_context->setSendHook(&hvSendHook);
 
     {%- for k,v in receivers %}
-    _params[{{v.display|capitalize}}ID] = {{v.attributes.default}}f;
+    _params[{{v.display|capitalize}}ID] = ({{v.attributes.default}}f - {{v.attributes.min}}f) / ({{v.attributes.max}}f - {{v.attributes.min}}f);
     {%- endfor %}
 }
 
@@ -67,7 +67,7 @@ void {{name}}MM::set_param(int param_id, float val) {
     switch (param_id) {
         {%- for k,v in receivers %}
         case {{v.display|capitalize}}ID:
-            hv_context->sendFloatToReceiver(Heavy_{{name}}::Parameter::In::{{k|upper}}, val);
+            hv_context->sendFloatToReceiver(Heavy_{{name}}::Parameter::In::{{k|upper}}, val * ({{v.attributes.max}}f - {{v.attributes.min}}f) + {{v.attributes.min}}f);
             break;
         {%- endfor %}
         default:
