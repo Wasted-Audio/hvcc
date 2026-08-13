@@ -162,7 +162,7 @@ class c2meta(Generator):
             shutil.copytree(Path(Path(__file__).parent, "assets"), asset_dir)
 
             return CompilerResp(
-                stage="c2metamodule",
+                stage="c2meta",
                 in_dir=c_src_dir,
                 out_dir=out_dir,
                 out_file=mm_h_path.absolute().parent,
@@ -171,7 +171,7 @@ class c2meta(Generator):
 
         except Exception as e:
             return CompilerResp(
-                stage="c2metamodule",
+                stage="c2meta",
                 notifs=CompilerNotif(
                     has_error=True,
                     exception=e,
