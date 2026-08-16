@@ -1,19 +1,10 @@
+# Heavy Compiler Collection
 # Copyright (C) 2026 Wasted Audio
 #
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# SPDX-License-Identifier: GPL-3.0-only
 
 import shutil
+import tempfile
 import time
 import jinja2
 
@@ -21,13 +12,17 @@ from pathlib import Path
 from typing import Optional
 
 from pydantic import BaseModel
+from PIL import Image
 
 from hvcc.generators.copyright import copyright_manager
 from hvcc.generators.filters import filter_uniqueid
 
 from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
 from hvcc.types.compiler import Generator, CompilerResp, CompilerMsg, CompilerNotif, ExternInfo
-from hvcc.types.meta import Meta
+from hvcc.types.meta import Meta, MetaModule
+
+from .meta_types import Knob, Input, Output, Led, Assets, UIElement
+from .panel import layout_panel_assets
 
 
 class mmJson(BaseModel):
@@ -35,6 +30,64 @@ class mmJson(BaseModel):
     MetaModulePluginMaintainerEmail: str
     MetaModulePluginMaintainerUrl: str
     MetaModuleDescription: str
+
+
+def ensure_panel_assets(
+    mm_meta: MetaModule,
+    externs: ExternInfo,
+    num_input_channels: int,
+    num_output_channels: int,
+    tmp_dir: Path,
+    verbose: Optional[bool] = False
+) -> Assets:
+    """Return the module's assets, generating a default panel if none exist."""
+    module = mm_meta.modules[0]
+
+    if module.assets is not None:
+        return module.assets
+
+    if verbose:
+        print("--> c2meta: generating custom panel")
+
+    assets = Assets(
+        knobs=[Knob(param=p.display) for _, p in externs.parameters.inParam],
+        inputs=[Input(id=i) for i in range(num_input_channels)],
+        outputs=[Output(id=i) for i in range(num_output_channels)],
+        leds=[
+            Led(led=p.display)
+            for _, p in externs.parameters.outParam
+            if p.display is not None
+        ],
+    )
+    panel_assets = layout_panel_assets(assets)
+
+    assert panel_assets.panel and panel_assets.panel.size
+    panel_img = Image.new(
+        "RGBA",
+        (panel_assets.panel.size.x, panel_assets.panel.size.y),
+        (60, 60, 60),
+    )
+
+    panel_path = tmp_dir / "panel.png"
+    panel_img.save(panel_path)
+    panel_assets.panel.image = panel_path
+
+    module.assets = panel_assets
+    return module.assets
+
+
+def write_asset_files(assets: Assets, out_dir: Path) -> None:
+    """Copy the panel image and all component images into out_dir/assets."""
+    asset_dir = Path(out_dir, "assets")
+    components_dir = Path(asset_dir, "components")
+    components_dir.mkdir(parents=True, exist_ok=True)
+
+    assert assets.panel and assets.panel.image
+    shutil.copyfile(assets.panel.image, Path(asset_dir, "panel.png"))
+
+    elements: list[UIElement] = [*assets.knobs, *assets.leds, *assets.inputs, *assets.outputs]
+    for element in elements:
+        shutil.copyfile(element.image, Path(components_dir, element.image.name))
 
 
 class c2meta(Generator):
@@ -118,12 +171,23 @@ class c2meta(Generator):
                     name=patch_name
                 ))
 
+            # generate panel assets
+            with tempfile.TemporaryDirectory() as tmp_dir:
+                assets = ensure_panel_assets(
+                    mm_meta, externs, num_input_channels, num_output_channels, Path(tmp_dir), verbose
+                )
+                write_asset_files(assets, out_dir)
+
             # generate elements.cpp
             elements_cpp = Path(source_dir, f"{patch_name.lower()}_elements.cpp")
             with open(elements_cpp, "w") as f:
                 f.write(env.get_template("elements.cpp").render(
                     name=patch_name,
-                    meta=mm_meta
+                    meta=mm_meta,
+                    num_input_channels=num_input_channels,
+                    num_output_channels=num_output_channels,
+                    receivers=receiver_list,
+                    senders=sender_list
                 ))
 
             # generate plugin CMakeLists.txt
@@ -157,9 +221,6 @@ class c2meta(Generator):
 
             with open(mm_json_path, "w") as f:
                 f.write(mm_json.model_dump_json(indent=4))
-
-            asset_dir = Path(out_dir, "assets")
-            shutil.copytree(Path(Path(__file__).parent, "assets"), asset_dir)
 
             return CompilerResp(
                 stage="c2meta",

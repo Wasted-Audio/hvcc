@@ -207,10 +207,10 @@ def load_ext_generator(module_name: str, verbose: bool) -> Optional[Generator]:
             if inspect.isclass(member) and not inspect.isabstract(member) and issubclass(member, Generator):
                 return member()
         if verbose:
-            print(f"---> Module {module_name} does not contain a class derived from hvcc.types.Compiler")
+            print(f"--> Module {module_name} does not contain a class derived from hvcc.types.Compiler")
         return None
     except ModuleNotFoundError:
-        print(f"---> Module {module_name} not found")
+        print(f"--> Module {module_name} not found")
         return None
 
 
