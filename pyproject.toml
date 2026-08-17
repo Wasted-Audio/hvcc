@@ -30,6 +30,7 @@ Jinja2 = ">=2.11"
 pydantic = ">=2.9.1"
 pydantic-extra-types = "^2.10.6"
 arpeggio = "^2.0.2"
+pillow = "11.3.0"
 
 [tool.poetry.group.dev.dependencies]
 numpy = "^2.0.1"
@@ -44,7 +45,7 @@ mypy = "^1.11.2"
 pytest = "^8.3.3"
 
 [tool.poetry-pyinstaller-plugin]
-collect = { "all" = ["arpeggio"] }
+collect = { "all" = ["arpeggio", "pillow"] }
 include = { "hvcc/generators" = "hvcc/generators", "hvcc/core" = "hvcc/core", "hvcc/interpreters" = "hvcc/interpreters" }
 
 [tool.poetry-pyinstaller-plugin.targets]
