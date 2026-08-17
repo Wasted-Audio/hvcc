@@ -29,23 +29,20 @@ void {{name}}MM::hvSendHook(HeavyContextInterface *c, const char *sendName, uint
 void {{name}}MM::update() {
     if (!hv_context) return;
 
-    {%- if num_input_channels > 0 %}
-    float* in_ptr = input_buffers;
-    {%- else %}
-    float* in_ptr = nullptr;
-    {%- endif %}
+    static constexpr float kInputScale  = 0.1f;
+    static constexpr float kOutputScale = 10.0f;
 
-    {%- if num_output_channels > 0 %}
-    float* out_ptr = output_buffers;
-    {%- else %}
-    float* out_ptr = nullptr;
-    {%- endif %}
+    float scaled_in[NUM_INPUTS > 0 ? NUM_INPUTS : 1];
+    for (int i = 0; i < NUM_INPUTS; ++i)
+        scaled_in[i] = input_buffers[i] * kInputScale;
+
+    float* in_ptr  = (NUM_INPUTS  > 0) ? scaled_in       : nullptr;
+    float* out_ptr = (NUM_OUTPUTS > 0) ? output_buffers  : nullptr;
 
     hv_context->processInline(in_ptr, out_ptr, 1);
 
-    {%- for n in range(0, num_output_channels) %}
-    current_outputs[{{n}}] = output_buffers[{{n}}];
-    {%- endfor %}
+    for (int i = 0; i < NUM_OUTPUTS; ++i)
+        current_outputs[i] = output_buffers[i] * kOutputScale;
 }
 
 void {{name}}MM::set_samplerate(float sr) {
