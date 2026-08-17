@@ -78,16 +78,24 @@ def ensure_panel_assets(
 
 def write_asset_files(assets: Assets, out_dir: Path) -> None:
     """Copy the panel image and all component images into out_dir/assets."""
-    asset_dir = Path(out_dir, "assets")
-    components_dir = Path(asset_dir, "components")
+    asset_dir = out_dir / "assets"
+    components_dir = asset_dir / "components"
     components_dir.mkdir(parents=True, exist_ok=True)
 
     assert assets.panel and assets.panel.image
-    shutil.copyfile(assets.panel.image, Path(asset_dir, "panel.png"))
+    shutil.copyfile(assets.panel.image, asset_dir / "panel.png")
+
+    screenshot = Image.open(assets.panel.image)
 
     elements: list[UIElement] = [*assets.knobs, *assets.leds, *assets.inputs, *assets.outputs]
     for element in elements:
-        shutil.copyfile(element.image, Path(components_dir, element.image.name))
+        shutil.copyfile(element.image, components_dir / element.image.name)
+
+        assert element.coords
+        img = Image.open(element.image)
+        screenshot.alpha_composite(img, (element.coords.x, element.coords.y))
+
+    screenshot.save(out_dir / "screenshot.png")
 
 
 class c2meta(Generator):

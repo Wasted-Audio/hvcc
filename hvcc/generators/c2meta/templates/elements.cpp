@@ -14,8 +14,8 @@ void init_{{ name|lower }}() {
 
 {% for knob in meta.modules[0].assets.knobs %}
   MetaModule::Knob {{knob.param}};
-  {{knob.param}}.x_mm = {{knob.coords.x}};
-  {{knob.param}}.y_mm = {{knob.coords.y}};
+  {{knob.param}}.x_mm = {{(knob.coords.x/2)}};
+  {{knob.param}}.y_mm = {{(knob.coords.y/2)}};
   {{knob.param}}.coords = MetaModule::Coords::TopLeft;
   {{knob.param}}.image = "{{name}}/components/{{knob.image.name}}";
   {{knob.param}}.short_name = "{{knob.param}}";
@@ -26,8 +26,8 @@ void init_{{ name|lower }}() {
 
 {%- for input in meta.modules[0].assets.inputs %}
   MetaModule::JackInput injack{{input.id}};
-  injack{{input.id}}.x_mm = {{input.coords.x}};
-  injack{{input.id}}.y_mm = {{input.coords.y}};
+  injack{{input.id}}.x_mm = {{(input.coords.x/2)}};
+  injack{{input.id}}.y_mm = {{(input.coords.y/2)}};
   injack{{input.id}}.coords = MetaModule::Coords::TopLeft;
   injack{{input.id}}.image = "{{name}}/components/{{input.image.name}}";
   injack{{input.id}}.short_name = "Input {{input.id}}";
@@ -38,8 +38,8 @@ void init_{{ name|lower }}() {
 
 {%- for output in meta.modules[0].assets.outputs %}
   MetaModule::JackOutput outjack{{output.id}};
-  outjack{{output.id}}.x_mm = {{output.coords.x}};
-  outjack{{output.id}}.y_mm = {{output.coords.y}};
+  outjack{{output.id}}.x_mm = {{(output.coords.x/2)}};
+  outjack{{output.id}}.y_mm = {{(output.coords.y/2)}};
   outjack{{output.id}}.coords = MetaModule::Coords::TopLeft;
   outjack{{output.id}}.image = "{{name}}/components/{{output.image.name}}";
   outjack{{output.id}}.short_name = "Output {{output.id}}";
@@ -50,8 +50,8 @@ void init_{{ name|lower }}() {
 
 {%- for led in meta.modules[0].assets.leds %}
   MetaModule::MonoLight led{{led.led}};
-  led{{led.led}}.x_mm = {{led.coords.x}};
-  led{{led.led}}.y_mm = {{led.coords.y}};
+  led{{led.led}}.x_mm = {{(led.coords.x/2)}};
+  led{{led.led}}.y_mm = {{(led.coords.y/2)}};
   led{{led.led}}.coords = MetaModule::Coords::TopLeft;
   led{{led.led}}.image = "{{name}}/components/{{led.image.name}}";
   led{{led.led}}.short_name = "LED {{led.led}}";

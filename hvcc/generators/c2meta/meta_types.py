@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Union
 
 from pydantic import BaseModel, Field
 
@@ -61,4 +61,4 @@ class Assets(BaseModel):
     leds: list[Led] = []
 
 
-UIElement = Knob | Input | Output | Led
+UIElement = Union[Knob, Input, Output, Led]
