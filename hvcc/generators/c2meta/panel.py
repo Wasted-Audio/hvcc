@@ -26,7 +26,8 @@ MARGIN_Y = 20
 
 @lru_cache(maxsize=None)
 def image_size(image: Path) -> tuple[int, int]:
-    return Image.open(image).size
+    with Image.open(image) as im:
+        return im.size
 
 
 @dataclass

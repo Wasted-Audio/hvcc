@@ -5,8 +5,8 @@
 #include "CoreModules/register_module.hh"
 #include "HeavyMetaModule_{{name}}.hpp"
 
-
-{%- set num_elements = receivers|length + senders|length + num_input_channels + num_output_channels %}
+{%- set assets = meta.modules[0].assets %}
+{%- set num_elements = assets.knobs|length + assets.leds|length + assets.inputs|length + assets.outputs|length %}
 {%- set ns = namespace(counter=0) %}
 {%- set ratio = 240/128.5 %}
 
@@ -14,7 +14,7 @@ void init_{{ name|lower }}() {
   static std::array<MetaModule::Element, {{num_elements}}> elements;
   static std::array<ElementCount::Indices, {{num_elements}}> indices;
 
-{% for knob in meta.modules[0].assets.knobs %}
+{% for knob in assets.knobs %}
   MetaModule::Knob {{knob.param}};
   {{knob.param}}.x_mm = {{((knob.coords.x/ratio)|round(2))}};
   {{knob.param}}.y_mm = {{((knob.coords.y/ratio)|round(2))}};
@@ -26,7 +26,7 @@ void init_{{ name|lower }}() {
   {% set ns.counter = ns.counter + 1 %}
 {%- endfor %}
 
-{%- for input in meta.modules[0].assets.inputs %}
+{%- for input in assets.inputs %}
   MetaModule::JackInput injack{{input.id}};
   injack{{input.id}}.x_mm = {{((input.coords.x/ratio)|round(2))}};
   injack{{input.id}}.y_mm = {{((input.coords.y/ratio)|round(2))}};
@@ -38,7 +38,7 @@ void init_{{ name|lower }}() {
   {% set ns.counter = ns.counter + 1 %}
 {%- endfor %}
 
-{%- for output in meta.modules[0].assets.outputs %}
+{%- for output in assets.outputs %}
   MetaModule::JackOutput outjack{{output.id}};
   outjack{{output.id}}.x_mm = {{((output.coords.x/ratio)|round(2))}};
   outjack{{output.id}}.y_mm = {{((output.coords.y/ratio)|round(2))}};
@@ -50,7 +50,7 @@ void init_{{ name|lower }}() {
   {% set ns.counter = ns.counter + 1 %}
 {%- endfor %}
 
-{%- for led in meta.modules[0].assets.leds %}
+{%- for led in assets.leds %}
   MetaModule::MonoLight led{{led.led}};
   led{{led.led}}.x_mm = {{((led.coords.x/ratio)|round(2))}};
   led{{led.led}}.y_mm = {{((led.coords.y/ratio)|round(2))}};
@@ -64,10 +64,10 @@ void init_{{ name|lower }}() {
 
   MetaModule::ModuleInfoView info{
       .description = "{{ meta.description }}",
-      .width_hp = {{ (meta.modules[0].assets.panel.size.x / 7.5) | round | int }},
+      .width_hp = {{ (assets.panel.size.x / 7.5) | round | int }},
       .elements = elements,
       .indices = indices,
   };
 
-  MetaModule::register_module<{{ name }}MM>("{{ name }}", "{{ name }}", info, "{{name}}/{{ meta.modules[0].assets.panel.image.name }}");
+  MetaModule::register_module<{{ name }}MM>("{{ meta.name }}", "{{ name }}", info, "{{name}}/{{ assets.panel.image.name }}");
 }

@@ -101,6 +101,7 @@ class MetaModule(BaseModel):
     description: str = "Description of the plugin"
     modules: list[metaPlugin] = [metaPlugin()]
 
+
 class Meta(BaseModel):
     name: Optional[str] = None
     nosimd: Optional[bool] = False
