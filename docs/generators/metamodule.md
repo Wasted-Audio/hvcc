@@ -14,7 +14,7 @@ It is currently not possible to set a specific type, so all parameters are float
 
 Send objects will become LEDs on the panel. These can also have a range, but will be normalized so they are always 0-1 for their brightness.
 
-All audio inputs and outputs will become jack sockets.
+All audio inputs and outputs will become jack sockets. Values are normalized from `-10 - 10` to `-1 - 1` and back to match typical PD audio operations with the MetaModule CV standard. You will need to do additional scaling in your patch if you want to use the raw CV values internally (e.g. for Pitch calculations).
 
 ## Metadata
 
