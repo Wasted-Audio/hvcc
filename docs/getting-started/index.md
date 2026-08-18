@@ -35,6 +35,7 @@ Heavy can interpret and convert a subset of features from Pure Data patches:
 - [Bela](http://bela.io)
 - [Hoxton OWL](https://www.rebeltech.org/product/owl-modular/)
 - [Daisy](https://www.electro-smith.com/daisy)
+- [MetaModule](https://metamodule.info/)
 - Raspberry Pi
 - Web (Javascript)
 
@@ -75,6 +76,7 @@ Some generators use other libraries and SDKs with different licensing:
 - [DPF](../generators/dpf.md) - requires the [DPF](https://github.com/DISTRHO/DPF) library and optionally the [DPF-Widgets](https://github.com/DISTRHO/DPF-Widgets) or [PDVG](https://github.com/wasted-Audio/PDVG) GUI libraries. These are all `ISC` licensed.
 - [FMOD](../generators/fmod.md) - no SDK required for building, but requires a [license](https://www.fmod.com/licensing) for distribution.
 - [Javascript](../generators/javascript.md) - requires [emscripten](https://github.com/emscripten-core/emscripten) which is dual licensed `MIT` and `University of Illinois/NCSA Open Source License`.
+- [MetaModule](../generators/metamodule.md) - requires the [metamodule-plugin-sdk](https://github.com/4ms/metamodule-plugin-sdk). This falls under the `GPLv3`, but has a [license exception](https://github.com/4ms/metamodule-plugin-sdk/blob/main/LICENSE.md) for plugins that only use the API.
 - [OWL](../generators/owl.md) - requires [OwlProgram](https://github.com/RebelTechnology/OwlProgram/) which uses `GPLv2`.
 - [PD External](../generators/pdext.md) - requires `pd.dll` for linking on Windows, which comes from Puredata and is `BSD3` license.
 - [Unity](../generators/unity.md) - no SDK required for building, but requires a Unity [license](https://unity.com/products) to use.
