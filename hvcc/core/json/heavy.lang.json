@@ -1262,6 +1262,11 @@
         "name": "",
         "connectionType": "-~>",
         "description": ""
+      },
+      {
+        "name": "",
+        "connectionType": "-->",
+        "description": ""
       }
     ],
     "args": [
