@@ -84,28 +84,29 @@ class DPF(BaseModel):
 
 
 class metaPlugin(BaseModel):
-    slug: str = "module-slug"
-    name: str = "Module Name"
+    slug:        str = "module-slug"
+    name:        str = "Module Name"
     description: str = "Description of the module"
-    tags: list[str] = []
-    assets: Optional[Assets] = None
+    tags:        list[str] = []
+    assets:      Optional[Assets] = None
 
 
 class MetaModule(BaseModel):
-    slug: str = "plugin-slug"
-    name: str = "Plugin Name"
-    version: str = "1.0.0"
-    license: str = "GPL-3.0-only"
-    brand: str = "Heavy"
-    author: str = "Heavy"
+    sdk_path:    Optional[str] = None
+    slug:        str = "plugin-slug"
+    name:        str = "Plugin Name"
+    version:     str = "1.0.0"
+    license:     str = "GPL-3.0-only"
+    brand:       str = "Heavy"
+    author:      str = "Heavy"
     description: str = "Description of the plugin"
-    modules: list[metaPlugin] = [metaPlugin()]
+    modules:     list[metaPlugin] = [metaPlugin()]
 
 
 class Meta(BaseModel):
-    name: Optional[str] = None
-    nosimd: Optional[bool] = False
-    daisy: Daisy = Daisy()
-    dpf: DPF = DPF()
-    meta: MetaModule = MetaModule()
+    name:     Optional[str] = None
+    nosimd:   Optional[bool] = False
+    daisy:    Daisy = Daisy()
+    dpf:      DPF = DPF()
+    meta:     MetaModule = MetaModule()
     external: Optional[Dict] = None

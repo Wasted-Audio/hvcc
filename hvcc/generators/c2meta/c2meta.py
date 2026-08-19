@@ -215,8 +215,12 @@ class c2meta(Generator):
             plugin_json_path = Path(out_dir, "plugin.json")
             plugin_json = mm_meta
 
+            # drop additional metadata
+            plugin_json.sdk_path = None
+            plugin_json.modules[0].assets = None
+
             with open(plugin_json_path, "w") as f:
-                f.write(plugin_json.model_dump_json(indent=4))
+                f.write(plugin_json.model_dump_json(indent=4, exclude_none=True))
 
 
             mm_json_path = Path(out_dir, "plugin-mm.json")

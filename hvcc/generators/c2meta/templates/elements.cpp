@@ -69,5 +69,5 @@ void init_{{ name|lower }}() {
       .indices = indices,
   };
 
-  MetaModule::register_module<{{ name }}MM>("{{ meta.name }}", "{{ name }}", info, "{{name}}/{{ assets.panel.image.name }}");
+  MetaModule::register_module<{{ name }}MM>("{{ meta.name }}", "{{ meta.modules[0].name }}", info, "{{name}}/{{ assets.panel.image.name }}");
 }

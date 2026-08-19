@@ -44,7 +44,9 @@ In order to set custom information you should supply a `metadata.json` using `-m
 }
 ```
 
-You can optionally supply a list of assets that make the panel, controls and sockets of your module. If you don't add the `assets` section a panel will be generated automatically. Make sure that your description here is exact and complete. You have to use the same names for all receivers and senders and use the correct amount of input and output IDs. Do note that audio i/o starts counting from 0, where PD counts from 1.
+You can optionally set the `sdk_path` to an absolute or relative path where you have your `metamodule-plugin-sdk` folder. By default this is expected in the root of the output folder.
+
+You can also optionally supply a list of assets that make the panel, controls and sockets of your module. If you don't add the `assets` section a panel will be generated automatically. Make sure that your description here is exact and complete. You have to use the same names for all receivers and senders and use the correct amount of input and output IDs. Do note that audio i/o starts counting from 0, where PD counts from 1.
 
 ```json
     {
