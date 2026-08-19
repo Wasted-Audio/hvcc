@@ -21,7 +21,7 @@ from .HeavyIrObject import HeavyIrObject
 from .HeavyGraph import HeavyGraph
 
 from hvcc.types.Lang import LangLetType
-
+from hvcc.types.IR import IROnMessage
 
 class HIrInlet(HeavyIrObject):
     """ A specific implementation of the inlet object.
@@ -35,6 +35,16 @@ class HIrInlet(HeavyIrObject):
         annotations: Optional[Dict] = None
     ) -> None:
         super().__init__("__inlet", args=args, graph=graph, annotations=annotations)
+
+    def get_ir_on_message(self, inlet_index: int = 0) -> list[IROnMessage]:
+        """ Parse incoming message and send to the control outlet connections.
+        """
+        x = []
+        for outlet in self.outlet_connections:
+            for c in outlet:
+                if c.is_control:
+                    x.extend(c.to_object.get_ir_on_message(c.inlet_index))
+        return x
 
     def _resolved_outlet_type(self, outlet_index: int = 0) -> Optional[LangLetType]:
         if outlet_index == 1:
