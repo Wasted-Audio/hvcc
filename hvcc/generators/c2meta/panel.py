@@ -11,6 +11,7 @@ from pathlib import Path
 from typing import Optional
 
 from PIL import Image
+from pydantic_extra_types.color import Color
 
 from hvcc.generators.c2meta.meta_types import Coords, Panel, Assets, Size, UIElement
 
@@ -22,6 +23,8 @@ PADDING_X = 10
 PADDING_Y = 10
 MARGIN_X = 10
 MARGIN_Y = 20
+
+DEFAULT_PANEL_COLOR = (60, 60, 60)
 
 
 @lru_cache(maxsize=None)
@@ -230,12 +233,17 @@ def layout_panel_assets(assets: Assets) -> Assets:
     Layout algorithm with column center alignment.
     Aligns knobs, jacks, and leds along standard vertical column axes.
     """
+    if assets.panel is not None and assets.panel.color is not None:
+        color = assets.panel.color
+    else:
+        color = Color(DEFAULT_PANEL_COLOR)
+
     cat_infos = _gather_category_info(
         [assets.knobs, assets.leds, assets.inputs, assets.outputs]
     )
 
     if not any(c.count for c in cat_infos):
-        assets.panel = Panel(size=Size(x=PANEL_MIN_WIDTH, y=PANEL_HEIGHT))
+        assets.panel = Panel(size=Size(x=PANEL_MIN_WIDTH, y=PANEL_HEIGHT), color=color)
         return assets
 
     available_h = PANEL_HEIGHT - (MARGIN_Y * 2)
@@ -249,6 +257,6 @@ def layout_panel_assets(assets: Assets) -> Assets:
     allocated_heights = _allocate_heights(cat_infos, available_h)
     _place_items(cat_infos, allocated_heights, grid)
 
-    assets.panel = Panel(size=Size(x=grid.panel_width, y=PANEL_HEIGHT))
+    assets.panel = Panel(size=Size(x=grid.panel_width, y=PANEL_HEIGHT), color=color)
 
     return assets

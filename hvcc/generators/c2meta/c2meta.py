@@ -43,13 +43,17 @@ def ensure_panel_assets(
     """Return the module's assets, generating a default panel if none exist."""
     module = mm_meta.modules[0]
 
-    if module.assets is not None:
+    if module.assets is not None and \
+            module.assets.panel is not None and \
+            module.assets.panel.image is not None and \
+            module.assets.panel.size is not None:
         return module.assets
 
     if verbose:
         print("--> c2meta: generating custom panel")
 
     assets = Assets(
+        panel=module.assets.panel if module.assets is not None else None,
         knobs=[Knob(param=p.display) for _, p in externs.parameters.inParam],
         inputs=[Input(id=i) for i in range(num_input_channels)],
         outputs=[Output(id=i) for i in range(num_output_channels)],
@@ -61,11 +65,11 @@ def ensure_panel_assets(
     )
     panel_assets = layout_panel_assets(assets)
 
-    assert panel_assets.panel and panel_assets.panel.size
+    assert panel_assets.panel and panel_assets.panel.size and panel_assets.panel.color
     panel_img = Image.new(
         "RGBA",
         (panel_assets.panel.size.x, panel_assets.panel.size.y),
-        (60, 60, 60),
+        panel_assets.panel.color.as_rgb_tuple(),
     )
 
     panel_path = tmp_dir / "panel.png"

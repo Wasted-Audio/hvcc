@@ -24,6 +24,7 @@ In order to set custom information you should supply a `metadata.json` using `-m
 {
     "name": "testplugin",
     "meta": {
+        "sdk_path": null,
         "slug": "plugin-slug",
         "name": "Plugin Name",
         "version": "1.0.0",

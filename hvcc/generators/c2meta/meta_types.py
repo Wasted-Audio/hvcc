@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Optional, Union
 
 from pydantic import BaseModel, Field
+from pydantic_extra_types.color import Color
 
 
 class XY(BaseModel):
@@ -51,6 +52,7 @@ class Led(BaseModel):
 class Panel(BaseModel):
     image: Optional[Path] = None
     size: Optional[Size] = None
+    color: Optional[Color] = None
 
 
 class Assets(BaseModel):
