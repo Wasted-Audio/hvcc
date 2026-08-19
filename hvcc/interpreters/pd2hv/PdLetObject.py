@@ -36,6 +36,8 @@ class PdLetObject(PdObject):
     def get_outlet_connection_type(self, outlet_index: int) -> Optional[str]:
         if len(self.obj_args) > 0 and self.obj_args[0] in {"-->", "~f>", "~i>", "-~>"}:
             return self.obj_args[0]
+        elif self.obj_type == "inlet~" and outlet_index == 1:
+            return "-->"
         else:
             return super().get_outlet_connection_type(outlet_index)
 

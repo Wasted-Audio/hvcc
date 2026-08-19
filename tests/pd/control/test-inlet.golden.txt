@@ -1,2 +1,2 @@
-[@ 0.000] print: test
-[@ 0.000] print: 0.5
+[@ 0.000] right: test
+[@ 5.021] left: 0.5
