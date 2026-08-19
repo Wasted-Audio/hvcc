@@ -2064,19 +2064,19 @@
 <div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>cd Hvcc_Out_Dir\wwise
 </span></code></pre></div>
 <p>Generate Visual Studio project files; note, WWISEROOT environment variable can be set from Wwise Launcher by clicking on <em>Set Environment Variables</em> button in front of an installed Wwise entry:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>python &quot;%WWISEROOT%\Scripts\Build\Plugins\wp.py&quot; premake Authoring
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>python &quot;%WWISEROOT%\Scripts\Build\Plugins\wp.py&quot; premake Windows_vc170
+<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>python "%WWISEROOT%\Scripts\Build\Plugins\wp.py" premake Authoring
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>python "%WWISEROOT%\Scripts\Build\Plugins\wp.py" premake Windows_vc170
 </span></code></pre></div>
 <p>Build Authoring and Engine plugins in Release configurations with for Visual Studio 2022 (vc170):</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>python &quot;%WWISEROOT%\Scripts\Build\Plugins\wp.py&quot; build -c Release -x x64 -t vc170 Authoring
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>python &quot;%WWISEROOT%\Scripts\Build\Plugins\wp.py&quot; build -c Release -x x64 -t vc170 Windows_vc170
+<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>python "%WWISEROOT%\Scripts\Build\Plugins\wp.py" build -c Release -x x64 -t vc170 Authoring
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>python "%WWISEROOT%\Scripts\Build\Plugins\wp.py" build -c Release -x x64 -t vc170 Windows_vc170
 </span></code></pre></div>
 <p>At this point, the plugins should be placed in correct SDK directories and be ready for use in the Authoring app.</p>
 <h3 id="optional-packaging-the-binaries-for-wwise-launcher">Optional: Packaging the Binaries for Wwise Launcher</h3>
 <p>We can go a step further and package the plugins into a bundle that can be installed conveniently from Wwise Launcher.</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>python &quot;%WWISEROOT%\Scripts\Build\Plugins\wp.py&quot; package --version 2022.1.0.1 Authoring
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>python &quot;%WWISEROOT%\Scripts\Build\Plugins\wp.py&quot; package --version 2022.1.0.1 Windows_vc170
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>python &quot;%WWISEROOT%\Scripts\Build\Plugins\wp.py&quot; generate-bundle --version 2022.1.0.1
+<div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>python "%WWISEROOT%\Scripts\Build\Plugins\wp.py" package --version 2022.1.0.1 Authoring
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>python "%WWISEROOT%\Scripts\Build\Plugins\wp.py" package --version 2022.1.0.1 Windows_vc170
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>python "%WWISEROOT%\Scripts\Build\Plugins\wp.py" generate-bundle --version 2022.1.0.1
 </span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>mkdir Bundle
 </span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>copy /y bundle.json Bundle
 </span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>copy /y *.tar.xz Bundle

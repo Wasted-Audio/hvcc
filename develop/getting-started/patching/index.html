@@ -2050,8 +2050,8 @@
 <p>Some generators, like Daisy and DPF, enable support for extra configuration metadata.json file using the <code>-m</code>. It depends on the generator what is supported. See the <a href="../../generators/dpf/#metadata">DPF docs</a> for more information on setting meta data for plugins.</p>
 <p>Simple Daisy example that selects the desired board to build for:</p>
 <div class="language-json highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="p">{</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">  </span><span class="nt">&quot;daisy&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">    </span><span class="nt">&quot;board&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;seed&quot;</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">  </span><span class="nt">"daisy"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">    </span><span class="nt">"board"</span><span class="p">:</span><span class="w"> </span><span class="s2">"seed"</span>
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">  </span><span class="p">}</span>
 </span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="p">}</span>
 </span></code></pre></div>
@@ -2080,6 +2080,7 @@
 <li>Heavy does not support initializing numbers in <code>[unpack]</code>, e.g. <code>[unpack 0 0]</code> gives <code>Heavy only supports arguments 'f' and 's' to unpack.</code> Workaround is to use <code>f</code> instead, e.g. <code>[unpack f f]</code>, and if necessary prime the default values with a <code>[loadbang]</code> and <code>[0 0(</code>.</li>
 <li>Sliders and number inputs are converted to <code>[f ]</code> and thus do not store send/receive/initialization/etc. settings.</li>
 <li>Heavy does not accept arguments and control connections to: <code>[rzero~]</code>, <code>[rzero_rev~]</code>, <code>[czero~]</code>, <code>[czero_rev~]</code>. In Heavy, these objects accept only signal inputs. Arguments and control connections are ignored.</li>
+<li><code>[inlet~]</code> does not support connections to the control inlet or second (control) outlet.</li>
 <li>On the <code>[select]</code> and <code>[route]</code> objects it is currently not possible to set the arguments via the right inlet (internally a hardcoded switch_case is used).</li>
 <li>Heavy supports remote/send messages, however empty messages are currently removed. So the typical <code>[; bla 1(</code> multiline message needs to contain at least something on the first line: <code>[_; bla 1(</code>.</li>
 <li>Remote/send messages with <code>sinesum</code>, <code>const</code> or <code>resize</code> arguments to initialize table values, or modify the table dimensions, are not supported.</li>

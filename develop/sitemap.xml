@@ -2,130 +2,130 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://wasted-audio.github.io/hvcc/develop/</loc>
-         <lastmod>2026-08-10</lastmod>
+         <lastmod>2026-08-19</lastmod>
     </url>
     <url>
          <loc>https://wasted-audio.github.io/hvcc/develop/changelog/</loc>
-         <lastmod>2026-08-10</lastmod>
+         <lastmod>2026-08-19</lastmod>
     </url>
     <url>
          <loc>https://wasted-audio.github.io/hvcc/develop/code_of_conduct/</loc>
-         <lastmod>2026-08-10</lastmod>
+         <lastmod>2026-08-19</lastmod>
     </url>
     <url>
          <loc>https://wasted-audio.github.io/hvcc/develop/contributing/</loc>
-         <lastmod>2026-08-10</lastmod>
+         <lastmod>2026-08-19</lastmod>
     </url>
     <url>
          <loc>https://wasted-audio.github.io/hvcc/develop/adr/</loc>
-         <lastmod>2026-08-10</lastmod>
+         <lastmod>2026-08-19</lastmod>
     </url>
     <url>
          <loc>https://wasted-audio.github.io/hvcc/develop/adr/ADR-001-GUI-Send-Receive/</loc>
-         <lastmod>2026-08-10</lastmod>
+         <lastmod>2026-08-19</lastmod>
     </url>
     <url>
          <loc>https://wasted-audio.github.io/hvcc/develop/adr/ADR-002-pd2gui-Parser/</loc>
-         <lastmod>2026-08-10</lastmod>
+         <lastmod>2026-08-19</lastmod>
     </url>
     <url>
          <loc>https://wasted-audio.github.io/hvcc/develop/adr/ADR-003-Control-Rate-Expr/</loc>
-         <lastmod>2026-08-10</lastmod>
+         <lastmod>2026-08-19</lastmod>
     </url>
     <url>
          <loc>https://wasted-audio.github.io/hvcc/develop/adr/ADR-004-Signal-Rate-Expr/</loc>
-         <lastmod>2026-08-10</lastmod>
+         <lastmod>2026-08-19</lastmod>
     </url>
     <url>
          <loc>https://wasted-audio.github.io/hvcc/develop/adr/ADR-005-PDNAM-External/</loc>
-         <lastmod>2026-08-10</lastmod>
+         <lastmod>2026-08-19</lastmod>
     </url>
     <url>
          <loc>https://wasted-audio.github.io/hvcc/develop/adr/ADR-006-gui2dpf-Templates/</loc>
-         <lastmod>2026-08-10</lastmod>
+         <lastmod>2026-08-19</lastmod>
     </url>
     <url>
          <loc>https://wasted-audio.github.io/hvcc/develop/generators/</loc>
-         <lastmod>2026-08-10</lastmod>
+         <lastmod>2026-08-19</lastmod>
     </url>
     <url>
          <loc>https://wasted-audio.github.io/hvcc/develop/generators/custom/</loc>
-         <lastmod>2026-08-10</lastmod>
+         <lastmod>2026-08-19</lastmod>
     </url>
     <url>
          <loc>https://wasted-audio.github.io/hvcc/develop/generators/daisy/</loc>
-         <lastmod>2026-08-10</lastmod>
+         <lastmod>2026-08-19</lastmod>
     </url>
     <url>
          <loc>https://wasted-audio.github.io/hvcc/develop/generators/daisy_json/</loc>
-         <lastmod>2026-08-10</lastmod>
+         <lastmod>2026-08-19</lastmod>
     </url>
     <url>
          <loc>https://wasted-audio.github.io/hvcc/develop/generators/dpf/</loc>
-         <lastmod>2026-08-10</lastmod>
+         <lastmod>2026-08-19</lastmod>
     </url>
     <url>
          <loc>https://wasted-audio.github.io/hvcc/develop/generators/fmod/</loc>
-         <lastmod>2026-08-10</lastmod>
+         <lastmod>2026-08-19</lastmod>
     </url>
     <url>
          <loc>https://wasted-audio.github.io/hvcc/develop/generators/javascript/</loc>
-         <lastmod>2026-08-10</lastmod>
+         <lastmod>2026-08-19</lastmod>
     </url>
     <url>
          <loc>https://wasted-audio.github.io/hvcc/develop/generators/owl/</loc>
-         <lastmod>2026-08-10</lastmod>
+         <lastmod>2026-08-19</lastmod>
     </url>
     <url>
          <loc>https://wasted-audio.github.io/hvcc/develop/generators/pdext/</loc>
-         <lastmod>2026-08-10</lastmod>
+         <lastmod>2026-08-19</lastmod>
     </url>
     <url>
          <loc>https://wasted-audio.github.io/hvcc/develop/generators/unity/</loc>
-         <lastmod>2026-08-10</lastmod>
+         <lastmod>2026-08-19</lastmod>
     </url>
     <url>
          <loc>https://wasted-audio.github.io/hvcc/develop/generators/wwise/</loc>
-         <lastmod>2026-08-10</lastmod>
+         <lastmod>2026-08-19</lastmod>
     </url>
     <url>
          <loc>https://wasted-audio.github.io/hvcc/develop/getting-started/</loc>
-         <lastmod>2026-08-10</lastmod>
+         <lastmod>2026-08-19</lastmod>
     </url>
     <url>
          <loc>https://wasted-audio.github.io/hvcc/develop/getting-started/patching/</loc>
-         <lastmod>2026-08-10</lastmod>
+         <lastmod>2026-08-19</lastmod>
     </url>
     <url>
          <loc>https://wasted-audio.github.io/hvcc/develop/reference/c/</loc>
-         <lastmod>2026-08-10</lastmod>
+         <lastmod>2026-08-19</lastmod>
     </url>
     <url>
          <loc>https://wasted-audio.github.io/hvcc/develop/reference/cpp/</loc>
-         <lastmod>2026-08-10</lastmod>
+         <lastmod>2026-08-19</lastmod>
     </url>
     <url>
          <loc>https://wasted-audio.github.io/hvcc/develop/reference/midi/</loc>
-         <lastmod>2026-08-10</lastmod>
+         <lastmod>2026-08-19</lastmod>
     </url>
     <url>
          <loc>https://wasted-audio.github.io/hvcc/develop/reference/ir/heavy_gui_ir/</loc>
-         <lastmod>2026-08-10</lastmod>
+         <lastmod>2026-08-19</lastmod>
     </url>
     <url>
          <loc>https://wasted-audio.github.io/hvcc/develop/reference/ir/heavy_ir/</loc>
-         <lastmod>2026-08-10</lastmod>
+         <lastmod>2026-08-19</lastmod>
     </url>
     <url>
          <loc>https://wasted-audio.github.io/hvcc/develop/reference/ir/heavy_lang/</loc>
-         <lastmod>2026-08-10</lastmod>
+         <lastmod>2026-08-19</lastmod>
     </url>
     <url>
          <loc>https://wasted-audio.github.io/hvcc/develop/reference/objects/supported/</loc>
-         <lastmod>2026-08-10</lastmod>
+         <lastmod>2026-08-19</lastmod>
     </url>
     <url>
          <loc>https://wasted-audio.github.io/hvcc/develop/reference/objects/unsupported/</loc>
-         <lastmod>2026-08-10</lastmod>
+         <lastmod>2026-08-19</lastmod>
     </url>
 </urlset>
