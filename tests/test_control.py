@@ -334,7 +334,7 @@ class TestPdControlPatches(TestPdControlBase):
         self._test_control_patch("test-extern_table.pd")
 
     def test_inlet(self):
-        self._test_control_patch("test-inlet.pd", num_iterations=10)
+        self._test_control_patch("test-inlet.pd")
 
     # list operations
 
