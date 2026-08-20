@@ -68,6 +68,7 @@ You can also optionally supply a dictionary of assets that make the panel, contr
         "inputs": [
             {
                 "id": 0,
+                "name": "input 1",
                 "coords": {
                     "x": 18,
                     "y": 60
@@ -78,6 +79,7 @@ You can also optionally supply a dictionary of assets that make the panel, contr
         "outputs": [
             {
                 "id": 0,
+                "name": "output 1",
                 "coords": {
                     "x": 18,
                     "y": 100
