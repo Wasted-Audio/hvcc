@@ -130,3 +130,5 @@ Creating plugin at <output_dir>/metamodule-plugins/<plugin_name>.mmplugin
 [100%] Built target debugelf
 
 ```
+
+The resulting `<output_dir>/metamodule-plugins/<plugin_name>.mmplugin` binary can be copied to an sd-card and loaded onto the MetaModule device.
