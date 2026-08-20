@@ -7,6 +7,7 @@ Next Release
 Features:
 
 * Support `[inlet~]` object's control inlet and outlet
+* New MetaModule generator
 
 0.17.0
 -----
