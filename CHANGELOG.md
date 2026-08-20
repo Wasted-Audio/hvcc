@@ -1,6 +1,13 @@
 CHANGELOG
 =====
 
+Next Release
+-----
+
+Features:
+
+* Support `[inlet~]` object's control inlet and outlet
+
 0.17.0
 -----
 
