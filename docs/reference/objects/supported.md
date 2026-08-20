@@ -158,7 +158,7 @@ Here is a list of [unsupported Pd objects](unsupported.md).
 | ftom~ | |
 | hilbert~ | |
 | hip~ | |
-| inlet~ | does not support connections to the control inlet or second (control) outlet |
+| inlet~ | |
 | line~ | |
 | lop~ | right inlet does not support signals |
 | max~ | |
