@@ -21,7 +21,7 @@ from .HeavyIrObject import HeavyIrObject
 from .HeavyGraph import HeavyGraph
 
 from hvcc.types.Lang import LangLetType
-
+from hvcc.types.IR import IROnMessage
 
 class HIrInlet(HeavyIrObject):
     """ A specific implementation of the inlet object.
@@ -36,17 +36,38 @@ class HIrInlet(HeavyIrObject):
     ) -> None:
         super().__init__("__inlet", args=args, graph=graph, annotations=annotations)
 
+    def get_ir_on_message(self, inlet_index: int = 0) -> list[IROnMessage]:
+        """ Parse incoming message and send to the control outlet connections.
+        """
+        x = []
+        for outlet in self.outlet_connections:
+            for c in outlet:
+                if c.is_control:
+                    x.extend(c.to_object.get_ir_on_message(c.inlet_index))
+        return x
+
     def _resolved_outlet_type(self, outlet_index: int = 0) -> Optional[LangLetType]:
+        if outlet_index == 1:
+            return "-->"
         if self.graph is not None:
             connections = self.graph.inlet_connections[self.args["index"]]
-            connection_type_set = {c.type for c in connections}
-            if len(connection_type_set) == 0:
-                # object has no incident connections.
-                return "-->"  # outlet type defaults to control (-->)
-            elif len(connection_type_set) == 1:
-                return list(connection_type_set)[0]
-            else:
+            signal_types = {c.type for c in connections if c.is_signal}
+            if len(signal_types) == 1:
+                return list(signal_types)[0]
+            elif len(signal_types) > 1:
                 raise HeavyException(
-                    f"{self} has multiple incident connections of differing type. "
+                    f"{self} has multiple incident signal connections of differing type. "
                     "The outlet type cannot be explicitly resolved.")
+            else:
+                connection_type_set = {c.type for c in connections}
+                if len(connection_type_set) == 0:
+                    # object has no incident connections.
+                    return "-->"  # outlet type defaults to control (-->)
+                elif len(connection_type_set) == 1:
+                    return list(connection_type_set)[0]
+                else:
+                    control_types = [t for t in connection_type_set if t == "-->"]
+                    if control_types:
+                        return "-->"
+                    return list(connection_type_set)[0]
         return None
