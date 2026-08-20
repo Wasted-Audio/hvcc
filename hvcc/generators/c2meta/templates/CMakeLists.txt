@@ -10,8 +10,8 @@ target_sources({{ name }} PRIVATE
     ${CPP_SOURCES}
 )
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DHV_SIMD_NONE=1")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DHV_SIMD_NONE=1")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DHV_SIMD_NONE=1 -DHV_BARE_METAL")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DHV_SIMD_NONE=1 -DHV_BARE_METAL")
 
 # Call this to link and create the plugin file
 create_plugin(
