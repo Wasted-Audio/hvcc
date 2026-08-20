@@ -26,13 +26,14 @@ class Size(XY):
 class Knob(BaseModel):
     param: str
     coords: Optional[Coords] = None
-    image: Path = Field(default=Path(Path(__file__).parent, 'assets/knob.png'))
+    image: Path = Field(default=Path(__file__).parent / 'assets/knob.png')
 
 
 class Jack(BaseModel):
     id: int
+    name: Optional[str] = None
     coords: Optional[Coords] = None
-    image: Path = Field(default=Path(Path(__file__).parent, 'assets/jack.png'))
+    image: Path = Field(default=Path(__file__).parent / 'assets/jack.png')
 
 
 class Input(Jack):
@@ -46,7 +47,7 @@ class Output(Jack):
 class Led(BaseModel):
     led: str
     coords: Optional[Coords] = None
-    image: Path = Field(default=Path(Path(__file__).parent, 'assets/led.png'))
+    image: Path = Field(default=Path(__file__).parent / 'assets/led.png')
 
 
 class Panel(BaseModel):

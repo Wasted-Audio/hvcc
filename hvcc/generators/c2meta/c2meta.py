@@ -202,8 +202,8 @@ class c2meta(Generator):
                     num_input_channels=num_input_channels,
                     num_output_channels=num_output_channels,
                     receivers=receiver_list,
-                    senders=sender_list
-                ))
+                    senders=sender_list,
+                    copyright=copyright_c))
 
             # generate plugin CMakeLists.txt
             mm_cmake_path = Path(out_dir, "CMakeLists.txt")

@@ -1,3 +1,5 @@
+{{copyright}}
+
 #include "HeavyMetaModule_{{name}}.hpp"
 
 

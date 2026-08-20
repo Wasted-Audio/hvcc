@@ -1,3 +1,5 @@
+{{copyright}}
+
 #include <array>
 #include "CoreModules/CoreProcessor.hh"
 #include "CoreModules/elements/element_counter.hh"
@@ -33,7 +35,11 @@ void init_{{ name|lower }}() {
   injack{{input.id}}.y_mm = {{((input.coords.y/ratio)|round(2))}};
   injack{{input.id}}.coords = MetaModule::Coords::TopLeft;
   injack{{input.id}}.image = "{{name}}/components/{{input.image.name}}";
+  {%- if input.name is not none %}
+  injack{{input.id}}.short_name = "{{input.name}}";
+  {%- else %}
   injack{{input.id}}.short_name = "Input {{input.id}}";
+  {%- endif %}
   elements[{{ns.counter}}] = injack{{input.id}};
   indices[{{ns.counter}}] = {.input_idx = InputID{{input.id}}};
   {% set ns.counter = ns.counter + 1 %}
@@ -45,7 +51,11 @@ void init_{{ name|lower }}() {
   outjack{{output.id}}.y_mm = {{((output.coords.y/ratio)|round(2))}};
   outjack{{output.id}}.coords = MetaModule::Coords::TopLeft;
   outjack{{output.id}}.image = "{{name}}/components/{{output.image.name}}";
+  {%- if output.name is not none %}
+  outjack{{output.id}}.short_name = "{{output.name}}";
+  {%- else %}
   outjack{{output.id}}.short_name = "Output {{output.id}}";
+  {%- endif %}
   elements[{{ns.counter}}] = outjack{{output.id}};
   indices[{{ns.counter}}] = {.output_idx = OutputID{{output.id}}};
   {% set ns.counter = ns.counter + 1 %}

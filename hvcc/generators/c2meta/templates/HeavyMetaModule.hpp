@@ -1,3 +1,5 @@
+{{copyright}}
+
 #pragma once
 
 #include "CoreModules/CoreProcessor.hh"
