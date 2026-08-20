@@ -217,7 +217,7 @@ class c2meta(Generator):
                     meta=mm_meta))
 
             plugin_json_path = Path(out_dir, "plugin.json")
-            plugin_json = mm_meta
+            plugin_json = mm_meta.model_copy(deep=True)
 
             # drop additional metadata
             plugin_json.sdk_path = None

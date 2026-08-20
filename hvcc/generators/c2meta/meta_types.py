@@ -6,7 +6,7 @@
 from pathlib import Path
 from typing import Optional, Union
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 from pydantic_extra_types.color import Color
 
 
@@ -54,6 +54,11 @@ class Panel(BaseModel):
     size: Optional[Size] = None
     color: Optional[Color] = None
 
+    @field_validator('size', mode='before')
+    def validate_size(cls, v):
+        if v is not None and (v.y != 240):
+            raise ValueError('Panel height must be 240 pixels')
+        return v
 
 class Assets(BaseModel):
     panel: Optional[Panel] = None

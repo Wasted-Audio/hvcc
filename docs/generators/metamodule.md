@@ -45,18 +45,15 @@ In order to set custom information you should supply a `metadata.json` using `-m
 }
 ```
 
-You can optionally set the `sdk_path` to an absolute or relative path where you have your `metamodule-plugin-sdk` folder. By default this is expected in the root of the output folder.
+You can optionally set the `sdk_path` to an absolute or relative path where you have your `metamodule-plugin-sdk` folder. By default this is expected one level above the root of the output folder. Make sure that it has a trailing slash `/`.
 
-You can also optionally supply a list of assets that make the panel, controls and sockets of your module. If you don't add the `assets` section a panel will be generated automatically. Make sure that your description here is exact and complete. You have to use the same names for all receivers and senders and use the correct amount of input and output IDs. Do note that audio i/o starts counting from 0, where PD counts from 1.
+You can also optionally supply a dictionary of assets that make the panel, controls and sockets of your module. If you don't add the `assets` section a panel will be generated automatically. Make sure that your description here is exact and complete. You have to use the same names for all receivers and senders and use the correct amount of input and output IDs. Do note that audio i/o starts counting from 0, where PD counts from 1.
 
 ```json
     {
         "panel": {
             "image": "path/to/panel_image.png",
-            "size": {
-                "x": 75,
-                "y": 240
-            }
+            "color": "#ff0000"
         },
         "knobs": [
             {
@@ -99,4 +96,37 @@ You can also optionally supply a list of assets that make the panel, controls an
             }
         ]
     }
+```
+
+Object positions are in pixel position relative to the top-left of the panel and top-left of the object image. The panel image height must always be 240px.
+
+When only the optional `panel.color` is set, using either hexadecimal or an RGB tupple values, this will set the color of the generated panel.
+
+An additional `screenshot.png` will be generated based on the panel and assets and their positions.
+
+## Building
+
+After generating the project go to the output directory and build the plugin:
+
+```sh
+cd <output_dir>
+cmake -B build
+cmake --build build
+```
+
+This should result in a successful build:
+
+```sh
+copy from `<plugin_name>-debug.so' [elf32-littlearm] to `<output_dir>/build/plugin/<plugin_name>.so' [elf32-littlearm]
+   text	   data	    bss	    dec	    hex	filename
+  48336	   1776	   2164	  52276	   cc34	<output_dir>/build/plugin/<plugin_name>.so
+Checking if symbols in <output_dir>/build/plugin/<plugin_name>.so would be resolved
+All symbols found!
+------------------
+Creating plugin at <output_dir>/metamodule-plugins/<plugin_name>.mmplugin
+[ 90%] Built target plugin
+[ 93%] Generating <plugin_name>-debug.so.readelf
+[ 96%] Generating <plugin_name>-debug.so.nm
+[100%] Built target debugelf
+
 ```

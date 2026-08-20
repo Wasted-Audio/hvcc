@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.22)
-include({{meta.sdk_path if meta.sdk_path is not none else ''}}metamodule-plugin-sdk/plugin.cmake)
+include({{meta.sdk_path if meta.sdk_path is not none else '../'}}metamodule-plugin-sdk/plugin.cmake)
 
 project({{ name }}
     VERSION {{ meta.version }}
