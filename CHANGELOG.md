@@ -6,7 +6,7 @@ Next Release
 
 Features:
 
-* Support `[inlet~]` object control inlet and outlet
+* Support `[inlet~]` object's control inlet and outlet
 
 0.17.0
 -----

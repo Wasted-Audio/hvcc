@@ -47,7 +47,7 @@ class PdLetObject(PdObject):
             args={
                 "name": "",  # Pd does not give an inlet name
                 "index": self.let_index,
-                "type": self.get_outlet_connection_type(self.let_index)
+                "type": self.get_outlet_connection_type(0)  # evaluate the primary outlet for the type
             },
             properties=HvPos(x=self.pos_x, y=self.pos_y)
         )
