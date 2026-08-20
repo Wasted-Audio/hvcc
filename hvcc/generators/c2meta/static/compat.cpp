@@ -1,4 +1,7 @@
 #include <cstdlib>
+#include <cstddef>
+
+struct _reent;
 
 extern "C" {
 

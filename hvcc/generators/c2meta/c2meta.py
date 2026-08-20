@@ -41,6 +41,9 @@ def ensure_panel_assets(
     verbose: Optional[bool] = False
 ) -> Assets:
     """Return the module's assets, generating a default panel if none exist."""
+    if not mm_meta.modules:
+        raise ValueError("--> c2meta: meta.modules must contain at least one module")
+
     module = mm_meta.modules[0]
 
     if module.assets is not None and \
@@ -89,17 +92,17 @@ def write_asset_files(assets: Assets, out_dir: Path) -> None:
     assert assets.panel and assets.panel.image
     shutil.copyfile(assets.panel.image, asset_dir / "panel.png")
 
-    screenshot = Image.open(assets.panel.image)
+    with Image.open(assets.panel.image).convert('RGBA') as screenshot:
 
-    elements: list[UIElement] = [*assets.knobs, *assets.leds, *assets.inputs, *assets.outputs]
-    for element in elements:
-        shutil.copyfile(element.image, components_dir / element.image.name)
+        elements: list[UIElement] = [*assets.knobs, *assets.leds, *assets.inputs, *assets.outputs]
+        for element in elements:
+            shutil.copyfile(element.image, components_dir / element.image.name)
 
-        assert element.coords
-        img = Image.open(element.image)
-        screenshot.alpha_composite(img, (element.coords.x, element.coords.y))
+            assert element.coords
+            with Image.open(element.image) as img:
+                screenshot.alpha_composite(img, (element.coords.x, element.coords.y))
 
-    screenshot.save(out_dir / "screenshot.png")
+        screenshot.save(out_dir / "screenshot.png")
 
 
 class c2meta(Generator):

@@ -1,3 +1,4 @@
+#include <array>
 #include "CoreModules/CoreProcessor.hh"
 #include "CoreModules/elements/element_counter.hh"
 #include "CoreModules/elements/elements.hh"
@@ -22,7 +23,7 @@ void init_{{ name|lower }}() {
   {{knob.param}}.image = "{{name}}/components/{{knob.image.name}}";
   {{knob.param}}.short_name = "{{knob.param}}";
   elements[{{ns.counter}}] = {{knob.param}};
-  indices[{{ns.counter}}] = {.param_idx = {{knob.param|capitalize}}ID};
+  indices[{{ns.counter}}] = {.param_idx = Param_{{knob.param|capitalize}}ID};
   {% set ns.counter = ns.counter + 1 %}
 {%- endfor %}
 
@@ -58,7 +59,7 @@ void init_{{ name|lower }}() {
   led{{led.led}}.image = "{{name}}/components/{{led.image.name}}";
   led{{led.led}}.short_name = "LED {{led.led}}";
   elements[{{ns.counter}}] = led{{led.led}};
-  indices[{{ns.counter}}] = {.light_idx = {{led.led|capitalize}}ID};
+  indices[{{ns.counter}}] = {.light_idx = Led_{{led.led|capitalize}}ID};
   {% set ns.counter = ns.counter + 1 %}
 {%- endfor %}
 

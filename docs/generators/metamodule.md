@@ -100,7 +100,7 @@ You can also optionally supply a dictionary of assets that make the panel, contr
 
 Object positions are in pixel position relative to the top-left of the panel and top-left of the object image. The panel image height must always be 240px.
 
-When only the optional `panel.color` is set, using either hexadecimal or an RGB tupple values, this will set the color of the generated panel.
+When only the optional `panel.color` is set, using either hexadecimal or an RGB tuple values, this will set the color of the generated panel.
 
 An additional `screenshot.png` will be generated based on the panel and assets and their positions.
 

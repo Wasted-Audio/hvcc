@@ -8,7 +8,7 @@ void {{name}}MM::hvSendHook(HeavyContextInterface *c, const char *sendName, uint
     switch (sendHash) {
         {% for k, v in senders -%}
         case {{v.hash}}: // {{v.display}}
-            _leds[{{v.display|capitalize}}ID] = (hv_msg_getFloat(m, 0) - {{v.attributes.min}}f) / ({{v.attributes.max}}f - {{v.attributes.min}}f);
+            _leds[Led_{{v.display|capitalize}}ID] = (hv_msg_getFloat(m, 0) - {{v.attributes.min}}f) / ({{v.attributes.max}}f - {{v.attributes.min}}f);
             break;
         {% endfor %}
         default:
@@ -22,7 +22,8 @@ void {{name}}MM::hvSendHook(HeavyContextInterface *c, const char *sendName, uint
     hv_context->setSendHook(&hvSendHook);
 
     {%- for k,v in receivers %}
-    _params[{{v.display|capitalize}}ID] = ({{v.attributes.default}}f - {{v.attributes.min}}f) / ({{v.attributes.max}}f - {{v.attributes.min}}f);
+    _params[Param_{{v.display|capitalize}}ID] = ({{v.attributes.default}}f - {{v.attributes.min}}f) / ({{v.attributes.max}}f - {{v.attributes.min}}f);
+    set_param(Param_{{v.display|capitalize}}ID, _params[Param_{{v.display|capitalize}}ID]);
     {%- endfor %}
 }
 
@@ -50,7 +51,7 @@ void {{name}}MM::set_samplerate(float sr) {
     hv_context->setSendHook(&hvSendHook);
 
     {%- for k,v in receivers %}
-    set_param({{v.display|capitalize}}ID, _params[{{v.display|capitalize}}ID]);
+    set_param(Param_{{v.display|capitalize}}ID, _params[Param_{{v.display|capitalize}}ID]);
     {%- endfor %}
 }
 
@@ -63,7 +64,7 @@ void {{name}}MM::set_param(int param_id, float val) {
 
     switch (param_id) {
         {%- for k,v in receivers %}
-        case {{v.display|capitalize}}ID:
+        case Param_{{v.display|capitalize}}ID:
             hv_context->sendFloatToReceiver(Heavy_{{name}}::Parameter::In::{{k|upper}}, val * ({{v.attributes.max}}f - {{v.attributes.min}}f) + {{v.attributes.min}}f);
             break;
         {%- endfor %}
@@ -103,8 +104,8 @@ float {{name}}MM::get_led_brightness(int led_id) const {
 
     switch (led_id) {
         {%- for k,v in senders %}
-        case {{v.display|capitalize}}ID:
-            return _leds[{{v.display|capitalize}}ID];
+        case Led_{{v.display|capitalize}}ID:
+            return _leds[Led_{{v.display|capitalize}}ID];
         {%- endfor %}
         default:
             return 0.0f;

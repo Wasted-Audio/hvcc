@@ -13,7 +13,7 @@ constexpr int NUM_OUTPUTS = {{ num_output_channels }};
 {% if (receivers|length > 0) %}
 enum {
     {%- for k,v in receivers %}
-    {{v.display|capitalize}}ID,
+    Param_{{v.display|capitalize}}ID,
     {%- endfor %}
 };
 {% endif %}
@@ -34,7 +34,7 @@ enum {
 {%- if (senders|length > 0) %}
 enum {
     {%- for k,v in senders %}
-    {{v.display|capitalize}}ID,
+    Led_{{v.display|capitalize}}ID,
     {%- endfor %}
 };
 {% endif %}
