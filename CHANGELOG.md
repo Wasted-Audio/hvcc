@@ -8,6 +8,13 @@ Features:
 
 * Support `[inlet~]` object's control inlet and outlet
 
+0.17.1
+-----
+
+Bugfixes:
+
+* Correctly parse `cyclone/` prefix as optional for PdBinopObject
+  
 0.17.0
 -----
 
