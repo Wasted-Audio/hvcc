@@ -35,7 +35,7 @@ jobs:
       - uses: actions/upload-artifact@v7
         with:
           name: heavy-binary-linux-${{ matrix.arch }}
-          path: dist/pyinstaller/manylinux_2_35_${{ matrix.arch }}/Heavy
+          path: dist/pyinstaller/linux_${{ matrix.arch }}/Heavy
 
   build-windows:
     runs-on: windows-latest
