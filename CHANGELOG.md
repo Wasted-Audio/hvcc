@@ -1,6 +1,13 @@
 CHANGELOG
 =====
 
+Next Release
+-----
+
+Bugfixes:
+
+* Correctly parse `cyclone/` prefix as optional for PdBinopObject
+  
 0.17.0
 -----
 
