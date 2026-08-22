@@ -25,7 +25,7 @@ from hvcc.types.Heavy import Heavy, HvPos
 
 class PdBinopObject(PdObject):
     # a translation dictionary from a Pd object to corresponding heavy object
-    __PD_HEAVY_DICT = {
+    __PD_HEAVY_DICT_PD = {
         "+": "+",
         "+~": "+",
         "-": "-",
@@ -54,18 +54,27 @@ class PdBinopObject(PdObject):
         "pow~": "pow",
         ">>": ">>",
         "<<": "<<",
-        "cyclone/>~": ">",
-        "cyclone/greaterthan~": ">",
-        "cyclone/>=~": ">=",
-        "cyclone/greaterthaneq~": ">=",
-        "cyclone/<~": "<",
-        "cyclone/lessthan~": "<",
-        "cyclone/<=~": "<=",
-        "cyclone/lessthaneq~": "<=",
-        "cyclone/==~": "==",
-        "cyclone/equals~": "==",
-        "cyclone/!=~": "!=",
-        "cyclone/notequals~": "!="
+    }
+
+    __PD_HEAVY_DICT_CYCLONE = {
+        ">~": ">",
+        "greaterthan~": ">",
+        ">=~": ">=",
+        "greaterthaneq~": ">=",
+        "<~": "<",
+        "lessthan~": "<",
+        "<=~": "<=",
+        "lessthaneq~": "<=",
+        "==~": "==",
+        "equals~": "==",
+        "!=~": "!=",
+        "notequals~": "!="
+    }
+
+    __PD_HEAVY_DICT = {
+        **__PD_HEAVY_DICT_PD,
+        **__PD_HEAVY_DICT_CYCLONE,
+        **{f"cyclone/{k}": v for k, v in __PD_HEAVY_DICT_CYCLONE.items()},
     }
 
     def __init__(
