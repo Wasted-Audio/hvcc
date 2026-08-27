@@ -3,9 +3,12 @@
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
+from enum import IntEnum
 from typing import Dict, Literal, List, Optional, Tuple, Union
 from typing_extensions import Self
 from pydantic import BaseModel, HttpUrl, model_validator
+
+from hvcc.types.GUI import Theme
 
 
 DaisyBoards = Literal['pod', 'petal', 'patch', 'patch_init', 'field']
@@ -30,6 +33,12 @@ class DPFUISize(BaseModel):
     height: int
 
 
+class DPFUIType(IntEnum):
+    NONE = 0
+    IMGUI = 1
+    NANOVG = 2
+
+
 class DPFPortGroups(BaseModel):
     input: Dict[str, Dict[str, Union[int, Tuple[int, bool]]]] = {}
     output: Dict[str, Dict[str, Union[int, Tuple[int, bool]]]] = {}
@@ -39,9 +48,11 @@ class DPF(BaseModel):
     dpf_path:           str = ""
     description:        Optional[str] = None
     makefile_dep:       List[str] = []
-    enable_ui:          bool = False
+    enable_ui:          Optional[DPFUIType] = DPFUIType.NONE
     enable_modgui:      bool = False
     ui_size:            Optional[DPFUISize] = None
+    ui_theme:           Optional[str] = None
+    ui_themes:          Optional[Dict[str, Theme]] = None
     midi_input:         bool = False
     midi_output:        bool = False
     port_groups:        Optional[DPFPortGroups] = None

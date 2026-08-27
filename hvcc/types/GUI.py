@@ -1,5 +1,5 @@
 # Heavy Compiler Collection
-# Copyright (C) 2025 Wasted Audio
+# Copyright (C) 2025-2026 Wasted Audio
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
@@ -31,8 +31,8 @@ class Font(IntEnum):
 class LabelShow(IntEnum):
     never = 0
     always = 1
-    when_active = 2
-    when_typing = 3
+    active = 2
+    typing = 3
 
 
 class LabelPos(IntEnum):
@@ -48,6 +48,10 @@ class Base(BaseModel):
     size: Size
 
 
+class BaseUI(Base):
+    id: str = ""
+
+
 class BaseParam(Base):
     parameter: str
 
@@ -60,12 +64,13 @@ class Label(BaseModel):
     font_size: int
 
 
-class Comment(Base):
+class Comment(BaseUI):
     type: Literal["comment"] = "comment"
     text: str
+    width: Optional[int] = 0
 
 
-class Canvas(Base):
+class Canvas(BaseUI):
     type: Literal["canvas"] = "canvas"
     label: Optional[Label] = None
     bg_color: Color
@@ -74,6 +79,7 @@ class Canvas(Base):
 class Bang(BaseParam):
     type: Literal["bang"] = "bang"
     label: Optional[Label] = None
+    flash_time: int
     fg_color: Color
     bg_color: Color
 
@@ -139,7 +145,7 @@ class Knob(BaseParam):
     circular: bool
     jump: bool
     square: bool
-    arc: Color
+    arc_color: Color
     arc_start: float
     arc_show: bool
 
@@ -151,21 +157,44 @@ class Number(BaseParam):
     bg_color: Color
     log_mode: bool
     log_height: int
+    min: float
+    max: float
 
 
 class Float(BaseParam):
     type: Literal["float"] = "float"
-    font_size: int
+    font_height: int
     label_text: str
     label_pos: LabelPos
     min: float
     max: float
 
 
-GUIObjects = Union[Bang, Toggle, Radio, Slider, Knob, Number, Float, Comment, Canvas]
+class Popmenu(BaseParam):
+    type: Literal["popmenu"] = "popmenu"
+    font_height: int
+    no_select: str
+    fg_color: Color
+    bg_color: Color
+    options: list[str]
+
+
+GUIObjects = Union[Bang, Toggle, Radio, Slider, Knob, Number, Float, Comment, Canvas, Popmenu]
+
+
+class Theme(BaseModel):
+    obj_corner_radius: Optional[float] = None
+    cnv_color: Optional[Color] = None
+    cnv_txt_color: Optional[Color] = None
+    io_color: Optional[Color] = None
+    bg_color: Optional[Color] = None
+    sel_color: Optional[Color] = None
+    com_txt_color: Optional[Color] = None
+    out_color: Optional[Color] = None
 
 
 class GraphBase(BaseModel):
+    id: str = "mainPatch"
     objects: list[GUIObjects]
     graphs: list["Graph"]
 
@@ -178,4 +207,5 @@ class Graph(GraphBase):
 
 class GraphRoot(GraphBase):
     size: Size
+    theme: Optional[Theme] = Theme()
     version: str = VERSION

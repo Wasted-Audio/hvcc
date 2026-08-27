@@ -1,5 +1,5 @@
 # Copyright (C) 2014-2018 Enzien Audio, Ltd.
-# Copyright (C) 2023-2024 Wasted Audio
+# Copyright (C) 2023-2026 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,14 +16,17 @@
 
 import json
 import random
-import os
 
 from typing import Any, Dict, List, Optional, Set, Tuple
+from pathlib import Path
+
+from hvcc.types.Heavy import Heavy
 
 from .HIrConvolution import HIrConvolution
 from .HIrExpr import HIrExpr
 from .HIrInlet import HIrInlet
 from .HIrLorenz import HIrLorenz
+from .HIrNam import HIrNam
 from .HIrOutlet import HIrOutlet
 from .HIrPack import HIrPack
 from .HIrSwitchcase import HIrSwitchcase
@@ -65,10 +68,10 @@ class HeavyParser:
     @classmethod
     def graph_from_file(
         cls,
-        hv_file: str,
+        hv_file: Path,
         graph: Optional[HeavyGraph] = None,
         graph_args: Optional[Dict] = None,
-        path_stack: Optional[set] = None,
+        path_stack: Optional[set[Path]] = None,
         xname: Optional[str] = None
     ) -> HeavyGraph:
         """ Read a graph object from a file.
@@ -80,7 +83,7 @@ class HeavyParser:
             It prevents infinite recursion when reading many abstractions deep.
         """
         # ensure that we have an absolute path to the hv_file
-        hv_file = os.path.abspath(os.path.expanduser(hv_file))
+        hv_file = hv_file.expanduser().absolute()
 
         # copy the path stack such that no changes are made to the calling stack
         path_stack = path_stack or set()
@@ -91,16 +94,16 @@ class HeavyParser:
 
         # open and parse the heavy file
         with open(hv_file, "r") as f:
-            json_heavy = json.load(f)
+            json_heavy = Heavy(**json.load(f))
 
         return cls.graph_from_object(hv_file, json_heavy, path_stack, graph, graph_args, xname)
 
     @classmethod
     def graph_from_object(
         cls,
-        hv_file: str,
-        json_heavy: Dict,
-        path_stack: set,
+        hv_file: Path,
+        json_heavy: Heavy,
+        path_stack: set[Path],
         graph: Optional[HeavyGraph] = None,
         graph_args: Optional[Dict] = None,
         xname: Optional[str] = None
@@ -114,7 +117,11 @@ class HeavyParser:
         """
         # resolve default graph arguments
         graph_args = graph_args or {}
-        for a in json_heavy["args"]:
+
+        if not isinstance(json_heavy.args, list):
+            raise HeavyException("Graph arguments must be a list.")
+
+        for a in json_heavy.args:
             if a["name"] not in graph_args:
                 if a["required"]:
                     raise HeavyException(f"Required argument \"{a['name']}\" not present.")
@@ -128,34 +135,34 @@ class HeavyParser:
                     graph=graph)
 
         # create a new graph
-        subpatch_name = json_heavy.get("annotations", {}).get("name", xname)
+        subpatch_name = json_heavy.annotations.get("name", xname if xname is not None else "")
         g = HeavyGraph(graph, graph_args, file=hv_file, xname=subpatch_name)
 
         # add the import paths to the global vars
-        g.local_vars.add_import_paths(json_heavy.get("imports", []))
+        g.local_vars.add_import_paths(json_heavy.imports)
         # add the file's relative directory to global vars
-        g.local_vars.add_import_paths([os.path.dirname(hv_file)])
+        g.local_vars.add_import_paths([hv_file.parent])
 
         # instantiate all objects
         try:
-            for obj_id, o in json_heavy["objects"].items():
-                if o["type"] == "comment":
+            for obj_id, o in json_heavy.objects.items():
+                if o.type == "comment":
                     continue  # first and foremost, ignore comment objects
 
-                elif o["type"] == "graph":
+                elif o.type == "graph":
                     # inline HeavyGraph objects (i.e. subgraphs)
                     # require a different set of initialisation arguments
                     x: Any = cls.graph_from_object(hv_file, o, path_stack, g, g.args, xname)
 
                 else:
                     # resolve the arguments dictionary based on the graph args
-                    args = g.resolve_arguments(o["args"])
+                    args = g.resolve_arguments(o.args if isinstance(o.args, dict) else {})
 
                     # before anything, search for an abstraction
                     # in case we want to override default functionality
                     # However, if we are in an abstraction that has the same
                     # name as the type that we are looking for, don't recurse!
-                    abs_path = g.find_path_for_abstraction(o["type"])
+                    abs_path = g.find_path_for_abstraction(o.type)
                     if abs_path is not None and abs_path not in path_stack:
                         x = cls.graph_from_file(
                             hv_file=abs_path,
@@ -165,17 +172,17 @@ class HeavyParser:
 
                     # if we know how to handle this object type natively
                     # either as a custom type or as a generic IR object
-                    elif HeavyParser.get_class_for_type(o["type"]) is not None:
-                        obj_cls = HeavyParser.get_class_for_type(o["type"])
-                        x = obj_cls(o["type"], args, g, o.get("annotations", {}))
+                    elif HeavyParser.get_class_for_type(o.type) is not None:
+                        obj_cls = HeavyParser.get_class_for_type(o.type)
+                        x = obj_cls(o.type, args, g, o.annotations)
 
                     # handle generic IR objects
-                    elif HeavyIrObject.is_ir(o["type"]):
-                        x = HeavyIrObject(o["type"], args, g, annotations=o.get("annotations", {}))
+                    elif HeavyIrObject.is_ir(o.type):
+                        x = HeavyIrObject(o.type, args, g, annotations=o.annotations)
 
                     # an object definition can't be found
                     else:
-                        g.add_error(f"Object type \"{o['type']}\" cannot be found.")
+                        g.add_error(f"Object type \"{o.type}\" cannot be found.")
                         # note that add_error() raises an exception. So really, there is no continue.
                         continue
 
@@ -183,13 +190,14 @@ class HeavyParser:
                 g.add_object(x, obj_id)
 
             # parse all of the connections
-            for c in json_heavy["connections"]:
+            for c in json_heavy.connections:
                 g.connect_objects(Connection(
-                    g.objs[c["from"]["id"]],
-                    c["from"]["outlet"],
-                    g.objs[c["to"]["id"]],
-                    c["to"]["inlet"],
-                    c["type"]))
+                    from_object=g.objs[c.conn_from.id],
+                    outlet_index=c.conn_from.outlet,
+                    to_object=g.objs[c.conn_to.id],
+                    inlet_index=c.conn_to.inlet,
+                    conn_type=c.type
+                ))
 
         except HeavyException as e:
             if g.is_root_graph():
@@ -239,10 +247,10 @@ class HLangIf(HeavyLangObject):
             x = HeavyIrObject("__if", self.args)
         elif self.has_inlet_connection_format("ff"):
             # TODO(mhroth): implement this
-            x = HeavyParser.graph_from_file("./hvlib/if~f.hv.json")
+            x = HeavyParser.graph_from_file(Path("./hvlib/if~f.hv.json"))
         elif self.has_inlet_connection_format("ii"):
             # TODO(mhroth): implement this
-            x = HeavyParser.graph_from_file("./hvlib/if~i.hv.json")
+            x = HeavyParser.graph_from_file(Path("./hvlib/if~i.hv.json"))
         else:
             fmt = self._get_connection_format(self.inlet_connections)
             raise HeavyException(f"Unhandled connection configuration to object [if]: {fmt}")
@@ -266,7 +274,7 @@ class HLangNoise(HeavyLangObject):
 
     def reduce(self) -> Tuple[Set, List]:
         seed = int(random.uniform(1, 2147483647))  # assign a random 32-bit seed
-        noise_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "./hvlib/noise.hv.json")
+        noise_path = Path(Path(__file__).parent, "./hvlib/noise.hv.json")
         x = HeavyParser.graph_from_file(noise_path, graph_args={"seed": seed})
         x.reduce()
         # TODO(mhroth): deal with control input
@@ -293,6 +301,7 @@ LANG_CLASS_DICT = {
     "system": HLangSystem,
     "phasor": HLangPhasor,
     "line": HLangLine,
+    "__nam~f": HIrNam,
     "random": HLangRandom,
     "delay": HLangDelay,
     "table": HLangTable,

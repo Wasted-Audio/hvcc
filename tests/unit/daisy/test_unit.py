@@ -1,12 +1,6 @@
 import unittest
 
-from os import path
-
 from hvcc.generators.c2daisy.json2daisy import flatten_pin_dicts, flatten_index_dicts
-
-
-# Grabbing the absolute path to test data
-data_path = path.join(path.dirname(path.abspath(__file__)), 'data')
 
 
 # A simple comparison for strings / literals / dicts within dicts

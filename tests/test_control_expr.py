@@ -1,4 +1,5 @@
-# Copyright (C) 2022-2025 Daniel Billotte, Wasted Audio
+# Copyright (C) 2022-2025 Daniel Billotte
+# Copyright (C) 2022-2026 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,8 +15,10 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import argparse
-import os
 # import unittest
+import platform
+
+from pathlib import Path
 
 from tests.framework.base_control import TestPdControlBase
 
@@ -25,8 +28,15 @@ class TestPdControlExprPatches(TestPdControlBase):
         Consider all available expressions: https://pd.iem.sh/objects/expr~/
     """
 
-    SCRIPT_DIR = os.path.dirname(__file__)
-    TEST_DIR = os.path.join(os.path.dirname(__file__), "pd", "control_expr")
+    SCRIPT_DIR = Path(__file__).parent
+    TEST_DIR = Path(Path(__file__).parent, "pd", "control_expr")
+    ARCH = None
+
+    @classmethod
+    def setUpClass(cls):
+        machine = platform.machine().lower()
+        if "arm" in machine or "aarch64" in machine:
+            cls.ARCH = "arm"
 
     # Math operations
 
@@ -126,7 +136,7 @@ class TestPdControlExprPatches(TestPdControlBase):
         self._test_control_patch("test-pow.pd")
 
     def test_sqrt(self):
-        self._test_control_patch("test-sqrt.pd")
+        self._test_control_patch("test-sqrt.pd", arch=self.ARCH)
 
     def test_exp(self):
         self._test_control_patch("test-exp.pd")
@@ -135,7 +145,7 @@ class TestPdControlExprPatches(TestPdControlBase):
         self._test_control_patch("test-expm1.pd")
 
     def test_ln_log(self):
-        self._test_control_patch("test-ln-log.pd")
+        self._test_control_patch("test-ln-log.pd", arch=self.ARCH)
 
     def test_log10(self):
         self._test_control_patch("test-log10.pd")
@@ -150,7 +160,7 @@ class TestPdControlExprPatches(TestPdControlBase):
         self._test_control_patch("test-cbrt.pd")
 
     def test_log1p(self):
-        self._test_control_patch("test-log1p.pd")
+        self._test_control_patch("test-log1p.pd", arch=self.ARCH)
 
     def test_ldexp(self):
         self._test_control_patch("test-ldexp.pd")
@@ -161,10 +171,10 @@ class TestPdControlExprPatches(TestPdControlBase):
         self._test_control_patch("test-sin-asin-sinh-asinh.pd")
 
     def test_cos_acos_cosh_acosh(self):
-        self._test_control_patch("test-cos-acos-cosh-acosh.pd")
+        self._test_control_patch("test-cos-acos-cosh-acosh.pd", arch=self.ARCH)
 
     def test_tan_atan_tanh_atanh(self):
-        self._test_control_patch("test-tan-atan-tanh-atanh.pd")
+        self._test_control_patch("test-tan-atan-tanh-atanh.pd", arch=self.ARCH)
 
     def test_atan2(self):
         self._test_control_patch("test-atan2.pd")
@@ -182,6 +192,9 @@ class TestPdControlExprPatches(TestPdControlBase):
     def test_skip_var(self):
         self._test_control_patch("test-skip-var.pd")
 
+    def test_multi_line(self):
+        self._test_control_patch("test-multi-line.pd")
+
 
 def main():
     # TODO(mhroth): make this work
@@ -191,7 +204,7 @@ def main():
         "pd_path",
         help="The path to the Pd file to read.")
     args = parser.parse_args()
-    if os.path.exists(args.pd_path):
+    if Path(args.pd_path).exists:
         result = TestPdControlExprPatches._test_control_patch(args.pd_path)
         print(result)
     else:

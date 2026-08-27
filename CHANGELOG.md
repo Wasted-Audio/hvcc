@@ -1,6 +1,94 @@
 CHANGELOG
 =====
 
+0.17.1
+-----
+
+Bugfixes:
+
+* Correctly parse `cyclone/` prefix as optional for PdBinopObject
+  
+0.17.0
+-----
+
+Features:
+
+* Support `list` object. Does not support tosymbol/fromsymbol
+* Support `[route float]` for routing floats
+* Support `trunc()` in `expr/expr~`
+* Support `threshold~` object
+* Allow `else/popmenu` (converted to `[f ]`)
+* DPF: Allow theme overrides in NanoVG UI
+* External Generator: Add current directory to search path
+
+Bugfixes:
+
+* Packing values to midi-out objects now works (#206)
+* Packing values to makenote object fixed
+* Resolve `msg_hasFormat` and `hv_msg_copy` inconsistencies (#61, #64)
+
+Tests:
+
+* Adding basic midi-out tests
+* Move to using `ruff`
+* Add tests and build for `arm`
+
+0.16.2
+-----
+
+Features:
+
+* multi-line `expr`/`expr~`
+
+Bugfixes:
+
+* Daisy: fix None in template
+
+Refactor:
+
+* Add pydantic type to pd2hv exports
+
+0.16.1
+-----
+
+Bugfixes:
+
+* Allow diacritics in send/receive (#344)
+* Resolve absolute nam path (#377)
+* Fix issue with Path in jinja2 environment
+* Daisy: Don't show warning if board doesn't have display section (#349)
+
+0.16.0
+-----
+
+Features:
+
+* Add theme configuration to pd2gui model
+* Add `flash_time` to pd2gui Bang parser
+* Only parse GUI with `--gui` flag
+* Port objects from cyclone
+* Port `pdnam~` external using `MicroNAM`
+* DPF: support `@hv_event` parameters
+* DPF: Generate optional NanoVG UI code from `pd2gui` parser
+
+Bugfixes:
+
+* Skip empty values when restoring tables (#348)
+* Only append to table when first value is a float
+* Fix parsing multi-array objects (#373)
+* GUI send/receive config for objects in subpatches
+* DPF: also send BPM value to `__hv_dpf_bpm` when transport is not playing
+* Wwise: use latest Windows SDK available locally instead of hardcoded version
+
+Refactor:
+
+* Migrate to Pathlib (note: Generator signature has changed!)
+* GUI IR: stable IDs for graphs/canvas/comments; updated float/number fields; use specific GUI IR filename
+
+Docs:
+
+* Versioning
+
 0.15.0
 -----
 

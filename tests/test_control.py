@@ -1,5 +1,5 @@
 # Copyright (C) 2014-2018 Enzien Audio, Ltd.
-# Copyright (C) 2022 Wasted Audio
+# Copyright (C) 2022-2026 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,16 +15,17 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import argparse
-import os
 import unittest
+
+from pathlib import Path
 
 from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
 from tests.framework.base_control import TestPdControlBase
 
 
 class TestPdControlPatches(TestPdControlBase):
-    SCRIPT_DIR = os.path.dirname(__file__)
-    TEST_DIR = os.path.join(os.path.dirname(__file__), "pd", "control")
+    SCRIPT_DIR = Path(__file__).parent
+    TEST_DIR = Path(Path(__file__).parent, "pd", "control")
 
     def test_abs(self):
         self._test_control_patch("test-abs.pd")
@@ -103,7 +104,7 @@ class TestPdControlPatches(TestPdControlBase):
         self._test_control_patch("test-exp.pd")
 
     def test_extern_names_capitals(self):
-        self._test_control_patch_expect_error("test-extern_names_capitals.pd", None)
+        self._test_control_patch_expect_error("test-extern_names_capitals.pd", NotificationEnum.EMPTY)
 
     def test_empty_patch(self):
         self._test_control_patch("test-empty_patch.pd")
@@ -231,12 +232,18 @@ class TestPdControlPatches(TestPdControlBase):
     def test_route(self):
         self._test_control_patch("test-route.pd")
 
+    def test_route_float(self):
+        self._test_control_patch("test-route_float.pd")
+
     @unittest.skip("currently does not support right inlet")
     def test_select(self):
         self._test_control_patch("test-select.pd")
 
     def test_select_min(self):
         self._test_control_patch("test-select-min.pd")
+
+    def test_select_float(self):
+        self._test_control_patch("test-select_float.pd")
 
     def test_send_receive(self):
         self._test_control_patch("test-send_receive.pd")
@@ -326,6 +333,37 @@ class TestPdControlPatches(TestPdControlBase):
     def test_extern_table(self):
         self._test_control_patch("test-extern_table.pd")
 
+    # list operations
+
+    def test_list_append(self):
+        self._test_control_patch("test-list_append.pd")
+
+    def test_list_prepend(self):
+        self._test_control_patch("test-list_prepend.pd")
+
+    def test_list_length(self):
+        self._test_control_patch("test-list_length.pd")
+
+    def test_list_trim(self):
+        self._test_control_patch("test-list_trim.pd")
+
+    def test_list_split(self):
+        self._test_control_patch("test-list_split.pd")
+
+    def test_list_store1(self):
+        self._test_control_patch("test-list_store.pd")
+
+    def test_list_store2(self):
+        self._test_control_patch("test-list_store2.pd", num_iterations=11)
+
+    def test_list_store3(self):
+        self._test_control_patch("test-list_store3.pd")
+
+    # Threshold
+
+    def test_threshold(self):
+        self._test_control_patch("test-threshold.pd", num_iterations=120)
+
 
 def main():
     # TODO(mhroth): make this work
@@ -335,7 +373,7 @@ def main():
         "pd_path",
         help="The path to the Pd file to read.")
     args = parser.parse_args()
-    if os.path.exists(args.pd_path):
+    if Path(args.pd_path).exists():
         test_control = TestPdControlPatches()
         result = test_control._test_control_patch(pd_file=args.pd_path)
         print(result)

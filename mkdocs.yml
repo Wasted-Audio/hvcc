@@ -1,0 +1,71 @@
+site_name: Heavy Compiler Collection
+repo_url: https://github.com/Wasted-Audio/hvcc
+repo_name: Wasted-Audio/hvcc
+site_url: https://wasted-audio.github.io/hvcc/
+theme:
+  name: material
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - search.suggest
+    - content.code.copy
+  palette:
+    scheme: slate  # Dark mode support
+  logo: img/logo-compressed.svg
+  favicon: img/favicon.ico
+
+extra:
+  version:
+    provider: mike
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets:
+      check_paths: true
+  - pymdownx.superfences
+
+hooks:
+  - docs/mkdocs_hooks.py
+
+nav:
+  - Home: index.md
+  - Getting Started:
+    - Introduction: getting-started/index.md
+    - Patching Guide: getting-started/patching.md
+  - Generators:
+    - Overview: generators/index.md
+    - Daisy:
+      - Basics: generators/daisy.md
+      - Board JSON: generators/daisy_json.md
+    - DPF: generators/dpf.md
+    - FMOD: generators/fmod.md
+    - Javascript: generators/javascript.md
+    - OWL: generators/owl.md
+    - Pd External: generators/pdext.md
+    - Unity: generators/unity.md
+    - Wwise: generators/wwise.md
+    - Custom: generators/custom.md
+  - Reference:
+    - MIDI: reference/midi.md
+    - C API: reference/c.md
+    - C++ API: reference/cpp.md
+    - Supported Objects: reference/objects/supported.md
+    - Unsupported Objects: reference/objects/unsupported.md
+    - Heavy Lang: reference/ir/heavy_lang.md
+    - Heavy IR: reference/ir/heavy_ir.md
+    - Heavy GUI IR: reference/ir/heavy_gui_ir.md
+  - ADRs:
+    - Overview: adr/index.md
+    - GUI Send/Receive: adr/ADR-001-GUI-Send-Receive.md
+    - pd2gui Parser: adr/ADR-002-pd2gui-Parser.md
+    - Control Rate Expr: adr/ADR-003-Control-Rate-Expr.md
+    - Signal Rate Expr: adr/ADR-004-Signal-Rate-Expr.md
+    - PDNAM External: adr/ADR-005-PDNAM-External.md
+    - gui2dpf Templates: adr/ADR-006-gui2dpf-Templates.md
+  - Changelog: changelog.md
+  - Contributing: contributing.md
+  - Code of Conduct: code_of_conduct.md
