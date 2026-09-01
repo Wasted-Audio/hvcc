@@ -66,11 +66,15 @@ void cBinop_onMessage(HeavyContextInterface *_c, ControlBinop *o, BinopType op, 
   switch (letIn) {
     case 0: {
       if (msg_isFloat(m, 0)) {
-        // Note(joe): supporting Pd's ability to perform operations of packs
-        // of floats is likely to not be supported in the future.
         if (msg_isFloat(m, 1)) o->k = msg_getFloat(m, 1);
         HvMessage *n = HV_MESSAGE_ON_STACK(1);
-        float f = cBinop_perform_op(op, msg_getFloat(m, 0), o->k);
+        o->s = msg_getFloat(m, 0);
+        float f = cBinop_perform_op(op, o->s, o->k);
+        msg_initWithFloat(n, msg_getTimestamp(m), f);
+        sendMessage(_c, 0, n);
+      } else if (msg_isBang(m, 0)) {
+        HvMessage *n = HV_MESSAGE_ON_STACK(1);
+        float f = cBinop_perform_op(op, o->s, o->k);
         msg_initWithFloat(n, msg_getTimestamp(m), f);
         sendMessage(_c, 0, n);
       }
@@ -86,15 +90,21 @@ void cBinop_onMessage(HeavyContextInterface *_c, ControlBinop *o, BinopType op, 
   }
 }
 
-void cBinop_k_onMessage(HeavyContextInterface *_c, void *o, BinopType op, float k,
+void cBinop_k_onMessage(HeavyContextInterface *_c, ControlBinop *o, BinopType op, float k,
     int letIn, const HvMessage *m,
     void (*sendMessage)(HeavyContextInterface *, int, const HvMessage *)) {
   if (msg_isFloat(m, 0)) {
-    // NOTE(mhroth): Heavy does not support sending bangs to binop objects to return the previous output
     float f = (msg_isFloat(m, 1)) ? msg_getFloat(m, 1) : k;
+    o->s = msg_getFloat(m, 0); // Store previous left input
     HvMessage *n = HV_MESSAGE_ON_STACK(1);
-    f = cBinop_perform_op(op, msg_getFloat(m, 0), f);
-    msg_initWithFloat(n, msg_getTimestamp(m), f);
+    float res = cBinop_perform_op(op, o->s, f);
+    msg_initWithFloat(n, msg_getTimestamp(m), res);
+    sendMessage(_c, 0, n);
+  } else if (msg_isBang(m, 0)) {
+    // Re-evaluate operation using stored left input and right constant k
+    HvMessage *n = HV_MESSAGE_ON_STACK(1);
+    float res = cBinop_perform_op(op, o->s, k);
+    msg_initWithFloat(n, msg_getTimestamp(m), res);
     sendMessage(_c, 0, n);
   }
 }
