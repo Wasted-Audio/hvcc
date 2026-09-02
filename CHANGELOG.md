@@ -11,6 +11,7 @@ Features:
 Bugs:
 
 * DPF: Better override for theme colors
+* pd2gui: properly return on subpatch restore without GoP
 
 0.17.1
 -----
