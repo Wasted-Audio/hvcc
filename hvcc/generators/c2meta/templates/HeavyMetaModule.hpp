@@ -55,6 +55,12 @@ public:
     void set_input(int input_id, float val) override;
     float get_output(int output_id) const override;
     float get_led_brightness(int led_id) const override;
+    void mark_input_unpatched(int input_id) override;
+    void mark_input_patched(int input_id) override;
+    void mark_output_unpatched(int output_id) override;
+    void mark_output_patched(int ounput_id) override;
+    void mark_all_inputs_unpatched() override;
+    void mark_all_outputs_unpatched() override;
 
 private:
     static void hvSendHook(HeavyContextInterface *c, const char *sendName, uint32_t sendHash, const HvMessage *m);

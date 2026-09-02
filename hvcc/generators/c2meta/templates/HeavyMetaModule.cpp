@@ -2,6 +2,11 @@
 
 #include "HeavyMetaModule_{{name}}.hpp"
 
+#define MM_INPUT_PATCHED        0x1B705A3F  // __mm_in_patched
+#define MM_OUTPUT_PATCHED       0xB390A0FB  // __mm_out_patched
+#define MM_INPUTS_UNPATCHED     0xAF350DDA  // __mm_in_patched_all
+#define MM_OUTPUTS_UNPATCHED    0x2D7EA032  // __mm_out_patched_all
+
 
 float {{name}}MM::_leds[NUM_LEDS > 0 ? NUM_LEDS : 1] = {0.0f};
 
@@ -112,4 +117,55 @@ float {{name}}MM::get_led_brightness(int led_id) const {
         default:
             return 0.0f;
     }
+}
+
+
+// Jack input and output detections
+
+void {{name}}MM::mark_input_unpatched(int input_id) {
+    if (input_id < 0 || input_id >= NUM_INPUTS) {
+        return;
+    }
+
+    hv_context->sendMessageToReceiverV(MM_INPUT_PATCHED, 0, "ff",
+        (float) input_id, 0.0f
+    );
+}
+
+void {{name}}MM::mark_input_patched(int input_id) {
+    if (input_id < 0 || input_id >= NUM_INPUTS) {
+        return;
+    }
+
+    hv_context->sendMessageToReceiverV(MM_INPUT_PATCHED, 0, "ff",
+        (float) input_id, 1.0f
+    );
+}
+
+void {{name}}MM::mark_output_unpatched(int output_id) {
+    if (output_id < 0 || output_id >= NUM_OUTPUTS) {
+        return;
+    }
+
+    hv_context->sendMessageToReceiverV(MM_OUTPUT_PATCHED, 0, "ff",
+        (float) output_id, 0.0f
+    );
+}
+
+void {{name}}MM::mark_output_patched(int output_id) {
+    if (output_id < 0 || output_id >= NUM_OUTPUTS) {
+        return;
+    }
+
+    hv_context->sendMessageToReceiverV(MM_OUTPUT_PATCHED, 0, "ff",
+        (float) output_id, 1.0f
+    );
+}
+
+void {{name}}MM::mark_all_inputs_unpatched() {
+    hv_context->sendBangToReceiver(MM_INPUTS_UNPATCHED);
+}
+
+void {{name}}MM::mark_all_outputs_unpatched() {
+    hv_context->sendBangToReceiver(MM_OUTPUTS_UNPATCHED);
 }
