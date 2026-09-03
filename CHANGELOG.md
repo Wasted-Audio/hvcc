@@ -10,8 +10,9 @@ Features:
 
 Bugs:
 
-* DPF: Better override for theme colors
 * pd2gui: properly return on subpatch restore without GoP
+* DPF: Better override for theme colors
+* DPF: NanoVG gui_objects - missing label for toggle
 
 0.17.1
 -----

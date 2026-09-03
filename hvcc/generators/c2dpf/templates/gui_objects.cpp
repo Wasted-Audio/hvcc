@@ -59,6 +59,7 @@
         nvgRGB{{object.fg_color.as_rgb_tuple()}}
             {%- endif %}
     );
+{% include 'gui_label.cpp' %}
     {{parent}}->addManagedChild({{object.parameter}});
         {%- elif object.type in ['vradio', 'hradio'] %}
     // {{object.type}}
