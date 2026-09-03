@@ -8,13 +8,13 @@
       
       
       
-        <link rel="canonical" href="https://wasted-audio.github.io/hvcc/develop/reference/midi/">
+        <link rel="canonical" href="https://wasted-audio.github.io/hvcc/develop/generators/daisy_boards/">
       
       
-        <link rel="prev" href="../../generators/custom/">
+        <link rel="prev" href="../daisy/">
       
       
-        <link rel="next" href="../c/">
+        <link rel="next" href="../daisy_json/">
       
       
         
@@ -25,7 +25,7 @@
     
     
       
-        <title>MIDI - Heavy Compiler Collection</title>
+        <title>Boards - Heavy Compiler Collection</title>
       
     
     
@@ -74,7 +74,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#midi-io" class="md-skip">
+        <a href="#daisy-board-io" class="md-skip">
           Skip to content
         </a>
       
@@ -111,7 +111,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              MIDI
+              Boards
             
           </span>
         </div>
@@ -235,11 +235,13 @@
   
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
-        <a href="../../generators/" class="md-tabs__link">
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../" class="md-tabs__link">
           
   
   
@@ -255,13 +257,11 @@
   
   
   
-    
-  
   
     
     
-      <li class="md-tabs__item md-tabs__item--active">
-        <a href="./" class="md-tabs__link">
+      <li class="md-tabs__item">
+        <a href="../../reference/midi/" class="md-tabs__link">
           
   
   
@@ -540,26 +540,31 @@
       
   
   
+    
   
   
+  
     
     
     
     
+      
+        
+        
       
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
         
           
-          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
             
   
   
@@ -577,7 +582,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_3">
             <span class="md-nav__icon md-icon"></span>
             
@@ -595,7 +600,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../generators/" class="md-nav__link">
+      <a href="../" class="md-nav__link">
         
   
   
@@ -620,26 +625,31 @@
                 
   
   
+    
   
   
+  
     
     
     
     
       
       
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_2" >
         
           
-          <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="0">
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="">
             
   
   
@@ -657,7 +667,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_3_2">
             <span class="md-nav__icon md-icon"></span>
             
@@ -675,7 +685,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../generators/daisy/" class="md-nav__link">
+      <a href="../daisy/" class="md-nav__link">
         
   
   
@@ -700,10 +710,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../../generators/daisy_boards/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Boards
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -719,6 +756,81 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#patch" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        patch
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#patch_init" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        patch_init
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#petal" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        petal
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pod" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        pod
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#field" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        field
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -731,7 +843,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../generators/daisy_json/" class="md-nav__link">
+      <a href="../daisy_json/" class="md-nav__link">
         
   
   
@@ -767,7 +879,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../generators/dpf/" class="md-nav__link">
+      <a href="../dpf/" class="md-nav__link">
         
   
   
@@ -795,7 +907,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../generators/fmod/" class="md-nav__link">
+      <a href="../fmod/" class="md-nav__link">
         
   
   
@@ -823,7 +935,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../generators/javascript/" class="md-nav__link">
+      <a href="../javascript/" class="md-nav__link">
         
   
   
@@ -851,7 +963,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../generators/owl/" class="md-nav__link">
+      <a href="../owl/" class="md-nav__link">
         
   
   
@@ -879,7 +991,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../generators/pdext/" class="md-nav__link">
+      <a href="../pdext/" class="md-nav__link">
         
   
   
@@ -907,7 +1019,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../generators/unity/" class="md-nav__link">
+      <a href="../unity/" class="md-nav__link">
         
   
   
@@ -935,7 +1047,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../generators/wwise/" class="md-nav__link">
+      <a href="../wwise/" class="md-nav__link">
         
   
   
@@ -963,7 +1075,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../generators/custom/" class="md-nav__link">
+      <a href="../custom/" class="md-nav__link">
         
   
   
@@ -995,31 +1107,26 @@
       
   
   
-    
   
   
-  
     
     
     
     
-      
-        
-        
       
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
         
           
-          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
             
   
   
@@ -1037,7 +1144,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_4">
             <span class="md-nav__icon md-icon"></span>
             
@@ -1052,37 +1159,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    MIDI
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../../reference/midi/" class="md-nav__link">
         
   
   
@@ -1098,81 +1178,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#inputs" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Inputs
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#outputs" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Outputs
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#note" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Note
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#handling-midi-input" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Handling MIDI Input
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#handling-midi-output" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Handling MIDI Output
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -1185,7 +1190,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../c/" class="md-nav__link">
+      <a href="../../reference/c/" class="md-nav__link">
         
   
   
@@ -1213,7 +1218,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../cpp/" class="md-nav__link">
+      <a href="../../reference/cpp/" class="md-nav__link">
         
   
   
@@ -1241,7 +1246,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../objects/supported/" class="md-nav__link">
+      <a href="../../reference/objects/supported/" class="md-nav__link">
         
   
   
@@ -1269,7 +1274,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../objects/unsupported/" class="md-nav__link">
+      <a href="../../reference/objects/unsupported/" class="md-nav__link">
         
   
   
@@ -1297,7 +1302,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../ir/heavy_lang/" class="md-nav__link">
+      <a href="../../reference/ir/heavy_lang/" class="md-nav__link">
         
   
   
@@ -1325,7 +1330,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../ir/heavy_ir/" class="md-nav__link">
+      <a href="../../reference/ir/heavy_ir/" class="md-nav__link">
         
   
   
@@ -1353,7 +1358,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../ir/heavy_gui_ir/" class="md-nav__link">
+      <a href="../../reference/ir/heavy_gui_ir/" class="md-nav__link">
         
   
   
@@ -1744,10 +1749,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#inputs" class="md-nav__link">
+  <a href="#patch" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Inputs
+        patch
       
     </span>
   </a>
@@ -1755,10 +1760,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#outputs" class="md-nav__link">
+  <a href="#patch_init" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Outputs
+        patch_init
       
     </span>
   </a>
@@ -1766,10 +1771,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#note" class="md-nav__link">
+  <a href="#petal" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Note
+        petal
       
     </span>
   </a>
@@ -1777,10 +1782,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#handling-midi-input" class="md-nav__link">
+  <a href="#pod" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Handling MIDI Input
+        pod
       
     </span>
   </a>
@@ -1788,10 +1793,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#handling-midi-output" class="md-nav__link">
+  <a href="#field" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Handling MIDI Output
+        field
       
     </span>
   </a>
@@ -1818,151 +1823,530 @@
   
 
 
-<h1 id="midi-io">MIDI I/O</h1>
-<p>In PureData there are several objects to handle interfacing with MIDI.</p>
-<p><strong>heavy</strong> doesn't provide cross-platform implementation for MIDI I/O as the requirements tend to change depending on the platform or framework being used.</p>
-<p>Instead, it provides wrappers around these objects that route the data to specific hard-coded receivers/parameters in the patch context. For example a <code>[notein]</code> object will be replaced by a <code>[r __hv_notein]</code> receiver with input data split into its constituent parts and routed to the appropriate outlet.</p>
-<h2 id="inputs">Inputs</h2>
-<p>The following Pd objects are mapped to their corresponding heavy parameter and internal hash.</p>
+<h1 id="daisy-board-io">Daisy Board I/O</h1>
+<p>An overview of the standard Electro-Smith prototyping devices and their included <a href="../daisy_json/">Board JSON</a> layout.</p>
+<p>You can inspect the <a href="https://github.com/Wasted-Audio/hvcc/tree/develop/hvcc/generators/c2daisy/json2daisy/resources">JSON descriptions</a> in the HVCC source repository.</p>
+<h2 id="patch">patch</h2>
 <table>
 <thead>
 <tr>
-<th>Pd object</th>
-<th>heavy param</th>
-<th>heavy hash</th>
+<th>Name</th>
+<th>Aliases</th>
+<th>Type</th>
+<th>Variants</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>[notein]</td>
-<td>__hv_notein</td>
-<td>0x67E37CA3</td>
+<td>knob1</td>
+<td>knob, ctrl, ctrl1</td>
+<td>Voltage Input</td>
+<td>---</td>
 </tr>
 <tr>
-<td>[ctlin]</td>
-<td>__hv_ctlin</td>
-<td>0x41BE0f9C</td>
+<td>knob2</td>
+<td>ctrl2</td>
+<td>Voltage Input</td>
+<td>---</td>
 </tr>
 <tr>
-<td>[polytouchin]</td>
-<td>__hv_polytouchin</td>
-<td>0xBC530F59</td>
+<td>knob3</td>
+<td>ctrl3</td>
+<td>Voltage Input</td>
+<td>---</td>
 </tr>
 <tr>
-<td>[pgmin]</td>
-<td>__hv_pgmin</td>
-<td>0x2E1EA03D</td>
+<td>knob4</td>
+<td>ctrl4</td>
+<td>Voltage Input</td>
+<td>---</td>
 </tr>
 <tr>
-<td>[touchin]</td>
-<td>__hv_touchin</td>
-<td>0x553925BD</td>
+<td>encoder</td>
+<td>---</td>
+<td>Encoder</td>
+<td>encoder_press, encoder_rise, encoder_fall, encoder_seconds</td>
 </tr>
 <tr>
-<td>[bendin]</td>
-<td>__hv_bendin</td>
-<td>0x3083F0F7</td>
+<td>gateout</td>
+<td>---</td>
+<td>Gate Out</td>
+<td>---</td>
 </tr>
 <tr>
-<td>[midiin]</td>
-<td>__hv_midiin</td>
-<td>0x149631bE</td>
+<td>cvout1</td>
+<td>cvout</td>
+<td>CV Out</td>
+<td>---</td>
 </tr>
 <tr>
-<td>[midirealtimein]</td>
-<td>__hv_midirealtimein</td>
-<td>0x6FFF0BCF</td>
+<td>cvout2</td>
+<td>---</td>
+<td>CV Out</td>
+<td>---</td>
+</tr>
+<tr>
+<td>gatein1</td>
+<td>gate, gate1</td>
+<td>Gate In</td>
+<td>gatein1_trig</td>
+</tr>
+<tr>
+<td>gatein2</td>
+<td>gate2</td>
+<td>Gate In</td>
+<td>gatein2_trig</td>
 </tr>
 </tbody>
 </table>
-<h2 id="outputs">Outputs</h2>
-<p>The same principle applies for sending MIDI data out of the heavy context. If you add a [noteout] object there'll be a corresponding sendhook callback with a message containing the MIDI data sent by the patch.</p>
+<h2 id="patch_init">patch_init</h2>
 <table>
 <thead>
 <tr>
-<th>Pd object</th>
-<th>heavy sendhook</th>
-<th>heavy hash</th>
+<th>Name</th>
+<th>Aliases</th>
+<th>Type</th>
+<th>Variants</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>[noteout]</td>
-<td>__hv_noteout</td>
-<td>0xD1D4AC2</td>
+<td>cv_1</td>
+<td>knob, knob1, ctrl, ctrl1</td>
+<td>Voltage Input</td>
+<td>---</td>
 </tr>
 <tr>
-<td>[ctlout]</td>
-<td>__hv_ctlout</td>
-<td>0xE5e2A040</td>
+<td>cv_2</td>
+<td>knob2, ctrl2</td>
+<td>Voltage Input</td>
+<td>---</td>
 </tr>
 <tr>
-<td>[polytouchout]</td>
-<td>__hv_polytouchout</td>
-<td>0xD5ACA9D1</td>
+<td>cv_3</td>
+<td>knob3, ctrl3</td>
+<td>Voltage Input</td>
+<td>---</td>
 </tr>
 <tr>
-<td>[pgmout]</td>
-<td>__hv_pgmout</td>
-<td>0x8753E39E</td>
+<td>cv_4</td>
+<td>knob4, ctrl4</td>
+<td>Voltage Input</td>
+<td>---</td>
 </tr>
 <tr>
-<td>[touchout]</td>
-<td>__hv_touchout</td>
-<td>0x476D4387</td>
+<td>cv_5</td>
+<td>knob5, ctrl5</td>
+<td>Voltage Input</td>
+<td>---</td>
 </tr>
 <tr>
-<td>[bendout]</td>
-<td>__hv_bendout</td>
-<td>0xE8458013</td>
+<td>cv_6</td>
+<td>knob6, ctrl6</td>
+<td>Voltage Input</td>
+<td>---</td>
 </tr>
 <tr>
-<td>[midiout]</td>
-<td>__hv_midiout</td>
-<td>0x6511DE55</td>
+<td>cv_7</td>
+<td>knob7, ctrl7</td>
+<td>Voltage Input</td>
+<td>---</td>
 </tr>
 <tr>
-<td>[midiout]</td>
-<td>__hv_midioutport</td>
-<td>0x165707E4</td>
+<td>cv_8</td>
+<td>knob8, ctrl8</td>
+<td>Voltage Input</td>
+<td>---</td>
+</tr>
+<tr>
+<td>adc_9</td>
+<td>---</td>
+<td>Voltage Input</td>
+<td>---</td>
+</tr>
+<tr>
+<td>adc_10</td>
+<td>---</td>
+<td>Voltage Input</td>
+<td>---</td>
+</tr>
+<tr>
+<td>adc_11</td>
+<td>---</td>
+<td>Voltage Input</td>
+<td>---</td>
+</tr>
+<tr>
+<td>adc_12</td>
+<td>---</td>
+<td>Voltage Input</td>
+<td>---</td>
+</tr>
+<tr>
+<td>gate_out_1</td>
+<td>gateout, gateout1</td>
+<td>Gate Out</td>
+<td>---</td>
+</tr>
+<tr>
+<td>gate_out_2</td>
+<td>gateout2</td>
+<td>Gate Out</td>
+<td>---</td>
+</tr>
+<tr>
+<td>cvout1</td>
+<td>cvout, cv_out_1</td>
+<td>CV Out</td>
+<td>---</td>
+</tr>
+<tr>
+<td>cvout2</td>
+<td>cv_out_2</td>
+<td>CV Out</td>
+<td>---</td>
+</tr>
+<tr>
+<td>gate_in_1</td>
+<td>gate, gate1</td>
+<td>Gate In</td>
+<td>gate_in_1_trig</td>
+</tr>
+<tr>
+<td>gate_in_2</td>
+<td>gate2</td>
+<td>Gate In</td>
+<td>gate_in_2_trig</td>
+</tr>
+<tr>
+<td>sw1</td>
+<td>switch, switch1, button</td>
+<td>Switch</td>
+<td>sw1_press, sw1_fall, sw1_seconds</td>
+</tr>
+<tr>
+<td>sw2</td>
+<td>switch2, toggle</td>
+<td>Switch</td>
+<td>sw2_press, sw2_fall, sw2_seconds</td>
 </tr>
 </tbody>
 </table>
-<h2 id="note">Note</h2>
-<ul>
-<li>Channel numbering in the generator is expect to start at 0. For this reason the midi wrapper objects internally <code>[+ 1]</code> and <code>[- 1]</code> since Pure Data starts channel numbering at 1 and this keeps some expected patch compatibility in place.</li>
-<li>Also for compatibility reasons <code>[bendout]</code> uses -8192 to 8191 range (and resets the offset with an internal <code>[+ 8192]</code>). This ensures expected behaviour with pd-vanilla patches.</li>
-<li>It is generally the users responsibility to convert to and from the MIDI byte data to the float values used by heavy.</li>
-<li>The <code>[ctlin]</code> object is currently unable to match CC message 0. One can of course still filter for this message in the patch itself.</li>
-<li>The <code>[midiout]</code> object currently does not respond to port numbers.</li>
-</ul>
-<p>Some framework targets like <a href="../../generators/dpf/">DPF</a> already have implementations available. However, if you're integrating the C/C++ code on a custom platform then you'll need to provide your own conversion process.</p>
-<p>Here's the <code>DPF</code> implementation as an example.</p>
-<h2 id="handling-midi-input">Handling MIDI Input</h2>
-<p>The MIDI input is called during the DPF <code>run()</code> loop where it receives <code>MidiEvent</code> messages.</p>
-<p><a href="https://github.com/Wasted-Audio/hvcc/blob/develop/hvcc/generators/c2dpf/templates/HeavyDPF.cpp#L201-L205">Source code (run loop)</a></p>
-<p><a href="https://github.com/Wasted-Audio/hvcc/blob/develop/hvcc/generators/c2dpf/templates/midiInput.cpp">Source code (handleMidiInput)</a></p>
-<h2 id="handling-midi-output">Handling MIDI Output</h2>
-<p>For MIDI output you will need to set a heavy sendhook function that will trigger <code>DPF</code> MIDI output events from the heavy context:</p>
-<div class="language-cpp highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">hvSendHookFunc</span><span class="p">(</span><span class="n">HeavyContextInterface</span><span class="w"> </span><span class="o">*</span><span class="n">c</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">sendName</span><span class="p">,</span><span class="w"> </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">sendHash</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">HvMessage</span><span class="w"> </span><span class="o">*</span><span class="n">m</span><span class="p">)</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="p">{</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">  </span><span class="p">{{</span><span class="n">class_name</span><span class="p">}}</span><span class="o">*</span><span class="w"> </span><span class="n">plugin</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">({{</span><span class="n">class_name</span><span class="p">}}</span><span class="o">*</span><span class="p">)</span><span class="n">c</span><span class="o">-&gt;</span><span class="n">getUserData</span><span class="p">();</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">plugin</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="nb">nullptr</span><span class="p">)</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">  </span><span class="p">{</span>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="cp">#if DISTRHO_PLUGIN_WANT_MIDI_OUTPUT</span>
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="w">    </span><span class="n">plugin</span><span class="o">-&gt;</span><span class="n">handleMidiSend</span><span class="p">(</span><span class="n">sendHash</span><span class="p">,</span><span class="w"> </span><span class="n">m</span><span class="p">);</span>
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="cp">#endif</span>
-</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="w">  </span><span class="p">}</span>
-</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="p">}</span>
-</span></code></pre></div>
-<p>That can then be attached to the heavy context in the constructor:</p>
-<div class="language-cpp highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="w">  </span><span class="n">_context</span><span class="o">-&gt;</span><span class="n">setUserData</span><span class="p">(</span><span class="k">this</span><span class="p">);</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">  </span><span class="n">_context</span><span class="o">-&gt;</span><span class="n">setSendHook</span><span class="p">(</span><span class="o">&amp;</span><span class="n">hvSendHookFunc</span><span class="p">);</span>
-</span></code></pre></div>
-<p>This will prepare the DPF MidiEvents and needs to take special care for Note Off messages.</p>
-<p>Pd does not have specific Note Off events, so velocity 0 is assumed to be Note Off in this case. And because DPF only supports a single midi port we do a <code>% 16</code> to reduce them to only one.</p>
-<p>Bend assumes input values ranged <code>0 - 16383</code> for <code>[bendin]</code> (normal bend range), however as mentioned before <code>[bendout]</code> uses <code>-8192 to 8191</code> to stay compatible with pd-vanilla.</p>
-<p><a href="https://github.com/Wasted-Audio/hvcc/blob/develop/hvcc/generators/c2dpf/templates/midiOutput.cpp">Source code (handleMidiSend)</a></p>
+<h2 id="petal">petal</h2>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Aliases</th>
+<th>Type</th>
+<th>Variants</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>sw1</td>
+<td>switch, switch1</td>
+<td>Switch</td>
+<td>sw1_press, sw1_fall, sw1_seconds</td>
+</tr>
+<tr>
+<td>sw2</td>
+<td>switch2</td>
+<td>Switch</td>
+<td>sw2_press, sw2_fall, sw2_seconds</td>
+</tr>
+<tr>
+<td>sw3</td>
+<td>switch3</td>
+<td>Switch</td>
+<td>sw3_press, sw3_fall, sw3_seconds</td>
+</tr>
+<tr>
+<td>sw4</td>
+<td>switch4</td>
+<td>Switch</td>
+<td>sw4_press, sw4_fall, sw4_seconds</td>
+</tr>
+<tr>
+<td>sw5</td>
+<td>switch5</td>
+<td>Switch</td>
+<td>sw5_press, sw5_fall, sw5_seconds</td>
+</tr>
+<tr>
+<td>sw6</td>
+<td>switch6</td>
+<td>Switch</td>
+<td>sw6_press, sw6_fall, sw6_seconds</td>
+</tr>
+<tr>
+<td>sw7</td>
+<td>switch7</td>
+<td>Switch</td>
+<td>sw7_press, sw7_fall, sw7_seconds</td>
+</tr>
+<tr>
+<td>encoder</td>
+<td>---</td>
+<td>Encoder</td>
+<td>encoder_press, encoder_rise, encoder_fall, encoder_seconds</td>
+</tr>
+<tr>
+<td>knob1</td>
+<td>knob, ctrl, ctrl1</td>
+<td>Voltage Input</td>
+<td>---</td>
+</tr>
+<tr>
+<td>knob2</td>
+<td>ctrl2</td>
+<td>Voltage Input</td>
+<td>---</td>
+</tr>
+<tr>
+<td>knob3</td>
+<td>ctrl3</td>
+<td>Voltage Input</td>
+<td>---</td>
+</tr>
+<tr>
+<td>knob4</td>
+<td>ctrl4</td>
+<td>Voltage Input</td>
+<td>---</td>
+</tr>
+<tr>
+<td>knob5</td>
+<td>ctrl5</td>
+<td>Voltage Input</td>
+<td>---</td>
+</tr>
+<tr>
+<td>knob6</td>
+<td>ctrl6</td>
+<td>Voltage Input</td>
+<td>---</td>
+</tr>
+<tr>
+<td>expression</td>
+<td>---</td>
+<td>Voltage Input</td>
+<td>---</td>
+</tr>
+<tr>
+<td>led_ring_1 ... led_ring_8</td>
+<td>---</td>
+<td>RGB LED</td>
+<td>led_ring_1_red, led_ring_1_green, led_ring_1_blue, led_ring_1_white</td>
+</tr>
+<tr>
+<td>led_fs_1</td>
+<td>---</td>
+<td>LED</td>
+<td>---</td>
+</tr>
+<tr>
+<td>led_fs_2</td>
+<td>---</td>
+<td>LED</td>
+<td>---</td>
+</tr>
+<tr>
+<td>led_fs_3</td>
+<td>---</td>
+<td>LED</td>
+<td>---</td>
+</tr>
+<tr>
+<td>led_fs_4</td>
+<td>---</td>
+<td>LED</td>
+<td>---</td>
+</tr>
+</tbody>
+</table>
+<h2 id="pod">pod</h2>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Aliases</th>
+<th>Type</th>
+<th>Variants</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>sw1</td>
+<td>switch, button, switch1, button1</td>
+<td>Switch</td>
+<td>sw1_press, sw1_fall, sw1_seconds</td>
+</tr>
+<tr>
+<td>sw2</td>
+<td>switch2, button2</td>
+<td>Switch</td>
+<td>sw2_press, sw2_fall, sw2_seconds</td>
+</tr>
+<tr>
+<td>knob1</td>
+<td>knob, ctrl, ctrl1</td>
+<td>Voltage Input</td>
+<td>---</td>
+</tr>
+<tr>
+<td>knob2</td>
+<td>ctrl2</td>
+<td>Voltage Input</td>
+<td>---</td>
+</tr>
+<tr>
+<td>encoder</td>
+<td>---</td>
+<td>Encoder</td>
+<td>encoder_press, encoder_rise, encoder_fall, encoder_seconds</td>
+</tr>
+<tr>
+<td>led1</td>
+<td>led</td>
+<td>RGB LED</td>
+<td>led1_red, led1_green, led1_blue, led1_white</td>
+</tr>
+<tr>
+<td>led2</td>
+<td>---</td>
+<td>RGB LED</td>
+<td>led2_red, led2_green, led2_blue, led2_white</td>
+</tr>
+<tr>
+<td>gatein</td>
+<td>gate, gate1</td>
+<td>Gate In</td>
+<td>gatein_trig</td>
+</tr>
+</tbody>
+</table>
+<h2 id="field">field</h2>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Aliases</th>
+<th>Type</th>
+<th>Variants</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>sw1</td>
+<td>switch, button, switch1, button1</td>
+<td>Switch</td>
+<td>sw1_press, sw1_fall, sw1_seconds</td>
+</tr>
+<tr>
+<td>sw2</td>
+<td>switch2, button2</td>
+<td>Switch</td>
+<td>sw2_press, sw2_fall, sw2_seconds</td>
+</tr>
+<tr>
+<td>cv1</td>
+<td>---</td>
+<td>Bipolar Voltage Input</td>
+<td>---</td>
+</tr>
+<tr>
+<td>cv2</td>
+<td>---</td>
+<td>Bipolar Voltage Input</td>
+<td>---</td>
+</tr>
+<tr>
+<td>cv3</td>
+<td>---</td>
+<td>Bipolar Voltage Input</td>
+<td>---</td>
+</tr>
+<tr>
+<td>cv4</td>
+<td>---</td>
+<td>Bipolar Voltage Input</td>
+<td>---</td>
+</tr>
+<tr>
+<td>knob1</td>
+<td>knob, ctrl, ctrl1</td>
+<td>Voltage Input</td>
+<td>---</td>
+</tr>
+<tr>
+<td>knob2</td>
+<td>ctrl2</td>
+<td>Voltage Input</td>
+<td>---</td>
+</tr>
+<tr>
+<td>knob3 ... knob8</td>
+<td>---</td>
+<td>Voltage Input</td>
+<td>---</td>
+</tr>
+<tr>
+<td>cvout1</td>
+<td>cvout</td>
+<td>CV Out</td>
+<td>---</td>
+</tr>
+<tr>
+<td>cvout2</td>
+<td>---</td>
+<td>CV Out</td>
+<td>---</td>
+</tr>
+<tr>
+<td>gatein</td>
+<td>---</td>
+<td>Gate In</td>
+<td>gatein_trig</td>
+</tr>
+<tr>
+<td>gateout</td>
+<td>---</td>
+<td>Gate Out</td>
+<td>---</td>
+</tr>
+<tr>
+<td>pada1 ... pada8</td>
+<td>---</td>
+<td>Switch</td>
+<td>pada1_press, pada1_fall</td>
+</tr>
+<tr>
+<td>padb1 ... padb8</td>
+<td>---</td>
+<td>Switch</td>
+<td>padb1_press, padb1_fall</td>
+</tr>
+<tr>
+<td>led_key_a1 ... led_key_a8</td>
+<td>---</td>
+<td>LED</td>
+<td>---</td>
+</tr>
+<tr>
+<td>led_key_b1 ... led_key_b8</td>
+<td>---</td>
+<td>LED</td>
+<td>---</td>
+</tr>
+<tr>
+<td>led_knob_1 ... led_knob_8</td>
+<td>---</td>
+<td>LED</td>
+<td>---</td>
+</tr>
+</tbody>
+</table>
 
 
 
