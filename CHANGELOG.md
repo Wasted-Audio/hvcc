@@ -14,6 +14,10 @@ Bugs:
 * DPF: Better override for theme colors
 * DPF: NanoVG gui_objects - missing label for toggle
 
+Docs:
+
+* Daisy: add included boards I/O
+
 0.17.1
 -----
 
