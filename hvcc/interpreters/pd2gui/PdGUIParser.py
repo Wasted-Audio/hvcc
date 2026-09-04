@@ -35,7 +35,7 @@ class PdGUIParser(PdParser):
         file_path: Path,
         obj_args: Optional[list] = None,
         is_root: bool = True
-    ) -> tuple[Union[Graph, GraphRoot], bool]:
+    ) -> tuple[Optional[Union[Graph, GraphRoot]], bool]:
         if is_root:
             self.search_paths.append(file_path)
 
@@ -65,7 +65,7 @@ class PdGUIParser(PdParser):
         graph_args: list,
         pd_path: Path,
         is_root: bool = False
-    ) -> tuple[Union[Graph, GraphRoot], bool]:
+    ) -> tuple[Optional[Union[Graph, GraphRoot]], bool]:
 
         objects: list[GUIObjects] = []
         graphs: list[Graph] = []
@@ -105,22 +105,25 @@ class PdGUIParser(PdParser):
                         except IndexError:
                             continue
 
-                    elif line[1] == "restore" and gop:
-                        objects = self.filter_invisible_objects(objects, gop_start, gop_size)
-                        graphs = self.filter_invisible_graphs(graphs, gop_start, gop_size)
-                        self.object_counter["graph"] += 1
+                    elif line[1] == "restore":
+                        if gop:
+                            objects = self.filter_invisible_objects(objects, gop_start, gop_size)
+                            graphs = self.filter_invisible_graphs(graphs, gop_start, gop_size)
+                            self.object_counter["graph"] += 1
 
-                        return Graph(
-                            id=f"graph{self.object_counter['graph']}",
-                            position=Coords(
-                                x=int(line[2]),
-                                y=int(line[3])
-                            ),
-                            gop_start=gop_start,
-                            gop_size=gop_size,
-                            objects=objects,
-                            graphs=graphs
-                        ), gop
+                            return Graph(
+                                id=f"graph{self.object_counter['graph']}",
+                                position=Coords(
+                                    x=int(line[2]),
+                                    y=int(line[3])
+                                ),
+                                gop_start=gop_start,
+                                gop_size=gop_size,
+                                objects=objects,
+                                graphs=graphs
+                            ), gop
+                        else:
+                            return None, False
 
                     elif line[1] == "text":
                         x = self.add_comment(line)

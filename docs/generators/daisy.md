@@ -20,6 +20,8 @@ Which can be configured using the `-m` metadata.json `daisy.board` setting:
 }
 ```
 
+We have included an [overview](daisy_boards.md) of Electro-Smith devices and their layout.
+
 However one can also create custom board layouts. See [the Daisy Component documentation](daisy_json.md) for more information.
 
 The custom layout can be passed on via the meta.json as such:
