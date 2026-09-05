@@ -4,8 +4,8 @@
 
 #define MM_INPUT_PATCHED        0x1B705A3F  // __mm_in_patched
 #define MM_OUTPUT_PATCHED       0xB390A0FB  // __mm_out_patched
-#define MM_INPUTS_UNPATCHED     0xAF350DDA  // __mm_in_patched_all
-#define MM_OUTPUTS_UNPATCHED    0x2D7EA032  // __mm_out_patched_all
+#define MM_INPUTS_UNPATCHED     0x9190DD5E  // __mm_in_unpatched_all
+#define MM_OUTPUTS_UNPATCHED    0x491990E4  // __mm_out_unpatched_all
 
 
 float {{name}}MM::_leds[NUM_LEDS > 0 ? NUM_LEDS : 1] = {0.0f};
@@ -24,9 +24,16 @@ void {{name}}MM::hvSendHook(HeavyContextInterface *c, const char *sendName, uint
     {%- endif %}
 }
 
+void {{name}}MM::hvPrintHook(HeavyContextInterface *c, const char *printLabel, const char *msgString, const HvMessage *m) {
+    char buf[64];
+    snprintf(buf, sizeof(buf), "%.48s %s", printLabel, msgString);
+    printf("> %s \n", buf);
+}
+
 {{name}}MM::{{name}}MM(double samplerate) {
     hv_context = std::make_unique<Heavy_{{name}}>(samplerate);
     hv_context->setSendHook(&hvSendHook);
+    hv_context->setPrintHook(&hvPrintHook);
 
     {%- for k,v in receivers %}
     _params[Param_{{v.display|capitalize}}ID] = ({{v.attributes.default}}f - {{v.attributes.min}}f) / ({{v.attributes.max}}f - {{v.attributes.min}}f);
@@ -56,6 +63,7 @@ void {{name}}MM::update() {
 void {{name}}MM::set_samplerate(float sr) {
     hv_context = std::make_unique<Heavy_{{name}}>(static_cast<double>(sr));
     hv_context->setSendHook(&hvSendHook);
+    hv_context->setPrintHook(&hvPrintHook);
 
     {%- for k,v in receivers %}
     set_param(Param_{{v.display|capitalize}}ID, _params[Param_{{v.display|capitalize}}ID]);
@@ -162,10 +170,14 @@ void {{name}}MM::mark_output_patched(int output_id) {
     );
 }
 
+// WIP, these don't work yet
+
 void {{name}}MM::mark_all_inputs_unpatched() {
-    hv_context->sendBangToReceiver(MM_INPUTS_UNPATCHED);
+    // hv_context->sendBangToReceiver(MM_INPUTS_UNPATCHED);
+    hv_context->sendMessageToReceiverV(MM_INPUTS_UNPATCHED, 0, "f", 1.0f);
 }
 
 void {{name}}MM::mark_all_outputs_unpatched() {
-    hv_context->sendBangToReceiver(MM_OUTPUTS_UNPATCHED);
+    // hv_context->sendBangToReceiver(MM_OUTPUTS_UNPATCHED);
+    hv_context->sendMessageToReceiverV(MM_OUTPUTS_UNPATCHED, 0, "f", 1.0f);
 }

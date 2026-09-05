@@ -58,12 +58,13 @@ public:
     void mark_input_unpatched(int input_id) override;
     void mark_input_patched(int input_id) override;
     void mark_output_unpatched(int output_id) override;
-    void mark_output_patched(int ounput_id) override;
+    void mark_output_patched(int output_id) override;
     void mark_all_inputs_unpatched() override;
     void mark_all_outputs_unpatched() override;
 
 private:
     static void hvSendHook(HeavyContextInterface *c, const char *sendName, uint32_t sendHash, const HvMessage *m);
+    static void hvPrintHook(HeavyContextInterface *c, const char *printLabel, const char *msgString, const HvMessage *m);
 
     std::unique_ptr<HeavyContextInterface> hv_context;
 
