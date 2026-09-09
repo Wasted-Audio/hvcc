@@ -7,7 +7,7 @@
     {{object.id}}->setColors(nvgRGB{{object.bg_color.as_rgb_tuple()}});
             {%- if object.label != None %}
     {{object.id}}->setLabel("{{object.label.text}}",
-                {%- if meta.ui_theme is not none and meta.ui_themes[meta.ui_theme].cnv_text_color is not none %}
+                {%- if meta.ui_theme_set is sameas true and meta.ui_theme is not none and meta.ui_themes[meta.ui_theme].cnv_text_color is not none %}
         Colors::cnvTextColor,
                 {%- else %}
         nvgRGB{{object.label.color.as_rgb_tuple()}},
@@ -33,7 +33,7 @@
     {{object.parameter}}->setSize({{object.size.x}} * scaleFactor, {{object.size.y}} * scaleFactor);
     {{object.parameter}}->setAbsolutePos({{object.position.x}} * scaleFactor, {{object.position.y}} * scaleFactor);
     {{object.parameter}}->setColors(
-            {%- if meta.ui_theme is not none and meta.ui_themes[meta.ui_theme].bg_color is not none and meta.ui_themes[meta.ui_theme].cnvTextColor is not none %}
+            {%- if meta.ui_theme_set is sameas true and meta.ui_theme is not none and meta.ui_themes[meta.ui_theme].bg_color is not none and meta.ui_themes[meta.ui_theme].cnvTextColor is not none %}
         Colors::bgColor,
         Colors::cnvTextColor
             {%- else %}
@@ -51,7 +51,7 @@
     {{object.parameter}}->setSize({{object.size.x}} * scaleFactor, {{object.size.y}} * scaleFactor);
     {{object.parameter}}->setAbsolutePos({{object.position.x}} * scaleFactor, {{object.position.y}} * scaleFactor);
     {{object.parameter}}->setColors(
-            {%- if meta.ui_theme is not none and meta.ui_themes[meta.ui_theme].bg_color is not none and meta.ui_themes[meta.ui_theme].cnvTextColor is not none %}
+            {%- if meta.ui_theme_set is sameas true and meta.ui_theme is not none and meta.ui_themes[meta.ui_theme].bg_color is not none and meta.ui_themes[meta.ui_theme].cnvTextColor is not none %}
         Colors::bgColor,
         Colors::cnvTextColor
             {%- else %}
@@ -59,6 +59,7 @@
         nvgRGB{{object.fg_color.as_rgb_tuple()}}
             {%- endif %}
     );
+{% include 'gui_label.cpp' %}
     {{parent}}->addManagedChild({{object.parameter}});
         {%- elif object.type in ['vradio', 'hradio'] %}
     // {{object.type}}
@@ -71,7 +72,7 @@
     {{object.parameter}}->setHorizontal();
             {%- endif %}
     {{object.parameter}}->setColors(
-            {%- if meta.ui_theme is not none and meta.ui_themes[meta.ui_theme].bg_color is not none and meta.ui_themes[meta.ui_theme].cnvTextColor is not none %}
+            {%- if meta.ui_theme_set is sameas true and meta.ui_theme is not none and meta.ui_themes[meta.ui_theme].bg_color is not none and meta.ui_themes[meta.ui_theme].cnvTextColor is not none %}
         Colors::bgColor,
         Colors::cnvTextColor
             {%- else %}
@@ -106,7 +107,7 @@
     {{object.parameter}}->setUsingLogScale({{object.logarithmic|lower}});
     {{object.parameter}}->setSteadyOnClick({{object.steady|lower}});
     {{object.parameter}}->setColors(
-            {%- if meta.ui_theme is not none and meta.ui_themes[meta.ui_theme].bg_color is not none and meta.ui_themes[meta.ui_theme].cnvTextColor is not none %}
+            {%- if meta.ui_theme_set is sameas true and meta.ui_theme is not none and meta.ui_themes[meta.ui_theme].bg_color is not none and meta.ui_themes[meta.ui_theme].cnvTextColor is not none %}
         Colors::bgColor,
         Colors::cnvTextColor
             {%- else %}
@@ -139,7 +140,7 @@
     {{object.parameter}}->setDiscrete({{object.discrete|lower}});
     {{object.parameter}}->setUsingLogScale(PDKnobEventHandler::LogMode::{{object.log_mode|upper}});
     {{object.parameter}}->setColors(
-        {%- if meta.ui_theme is not none and meta.ui_themes[meta.ui_theme].bg_color is not none and meta.ui_themes[meta.ui_theme].cnvTextColor is not none and meta.ui_themes[meta.ui_theme].io_color is not none %}
+        {%- if meta.ui_theme_set is sameas true and meta.ui_theme is not none and meta.ui_themes[meta.ui_theme].bg_color is not none and meta.ui_themes[meta.ui_theme].cnvTextColor is not none and meta.ui_themes[meta.ui_theme].io_color is not none %}
         Colors::bgColor,
         Colors::cnvTextColor,
         Colors::ioColor
@@ -165,7 +166,7 @@
             {%- endif %}
         {%- endfor %}
     {{object.parameter}}->setColors(
-            {%- if meta.ui_theme is not none and meta.ui_themes[meta.ui_theme].bg_color is not none and meta.ui_themes[meta.ui_theme].cnvTextColor is not none %}
+            {%- if meta.ui_theme_set is sameas true and meta.ui_theme is not none and meta.ui_themes[meta.ui_theme].bg_color is not none and meta.ui_themes[meta.ui_theme].cnvTextColor is not none %}
         Colors::bgColor,
         Colors::cnvTextColor
             {%- else %}

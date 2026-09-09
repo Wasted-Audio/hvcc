@@ -46,6 +46,7 @@ class pd2gui:
 
         try:
             gui_graph, _ = parser.gui_from_file(pd_path)
+            assert gui_graph is not None, "Failed to parse GUI graph from Pd patch."
 
             ir_dir = ir_file.parent
             if not ir_dir.exists():

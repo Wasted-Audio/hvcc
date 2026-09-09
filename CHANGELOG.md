@@ -9,13 +9,23 @@ Features:
 * Support `[inlet~]` object's control inlet and outlet
 * New MetaModule generator
 
+Bugs:
+
+* pd2gui: properly return on subpatch restore without GoP
+* DPF: Better override for theme colors
+* DPF: NanoVG gui_objects - missing label for toggle
+
+Docs:
+
+* Daisy: add included boards I/O
+
 0.17.1
 -----
 
 Bugfixes:
 
 * Correctly parse `cyclone/` prefix as optional for PdBinopObject
-  
+
 0.17.0
 -----
 

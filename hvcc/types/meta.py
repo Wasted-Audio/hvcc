@@ -52,6 +52,7 @@ class DPF(BaseModel):
     enable_ui:          Optional[DPFUIType] = DPFUIType.NONE
     enable_modgui:      bool = False
     ui_size:            Optional[DPFUISize] = None
+    ui_theme_set:       bool = False
     ui_theme:           Optional[str] = None
     ui_themes:          Optional[Dict[str, Theme]] = None
     midi_input:         bool = False
