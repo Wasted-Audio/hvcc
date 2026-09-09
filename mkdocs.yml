@@ -45,6 +45,7 @@ nav:
     - DPF: generators/dpf.md
     - FMOD: generators/fmod.md
     - Javascript: generators/javascript.md
+    - MetaModule: generators/metamodule.md
     - OWL: generators/owl.md
     - Pd External: generators/pdext.md
     - Unity: generators/unity.md
@@ -67,6 +68,7 @@ nav:
     - Signal Rate Expr: adr/ADR-004-Signal-Rate-Expr.md
     - PDNAM External: adr/ADR-005-PDNAM-External.md
     - gui2dpf Templates: adr/ADR-006-gui2dpf-Templates.md
+    - MetaModule: adr/ADR-007-MetaModule-Generator.md
   - Changelog: changelog.md
   - Contributing: contributing.md
   - Code of Conduct: code_of_conduct.md

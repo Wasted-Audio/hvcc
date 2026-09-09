@@ -6,6 +6,7 @@ HVCC supports a number of dedicated generators that can help to wrap the heavy c
 * [DPF](dpf.md)
 * [FMOD](fmod.md)
 * [Javascript](javascript.md)
+* [MetaModule](metamodule.md)
 * [OWL](owl.md)
 * [Pdext](pdext.md)
 * [Wwise](wwise.md)
