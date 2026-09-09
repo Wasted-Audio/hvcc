@@ -4,8 +4,6 @@
 
 #define MM_INPUT_PATCHED        0x1B705A3F  // __mm_in_patched
 #define MM_OUTPUT_PATCHED       0xB390A0FB  // __mm_out_patched
-#define MM_INPUTS_UNPATCHED     0x9190DD5E  // __mm_in_unpatched_all
-#define MM_OUTPUTS_UNPATCHED    0x491990E4  // __mm_out_unpatched_all
 
 
 float {{name}}MM::_leds[NUM_LEDS > 0 ? NUM_LEDS : 1] = {0.0f};
@@ -168,16 +166,4 @@ void {{name}}MM::mark_output_patched(int output_id) {
     hv_context->sendMessageToReceiverV(MM_OUTPUT_PATCHED, 0, "ff",
         (float) output_id, 1.0f
     );
-}
-
-// WIP, these don't work yet
-
-void {{name}}MM::mark_all_inputs_unpatched() {
-    // hv_context->sendBangToReceiver(MM_INPUTS_UNPATCHED);
-    hv_context->sendMessageToReceiverV(MM_INPUTS_UNPATCHED, 0, "f", 1.0f);
-}
-
-void {{name}}MM::mark_all_outputs_unpatched() {
-    // hv_context->sendBangToReceiver(MM_OUTPUTS_UNPATCHED);
-    hv_context->sendMessageToReceiverV(MM_OUTPUTS_UNPATCHED, 0, "f", 1.0f);
 }
