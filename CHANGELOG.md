@@ -17,6 +17,7 @@ Bugs:
 Docs:
 
 * Daisy: add included boards I/O
+* DPF: document GUI generation
 
 0.17.1
 -----
