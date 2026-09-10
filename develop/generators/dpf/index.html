@@ -14,7 +14,7 @@
         <link rel="prev" href="../daisy_json/">
       
       
-        <link rel="next" href="../fmod/">
+        <link rel="next" href="../dpf_imgui/">
       
       
         
@@ -25,7 +25,7 @@
     
     
       
-        <title>DPF - Heavy Compiler Collection</title>
+        <title>Basics - Heavy Compiler Collection</title>
       
     
     
@@ -111,7 +111,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              DPF
+              Basics
             
           </span>
         </div>
@@ -776,6 +776,63 @@
   
   
   
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3_3" id="__nav_3_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    DPF
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    DPF
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
     <li class="md-nav__item md-nav__item--active">
       
       <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
@@ -791,7 +848,7 @@
   <span class="md-ellipsis">
     
   
-    DPF
+    Basics
   
 
     
@@ -809,7 +866,7 @@
   <span class="md-ellipsis">
     
   
-    DPF
+    Basics
   
 
     
@@ -920,6 +977,70 @@
     </ul>
   
 </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dpf_imgui/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ImGui
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dpf_nanovg/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    NanoVG
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
       
     </li>
   
@@ -1942,11 +2063,11 @@ On the plugin side this behaves like the <code>trig</code> type.</p>
 <p>Other fields that the DPF metadata supports are:</p>
 <ul>
 <li><code>port_groups</code> - If your plugin has more audio i/o that need to be grouped together or given Control Voltage status</li>
-<li><code>enumerators</code> - Configure a set of parameters that cycle over <code>&lt;key&gt;: &lt;value&gt;</code></li>
+<li><code>enumerators</code> - Configure a set of parameters that cycle over a list of string values and return an integer in the patch.</li>
 <li><code>enable_ui</code> - Integer value that can generate different plugin UIs.<ul>
 <li>0 - The same as disabling the UI, creates nothing.</li>
-<li>1 - A generic DearImgui UI. Requires <code>dpf-widgets</code> on the same level as <code>dpf</code>.</li>
-<li>2 - A NanoVG based UI that emulates <a href="https://plugdata.org/">Plugdata</a> graphics. Requires <code>PDVG</code> on the same level as <code>dpf</code>. It also requires the use of <code>@hv_param</code> <a href="../../getting-started/patching/#gui-objects">receive config</a> on the UI objects. An example project using this can be found <a href="https://github.com/Wasted-Audio/pdvg-example-plugin/">here</a>.</li>
+<li>1 - A generic <a href="../dpf_imgui/">Dear Imgui</a> UI. Requires <code>dpf-widgets</code> on the same level as <code>dpf</code>.</li>
+<li>2 - A <a href="../dpf_nanovg/">NanoVG</a> based UI that emulates <a href="https://plugdata.org/">Plugdata</a> graphics. Requires <code>PDVG</code> on the same level as <code>dpf</code>. It also requires the use of <code>@hv_param</code> <a href="../../getting-started/patching/#gui-objects">receive config</a> on the UI objects. An example project using this can be found <a href="https://github.com/Wasted-Audio/pdvg-example-plugin/">here</a>.</li>
 </ul>
 </li>
 <li><code>enable_modgui</code> - Boolean for use in MOD audio based systems.</li>
