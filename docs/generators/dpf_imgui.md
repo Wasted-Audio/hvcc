@@ -30,6 +30,7 @@ Exposed parameters will be converted to appropriate controls based on their type
 | int            | SliderInt   |
 | bool           | Toggle      |
 | int+enumerator | Combobox    |
+| @hv_event      | Button      |
 
 ## Enumerator
 
