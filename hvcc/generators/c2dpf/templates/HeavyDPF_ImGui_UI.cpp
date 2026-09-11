@@ -145,15 +145,14 @@ protected:
         {%- endif %}
     {% endfor %}
     {%- for k, v in events %}
-            if (ImGui::Button("{{v.display}}"))
+            ImGui::Button("{{v.display}}");
+            if (ImGui::IsItemActivated())
             {
                 f{{v.display|lower}} = true;
-                if (ImGui::IsItemActivated())
-                {
-                    editParameter({{v.display|upper}}, true);
-                }
+                editParameter({{v.display|upper}}, true);
                 setParameterValue({{v.display|upper}}, f{{v.display|lower}});
                 f{{v.display|lower}} = false;
+                editParameter({{v.display|upper}}, false);
             }
     {%- endfor %}
 
