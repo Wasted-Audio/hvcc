@@ -6,9 +6,9 @@
 START_NAMESPACE_DISTRHO
 
 // --------------------------------------------------------------------------------------------------------------------
-{%- if (receivers|length > 0) or (events|length > 0) or (senders|length > 0) %}
+{%- if (receivers|length > 0) or (senders|length > 0) or (events|length > 0) %}
 enum HeavyParams {
-    {%- for k, v in receivers + events + senders %}
+    {%- for k, v in receivers + senders + events %}
     {{v.display|upper}},
     {%- endfor %}
 };
@@ -16,7 +16,7 @@ enum HeavyParams {
 
 class ImGuiPluginUI : public UI
 {
-    {% for k, v in receivers + events + senders -%}
+    {% for k, v in receivers + senders + events -%}
         {%- if v.attributes.type == 'bool': %}
     bool f{{v.display|lower}} = {{v.attributes.default}}f != 0.0f;
         {%- elif v.attributes.type == 'int': %}
@@ -60,7 +60,7 @@ protected:
     {
     {%- if (receivers|length > 0) or (senders|length > 0) %}
         switch (index) {
-            {% for k, v  in receivers + events + senders -%}
+            {% for k, v  in receivers + senders + events -%}
             case {{v.display|upper}}:
                 {%- if v.attributes.type == 'bool': %}
                 f{{v.display|lower}} = value != 0.0f;
@@ -159,7 +159,7 @@ protected:
 
             if (ImGui::IsItemDeactivated())
             {
-            {%- for k, v in receivers + events + senders %}
+            {%- for k, v in receivers + senders + events %}
                 editParameter({{v.display|upper}}, false);
             {%- endfor %}
             }
