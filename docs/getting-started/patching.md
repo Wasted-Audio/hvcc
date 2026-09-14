@@ -99,7 +99,7 @@ If there's an incompatibility within the patch, Heavy will generate an error mes
 
 ## Warnings
 
-Heavy will also perform patch analysis to look for common mistakes and inconsitencies between Pd and heavy behaviour. The targets will still be generated correctly but it might be useful information for example when cleaning up the patch.
+Heavy will also perform patch analysis to look for common mistakes and inconsistencies between Pd and heavy behaviour. The targets will still be generated correctly but it might be useful information for example when cleaning up the patch.
 
 ![warnings](../img/docs_warnings.png)
 
@@ -119,7 +119,7 @@ Just because pd-vanilla can run your patch, does not mean it will behave exactly
 
 ## Known Limitations
 
-This list will be continuously epanded to document differences in object behavior between PD and Heavy.
+This list will be continuously expanded to document differences in object behavior between PD and Heavy.
 
 - Many objects do not take control signals on their left inlet. `[osc~]` for instance always requires the use of `[sig~]` before connecting a value.
 - Heavy does not support symbols to the first inlet of `[pack]`. e.g. `[pack s f]`.
@@ -137,7 +137,7 @@ This list will be continuously epanded to document differences in object behavio
 - Heavy does not support multichannel connections.
 - Arrays and tables do not support spaces in the name.
 - It is allowed to use `[block~]`, but it will be completely ignored. Heavy runs with single sample processing by default.
-- Both `[expr]` and `expr~]` do not support `size()`, `sum()`, `Sum()`, `avg()`, `Avg()`, `mtof()`, `ftom()`, `dbtorms()`, `rmstodb()`, `powtodb()`, and `dbtopow()` functions. They do not support symbol input or symbol/string functions.
+- Both `[expr]` and `[expr~]` do not support `size()`, `sum()`, `Sum()`, `avg()`, `Avg()`, `mtof()`, `ftom()`, `dbtorms()`, `rmstodb()`, `powtodb()`, and `dbtopow()` functions. They do not support symbol input or symbol/string functions.
 - `[expr~]` only supports signal inputs.
 - `[list]` only accepts operation argument. Does not support tosymbol/fromsymbol.
 - Control rate Binary operations - `+`, `-`, `/`, `*`, `div`, `<<`, `>>`, `&&`, `||`, `^`, `==`, `!=`, `mod`, `%`, `&`, `|`, `<`, `<=`, `>`, `>=`, `max`, `min`, `pow`, `atan2` - do not support banging the left inlet. Use a `[f ]` to store the left value and bang that instead.

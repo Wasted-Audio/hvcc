@@ -35,24 +35,29 @@ nav:
   - Home: index.md
   - Getting Started:
     - Introduction: getting-started/index.md
+    - Tools: getting-started/tools.md
     - Patching Guide: getting-started/patching.md
+
   - Generators:
     - Overview: generators/index.md
+    - C/C++ Source: generators/c.md
     - Daisy:
       - Basics: generators/daisy.md
       - Boards: generators/daisy_boards.md
       - Board JSON: generators/daisy_json.md
-    - DPF:
+    - DPF (Audio Plugins):
       - Basics: generators/dpf.md
       - ImGui: generators/dpf_imgui.md
       - NanoVG: generators/dpf_nanovg.md
-    - FMOD: generators/fmod.md
+    - Game Audio:
+      - FMOD: generators/fmod.md
+      - Unity: generators/unity.md
+      - Wwise: generators/wwise.md
     - Javascript: generators/javascript.md
     - OWL: generators/owl.md
     - Pd External: generators/pdext.md
-    - Unity: generators/unity.md
-    - Wwise: generators/wwise.md
     - Custom: generators/custom.md
+
   - Reference:
     - MIDI: reference/midi.md
     - C API: reference/c.md
@@ -62,6 +67,7 @@ nav:
     - Heavy Lang: reference/ir/heavy_lang.md
     - Heavy IR: reference/ir/heavy_ir.md
     - Heavy GUI IR: reference/ir/heavy_gui_ir.md
+
   - ADRs:
     - Overview: adr/index.md
     - GUI Send/Receive: adr/ADR-001-GUI-Send-Receive.md
@@ -70,6 +76,8 @@ nav:
     - Signal Rate Expr: adr/ADR-004-Signal-Rate-Expr.md
     - PDNAM External: adr/ADR-005-PDNAM-External.md
     - gui2dpf Templates: adr/ADR-006-gui2dpf-Templates.md
-  - Changelog: changelog.md
-  - Contributing: contributing.md
-  - Code of Conduct: code_of_conduct.md
+
+  - Community & Development:
+    - Changelog: changelog.md
+    - Contributing: contributing.md
+    - Code of Conduct: code_of_conduct.md

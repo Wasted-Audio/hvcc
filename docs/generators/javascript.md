@@ -4,6 +4,8 @@
 >
 > Use a version earlier or later with this Generator for functional output.
 
+This generator requires having [emsdk](https://github.com/emscripten-core/emsdk) installed and active in the path. Activating this generator automatically builds the webassembly target.
+
 ## Getting Started
 
 Heavy can provide a Javascript (JS) implementation of your patch using WebAssembly. The library provides a basic interface for processing audio, handling playback and sending or receiving messages. Both `AudioWorklet` and `ScriptProcessorNode` are supported. The old `asm.js` implementation has been deprecated.
@@ -48,7 +50,7 @@ The initial set up should look something like this:
   // construct a new patch module, this contains all the necessary libraries
   // make sure to replace {PATCH} with the name of your patch
   window.onload = function() {
-    {PANRT}_Module().then(loadedModule => {
+    {PATCH}_Module().then(loadedModule => {
       heavyModule = loadedModule;
       moduleLoaded();
     });

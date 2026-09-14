@@ -19,6 +19,7 @@ Docs:
 
 * Daisy: add included boards I/O
 * DPF: document GUI generation
+* General improvements
 
 0.17.1
 -----

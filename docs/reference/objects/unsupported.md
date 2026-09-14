@@ -8,83 +8,83 @@ Here is a list of [supported Pd objects](supported.md).
 
 ## Message Objects
 
-```list
-append
-array
-bag
-choice
-clone
-cputime
-drawcurve
-drawnumber
-drawpolygon
-drawsymbol
-drawtext
-element
-file
-filledcurve
-filledpolygon
-fudiformat
-fudiparse
-get
-getsize
-glist
-key
-keyname
-keyup
-makefilename
-namecanvas
-netreceive
-netsend
-openpanel
-oscformat
-oscparse
-plot
-pointer
-qlist
-realtime
-savepanel
-savestate
-scalar
-set
-setsize
-soundfiler
-stdout
-struct
-sysexin
-tabread4
-template
-text
-textfile
-trace
-v
-value
-```
+| object |
+| ------ |
+| append |
+| array |
+| bag |
+| choice |
+| clone |
+| cputime |
+| drawcurve |
+| drawnumber |
+| drawpolygon |
+| drawsymbol |
+| drawtext |
+| element |
+| file |
+| filledcurve |
+| filledpolygon |
+| fudiformat |
+| fudiparse |
+| get |
+| getsize |
+| glist |
+| key |
+| keyname |
+| keyup |
+| makefilename |
+| namecanvas |
+| netreceive |
+| netsend |
+| openpanel |
+| oscformat |
+| oscparse |
+| plot |
+| pointer |
+| qlist |
+| realtime |
+| savepanel |
+| savestate |
+| scalar |
+| set |
+| setsize |
+| soundfiler |
+| stdout |
+| struct |
+| sysexin |
+| tabread4 |
+| template |
+| text |
+| textfile |
+| trace |
+| v |
+| value |
 
 ## Signal Objects
 
-```list
-bob~
-bonk~
-fexpr~
-fft~
-framp~
-ifft~
-log~
-loop~
-lrshift~
-pd~
-print~
-readsf~
-rfft~
-rifft~
-scope~
-sigmund~
-switch~
-slop~
-tabreceive~
-tabsend~
-vline~
-vsnapshot~
-writesf~
-```
+| object |
+| ------ |
+| bob~ |
+| bonk~ |
+| fexpr~ |
+| fft~ |
+| framp~ |
+| ifft~ |
+| log~ |
+| loop~ |
+| lrshift~ |
+| pd~ |
+| print~ |
+| readsf~ |
+| rfft~ |
+| rifft~ |
+| scope~ |
+| sigmund~ |
+| switch~ |
+| slop~ |
+| tabreceive~ |
+| tabsend~ |
+| vline~ |
+| vsnapshot~ |
+| writesf~ |

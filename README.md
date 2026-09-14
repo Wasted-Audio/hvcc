@@ -33,13 +33,17 @@ It has since then been expanded to provide further support for many different pl
 - [Supported vanilla objects](docs/reference/objects/supported.md)
 - [Unsupported vanilla objects](docs/reference/objects/unsupported.md)
 
-## Integrations
+## Integrations & Use Cases
 
 hvcc has been integrated into several projects and services. This allows to easily compile patches without having to install hvcc manually.
 
 - [plugdata](https://plugdata.org/) - Modern interface for Pure Data. Includes a full cross-platform toolchain and targets Daisy, DPF and PD Externals.
 - [mod-cloud-builder](https://github.com/moddevices/mod-cloud-builder) - Online service for building LV2 plugins for the MOD platform.
 - [OWL Patch Library](https://www.rebeltech.org/patch-library) - Online service for building OWL plugins (uses an old fork).
+
+> [!NOTE]
+> **Using HVCC in a commercial product, hardware device, game, or research?**
+> We are collecting information on how HVCC is used in the wild to better understand ecosystem needs and ensure long-term sustainability. [**Tell us about your use case!**](#use-cases-and-commercial-users)
 
 ## Requirements
 
@@ -76,7 +80,7 @@ pip3 install -e .
 
 Also review our [Contribution Guide](CONTRIBUTING.md) before opening a pull request.
 
-## Usage
+## Basic Usage
 
 `hvcc` requires at least one argument that determines the top-level patch file to be loaded.
 
@@ -166,21 +170,41 @@ hvcc ~/myProject/_main.pd -o ~/Desktop/somewhere/else/ -n mySynth --copyright "C
 
 Displays all the available parameters and options for hvcc.
 
+For more information see [CLI & Tools](docs/getting-started/tools.md)
+
 ## Contact
 
 The Heavy community aims to be safe and inclusive, please read our [Code of Conduct](CODE_OF_CONDUCT.md) before engaging.
 
+### Use Cases and Commercial Users
+
+We are actively gathering information from individuals and companies using HVCC in production, commercial products, embedded hardware, or research.
+
+Sharing your experience helps guide future development, highlight real-world adoption, and support the project's sustainability.
+
+If you or your organization use HVCC, please reach out to:
+
+- **Email (Private):** [`contact@wasted.audio`](mailto:contact@wasted.audio)
+- **GitHub Discussions (Public):** Share your work in [HVCC Discussions](https://github.com/Wasted-Audio/hvcc/discussions)
+
+**Helpful details to include:**
+
+- Company or project name (and whether you'd like to be publicly featured or kept confidential)
+- Target framework or hardware (e.g., Daisy, DPF/VST/LV2, Unity/Wwise, custom embedded C/C++)
+- Any features or improvements that would most benefit your workflow
+
+### Community and Chat
+
 There are several places where heavy/hvcc conversation is happening:
 
 - [Discord](https://discord.gg/fmxJveg)
-- [IRC](https://web.libera.chat/#hvcc)
-- A number of forums:
+- [IRC](https://web.libera.chat/#hvcc) (`#hvcc` on Libera.Chat)
+- Forums:
   - [Bela](https://forum.bela.io/?q=hvcc)
   - [Rebel Technology](https://community.rebeltech.org/tags/puredata)
   - [Daisy](https://forum.electro-smith.com/c/integrations/pure-data/32)
   - [MOD](https://forum.moddevices.com/c/developers/pure-data/56)
-
-Or you can use the [discussions](https://github.com/Wasted-Audio/hvcc/discussions) tab of this repository
+- [Github Discussions](https://github.com/Wasted-Audio/hvcc/discussions)
 
 ## Funding
 

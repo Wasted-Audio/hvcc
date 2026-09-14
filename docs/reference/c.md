@@ -140,7 +140,7 @@ void printHook(HeavyContextInterface *c, const char *printName, const char *str,
 }
 
 int main(int argc, const char *argv[]) {
-  Heavy_example *context = hv_example_new(0, 0, 44100.0);
+  Heavy_example *context = hv_example_new(44100.0);
 
   // set print hook
   hv_setPrintHook(context, &printHook);
