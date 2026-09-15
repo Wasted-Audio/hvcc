@@ -15,7 +15,8 @@ The goal was to leverage Pure Data as a design interface and statically interpre
 It has since then been expanded to provide further support for many different platforms and frameworks, targeting game audio design, daw plugins and embedded production tools. In 2021 Wasted Audio took over maintenance of the project.
 
 > [!IMPORTANT]
-> **Using HVCC in a commercial product, hardware device, game, or research?**
+> **Using HVCC in a (commercial) product, hardware device, game, or research?**
+>
 > We are collecting information on how HVCC is used in the wild to better understand ecosystem needs and ensure long-term sustainability. [**Tell us about your use case!**](#use-cases-and-commercial-users)
 
 ## Documentation
