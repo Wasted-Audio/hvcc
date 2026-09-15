@@ -3,7 +3,7 @@
 These are all the objects that hvcc is not able to parse. It will give errors if you use them.
 
 > [!NOTE]
-> This list in non-exhaustive and not fully up to date. Please report any missing pd-vanilla objects.
+> This list is non-exhaustive and not fully up to date. Please report any missing pd-vanilla objects.
 
 Here is a list of [supported Pd objects](supported.md).
 
