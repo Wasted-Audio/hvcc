@@ -2353,7 +2353,10 @@
 <p><img alt="files" src="../../img/docs_unity_audiolib_loading.png" /></p>
 <p>Ensure that the platform settings have been applied to each plugin binary you wish to use and that paths are correct. <code>x86</code> corresponds to 32-bit platforms and <code>x86_x64</code> is for 64-bit platforms.</p>
 <p>When building for mobile devices it's generally best to download the plugin target for your development platform (windows/macos) <em>and</em> the device platform (ios/android). The development platform plugins will allow testing in the Unity editor and standalone builds. See the Android/iOS specific instructions below for more information.</p>
-<p><strong>Note:</strong> Unity has to be restarted each time the plugin file changes on the local hard disk.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Unity has to be restarted each time the plugin file changes on the local hard disk.</p>
+</div>
 <h2 id="exposing-and-setting-parameters">Exposing and Setting Parameters</h2>
 <p>Each <a href="../../getting-started/patching/#exposing-parameters">exposed parameter</a> will automatically generate a parameter in the Unity Editor interface. These parameters can be scripted easily from elsewhere in your project.</p>
 <div class="language-c# highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">public</span><span class="w"> </span><span class="k">class</span><span class="w"> </span><span class="nc">MyAudioLibController</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">MonoBehaviour</span><span class="w"> </span><span class="p">{</span>

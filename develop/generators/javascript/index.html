@@ -2163,10 +2163,11 @@
 
 
 <h1 id="javascript">Javascript</h1>
-<blockquote>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
 <p>Emscripten versions 3.1.42 until 3.1.47 contain a bug that breaks our builds.</p>
 <p>Use a version earlier or later with this Generator for functional output.</p>
-</blockquote>
+</div>
 <p>This generator requires having <a href="https://github.com/emscripten-core/emsdk">emsdk</a> installed and active in the path. Activating this generator automatically builds the webassembly target.</p>
 <h2 id="getting-started">Getting Started</h2>
 <p>Heavy can provide a Javascript (JS) implementation of your patch using WebAssembly. The library provides a basic interface for processing audio, handling playback and sending or receiving messages. Both <code>AudioWorklet</code> and <code>ScriptProcessorNode</code> are supported. The old <code>asm.js</code> implementation has been deprecated.</p>
@@ -2307,7 +2308,10 @@
 </span><span id="__span-2-17"><a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a>
 </span><span id="__span-2-18"><a id="__codelineno-2-18" name="__codelineno-2-18" href="#__codelineno-2-18"></a><span class="p">&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
 </span></code></pre></div>
-<p>Note: these are calls directly to the <code>AudioLib</code> so make sure to include <code>.audiolib</code> when sending events or messages.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>These are calls directly to the <code>AudioLib</code> so make sure to include <code>.audiolib</code> when sending events or messages.</p>
+</div>
 <h2 id="loading-custom-samples">Loading Custom Samples</h2>
 <p>If you have a table that is externed, using the <code>@hv_table</code> annotation, it can be used to load audio files from the web page. The table will be resized to fit this sample data.</p>
 <p><code>[table array1 100 @hv_table]</code></p>

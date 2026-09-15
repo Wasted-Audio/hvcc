@@ -2123,7 +2123,10 @@
 </span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">    </span><span class="p">}</span>
 </span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="p">}</span>
 </span></code></pre></div>
-<p>This will increase the program size with a few kb and will disable <code>usb_midi</code> as we currently do not have composite USB device yet.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Enabling <code>debug_printing</code> increases program size and will disable <code>usb_midi</code> because composite USB devices are not yet supported.</p>
+</div>
 <h2 id="custom-samplerate-and-blocksize">Custom samplerate and blocksize</h2>
 <p>This can be done by adding either to the meta.json:</p>
 <div class="language-json highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="p">{</span>

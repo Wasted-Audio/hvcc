@@ -2289,7 +2289,10 @@
 <h2 id="audio-inputoutput">Audio Input/Output</h2>
 <p>To receive audio input into your patch add an <code>[adc~]</code> object.</p>
 <p>To send audio output add a <code>[dac~]</code> The number of channels can be configured by providing arguments to object. For example <code>[dac~ 1 2 3]</code> will generate three output channels. <code>[adc~ 1]</code> will make a single channel of audio input.</p>
-<p>Note that top-level graphs (e.g. <code>_main.pd</code>) should not have any <code>[inlet~]</code> or <code>[outlet~]</code> objects. These are reserved only for abstractions.</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>Top-level graphs (e.g. <code>_main.pd</code>) should not have any <code>[inlet~]</code> or <code>[outlet~]</code> objects. These are reserved only for abstractions.</p>
+</div>
 <h2 id="exposing-parameters">Exposing Parameters</h2>
 <h3 id="input-parameters">Input Parameters</h3>
 <p>All (control) <code>[receive]</code> and <code>[r]</code> objects annotated with <code>@hv_param</code> will be exposed as <strong>input</strong> parameters in each framework. The name provided will propagate through to the plugin interface.</p>

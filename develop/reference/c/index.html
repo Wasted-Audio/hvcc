@@ -2672,7 +2672,12 @@
 <p>The input and output buffers may refer to the same array, i.e. in-place processing is supported. It is possible to pass through a respective <code>NULL</code> value if there are no input or output channels.</p>
 <p>The last parameter of any <code>process()</code> function is the frame size of the in/out sample data. The block size should be a multiple of 1, 4, 4, or 8 depending on what SIMD optimisation is being used, i.e. None, SSE, NEON, or AVX respectively.</p>
 <h3 id="block-sizes-and-simd">Block Sizes and SIMD</h3>
-<p>Use of hardware SIMD operations can dramatically speed up the processing of Heavy contexts by up to 8 times. For instance, if SSE optimisation is being used, then the internal block size of Heavy is 4 (because SSE processes vectors of 4 <code>float</code>s at a time). If a <code>process()</code> function is asked to process a number of samples that is <em>not</em> a multiple of 4, then the remaining samples (up to 3) <em>will remain unprocessed</em>. The <code>process()</code> function returns the number of samples that it did compute.</p>
+<p>Use of hardware SIMD operations can dramatically speed up the processing of Heavy contexts by up to 8 times. For instance, if SSE optimisation is being used, then the internal block size of Heavy is 4 (because SSE processes vectors of 4 <code>float</code>s at a time). </p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>If a <code>process()</code> function is asked to process a number of samples that is <em>not</em> a multiple of 4, then the remaining samples (up to 3) <em>will remain unprocessed</em>.</p>
+</div>
+<p>The <code>process()</code> function returns the number of samples that it did compute.</p>
 <h3 id="hv_process">hv_process()</h3>
 <p>Expected buffer format is as an array of float sample arrays:</p>
 <p><img alt="process" src="../../img/docs_c_process.svg" /></p>
@@ -2728,7 +2733,11 @@
 </span></code></pre></div>
 <h2 id="the-print-hook">The Print Hook</h2>
 <p>A print hook is a user-defined function which will be called when any message is sent to a <code>[print]</code> object in the context. The function is called on the audio thread and it is high recommended that it is only used for debugging purposes, not for production deployments.</p>
-<p>The print hook can be set, reset, or removed (i.e. set to <code>NULL</code>) using the <code>hv_setPrintHook()</code> function. This function is <strong>not</strong> thread-safe.</p>
+<p>The print hook can be set, reset, or removed (i.e. set to <code>NULL</code>) using the <code>hv_setPrintHook()</code> function. </p>
+<div class="admonition caution">
+<p class="admonition-title">Caution</p>
+<p>This function is <strong>not</strong> thread-safe.</p>
+</div>
 <div class="language-c highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stdio.h&gt;</span>
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">"Heavy_example.h"</span>
 </span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
@@ -2750,7 +2759,11 @@
 </span></code></pre></div>
 <h2 id="the-send-hook">The Send Hook</h2>
 <p>A send hook is a user-defined function which will be called when a message is sent to <em>any</em> <code>[send]</code> object in the context. This is the way in which control messages can be sent out of the patch. The function is called on the audio thread and it is high recommended that as little time as possible is spent in this function.</p>
-<p>The send hook can be set, reset, or removed (i.e. set to <code>NULL</code>) using the <code>hv_setSendHook()</code> function. This function is <strong>not</strong> thread-safe.</p>
+<p>The send hook can be set, reset, or removed (i.e. set to <code>NULL</code>) using the <code>hv_setSendHook()</code> function.</p>
+<div class="admonition caution">
+<p class="admonition-title">Caution</p>
+<p>This function is <strong>not</strong> thread-safe.</p>
+</div>
 <div class="language-c highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1">// define the send hook as a function with the following signature</span>
 </span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="k">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">sendHook</span><span class="p">(</span><span class="n">HeavyContextInterface</span><span class="w"> </span><span class="o">*</span><span class="n">c</span><span class="p">,</span>
 </span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">sendName</span><span class="p">,</span><span class="w"> </span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">sendHash</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">HvMessage</span><span class="w"> </span><span class="o">*</span><span class="n">m</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
@@ -3125,7 +3138,10 @@
 </span></code></pre></div>
 <h3 id="tables">Tables</h3>
 <p>Any named <code>[table]</code> object can be retrieved from the patch at runtime. The current size of the table can be queried, or it can be resized. The backing float buffer can also be referenced, allowing arbitrary data to be read or written. The table hash can be determined with <code>hv_stringToHash()</code>.</p>
-<p>NOTE: These operations are in no way synchronised with the audio loop, and care must be taken to avoid any concurrency issues.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>These operations are in no way synchronised with the audio loop, and care must be taken to avoid any concurrency issues.</p>
+</div>
 <div class="language-c highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="cm">/**</span>
 </span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="cm"> * Resizes the table to the given length.</span>
 </span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="cm"> *</span>

@@ -1332,10 +1332,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#note" class="md-nav__link">
+  <a href="#notes" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Note
+        Notes
       
     </span>
   </a>
@@ -1343,6 +1343,18 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#dpf" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DPF
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="DPF">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
   <a href="#handling-midi-input" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1352,8 +1364,8 @@
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
+        
+          <li class="md-nav__item">
   <a href="#handling-midi-output" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1361,6 +1373,11 @@
       
     </span>
   </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -2023,10 +2040,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#note" class="md-nav__link">
+  <a href="#notes" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Note
+        Notes
       
     </span>
   </a>
@@ -2034,6 +2051,18 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#dpf" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DPF
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="DPF">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
   <a href="#handling-midi-input" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2043,8 +2072,8 @@
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
+        
+          <li class="md-nav__item">
   <a href="#handling-midi-output" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2052,6 +2081,11 @@
       
     </span>
   </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -2185,7 +2219,7 @@
 </tr>
 </tbody>
 </table>
-<h2 id="note">Note</h2>
+<h2 id="notes">Notes</h2>
 <ul>
 <li>Channel numbering in the generator is expect to start at 0. For this reason the midi wrapper objects internally <code>[+ 1]</code> and <code>[- 1]</code> since Pure Data starts channel numbering at 1 and this keeps some expected patch compatibility in place.</li>
 <li>Also for compatibility reasons <code>[bendout]</code> uses -8192 to 8191 range (and resets the offset with an internal <code>[+ 8192]</code>). This ensures expected behaviour with pd-vanilla patches.</li>
@@ -2194,12 +2228,13 @@
 <li>The <code>[midiout]</code> object currently does not respond to port numbers.</li>
 </ul>
 <p>Some framework targets like <a href="../../generators/dpf/">DPF</a> already have implementations available. However, if you're integrating the C/C++ code on a custom platform then you'll need to provide your own conversion process.</p>
+<h2 id="dpf">DPF</h2>
 <p>Here's the <code>DPF</code> implementation as an example.</p>
-<h2 id="handling-midi-input">Handling MIDI Input</h2>
+<h3 id="handling-midi-input">Handling MIDI Input</h3>
 <p>The MIDI input is called during the DPF <code>run()</code> loop where it receives <code>MidiEvent</code> messages.</p>
 <p><a href="https://github.com/Wasted-Audio/hvcc/blob/develop/hvcc/generators/c2dpf/templates/HeavyDPF.cpp#L201-L205">Source code (run loop)</a></p>
 <p><a href="https://github.com/Wasted-Audio/hvcc/blob/develop/hvcc/generators/c2dpf/templates/midiInput.cpp">Source code (handleMidiInput)</a></p>
-<h2 id="handling-midi-output">Handling MIDI Output</h2>
+<h3 id="handling-midi-output">Handling MIDI Output</h3>
 <p>For MIDI output you will need to set a heavy sendhook function that will trigger <code>DPF</code> MIDI output events from the heavy context:</p>
 <div class="language-cpp highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">hvSendHookFunc</span><span class="p">(</span><span class="n">HeavyContextInterface</span><span class="w"> </span><span class="o">*</span><span class="n">c</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">sendName</span><span class="p">,</span><span class="w"> </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">sendHash</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">HvMessage</span><span class="w"> </span><span class="o">*</span><span class="n">m</span><span class="p">)</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="p">{</span>

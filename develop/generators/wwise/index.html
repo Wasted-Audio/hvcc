@@ -2307,7 +2307,11 @@
 <h3 id="input-parameters">Input Parameters</h3>
 <p>Exposing an input parameter will automatically generate a Slider UI in the plugin interface, that can then be connected to RTPCs from your game.</p>
 <h3 id="output-parameters">Output Parameters</h3>
-<p>Sending a <code>single float value</code> to an output parameters will in turn cause the corresponding RTPC of the same name to be set. It will be set on the same game object. <strong>Note</strong>: it's important that the naming of the output parameter and the global RTPC set up in Wwise are exactly the same.</p>
+<p>Sending a <code>single float value</code> to an output parameters will in turn cause the corresponding RTPC of the same name to be set. It will be set on the same game object.</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>The naming of the output parameter and the global RTPC set up in Wwise must match exactly.</p>
+</div>
 <p>The example patch below describes a simple envelope follower that can be used to modulate other parameters of the same voice:</p>
 <p><img alt="Envelope follower with an output RTPC" src="../../img/docs_wwise_env.png" /></p>
 <h3 id="posting-wwise-events-from-the-plugin">Posting Wwise Events from the Plugin</h3>
@@ -2352,7 +2356,11 @@
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>hvcc HvccTestFX71.pd -o Hvcc_Out_Dir -g wwise -n HvccTestFX71
 </span></code></pre></div>
 <h3 id="building-c-code">Building C++ Code</h3>
-<p>Heavy generates a project compatible with Audiokinetic's <a href="https://www.audiokinetic.com/en/library/edge/?source=SDK&amp;id=effectplugin_tools.html">Development Tools</a>, which can build the plugins for all supported platforms, see the documentation for more details. <strong>Important:</strong> Please close any running Wwise Authoring instance as it'll prevent the plugin from being built.</p>
+<p>Heavy generates a project compatible with Audiokinetic's <a href="https://www.audiokinetic.com/en/library/edge/?source=SDK&amp;id=effectplugin_tools.html">Development Tools</a>, which can build the plugins for all supported platforms, see the documentation for more details.</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>Please close any running Wwise Authoring instance as it'll prevent the plugin from being built.</p>
+</div>
 <p>Change into the generated directory:</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>cd Hvcc_Out_Dir\wwise
 </span></code></pre></div>
@@ -2376,8 +2384,11 @@
 </span></code></pre></div>
 <p>The <em>Bundle</em> directory now contains a packaged plugin you can install through Wwise Launcher, see Wwise Version -&gt; Manage Plug-ins -&gt; Install from directory / Install from archive.</p>
 <h2 id="example-building-your-plugin-on-linux">Example: Building Your Plugin on Linux</h2>
-<p>Building Linux plugin binaries is relatively easy. It requires python3 to be installed.
-Also make sure the Linux SDK is in a path without spaces or special characters.</p>
+<p>Building Linux plugin binaries is relatively easy. It requires python3 to be installed.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Make sure the Linux SDK is installed in a path without spaces or special characters.</p>
+</div>
 <p>Then make sure the <code>premake5</code> binary in the SDK has the executable flag set:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>&lt;SDK_PATH&gt;$<span class="w"> </span>chmod<span class="w"> </span>+x<span class="w"> </span>Tools/Linux/bin/premake5
 </span></code></pre></div>

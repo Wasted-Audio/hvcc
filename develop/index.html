@@ -444,10 +444,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#integrations-use-cases" class="md-nav__link">
+  <a href="#integrations" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Integrations &amp; Use Cases
+        Integrations
       
     </span>
   </a>
@@ -2160,10 +2160,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#integrations-use-cases" class="md-nav__link">
+  <a href="#integrations" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Integrations &amp; Use Cases
+        Integrations
       
     </span>
   </a>
@@ -2365,6 +2365,11 @@
 <p>Originaly created by Enzien Audio, the need for <code>hvcc</code> arose from running against performance limitations while creating interactive music and sound products for the iPhone. <a href="https://puredata.info">Pure Data</a> (libpd) was the only real choice for a design tool as it was embeddable and provided a high enough abstraction level that musicians or sound designers could be creative.</p>
 <p>The goal was to leverage Pure Data as a design interface and statically interpret the resultant patches to generate a low-level, portable and optimised C/C++ program that would be structured to take advantage of modern hardware whilst still generating the same behaviour and audio output as Pure Data.</p>
 <p>It has since then been expanded to provide further support for many different platforms and frameworks, targeting game audio design, daw plugins and embedded production tools. In 2021 Wasted Audio took over maintenance of the project.</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p><strong>Using HVCC in a (commercial) product, hardware device, game, or research?</strong></p>
+<p>We are collecting information on how HVCC is used in the wild to better understand ecosystem needs and ensure long-term sustainability. <a href="#use-cases-and-commercial-users"><strong>Tell us about your use case!</strong></a></p>
+</div>
 <h2 id="documentation">Documentation</h2>
 <ul>
 <li><a href="getting-started/">Introduction</a><ul>
@@ -2386,18 +2391,14 @@
 <li><a href="reference/objects/supported/">Supported vanilla objects</a></li>
 <li><a href="reference/objects/unsupported/">Unsupported vanilla objects</a></li>
 </ul>
-<h2 id="integrations-use-cases">Integrations &amp; Use Cases</h2>
+<h2 id="integrations">Integrations</h2>
 <p>hvcc has been integrated into several projects and services. This allows to easily compile patches without having to install hvcc manually.</p>
 <ul>
 <li><a href="https://plugdata.org/">plugdata</a> - Modern interface for Pure Data. Includes a full cross-platform toolchain and targets Daisy, DPF and PD Externals.</li>
 <li><a href="https://github.com/moddevices/mod-cloud-builder">mod-cloud-builder</a> - Online service for building LV2 plugins for the MOD platform.</li>
 <li><a href="https://www.rebeltech.org/patch-library">OWL Patch Library</a> - Online service for building OWL plugins (uses an old fork).</li>
+<li><a href="https://app.boochow.com/">Boochow Web Apps</a> - Online service for building Korg Logue SDK plugins.</li>
 </ul>
-<blockquote>
-<p>[!NOTE]
-<strong>Using HVCC in a commercial product, hardware device, game, or research?</strong>
-We are collecting information on how HVCC is used in the wild to better understand ecosystem needs and ensure long-term sustainability. <a href="#use-cases-and-commercial-users"><strong>Tell us about your use case!</strong></a></p>
-</blockquote>
 <h2 id="requirements">Requirements</h2>
 <p>Python 3.9 up to 3.14</p>
 <ul>

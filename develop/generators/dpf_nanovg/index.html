@@ -2111,6 +2111,11 @@
 </span></code></pre></div>
 <h2 id="objects">Objects</h2>
 <p>Object position, size, labels, colors, and other object settings will be translated to the generated GUI. For proper subpatch support you currently need to use our <a href="https://github.com/Wasted-Audio/DPF">fork of DPF</a>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The generator will only create static rendering. It is not possible to change object positions or settings using messages.
+The UI will be completely separate from the patch DSP.</p>
+</div>
 <h3 id="parameters">Parameters</h3>
 <p>You need to make sure that all parameters are associated with PD Graphical objects by using the object <a href="../../getting-started/patching/#gui-objects">receive config</a>. Set the complete configuration, with min/max/default/type, as you would normally on a receiver. Objects need to be visible in the main patch canvas, otherwise you will get errors. Send parameters, useful as read-only indicators, are currently not supported.</p>
 <ul>
