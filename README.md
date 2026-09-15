@@ -14,6 +14,10 @@ The goal was to leverage Pure Data as a design interface and statically interpre
 
 It has since then been expanded to provide further support for many different platforms and frameworks, targeting game audio design, daw plugins and embedded production tools. In 2021 Wasted Audio took over maintenance of the project.
 
+> [!IMPORTANT]
+> **Using HVCC in a commercial product, hardware device, game, or research?**
+> We are collecting information on how HVCC is used in the wild to better understand ecosystem needs and ensure long-term sustainability. [**Tell us about your use case!**](#use-cases-and-commercial-users)
+
 ## Documentation
 
 - [Introduction](docs/getting-started/index.md)
@@ -33,17 +37,14 @@ It has since then been expanded to provide further support for many different pl
 - [Supported vanilla objects](docs/reference/objects/supported.md)
 - [Unsupported vanilla objects](docs/reference/objects/unsupported.md)
 
-## Integrations & Use Cases
+## Integrations
 
 hvcc has been integrated into several projects and services. This allows to easily compile patches without having to install hvcc manually.
 
 - [plugdata](https://plugdata.org/) - Modern interface for Pure Data. Includes a full cross-platform toolchain and targets Daisy, DPF and PD Externals.
 - [mod-cloud-builder](https://github.com/moddevices/mod-cloud-builder) - Online service for building LV2 plugins for the MOD platform.
 - [OWL Patch Library](https://www.rebeltech.org/patch-library) - Online service for building OWL plugins (uses an old fork).
-
-> [!NOTE]
-> **Using HVCC in a commercial product, hardware device, game, or research?**
-> We are collecting information on how HVCC is used in the wild to better understand ecosystem needs and ensure long-term sustainability. [**Tell us about your use case!**](#use-cases-and-commercial-users)
+- [Boochow Web Apps](https://app.boochow.com/) - Online service for building Korg Logue SDK plugins.
 
 ## Requirements
 

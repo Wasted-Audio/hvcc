@@ -27,6 +27,9 @@ markdown_extensions:
   - pymdownx.snippets:
       check_paths: true
   - pymdownx.superfences
+  - pymdownx.blocks.admonition
+  - pymdownx.quotes:
+      callouts: true
 
 hooks:
   - docs/mkdocs_hooks.py

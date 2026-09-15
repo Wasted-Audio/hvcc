@@ -1,5 +1,6 @@
 # Javascript
 
+> [!WARNING]
 > Emscripten versions 3.1.42 until 3.1.47 contain a bug that breaks our builds.
 >
 > Use a version earlier or later with this Generator for functional output.
@@ -153,7 +154,8 @@ The JS target supports [exposing event and parameter](../getting-started/patchin
 </script>
 ```
 
-Note: these are calls directly to the `AudioLib` so make sure to include `.audiolib` when sending events or messages.
+> [!NOTE]
+> These are calls directly to the `AudioLib` so make sure to include `.audiolib` when sending events or messages.
 
 ## Loading Custom Samples
 

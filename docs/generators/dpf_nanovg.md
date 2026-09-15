@@ -20,6 +20,10 @@ You can enable the NanoVG export by setting `"enable_ui": 2`. The size will be a
 
 Object position, size, labels, colors, and other object settings will be translated to the generated GUI. For proper subpatch support you currently need to use our [fork of DPF](https://github.com/Wasted-Audio/DPF).
 
+> [!NOTE]
+> The generator will only create static rendering. It is not possible to change object positions or settings using messages.
+> The UI will be completely separate from the patch DSP.
+
 ### Parameters
 
 You need to make sure that all parameters are associated with PD Graphical objects by using the object [receive config](../getting-started/patching.md#gui-objects). Set the complete configuration, with min/max/default/type, as you would normally on a receiver. Objects need to be visible in the main patch canvas, otherwise you will get errors. Send parameters, useful as read-only indicators, are currently not supported.

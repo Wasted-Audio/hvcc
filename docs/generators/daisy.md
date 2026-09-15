@@ -84,7 +84,8 @@ Printing to serial console can be enabled using the `debug_printing` flag in the
 }
 ```
 
-This will increase the program size with a few kb and will disable `usb_midi` as we currently do not have composite USB device yet.
+> [!WARNING]
+> Enabling `debug_printing` increases program size and will disable `usb_midi` because composite USB devices are not yet supported.
 
 ## Custom samplerate and blocksize
 

@@ -60,7 +60,7 @@ An accompanying metadata.json file can be included to set additional plugin sett
 
 The `project` flag creates a `README.md` and `Makefile` in the root of the project output, but may conflict with other generators.
 
-Each of these are optional and have either a default value or are entirely optional (description and homepage). Midi i/o ports are on by default, but can be set to `0` and they will be disabled - currently `midi_input` always has to be on!.
+Each of these are optional and have either a default value or are entirely optional (description and homepage). Midi i/o ports are on by default, but can be set to `0` and they will be disabled.
 
 ```json
 {
