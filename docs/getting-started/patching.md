@@ -6,7 +6,8 @@ To receive audio input into your patch add an `[adc~]` object.
 
 To send audio output add a `[dac~]` The number of channels can be configured by providing arguments to object. For example `[dac~ 1 2 3]` will generate three output channels. `[adc~ 1]` will make a single channel of audio input.
 
-Note that top-level graphs (e.g. `_main.pd`) should not have any `[inlet~]` or `[outlet~]` objects. These are reserved only for abstractions.
+> [!IMPORTANT]
+> Top-level graphs (e.g. `_main.pd`) should not have any `[inlet~]` or `[outlet~]` objects. These are reserved only for abstractions.
 
 ## Exposing Parameters
 

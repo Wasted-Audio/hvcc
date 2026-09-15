@@ -60,7 +60,12 @@ The last parameter of any `process()` function is the frame size of the in/out s
 
 ### Block Sizes and SIMD
 
-Use of hardware SIMD operations can dramatically speed up the processing of Heavy contexts by up to 8 times. For instance, if SSE optimisation is being used, then the internal block size of Heavy is 4 (because SSE processes vectors of 4 `float`s at a time). If a `process()` function is asked to process a number of samples that is *not* a multiple of 4, then the remaining samples (up to 3) *will remain unprocessed*. The `process()` function returns the number of samples that it did compute.
+Use of hardware SIMD operations can dramatically speed up the processing of Heavy contexts by up to 8 times. For instance, if SSE optimisation is being used, then the internal block size of Heavy is 4 (because SSE processes vectors of 4 `float`s at a time). 
+
+> [!WARNING]
+> If a `process()` function is asked to process a number of samples that is *not* a multiple of 4, then the remaining samples (up to 3) *will remain unprocessed*.
+
+The `process()` function returns the number of samples that it did compute.
 
 ### hv_process()
 
@@ -128,7 +133,10 @@ int main(int argc, const char *argv[]) {
 
 A print hook is a user-defined function which will be called when any message is sent to a `[print]` object in the context. The function is called on the audio thread and it is high recommended that it is only used for debugging purposes, not for production deployments.
 
-The print hook can be set, reset, or removed (i.e. set to `NULL`) using the `hv_setPrintHook()` function. This function is **not** thread-safe.
+The print hook can be set, reset, or removed (i.e. set to `NULL`) using the `hv_setPrintHook()` function. 
+
+> [!CAUTION]
+> This function is **not** thread-safe.
 
 ```c
 #include <stdio.h>
@@ -155,7 +163,10 @@ int main(int argc, const char *argv[]) {
 
 A send hook is a user-defined function which will be called when a message is sent to *any* `[send]` object in the context. This is the way in which control messages can be sent out of the patch. The function is called on the audio thread and it is high recommended that as little time as possible is spent in this function.
 
-The send hook can be set, reset, or removed (i.e. set to `NULL`) using the `hv_setSendHook()` function. This function is **not** thread-safe.
+The send hook can be set, reset, or removed (i.e. set to `NULL`) using the `hv_setSendHook()` function.
+
+> [!CAUTION]
+> This function is **not** thread-safe.
 
 ```c
 // define the send hook as a function with the following signature
@@ -567,7 +578,8 @@ void hv_msg_free(HvMessage *m);
 
 Any named `[table]` object can be retrieved from the patch at runtime. The current size of the table can be queried, or it can be resized. The backing float buffer can also be referenced, allowing arbitrary data to be read or written. The table hash can be determined with `hv_stringToHash()`.
 
-NOTE: These operations are in no way synchronised with the audio loop, and care must be taken to avoid any concurrency issues.
+> [!WARNING]
+> These operations are in no way synchronised with the audio loop, and care must be taken to avoid any concurrency issues.
 
 ```c
 /**
