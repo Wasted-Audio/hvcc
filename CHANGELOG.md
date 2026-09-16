@@ -8,6 +8,7 @@ Features:
 
 * Support `[inlet~]` object's control inlet and outlet
 * DPF: support Event type using a button for ImGui
+* DPF: support NanoVG slider integer quantization
 
 Bugs:
 
