@@ -102,6 +102,9 @@
         {%- for k, v in receivers + senders %}
             {%- if v.display == object.parameter %}
     {{object.parameter}}->setDefault({{v.attributes.default}}f);
+                {%- if v.attributes.type == "int" %}
+    {{object.parameter}}->setInteger(true);
+                {%- endif %}
             {%- endif %}
         {%- endfor %}
     {{object.parameter}}->setUsingLogScale({{object.logarithmic|lower}});
