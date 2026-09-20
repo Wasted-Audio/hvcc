@@ -480,9 +480,9 @@ class HeavyGraph(HeavyIrObject):
         """
         for i, cc in enumerate(self.inlet_connections):
             if len(cc) == 0:
-                # make copy of outlet_connections list because it will be changed
-                for c in list(self.inlet_objs[i].outlet_connections[0]):
-                    self.disconnect_objects(c)
+                for outlet in self.inlet_objs[i].outlet_connections:
+                    for c in list(outlet):
+                        self.disconnect_objects(c)
 
         # the recursive bit
         for o in [o for o in self.objs.values() if (o.type == "__graph")]:
@@ -929,9 +929,10 @@ class HeavyGraph(HeavyIrObject):
     def get_ir_on_message(self, inlet_index: int = 0) -> List[IROnMessage]:
         # pass the method through the inlet object, but only follow control connections
         x = []
-        for c in self.inlet_objs[inlet_index].outlet_connections[0]:
-            if c.is_control:
-                x.extend(c.to_object.get_ir_on_message(c.inlet_index))
+        for outlet in self.inlet_objs[inlet_index].outlet_connections:
+            for c in outlet:
+                if c.is_control:
+                    x.extend(c.to_object.get_ir_on_message(c.inlet_index))
         return x
 
     def get_ir_table_dict(self) -> Dict[str, IRTable]:

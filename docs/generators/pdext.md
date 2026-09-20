@@ -13,3 +13,7 @@ All outgoing control messages must be passed to a send object with the name `[s 
 ## Print Hook
 
 It is possible to directly print to the console of pd from inside the external. The print hook is prepended with the external name and a timestamp in ms since the start of the external object: `[printtest~ @ 500ms] print: something`.
+
+## Compilation
+
+This generator creates a Makefile that builds on [pd-lib-builder](https://github.com/pure-data/pd-lib-builder) and requires `make` and a suitable C-compiler (gcc or clang) to build.

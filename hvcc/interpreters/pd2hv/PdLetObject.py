@@ -36,6 +36,8 @@ class PdLetObject(PdObject):
     def get_outlet_connection_type(self, outlet_index: int) -> Optional[str]:
         if len(self.obj_args) > 0 and self.obj_args[0] in {"-->", "~f>", "~i>", "-~>"}:
             return self.obj_args[0]
+        elif self.obj_type == "inlet~" and outlet_index == 1:
+            return "-->"
         else:
             return super().get_outlet_connection_type(outlet_index)
 
@@ -45,7 +47,7 @@ class PdLetObject(PdObject):
             args={
                 "name": "",  # Pd does not give an inlet name
                 "index": self.let_index,
-                "type": self.get_outlet_connection_type(self.let_index)
+                "type": self.get_outlet_connection_type(0)  # evaluate the primary outlet for the type
             },
             properties=HvPos(x=self.pos_x, y=self.pos_y)
         )

@@ -2,6 +2,7 @@
 
 HVCC supports a number of dedicated generators that can help to wrap the heavy c/cpp output into a pluggable format:
 
+* [C](c.md)
 * [Daisy](daisy.md)
 * [DPF](dpf.md)
 * [FMOD](fmod.md)

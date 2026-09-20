@@ -124,6 +124,7 @@ class c2dpf(Generator):
                         class_name=f"HeavyDPF_{patch_name}",
                         receivers=receiver_list,
                         senders=sender_list,
+                        events=event_list,
                         copyright=copyright_c))
             elif dpf_meta.enable_ui == DPFUIType.NANOVG:
                 gui_json, widgets, gui_objects_render = nanovg_render(

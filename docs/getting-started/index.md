@@ -12,7 +12,8 @@ Heavy makes use of modern software principles to generate highly optimised C/C++
 
 Currently Heavy supports compiling Pure Data (.pd) patch files.
 
-However it's important to note that Pd is merely used as a front-end authoring editor, Heavy does not make use of any Pure Data code, and it is entirely unrelated to the embeddable Pd engine, [libpd](https://github.com/libpd/libpd).
+> [!NOTE]
+> Pure Data is merely used as a front-end authoring editor. Heavy does not make use of any Pure Data code, and it is entirely unrelated to the embeddable Pd engine, [libpd](https://github.com/libpd/libpd).
 
 ## What is Pure Data?
 

@@ -85,12 +85,12 @@ So, a very simple but viable board description might look like:
 }
 ```
 
-### Notes
-
-- Components names are always turned to lower-case.
-  - It is best to use lower-case in both your board.json and patch file to minimize confusion!
-- Pin numbers are based on the Digital pin numbering on the [Seed pinout](https://daisy.audio/hardware/Seed/#pinout).
-  - This means that `"pin": 20` refers to `D20` on the Daisy Seed.
+> [!NOTE]
+>
+> - Components names are always turned to lower-case.
+>   - It is best to use lower-case in both your board.json and patch file to minimize confusion!
+> - Pin numbers are based on the Digital pin numbering on the [Seed pinout](https://daisy.audio/hardware/Seed/#pinout).
+>   - This means that `"pin": 20` refers to `D20` on the Daisy Seed.
 
 ### Component reference
 
@@ -103,7 +103,7 @@ So, a very simple but viable board description might look like:
 | Switch | _press | Returns a float representing the current state (1 = pressed, 0 = not pressed) |
 | Switch | _fall | Returns a bang on the signal's falling edge (i.e. when the switch is released). |
 | Switch | _seconds | Returns a float representing the number of seconds the switch has been held down. |
-| Switch3 | --- | Returns a float representing the current state, either 0 or 1. |
+| Switch3 | --- | Returns a float representing the current state. Either 0 (center), 1 (left/up) or 2 (right/down). |
 | Encoder | --- | Returns a 1 if turned one direction, -1 if turned in the other, and 0 otherwise. |
 | Encoder | \_rise | Returns a bang when the encoder is pressed. The special alias _EncSwitch_ is always bound to this. |
 | Encoder | _press | Same as switch _press. |
@@ -181,7 +181,7 @@ You can also display a table from your patch. Here the name of the table is `sco
 
 ```cpp
     hardware.display.Fill(0);
-    
+
     float* table_buffer = hv->getBufferForTable(hv->getHashForString("scope"));
     for (int i=0; i<128; i++)
     {
