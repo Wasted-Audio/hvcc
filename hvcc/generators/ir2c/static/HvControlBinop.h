@@ -52,6 +52,7 @@ typedef enum BinopType {
 
 typedef struct ControlBinop {
   float k;
+  float s;
 } ControlBinop;
 
 hv_size_t cBinop_init(ControlBinop *o, float k);
@@ -60,7 +61,7 @@ void cBinop_onMessage(HeavyContextInterface *_c, ControlBinop *o, BinopType op, 
     const HvMessage *m,
     void (*sendMessage)(HeavyContextInterface *, int, const HvMessage *));
 
-void cBinop_k_onMessage(HeavyContextInterface *_c, void *o, BinopType op, float k,
+void cBinop_k_onMessage(HeavyContextInterface *_c, ControlBinop *o, BinopType op, float k,
     int letIn, const HvMessage *m,
     void (*sendMessage)(HeavyContextInterface *, int, const HvMessage *));
 

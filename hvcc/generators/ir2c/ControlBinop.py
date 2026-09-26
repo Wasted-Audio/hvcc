@@ -91,11 +91,8 @@ class ControlBinop(HeavyObject):
 
     @classmethod
     def get_C_init(cls, obj_type: str, obj_id: str, args: Dict) -> List[str]:
-        if obj_type.endswith("_k"):
-            return []
-        else:
-            obj_arg = float(list(args.values())[0])
-            return [f"cBinop_init(&cBinop_{obj_id}, {obj_arg}f); // {obj_type}"]
+        obj_arg = float(list(args.values())[0])
+        return [f"cBinop_init(&cBinop_{obj_id}, {obj_arg}f); // {obj_type}"]
 
     @classmethod
     def get_C_free(cls, obj_type: str, obj_id: str, args: Dict) -> List[str]:
@@ -105,11 +102,11 @@ class ControlBinop(HeavyObject):
     def get_C_onMessage(cls, obj_type: str, obj_id: str, inlet_index: int, args: Dict) -> List[str]:
         if obj_type.endswith("_k"):
             return [
-                "cBinop_k_onMessage(_c, NULL, {0}, {1}f, {2}, m, &cBinop_{3}_sendMessage);".format(
+                "cBinop_k_onMessage(_c, &Context(_c)->cBinop_{0}, {1}, {2}f, {3}, m, &cBinop_{0}_sendMessage);".format(
+                    obj_id,
                     cls.__OPERATION_DICT[obj_type[:-2]],
                     float(args["k"]),
-                    inlet_index,
-                    obj_id)
+                    inlet_index)
             ]
         else:
             return [
