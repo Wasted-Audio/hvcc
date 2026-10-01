@@ -1,6 +1,13 @@
 CHANGELOG
 =====
 
+Next Release
+-----
+
+Bugfixes:
+
+- Daisy: Seed1.1 codec initialization test
+
 0.17.2
 -----
 
