@@ -104,11 +104,11 @@ struct DaisyPatch {
     sai_config[0].b_sync          = daisy::SaiHandle::Config::Sync::SLAVE;
     if (som.CheckBoardVersion() == daisy::DaisySeed::BoardVersion::DAISY_SEED_1_1)
     {
-        sai_config[0].a_dir         = SaiHandle::Config::Direction::RECEIVE;
-        sai_config[0].b_dir         = SaiHandle::Config::Direction::TRANSMIT;
+        sai_config[0].a_dir         = daisy::SaiHandle::Config::Direction::RECEIVE;
+        sai_config[0].b_dir         = daisy::SaiHandle::Config::Direction::TRANSMIT;
     } else {
-        sai_config[0].a_dir         = SaiHandle::Config::Direction::TRANSMIT;
-        sai_config[0].b_dir         = SaiHandle::Config::Direction::RECEIVE;
+        sai_config[0].a_dir         = daisy::SaiHandle::Config::Direction::TRANSMIT;
+        sai_config[0].b_dir         = daisy::SaiHandle::Config::Direction::RECEIVE;
     }
     sai_config[0].pin_config.fs   = daisy::Pin(daisy::PORTE, 4);
     sai_config[0].pin_config.mclk = daisy::Pin(daisy::PORTE, 2);
