@@ -7,7 +7,7 @@ Next Release
 Bugfixes:
 
 - Daisy: Seed1.1 codec initialization test
-- Daisy: add delay_ticks of 500 to CD4021 config
+- Daisy: add delay_ticks option to CD4021 config
 
 0.17.2
 -----
