@@ -325,7 +325,7 @@
 		]
 	},
 	"CD4021": {
-		"map_init": "{name}.Init({{ som.GetPin({pin_clk}), som.GetPin({pin_cs}), {{ som.GetPin({pin_data}) }} }});",
+		"map_init": "{name}.Init({{ som.GetPin({pin_clk}), som.GetPin({pin_cs}), {{ som.GetPin({pin_data}) }}, 500 }});",
 		"typename": "daisy::ShiftRegister4021<{driver_count}>",
 		"non_class_decl": "uint8_t {name}_debounced[8*{driver_count}];",
 		"driver_count": 1,
