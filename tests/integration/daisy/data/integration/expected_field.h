@@ -58,7 +58,7 @@ struct DaisyField {
     sw2.Init(som.GetPin(29), som.AudioCallbackRate(), daisy::Switch::TYPE_MOMENTARY, daisy::Switch::POLARITY_INVERTED);
 
     // Muxes
-    pad_shift.Init({ som.GetPin(28), som.GetPin(27), { som.GetPin(26) } });
+    pad_shift.Init({ som.GetPin(28), som.GetPin(27), { som.GetPin(26) }, 10 });
 
     // Gate ins
     gatein.Init(som.GetPin(0), true);
