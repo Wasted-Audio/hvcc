@@ -4,6 +4,10 @@ CHANGELOG
 Next Release
 -----
 
+Features:
+
+* Daisy: add new devkits to json2daisy, integration tests and docs
+
 Bugfixes:
 
 - Daisy: Seed1.1 codec initialization test (#422)
