@@ -9,6 +9,9 @@ Currently daisy platform is supported for:
 * `patch`
 * `patch_init`
 * `field`
+* `desktop_devkit`
+* `eurorack_devkit`
+* `pedal_devkit`
 
 Which can be configured using the `-m` metadata.json `daisy.board` setting:
 
