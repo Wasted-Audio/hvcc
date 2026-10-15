@@ -13,6 +13,11 @@ Bugfixes:
 * Daisy: Seed1.1 codec initialization test (#422)
 * Daisy: add delay_ticks option to CD4021 config (#404)
 
+Updates:
+
+* Deprecate python 3.9
+* Support python 3.15
+
 0.17.2
 -----
 
