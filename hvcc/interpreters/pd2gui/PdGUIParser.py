@@ -602,7 +602,7 @@ class PdGUIParser(PdParser):
             bg_color=Color(line[18]),
             fg_color=Color(line[19]),
             log_mode=bool(int(line[9])),
-            log_height=int(line[21]),
+            log_height=int(line[22]),
             min=float(line[7]),
             max=float(line[8])
         )
