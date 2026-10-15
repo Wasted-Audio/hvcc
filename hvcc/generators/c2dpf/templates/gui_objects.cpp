@@ -163,7 +163,7 @@
     {{object.parameter}}->setSize({{object.size.x}} * scaleFactor, {{object.size.y}} * scaleFactor);
     {{object.parameter}}->setAbsolutePos({{object.position.x}} * scaleFactor, {{object.position.y}} * scaleFactor);
     {{object.parameter}}->setRange({{object.min}}f, {{object.max}}f);
-    {{object.parameter}}->setUsingLogScale({{ 'true' if object.log_mode is sameas true else 'false' }});
+    {{object.parameter}}->setUsingLogScale({{object.log_mode|lower}});
     {{object.parameter}}->setLogarithmicHeight({{object.log_height}});
         {%- for k, v in receivers + senders %}
             {%- if v.display == object.parameter %}
