@@ -7,9 +7,11 @@ Next Release
 Features:
 
 * Daisy: add new devkits to json2daisy, integration tests and docs
+* DPF: support NanoVG `[nbx]` `log_mode` and `log_height`
 
 Bugfixes:
 
+* pd2gui: use correct value for `[nbx]` `log_height`
 * Daisy: Seed1.1 codec initialization test (#422)
 * Daisy: add delay_ticks option to CD4021 config (#404)
 
