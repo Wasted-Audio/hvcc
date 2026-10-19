@@ -43,9 +43,10 @@ It has since then been expanded to provide further support for many different pl
 hvcc has been integrated into several projects and services. This allows to easily compile patches without having to install hvcc manually.
 
 - [plugdata](https://plugdata.org/) - Modern interface for Pure Data. Includes a full cross-platform toolchain and targets Daisy, DPF and PD Externals.
-- [mod-cloud-builder](https://github.com/moddevices/mod-cloud-builder) - Online service for building LV2 plugins for the MOD platform.
+- [mod-cloud-builder](https://github.com/moddevices/mod-cloud-builder) - Online service for building LV2 plugins for the MOD platform (uses a fork).
 - [OWL Patch Library](https://www.rebeltech.org/patch-library) - Online service for building OWL plugins (uses an old fork).
-- [Boochow Web Apps](https://app.boochow.com/) - Online service for building Korg Logue SDK plugins.
+- [Bela](https://learn.bela.io/tutorials/pure-data/advanced/using-the-heavy-compiler/) - Embedded platform for sound experimentation (uses a fork).
+- [Boochow Web Apps](https://app.boochow.com/) - Online service for building Korg Logue SDK plugins (custom wrapper).
 
 ## Requirements
 
