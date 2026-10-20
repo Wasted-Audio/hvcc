@@ -8,6 +8,7 @@ Features:
 
 * Daisy: add new devkits to json2daisy, integration tests and docs
 * DPF: support NanoVG `[nbx]` `log_mode` and `log_height`
+* DPF: update `[knob]` `setLabelStyle()`
 
 Bugfixes:
 

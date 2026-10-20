@@ -153,8 +153,7 @@
         nvgRGB{{object.arc_color.as_rgb_tuple()}}
             {%- endif %}
     );
-    {{object.parameter}}->setLabelStyle({{object.label_pos.x}} * scaleFactor, {{object.label_pos.y}} * scaleFactor, {{object.label_size}} * scaleFactor);
-    {{object.parameter}}->setShowLabel(LabelShow::{{object.label_show.name|upper}});
+    {{object.parameter}}->setLabelStyle({{object.label_pos.x}} * scaleFactor, {{object.label_pos.y}} * scaleFactor, {{object.label_size}} * scaleFactor, LabelShow::{{object.label_show.name|upper}});
     {{parent}}->addManagedChild({{object.parameter}});
         {%- elif object.type == 'number' %}
     // number
