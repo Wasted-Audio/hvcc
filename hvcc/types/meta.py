@@ -60,9 +60,13 @@ class DPFPortGroups(BaseModel):
         # group names must be unique across input/output/params,
         # since they all become entries of the same PortGroups enum
         names = list(self.input) + list(self.output) + list(self.params)
-        dups = {n for n in names if names.count(n) > 1}
+        if "Count" in names:
+            raise ValueError("Port group name 'Count' is reserved and cannot be used")
+
+        symbols = [name.lower() for name in names]
+        dups = {symbol for symbol in symbols if symbols.count(symbol) > 1}
         if dups:
-            raise ValueError(f"Port group name(s) used more that once: {', '.join(sorted(dups))}")
+            raise ValueError(f"Port group symbols(s) used more than once: {', '.join(sorted(dups))}")
 
         # a port index may only appear once per direction
         for direction in (self.input, self.output):

@@ -27,19 +27,9 @@ public:
 {% if meta.port_groups != None %}
   enum PortGroups
   {
-{%- if meta.port_groups.input|length %}
-  {%- for group, value in meta.port_groups.input.items() %}
-    kPortGroup{{group}},
-  {%- endfor %}
-{%- endif %}
-{%- if meta.port_groups.output|length %}
-  {%- for group, value in meta.port_groups.output.items() %}
-    kPortGroup{{group}},
-  {%- endfor %}
-{%- endif %}
-{%- if meta.port_groups.params|length %}
-  {%- for group, value in meta.port_groups.params.items() %}
-    kPortGroup{{group}},
+{%- if meta.port_groups.input|length or meta.port_groups.output|length or meta.port_groups.params|length %}
+  {%- for group, value in (meta.port_groups.input.items()|list) + (meta.port_groups.output.items()|list) + (meta.port_groups.params.items()|list) %}
+    kPortGroup{{group|replace(" ", "_")}},
   {%- endfor %}
 {%- endif %}
     kPortGroupCount

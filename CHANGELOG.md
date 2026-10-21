@@ -16,6 +16,7 @@ Bugfixes:
 * pd2gui: use correct value for `[nbx]` `log_height`
 * Daisy: Seed1.1 codec initialization test (#422)
 * Daisy: add delay_ticks option to CD4021 config (#404)
+* DPF: use correct default port groups
 
 Updates:
 
