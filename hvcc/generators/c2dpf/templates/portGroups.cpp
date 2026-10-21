@@ -1,6 +1,6 @@
 void {{class_name}}::initAudioPort(bool input, uint32_t index, AudioPort& port)
 {
-    port.hints = 0x0;
+    Plugin::initAudioPort(input, index, port);
 
     if (input)
     {
@@ -73,16 +73,8 @@ void {{class_name}}::initPortGroup(uint32_t groupId, PortGroup& portGroup)
 {
   switch (groupId)
   {
-{%- if port_groups.input|length %}
-  {%- for group, value in port_groups.input.items() %}
-    case kPortGroup{{group}}:
-      portGroup.name   = "{{group}}";
-      portGroup.symbol = "{{group|lower}}";
-      break;
-  {%- endfor %}
-{%- endif %}
-{%- if port_groups.output|length %}
-  {%- for group, value in port_groups.output.items() %}
+{%- if port_groups.input|length or port_groups.output|length or port_groups.params|length%}
+  {%- for group, value in (port_groups.input.items()|list) + (port_groups.output.items()|list) + (port_groups.params.items()|list) %}
     case kPortGroup{{group}}:
       portGroup.name   = "{{group}}";
       portGroup.symbol = "{{group|lower}}";
