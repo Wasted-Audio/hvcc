@@ -78,6 +78,16 @@ def test_normalization():
         _normalize_port_groups(port_groups_invalid, num_input_channels=2, num_output_channels=2)
 
 
+def test_reserved():
+    reserved_names = ["Count", "Mono", "Stereo", "Count_"]
+
+    for name in reserved_names:
+        with pytest.raises(ValueError):
+            DPFPortGroups(
+                input={name: {"one": 1}}
+            )
+
+
 def test_slugify():
     assert slugify("Group 1") == "Group_1"
     assert slugify("group-2") == "group_2"

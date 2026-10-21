@@ -66,8 +66,10 @@ class DPFPortGroups(BaseModel):
         # group names must be unique across input/output/params,
         # since they all become entries of the same PortGroups enum
         names = list(self.input) + list(self.output) + list(self.params)
-        if "Count" in names:
-            raise ValueError("Port group name 'Count' is reserved and cannot be used")
+        reserved = {"Count", "Mono", "Stereo"}
+        for name in names:
+            if slugify(name) in reserved:
+                raise ValueError(f"Port group name '{name}' is reserved and cannot be used")
 
         symbols = [slugify(name).lower() for name in names]
         dups = {symbol for symbol in symbols if symbols.count(symbol) > 1}
