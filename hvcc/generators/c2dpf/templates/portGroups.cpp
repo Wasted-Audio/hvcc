@@ -1,6 +1,6 @@
 void {{class_name}}::initAudioPort(bool input, uint32_t index, AudioPort& port)
 {
-    Plugin::initAudioPort(input, index, port);
+    port.hints = 0x0;
 
     if (input)
     {
