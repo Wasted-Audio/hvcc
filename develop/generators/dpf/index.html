@@ -2206,7 +2206,7 @@ On the plugin side this behaves like the <code>trig</code> type.</p>
 </span></code></pre></div>
 <p>Other fields that the DPF metadata supports are:</p>
 <ul>
-<li><code>port_groups</code> - If your plugin has more audio i/o that need to be grouped together or given Control Voltage status</li>
+<li><code>port_groups</code> - If your plugin has more audio i/o that need to be grouped together or given Control Voltage status (uses PD numbers starting at 1). Can also be used for grouping parameters.</li>
 <li><code>enumerators</code> - Configure a set of parameters that cycle over a list of string values and return an integer in the patch.</li>
 <li><code>enable_ui</code> - Integer value that can generate different plugin UIs.<ul>
 <li>0 - The same as disabling the UI, creates nothing.</li>
