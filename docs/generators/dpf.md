@@ -90,7 +90,7 @@ Each of these are optional and have either a default value or are entirely optio
 
 Other fields that the DPF metadata supports are:
 
-- `port_groups` - If your plugin has more audio i/o that need to be grouped together or given Control Voltage status
+- `port_groups` - If your plugin has more audio i/o that need to be grouped together or given Control Voltage status (uses PD numbers starting at 1). Can also be used for grouping parameters.
 - `enumerators` - Configure a set of parameters that cycle over a list of string values and return an integer in the patch.
 - `enable_ui` - Integer value that can generate different plugin UIs.
   - 0 - The same as disabling the UI, creates nothing.
