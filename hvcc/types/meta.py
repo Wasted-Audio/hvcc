@@ -3,6 +3,7 @@
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
+import re
 from enum import IntEnum
 from typing import Literal, Optional, Tuple, Union
 from typing_extensions import Self
@@ -16,6 +17,11 @@ DaisyBootloader = Literal['BOOT_NONE', 'BOOT_SRAM', 'BOOT_QSPI']
 DPFFormats = Literal['lv2', 'lv2_sep', 'vst2', 'vst3', 'clap', 'jack', 'dssi', 'ladspa', 'au']
 
 DPFPortGroupConfig = dict[str, Union[int, Tuple[int, bool]]]
+
+
+def slugify(value: str) -> str:
+    """Used for cleaning up portgroup names by replacing invalid characters with underscores"""
+    return re.sub(r'[^A-Za-z0-9_]+', '_', str(value)).strip('_')
 
 
 class Daisy(BaseModel):
@@ -63,7 +69,7 @@ class DPFPortGroups(BaseModel):
         if "Count" in names:
             raise ValueError("Port group name 'Count' is reserved and cannot be used")
 
-        symbols = [name.replace(" ", "_").lower() for name in names]
+        symbols = [slugify(name).lower() for name in names]
         dups = {symbol for symbol in symbols if symbols.count(symbol) > 1}
         if dups:
             raise ValueError(f"Port group symbols(s) used more than once: {', '.join(sorted(dups))}")

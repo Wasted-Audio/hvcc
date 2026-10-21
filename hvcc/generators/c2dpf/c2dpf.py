@@ -25,7 +25,7 @@ from ..filters import filter_uniqueid
 
 from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
 from hvcc.types.compiler import Generator, CompilerResp, CompilerMsg, CompilerNotif, ExternInfo
-from hvcc.types.meta import DPFPortGroups, DPFPortGroupConfig, Meta, DPF, DPFUIType, DPFUISize
+from hvcc.types.meta import DPFPortGroups, DPFPortGroupConfig, Meta, DPF, DPFUIType, DPFUISize, slugify
 from .nanovg_render import open_gui_json, nanovg_render
 
 
@@ -131,6 +131,7 @@ class c2dpf(Generator):
             # initialize the jinja template environment
             env = jinja2.Environment()
             env.filters["uniqueid"] = filter_uniqueid
+            env.filters["slugify"] = slugify
 
             env.loader = jinja2.FileSystemLoader(Path(__file__).parent / "templates")
 

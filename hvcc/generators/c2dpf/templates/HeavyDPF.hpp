@@ -29,7 +29,7 @@ public:
   {
 {%- if meta.port_groups.input|length or meta.port_groups.output|length or meta.port_groups.params|length %}
   {%- for group, value in (meta.port_groups.input.items()|list) + (meta.port_groups.output.items()|list) + (meta.port_groups.params.items()|list) %}
-    kPortGroup{{group|replace(" ", "_")}},
+    kPortGroup{{group|slugify}},
   {%- endfor %}
 {%- endif %}
     kPortGroupCount
