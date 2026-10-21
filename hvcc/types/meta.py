@@ -63,7 +63,7 @@ class DPFPortGroups(BaseModel):
         if "Count" in names:
             raise ValueError("Port group name 'Count' is reserved and cannot be used")
 
-        symbols = [name.lower() for name in names]
+        symbols = [name.replace(" ", "_").lower() for name in names]
         dups = {symbol for symbol in symbols if symbols.count(symbol) > 1}
         if dups:
             raise ValueError(f"Port group symbols(s) used more than once: {', '.join(sorted(dups))}")
