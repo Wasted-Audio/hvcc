@@ -6,8 +6,8 @@ void {{class_name}}::initAudioPort(bool input, uint32_t index, AudioPort& port)
     {
       switch (index)
       {
-{%- if meta.port_groups.input|length %}
-  {%- for group, gConfig in meta.port_groups.input.items() %}
+{%- if port_groups.input|length %}
+  {%- for group, gConfig in port_groups.input.items() %}
     {%- for port, value in gConfig.items() %}
       case {{value[0] if value[0] is number else value}}:
         port.name    = "Input {{port}} ({{group}})";
@@ -38,8 +38,8 @@ void {{class_name}}::initAudioPort(bool input, uint32_t index, AudioPort& port)
     {
       switch (index)
       {
-{%- if meta.port_groups.output|length %}
-  {%- for group, gConfig in meta.port_groups.output.items() %}
+{%- if port_groups.output|length %}
+  {%- for group, gConfig in port_groups.output.items() %}
     {%- for port, value in gConfig.items() %}
       case {{value[0] if value[0] is number else value}}:
         port.name    = "Output {{port}} ({{group}})";
@@ -73,16 +73,16 @@ void {{class_name}}::initPortGroup(uint32_t groupId, PortGroup& portGroup)
 {
   switch (groupId)
   {
-{%- if meta.port_groups.input|length %}
-  {%- for group, value in meta.port_groups.input.items() %}
+{%- if port_groups.input|length %}
+  {%- for group, value in port_groups.input.items() %}
     case kPortGroup{{group}}:
       portGroup.name   = "{{group}}";
       portGroup.symbol = "{{group|lower}}";
       break;
   {%- endfor %}
 {%- endif %}
-{%- if meta.port_groups.output|length %}
-  {%- for group, value in meta.port_groups.output.items() %}
+{%- if port_groups.output|length %}
+  {%- for group, value in port_groups.output.items() %}
     case kPortGroup{{group}}:
       portGroup.name   = "{{group}}";
       portGroup.symbol = "{{group|lower}}";

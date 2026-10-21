@@ -25,8 +25,49 @@ from ..filters import filter_uniqueid
 
 from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
 from hvcc.types.compiler import Generator, CompilerResp, CompilerMsg, CompilerNotif, ExternInfo
-from hvcc.types.meta import Meta, DPF, DPFUIType, DPFUISize
+from hvcc.types.meta import DPFPortGroups, DPFPortGroupConfig, Meta, DPF, DPFUIType, DPFUISize
 from .nanovg_render import open_gui_json, nanovg_render
+
+
+def _normalize_port_groups(
+        port_groups: Optional[DPFPortGroups],
+        num_input_channels: int,
+        num_output_channels: int
+) -> Optional[DPFPortGroups]:
+    """Convert 1-based PD port indices to 0-based DPF channel indices."""
+    if port_groups is None:
+        return None
+
+    def shift(
+        direction: dict[str, DPFPortGroupConfig],
+        num_channels: int
+    ) -> dict[str, DPFPortGroupConfig]:
+        out: dict[str, DPFPortGroupConfig] = {}
+
+        for group, gConfig in direction.items():
+            shifted: DPFPortGroupConfig = {}
+            for port, value in gConfig.items():
+                if isinstance(value, (list, tuple)):
+                    index, is_cv = value[0], value[1]
+                else:
+                    index, is_cv = value, False
+
+                dpf_index = index - 1
+
+                if not (0 <= dpf_index < num_channels):
+                    raise ValueError(
+                        f"Port group '{group}' references port {index} "
+                        f"({port}), which is out of range for {num_channels} channels."
+                    )
+                shifted[port] = (dpf_index, is_cv) if is_cv else dpf_index
+            out[group] = shifted
+        return out
+
+    return DPFPortGroups.model_construct(
+        input=shift(port_groups.input, num_input_channels),
+        output=shift(port_groups.output, num_output_channels),
+        params=port_groups.params
+    )
 
 
 class c2dpf(Generator):
@@ -81,6 +122,12 @@ class c2dpf(Generator):
                     height=gui_json.size.y
                 )
 
+            port_groups = _normalize_port_groups(
+                dpf_meta.port_groups,
+                num_input_channels=num_input_channels,
+                num_output_channels=num_output_channels) or DPFPortGroups()
+            param_group_map = {param: group for group, params in port_groups.params.items() for param in params}
+
             # initialize the jinja template environment
             env = jinja2.Environment()
             env.filters["uniqueid"] = filter_uniqueid
@@ -106,6 +153,8 @@ class c2dpf(Generator):
                 f.write(env.get_template("HeavyDPF.cpp").render(
                     name=patch_name,
                     meta=dpf_meta,
+                    port_groups=port_groups,
+                    param_group_map=param_group_map,
                     class_name=f"HeavyDPF_{patch_name}",
                     num_input_channels=num_input_channels,
                     num_output_channels=num_output_channels,

@@ -37,6 +37,11 @@ public:
     kPortGroup{{group}},
   {%- endfor %}
 {%- endif %}
+{%- if meta.port_groups.params|length %}
+  {%- for group, value in meta.port_groups.params.items() %}
+    kPortGroup{{group}},
+  {%- endfor %}
+{%- endif %}
     kPortGroupCount
   };
 {%- endif %}

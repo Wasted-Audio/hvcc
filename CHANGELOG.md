@@ -8,7 +8,8 @@ Features:
 
 * Daisy: add new devkits to json2daisy, integration tests and docs
 * DPF: support NanoVG `[nbx]` `log_mode` and `log_height`
-* DPF: update `[knob]` `setLabelStyle()`
+* DPF: update NanoVG `[knob]` `setLabelStyle()`
+* DPF: support port groups for parameters (#300)
 
 Bugfixes:
 
@@ -20,6 +21,7 @@ Updates:
 
 * Deprecate python 3.9
 * Support python 3.15
+* DPF: match port group indices with PD i/o (start at 1)
 
 0.17.2
 -----

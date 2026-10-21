@@ -52,4 +52,8 @@
           parameter.enumValues.values = values;
         }
       {%- endif %}
+      {%- set grp = param_group_map[v.display] if v.display in param_group_map else none -%}
+      {%- if grp not sameas none %}
+        parameter.groupId = kPortGroup{{grp}};
+      {%- endif -%}
         break;
