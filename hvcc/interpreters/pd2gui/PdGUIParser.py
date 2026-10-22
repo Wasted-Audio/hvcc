@@ -297,14 +297,23 @@ class PdGUIParser(PdParser):
         )
 
     @classmethod
-    def filter_params(cls, param: str) -> Optional[str]:
-        """ Only allow externed parameters
+    def filter_params(cls, param_recv: str, param_send: str) -> tuple[Optional[str], bool]:
+        """ Only allow external parameters.
+            Returns (identifier, is_send).
         """
 
-        if "@hv_param" in param or "@hv_event" in param:
-            return param.split(" ")[0]
-        else:
-            return None
+        def externed(param: str) -> Optional[str]:
+            if "@hv_param" in param or "@hv_event" in param:
+                return param.split()[0]
+            else:
+                return None
+
+        recv, send = externed(param_recv), externed(param_send)
+
+        if recv and send:
+            raise ValueError("You cannot have both external receive and send parameter on this object.")
+
+        return send or recv, bool(send)
 
     @classmethod
     def __resolve_object_args(
@@ -375,7 +384,7 @@ class PdGUIParser(PdParser):
 
     @classmethod
     def add_bang(cls, line: list[str]) -> Optional[Bang]:
-        param = cls.filter_params(line[10])
+        param, send = cls.filter_params(line[10], line[11])
         if param is None:
             return None
 
@@ -400,6 +409,7 @@ class PdGUIParser(PdParser):
                 y=int(line[5])
             ),
             parameter=param,
+            send=send,
             label=label,
             flash_time=int(line[6]),
             bg_color=Color(line[16]),
@@ -408,7 +418,7 @@ class PdGUIParser(PdParser):
 
     @classmethod
     def add_toggle(cls, line: list[str]) -> Optional[Toggle]:
-        param = cls.filter_params(line[8])
+        param, send = cls.filter_params(line[8], line[9])
         if param is None:
             return None
 
@@ -433,6 +443,7 @@ class PdGUIParser(PdParser):
                 y=int(line[5])
             ),
             parameter=param,
+            send=send,
             label=label,
             bg_color=Color(line[14]),
             fg_color=Color(line[15]),
@@ -441,7 +452,7 @@ class PdGUIParser(PdParser):
 
     @classmethod
     def add_radio(cls, line: list[str]) -> Optional[Union[VRadio, HRadio]]:
-        param = cls.filter_params(line[10])
+        param, send = cls.filter_params(line[10], line[11])
         if param is None:
             return None
 
@@ -473,6 +484,7 @@ class PdGUIParser(PdParser):
                 y=int(line[5]) * (int(line[8]) if radio_type == "vradio" else 1)
             ),
             parameter=param,
+            send=send,
             label=label,
             bg_color=Color(line[16]),
             fg_color=Color(line[17]),
@@ -481,7 +493,7 @@ class PdGUIParser(PdParser):
 
     @classmethod
     def add_slider(cls, line: list[str]) -> Optional[Union[VSlider, HSlider]]:
-        param = cls.filter_params(line[12])
+        param, send = cls.filter_params(line[12], line[13])
         if param is None:
             return None
 
@@ -511,6 +523,7 @@ class PdGUIParser(PdParser):
                 y=int(line[6])
             ),
             parameter=param,
+            send=send,
             label=label,
             bg_color=Color(line[18]),
             fg_color=Color(line[19]),
@@ -522,7 +535,7 @@ class PdGUIParser(PdParser):
 
     @classmethod
     def add_knob(cls, line: list[str]) -> Optional[Knob]:
-        param = cls.filter_params(line[11])
+        param, send = cls.filter_params(line[11], line[12])
         if param is None:
             return None
 
@@ -545,6 +558,7 @@ class PdGUIParser(PdParser):
                 y=int(line[5])
             ),
             parameter=param,
+            send=send,
             label_size=int(line[27]),
             label_pos=Coords(
                 x=int(line[28]),
@@ -573,7 +587,7 @@ class PdGUIParser(PdParser):
 
     @classmethod
     def add_number(cls, line: list[str]) -> Optional[Number]:
-        param = cls.filter_params(line[12])
+        param, send = cls.filter_params(line[12], line[13])
         if param is None:
             return None
 
@@ -598,6 +612,7 @@ class PdGUIParser(PdParser):
                 y=int(line[6])
             ),
             parameter=param,
+            send=send,
             label=label,
             bg_color=Color(line[18]),
             fg_color=Color(line[19]),
@@ -638,7 +653,7 @@ class PdGUIParser(PdParser):
 
     @classmethod
     def add_float(cls, line: list[str]) -> Optional[Float]:
-        param = cls.filter_params(line[9])
+        param, send = cls.filter_params(line[9], line[10])
         if param is None:
             return None
 
@@ -654,6 +669,7 @@ class PdGUIParser(PdParser):
                 y=font_height
             ),
             parameter=param,
+            send=send,
             label_text=line[8] if line[8] != "-" else "",
             font_height=font_height,
             label_pos=LabelPos(int(line[7])),
@@ -663,7 +679,7 @@ class PdGUIParser(PdParser):
 
     @classmethod
     def add_popmenu(cls, line: list[str]) -> Optional[Popmenu]:
-        param = cls.filter_params(line[11])
+        param, send = cls.filter_params(line[11], line[12])
         if param is None:
             return None
 
@@ -677,6 +693,7 @@ class PdGUIParser(PdParser):
                 y=int(line[6])
             ),
             parameter=param,
+            send=send,
             font_height=int(line[7]),
             no_select=line[10],
             fg_color=Color(line[9]),
