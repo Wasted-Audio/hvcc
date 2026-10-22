@@ -80,7 +80,8 @@ void {{class_name}}::parameterChanged(uint32_t index, float value)
 {
     switch (index)
     {
-{%- for k, v in receivers + senders + out_events %}
+ {%- set widget_names = widgets.values() | sum(start=[]) %}
+ {%- for k, v in receivers + senders + out_events if v.display in widget_names %}
         case k{{v.display|capitalize}}:
     {%- if v.attributes.type == "bool" %}
             {{v.display}}->setDown(static_cast<bool>(value));

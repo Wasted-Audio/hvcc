@@ -164,13 +164,6 @@ void {{class_name}}::setParameterValue(uint32_t index, float value)
 }
 
 {%- if out_events|length > 0 %}
-struct OutputEvent {
-    uint32_t id;
-    uint32_t holdSamples;
-};
-
-OutputEvent outputEvents[{{receivers|length + events|length + senders|length + out_events|length}}];
-
 void {{class_name}}::setOutputEvent(uint32_t id)
 {
   OutputEvent& p = outputEvents[id];

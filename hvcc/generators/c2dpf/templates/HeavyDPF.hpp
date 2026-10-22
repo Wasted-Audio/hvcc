@@ -135,10 +135,19 @@ protected:
   // -------------------------------------------------------------------
 
 private:
-  {%- if (receivers|length > 0) or (senders|length > 0) or (events|length > 0) %}
+{%- if (receivers|length > 0) or (senders|length > 0) or (events|length > 0) or (out_events|length > 0) %}
   // parameters
   float _parameters[HV_DPF_NUM_PARAMETER];
-  {%- endif %}
+{%- endif %}
+
+{%- if out_events|length > 0 %}
+  struct OutputEvent {
+    uint32_t id;
+    uint32_t holdSamples;
+  };
+{%- endif %}
+
+  OutputEvent outputEvents[{{receivers|length + events|length + senders|length + out_events|length}}];
 
   // transport values
   bool wasPlaying = false;
