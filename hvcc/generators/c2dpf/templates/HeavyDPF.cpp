@@ -82,7 +82,7 @@ static void hvPrintHookFunc(HeavyContextInterface *c, const char *printLabel, co
 {{class_name}}::{{class_name}}()
  : Plugin(HV_DPF_NUM_PARAMETER, 0, 0)
 {
-  {% for k, v in receivers + senders + events -%}
+  {% for k, v in receivers + events + senders + out_events -%}
     {%- if v.attributes %}
   _parameters[{{loop.index-1}}] = {{v.attributes.default}}f;
     {%- else %}
@@ -113,11 +113,11 @@ static void hvPrintHookFunc(HeavyContextInterface *c, const char *printLabel, co
 
 void {{class_name}}::initParameter(uint32_t index, Parameter& parameter)
 {
-  {%- if (receivers|length > 0) or (senders|length > 0) -%}
+  {%- if (receivers|length > 0) or (events|length > 0) or (senders|length > 0) or (out_events|length > 0) -%}
   // initialise parameters with defaults
   switch (index)
   {
-    {% for k, v in receivers + senders + events %}
+    {% for k, v in receivers + events + senders + out_events %}
 {% include 'initParameter.cpp' %}
     {% endfor -%}
   }
@@ -138,9 +138,9 @@ float {{class_name}}::getParameterValue(uint32_t index) const
 
 void {{class_name}}::setParameterValue(uint32_t index, float value)
 {
-  {%- if (receivers|length > 0) or (events|length > 0) %}
+  {%- if (receivers|length > 0) or (senders|length > 0) %}
   switch (index) {
-    {%- for k, v  in receivers + senders + events %}
+    {%- for k, v  in receivers + senders %}
     case {{loop.index-1}}: {
       {%- if v.type == "send" %}
       // do nothing for {{k|upper}}
@@ -165,9 +165,9 @@ void {{class_name}}::setParameterValue(uint32_t index, float value)
 
 void {{class_name}}::setOutputParameter(uint32_t sendHash, const HvMessage *m)
 {
-  {%- if senders|length > 0 %}
+  {%- if (senders|length > 0) or (out_events|length > 0) %}
   switch (sendHash) {
-    {% for k, v in senders -%}
+    {% for k, v in senders + out_events -%}
     case {{v.hash}}: // {{v.display}}
       _parameters[param{{v.display}}] = hv_msg_getFloat(m, 0);
       break;

@@ -10,9 +10,9 @@ START_NAMESPACE_DISTRHO
 
 // -----------------------------------------------------------------------------------------------------------
 
-{%- if (receivers|length > 0) or (senders|length > 0) or (events|length > 0) %}
+{%- if (receivers|length > 0) or (events|length > 0) or (senders|length > 0) or (out_events|length > 0) %}
 enum HeavyParams {
-    {%- for k, v in receivers + senders + events %}
+    {%- for k, v in receivers + events + senders + out_events %}
     k{{v.display|capitalize}},
     {%- endfor %}
     kParameterCount
@@ -80,7 +80,7 @@ void {{class_name}}::parameterChanged(uint32_t index, float value)
 {
     switch (index)
     {
-{%- for k, v in receivers %}
+{%- for k, v in receivers + senders %}
         case k{{v.display|capitalize}}:
     {%- if v.attributes.type == "bool" %}
             {{v.display}}->setDown(static_cast<bool>(value));

@@ -9,7 +9,7 @@
 
 START_NAMESPACE_DISTRHO
 
-#define HV_DPF_NUM_PARAMETER {{receivers|length + senders|length + events|length}}
+#define HV_DPF_NUM_PARAMETER {{receivers|length + events|length + senders|length + out_events|length}}
 
 static void hvSendHookFunc(HeavyContextInterface *c, const char *sendName, uint32_t sendHash, const HvMessage *m);
 static void hvPrintHookFunc(HeavyContextInterface *c, const char *printLabel, const char *msgString, const HvMessage *m);
@@ -19,7 +19,7 @@ class {{class_name}} : public Plugin
 public:
   enum Parameters
   {
-    {%- for k, v in receivers + senders + events %}
+    {%- for k, v in receivers + events + senders + out_events %}
       param{{v.display}},
     {%- endfor %}
   };

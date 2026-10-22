@@ -42,7 +42,8 @@
             {%- endif %}
     );
     {{object.parameter}}->setInterval({{object.flash_time}});
-{% include 'gui_label.cpp' %}
+    {{object.parameter}}->setSend({{object.send|lower}});
+{%- include 'gui_label.cpp' %}
     {{parent}}->addManagedChild({{object.parameter}});
         {%- elif object.type == 'toggle' %}
     // toggle
@@ -59,7 +60,8 @@
         nvgRGB{{object.fg_color.as_rgb_tuple()}}
             {%- endif %}
     );
-{% include 'gui_label.cpp' %}
+    {{object.parameter}}->setSend({{object.send|lower}});
+{%- include 'gui_label.cpp' %}
     {{parent}}->addManagedChild({{object.parameter}});
         {%- elif object.type in ['vradio', 'hradio'] %}
     // {{object.type}}
@@ -80,7 +82,8 @@
         nvgRGB{{object.fg_color.as_rgb_tuple()}}
             {%- endif %}
     );
-{% include 'gui_label.cpp' %}
+    {{object.parameter}}->setSend({{object.send|lower}});
+{%- include 'gui_label.cpp' %}
     {{parent}}->addManagedChild({{object.parameter}});
         {%- elif object.type in ['vslider', 'hslider'] %}
     // {{object.type}}
@@ -118,7 +121,8 @@
         nvgRGB{{object.fg_color.as_rgb_tuple()}}
             {%- endif %}
     );
-{% include 'gui_label.cpp' %}
+    {{object.parameter}}->setSend({{object.send|lower}});
+{%- include 'gui_label.cpp' %}
     {{parent}}->addManagedChild({{object.parameter}});
         {%- elif object.type == 'knob' %}
     // knob
@@ -153,6 +157,7 @@
         nvgRGB{{object.arc_color.as_rgb_tuple()}}
             {%- endif %}
     );
+    {{object.parameter}}->setSend({{object.send|lower}});
     {{object.parameter}}->setLabelStyle({{object.label_pos.x}} * scaleFactor, {{object.label_pos.y}} * scaleFactor, {{object.label_size}} * scaleFactor, LabelShow::{{object.label_show.name|upper}});
     {{parent}}->addManagedChild({{object.parameter}});
         {%- elif object.type == 'number' %}
@@ -178,7 +183,8 @@
         nvgRGB{{object.fg_color.as_rgb_tuple()}}
             {%- endif %}
     );
-{% include 'gui_label.cpp' %}
+    {{object.parameter}}->setSend({{object.send|lower}});
+{%- include 'gui_label.cpp' %}
     {{parent}}->addManagedChild({{object.parameter}});
         {%- elif object.type == 'float' %}
     // float
@@ -193,6 +199,7 @@
             {%- endif %}
         {%- endfor %}
     {{object.parameter}}->setLabel("{{object.label_text}}", ({{object.font_height}} + 2) * scaleFactor, LabelPos::{{object.label_pos.name|capitalize}});
+    {{object.parameter}}->setSend({{object.send|lower}});
     {{parent}}->addManagedChild({{object.parameter}});
         {%- endif %}
     {%- endfor %}

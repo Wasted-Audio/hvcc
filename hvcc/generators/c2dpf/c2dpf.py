@@ -207,6 +207,7 @@ class c2dpf(Generator):
                         receivers=receiver_list,
                         senders=sender_list,
                         events=event_list,
+                        out_events=out_event_list,
                         copyright=copyright_c))
 
             dpf_h_path = Path(source_dir, "DistrhoPluginInfo.h")

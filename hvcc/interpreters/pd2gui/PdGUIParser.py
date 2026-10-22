@@ -384,7 +384,7 @@ class PdGUIParser(PdParser):
 
     @classmethod
     def add_bang(cls, line: list[str]) -> Optional[Bang]:
-        param, send = cls.filter_params(line[10], line[11])
+        param, send = cls.filter_params(line[10], line[9])
         if param is None:
             return None
 
@@ -418,7 +418,7 @@ class PdGUIParser(PdParser):
 
     @classmethod
     def add_toggle(cls, line: list[str]) -> Optional[Toggle]:
-        param, send = cls.filter_params(line[8], line[9])
+        param, send = cls.filter_params(line[8], line[7])
         if param is None:
             return None
 
@@ -452,7 +452,7 @@ class PdGUIParser(PdParser):
 
     @classmethod
     def add_radio(cls, line: list[str]) -> Optional[Union[VRadio, HRadio]]:
-        param, send = cls.filter_params(line[10], line[11])
+        param, send = cls.filter_params(line[10], line[9])
         if param is None:
             return None
 
@@ -493,7 +493,7 @@ class PdGUIParser(PdParser):
 
     @classmethod
     def add_slider(cls, line: list[str]) -> Optional[Union[VSlider, HSlider]]:
-        param, send = cls.filter_params(line[12], line[13])
+        param, send = cls.filter_params(line[12], line[11])
         if param is None:
             return None
 
@@ -535,7 +535,7 @@ class PdGUIParser(PdParser):
 
     @classmethod
     def add_knob(cls, line: list[str]) -> Optional[Knob]:
-        param, send = cls.filter_params(line[11], line[12])
+        param, send = cls.filter_params(line[11], line[10])
         if param is None:
             return None
 
@@ -587,7 +587,7 @@ class PdGUIParser(PdParser):
 
     @classmethod
     def add_number(cls, line: list[str]) -> Optional[Number]:
-        param, send = cls.filter_params(line[12], line[13])
+        param, send = cls.filter_params(line[12], line[11])
         if param is None:
             return None
 
