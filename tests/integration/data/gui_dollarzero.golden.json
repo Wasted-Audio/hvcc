@@ -12,6 +12,7 @@
         "y": 128
       },
       "parameter": "1001_vol",
+      "send": false,
       "label": null,
       "min": 0.0,
       "max": 127.0,
