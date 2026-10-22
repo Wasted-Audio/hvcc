@@ -138,9 +138,9 @@ float {{class_name}}::getParameterValue(uint32_t index) const
 
 void {{class_name}}::setParameterValue(uint32_t index, float value)
 {
-  {%- if (receivers|length > 0) or (senders|length > 0) %}
+  {%- if (receivers|length > 0) or (events|length > 0) or (senders|length > 0) %}
   switch (index) {
-    {%- for k, v  in receivers + senders %}
+    {%- for k, v  in receivers + events + senders %}
     case {{loop.index-1}}: {
       {%- if v.type == "send" %}
       // do nothing for {{k|upper}}
@@ -163,13 +163,34 @@ void {{class_name}}::setParameterValue(uint32_t index, float value)
   {%- endif %}
 }
 
+{%- if out_events|length > 0 %}
+struct OutputEvent {
+    uint32_t id;
+    uint32_t holdSamples;
+};
+
+OutputEvent outputEvents[{{receivers|length + events|length + senders|length + out_events|length}}];
+
+void {{class_name}}::setOutputEvent(uint32_t id)
+{
+  OutputEvent& p = outputEvents[id];
+  p.id = id;
+  p.holdSamples = (uint32_t)(getSampleRate() * 0.05f); // ~50 ms hold
+  _parameters[id] = 1.0f;
+}
+{%- endif %}
+
 void {{class_name}}::setOutputParameter(uint32_t sendHash, const HvMessage *m)
 {
   {%- if (senders|length > 0) or (out_events|length > 0) %}
   switch (sendHash) {
     {% for k, v in senders + out_events -%}
     case {{v.hash}}: // {{v.display}}
+      {%- if v.extern == "event" %}
+      setOutputEvent(param{{v.display}});
+      {%- else %}
       _parameters[param{{v.display}}] = hv_msg_getFloat(m, 0);
+      {%- endif %}
       break;
     {% endfor %}
   }
@@ -216,6 +237,18 @@ void {{class_name}}::run(const float** inputs, float** outputs, uint32_t frames,
 void {{class_name}}::run(const float** inputs, float** outputs, uint32_t frames)
 {
 #endif
+
+{%- if out_events|length > 0 %}
+  for (auto& p : outputEvents)
+  {
+    if (p.holdSamples > 0)
+    {
+      if (p.holdSamples > frames) p.holdSamples -= frames;
+      else { p.holdSamples = 0; _parameters[p.id] = 0.0f; }
+    }
+  }
+{%- endif %}
+
   hostTransportEvents(frames);
 {% if meta.denormals is sameas false %}
   const ScopedDenormalDisable sdd;

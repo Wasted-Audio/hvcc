@@ -80,10 +80,13 @@ void {{class_name}}::parameterChanged(uint32_t index, float value)
 {
     switch (index)
     {
-{%- for k, v in receivers + senders %}
+{%- for k, v in receivers + senders + out_events %}
         case k{{v.display|capitalize}}:
     {%- if v.attributes.type == "bool" %}
             {{v.display}}->setDown(static_cast<bool>(value));
+    {%- elif v.extern == "event" %}
+            if (value > 0.5f)
+                {{v.display}}->trigger();
     {%- else %}
             {{v.display}}->setValue(value);
     {%- endif %}
