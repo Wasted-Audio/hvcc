@@ -1,0 +1,361 @@
+{
+    "name": "desktop_devkit",
+    "som": "seed",
+    "defines": {
+        "HAS_MIDI": 1
+    },
+    "audio": {
+        "channels": 2
+    },
+    "parents": {
+        "i2c": {
+            "component": "i2c",
+            "pin": {
+                "scl": 11,
+                "sda": 12
+            }
+        },
+        "led_driver": {
+            "component": "PCA9685",
+            "address": "{0x00}",
+            "parent": "i2c",
+            "driver_count": 1
+        },
+        "pot_mux": {
+            "component": "CD4051",
+            "mux_count": 8,
+            "pin": {
+                "adc": 15,
+                "sel0": 24,
+                "sel1": 25,
+                "sel2": 26
+            }
+        },
+        "button_sr": {
+            "component": "CD4021",
+            "driver_count": 2,
+            "pin": {
+                "clk": 8,
+                "cs": 9,
+                "data": 10
+            }
+        }
+    },
+    "components": {
+        "s1": {
+            "component": "CD4021Switch",
+            "parent": "button_sr",
+            "index": 15
+        },
+        "s2": {
+            "component": "CD4021Switch",
+            "parent": "button_sr",
+            "index": 14
+        },
+        "s3": {
+            "component": "CD4021Switch",
+            "parent": "button_sr",
+            "index": 13
+        },
+        "s4": {
+            "component": "CD4021Switch",
+            "parent": "button_sr",
+            "index": 12
+        },
+        "s5": {
+            "component": "CD4021Switch",
+            "parent": "button_sr",
+            "index": 11
+        },
+        "s6": {
+            "component": "CD4021Switch",
+            "parent": "button_sr",
+            "index": 10
+        },
+        "s7": {
+            "component": "CD4021Switch",
+            "parent": "button_sr",
+            "index": 9
+        },
+        "s8": {
+            "component": "CD4021Switch",
+            "parent": "button_sr",
+            "index": 8
+        },
+        "s9": {
+            "component": "CD4021Switch",
+            "parent": "button_sr",
+            "index": 7
+        },
+        "s10": {
+            "component": "CD4021Switch",
+            "parent": "button_sr",
+            "index": 6
+        },
+        "s11": {
+            "component": "CD4021Switch",
+            "parent": "button_sr",
+            "index": 5
+        },
+        "s12": {
+            "component": "CD4021Switch",
+            "parent": "button_sr",
+            "index": 4
+        },
+        "s13": {
+            "component": "CD4021Switch",
+            "parent": "button_sr",
+            "index": 3
+        },
+        "s14": {
+            "component": "CD4021Switch",
+            "parent": "button_sr",
+            "index": 2
+        },
+        "s15": {
+            "component": "CD4021Switch",
+            "parent": "button_sr",
+            "index": 1
+        },
+        "s16": {
+            "component": "CD4021Switch",
+            "parent": "button_sr",
+            "index": 0
+        },
+        "sw17": {
+            "component": "Switch",
+            "pin": 19
+        },
+        "sw18": {
+            "component": "Switch3",
+            "pin": {
+                "a": 28,
+                "b": 27
+            }
+        },
+        "pot1": {
+            "component": "CD4051AnalogControl",
+            "index": 0,
+            "parent": "pot_mux"
+        },
+        "pot2": {
+            "component": "CD4051AnalogControl",
+            "index": 1,
+            "parent": "pot_mux"
+        },
+        "pot3": {
+            "component": "CD4051AnalogControl",
+            "index": 2,
+            "parent": "pot_mux"
+        },
+        "pot4": {
+            "component": "CD4051AnalogControl",
+            "index": 3,
+            "parent": "pot_mux"
+        },
+        "pot5": {
+            "component": "CD4051AnalogControl",
+            "index": 4,
+            "parent": "pot_mux"
+        },
+        "pot6": {
+            "component": "CD4051AnalogControl",
+            "index": 5,
+            "parent": "pot_mux"
+        },
+        "pot7": {
+            "component": "CD4051AnalogControl",
+            "index": 6,
+            "parent": "pot_mux"
+        },
+        "pot8": {
+            "component": "CD4051AnalogControl",
+            "index": 7,
+            "parent": "pot_mux"
+        },
+        "cv1": {
+            "component": "AnalogControlBipolar",
+            "pin": 20
+        },
+        "cv2": {
+            "component": "AnalogControlBipolar",
+            "pin": 21
+        },
+        "gate_in1": {
+            "component": "GateIn",
+            "pin": 0
+        },
+        "gate_in2": {
+            "component": "GateIn",
+            "pin": 18
+        },
+        "cvout1": {
+            "component": "CVOuts"
+        },
+        "cvout2": {
+            "component": "CVOuts"
+        },
+        "d1": {
+            "component": "PCA9685Led",
+            "parent": "led_driver",
+            "index": 0
+        },
+        "d2": {
+            "component": "PCA9685Led",
+            "parent": "led_driver",
+            "index": 1
+        },
+        "d3": {
+            "component": "PCA9685Led",
+            "parent": "led_driver",
+            "index": 2
+        },
+        "d4": {
+            "component": "PCA9685Led",
+            "parent": "led_driver",
+            "index": 3
+        },
+        "d5": {
+            "component": "PCA9685Led",
+            "parent": "led_driver",
+            "index": 4
+        },
+        "d6": {
+            "component": "PCA9685Led",
+            "parent": "led_driver",
+            "index": 5
+        },
+        "d7": {
+            "component": "PCA9685Led",
+            "parent": "led_driver",
+            "index": 6
+        },
+        "d8": {
+            "component": "PCA9685Led",
+            "parent": "led_driver",
+            "index": 7
+        },
+        "d9": {
+            "component": "PCA9685Led",
+            "parent": "led_driver",
+            "index": 8
+        },
+        "d10": {
+            "component": "PCA9685Led",
+            "parent": "led_driver",
+            "index": 9
+        },
+        "d11": {
+            "component": "PCA9685Led",
+            "parent": "led_driver",
+            "index": 10
+        },
+        "d12": {
+            "component": "PCA9685Led",
+            "parent": "led_driver",
+            "index": 11
+        },
+        "d13": {
+            "component": "PCA9685Led",
+            "parent": "led_driver",
+            "index": 12
+        },
+        "d14": {
+            "component": "PCA9685Led",
+            "parent": "led_driver",
+            "index": 13
+        },
+        "d15": {
+            "component": "PCA9685Led",
+            "parent": "led_driver",
+            "index": 14
+        },
+        "d16": {
+            "component": "PCA9685Led",
+            "parent": "led_driver",
+            "index": 15
+        },
+        "detect_l": {
+            "component": "Switch",
+            "pin": 16,
+            "polarity": "daisy::Switch::POLARITY_NORMAL"
+        },
+        "detect_r": {
+            "component": "Switch",
+            "pin": 17,
+            "polarity": "daisy::Switch::POLARITY_NORMAL"
+        },
+        "sd_detect": {
+            "component": "Switch",
+            "pin": 7
+        }
+    },
+    "aliases": {
+        "knob1": "pot1",
+        "vr1": "pot1",
+        "knob2": "pot2",
+        "vr2": "pot2",
+        "knob3": "pot3",
+        "vr3": "pot3",
+        "knob4": "pot4",
+        "vr4": "pot4",
+        "knob5": "pot5",
+        "vr5": "pot5",
+        "knob6": "pot6",
+        "vr6": "pot6",
+        "knob7": "pot7",
+        "vr7": "pot7",
+        "knob8": "pot8",
+        "vr8": "pot8",
+        "led1": "d1",
+        "led2": "d2",
+        "led3": "d3",
+        "led4": "d4",
+        "led5": "d5",
+        "led6": "d6",
+        "led7": "d7",
+        "led8": "d8",
+        "led9": "d9",
+        "led10": "d10",
+        "led11": "d11",
+        "led12": "d12",
+        "led13": "d13",
+        "led14": "d14",
+        "led15": "d15",
+        "led16": "d16",
+        "sw1": "s1",
+        "button1": "s1",
+        "sw2": "s2",
+        "button2": "s2",
+        "sw3": "s3",
+        "button3": "s3",
+        "sw4": "s4",
+        "button4": "s4",
+        "sw5": "s5",
+        "button5": "s5",
+        "sw6": "s6",
+        "button6": "s6",
+        "sw7": "s7",
+        "button7": "s7",
+        "sw8": "s8",
+        "button8": "s8",
+        "sw9": "s9",
+        "button9": "s9",
+        "sw10": "s10",
+        "button10": "s10",
+        "sw11": "s11",
+        "button11": "s11",
+        "sw12": "s12",
+        "button12": "s12",
+        "sw13": "s13",
+        "button13": "s13",
+        "sw14": "s14",
+        "button14": "s14",
+        "sw15": "s15",
+        "button15": "s15",
+        "sw16": "s16",
+        "button16": "s16",
+        "s17": "sw17",
+        "s18": "sw18"
+    }
+}

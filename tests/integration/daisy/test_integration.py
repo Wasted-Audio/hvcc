@@ -48,6 +48,23 @@ class TestIntegration(unittest.TestCase):
         with open(Path(data_path, 'integration', 'expected_field.h'), 'r') as file:
             self.assertEqual(header, file.read(), 'The output string should match "expected_field.h" exactly')
 
+    def test_desktop_devkit(self):
+        self.maxDiff = None
+        header, info = generate_header_from_name('desktop_devkit')
+        with open(Path(data_path, 'integration', 'expected_desktop_devkit.h'), 'r') as file:
+            self.assertEqual(header, file.read(), 'The output string should match "expected_desktop_devkit.h" exactly')
+
+    def test_eurorack_devkit(self):
+        self.maxDiff = None
+        header, info = generate_header_from_name('eurorack_devkit')
+        with open(Path(data_path, 'integration', 'expected_eurorack_devkit.h'), 'r') as file:
+            self.assertEqual(header, file.read(), 'The output string should match "expected_eurorack_devkit.h" exactly')
+
+    def test_pedal_devkit(self):
+        self.maxDiff = None
+        header, info = generate_header_from_name('pedal_devkit')
+        with open(Path(data_path, 'integration', 'expected_pedal_devkit.h'), 'r') as file:
+            self.assertEqual(header, file.read(), 'The output string should match "expected_pedal_devkit.h" exactly')
 
 def test_empty_display(tmp_path: Path):
     pd_path = tmp_path / "empty_display.pd"
