@@ -54,6 +54,7 @@ class BaseUI(Base):
 
 class BaseParam(Base):
     parameter: str
+    send: bool = False
 
 
 class Label(BaseModel):

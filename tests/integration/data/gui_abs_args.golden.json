@@ -16,6 +16,7 @@
             "y": 128
           },
           "parameter": "1_2_vol",
+          "send": false,
           "label": null,
           "min": 0.0,
           "max": 127.0,
@@ -35,6 +36,7 @@
             "y": 8
           },
           "parameter": "float_vol",
+          "send": false,
           "font_height": 8,
           "label_text": "",
           "label_pos": 0,

@@ -10,9 +10,9 @@ START_NAMESPACE_DISTRHO
 
 // -----------------------------------------------------------------------------------------------------------
 
-{%- if (receivers|length > 0) or (senders|length > 0) or (events|length > 0) %}
+{%- if (receivers|length > 0) or (events|length > 0) or (senders|length > 0) or (out_events|length > 0) %}
 enum HeavyParams {
-    {%- for k, v in receivers + senders + events %}
+    {%- for k, v in receivers + events + senders + out_events %}
     k{{v.display|capitalize}},
     {%- endfor %}
     kParameterCount
@@ -80,9 +80,13 @@ void {{class_name}}::parameterChanged(uint32_t index, float value)
 {
     switch (index)
     {
-{%- for k, v in receivers %}
+ {%- set widget_names = widgets.values() | sum(start=[]) %}
+ {%- for k, v in receivers + senders + out_events if v.display in widget_names %}
         case k{{v.display|capitalize}}:
-    {%- if v.attributes.type == "bool" %}
+    {%- if v.extern == "event" %}
+            if (value > 0.5f)
+                {{v.display}}->trigger();
+    {%- elif v.attributes.type == "bool" %}
             {{v.display}}->setDown(static_cast<bool>(value));
     {%- else %}
             {{v.display}}->setValue(value);
