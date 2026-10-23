@@ -129,7 +129,7 @@ void {{class_name}}::initParameter(uint32_t index, Parameter& parameter)
 
 float {{class_name}}::getParameterValue(uint32_t index) const
 {
-  {%- if (receivers|length > 0) or (senders|length > 0) %}
+  {%- if (receivers|length > 0) or (events|length > 0) or (senders|length > 0) or (out_events|length > 0) %}
   return _parameters[index];
   {% else %}
   return 0.0f;
@@ -138,13 +138,11 @@ float {{class_name}}::getParameterValue(uint32_t index) const
 
 void {{class_name}}::setParameterValue(uint32_t index, float value)
 {
-  {%- if (receivers|length > 0) or (events|length > 0) or (senders|length > 0) %}
+  {%- if (receivers|length > 0) or (events|length > 0) %}
   switch (index) {
-    {%- for k, v  in receivers + events + senders %}
+    {%- for k, v  in receivers + events %}
     case {{loop.index-1}}: {
-      {%- if v.type == "send" %}
-      // do nothing for {{k|upper}}
-      {%- elif v.extern == "event" %}
+      {%- if v.extern == "event" %}
       if (value == 1)
         _context->sendBangToReceiver(Heavy_{{name}}::Event::In::{{k|upper}});
       {%- else %}

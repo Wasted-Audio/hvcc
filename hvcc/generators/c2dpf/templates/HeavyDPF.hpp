@@ -142,12 +142,12 @@ private:
 
 {%- if out_events|length > 0 %}
   struct OutputEvent {
-    uint32_t id;
-    uint32_t holdSamples;
+    uint32_t id = 0;
+    uint32_t holdSamples = 0;
   };
-{%- endif %}
 
   OutputEvent outputEvents[{{receivers|length + events|length + senders|length + out_events|length}}];
+{%- endif %}
 
   // transport values
   bool wasPlaying = false;
