@@ -26,7 +26,7 @@ Object position, size, labels, colors, and other object settings will be transla
 
 ### Parameters
 
-You need to make sure that all parameters are associated with PD Graphical objects by using the object [receive config](../getting-started/patching.md#gui-objects). Set the complete configuration, with min/max/default/type, as you would normally on a receiver. Objects need to be visible in the main patch canvas, otherwise you will get errors. Send parameters, useful as read-only indicators, are currently not supported.
+You need to make sure that all parameters are associated with PD Graphical objects by using the object [receive config](../getting-started/patching.md#gui-objects). Set the complete configuration, with min/max/default/type, as you would normally on a receiver. Objects need to be visible in the main patch canvas, otherwise you will get errors. You can also use an external send parameter, but only one external parameter per object at the same item. Make sure that all external parameters have unique names.
 
 - Number box (nbx)
 - Vertical slider (vsl)
