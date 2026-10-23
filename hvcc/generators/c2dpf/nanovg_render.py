@@ -58,6 +58,8 @@ def nanovg_render(
 
     def generate_gui_objects(graphs: list[Graph], objects: list[GUIObjects], parent: str):
         for w in objects:
+            if w.type == "popmenu":
+                continue
             widgets[w.type].append(w.id if isinstance(w, (Canvas, Comment)) else w.parameter)
 
         gui_objects_render.append(env.get_template("gui_objects.cpp").render(
