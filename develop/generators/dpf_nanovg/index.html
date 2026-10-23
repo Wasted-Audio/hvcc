@@ -2117,7 +2117,7 @@
 The UI will be completely separate from the patch DSP.</p>
 </div>
 <h3 id="parameters">Parameters</h3>
-<p>You need to make sure that all parameters are associated with PD Graphical objects by using the object <a href="../../getting-started/patching/#gui-objects">receive config</a>. Set the complete configuration, with min/max/default/type, as you would normally on a receiver. Objects need to be visible in the main patch canvas, otherwise you will get errors. Send parameters, useful as read-only indicators, are currently not supported.</p>
+<p>You need to make sure that all parameters are associated with PD Graphical objects by using the object <a href="../../getting-started/patching/#gui-objects">receive config</a>. Set the complete configuration, with min/max/default/type, as you would normally on a receiver. Objects need to be visible in the main patch canvas, otherwise you will get errors. You can also use an external send parameter, but only one external parameter per object at a item. Send parameters become read only UI objects. Make sure that all external parameters have unique names.</p>
 <ul>
 <li>Number box (nbx)</li>
 <li>Vertical slider (vsl)</li>
