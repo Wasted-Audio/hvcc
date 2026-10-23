@@ -24,6 +24,7 @@ Updates:
 * Deprecate python 3.9
 * Support python 3.15
 * DPF: match port group indices with PD i/o (start at 1)
+* DPF: improve parameter order: receive/event/send/out_event
 
 0.17.2
 -----
