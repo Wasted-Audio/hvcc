@@ -1,13 +1,13 @@
 import json
 from copy import deepcopy
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 
 from hvcc.core.hv2ir.HeavyLangObject import HeavyLangObject
 from hvcc.types.compiler import ExternParams
 
 
 def filter_match(
-    set: Dict,
+    set: dict,
     key: str,
     match: str,
     key_exclude: Optional[str] = None,
@@ -19,7 +19,7 @@ def filter_match(
         return filter(lambda x: x.get(key, '') == match, set)
 
 
-def verify_param_exists(name: str, original_name: str, components: Dict, input: bool = True) -> Any:
+def verify_param_exists(name: str, original_name: str, components: dict, input: bool = True) -> Any:
     for comp in components:
 
         # Dealing with the cvouts the way we have it set up is really annoying
@@ -42,7 +42,7 @@ def verify_param_exists(name: str, original_name: str, components: Dict, input: 
     raise NameError(f'Unknown parameter "{original_name}"')
 
 
-def verify_param_direction(name: str, components: Dict) -> bool:
+def verify_param_direction(name: str, components: dict) -> bool:
     for comp in components:
         if comp['component'] == 'CVOuts':
             if name == comp['name']:
@@ -55,7 +55,7 @@ def verify_param_direction(name: str, components: Dict) -> bool:
     return False
 
 
-def get_root_component(variant: str, original_name: str, components: Dict) -> str:
+def get_root_component(variant: str, original_name: str, components: dict) -> str:
     for comp in components:
         if comp['component'] == 'CVOuts':
             if variant == comp['name']:
@@ -71,9 +71,9 @@ def get_root_component(variant: str, original_name: str, components: Dict) -> st
 def get_component_mapping(
     component_variant: str,
     original_name: str,
-    component: Dict,
-    components: Dict
-) -> Dict:
+    component: dict,
+    components: dict
+) -> dict:
     for variant in component['mapping']:
         if component['component'] == 'CVOuts':
             stripped = variant['name'].format_map({'name': ''})
@@ -85,12 +85,12 @@ def get_component_mapping(
 
 
 def verify_param_used(
-    component: Dict,
-    params_in: Dict,
-    params_out: Dict,
-    params_in_original_name: Dict,
-    params_out_original_name: Dict,
-    components: Dict
+    component: dict,
+    params_in: dict,
+    params_out: dict,
+    params_in_original_name: dict,
+    params_out_original_name: dict,
+    components: dict
 ) -> bool:
     # Exclude parents, since they don't have 1-1 i/o mapping
     if component.get('is_parent', False):
@@ -105,8 +105,8 @@ def verify_param_used(
 
 def de_alias(
     name: str,
-    aliases: Dict,
-    components: Dict
+    aliases: dict,
+    components: dict
 ) -> str:
     low = name.lower()
     # simple case
@@ -132,10 +132,10 @@ def de_alias(
 
 def parse_parameters(
     parameters: ExternParams,
-    components: Dict,
-    aliases: Dict,
+    components: dict,
+    aliases: dict,
     object_name: str
-) -> Dict:
+) -> dict:
     """
     Parses the `parameters` passed from hvcc and generates getters and setters
     according to the info in `components`. The `aliases` help disambiguate parameters
@@ -144,9 +144,9 @@ def parse_parameters(
     """
 
     # Verify that the params are valid and remove unused components
-    replacements: Dict = {}
-    params_in: Dict = {}
-    params_in_original_names: Dict = {}
+    replacements: dict = {}
+    params_in: dict = {}
+    params_in_original_names: dict = {}
     for key, recv in parameters.inParam:
         de_aliased = de_alias(key, aliases, components)
         params_in[de_aliased] = recv

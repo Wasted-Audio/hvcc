@@ -14,7 +14,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from typing import Dict, List
 
 from hvcc.types.IR import IRSignalList
 
@@ -62,7 +61,7 @@ class SignalVar(HeavyObject):
         return {"HvSignalVar.h", "HvSignalVar.c"}
 
     @classmethod
-    def get_C_init(cls, obj_type: str, obj_id: str, args: Dict) -> List[str]:
+    def get_C_init(cls, obj_type: str, obj_id: str, args: dict) -> list[str]:
         assert obj_type in ["__var~f", "__var~i"], obj_type
         return [
             "{0}_init(&{0}_{1}, {2}, {3}, {4});".format(
@@ -73,11 +72,11 @@ class SignalVar(HeavyObject):
                 "true" if args["reverse"] else "false")]
 
     @classmethod
-    def get_C_free(cls, obj_type: str, obj_id: str, args: Dict) -> List[str]:
+    def get_C_free(cls, obj_type: str, obj_id: str, args: dict) -> list[str]:
         return []
 
     @classmethod
-    def get_C_onMessage(cls, obj_type: str, obj_id: str, inlet_index: int, args: Dict) -> List[str]:
+    def get_C_onMessage(cls, obj_type: str, obj_id: str, inlet_index: int, args: dict) -> list[str]:
         assert obj_type in ["__var~f", "__var~i"]
         return [
             "{0}_onMessage(_c, &Context(_c)->{0}_{1}, m);".format(
@@ -85,7 +84,7 @@ class SignalVar(HeavyObject):
                 obj_id)]
 
     @classmethod
-    def get_C_process(cls, process_dict: IRSignalList, obj_type: str, obj_id: str, args: Dict) -> List[str]:
+    def get_C_process(cls, process_dict: IRSignalList, obj_type: str, obj_id: str, args: dict) -> list[str]:
         fmt = obj_type[-1]
         if obj_type in ["__var~f", "__var~i"]:
             # NOTE(mhroth): signal rate variables do not process anything

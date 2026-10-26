@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from typing import Dict, Optional
+from typing import Optional
 
 from .HeavyGraph import HeavyGraph
 from .HeavyIrObject import HeavyIrObject
@@ -28,9 +28,9 @@ class HLangDac(HeavyLangObject):
     def __init__(
         self,
         obj_type: str,
-        args: Dict,
+        args: dict,
         graph: 'HeavyGraph',
-        annotations: Optional[Dict] = None
+        annotations: Optional[dict] = None
     ) -> None:
         assert obj_type == "dac"
         super().__init__(obj_type, args, graph,

@@ -14,7 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from pathlib import Path
-from typing import Dict, Optional
+from typing import Optional
 
 from hvcc.generators.ir2c.SignalNamHeader import ModelNet, load_nam_file
 
@@ -29,9 +29,9 @@ class HIrNam(HeavyIrObject):
     def __init__(
         self,
         obj_type: str,
-        args: Optional[Dict] = None,
+        args: Optional[dict] = None,
         graph: Optional[HeavyGraph] = None,
-        annotations: Optional[Dict] = None
+        annotations: Optional[dict] = None
     ) -> None:
         assert obj_type == "__nam~f"
 

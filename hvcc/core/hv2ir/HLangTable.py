@@ -15,7 +15,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import re
-from typing import Dict, Optional
+from typing import Optional
 
 from .HeavyGraph import HeavyGraph
 from .HeavyIrObject import HeavyIrObject
@@ -29,9 +29,9 @@ class HLangTable(HeavyLangObject):
     def __init__(
         self,
         obj_type: str,
-        args: Dict,
+        args: dict,
         graph: 'HeavyGraph',
-        annotations: Optional[Dict] = None
+        annotations: Optional[dict] = None
     ) -> None:
         assert obj_type == "table"
         super().__init__(obj_type, args, graph, annotations=annotations)

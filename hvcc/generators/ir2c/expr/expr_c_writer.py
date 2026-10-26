@@ -14,7 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import re
-from typing import List, Union
+from typing import Union
 
 from .expr_arpeggio_parser import ExprArpeggioParser, ExprNode, ParseExpr
 
@@ -65,7 +65,7 @@ class ExprCWriter:
         self,
         vv_in: Union[str, None] = None,
         v_out: str = ""
-    ) -> List[str]:
+    ) -> list[str]:
         self._simd_bind_variables(vv_in)
         self._simd_replace_constants()
         return self._to_c_simd(v_out)
@@ -113,9 +113,9 @@ class ExprCWriter:
         node.value = f"{a_name}[{int(parts[2])-1}]"
         node.type = "bound_var"
 
-    def _to_c_simd(self, v_out: str) -> List[str]:
+    def _to_c_simd(self, v_out: str) -> list[str]:
         ba = BufferAllocator()
-        lines: List[str] = []
+        lines: list[str] = []
 
         def _to_c_simd_R(expr_tree: ExprNode, r_vec: Union[str, None] = None) -> str:
             if expr_tree.value == "-" and len(expr_tree.nodes) == 1:

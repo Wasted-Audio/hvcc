@@ -15,7 +15,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import re
-from typing import TYPE_CHECKING, Dict, Optional
+from typing import TYPE_CHECKING, Optional
 
 from .HeavyIrObject import HeavyIrObject
 
@@ -30,9 +30,9 @@ class HIrReceive(HeavyIrObject):
     def __init__(
         self,
         obj_type: str,
-        args: Optional[Dict] = None,
+        args: Optional[dict] = None,
         graph: Optional['HeavyGraph'] = None,
-        annotations: Optional[Dict] = None
+        annotations: Optional[dict] = None
     ) -> None:
         super().__init__("__receive", args=args, graph=graph, annotations=annotations)
         if args is not None and args["extern"]:

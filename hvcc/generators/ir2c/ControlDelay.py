@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from typing import Callable, Dict, List
+from collections.abc import Callable
 
 from hvcc.types.IR import IRObjectdict, IROnMessage
 
@@ -35,7 +35,7 @@ class ControlDelay(HeavyObject):
         return {"HvControlDelay.h", "HvControlDelay.c"}
 
     @classmethod
-    def get_C_init(cls, obj_type: str, obj_id: str, args: Dict) -> List[str]:
+    def get_C_init(cls, obj_type: str, obj_id: str, args: dict) -> list[str]:
         return [
             "{0}_init(this, &{0}_{1}, {2}f);".format(
                 cls.preamble,
@@ -44,11 +44,11 @@ class ControlDelay(HeavyObject):
         ]
 
     @classmethod
-    def get_C_free(cls, obj_type: str, obj_id: str, args: Dict) -> List[str]:
+    def get_C_free(cls, obj_type: str, obj_id: str, args: dict) -> list[str]:
         return []  # no need to free any control binop objects
 
     @classmethod
-    def get_C_onMessage(cls, obj_type: str, obj_id: str, inlet_index: int, args: Dict) -> List[str]:
+    def get_C_onMessage(cls, obj_type: str, obj_id: str, inlet_index: int, args: dict) -> list[str]:
         return [
             "{0}_onMessage(_c, &Context(_c)->{0}_{1}, {2}, m, "
             "&{0}_{1}_sendMessage);".format(
@@ -62,11 +62,11 @@ class ControlDelay(HeavyObject):
         cls,
         obj_type: str,
         obj_id: str,
-        on_message_list: List[List[IROnMessage]],
+        on_message_list: list[list[IROnMessage]],
         get_obj_class: Callable,
-        objects: Dict[str, IRObjectdict],
-        args: Dict
-    ) -> List[str]:
+        objects: dict[str, IRObjectdict],
+        args: dict
+    ) -> list[str]:
         send_message_list = [
             f"cDelay_{obj_id}_sendMessage(HeavyContextInterface *_c, int letIn, const HvMessage *const m) {{"
         ]

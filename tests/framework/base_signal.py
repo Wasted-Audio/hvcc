@@ -18,7 +18,7 @@ import platform
 import shutil
 import subprocess
 from pathlib import Path
-from typing import List, Optional
+from typing import Optional
 
 import numpy
 from scipy.io import wavfile
@@ -30,7 +30,7 @@ class TestPdSignalBase(HvBaseTest):
 
     def compile_and_run(
         self,
-        source_files: List[Path],
+        source_files: list[Path],
         out_dir: Path,
         sample_rate: Optional[int] = None,
         block_size: Optional[int] = None,
@@ -54,7 +54,7 @@ class TestPdSignalBase(HvBaseTest):
     def _compare_wave_output(
         self,
         out_dir: Path,
-        c_sources: List[Path],
+        c_sources: list[Path],
         golden_path: Path,
         flag: Optional[str] = None
     ):

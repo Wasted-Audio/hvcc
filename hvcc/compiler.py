@@ -21,7 +21,7 @@ import os
 import re
 import sys
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 
 from hvcc.core.hv2ir import hv2ir
 from hvcc.generators.c2daisy import c2daisy
@@ -68,7 +68,7 @@ def add_error(
     return results
 
 
-def check_extern_name_conflicts(extern_type: str, extern_list: List, results: CompilerResults) -> None:
+def check_extern_name_conflicts(extern_type: str, extern_list: list, results: CompilerResults) -> None:
     """ In most of the generator code extern names become capitalised when used
         as enums. This method makes sure that there are no cases where two unique
         keys become the same after being capitalised.
@@ -83,7 +83,7 @@ def check_extern_name_conflicts(extern_type: str, extern_list: List, results: Co
                           "capital letters are not the only difference.")
 
 
-def count_midi_objects(hvir: IRGraph) -> Dict[str, List[str]]:
+def count_midi_objects(hvir: IRGraph) -> dict[str, list[str]]:
     in_midi = []
     out_midi = []
 
@@ -123,7 +123,7 @@ def count_midi_objects(hvir: IRGraph) -> Dict[str, List[str]]:
     }
 
 
-def filter_midi_from_out_parameters(output_parameter_list: List, midi_out_objects: List) -> List:
+def filter_midi_from_out_parameters(output_parameter_list: list, midi_out_objects: list) -> list:
     new_out_list = []
 
     for item in output_parameter_list:
@@ -225,9 +225,9 @@ def compile_dataflow(
     out_dir: Path,
     patch_name: str = "heavy",
     patch_meta_file: Optional[Path] = None,
-    search_paths: Optional[List[Path]] = None,
-    generators: Optional[List[str]] = None,
-    ext_generators: Optional[List[str]] = None,
+    search_paths: Optional[list[Path]] = None,
+    generators: Optional[list[str]] = None,
+    ext_generators: Optional[list[str]] = None,
     verbose: bool = False,
     copyright: Optional[str] = None,
     nodsp: Optional[bool] = False,
@@ -333,7 +333,7 @@ def compile_dataflow(
     num_input_channels = hvir.signal.numInputBuffers
     num_output_channels = hvir.signal.numOutputBuffers
 
-    gen_args: Dict[str, Any] = {
+    gen_args: dict[str, Any] = {
         'c_src_dir': c_src_dir,
         'out_dir': out_dir,
         'patch_name': patch_name,

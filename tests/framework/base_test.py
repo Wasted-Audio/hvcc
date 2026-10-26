@@ -18,7 +18,7 @@ import shutil
 import subprocess
 import unittest
 from pathlib import Path
-from typing import List, Optional
+from typing import Optional
 
 import jinja2
 
@@ -95,7 +95,7 @@ class HvBaseTest(unittest.TestCase):
 
     def _compile_and_run(
         self,
-        source_files: List[Path],
+        source_files: list[Path],
         out_dir: Path,
         flag: Optional[str] = None
     ):
@@ -117,7 +117,7 @@ class HvBaseTest(unittest.TestCase):
 
     def _compile_and_run_clang(
         self,
-        source_files: List[Path],
+        source_files: list[Path],
         out_dir: Path,
         flag: Optional[str] = None,
     ):

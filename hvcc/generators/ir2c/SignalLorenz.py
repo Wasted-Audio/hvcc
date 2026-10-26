@@ -14,7 +14,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from typing import Dict, List
 
 from hvcc.types.IR import IRSignalList
 
@@ -35,7 +34,7 @@ class SignalLorenz(HeavyObject):
         return {"HvSignalLorenz.h", "HvSignalLorenz.c", "HvMath.h"}
 
     @classmethod
-    def get_C_init(cls, obj_type: str, obj_id: str, args: Dict) -> List[str]:
+    def get_C_init(cls, obj_type: str, obj_id: str, args: dict) -> list[str]:
         return [
             "sLorenz_init(&sLorenz_{0}, {1}f, {2}f, {3}f);".format(
                 obj_id,
@@ -45,11 +44,11 @@ class SignalLorenz(HeavyObject):
         ]
 
     @classmethod
-    def get_C_free(cls, obj_type: str, obj_id: str, args: Dict) -> List[str]:
+    def get_C_free(cls, obj_type: str, obj_id: str, args: dict) -> list[str]:
         return []  # nothing to free
 
     @classmethod
-    def get_C_onMessage(cls, obj_type: str, obj_id: str, inlet_index: int, args: Dict) -> List[str]:
+    def get_C_onMessage(cls, obj_type: str, obj_id: str, inlet_index: int, args: dict) -> list[str]:
         return [
             "sLorenz_onMessage(_c, &Context(_c)->sLorenz_{0}, {1}, m);".format(
                 obj_id,
@@ -57,7 +56,7 @@ class SignalLorenz(HeavyObject):
         ]
 
     @classmethod
-    def get_C_process(cls, process_dict: IRSignalList, obj_type: str, obj_id: str, args: Dict) -> List[str]:
+    def get_C_process(cls, process_dict: IRSignalList, obj_type: str, obj_id: str, args: dict) -> list[str]:
         return [
             "__hv_lorenz_f(&sLorenz_{0}, {1}, {2});".format(
                 process_dict.id,

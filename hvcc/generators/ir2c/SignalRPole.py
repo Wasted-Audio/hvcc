@@ -14,7 +14,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from typing import Dict, List
 
 from hvcc.types.IR import IRSignalList
 
@@ -41,19 +40,19 @@ class SignalRPole(HeavyObject):
         }
 
     @classmethod
-    def get_C_def(cls, obj_type: str, obj_id: str) -> List[str]:
+    def get_C_def(cls, obj_type: str, obj_id: str) -> list[str]:
         return [f"SignalRPole sRPole_{obj_id};"]
 
     @classmethod
-    def get_C_init(cls, obj_type: str, obj_id: str, args: Dict) -> List[str]:
+    def get_C_init(cls, obj_type: str, obj_id: str, args: dict) -> list[str]:
         return [f"sRPole_init(&sRPole_{obj_id});"]
 
     @classmethod
-    def get_C_free(cls, obj_type: str, obj_id: str, args: Dict) -> List[str]:
+    def get_C_free(cls, obj_type: str, obj_id: str, args: dict) -> list[str]:
         return []
 
     @classmethod
-    def get_C_process(cls, process_dict: IRSignalList, obj_type: str, obj_id: str, args: Dict) -> List[str]:
+    def get_C_process(cls, process_dict: IRSignalList, obj_type: str, obj_id: str, args: dict) -> list[str]:
         return [
             "__hv_rpole_f(&sRPole_{0}, VIf({1}), VIf({2}), VOf({3}));".format(
                 process_dict.id,

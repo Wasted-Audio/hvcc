@@ -14,7 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import re
-from typing import Callable, Dict, List, Tuple
+from collections.abc import Callable
 
 from .HeavyObject import HeavyObject
 
@@ -32,7 +32,7 @@ class ControlExpr(HeavyObject):
         return {"HvControlExpr.h", "HvControlExpr.c"}
 
     @classmethod
-    def get_C_init(cls, obj_type: str, obj_id: str, args: Dict) -> List[str]:
+    def get_C_init(cls, obj_type: str, obj_id: str, args: dict) -> list[str]:
         """ (Per object) code that gets inserted into from the Heavy_heavy ctor.
             Only if "ir[init]" == true
         """
@@ -41,7 +41,7 @@ class ControlExpr(HeavyObject):
         return [f"cExpr_init(&cExpr_{obj_id}, {eval_f});"]
 
     @classmethod
-    def get_C_def(cls, obj_type: str, obj_id: str) -> List[str]:
+    def get_C_def(cls, obj_type: str, obj_id: str) -> list[str]:
         """ (Per object) code that gets inserted into the header file
             Only if "ir[init]" == true
         """
@@ -51,7 +51,7 @@ class ControlExpr(HeavyObject):
         return lines
 
     @classmethod
-    def get_C_onMessage(cls, obj_type: str, obj_id: str, inlet_index: int, args: Dict) -> List[str]:
+    def get_C_onMessage(cls, obj_type: str, obj_id: str, inlet_index: int, args: dict) -> list[str]:
         """ (Per object) code that gets inserted into the c<PREAMBLE>_<OBJID>_sendMessage
             method in the .cpp file
 
@@ -70,11 +70,11 @@ class ControlExpr(HeavyObject):
         cls,
         obj_type: str,
         obj_id: str,
-        on_message_list: List,
+        on_message_list: list,
         get_obj_class: Callable,
-        objects: Dict,
-        args: Dict
-    ) -> List[str]:
+        objects: dict,
+        args: dict
+    ) -> list[str]:
         """ (Per object) this creates the _sendMessage function that other objects use to
             send messages to this object.
         """
@@ -106,7 +106,7 @@ def var_n(a_name: str, var: str) -> str:
 def internal_expr(exp: str) -> str:
     """ Convert function names to C or internal names
     """
-    internal: List[Tuple[str, str]] = [
+    internal: list[tuple[str, str]] = [
         (r"\\,",           ","),
         (r"\bfact(?=\()",  "expr_fact"),
         (r"\bimodf(?=\()", "expr_imodf"),
@@ -132,7 +132,7 @@ def bind_expr(exp: str = "$f1+2", a_name: str = "a") -> str:
     return exp
 
 
-hv_utils: List[Tuple[str, str]] = [
+hv_utils: list[tuple[str, str]] = [
     (r"\babs(?=\()",        "hv_abs_f"),
     (r"\bacos(?=\()",       "hv_acos_f"),
     (r"\bacosh(?=\()",      "hv_acosh_f"),

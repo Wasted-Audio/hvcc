@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from typing import Dict, Optional
+from typing import Optional
 
 from .HeavyGraph import HeavyGraph
 from .HeavyIrObject import HeavyIrObject
@@ -27,9 +27,9 @@ class HIrSwitchcase(HeavyIrObject):
     def __init__(
         self,
         obj_type: str,
-        args: Optional[Dict] = None,
+        args: Optional[dict] = None,
         graph: Optional[HeavyGraph] = None,
-        annotations: Optional[Dict] = None
+        annotations: Optional[dict] = None
     ) -> None:
         if args is not None:
             num_cases = len(args["cases"])

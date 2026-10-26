@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from typing import Callable, Dict, List
+from collections.abc import Callable
 
 from hvcc.types.IR import IRObjectdict, IROnMessage
 
@@ -35,19 +35,19 @@ class ControlPrint(HeavyObject):
         return {"HvControlPrint.h", "HvControlPrint.c"}
 
     @classmethod
-    def get_C_init(cls, obj_type: str, obj_id: str, args: Dict) -> List[str]:
+    def get_C_init(cls, obj_type: str, obj_id: str, args: dict) -> list[str]:
         return []
 
     @classmethod
-    def get_C_free(cls, obj_type: str, obj_id: str, args: Dict) -> List[str]:
+    def get_C_free(cls, obj_type: str, obj_id: str, args: dict) -> list[str]:
         return []
 
     @classmethod
-    def get_C_onMessage(cls, obj_type: str, obj_id: str, inlet_index: int, args: Dict) -> List[str]:
+    def get_C_onMessage(cls, obj_type: str, obj_id: str, inlet_index: int, args: dict) -> list[str]:
         return [f"cPrint_onMessage(_c, m, \"{args['label']}\");"]
 
     @classmethod
-    def get_C_decl(cls, obj_type: str, obj_id: str, args: Dict) -> List[str]:
+    def get_C_decl(cls, obj_type: str, obj_id: str, args: dict) -> list[str]:
         return []
 
     @classmethod
@@ -55,9 +55,9 @@ class ControlPrint(HeavyObject):
         cls,
         obj_type: str,
         obj_id: str,
-        on_message_list: List[List[IROnMessage]],
+        on_message_list: list[list[IROnMessage]],
         get_obj_class: Callable,
-        objects: Dict[str, IRObjectdict],
-        args: Dict
-    ) -> List[str]:
+        objects: dict[str, IRObjectdict],
+        args: dict
+    ) -> list[str]:
         return []

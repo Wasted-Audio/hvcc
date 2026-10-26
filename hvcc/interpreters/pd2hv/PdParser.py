@@ -19,7 +19,8 @@ import os
 import re
 from collections import Counter, OrderedDict
 from pathlib import Path
-from typing import Any, Generator, Optional, Type
+from typing import Any, Optional
+from collections.abc import Generator
 
 from .HeavyGraph import HeavyGraph  # pre-converted Heavy graphs
 from .HeavyObject import HeavyObject
@@ -172,7 +173,7 @@ class PdParser:
         pos_x: int = 0,
         pos_y: int = 0,
         is_root: bool = True,
-        pd_graph_class: Type[PdGraph] = PdGraph
+        pd_graph_class: type[PdGraph] = PdGraph
     ) -> Any:
         """ Instantiate a PdGraph from a file.
             Note that obj_args does not include $0.
@@ -225,7 +226,7 @@ class PdParser:
         pos_x: int = 0,
         pos_y: int = 0,
         is_root: bool = False,
-        pd_graph_class: Type[PdGraph] = PdGraph
+        pd_graph_class: type[PdGraph] = PdGraph
     ) -> Any:
         """ Instantiate a PdGraph from an existing canvas.
             Note that graph_args includes $0.

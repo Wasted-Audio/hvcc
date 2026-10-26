@@ -15,7 +15,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
-from typing import List
 
 
 class PrettyfyC:
@@ -43,10 +42,10 @@ class PrettyfyC:
     @classmethod
     def prettyfy_list(
         cls,
-        list_in: List,
+        list_in: list,
         indent: int = 0,
         step: int = 2
-    ) -> List:
+    ) -> list:
         g = []
         for line in list_in:
             indent -= line.count("}")

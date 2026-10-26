@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from typing import Dict, Optional
+from typing import Optional
 
 from .Connection import Connection
 from .HeavyGraph import HeavyGraph
@@ -53,9 +53,9 @@ class HLangBinop(HeavyLangObject):
     def __init__(
         self,
         obj_type: str,
-        args: Optional[Dict] = None,
+        args: Optional[dict] = None,
         graph: Optional['HeavyGraph'] = None,
-        annotations: Optional[Dict] = None
+        annotations: Optional[dict] = None
     ) -> None:
         super().__init__(obj_type, args, graph,
                          num_inlets=2,

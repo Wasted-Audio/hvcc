@@ -20,7 +20,7 @@ import shutil
 import time
 from collections import Counter, OrderedDict
 from pathlib import Path
-from typing import Dict, List, Optional, Type, Union
+from typing import Optional, Union
 
 import jinja2
 
@@ -143,13 +143,13 @@ class ir2c:
         return HeavyObject.get_hash_string(x)
 
     @classmethod
-    def filter_extern(cls, d: Dict) -> Dict:
+    def filter_extern(cls, d: dict) -> dict:
         """ Return a dictionary of objects that are externed.
         """
         return {k: v for k, v in d.items() if v.extern}
 
     @classmethod
-    def get_class(cls, obj_type: str) -> Type[HeavyObject]:
+    def get_class(cls, obj_type: str) -> type[HeavyObject]:
         if SignalMath.handles_type(obj_type):
             return SignalMath
         elif ControlBinop.handles_type(obj_type):
@@ -213,7 +213,7 @@ class ir2c:
         file_set.update(ir2c.__BASE_FILE_SET)
 
         # generate object definition and initialisation list
-        init_list: List = []
+        init_list: list = []
         free_list = []
         def_list = []
         decl_list = []
@@ -259,7 +259,7 @@ class ir2c:
             decl_list.extend(obj_class.get_C_decl(o.type, obj_id, o.args))
 
         # generate static table data initialisers
-        table_data_list: List = []
+        table_data_list: list = []
         for k, v in ir.tables.items():
             o = ir.objects[v.id]
             obj_class = ir2c.get_class(o.type)
@@ -269,8 +269,8 @@ class ir2c:
                 o.args))
 
         # generate the list of functions to process
-        process_list: List = []
-        process_classes: set[Type[HeavyObject]] = set()
+        process_list: list = []
+        process_classes: set[type[HeavyObject]] = set()
         for y in ir.signal.processOrder:
             obj_id = y.id
             o = ir.objects[obj_id]

@@ -18,7 +18,7 @@ import argparse
 import json
 import time
 from pathlib import Path
-from typing import List, Optional
+from typing import Optional
 
 from hvcc.interpreters.pd2hv.PdParser import PdParser
 from hvcc.types.compiler import CompilerNotif, CompilerResp
@@ -42,7 +42,7 @@ class Colours:
 class pd2hv:
 
     @classmethod
-    def get_supported_objects(cls) -> List:
+    def get_supported_objects(cls) -> list:
         return PdParser.get_supported_objects()
 
     @classmethod
@@ -50,7 +50,7 @@ class pd2hv:
         cls,
         pd_path: Path,
         hv_dir: Path,
-        search_paths: Optional[List] = None,
+        search_paths: Optional[list] = None,
         verbose: bool = False,
         export_args: bool = False
     ) -> CompilerResp:

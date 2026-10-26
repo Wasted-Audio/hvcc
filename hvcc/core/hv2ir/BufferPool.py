@@ -15,7 +15,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from collections import defaultdict
-from typing import Dict, List, Optional, Tuple
+from typing import Optional
 
 from .HeavyException import HeavyException
 
@@ -26,7 +26,7 @@ class BufferPool:
         # the idea is that the same buffer is reused as quickly as possible so that it doesn't need
         # to be moved around in the cache. It does not give substantially different results
         # from a Counter-based implementation, but it is more consistent and predictable.
-        self.pool: Dict = {
+        self.pool: dict = {
             "~f>": defaultdict(list),
             "~i>": defaultdict(list)
         }
@@ -42,7 +42,7 @@ class BufferPool:
         else:
             raise HeavyException(f"Unknown connection type: \"{connection_type}\"")
 
-    def get_buffer(self, connection_type: str, count: int = 1, excludeSet: Optional[set] = None) -> Tuple[str, int]:
+    def get_buffer(self, connection_type: str, count: int = 1, excludeSet: Optional[set] = None) -> tuple[str, int]:
         """ Returns a currently unused buffer. The buffer can be assigned a retain count. An optional
             exclude set can also be supplied, ensuring that the returned buffer is not one of them.
         """
@@ -60,7 +60,7 @@ class BufferPool:
         pool[count].append(b)
         return b
 
-    def retain_buffer(self, b: List, count: int = 1) -> int:
+    def retain_buffer(self, b: list, count: int = 1) -> int:
         """ Increases the retain count of the buffer. Returns the new count.
         """
         # adc~ and ZERO_BUFFER are special. They cannot be retained.

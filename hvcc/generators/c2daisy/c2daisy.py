@@ -16,7 +16,7 @@
 import shutil
 import time
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 
 import jinja2
 
@@ -161,7 +161,7 @@ class c2daisy(Generator):
             with open(daisy_cpp_path, 'w') as f:
                 f.write(rendered_cpp)
 
-            makefile_replacements: Dict[str, Any] = {'name': patch_name}
+            makefile_replacements: dict[str, Any] = {'name': patch_name}
             makefile_replacements['linker_script'] = daisy_meta.linker_script
 
             # libdaisy path

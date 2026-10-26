@@ -17,7 +17,7 @@
 import os
 from collections import defaultdict
 from pathlib import Path
-from typing import Dict, List, Optional, Union
+from typing import Optional, Union
 
 from .HeavyException import HeavyException
 from .HeavyLangObject import HeavyLangObject
@@ -32,7 +32,7 @@ class LocalVars:
         # the data structure is a list map
         # key is the name under which the object is registered, value is a
         # list of all objects who are registered with that name
-        self.__REGISTERED_OBJ_DICT: Dict = defaultdict(list)
+        self.__REGISTERED_OBJ_DICT: dict = defaultdict(list)
 
         # the list of globally declared paths
         self.declared_paths = [stdlib_dir]  # initialise with the standard library directory
@@ -48,7 +48,7 @@ class LocalVars:
                 return file_path  # if a matching abstraction is found, return the path
         return None  # otherwise return None
 
-    def add_import_paths(self, path_list: List) -> None:
+    def add_import_paths(self, path_list: list) -> None:
         """ Add import paths. Paths are expanded and made as explicit as possible.
         """
         self.declared_paths.extend([os.path.abspath(os.path.expanduser(p)) for p in path_list])
@@ -74,14 +74,14 @@ class LocalVars:
 
         self.__REGISTERED_OBJ_DICT[name].remove(obj)
 
-    def get_objects_for_name(self, name: str, obj_types: Union[str, List]) -> List:
+    def get_objects_for_name(self, name: str, obj_types: Union[str, list]) -> list:
         """ Returns a list of objects registered under a name in this scope.
         """
 
         obj_types = obj_types if isinstance(obj_types, list) else [obj_types]
         return [o for o in self.__REGISTERED_OBJ_DICT[name] if o.type in obj_types]
 
-    def get_registered_objects_for_type(self, obj_type: str) -> Dict:
+    def get_registered_objects_for_type(self, obj_type: str) -> dict:
         """ Returns a list-dictionary for all objects of the given type, indexed by name.
         """
 

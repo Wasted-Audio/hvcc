@@ -2,7 +2,7 @@ import json
 import shutil
 import time
 from pathlib import Path
-from typing import List, Optional
+from typing import Optional
 
 import jinja2
 
@@ -29,7 +29,7 @@ class c2owl(Generator):
     """
 
     @classmethod
-    def make_jdata(cls, patch_ir: Path) -> List:
+    def make_jdata(cls, patch_ir: Path) -> list:
         jdata = list()
 
         with open(patch_ir, mode="r") as f:

@@ -5,10 +5,10 @@
 
 import re
 from enum import IntEnum
-from typing import Literal, Optional, Tuple, Union
+from typing import Literal, Optional, Union
 
 from pydantic import BaseModel, HttpUrl, model_validator
-from typing_extensions import Self
+from typing import Self
 
 from hvcc.types.GUI import Theme
 
@@ -16,7 +16,7 @@ DaisyBoards = Literal['pod', 'petal', 'patch', 'patch_init', 'field']
 DaisyBootloader = Literal['BOOT_NONE', 'BOOT_SRAM', 'BOOT_QSPI']
 DPFFormats = Literal['lv2', 'lv2_sep', 'vst2', 'vst3', 'clap', 'jack', 'dssi', 'ladspa', 'au']
 
-DPFPortGroupConfig = dict[str, Union[int, Tuple[int, bool]]]
+DPFPortGroupConfig = dict[str, Union[int, tuple[int, bool]]]
 
 
 def slugify(value: str) -> str:

@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from typing import Dict, List, Optional
+from typing import Optional
 
 from .Connection import Connection
 from .HeavyException import HeavyException
@@ -28,9 +28,9 @@ class HLangSequence(HeavyLangObject):
     def __init__(
         self,
         obj_type: str,
-        args: Dict,
+        args: dict,
         graph: 'HeavyGraph',
-        annotations: Optional[Dict] = None
+        annotations: Optional[dict] = None
     ) -> None:
         # get the number of outlets that this object has
         num_outlets = len(args[self._HEAVY_LANG_DICT[obj_type].args[0].name])
@@ -40,7 +40,7 @@ class HLangSequence(HeavyLangObject):
                          annotations=annotations)
 
     def reduce(self) -> tuple:
-        cast_objs: List = []
+        cast_objs: list = []
         for a in self.args[self.name_for_arg()]:
             if a in {"a", "anything", "l", "list"}:
                 cast_objs.append(None)  # pass through

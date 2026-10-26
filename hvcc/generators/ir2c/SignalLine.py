@@ -14,7 +14,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from typing import Dict, List
 
 from hvcc.types.IR import IRSignalList
 
@@ -35,23 +34,23 @@ class SignalLine(HeavyObject):
         return {"HvSignalLine.h", "HvSignalLine.c"}
 
     @classmethod
-    def get_C_init(cls, obj_type: str, obj_id: str, args: Dict) -> List[str]:
+    def get_C_init(cls, obj_type: str, obj_id: str, args: dict) -> list[str]:
         return [
             f"sLine_init(&sLine_{obj_id});"
         ]
 
     @classmethod
-    def get_C_free(cls, obj_type: str, obj_id: str, args: Dict) -> List[str]:
+    def get_C_free(cls, obj_type: str, obj_id: str, args: dict) -> list[str]:
         return []  # nothing to free
 
     @classmethod
-    def get_C_onMessage(cls, obj_type: str, obj_id: str, inlet_index: int, args: Dict) -> List[str]:
+    def get_C_onMessage(cls, obj_type: str, obj_id: str, inlet_index: int, args: dict) -> list[str]:
         return [
             f"sLine_onMessage(_c, &Context(_c)->sLine_{obj_id}, {inlet_index}, m, NULL);"
         ]
 
     @classmethod
-    def get_C_process(cls, process_dict: IRSignalList, obj_type: str, obj_id: str, args: Dict) -> List[str]:
+    def get_C_process(cls, process_dict: IRSignalList, obj_type: str, obj_id: str, args: dict) -> list[str]:
         return [
             "__hv_line_f(&sLine_{0}, VOf({1}));".format(
                 process_dict.id,

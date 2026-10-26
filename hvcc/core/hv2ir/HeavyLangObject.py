@@ -20,7 +20,7 @@ import random
 import string
 from pathlib import Path
 from struct import pack, unpack
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
+from typing import TYPE_CHECKING, Any, Optional, Union
 
 from hvcc.types.compiler import CompilerMsg, CompilerNotif
 from hvcc.types.Lang import HeavyLangType, LangLet, LangLetType, LangNode, LangValueType
@@ -47,11 +47,11 @@ class HeavyLangObject:
     def __init__(
         self,
         obj_type: str,
-        args: Optional[Dict] = None,
+        args: Optional[dict] = None,
         graph: Optional['HeavyGraph'] = None,
         num_inlets: int = -1,
         num_outlets: int = -1,
-        annotations: Optional[Dict] = None
+        annotations: Optional[dict] = None
     ) -> None:
         # set the object type
         self.type = obj_type
@@ -63,25 +63,25 @@ class HeavyLangObject:
         self.graph = graph
 
         # set local arguments
-        self.args: Dict = args or {}
+        self.args: dict = args or {}
 
         # set local annotations
-        self.annotations: Dict = annotations or {}
+        self.annotations: dict = annotations or {}
 
         # a list of locally generated warnings and errors (notifications)
-        self.warnings: List[CompilerMsg] = []
-        self.errors: List[CompilerMsg] = []
+        self.warnings: list[CompilerMsg] = []
+        self.errors: list[CompilerMsg] = []
 
         # resolve arguments and fill in missing defaults for HeavyLang objects
         self.__resolve_default_lang_args()
 
         # the list of connections at each inlet
         num_inlets = num_inlets if num_inlets >= 0 else len(self._obj_desc.inlets)
-        self.inlet_connections: List = [[] for _ in range(num_inlets)]
+        self.inlet_connections: list = [[] for _ in range(num_inlets)]
 
         # the list of connections at each outlet
         num_outlets = num_outlets if num_outlets >= 0 else len(self._obj_desc.outlets)
-        self.outlet_connections: List = [[] for _ in range(num_outlets)]
+        self.outlet_connections: list = [[] for _ in range(num_outlets)]
 
     @property
     def scope(self) -> str:
@@ -250,7 +250,7 @@ class HeavyLangObject:
         else:
             raise HeavyException(f"Connection {c} does not connect to this object {self}.")
 
-    def replace_connection(self, c: Connection, n_list: List) -> None:
+    def replace_connection(self, c: Connection, n_list: list) -> None:
         """ Replaces connection c with connection list n_list, maintaining connection order
         """
         if c.from_object is self:
@@ -267,7 +267,7 @@ class HeavyLangObject:
         else:
             raise HeavyException(f"Connections must have a common endpoint: {c} / {n_list}")
 
-    def get_connection_move_list(self, o: 'HeavyIrObject', connection_type_filter: str = "-~>") -> List:
+    def get_connection_move_list(self, o: 'HeavyIrObject', connection_type_filter: str = "-~>") -> list:
         """ Create a list of commands to move all connections from this object
             to the given object o.
         """
@@ -278,7 +278,7 @@ class HeavyLangObject:
             m.append((c, [c.copy(from_object=o)]))
         return m
 
-    def _get_connection_format(self, connections_list: List) -> str:
+    def _get_connection_format(self, connections_list: list) -> str:
         fmt = []
         for cc in connections_list:
             s = {c.type for c in cc}
@@ -299,13 +299,13 @@ class HeavyLangObject:
                 fmt.append("m")
         return "".join(fmt)
 
-    def has_inlet_connection_format(self, fmts: Optional[Union[str, List]] = None) -> bool:
+    def has_inlet_connection_format(self, fmts: Optional[Union[str, list]] = None) -> bool:
         """ Returns true if the object has given format at its inlets.
         """
         fmts = fmts if isinstance(fmts, list) else [fmts]
         return self._get_connection_format(self.inlet_connections) in fmts
 
-    def has_outlet_connection_format(self, fmts: Optional[Union[str, List]] = None) -> bool:
+    def has_outlet_connection_format(self, fmts: Optional[Union[str, list]] = None) -> bool:
         """ Returns true if the object has given format at its outlets.
             Take either litteral or list as input.
         """

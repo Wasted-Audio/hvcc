@@ -16,7 +16,7 @@
 
 import json
 from pathlib import Path
-from typing import TYPE_CHECKING, Dict, List, Optional
+from typing import TYPE_CHECKING, Optional
 
 from hvcc.types.IR import (
     HeavyIRType,
@@ -51,11 +51,11 @@ class HeavyIrObject(HeavyLangObject):
     def __init__(
         self,
         obj_type: str,
-        args: Optional[Dict] = None,
+        args: Optional[dict] = None,
         graph: Optional['HeavyGraph'] = None,
         num_inlets: int = -1,
         num_outlets: int = -1,
-        annotations: Optional[Dict] = None
+        annotations: Optional[dict] = None
     ) -> None:
         # allow the number of inlets and outlets to be overridden
         num_inlets = (len(self.__HEAVY_OBJS_IR_DICT[obj_type].inlets)
@@ -133,7 +133,7 @@ class HeavyIrObject(HeavyLangObject):
         # A Heavy IR object is already reduced. Returns itself and no connection changes.
         return ({self}, [])
 
-    def get_parent_order(self) -> List:
+    def get_parent_order(self) -> list:
         """ Returns a list of all objects in process order, with this object at the end.
         """
         if self.__is_ordered:
@@ -203,7 +203,7 @@ class HeavyIrObject(HeavyLangObject):
     # Intermediate Representation generators
     #
 
-    def get_object_dict(self) -> Dict[str, IRObjectdict]:
+    def get_object_dict(self) -> dict[str, IRObjectdict]:
         """ Returns a dictionary of all constituent low-level objects,
             indexed by id, including their arguments and type.
         """
@@ -214,12 +214,12 @@ class HeavyIrObject(HeavyLangObject):
             )
         }
 
-    def get_ir_init_list(self) -> List[str]:
+    def get_ir_init_list(self) -> list[str]:
         """ Returns a list of all object id for objects that need initialisation.
         """
         return [self.id] if self.__obj_desc.ir.init else []
 
-    def get_ir_on_message(self, inlet_index: int = 0) -> List[IROnMessage]:
+    def get_ir_on_message(self, inlet_index: int = 0) -> list[IROnMessage]:
         """ Returns an array of dictionaries containing the information for the
             corresponding on_message call.
         """
@@ -228,7 +228,7 @@ class HeavyIrObject(HeavyLangObject):
             inletIndex=inlet_index
         )]
 
-    def get_ir_control_list(self) -> List[IRSendMessage]:
+    def get_ir_control_list(self) -> list[IRSendMessage]:
         """ Returns the intermediate representation for object control functions.
             Basically, does sendMessage() need to be written?
         """
@@ -248,7 +248,7 @@ class HeavyIrObject(HeavyLangObject):
         else:
             return []
 
-    def get_ir_signal_list(self) -> List[IRSignalList]:
+    def get_ir_signal_list(self) -> list[IRSignalList]:
         """ Returns the intermediate representation for object process functions.
             Only outputs buffer information for lets that require a signal.
         """

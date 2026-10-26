@@ -18,7 +18,7 @@ import platform
 import shutil
 import subprocess
 from pathlib import Path
-from typing import List, Optional
+from typing import Optional
 
 from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
 from tests.framework.base_test import HvBaseTest
@@ -29,11 +29,11 @@ class TestPdMIDIBase(HvBaseTest):
 
     def compile_and_run(
         self,
-        source_files: List[Path],
+        source_files: list[Path],
         out_dir: Path,
         num_iterations: int,
         flag: Optional[str] = None
-    ) -> List[str]:
+    ) -> list[str]:
         exe_path = self._compile_and_run(source_files, out_dir, flag)
 
         # run executable (returns stdout)

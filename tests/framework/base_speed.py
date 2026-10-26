@@ -19,7 +19,7 @@ import os
 import shutil
 import subprocess
 from pathlib import Path
-from typing import List, Optional
+from typing import Optional
 
 from tests.framework.base_test import HvBaseTest
 
@@ -28,7 +28,7 @@ class TestPdSpeedBase(HvBaseTest):
 
     def compile_and_run(
         self,
-        source_files: List[Path],
+        source_files: list[Path],
         out_dir: Path,
         sample_rate: Optional[int] = None,
         block_size: Optional[int] = None,

@@ -14,7 +14,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from typing import Dict, List
 
 from hvcc.types.IR import IRSignalList
 
@@ -98,7 +97,7 @@ class SignalMath(HeavyObject):
         return {"HvMath.h"}
 
     @classmethod
-    def get_C_process(cls, process_dict: IRSignalList, obj_type: str, obj_id: str, args: Dict) -> List[str]:
+    def get_C_process(cls, process_dict: IRSignalList, obj_type: str, obj_id: str, args: dict) -> list[str]:
         return [
             "{0}({1}, {2});".format(
                 cls.__OPERATION_DICT[obj_type],

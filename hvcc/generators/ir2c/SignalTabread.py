@@ -14,7 +14,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from typing import Dict, List
 
 from hvcc.types.IR import IRSignalList
 
@@ -37,11 +36,11 @@ class SignalTabread(HeavyObject):
         return {"HvSignalTabread.h", "HvSignalTabread.c"}
 
     @classmethod
-    def get_C_free(cls, obj_type: str, obj_id: str, args: Dict) -> List[str]:
+    def get_C_free(cls, obj_type: str, obj_id: str, args: dict) -> list[str]:
         return []
 
     @classmethod
-    def get_C_init(cls, obj_type: str, obj_id: str, args: Dict) -> List[str]:
+    def get_C_init(cls, obj_type: str, obj_id: str, args: dict) -> list[str]:
         return [
             "sTabread_init(&sTabread_{0}, &hTable_{1}, {2});".format(
                 obj_id,
@@ -49,7 +48,7 @@ class SignalTabread(HeavyObject):
                 "true" if obj_type in {"__tabread~f", "__tabread_stoppable~f"} else "false")]
 
     @classmethod
-    def get_C_onMessage(cls, obj_type: str, obj_id: str, inlet_index: int, args: Dict) -> List[str]:
+    def get_C_onMessage(cls, obj_type: str, obj_id: str, inlet_index: int, args: dict) -> list[str]:
         if obj_type in ["__tabread~f", "__tabreadu~f", "__tabread_stoppable~f"]:
             return [
                 "sTabread_onMessage(_c, &Context(_c)->sTabread_{0}, {1}, m, &sTabread_{0}_sendMessage);".format(
@@ -59,7 +58,7 @@ class SignalTabread(HeavyObject):
             return [f"sTabread_onMessage(_c, &Context(_c)->sTabread_{obj_id}, {inlet_index}, m, NULL);"]
 
     @classmethod
-    def get_C_process(cls, process_dict: IRSignalList, obj_type: str, obj_id: str, args: Dict) -> List[str]:
+    def get_C_process(cls, process_dict: IRSignalList, obj_type: str, obj_id: str, args: dict) -> list[str]:
         if obj_type == "__tabread~if":
             return [
                 "__hv_tabread_if(&sTabread_{0}, {1}, {2});".format(

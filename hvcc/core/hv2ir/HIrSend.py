@@ -15,7 +15,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import re
-from typing import Dict, List, Optional
+from typing import Optional
 
 from hvcc.types.IR import IRSendMessage
 
@@ -30,9 +30,9 @@ class HIrSend(HeavyIrObject):
     def __init__(
         self,
         obj_type: str,
-        args: Optional[Dict] = None,
+        args: Optional[dict] = None,
         graph: Optional[HeavyGraph] = None,
-        annotations: Optional[Dict] = None
+        annotations: Optional[dict] = None
     ) -> None:
         super().__init__("__send", args=args, graph=graph, annotations=annotations)
         if args is not None and args["extern"]:
@@ -42,7 +42,7 @@ class HIrSend(HeavyIrObject):
                 self.add_error(f"Parameter and Event names may only contain \
                                 alphanumeric characters or underscore: '{args['name']}'")
 
-    def get_ir_control_list(self) -> List[IRSendMessage]:
+    def get_ir_control_list(self) -> list[IRSendMessage]:
         if self.graph is not None and self.name is not None:
             receive_objs = self.graph.resolve_objects_for_name(self.name, "__receive")
             on_message_list = [x for o in receive_objs for x in o.get_ir_on_message(inlet_index=0)]

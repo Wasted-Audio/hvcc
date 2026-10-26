@@ -3,7 +3,7 @@
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
-from typing import Dict, List, Optional, Union
+from typing import Optional, Union
 
 from pydantic import BaseModel, RootModel
 
@@ -12,7 +12,7 @@ from hvcc.version import VERSION
 
 # IR Object Definitions
 
-IRValue = Union[float, int, str, List[float], List[int]]
+IRValue = Union[float, int, str, list[float], list[int]]
 
 
 class IRArg(BaseModel):
@@ -36,20 +36,20 @@ class Perf(BaseModel):
 
 
 class IRNode(BaseModel):
-    inlets: List[LangLetType]
+    inlets: list[LangLetType]
     ir: IR
-    outlets: List[LangLetType]
-    args: List[IRArg] = []
+    outlets: list[LangLetType]
+    args: list[IRArg] = []
     perf: Optional[Perf] = Perf()
     # perf: Perf
     description: Optional[str] = None
-    alias: List[str] = []
-    tags: List[str] = []
-    keywords: List[str] = []
+    alias: list[str] = []
+    tags: list[str] = []
+    keywords: list[str] = []
 
 
 class HeavyIRType(RootModel):
-    root: Dict[str, IRNode]
+    root: dict[str, IRNode]
 
 
 # IR Graph Definitions
@@ -60,20 +60,20 @@ class IRName(BaseModel):
 
 
 class IRObjectdict(BaseModel):
-    args: Dict
+    args: dict
     type: str
 
 
 class IRInit(BaseModel):
-    order: List[str] = []
+    order: list[str] = []
 
 
 class IRReceiver(BaseModel):
     display: str
     hash: str
     extern: Optional[str] = None
-    attributes: Dict
-    ids: List[str]
+    attributes: dict
+    ids: list[str]
 
 
 class IROnMessage(BaseModel):
@@ -85,10 +85,10 @@ class IRSendMessage(BaseModel):
     """ This object is a mess and should be split up
     """
     id: str
-    onMessage: List[List[IROnMessage]]  # TODO: why is it a nested List?
+    onMessage: list[list[IROnMessage]]  # TODO: why is it a nested List?
     type: Optional[str] = None
     extern: Optional[str] = ''
-    attributes: Optional[Union[List, Dict]] = None  # TODO: List from IR and Dict from Lang
+    attributes: Optional[Union[list, dict]] = None  # TODO: List from IR and Dict from Lang
     hash: Optional[str] = None
     display: Optional[str] = None
     name: str = ''
@@ -102,8 +102,8 @@ class IRTable(BaseModel):
 
 
 class IRControl(BaseModel):
-    receivers: Dict[str, IRReceiver]
-    sendMessage: List[IRSendMessage]
+    receivers: dict[str, IRReceiver]
+    sendMessage: list[IRSendMessage]
 
 
 class IRNumTempBuffer(BaseModel):
@@ -118,23 +118,23 @@ class IRBuffer(BaseModel):
 
 class IRSignalList(BaseModel):
     id: str
-    inputBuffers: List[IRBuffer]
-    outputBuffers: List[IRBuffer]
+    inputBuffers: list[IRBuffer]
+    outputBuffers: list[IRBuffer]
 
 
 class IRSignal(BaseModel):
     numInputBuffers: int
     numOutputBuffers: int
     numTemporaryBuffers: IRNumTempBuffer
-    processOrder: List[IRSignalList]
+    processOrder: list[IRSignalList]
 
 
 class IRGraph(BaseModel):
     version: str = VERSION
     name: IRName
-    objects: Dict[str, IRObjectdict] = {}
+    objects: dict[str, IRObjectdict] = {}
     init: IRInit
-    tables: Dict[str, IRTable] = {}
+    tables: dict[str, IRTable] = {}
     control: IRControl
     signal: IRSignal
 

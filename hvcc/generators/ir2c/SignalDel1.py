@@ -14,7 +14,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from typing import Dict, List
 
 from hvcc.types.IR import IRSignalList
 
@@ -37,19 +36,19 @@ class SignalDel1(HeavyObject):
         return {"HvSignalDel1.h", "HvSignalDel1.c"}
 
     @classmethod
-    def get_C_def(cls, obj_type: str, obj_id: str) -> List[str]:
+    def get_C_def(cls, obj_type: str, obj_id: str) -> list[str]:
         return [f"SignalDel1 sDel1_{obj_id};"]
 
     @classmethod
-    def get_C_init(cls, obj_type: str, obj_id: str, args: Dict) -> List[str]:
+    def get_C_init(cls, obj_type: str, obj_id: str, args: dict) -> list[str]:
         return [f"sDel1_init(&sDel1_{obj_id});"]
 
     @classmethod
-    def get_C_free(cls, obj_type: str, obj_id: str, args: Dict) -> List[str]:
+    def get_C_free(cls, obj_type: str, obj_id: str, args: dict) -> list[str]:
         return []
 
     @classmethod
-    def get_C_process(cls, process_dict: IRSignalList, obj_type: str, obj_id: str, args: Dict) -> List[str]:
+    def get_C_process(cls, process_dict: IRSignalList, obj_type: str, obj_id: str, args: dict) -> list[str]:
         return [
             "__hv_del1_f(&sDel1_{0}, VIf({1}), VOf({2}));".format(
                 process_dict.id,

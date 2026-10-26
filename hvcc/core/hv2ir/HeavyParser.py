@@ -17,7 +17,7 @@
 import json
 import random
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Set, Tuple
+from typing import Any, Optional
 
 from hvcc.types.Heavy import Heavy
 
@@ -69,7 +69,7 @@ class HeavyParser:
         cls,
         hv_file: Path,
         graph: Optional[HeavyGraph] = None,
-        graph_args: Optional[Dict] = None,
+        graph_args: Optional[dict] = None,
         path_stack: Optional[set[Path]] = None,
         xname: Optional[str] = None
     ) -> HeavyGraph:
@@ -104,7 +104,7 @@ class HeavyParser:
         json_heavy: Heavy,
         path_stack: set[Path],
         graph: Optional[HeavyGraph] = None,
-        graph_args: Optional[Dict] = None,
+        graph_args: Optional[dict] = None,
         xname: Optional[str] = None
     ) -> HeavyGraph:
 
@@ -234,14 +234,14 @@ class HLangIf(HeavyLangObject):
     def __init__(
         self,
         obj_type: str,
-        args: Dict,
+        args: dict,
         graph: HeavyGraph,
-        annotations: Optional[Dict] = None
+        annotations: Optional[dict] = None
     ) -> None:
         assert obj_type == "if"
         super().__init__("if", args, graph, num_inlets=2, num_outlets=2, annotations=annotations)
 
-    def reduce(self) -> Tuple[Set, List]:
+    def reduce(self) -> tuple[set, list]:
         if self.has_inlet_connection_format(["cc", "_c", "c_", "__"]):
             x = HeavyIrObject("__if", self.args)
         elif self.has_inlet_connection_format("ff"):
@@ -264,14 +264,14 @@ class HLangNoise(HeavyLangObject):
     def __init__(
         self,
         obj_type: str,
-        args: Dict,
+        args: dict,
         graph: HeavyGraph,
-        annotations: Optional[Dict] = None
+        annotations: Optional[dict] = None
     ) -> None:
         assert obj_type == "noise"
         super().__init__("noise", args, graph, num_inlets=1, num_outlets=1, annotations=annotations)
 
-    def reduce(self) -> Tuple[Set, List]:
+    def reduce(self) -> tuple[set, list]:
         seed = int(random.uniform(1, 2147483647))  # assign a random 32-bit seed
         noise_path = Path(Path(__file__).parent, "./hvlib/noise.hv.json")
         x = HeavyParser.graph_from_file(noise_path, graph_args={"seed": seed})
