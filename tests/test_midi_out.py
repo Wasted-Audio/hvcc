@@ -33,7 +33,7 @@ class TestPdMIDIOutPatches(TestPdMIDIBase):
             "-o create_test_midi ; " \
             "./create_test_midi"
 
-        subprocess.run(command, capture_output=True, shell=True)
+        subprocess.run(command, check=False, capture_output=True, shell=True)
 
     def test_noteout(self):
         self._test_midi_patch("test-noteout.pd")
