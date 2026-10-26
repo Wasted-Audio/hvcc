@@ -15,9 +15,9 @@
 
 from typing import Dict, List
 
-from .HeavyObject import HeavyObject
-
 from hvcc.types.IR import IRSignalList
+
+from .HeavyObject import HeavyObject
 
 
 class SignalSchmitt(HeavyObject):

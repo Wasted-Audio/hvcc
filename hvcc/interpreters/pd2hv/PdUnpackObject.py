@@ -16,9 +16,9 @@
 
 from typing import Optional
 
-from .PdObject import PdObject
+from hvcc.types.Heavy import Heavy, HvConn, HvConnFrom, HvConnTo, HvPos
 
-from hvcc.types.Heavy import Heavy, HvPos, HvConn, HvConnFrom, HvConnTo
+from .PdObject import PdObject
 
 
 class PdUnpackObject(PdObject):

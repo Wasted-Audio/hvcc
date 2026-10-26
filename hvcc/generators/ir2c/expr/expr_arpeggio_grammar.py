@@ -13,9 +13,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from arpeggio import ParserPython, StrMatch     # type: ignore
-from arpeggio import ZeroOrMore                 # type: ignore
-from arpeggio import RegExMatch as regex        # type: ignore
+from arpeggio import (  # type: ignore
+    ParserPython,
+    StrMatch,
+    ZeroOrMore,  # type: ignore
+)
+from arpeggio import RegExMatch as regex  # type: ignore
 
 
 class SuppressStrMatch(StrMatch):

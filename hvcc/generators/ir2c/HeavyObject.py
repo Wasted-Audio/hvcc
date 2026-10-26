@@ -14,10 +14,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from struct import unpack, pack
-from typing import Callable, Dict, List, Union, Optional
+from struct import pack, unpack
+from typing import Callable, Dict, List, Optional, Union
 
-from hvcc.types.IR import IROnMessage, IRSignalList, IRBuffer, IRObjectdict
+from hvcc.types.IR import IRBuffer, IRObjectdict, IROnMessage, IRSignalList
 
 
 class HeavyObject:

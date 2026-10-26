@@ -16,12 +16,18 @@
 
 import json
 import random
-
-from typing import Any, Dict, List, Optional, Set, Tuple
 from pathlib import Path
+from typing import Any, Dict, List, Optional, Set, Tuple
 
 from hvcc.types.Heavy import Heavy
 
+from .Connection import Connection
+
+# from .HLangIf import HLangIf  # circular import. moved here
+from .HeavyException import HeavyException
+from .HeavyGraph import HeavyGraph
+from .HeavyIrObject import HeavyIrObject
+from .HeavyLangObject import HeavyLangObject
 from .HIrConvolution import HIrConvolution
 from .HIrExpr import HIrExpr
 from .HIrInlet import HIrInlet
@@ -33,23 +39,19 @@ from .HIrSwitchcase import HIrSwitchcase
 from .HIrTabhead import HIrTabhead
 from .HIrTabread import HIrTabread
 from .HIrTabwrite import HIrTabwrite
-
 from .HLangAdc import HLangAdc
 from .HLangBinop import HLangBinop
 from .HLangBiquad import HLangBiquad
 from .HLangDac import HLangDac
 from .HLangDelay import HLangDelay
-# from .HLangIf import HLangIf  # circular import. moved here
-from .HeavyException import HeavyException
-from .HeavyIrObject import HeavyIrObject
-from .HeavyLangObject import HeavyLangObject
 from .HLangLine import HLangLine
 from .HLangMessage import HLangMessage
+
 # from .HLangNoise import HLangNoise  # circular import. moved here
 from .HLangPhasor import HLangPhasor
 from .HLangPrint import HLangPrint
-from .HLangReceive import HLangReceive
 from .HLangRandom import HLangRandom
+from .HLangReceive import HLangReceive
 from .HLangSend import HLangSend
 from .HLangSequence import HLangSequence
 from .HLangSlice import HLangSlice
@@ -58,9 +60,6 @@ from .HLangTable import HLangTable
 from .HLangUnop import HLangUnop
 from .HLangVar import HLangVar
 from .HLangVario import HLangVario
-
-from .HeavyGraph import HeavyGraph
-from .Connection import Connection
 
 
 class HeavyParser:

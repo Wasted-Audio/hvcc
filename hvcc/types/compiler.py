@@ -5,14 +5,14 @@
 
 from abc import ABC, abstractmethod
 from collections import Counter, defaultdict
-from typing import Dict, List, Optional, Tuple
 from pathlib import Path
+from typing import Dict, List, Optional, Tuple
 
 from pydantic import BaseModel, RootModel
 
 from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
-from hvcc.types.meta import Meta
 from hvcc.types.IR import IRGraph, IRReceiver, IRSendMessage, IRTable
+from hvcc.types.meta import Meta
 
 
 class CompilerMsg(BaseModel):

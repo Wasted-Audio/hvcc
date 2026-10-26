@@ -4,16 +4,34 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 import re
-
 from collections import Counter
-from typing import Generator, Optional, Union
 from pathlib import Path
+from typing import Generator, Optional, Union
 
 from hvcc.interpreters.pd2hv.PdParser import PdParser
 from hvcc.types.GUI import (
-    Size, Coords, Font, LabelShow, LabelPos, Label, Color, Canvas,
-    Bang, Toggle, VRadio, HRadio, VSlider, HSlider, Knob,  Number, Float,
-    Comment, Popmenu, GUIObjects, Graph, GraphRoot
+    Bang,
+    Canvas,
+    Color,
+    Comment,
+    Coords,
+    Float,
+    Font,
+    Graph,
+    GraphRoot,
+    GUIObjects,
+    HRadio,
+    HSlider,
+    Knob,
+    Label,
+    LabelPos,
+    LabelShow,
+    Number,
+    Popmenu,
+    Size,
+    Toggle,
+    VRadio,
+    VSlider,
 )
 
 

@@ -5,13 +5,12 @@
 
 import argparse
 import time
-
-from typing import Optional
 from pathlib import Path
+from typing import Optional
 
-from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
 from hvcc.interpreters.pd2gui.PdGUIParser import PdGUIParser
-from hvcc.types.compiler import CompilerResp, CompilerNotif, CompilerMsg
+from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
+from hvcc.types.compiler import CompilerMsg, CompilerNotif, CompilerResp
 
 
 class Colours:

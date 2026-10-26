@@ -14,15 +14,15 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from typing import Optional, Any
 from pathlib import Path
+from typing import Any, Optional
+
+from hvcc.types.compiler import CompilerNotif
+from hvcc.types.Heavy import Heavy, HvPos
 
 from .Connection import Connection
 from .NotificationEnum import NotificationEnum
 from .PdObject import PdObject
-
-from hvcc.types.compiler import CompilerNotif
-from hvcc.types.Heavy import Heavy, HvPos
 
 
 class PdGraph(PdObject):

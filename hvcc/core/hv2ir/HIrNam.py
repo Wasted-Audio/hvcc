@@ -13,13 +13,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from typing import Dict, Optional
 from pathlib import Path
-
-from .HeavyIrObject import HeavyIrObject
-from .HeavyGraph import HeavyGraph
+from typing import Dict, Optional
 
 from hvcc.generators.ir2c.SignalNamHeader import ModelNet, load_nam_file
+
+from .HeavyGraph import HeavyGraph
+from .HeavyIrObject import HeavyIrObject
 
 
 class HIrNam(HeavyIrObject):

@@ -14,13 +14,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
 import json
+import os
 import shutil
 import subprocess
-
-from typing import List, Optional
 from pathlib import Path
+from typing import List, Optional
 
 from tests.framework.base_test import HvBaseTest
 

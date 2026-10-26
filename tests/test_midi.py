@@ -13,9 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import unittest
 import subprocess
-
+import unittest
 from pathlib import Path
 
 from tests.framework.base_midi import TestPdMIDIBase

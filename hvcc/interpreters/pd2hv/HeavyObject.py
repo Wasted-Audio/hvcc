@@ -18,15 +18,15 @@ import decimal
 import json
 from importlib import resources
 from pathlib import Path
-from typing import Optional, Any, Union, cast
+from typing import Any, Optional, Union, cast
+
+from hvcc.types.Heavy import Heavy, HvPos
+from hvcc.types.IR import HeavyIRType, IRArg, IRNode
+from hvcc.types.Lang import HeavyLangType, LangArg, LangNode
 
 from .Connection import Connection
 from .NotificationEnum import NotificationEnum
 from .PdObject import PdObject
-
-from hvcc.types.IR import HeavyIRType, IRNode, IRArg
-from hvcc.types.Lang import HeavyLangType, LangNode, LangArg
-from hvcc.types.Heavy import Heavy, HvPos
 
 
 class HeavyObject(PdObject):

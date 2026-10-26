@@ -15,19 +15,24 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import json
-
-from typing import Dict, List, Optional, TYPE_CHECKING
 from pathlib import Path
+from typing import TYPE_CHECKING, Dict, List, Optional
 
+from hvcc.types.IR import (
+    HeavyIRType,
+    IRBuffer,
+    IRNode,
+    IRObjectdict,
+    IROnMessage,
+    IRSendMessage,
+    IRSignalList,
+)
+from hvcc.types.Lang import LangLetType
 
+from .BufferPool import BufferPool
 from .Connection import Connection
 from .HeavyException import HeavyException
 from .HeavyLangObject import HeavyLangObject
-from .BufferPool import BufferPool
-
-from hvcc.types.IR import HeavyIRType, IRNode, IRObjectdict, IRSendMessage, IROnMessage, IRSignalList, IRBuffer
-from hvcc.types.Lang import LangLetType
-
 
 if TYPE_CHECKING:
     from .HeavyGraph import HeavyGraph

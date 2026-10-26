@@ -4,7 +4,6 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 import json
-
 from pathlib import Path
 
 from hvcc.interpreters.pd2gui.pd2gui import pd2gui

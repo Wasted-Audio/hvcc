@@ -16,12 +16,13 @@
 
 from typing import Dict, Optional
 
-from .HeavyException import HeavyException
-from .HeavyIrObject import HeavyIrObject
-from .HeavyGraph import HeavyGraph
-
-from hvcc.types.Lang import LangLetType
 from hvcc.types.IR import IROnMessage
+from hvcc.types.Lang import LangLetType
+
+from .HeavyException import HeavyException
+from .HeavyGraph import HeavyGraph
+from .HeavyIrObject import HeavyIrObject
+
 
 class HIrInlet(HeavyIrObject):
     """ A specific implementation of the inlet object.

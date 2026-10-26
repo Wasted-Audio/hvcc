@@ -3,12 +3,12 @@
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
-from pydantic import BaseModel, RootModel
 from typing import Dict, List, Optional, Union
+
+from pydantic import BaseModel, RootModel
 
 from hvcc.types.Lang import LangLetType
 from hvcc.version import VERSION
-
 
 # IR Object Definitions
 

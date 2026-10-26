@@ -17,18 +17,24 @@
 import os
 import subprocess
 import time
-import jinja2
-
+from pathlib import Path
 from shutil import which
 from typing import Optional
-from pathlib import Path
+
+import jinja2
 
 from hvcc.core.hv2ir.HeavyException import HeavyException
-from ..copyright import copyright_manager
-
 from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
-from hvcc.types.compiler import Generator, CompilerResp, CompilerNotif, CompilerMsg, ExternInfo
+from hvcc.types.compiler import (
+    CompilerMsg,
+    CompilerNotif,
+    CompilerResp,
+    ExternInfo,
+    Generator,
+)
 from hvcc.types.meta import Meta
+
+from ..copyright import copyright_manager
 
 
 class c2js(Generator):

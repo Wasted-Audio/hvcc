@@ -15,9 +15,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import datetime
-
-from typing import Optional
 from pathlib import Path
+from typing import Optional
 
 
 def get_default_copyright_text() -> str:

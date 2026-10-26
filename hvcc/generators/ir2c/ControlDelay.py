@@ -16,9 +16,9 @@
 
 from typing import Callable, Dict, List
 
-from .HeavyObject import HeavyObject
+from hvcc.types.IR import IRObjectdict, IROnMessage
 
-from hvcc.types.IR import IROnMessage, IRObjectdict
+from .HeavyObject import HeavyObject
 
 
 class ControlDelay(HeavyObject):

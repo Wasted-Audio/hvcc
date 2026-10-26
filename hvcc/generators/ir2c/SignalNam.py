@@ -13,12 +13,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from typing import Optional
 from pathlib import Path
+from typing import Optional
+
+from hvcc.types.IR import IRSignalList
 
 from .HeavyObject import HeavyObject
 from .SignalNamHeader import convert_nam_to_header, to_symbol_stem
-from hvcc.types.IR import IRSignalList
 
 
 class UnknownModelException(Exception):

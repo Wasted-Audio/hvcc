@@ -14,11 +14,11 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-from .PdObject import PdObject
-
 from typing import Optional
 
 from hvcc.types.Heavy import Heavy, HvPos
+
+from .PdObject import PdObject
 
 
 class PdExprObject(PdObject):

@@ -17,10 +17,10 @@
 from collections import Counter
 from typing import Optional
 
+from hvcc.types.Heavy import Heavy, HvConn, HvConnFrom, HvConnTo, HvPos
+
 from .NotificationEnum import NotificationEnum
 from .PdObject import PdObject
-
-from hvcc.types.Heavy import Heavy, HvPos, HvConn, HvConnFrom, HvConnTo
 
 
 class PdSelectObject(PdObject):

@@ -6,11 +6,11 @@
 import re
 from enum import IntEnum
 from typing import Literal, Optional, Tuple, Union
-from typing_extensions import Self
+
 from pydantic import BaseModel, HttpUrl, model_validator
+from typing_extensions import Self
 
 from hvcc.types.GUI import Theme
-
 
 DaisyBoards = Literal['pod', 'petal', 'patch', 'patch_init', 'field']
 DaisyBootloader = Literal['BOOT_NONE', 'BOOT_SRAM', 'BOOT_QSPI']

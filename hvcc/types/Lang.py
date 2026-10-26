@@ -3,9 +3,9 @@
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
-from pydantic import BaseModel, RootModel
-from typing import List, Optional, Dict, Literal, Union
+from typing import Dict, List, Literal, Optional, Union
 
+from pydantic import BaseModel, RootModel
 
 LangConnectionType = Literal["-->", "-~>", "~f>"]
 LangLetType = Literal["-->", "-~>", "~i>", "~f>", "signal"]

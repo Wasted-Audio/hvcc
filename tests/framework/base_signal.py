@@ -17,11 +17,10 @@
 import platform
 import shutil
 import subprocess
-import numpy
-
-from typing import List, Optional
 from pathlib import Path
+from typing import List, Optional
 
+import numpy
 from scipy.io import wavfile
 
 from tests.framework.base_test import HvBaseTest

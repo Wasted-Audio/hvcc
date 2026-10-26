@@ -13,20 +13,34 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import jinja2
 import shutil
 import time
-
-from typing import Optional
 from pathlib import Path
+from typing import Optional
+
+import jinja2
+
+from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
+from hvcc.types.compiler import (
+    CompilerMsg,
+    CompilerNotif,
+    CompilerResp,
+    ExternInfo,
+    Generator,
+)
+from hvcc.types.meta import (
+    DPF,
+    DPFPortGroupConfig,
+    DPFPortGroups,
+    DPFUISize,
+    DPFUIType,
+    Meta,
+    slugify,
+)
 
 from ..copyright import copyright_manager
 from ..filters import filter_uniqueid
-
-from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
-from hvcc.types.compiler import Generator, CompilerResp, CompilerMsg, CompilerNotif, ExternInfo
-from hvcc.types.meta import DPFPortGroups, DPFPortGroupConfig, Meta, DPF, DPFUIType, DPFUISize, slugify
-from .nanovg_render import open_gui_json, nanovg_render
+from .nanovg_render import nanovg_render, open_gui_json
 
 
 def _normalize_port_groups(

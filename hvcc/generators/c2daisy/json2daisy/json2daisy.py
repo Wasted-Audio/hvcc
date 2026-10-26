@@ -1,9 +1,9 @@
-import jinja2
 import json
-
 from importlib import resources
 from pathlib import Path
 from typing import Optional
+
+import jinja2
 
 
 def map_load(pair: list, json_defs_file: Path):

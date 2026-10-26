@@ -1,10 +1,8 @@
 import unittest
-
 from pathlib import Path
 
 from hvcc.compiler import compile_dataflow
 from hvcc.generators.c2daisy.json2daisy import generate_header_from_name
-
 
 # Grabbing the absolute path to test data
 data_path = Path(Path(__file__).parent, 'data')

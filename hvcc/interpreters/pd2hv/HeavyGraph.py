@@ -15,14 +15,13 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import json
-
-from typing import Optional
 from pathlib import Path
-
-from .PdObject import PdObject
-from .HeavyObject import HeavyObject
+from typing import Optional
 
 from hvcc.types.Heavy import Heavy
+
+from .HeavyObject import HeavyObject
+from .PdObject import PdObject
 
 
 class HeavyGraph(PdObject):

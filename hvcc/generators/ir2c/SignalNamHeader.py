@@ -22,12 +22,10 @@
 # SOFTWARE.
 
 
-import re
 import json
-
+import re
 from enum import Enum
 from pathlib import Path
-
 
 """ Vendored and modified from MicroNAM https://github.com/jaffco/MicroNAM
 """

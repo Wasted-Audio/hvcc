@@ -16,11 +16,11 @@
 
 from typing import Optional
 
+from hvcc.types.Heavy import Heavy, HvPos
+
 from .Connection import Connection
 from .HeavyObject import HeavyObject
 from .PdObject import PdObject
-
-from hvcc.types.Heavy import Heavy, HvPos
 
 
 class PdBinopObject(PdObject):

@@ -17,10 +17,10 @@
 import re
 from typing import Optional
 
+from hvcc.types.Heavy import Heavy, HvPos
+
 from .NotificationEnum import NotificationEnum
 from .PdObject import PdObject
-
-from hvcc.types.Heavy import Heavy, HvPos
 
 
 class PdMessageObject(PdObject):

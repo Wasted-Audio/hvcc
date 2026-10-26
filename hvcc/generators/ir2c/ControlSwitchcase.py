@@ -15,9 +15,10 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from typing import Callable, Dict, List
-from .HeavyObject import HeavyObject
 
-from hvcc.types.IR import IROnMessage, IRObjectdict
+from hvcc.types.IR import IRObjectdict, IROnMessage
+
+from .HeavyObject import HeavyObject
 
 
 class ControlSwitchcase(HeavyObject):

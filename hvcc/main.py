@@ -18,11 +18,10 @@ import argparse
 import json
 import sys
 import time
-
 from pathlib import Path
 
-from hvcc.version import VERSION
 from hvcc.compiler import compile_dataflow
+from hvcc.version import VERSION
 
 
 class Colours:

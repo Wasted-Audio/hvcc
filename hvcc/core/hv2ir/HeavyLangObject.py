@@ -18,16 +18,15 @@ import decimal
 import json
 import random
 import string
-
-from struct import unpack, pack
-from typing import Optional, Union, List, Dict, Any, TYPE_CHECKING
 from pathlib import Path
+from struct import pack, unpack
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
+
+from hvcc.types.compiler import CompilerMsg, CompilerNotif
+from hvcc.types.Lang import HeavyLangType, LangLet, LangLetType, LangNode, LangValueType
 
 from .Connection import Connection
 from .HeavyException import HeavyException
-
-from hvcc.types.compiler import CompilerMsg, CompilerNotif
-from hvcc.types.Lang import HeavyLangType, LangNode, LangLet, LangLetType, LangValueType
 
 if TYPE_CHECKING:
     from .HeavyGraph import HeavyGraph

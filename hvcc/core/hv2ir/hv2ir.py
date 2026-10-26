@@ -18,14 +18,12 @@ import argparse
 import json
 import os
 import time
-
-from typing import Optional
 from pathlib import Path
+from typing import Optional
 
 from hvcc.core.hv2ir.HeavyException import HeavyException
 from hvcc.core.hv2ir.HeavyParser import HeavyParser
-
-from hvcc.types.compiler import CompilerResp, CompilerNotif, CompilerMsg
+from hvcc.types.compiler import CompilerMsg, CompilerNotif, CompilerResp
 
 
 class hv2ir:

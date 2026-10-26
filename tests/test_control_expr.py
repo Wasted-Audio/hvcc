@@ -15,9 +15,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import argparse
+
 # import unittest
 import platform
-
 from pathlib import Path
 
 from tests.framework.base_control import TestPdControlBase

@@ -13,21 +13,26 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import jinja2
 import shutil
 import time
-
-from typing import Any, Dict, Optional
 from pathlib import Path
+from typing import Any, Dict, Optional
 
-from ..copyright import copyright_manager
-from .parameters import parse_parameters, display_parameters, display_processor
-from .json2daisy import generate_header_from_file, generate_header_from_name
+import jinja2
 
 from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
-from hvcc.types.compiler import Generator, CompilerResp, CompilerNotif, CompilerMsg, ExternInfo
-from hvcc.types.meta import Meta, Daisy
+from hvcc.types.compiler import (
+    CompilerMsg,
+    CompilerNotif,
+    CompilerResp,
+    ExternInfo,
+    Generator,
+)
+from hvcc.types.meta import Daisy, Meta
 
+from ..copyright import copyright_manager
+from .json2daisy import generate_header_from_file, generate_header_from_name
+from .parameters import display_parameters, display_processor, parse_parameters
 
 hv_midi_messages = [
     "__hv_noteout",

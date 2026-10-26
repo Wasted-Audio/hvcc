@@ -15,7 +15,9 @@
 
 from typing import Literal, Union
 
-from arpeggio import ParsingExpression as ParseTreeNode, Terminal  # type: ignore
+from arpeggio import ParsingExpression as ParseTreeNode  # type: ignore
+from arpeggio import Terminal
+
 from .expr_arpeggio_grammar import expr_grammar
 
 ParseExpr = Union[ParseTreeNode, Terminal]

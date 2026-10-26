@@ -17,9 +17,8 @@
 import platform
 import shutil
 import subprocess
-
-from typing import List, Optional
 from pathlib import Path
+from typing import List, Optional
 
 from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
 from tests.framework.base_test import HvBaseTest

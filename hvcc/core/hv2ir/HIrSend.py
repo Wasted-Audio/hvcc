@@ -17,10 +17,10 @@
 import re
 from typing import Dict, List, Optional
 
-from .HeavyIrObject import HeavyIrObject
-from .HeavyGraph import HeavyGraph
-
 from hvcc.types.IR import IRSendMessage
+
+from .HeavyGraph import HeavyGraph
+from .HeavyIrObject import HeavyIrObject
 
 
 class HIrSend(HeavyIrObject):

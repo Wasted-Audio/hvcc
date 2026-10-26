@@ -16,7 +16,6 @@
 
 import argparse
 import os
-
 from pathlib import Path
 
 from tests.framework.base_signal import TestPdSignalBase

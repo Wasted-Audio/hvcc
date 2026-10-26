@@ -14,18 +14,16 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import jinja2
 import shutil
 import subprocess
 import unittest
-
-from typing import List, Optional
 from pathlib import Path
+from typing import List, Optional
+
+import jinja2
 
 import hvcc
-
 from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
-
 
 simd_flags = {
     "HV_SIMD_NONE": ["-DHV_SIMD_NONE"],

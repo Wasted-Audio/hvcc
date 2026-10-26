@@ -1,11 +1,10 @@
 import json
-
 from pathlib import Path
 
 import jinja2
 
+from hvcc.types.GUI import Canvas, Comment, Graph, GraphRoot, GUIObjects
 from hvcc.types.meta import DPF
-from hvcc.types.GUI import Canvas, Comment, GraphRoot, Graph, GUIObjects
 
 
 def open_gui_json(

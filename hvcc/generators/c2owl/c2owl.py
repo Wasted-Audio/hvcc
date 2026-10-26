@@ -1,19 +1,24 @@
+import json
 import shutil
 import time
-import jinja2
-import json
-
-from typing import List, Optional
 from pathlib import Path
+from typing import List, Optional
+
+import jinja2
 
 import hvcc.core.hv2ir.HeavyLangObject as HeavyLangObject
-from ..copyright import copyright_manager
-
 from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
-from hvcc.types.compiler import Generator, CompilerResp, CompilerNotif, CompilerMsg, ExternInfo
-from hvcc.types.meta import Meta
+from hvcc.types.compiler import (
+    CompilerMsg,
+    CompilerNotif,
+    CompilerResp,
+    ExternInfo,
+    Generator,
+)
 from hvcc.types.IR import IRGraph
+from hvcc.types.meta import Meta
 
+from ..copyright import copyright_manager
 
 heavy_hash = HeavyLangObject.HeavyLangObject.get_hash
 OWL_BUTTONS = ['Push', 'B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8', 'B9', 'B10', 'B11', 'Red', 'Green']

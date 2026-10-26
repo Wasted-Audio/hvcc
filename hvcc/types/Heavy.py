@@ -5,7 +5,7 @@
 
 from typing import Union
 
-from pydantic import BaseModel, Field, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class HvPos(BaseModel):

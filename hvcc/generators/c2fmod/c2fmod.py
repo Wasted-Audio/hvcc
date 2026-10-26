@@ -3,16 +3,22 @@
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
-import jinja2
 import os
 import shutil
 import time
-
-from typing import Optional
 from pathlib import Path
+from typing import Optional
+
+import jinja2
 
 from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
-from hvcc.types.compiler import Generator, CompilerResp, CompilerNotif, CompilerMsg, ExternInfo
+from hvcc.types.compiler import (
+    CompilerMsg,
+    CompilerNotif,
+    CompilerResp,
+    ExternInfo,
+    Generator,
+)
 from hvcc.types.meta import Meta
 
 from ..copyright import copyright_manager

@@ -16,9 +16,9 @@
 
 from typing import Callable, Dict, List
 
-from .HeavyObject import HeavyObject
-
 from hvcc.types.IR import IRObjectdict, IROnMessage
+
+from .HeavyObject import HeavyObject
 
 
 class ControlSend(HeavyObject):

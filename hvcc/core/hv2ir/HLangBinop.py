@@ -14,12 +14,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from typing import Optional, Dict
+from typing import Dict, Optional
 
 from .Connection import Connection
-from .HeavyLangObject import HeavyLangObject
-from .HeavyIrObject import HeavyIrObject
 from .HeavyGraph import HeavyGraph
+from .HeavyIrObject import HeavyIrObject
+from .HeavyLangObject import HeavyLangObject
 
 
 class HLangBinop(HeavyLangObject):

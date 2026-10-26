@@ -17,12 +17,12 @@
 import argparse
 import json
 import time
-
-from typing import List, Optional
 from pathlib import Path
+from typing import List, Optional
 
 from hvcc.interpreters.pd2hv.PdParser import PdParser
-from hvcc.types.compiler import CompilerResp, CompilerNotif
+from hvcc.types.compiler import CompilerNotif, CompilerResp
+
 from .PdGraph import PdGraph
 
 

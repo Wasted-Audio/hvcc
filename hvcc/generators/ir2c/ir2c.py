@@ -15,19 +15,16 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import argparse
-import jinja2
 import json
 import shutil
 import time
-
-from collections import Counter
-from collections import OrderedDict
+from collections import Counter, OrderedDict
 from pathlib import Path
 from typing import Dict, List, Optional, Type, Union
 
-from hvcc.generators.ir2c.PrettyfyC import PrettyfyC
-from hvcc.generators.copyright import copyright_manager
+import jinja2
 
+from hvcc.generators.copyright import copyright_manager
 from hvcc.generators.ir2c.ControlBinop import ControlBinop
 from hvcc.generators.ir2c.ControlCast import ControlCast
 from hvcc.generators.ir2c.ControlDelay import ControlDelay
@@ -37,8 +34,8 @@ from hvcc.generators.ir2c.ControlList import ControlList
 from hvcc.generators.ir2c.ControlMessage import ControlMessage
 from hvcc.generators.ir2c.ControlPack import ControlPack
 from hvcc.generators.ir2c.ControlPrint import ControlPrint
-from hvcc.generators.ir2c.ControlReceive import ControlReceive
 from hvcc.generators.ir2c.ControlRandom import ControlRandom
+from hvcc.generators.ir2c.ControlReceive import ControlReceive
 from hvcc.generators.ir2c.ControlSend import ControlSend
 from hvcc.generators.ir2c.ControlSlice import ControlSlice
 from hvcc.generators.ir2c.ControlSwitchcase import ControlSwitchcase
@@ -50,26 +47,26 @@ from hvcc.generators.ir2c.ControlUnop import ControlUnop
 from hvcc.generators.ir2c.ControlVar import ControlVar
 from hvcc.generators.ir2c.HeavyObject import HeavyObject
 from hvcc.generators.ir2c.HeavyTable import HeavyTable
-from hvcc.generators.ir2c.SignalConvolution import SignalConvolution
+from hvcc.generators.ir2c.PrettyfyC import PrettyfyC
 from hvcc.generators.ir2c.SignalBiquad import SignalBiquad
+from hvcc.generators.ir2c.SignalConvolution import SignalConvolution
 from hvcc.generators.ir2c.SignalCPole import SignalCPole
 from hvcc.generators.ir2c.SignalDel1 import SignalDel1
 from hvcc.generators.ir2c.SignalEnvelope import SignalEnvelope
 from hvcc.generators.ir2c.SignalExpr import SignalExpr
 from hvcc.generators.ir2c.SignalLine import SignalLine
 from hvcc.generators.ir2c.SignalLorenz import SignalLorenz
-from hvcc.generators.ir2c.SignalNam import SignalNam
 from hvcc.generators.ir2c.SignalMath import SignalMath
+from hvcc.generators.ir2c.SignalNam import SignalNam
 from hvcc.generators.ir2c.SignalPhasor import SignalPhasor
 from hvcc.generators.ir2c.SignalRPole import SignalRPole
-from hvcc.generators.ir2c.SignalSample import SignalSample
 from hvcc.generators.ir2c.SignalSamphold import SignalSamphold
+from hvcc.generators.ir2c.SignalSample import SignalSample
 from hvcc.generators.ir2c.SignalSchmitt import SignalSchmitt
 from hvcc.generators.ir2c.SignalTabhead import SignalTabhead
 from hvcc.generators.ir2c.SignalTabread import SignalTabread
 from hvcc.generators.ir2c.SignalTabwrite import SignalTabwrite
 from hvcc.generators.ir2c.SignalVar import SignalVar
-
 from hvcc.types.compiler import CompilerResp, ExternInfo
 from hvcc.types.IR import IRGraph
 

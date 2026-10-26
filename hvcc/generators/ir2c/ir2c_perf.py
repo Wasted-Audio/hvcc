@@ -16,10 +16,9 @@
 
 import argparse
 import json
-
 from collections import Counter, defaultdict
-from typing import Dict
 from pathlib import Path
+from typing import Dict
 
 from hvcc.types.IR import HeavyIRType, IRGraph
 

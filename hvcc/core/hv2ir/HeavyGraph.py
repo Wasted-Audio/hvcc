@@ -15,25 +15,34 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import re
-
 from collections import Counter
-from typing import Optional, Union, Dict, List, Set, Tuple
 from pathlib import Path
-
-from .BufferPool import BufferPool
-from .Connection import Connection
-from .LocalVars import LocalVars
-from .HeavyException import HeavyException
-from .HeavyIrObject import HeavyIrObject
-from .HIrReceive import HIrReceive
-from .HeavyLangObject import HeavyLangObject
+from typing import Dict, List, Optional, Set, Tuple, Union
 
 from hvcc.types.compiler import CompilerNotif
 from hvcc.types.IR import (
-    IRObjectdict, IRGraph, IRName, IRInit, IRControl, IRReceiver,
-    IRSendMessage, IROnMessage, IRSignalList, IRSignal, IRTable, IRNumTempBuffer,
+    IRControl,
+    IRGraph,
+    IRInit,
+    IRName,
+    IRNumTempBuffer,
+    IRObjectdict,
+    IROnMessage,
+    IRReceiver,
+    IRSendMessage,
+    IRSignal,
+    IRSignalList,
+    IRTable,
 )
 from hvcc.types.Lang import LangLetType
+
+from .BufferPool import BufferPool
+from .Connection import Connection
+from .HeavyException import HeavyException
+from .HeavyIrObject import HeavyIrObject
+from .HeavyLangObject import HeavyLangObject
+from .HIrReceive import HIrReceive
+from .LocalVars import LocalVars
 
 
 class HeavyGraph(HeavyIrObject):

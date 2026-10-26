@@ -16,9 +16,9 @@
 
 from typing import Optional
 
-from .PdObject import PdObject
-
 from hvcc.types.Heavy import Heavy, HvPos
+
+from .PdObject import PdObject
 
 
 class HvSwitchcase(PdObject):

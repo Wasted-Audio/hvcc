@@ -16,8 +16,8 @@
 
 import os
 from collections import defaultdict
-from typing import Optional, Union, Dict, List
 from pathlib import Path
+from typing import Dict, List, Optional, Union
 
 from .HeavyException import HeavyException
 from .HeavyLangObject import HeavyLangObject

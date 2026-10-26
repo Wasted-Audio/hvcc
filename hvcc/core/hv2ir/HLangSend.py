@@ -14,11 +14,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from typing import Optional, Dict
+from typing import Dict, Optional
 
+from .HeavyGraph import HeavyGraph
 from .HeavyLangObject import HeavyLangObject
 from .HIrSend import HIrSend
-from .HeavyGraph import HeavyGraph
 
 
 class HLangSend(HeavyLangObject):

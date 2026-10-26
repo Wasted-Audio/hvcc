@@ -15,12 +15,12 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import re
-from typing import Optional, Dict
+from typing import Dict, Optional
 
 from .HeavyException import HeavyException
+from .HeavyGraph import HeavyGraph
 from .HeavyIrObject import HeavyIrObject
 from .HeavyLangObject import HeavyLangObject
-from .HeavyGraph import HeavyGraph
 
 
 class HLangBiquad(HeavyLangObject):

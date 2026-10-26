@@ -16,10 +16,10 @@
 
 from typing import Dict, List, Optional
 
-from .HeavyIrObject import HeavyIrObject
-from .HeavyGraph import HeavyGraph
-
 from hvcc.types.IR import IROnMessage
+
+from .HeavyGraph import HeavyGraph
+from .HeavyIrObject import HeavyIrObject
 
 
 class HIrOutlet(HeavyIrObject):

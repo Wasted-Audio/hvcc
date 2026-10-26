@@ -16,15 +16,14 @@
 
 import random
 import string
-
 from collections import defaultdict
-from typing import Optional, TYPE_CHECKING
-
-from .Connection import Connection
-from .NotificationEnum import NotificationEnum
+from typing import TYPE_CHECKING, Optional
 
 from hvcc.types.compiler import CompilerMsg, CompilerNotif
 from hvcc.types.Heavy import Heavy
+
+from .Connection import Connection
+from .NotificationEnum import NotificationEnum
 
 if TYPE_CHECKING:
     from .PdGraph import PdGraph

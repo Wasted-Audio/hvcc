@@ -15,9 +15,9 @@
 
 from typing import Dict, Optional
 
-from .HeavyIrObject import HeavyIrObject
 from .HeavyException import HeavyException
 from .HeavyGraph import HeavyGraph
+from .HeavyIrObject import HeavyIrObject
 
 
 class HIrExpr(HeavyIrObject):

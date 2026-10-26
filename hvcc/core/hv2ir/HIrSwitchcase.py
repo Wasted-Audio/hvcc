@@ -16,8 +16,8 @@
 
 from typing import Dict, Optional
 
-from .HeavyIrObject import HeavyIrObject
 from .HeavyGraph import HeavyGraph
+from .HeavyIrObject import HeavyIrObject
 
 
 class HIrSwitchcase(HeavyIrObject):

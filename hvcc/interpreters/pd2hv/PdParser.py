@@ -17,32 +17,29 @@
 import decimal
 import os
 import re
-
-from collections import Counter
-from collections import OrderedDict
+from collections import Counter, OrderedDict
 from pathlib import Path
-from typing import Optional, Type, Any, Generator
+from typing import Any, Generator, Optional, Type
 
+from .HeavyGraph import HeavyGraph  # pre-converted Heavy graphs
 from .HeavyObject import HeavyObject
-from .HeavyGraph import HeavyGraph              # pre-converted Heavy graphs
-from .HvSwitchcase import HvSwitchcase          # __switchcase
-from .PdAudioIoObject import PdAudioIoObject    # adc~/dac~
-from .PdBinopObject import PdBinopObject        # binary arithmatic operators
-from .PdExprObject import PdExprObject          # expr/expr~
-from .PdGraph import PdGraph                    # canvas
-from .PdLetObject import PdLetObject            # inlet/inlet~/outlet/outlet~
-from .PdMessageObject import PdMessageObject    # msg
-from .PdPackObject import PdPackObject          # pack
-from .PdReceiveObject import PdReceiveObject    # r/r~/receive/receive~/catch~
-from .PdRouteObject import PdRouteObject        # route
-from .PdSelectObject import PdSelectObject      # select/sel
-from .PdSendObject import PdSendObject          # s/s~/send/send~/throw~
-from .PdTriggerObject import PdTriggerObject    # trigger/t
-from .PdTableObject import PdTableObject        # table
-from .PdUnpackObject import PdUnpackObject      # unpack
-from .PdLibSignalGraph import PdLibSignalGraph  # pd/lib abstraction connection checks
-
+from .HvSwitchcase import HvSwitchcase  # __switchcase
 from .NotificationEnum import NotificationEnum
+from .PdAudioIoObject import PdAudioIoObject  # adc~/dac~
+from .PdBinopObject import PdBinopObject  # binary arithmatic operators
+from .PdExprObject import PdExprObject  # expr/expr~
+from .PdGraph import PdGraph  # canvas
+from .PdLetObject import PdLetObject  # inlet/inlet~/outlet/outlet~
+from .PdLibSignalGraph import PdLibSignalGraph  # pd/lib abstraction connection checks
+from .PdMessageObject import PdMessageObject  # msg
+from .PdPackObject import PdPackObject  # pack
+from .PdReceiveObject import PdReceiveObject  # r/r~/receive/receive~/catch~
+from .PdRouteObject import PdRouteObject  # route
+from .PdSelectObject import PdSelectObject  # select/sel
+from .PdSendObject import PdSendObject  # s/s~/send/send~/throw~
+from .PdTableObject import PdTableObject  # table
+from .PdTriggerObject import PdTriggerObject  # trigger/t
+from .PdUnpackObject import PdUnpackObject  # unpack
 
 
 class PdParser:
