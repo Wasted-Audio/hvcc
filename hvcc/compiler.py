@@ -247,14 +247,13 @@ def compile_dataflow(
         return add_error(results, f"Unknown input path {in_path}")
 
     # meta-data file
-    if patch_meta_file is not None:
-        if patch_meta_file.is_file():
-            with open(patch_meta_file) as json_file:
-                try:
-                    patch_meta_json = json.load(json_file)
-                    patch_meta = Meta(**patch_meta_json)
-                except Exception as e:
-                    return add_error(results, f"Unable to open json_file: {e}")
+    if patch_meta_file is not None and patch_meta_file.is_file():
+        with open(patch_meta_file) as json_file:
+            try:
+                patch_meta_json = json.load(json_file)
+                patch_meta = Meta(**patch_meta_json)
+            except Exception as e:
+                return add_error(results, f"Unable to open json_file: {e}")
 
     patch_name = patch_meta.name or patch_name
     generators = ["c"] if generators is None else [x.lower() for x in generators]

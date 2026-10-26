@@ -97,10 +97,9 @@ class c2wwise(Generator):
                 raise Exception("Wwise plugins support only mono, stereo, 5.1, 7.1, "
                                 "and 7.1.4 (Atmos) configurations, number of [dac~] channels should be appropriate")
 
-            if plugin_type == "FX":
-                if num_input_channels != num_output_channels:
-                    raise Exception("Wwise FX plugins require the same input/output channel"
-                                    "configuration (i.e. [adc~ 1] -> [dac~ 1]).")
+            if plugin_type == "FX" and  num_input_channels != num_output_channels:
+                raise Exception("Wwise FX plugins require the same input/output channel"
+                                "configuration (i.e. [adc~ 1] -> [dac~ 1]).")
 
             patch_src_dir = Path(out_dir, "SoundEnginePlugin", "Heavy")
             if patch_src_dir.exists():

@@ -248,9 +248,9 @@ def generate_header(board_description_dict: dict) -> 'tuple[str, dict]':
     else:
         replacements['display'] = ''
 
-    if 'defines' in target:
-        # deprecate old oopsy syntax at some point
-        if target['defines'].get('HAS_MIDI') or target['defines'].get('OOPSY_TARGET_HAS_MIDI_INPUT'):
+    if 'defines' in target and \
+        (target['defines'].get('HAS_MIDI') or target['defines'].get('OOPSY_TARGET_HAS_MIDI_INPUT')):
+            # deprecate old oopsy syntax at some point
             target['has_midi'] = True
             replacements['midi'] = """daisy::MidiUartHandler midi;"""
 

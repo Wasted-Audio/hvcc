@@ -35,12 +35,11 @@ class HIrSend(HeavyIrObject):
         annotations: Optional[dict] = None
     ) -> None:
         super().__init__("__send", args=args, graph=graph, annotations=annotations)
-        if args is not None and args["extern"]:
-            # output parameters must contain only alphanumeric characters or underscores,
-            # so that the names can be easily and transparently turned into code
-            if re.search(r"\W", args["name"]):
-                self.add_error(f"Parameter and Event names may only contain \
-                                alphanumeric characters or underscore: '{args['name']}'")
+        # output parameters must contain only alphanumeric characters or underscores,
+        # so that the names can be easily and transparently turned into code
+        if args is not None and args["extern"] and re.search(r"\W", args["name"]):
+            self.add_error(f"Parameter and Event names may only contain \
+                            alphanumeric characters or underscore: '{args['name']}'")
 
     def get_ir_control_list(self) -> list[IRSendMessage]:
         if self.graph is not None and self.name is not None:

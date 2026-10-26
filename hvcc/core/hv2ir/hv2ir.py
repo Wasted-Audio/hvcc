@@ -101,18 +101,17 @@ class hv2ir:
             with open(ir_file, "w") as f:
                 json.dump(ir.model_dump(), f, indent=4)
 
-            if verbose and ir is not None:
-                if len(ir.signal.processOrder) > 0:
-                    print("")
-                    print("=== Signal Order ===")
-                    for so in ir.signal.processOrder:
-                        o = ir.objects[so.id]
-                        if len(o.args) > 0:
-                            print("{0} {{{1}}}".format(
-                                o.type,
-                                " ".join([f"{k}:{v}" for k, v in o.args.items()])))
-                        else:
-                            print(o.type)
+            if verbose and ir is not None and len(ir.signal.processOrder) > 0:
+                print("")
+                print("=== Signal Order ===")
+                for so in ir.signal.processOrder:
+                    o = ir.objects[so.id]
+                    if len(o.args) > 0:
+                        print("{0} {{{1}}}".format(
+                            o.type,
+                            " ".join([f"{k}:{v}" for k, v in o.args.items()])))
+                    else:
+                        print(o.type)
 
         return CompilerResp(
             stage="hv2ir",

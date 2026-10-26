@@ -100,31 +100,30 @@ class HeavyGraph(HeavyIrObject):
         args = dict(obj_args)  # make a copy of the input arguments
         for key, value in args.items():
             # do any of them reference a variable input?
-            if isinstance(value, str):
-                if value.find("$") > -1:
-                    # is there a value provided for that key in the graph arguments?
-                    for k in self.args:
-                        # replace all instances of $k with the argument value
-                        # do this for all keys in the graph's argument dictionary
-                        dollar_key = f"${k}"
-                        if value.find(dollar_key) > -1:
-                            if value == dollar_key:
-                                value = self.args[k]  # maintain the original data type
-                                break  # break because all dollar arguments have by definition been replaced
-                            else:
-                                # otherwise assume a string value
-                                value = value.replace(dollar_key, str(self.args[k]))
-                                # continue around the loop in case value has multiple dollar args
+            if isinstance(value, str) and value.find("$") > -1:
+                # is there a value provided for that key in the graph arguments?
+                for k in self.args:
+                    # replace all instances of $k with the argument value
+                    # do this for all keys in the graph's argument dictionary
+                    dollar_key = f"${k}"
+                    if value.find(dollar_key) > -1:
+                        if value == dollar_key:
+                            value = self.args[k]  # maintain the original data type
+                            break  # break because all dollar arguments have by definition been replaced
+                        else:
+                            # otherwise assume a string value
+                            value = value.replace(dollar_key, str(self.args[k]))
+                            # continue around the loop in case value has multiple dollar args
 
-                    if isinstance(value, str) and value.find("$") > -1:
-                        # if the variable cannot be resolved, leave it alone.
-                        # When the arguments are passed to the object, they will be
-                        # set to the default value. These unset variables are simply
-                        # removed from the argument dictionary
-                        args.pop(key, None)
-                        self.add_warning(f"Variable \"{key}\":\"{value}\" could not be resolved.")
-                    else:
-                        args[key] = value
+                if isinstance(value, str) and value.find("$") > -1:
+                    # if the variable cannot be resolved, leave it alone.
+                    # When the arguments are passed to the object, they will be
+                    # set to the default value. These unset variables are simply
+                    # removed from the argument dictionary
+                    args.pop(key, None)
+                    self.add_warning(f"Variable \"{key}\":\"{value}\" could not be resolved.")
+                else:
+                    args[key] = value
         return args
 
     def connect_objects(self, c: Connection, require_intra_graph_connection: bool = True) -> None:

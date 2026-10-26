@@ -101,9 +101,8 @@ class PdReceiveObject(PdObject):
                 self.add_error(str(e))
 
     def validate_configuration(self) -> None:
-        if self.obj_type in ("r~", "receive~"):
-            if len(self._inlet_connections.get("0", [])) > 0:
-                self.add_error("[receive~] inlet connections are not supported.")
+        if self.obj_type in ("r~", "receive~") and len(self._inlet_connections.get("0", [])) > 0:
+            self.add_error("[receive~] inlet connections are not supported.")
 
     def to_hv(self) -> Heavy:
         # note: control rate send objects should not modify their name argument
