@@ -51,7 +51,7 @@ class PdObject:
         self.pos_y = pos_y
 
         # this is set when the object is added to a graph
-        self.parent_graph: 'PdGraph' | None = None
+        self.parent_graph: PdGraph | None = None
 
         self._inlet_connections: dict = defaultdict(list)
         self._outlet_connections: dict = defaultdict(list)

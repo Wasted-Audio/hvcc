@@ -4,14 +4,8 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 import re
-import sys
 from enum import IntEnum
 from typing import Literal
-
-if sys.version_info >= (3, 11):  # noqa: UP036
-    from typing import Self
-else:
-    from typing_extensions import Self  # noqa: UP035
 
 from pydantic import BaseModel, HttpUrl, model_validator
 
@@ -58,7 +52,7 @@ class DPFPortGroups(BaseModel):
     params: dict[str, list[str]] = {}
 
     @model_validator(mode='after')
-    def check_groups(self) -> Self:
+    def check_groups(self) -> 'DPFPortGroups':
         # a parameter may only belong to a single group
         seen: dict[str, str] = {}
 
@@ -130,7 +124,7 @@ class DPF(BaseModel):
     clap_info:          list[str] = []
 
     @model_validator(mode='after')
-    def au_required(self) -> Self:
+    def au_required(self) -> 'DPF':
         if 'au' in self.plugin_formats:
             if self.brand_id is None:
                 raise ValueError("brand_id is required for au plugins")
