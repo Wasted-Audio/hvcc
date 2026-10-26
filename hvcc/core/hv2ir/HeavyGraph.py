@@ -757,7 +757,7 @@ class HeavyGraph(HeavyIrObject):
         for name, receivers in self.local_vars.get_registered_objects_for_type("__receive").items():
 
             # ensure that all receiver arguments are consistent
-            extern = list(set([r.args["extern"] for r in receivers]) - set([None]))
+            extern = list(set([r.args["extern"] for r in receivers]) - {None})
             attributes = [r.args["attributes"] for r in receivers if len(r.args["attributes"]) > 0]
             scope = list(set([r.annotations["scope"] for r in receivers]))
 

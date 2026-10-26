@@ -33,7 +33,7 @@ class PdUnpackObject(PdObject):
 
         if len(self.obj_args) == 0:
             self.add_error("Unpack requires at least one argument.")
-        if not (set(self.obj_args) <= set(["f", "s"])):
+        if not (set(self.obj_args) <= {"f", "s"}):
             self.add_warning("Heavy only supports arguments 'f' and 's' to unpack.")
 
     def to_hv(self) -> Heavy:

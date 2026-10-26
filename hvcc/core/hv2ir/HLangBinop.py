@@ -201,7 +201,7 @@ class HLangBinop(HeavyLangObject):
             v = HeavyIrObject("__var~f")
             vr = HeavyIrObject("__varread~f", args={"var_id": v.id})
 
-            obj_set = set([x, v, vr])
+            obj_set = {x, v, vr}
             connections = [(None, [Connection(vr, 0, x, 0, "~f>")])]
             for c in self.inlet_connections[0]:
                 connections.append((c, [c.copy(to_object=v, inlet_index=0)]))

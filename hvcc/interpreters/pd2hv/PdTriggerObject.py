@@ -39,7 +39,7 @@ class PdTriggerObject(PdObject):
         if len(self.obj_args) == 0:
             self.obj_args = ["b", "b"]
             self.add_warning("A trigger with no arguments defualts to [t b b].")
-        if obj_args is not None and not (set(obj_args) <= set(["a", "f", "s", "b"])):
+        if obj_args is not None and not (set(obj_args) <= {"a", "f", "s", "b"}):
             self.add_error(
                 "Heavy only supports arguments 'a', 'f', 's', and 'b'.",
                 NotificationEnum.ERROR_TRIGGER_ABFS)
