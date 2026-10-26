@@ -574,7 +574,7 @@ class PdParser:
                             "else/popmenu": (7, 6),
                         }
 
-                        if obj_type in arg_index.keys():
+                        if obj_type in arg_index:
                             send_index = arg_index[obj_type][0]
                             recv_index = arg_index[obj_type][1]
 
@@ -844,7 +844,7 @@ class PdParser:
         gui_recv: dict
     ) -> PdGraph:
         # parse remote messages
-        for index in msg_send.keys():
+        for index in msg_send:
             first_msg = g.get_object(index)
             conns = first_msg.get_inlet_connections()
 
@@ -866,7 +866,7 @@ class PdParser:
                 g.add_parsed_connection(msg_index, 0, send_index, 0)
 
         # parse gui sends
-        for index in gui_send.keys():
+        for index in gui_send:
             self.obj_counter["send"] += 1
             send = PdSendObject('send', gui_send[index].split())
             send_index = g.add_object(send)
@@ -874,7 +874,7 @@ class PdParser:
             g.add_parsed_connection(index, 0, send_index, 0)
 
         # parse gui receives
-        for index in gui_recv.keys():
+        for index in gui_recv:
             self.obj_counter["receive"] += 1
             recv = PdReceiveObject('receive', gui_recv[index].split())
             recv_index = g.add_object(recv)

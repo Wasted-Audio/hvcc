@@ -83,7 +83,7 @@ class HeavyIrObject(HeavyLangObject):
         """ Resolves missing default arguments. Also checks to make sure that all
             required arguments are present.
         """
-        if self.type in self.__HEAVY_OBJS_IR_DICT.keys():
+        if self.type in self.__HEAVY_OBJS_IR_DICT:
             for arg in self.__obj_desc.args:
                 if arg.name not in self.args:
                     # if a defined argument is not in the argument dictionary
@@ -105,7 +105,7 @@ class HeavyIrObject(HeavyLangObject):
     def is_ir(cls, obj_type: str) -> bool:
         """Returns true if the type is an IR object. False otherwise.
         """
-        return obj_type in cls.__HEAVY_OBJS_IR_DICT.keys()
+        return obj_type in cls.__HEAVY_OBJS_IR_DICT
 
     @property
     def does_process_signal(self) -> bool:

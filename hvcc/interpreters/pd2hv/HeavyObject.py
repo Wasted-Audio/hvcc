@@ -163,11 +163,11 @@ class HeavyObject(PdObject):
 
     @property
     def is_hvlang(self) -> bool:
-        return self.obj_type in self.__HEAVY_LANG_OBJS.keys()
+        return self.obj_type in self.__HEAVY_LANG_OBJS
 
     @property
     def is_hvir(self) -> bool:
-        return self.obj_type in self.__HEAVY_IR_OBJS.keys()
+        return self.obj_type in self.__HEAVY_IR_OBJS
 
     def get_inlet_connection_type(self, inlet_index: int) -> str | None:
         """ Returns the inlet connection type, None if the inlet does not exist.

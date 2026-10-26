@@ -66,7 +66,7 @@ def load_nam_file(nam_file: Path) -> tuple[ModelNet, int, list[float]]:
     with nam_file.open("r", encoding="utf-8") as f:
         payload = json.load(f)
 
-    if "weights" not in payload.keys() or not isinstance(payload["weights"], list):
+    if "weights" not in payload or not isinstance(payload["weights"], list):
         raise ValueError("Input .nam file must contain a 'weights' array")
 
     weights = payload["weights"]

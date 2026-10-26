@@ -43,7 +43,7 @@ class ir2c_perf:
         for o in ir.signal.processOrder:
             obj_id = o.id
             obj_type = ir.objects[obj_id].type
-            if obj_type in HEAVY_IR_JSON.keys():
+            if obj_type in HEAVY_IR_JSON:
                 objects[obj_type] += 1
                 obj_perf = HEAVY_IR_JSON[obj_type].perf
                 assert obj_perf is not None

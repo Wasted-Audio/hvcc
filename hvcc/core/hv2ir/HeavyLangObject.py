@@ -203,7 +203,7 @@ class HeavyLangObject:
         """ Resolves missing default arguments. Also checks to make sure that all
             required arguments are present. Does nothing if the object is IR.
         """
-        if self.type in self._HEAVY_LANG_DICT.keys():
+        if self.type in self._HEAVY_LANG_DICT:
             for arg in self._obj_desc.args:
                 if arg.name not in self.args:
                     # if a defined argument is not in the argument dictionary

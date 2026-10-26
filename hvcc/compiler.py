@@ -109,7 +109,7 @@ def count_midi_objects(hvir: IRGraph) -> dict[str, list[str]]:
         '__hv_touchout',
     ]
 
-    for recv in hvir.control.receivers.keys():
+    for recv in hvir.control.receivers:
         if recv in midi_in_objs:
             in_midi.append(recv)
 
