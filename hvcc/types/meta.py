@@ -8,10 +8,10 @@ import sys
 from enum import IntEnum
 from typing import Literal
 
-if sys.version_info >= (3, 11):
+if sys.version_info >= (3, 11):  # noqa: UP036
     from typing import Self
 else:
-    from typing_extensions import Self
+    from typing_extensions import Self  # noqa: UP035
 
 from pydantic import BaseModel, HttpUrl, model_validator
 

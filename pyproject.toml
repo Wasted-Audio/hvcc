@@ -60,4 +60,8 @@ plugins = [
 ]
 
 [tool.ruff.lint]
-ignore = ["UP030"]
+ignore = [
+    "N999",
+    "UP030",
+    "UP032"
+]
