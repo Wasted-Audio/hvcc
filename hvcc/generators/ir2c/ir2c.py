@@ -19,7 +19,10 @@ import json
 import shutil
 import time
 from collections import Counter, OrderedDict
+from collections.abc import Mapping
 from pathlib import Path
+from types import MappingProxyType
+from typing import Final
 
 import jinja2
 
@@ -72,7 +75,7 @@ from hvcc.types.IR import IRGraph
 
 class ir2c:
 
-    __OBJECT_CLASS_DICT = {
+    __OBJECT_CLASS_DICT: Final[Mapping[str, type]] = MappingProxyType({
         "__delay": ControlDelay,
         "__if": ControlIf,
         "__print": ControlPrint,
@@ -120,10 +123,10 @@ class ir2c:
         "__pack": ControlPack,
         "__rpole~f": SignalRPole,
         "__cpole~f": SignalCPole
-    }
+    })
 
     # the base set of C files necessary for the patch
-    __BASE_FILE_SET = {
+    __BASE_FILE_SET: Final[frozenset[str]] = frozenset({
         "HeavyContextInterface.hpp",
         "HeavyContext.hpp", "HeavyContext.cpp",
         "HvHeavy.h", "HvHeavyInternal.h", "HvHeavy.cpp",
@@ -133,7 +136,7 @@ class ir2c:
         "HvTable.h", "HvTable.c",
         "HvMessage.h", "HvMessage.c",
         "HvLightPipe.h", "HvLightPipe.c"
-    }
+    })
 
     @classmethod
     def filter_hvhash(cls, x: float | str) -> str:

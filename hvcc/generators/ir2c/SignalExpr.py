@@ -13,6 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from typing import ClassVar
 
 from hvcc.types.IR import IRSignalList
 
@@ -26,7 +27,7 @@ class SignalExpr(HeavyObject):
     """
 
     preamble = "cExprSig"
-    obj_eval_functions: dict = {}
+    obj_eval_functions: ClassVar[dict[str, str]] = {}
 
     @classmethod
     def handles_type(cls, obj_type: str) -> bool:

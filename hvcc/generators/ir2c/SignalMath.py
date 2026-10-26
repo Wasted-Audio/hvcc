@@ -14,6 +14,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from collections.abc import Mapping
+from types import MappingProxyType
+from typing import Final
 
 from hvcc.types.IR import IRSignalList
 
@@ -25,7 +28,7 @@ class SignalMath(HeavyObject):
     """
 
     # translation from operation to function preamble
-    __OPERATION_DICT = {
+    __OPERATION_DICT: Final[Mapping[str, str]] = MappingProxyType({
         "__add~f": "__hv_add_f",
         "__add~i": "__hv_add_i",
         "__sub~f": "__hv_sub_f",
@@ -84,7 +87,7 @@ class SignalMath(HeavyObject):
         "__bit_or~f": "__hv_bit_or_f",      # bitwise or
         "__bit_and~f": "__hv_bit_and_f",    # bitwise and
         "__bit_not~f": "__hv_bit_not_f",    # bitwise not
-    }
+    })
 
     @classmethod
     def handles_type(cls, obj_type: str) -> bool:

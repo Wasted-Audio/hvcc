@@ -14,13 +14,16 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from collections.abc import Mapping
+from types import MappingProxyType
+from typing import Final
 
 from .HeavyObject import HeavyObject
 
 
 class ControlUnop(HeavyObject):
     # a dictionary translating from the operation argument to the C case
-    __OPERATION_DICT = {
+    __OPERATION_DICT: Final[Mapping[str, str]] = MappingProxyType({
         "__cos": "HV_UNOP_COS",
         "__acos": "HV_UNOP_ACOS",
         "__cosh": "HV_UNOP_COSH",
@@ -42,7 +45,7 @@ class ControlUnop(HeavyObject):
         "__ceil": "HV_UNOP_CEIL",
         "__floor": "HV_UNOP_FLOOR",
         "__round": "HV_UNOP_ROUND"
-    }
+    })
 
     c_struct = "ControlUnop"
     preamble = "cUnop"

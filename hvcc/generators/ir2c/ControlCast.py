@@ -15,15 +15,18 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
+from types import MappingProxyType
+from typing import Final, Mapping
+
 from .HeavyObject import HeavyObject
 
 
 class ControlCast(HeavyObject):
-    __OPERATION_DICT = {
+    __OPERATION_DICT: Final[Mapping[str, str]] = MappingProxyType({
         "__cast_b": "HV_CAST_BANG",
         "__cast_f": "HV_CAST_FLOAT",
         "__cast_s": "HV_CAST_SYMBOL"
-    }
+    })
 
     c_struct = "ControlCast"
     preamble = "cCast"

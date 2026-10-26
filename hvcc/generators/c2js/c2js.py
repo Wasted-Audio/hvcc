@@ -19,6 +19,7 @@ import subprocess
 import time
 from pathlib import Path
 from shutil import which
+from typing import Final
 
 import jinja2
 
@@ -41,7 +42,7 @@ class c2js(Generator):
     emscripten library to be installed - https://github.com/kripken/emscripten
     """
 
-    __HV_API = [
+    __HV_API: Final[frozenset[str]] = frozenset({
         "_hv_{0}_new",
         "_hv_{0}_new_with_options",
         "_hv_delete",
@@ -68,7 +69,7 @@ class c2js(Generator):
         "_hv_sendMessageToReceiverFF",
         "_hv_sendMessageToReceiverFFF",
         "_malloc"  # Rationale: https://github.com/emscripten-core/emscripten/issues/6882#issuecomment-406745898
-    ]
+    })
 
     @classmethod
     def run_emscripten(

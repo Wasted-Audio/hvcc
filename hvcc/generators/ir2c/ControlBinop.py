@@ -14,13 +14,16 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from collections.abc import Mapping
+from types import MappingProxyType
+from typing import Final
 
 from .HeavyObject import HeavyObject
 
 
 class ControlBinop(HeavyObject):
     # a dictionary translating from the operation argument to the C case
-    __OPERATION_DICT = {
+    __OPERATION_DICT: Final[Mapping[str, str]] = MappingProxyType({
         "__add": "HV_BINOP_ADD",
         "__add_k": "HV_BINOP_ADD",
         "__sub": "HV_BINOP_SUBTRACT",
@@ -70,7 +73,7 @@ class ControlBinop(HeavyObject):
         "__unimod_k": "HV_BINOP_MOD_UNIPOLAR",
         "__bimod": "HV_BINOP_MOD_BIPOLAR",
         "__bimod_k": "HV_BINOP_MOD_BIPOLAR"
-    }
+    })
 
     c_struct = "ControlBinop"
     preamble = "cBinop"

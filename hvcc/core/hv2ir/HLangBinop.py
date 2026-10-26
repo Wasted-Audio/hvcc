@@ -14,7 +14,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from typing import Optional
+from collections.abc import Mapping
+from types import MappingProxyType
+from typing import Final, Optional
 
 from .Connection import Connection
 from .HeavyGraph import HeavyGraph
@@ -24,31 +26,31 @@ from .HeavyLangObject import HeavyLangObject
 
 class HLangBinop(HeavyLangObject):
 
-    __HEAVY_DICT = {
-        "+": ["__add", "__add_k", "__add~f", "__add~i"],
-        "-": ["__sub", "__sub_k", "__sub~f", "__sub~i"],
-        "*": ["__mul", "__mul_k", "__mul~f", "__mul~i"],
-        "/": ["__div", "__div_k", "__div~f", "__div~i"],
-        "max": ["__max", "__max_k", "__max~f", "__max~i"],
-        "min": ["__min", "__min_k", "__min~f", "__min~i"],
-        ">": ["__gt", "__gt_k", "__gt~f", "__gt~i"],
-        ">=": ["__gte", "__gte_k", "__gte~f", "__gte~i"],
-        "==": ["__eq", "__eq_k", "__eq~f", "__eq~i"],
-        "!=": ["__neq", "__neq_k", "__neq~f", "__neq~i"],
-        "<": ["__lt", "__lt_k", "__lt~f", "__lt~i"],
-        "<=": ["__lte", "__lte_k", "__lte~f", "__lte~i"],
-        "&": ["__and", "__and_k", "__and~f", "__and~i"],  # binary and
-        "&&": ["__logand", "__logand_k"],  # logical or
-        "&!": ["__andnot", "__andnot~f", "__andnot~i"],
-        "|": ["__or", "__or_k", "__or~f", "__or~i"],  # binary or
-        "||": ["__logor", "__logor_k"],  # logical or
-        "pow": ["__pow", "__pow_k", "__pow~f", "__pow~i"],
-        "atan2": ["__atan2", "__atan2_k", "__atan2~f"],
-        "mod": ["__unimod", "__unimod_k"],
-        "%": ["__bimod", "__bimod_k"],
-        ">>": ["__shiftright", "__shiftright_k"],  # binary right shift
-        "<<": ["__shiftleft", "__shiftleft_k"]  # binary left shift
-    }
+    __HEAVY_DICT: Final[Mapping[str, tuple[str, ...]]] = MappingProxyType({
+        "+": ("__add", "__add_k", "__add~f", "__add~i"),
+        "-": ("__sub", "__sub_k", "__sub~f", "__sub~i"),
+        "*": ("__mul", "__mul_k", "__mul~f", "__mul~i"),
+        "/": ("__div", "__div_k", "__div~f", "__div~i"),
+        "max": ("__max", "__max_k", "__max~f", "__max~i"),
+        "min": ("__min", "__min_k", "__min~f", "__min~i"),
+        ">": ("__gt", "__gt_k", "__gt~f", "__gt~i"),
+        ">=": ("__gte", "__gte_k", "__gte~f", "__gte~i"),
+        "==": ("__eq", "__eq_k", "__eq~f", "__eq~i"),
+        "!=": ("__neq", "__neq_k", "__neq~f", "__neq~i"),
+        "<": ("__lt", "__lt_k", "__lt~f", "__lt~i"),
+        "<=": ("__lte", "__lte_k", "__lte~f", "__lte~i"),
+        "&": ("__and", "__and_k", "__and~f", "__and~i"),    # binary and
+        "&&": ("__logand", "__logand_k"),                   # logical or
+        "&!": ("__andnot", "__andnot~f", "__andnot~i"),
+        "|": ("__or", "__or_k", "__or~f", "__or~i"),        # binary or
+        "||": ("__logor", "__logor_k"),                     # logical or
+        "pow": ("__pow", "__pow_k", "__pow~f", "__pow~i"),
+        "atan2": ("__atan2", "__atan2_k", "__atan2~f"),
+        "mod": ("__unimod", "__unimod_k"),
+        "%": ("__bimod", "__bimod_k"),
+        ">>": ("__shiftright", "__shiftright_k"),           # binary right shift
+        "<<": ("__shiftleft", "__shiftleft_k")              # binary left shift
+    })
 
     def __init__(
         self,

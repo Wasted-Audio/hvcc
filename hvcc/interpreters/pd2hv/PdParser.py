@@ -20,7 +20,7 @@ import re
 from collections import Counter, OrderedDict
 from collections.abc import Generator
 from pathlib import Path
-from typing import Any
+from typing import Any, ClassVar
 
 from .HeavyGraph import HeavyGraph  # pre-converted Heavy graphs
 from .HeavyObject import HeavyObject
@@ -792,7 +792,7 @@ class PdParser:
         return resolved_obj_args
 
     # a mapping of Pd objects to the classes that will parse them
-    __PD_CLASSES = {
+    __PD_CLASSES: ClassVar[dict[str, type]] = {
         "adc~": PdAudioIoObject,
         "dac~": PdAudioIoObject,
         "expr": PdExprObject,

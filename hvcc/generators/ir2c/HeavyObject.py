@@ -14,8 +14,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from collections.abc import Callable
+from collections.abc import Callable, Mapping
 from struct import pack, unpack
+from types import MappingProxyType
+from typing import Final
 
 from hvcc.types.IR import IRBuffer, IRObjectdict, IROnMessage, IRSignalList
 
@@ -25,13 +27,13 @@ class HeavyObject:
     c_struct = ""
     preamble = ""
 
-    __C_BUFFER_DICT = {
+    __C_BUFFER_DICT: Final[Mapping[str, str]] = MappingProxyType({
         "~f>": "Bf",
         "~i>": "Bi",
         "input": "I",
         "output": "O",
         "zero": "ZERO"
-    }
+    })
 
     @classmethod
     def get_C_struct(cls, obj_type: str = "") -> str:

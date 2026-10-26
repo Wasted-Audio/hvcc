@@ -14,6 +14,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from collections.abc import Mapping
+from types import MappingProxyType
+from typing import Final
 
 from hvcc.types.Heavy import Heavy, HvPos
 
@@ -24,7 +27,7 @@ from .PdObject import PdObject
 
 class PdBinopObject(PdObject):
     # a translation dictionary from a Pd object to corresponding heavy object
-    __PD_HEAVY_DICT_PD = {
+    __PD_HEAVY_DICT_PD: Final[Mapping[str, str]] = MappingProxyType({
         "+": "+",
         "+~": "+",
         "-": "-",
@@ -53,9 +56,9 @@ class PdBinopObject(PdObject):
         "pow~": "pow",
         ">>": ">>",
         "<<": "<<",
-    }
+    })
 
-    __PD_HEAVY_DICT_CYCLONE = {
+    __PD_HEAVY_DICT_CYCLONE: Final[Mapping[str, str]] = MappingProxyType({
         ">~": ">",
         "greaterthan~": ">",
         ">=~": ">=",
@@ -68,13 +71,13 @@ class PdBinopObject(PdObject):
         "equals~": "==",
         "!=~": "!=",
         "notequals~": "!="
-    }
+    })
 
-    __PD_HEAVY_DICT = {
+    __PD_HEAVY_DICT: Final[Mapping[str, str]] = MappingProxyType({
         **__PD_HEAVY_DICT_PD,
         **__PD_HEAVY_DICT_CYCLONE,
         **{f"cyclone/{k}": v for k, v in __PD_HEAVY_DICT_CYCLONE.items()},
-    }
+    })
 
     def __init__(
         self,

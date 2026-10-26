@@ -14,6 +14,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import re
+from collections.abc import Mapping
+from types import MappingProxyType
+from typing import Final
 
 from .expr_arpeggio_parser import ExprArpeggioParser, ExprNode, ParseExpr
 
@@ -176,7 +179,7 @@ class ExprCWriter:
 
 
 class ExprOpMap:
-    op_map = {
+    __OP_MAP: Final[Mapping[str, str]] = MappingProxyType({
         "~":            "hv_bit_not_f",
         "!":            "hv_not_f",
         "*":            "hv_mul_f",
@@ -250,12 +253,12 @@ class ExprOpMap:
         "trunc":        "hv_cast_fi_expr",
         "_load_f":      "hv_var_k_f",
         "_load_i":      "hv_var_k_i",
-    }
+    })
 
     @classmethod
     def get_hv_func(cls, symbol: str) -> str:
-        return cls.op_map[symbol]
+        return cls.__OP_MAP[symbol]
 
     @classmethod
     def get_hv_func_simd(cls, symbol: str) -> str:
-        return f"__{cls.op_map[symbol]}"
+        return f"__{cls.__OP_MAP[symbol]}"
