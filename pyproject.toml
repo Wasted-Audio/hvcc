@@ -58,3 +58,6 @@ build-backend = "poetry.core.masonry.api"
 plugins = [
   "pydantic.mypy"
 ]
+
+[tool.ruff.lint]
+ignore = ["UP030"]
