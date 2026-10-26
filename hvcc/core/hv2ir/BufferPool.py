@@ -15,7 +15,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from collections import defaultdict
-from typing import Optional
 
 from .HeavyException import HeavyException
 
@@ -31,7 +30,7 @@ class BufferPool:
             "~i>": defaultdict(list)
         }
 
-    def num_buffers(self, connection_type: Optional[str] = None) -> int:
+    def num_buffers(self, connection_type: str | None = None) -> int:
         """ Returns the number of buffers with the given retain count. By default returns
             the size of the entire pool. Number of buffers per connection type can also be retrieved.
         """
@@ -42,7 +41,7 @@ class BufferPool:
         else:
             raise HeavyException(f"Unknown connection type: \"{connection_type}\"")
 
-    def get_buffer(self, connection_type: str, count: int = 1, excludeSet: Optional[set] = None) -> tuple[str, int]:
+    def get_buffer(self, connection_type: str, count: int = 1, excludeSet: set | None = None) -> tuple[str, int]:
         """ Returns a currently unused buffer. The buffer can be assigned a retain count. An optional
             exclude set can also be supplied, ensuring that the returned buffer is not one of them.
         """

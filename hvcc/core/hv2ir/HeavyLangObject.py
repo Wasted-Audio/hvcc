@@ -20,7 +20,7 @@ import random
 import string
 from pathlib import Path
 from struct import pack, unpack
-from typing import TYPE_CHECKING, Any, Optional, Union
+from typing import TYPE_CHECKING, Any, Optional
 
 from hvcc.types.compiler import CompilerMsg, CompilerNotif
 from hvcc.types.Lang import HeavyLangType, LangLet, LangLetType, LangNode, LangValueType
@@ -47,11 +47,11 @@ class HeavyLangObject:
     def __init__(
         self,
         obj_type: str,
-        args: Optional[dict] = None,
+        args: dict | None = None,
         graph: Optional['HeavyGraph'] = None,
         num_inlets: int = -1,
         num_outlets: int = -1,
-        annotations: Optional[dict] = None
+        annotations: dict | None = None
     ) -> None:
         # set the object type
         self.type = obj_type
@@ -103,7 +103,7 @@ class HeavyLangObject:
         return self.annotations.get("const", False)
 
     @property
-    def name(self) -> Optional[str]:
+    def name(self) -> str | None:
         """ Returns the name of this object. Returns None if there is no name.
         """
         return self.args.get("name", None)
@@ -149,7 +149,7 @@ class HeavyLangObject:
     def force_arg_type(
         cls,
         value: LangValueType,
-        value_type: Optional[str] = None,
+        value_type: str | None = None,
         graph: Optional['HeavyGraph'] = None
     ) -> Any:
         """ Attempts to convert a value to a given value type. Raises an Exception otherwise.
@@ -299,13 +299,13 @@ class HeavyLangObject:
                 fmt.append("m")
         return "".join(fmt)
 
-    def has_inlet_connection_format(self, fmts: Optional[Union[str, list]] = None) -> bool:
+    def has_inlet_connection_format(self, fmts: str | list | None = None) -> bool:
         """ Returns true if the object has given format at its inlets.
         """
         fmts = fmts if isinstance(fmts, list) else [fmts]
         return self._get_connection_format(self.inlet_connections) in fmts
 
-    def has_outlet_connection_format(self, fmts: Optional[Union[str, list]] = None) -> bool:
+    def has_outlet_connection_format(self, fmts: str | list | None = None) -> bool:
         """ Returns true if the object has given format at its outlets.
             Take either litteral or list as input.
         """
@@ -322,7 +322,7 @@ class HeavyLangObject:
         """
         return all(len(c) == 0 for c in self.inlet_connections)
 
-    def _resolved_outlet_type(self, outlet_index: int = 0) -> Optional[LangLetType]:
+    def _resolved_outlet_type(self, outlet_index: int = 0) -> LangLetType | None:
         """ Returns the connection type expected at the given outlet.
             The result may be influenced by the state of the input connections.
         """
@@ -349,7 +349,7 @@ class HeavyLangObject:
 
         return None
 
-    def _resolve_connection_types(self, obj_stack: Optional[set] = None) -> None:
+    def _resolve_connection_types(self, obj_stack: set | None = None) -> None:
         """ Resolves the type of all connections before reduction to IR object types.
             If connections incident on an object are incompatible, they are either
             resolved, potentially by inserting conversion objects, or pruned.
@@ -374,7 +374,7 @@ class HeavyLangObject:
                 c.to_object._resolve_connection_types(obj_stack)  # turtle all the way down
 
     @classmethod
-    def get_hash(cls, x: Union[str, float, int]) -> int:
+    def get_hash(cls, x: str | float | int) -> int:
         """ Compute the message element hash used by msg_getHash(). Returns a 32-bit integer.
         """
         if isinstance(x, (float, int)) and not isinstance(x, str):

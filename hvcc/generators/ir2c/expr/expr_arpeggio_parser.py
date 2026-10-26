@@ -13,14 +13,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from typing import Literal, Union
+from typing import Literal
 
 from arpeggio import ParsingExpression as ParseTreeNode  # type: ignore
 from arpeggio import Terminal
 
 from .expr_arpeggio_grammar import expr_grammar
 
-ParseExpr = Union[ParseTreeNode, Terminal]
+ParseExpr = ParseTreeNode | Terminal
 NodeType = Literal["binary", "bound_var", "num_i", "num_f", "var", "func", "unary"]
 
 

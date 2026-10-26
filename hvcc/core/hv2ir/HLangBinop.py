@@ -53,9 +53,9 @@ class HLangBinop(HeavyLangObject):
     def __init__(
         self,
         obj_type: str,
-        args: Optional[dict] = None,
+        args: dict | None = None,
         graph: Optional['HeavyGraph'] = None,
-        annotations: Optional[dict] = None
+        annotations: dict | None = None
     ) -> None:
         super().__init__(obj_type, args, graph,
                          num_inlets=2,
@@ -68,7 +68,7 @@ class HLangBinop(HeavyLangObject):
         """
         return obj_type in HLangBinop.__HEAVY_DICT
 
-    def reduce(self) -> Optional[tuple]:
+    def reduce(self) -> tuple | None:
         if self.has_inlet_connection_format("__") or \
                 self.has_inlet_connection_format("_c") or \
                 self.has_inlet_connection_format("_f") or \

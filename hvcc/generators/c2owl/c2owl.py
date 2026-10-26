@@ -2,7 +2,6 @@ import json
 import shutil
 import time
 from pathlib import Path
-from typing import Optional
 
 import jinja2
 
@@ -84,8 +83,8 @@ class c2owl(Generator):
         patch_meta: Meta = Meta(),
         num_input_channels: int = 0,
         num_output_channels: int = 0,
-        copyright: Optional[str] = None,
-        verbose: Optional[bool] = False
+        copyright: str | None = None,
+        verbose: bool | None = False
     ) -> CompilerResp:
 
         tick = time.time()

@@ -18,7 +18,6 @@ import platform
 import shutil
 import subprocess
 from pathlib import Path
-from typing import Optional
 
 from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
 from tests.framework.base_test import HvBaseTest
@@ -31,7 +30,7 @@ class TestPdControlBase(HvBaseTest):
         source_files: list[Path],
         out_dir: Path,
         num_iterations: int,
-        flag: Optional[str] = None
+        flag: str | None = None
     ) -> list[str]:
         exe_path = self._compile_and_run(source_files, out_dir, flag)
 
@@ -47,7 +46,7 @@ class TestPdControlBase(HvBaseTest):
         self,
         result: str,
         golden: str,
-        flag: Optional[str] = None
+        flag: str | None = None
     ) -> str:
         return "\nResult ({0})\n-----------\n{1}\n\nGolden\n-----------\n{2}".format(
             flag or "",
@@ -84,8 +83,8 @@ class TestPdControlBase(HvBaseTest):
         pd_file: str,
         num_iterations: int = 1,
         allow_warnings: bool = True,
-        fail_message: Optional[str] = None,
-        arch: Optional[str] = None
+        fail_message: str | None = None,
+        arch: str | None = None
     ) -> None:
         """Compiles, runs, and tests a control patch.
         Allows warnings by default, always fails on errors.

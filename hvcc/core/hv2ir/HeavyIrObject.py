@@ -51,11 +51,11 @@ class HeavyIrObject(HeavyLangObject):
     def __init__(
         self,
         obj_type: str,
-        args: Optional[dict] = None,
+        args: dict | None = None,
         graph: Optional['HeavyGraph'] = None,
         num_inlets: int = -1,
         num_outlets: int = -1,
-        annotations: Optional[dict] = None
+        annotations: dict | None = None
     ) -> None:
         # allow the number of inlets and outlets to be overridden
         num_inlets = (len(self.__HEAVY_OBJS_IR_DICT[obj_type].inlets)
@@ -129,7 +129,7 @@ class HeavyIrObject(HeavyLangObject):
         """
         return self.__obj_desc.outlets[inlet_index] in {"~i>", "~f>"}
 
-    def reduce(self) -> Optional[tuple]:
+    def reduce(self) -> tuple | None:
         # A Heavy IR object is already reduced. Returns itself and no connection changes.
         return ({self}, [])
 
@@ -149,7 +149,7 @@ class HeavyIrObject(HeavyLangObject):
                 order_list.append(self)
                 return order_list
 
-    def assign_signal_buffers(self, buffer_pool: Optional[BufferPool]) -> None:
+    def assign_signal_buffers(self, buffer_pool: BufferPool | None) -> None:
         if buffer_pool is not None:
             # assign the inlet buffers
             for cc in self.inlet_connections:
@@ -193,7 +193,7 @@ class HeavyIrObject(HeavyLangObject):
                     if len(self.outlet_connections[i]) == 0:
                         exclude_set.add(b)
 
-    def _resolved_outlet_type(self, outlet_index: int = 0) -> Optional[LangLetType]:
+    def _resolved_outlet_type(self, outlet_index: int = 0) -> LangLetType | None:
         """ Returns the connection type at the given outlet.
             This information is always well-defined for IR objects.
         """

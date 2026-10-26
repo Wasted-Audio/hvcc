@@ -6,7 +6,6 @@
 from abc import ABC, abstractmethod
 from collections import Counter, defaultdict
 from pathlib import Path
-from typing import Optional
 
 from pydantic import BaseModel, RootModel
 
@@ -22,7 +21,7 @@ class CompilerMsg(BaseModel):
 
 class CompilerNotif(BaseModel, arbitrary_types_allowed=True):
     has_error: bool = False
-    exception: Optional[Exception] = None
+    exception: Exception | None = None
     warnings: list[CompilerMsg] = []
     errors: list[CompilerMsg] = []
 
@@ -37,7 +36,7 @@ class CompilerResp(BaseModel):
     compile_time: float = 0.0
     obj_counter: Counter = Counter()
     obj_perf: dict[str, dict[str, float]] = defaultdict(lambda: defaultdict(float))
-    ir: Optional[IRGraph] = None
+    ir: IRGraph | None = None
 
 
 class CompilerResults(RootModel):
@@ -86,7 +85,7 @@ class Generator(ABC):
         patch_meta: Meta = Meta(),
         num_input_channels: int = 0,
         num_output_channels: int = 0,
-        copyright: Optional[str] = None,
-        verbose: Optional[bool] = False
+        copyright: str | None = None,
+        verbose: bool | None = False
     ) -> CompilerResp:
         raise NotImplementedError

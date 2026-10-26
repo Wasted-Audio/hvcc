@@ -17,7 +17,6 @@
 import shutil
 import time
 from pathlib import Path
-from typing import Optional
 
 import jinja2
 
@@ -46,12 +45,12 @@ class c2wwise(Generator):
         c_src_dir: Path,
         out_dir: Path,
         externs: ExternInfo,
-        patch_name: Optional[str] = None,
+        patch_name: str | None = None,
         patch_meta: Meta = Meta(),
         num_input_channels: int = 0,
         num_output_channels: int = 0,
-        copyright: Optional[str] = None,
-        verbose: Optional[bool] = False
+        copyright: str | None = None,
+        verbose: bool | None = False
     ) -> CompilerResp:
         tick = time.time()
 

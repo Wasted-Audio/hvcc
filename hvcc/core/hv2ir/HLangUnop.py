@@ -14,7 +14,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from typing import Optional
 
 from .HeavyGraph import HeavyGraph
 from .HeavyIrObject import HeavyIrObject
@@ -53,7 +52,7 @@ class HLangUnop(HeavyLangObject):
         obj_type: str,
         args: dict,
         graph: 'HeavyGraph',
-        annotations: Optional[dict] = None
+        annotations: dict | None = None
     ) -> None:
         assert self.handles_type(obj_type)
         super().__init__(obj_type, args, graph,
@@ -67,7 +66,7 @@ class HLangUnop(HeavyLangObject):
         """
         return obj_type in HLangUnop.__HEAVY_DICT
 
-    def reduce(self) -> Optional[tuple]:
+    def reduce(self) -> tuple | None:
         if len(self.inlet_connections[0]) == 0:
             self.add_error("Unary operator objects must have an input.")
 

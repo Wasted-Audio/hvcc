@@ -6,7 +6,6 @@
 import re
 from collections import Counter
 from pathlib import Path
-from typing import Optional, Union
 from collections.abc import Generator
 
 from hvcc.interpreters.pd2hv.PdParser import PdParser
@@ -52,9 +51,9 @@ class PdGUIParser(PdParser):
     def gui_from_file(
         self,
         file_path: Path,
-        obj_args: Optional[list] = None,
+        obj_args: list | None = None,
         is_root: bool = True
-    ) -> tuple[Optional[Union[Graph, GraphRoot]], bool]:
+    ) -> tuple[Graph | GraphRoot | None, bool]:
         if is_root:
             self.search_paths.append(file_path)
 
@@ -84,11 +83,11 @@ class PdGUIParser(PdParser):
         graph_args: list,
         pd_path: Path,
         is_root: bool = False
-    ) -> tuple[Optional[Union[Graph, GraphRoot]], bool]:
+    ) -> tuple[Graph | GraphRoot | None, bool]:
 
         objects: list[GUIObjects] = []
         graphs: list[Graph] = []
-        x: Optional[GUIObjects] = None
+        x: GUIObjects | None = None
 
         # graph on parent settings
         gop: bool = False
@@ -316,12 +315,12 @@ class PdGUIParser(PdParser):
         )
 
     @classmethod
-    def filter_params(cls, param_recv: str, param_send: str) -> tuple[Optional[str], bool]:
+    def filter_params(cls, param_recv: str, param_send: str) -> tuple[str | None, bool]:
         """ Only allow external parameters.
             Returns (identifier, is_send).
         """
 
-        def externed(param: str) -> Optional[str]:
+        def externed(param: str) -> str | None:
             if "@hv_param" in param or "@hv_event" in param:
                 return param.split()[0]
             else:
@@ -402,7 +401,7 @@ class PdGUIParser(PdParser):
         )
 
     @classmethod
-    def add_bang(cls, line: list[str]) -> Optional[Bang]:
+    def add_bang(cls, line: list[str]) -> Bang | None:
         param, send = cls.filter_params(line[10], line[9])
         if param is None:
             return None
@@ -436,7 +435,7 @@ class PdGUIParser(PdParser):
         )
 
     @classmethod
-    def add_toggle(cls, line: list[str]) -> Optional[Toggle]:
+    def add_toggle(cls, line: list[str]) -> Toggle | None:
         param, send = cls.filter_params(line[8], line[7])
         if param is None:
             return None
@@ -470,14 +469,14 @@ class PdGUIParser(PdParser):
         )
 
     @classmethod
-    def add_radio(cls, line: list[str]) -> Optional[Union[VRadio, HRadio]]:
+    def add_radio(cls, line: list[str]) -> VRadio | HRadio | None:
         param, send = cls.filter_params(line[10], line[9])
         if param is None:
             return None
 
         radio_type = line[4]
 
-        radio_obj: dict[str, type[Union[VRadio, HRadio]]] = {
+        radio_obj: dict[str, type[VRadio | HRadio]] = {
             "vradio": VRadio,
             "hradio": HRadio
         }
@@ -511,12 +510,12 @@ class PdGUIParser(PdParser):
         )
 
     @classmethod
-    def add_slider(cls, line: list[str]) -> Optional[Union[VSlider, HSlider]]:
+    def add_slider(cls, line: list[str]) -> VSlider | HSlider | None:
         param, send = cls.filter_params(line[12], line[11])
         if param is None:
             return None
 
-        slider: dict[str, type[Union[VSlider, HSlider]]] = {
+        slider: dict[str, type[VSlider | HSlider]] = {
             "vsl": VSlider,
             "hsl": HSlider
         }
@@ -553,7 +552,7 @@ class PdGUIParser(PdParser):
         )
 
     @classmethod
-    def add_knob(cls, line: list[str]) -> Optional[Knob]:
+    def add_knob(cls, line: list[str]) -> Knob | None:
         param, send = cls.filter_params(line[11], line[10])
         if param is None:
             return None
@@ -605,7 +604,7 @@ class PdGUIParser(PdParser):
         )
 
     @classmethod
-    def add_number(cls, line: list[str]) -> Optional[Number]:
+    def add_number(cls, line: list[str]) -> Number | None:
         param, send = cls.filter_params(line[12], line[11])
         if param is None:
             return None
@@ -671,7 +670,7 @@ class PdGUIParser(PdParser):
         )
 
     @classmethod
-    def add_float(cls, line: list[str]) -> Optional[Float]:
+    def add_float(cls, line: list[str]) -> Float | None:
         param, send = cls.filter_params(line[9], line[10])
         if param is None:
             return None
@@ -697,7 +696,7 @@ class PdGUIParser(PdParser):
         )
 
     @classmethod
-    def add_popmenu(cls, line: list[str]) -> Optional[Popmenu]:
+    def add_popmenu(cls, line: list[str]) -> Popmenu | None:
         param, send = cls.filter_params(line[11], line[12])
         if param is None:
             return None

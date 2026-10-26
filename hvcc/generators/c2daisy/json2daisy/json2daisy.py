@@ -1,7 +1,6 @@
 import json
 from importlib import resources
 from pathlib import Path
-from typing import Optional
 
 import jinja2
 
@@ -35,7 +34,7 @@ def filter_match(
     component_set: list,
     key: str,
     match: str,
-    key_exclude: Optional[str] = None,
+    key_exclude: str | None = None,
     match_exclude: bool = False
 ) -> filter:
     if (key_exclude is not None and match_exclude):
@@ -48,7 +47,7 @@ def filter_matches(
     component_set: list,
     key: str,
     matches: list,
-    key_exclude: Optional[str] = None,
+    key_exclude: str | None = None,
     match_exclude: bool = False
 ) -> filter:
     if (key_exclude is not None and match_exclude):
@@ -60,7 +59,7 @@ def filter_matches(
 def filter_has(
     component_set: list,
     key: str,
-    key_exclude: Optional[str] = None,
+    key_exclude: str | None = None,
     match_exclude: bool = False
 ) -> filter:
     if (key_exclude is not None and match_exclude):
@@ -74,7 +73,7 @@ def filter_map_init(
     component_set: list,
     key: str,
     match: str,
-    key_exclude: Optional[str] = None,
+    key_exclude: str | None = None,
     match_exclude: bool = False
 ) -> str:
     filtered = filter_match(component_set, key, match, key_exclude=key_exclude, match_exclude=match_exclude)
@@ -86,7 +85,7 @@ def filter_map_set(
     component_set: list,
     key: str,
     match: str,
-    key_exclude: Optional[str] = None,
+    key_exclude: str | None = None,
     match_exclude: bool = False
 ) -> str:
     filtered = filter_match(component_set, key, match, key_exclude=key_exclude, match_exclude=match_exclude)
@@ -100,7 +99,7 @@ def filter_map_ctrl(
     key: str,
     matches: list,
     init_key: str,
-    key_exclude: Optional[str] = None,
+    key_exclude: str | None = None,
     match_exclude: bool = False
 ) -> str:
     component_filt = filter_matches(component_set, key, matches, key_exclude=key_exclude, match_exclude=match_exclude)
@@ -112,7 +111,7 @@ def filter_map_ctrl(
 def filter_map_template(
     component_set: list,
     name: str,
-    key_exclude: Optional[str] = None,
+    key_exclude: str | None = None,
     match_exclude: bool = False
 ) -> str:
     filtered = filter_has(component_set, name, key_exclude=key_exclude, match_exclude=match_exclude)

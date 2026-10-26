@@ -15,7 +15,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import re
-from typing import Optional
 
 from hvcc.types.IR import IRSendMessage
 
@@ -30,9 +29,9 @@ class HIrSend(HeavyIrObject):
     def __init__(
         self,
         obj_type: str,
-        args: Optional[dict] = None,
-        graph: Optional[HeavyGraph] = None,
-        annotations: Optional[dict] = None
+        args: dict | None = None,
+        graph: HeavyGraph | None = None,
+        annotations: dict | None = None
     ) -> None:
         super().__init__("__send", args=args, graph=graph, annotations=annotations)
         # output parameters must contain only alphanumeric characters or underscores,

@@ -14,7 +14,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from typing import Optional
 
 from .HeavyGraph import HeavyGraph
 from .HeavyLangObject import HeavyLangObject
@@ -32,12 +31,12 @@ class HLangReceive(HeavyLangObject):
         obj_type: str,
         args: dict,
         graph: 'HeavyGraph',
-        annotations: Optional[dict] = None
+        annotations: dict | None = None
     ) -> None:
         assert obj_type == "receive"
         super().__init__(obj_type, args, graph, annotations=annotations)
 
-    def reduce(self) -> Optional[tuple]:
+    def reduce(self) -> tuple | None:
         if self.has_outlet_connection_format(["c"]):
             x = HIrReceive("__receive", self.args, annotations=self.annotations)
             return ({x}, self.get_connection_move_list(x))

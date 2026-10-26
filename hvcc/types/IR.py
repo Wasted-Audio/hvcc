@@ -3,7 +3,6 @@
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
-from typing import Optional, Union
 
 from pydantic import BaseModel, RootModel
 
@@ -12,14 +11,14 @@ from hvcc.version import VERSION
 
 # IR Object Definitions
 
-IRValue = Union[float, int, str, list[float], list[int]]
+IRValue = float | int | str | list[float] | list[int]
 
 
 class IRArg(BaseModel):
     name: str
     value_type: str
     description: str = ""
-    default: Optional[IRValue] = None
+    default: IRValue | None = None
     required: bool
 
 
@@ -40,9 +39,9 @@ class IRNode(BaseModel):
     ir: IR
     outlets: list[LangLetType]
     args: list[IRArg] = []
-    perf: Optional[Perf] = Perf()
+    perf: Perf | None = Perf()
     # perf: Perf
-    description: Optional[str] = None
+    description: str | None = None
     alias: list[str] = []
     tags: list[str] = []
     keywords: list[str] = []
@@ -71,14 +70,14 @@ class IRInit(BaseModel):
 class IRReceiver(BaseModel):
     display: str
     hash: str
-    extern: Optional[str] = None
+    extern: str | None = None
     attributes: dict
     ids: list[str]
 
 
 class IROnMessage(BaseModel):
     id: str
-    inletIndex: Optional[int] = None
+    inletIndex: int | None = None
 
 
 class IRSendMessage(BaseModel):
@@ -86,11 +85,11 @@ class IRSendMessage(BaseModel):
     """
     id: str
     onMessage: list[list[IROnMessage]]  # TODO: why is it a nested List?
-    type: Optional[str] = None
-    extern: Optional[str] = ''
-    attributes: Optional[Union[list, dict]] = None  # TODO: List from IR and Dict from Lang
-    hash: Optional[str] = None
-    display: Optional[str] = None
+    type: str | None = None
+    extern: str | None = ''
+    attributes: list | dict | None = None  # TODO: List from IR and Dict from Lang
+    hash: str | None = None
+    display: str | None = None
     name: str = ''
 
 
@@ -98,7 +97,7 @@ class IRTable(BaseModel):
     id: str
     display: str
     hash: str
-    extern: Optional[bool] = None
+    extern: bool | None = None
 
 
 class IRControl(BaseModel):

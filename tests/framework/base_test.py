@@ -18,7 +18,6 @@ import shutil
 import subprocess
 import unittest
 from pathlib import Path
-from typing import Optional
 
 import jinja2
 
@@ -50,7 +49,7 @@ class HvBaseTest(unittest.TestCase):
         expect_warning: bool = False,
         expect_fail: bool = False,
         expected_enum: NotificationEnum = NotificationEnum.EMPTY
-    ) -> Optional[Path]:
+    ) -> Path | None:
         """Run hvcc on a Pd file. Returns the output directory.
         """
 
@@ -96,7 +95,7 @@ class HvBaseTest(unittest.TestCase):
         self,
         source_files: list[Path],
         out_dir: Path,
-        flag: Optional[str] = None
+        flag: str | None = None
     ):
         exe_path = Path(out_dir, "heavy")
 
@@ -118,7 +117,7 @@ class HvBaseTest(unittest.TestCase):
         self,
         source_files: list[Path],
         out_dir: Path,
-        flag: Optional[str] = None,
+        flag: str | None = None,
     ):
         flag = flag or "HV_SIMD_NONE"
         self.assertTrue(flag in simd_flags, f"Unknown compiler flag: {flag}")

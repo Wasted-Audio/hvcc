@@ -18,7 +18,6 @@ import argparse
 import json
 import time
 from pathlib import Path
-from typing import Optional
 
 from hvcc.interpreters.pd2hv.PdParser import PdParser
 from hvcc.types.compiler import CompilerNotif, CompilerResp
@@ -50,7 +49,7 @@ class pd2hv:
         cls,
         pd_path: Path,
         hv_dir: Path,
-        search_paths: Optional[list] = None,
+        search_paths: list | None = None,
         verbose: bool = False,
         export_args: bool = False
     ) -> CompilerResp:

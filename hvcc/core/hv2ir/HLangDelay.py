@@ -28,9 +28,9 @@ class HLangDelay(HeavyLangObject):
     def __init__(
         self,
         obj_type: str,
-        args: Optional[dict] = None,
+        args: dict | None = None,
         graph: Optional['HeavyGraph'] = None,
-        annotations: Optional[dict] = None
+        annotations: dict | None = None
     ) -> None:
         assert obj_type == "delay"
         super().__init__("delay", args, graph,

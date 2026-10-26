@@ -15,7 +15,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import random
-from typing import Optional
 
 from .HeavyGraph import HeavyGraph
 from .HeavyIrObject import HeavyIrObject
@@ -31,7 +30,7 @@ class HLangRandom(HeavyLangObject):
         obj_type: str,
         args: dict,
         graph: 'HeavyGraph',
-        annotations: Optional[dict] = None
+        annotations: dict | None = None
     ) -> None:
         assert obj_type == "random"
         super().__init__(obj_type, args, graph,

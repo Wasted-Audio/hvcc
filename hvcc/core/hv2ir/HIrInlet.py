@@ -14,7 +14,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from typing import Optional
 
 from hvcc.types.IR import IROnMessage
 from hvcc.types.Lang import LangLetType
@@ -31,9 +30,9 @@ class HIrInlet(HeavyIrObject):
     def __init__(
         self,
         obj_type: str,
-        args: Optional[dict] = None,
-        graph: Optional[HeavyGraph] = None,
-        annotations: Optional[dict] = None
+        args: dict | None = None,
+        graph: HeavyGraph | None = None,
+        annotations: dict | None = None
     ) -> None:
         super().__init__("__inlet", args=args, graph=graph, annotations=annotations)
 
@@ -47,7 +46,7 @@ class HIrInlet(HeavyIrObject):
                     x.extend(c.to_object.get_ir_on_message(c.inlet_index))
         return x
 
-    def _resolved_outlet_type(self, outlet_index: int = 0) -> Optional[LangLetType]:
+    def _resolved_outlet_type(self, outlet_index: int = 0) -> LangLetType | None:
         if outlet_index == 1:
             return "-->"
         if self.graph is not None:

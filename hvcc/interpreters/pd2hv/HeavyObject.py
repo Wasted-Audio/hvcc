@@ -18,7 +18,7 @@ import decimal
 import json
 from importlib import resources
 from pathlib import Path
-from typing import Any, Optional, Union, cast
+from typing import Any, cast
 
 from hvcc.types.Heavy import Heavy, HvPos
 from hvcc.types.IR import HeavyIRType, IRArg, IRNode
@@ -42,13 +42,13 @@ class HeavyObject(PdObject):
     def __init__(
         self,
         obj_type: str,
-        obj_args: Optional[list] = None,
+        obj_args: list | None = None,
         pos_x: int = 0,
         pos_y: int = 0
     ) -> None:
         super().__init__(obj_type, obj_args, pos_x, pos_y)
 
-        self.__obj_dict: Union[IRNode, LangNode]
+        self.__obj_dict: IRNode | LangNode
 
         # get the object dictionary (note that it is NOT a copy)
         if self.is_hvlang:
@@ -78,7 +78,7 @@ class HeavyObject(PdObject):
                     obj_args[i] = a.split(" ")[0] if "@hv_table" in a else a
 
         for i, a in enumerate(self.__obj_dict.args):
-            arg = cast(Union[IRArg, LangArg], a)
+            arg = cast(IRArg | LangArg, a)
             # if the argument exists (and has been correctly resolved)
             if i < len(obj_args) and obj_args[i] is not None:
                 # force the Heavy argument type
@@ -114,7 +114,7 @@ class HeavyObject(PdObject):
     def force_arg_type(
         cls,
         value: str,
-        value_type: Optional[str] = None
+        value_type: str | None = None
     ) -> Any:
         # TODO(mhroth): add support for mixedarray?
         if value_type == "auto":
@@ -169,7 +169,7 @@ class HeavyObject(PdObject):
     def is_hvir(self) -> bool:
         return self.obj_type in self.__HEAVY_IR_OBJS.keys()
 
-    def get_inlet_connection_type(self, inlet_index: int) -> Optional[str]:
+    def get_inlet_connection_type(self, inlet_index: int) -> str | None:
         """ Returns the inlet connection type, None if the inlet does not exist.
         """
         # TODO(mhroth): it's stupid that hvlang and hvir json have different data formats here
@@ -186,7 +186,7 @@ class HeavyObject(PdObject):
         else:
             return None
 
-    def get_outlet_connection_type(self, outlet_index: int) -> Optional[str]:
+    def get_outlet_connection_type(self, outlet_index: int) -> str | None:
         """ Returns the outlet connection type, None if the inlet does not exist.
         """
         # TODO(mhroth): it's stupid that hvlang and hvir json have different data formats here

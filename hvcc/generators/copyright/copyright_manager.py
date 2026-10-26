@@ -16,7 +16,6 @@
 
 import datetime
 from pathlib import Path
-from typing import Optional
 
 
 def get_default_copyright_text() -> str:
@@ -25,14 +24,14 @@ def get_default_copyright_text() -> str:
     return copyright
 
 
-def get_copyright_for_c(copyright_text: Optional[str] = None) -> str:
+def get_copyright_for_c(copyright_text: str | None = None) -> str:
     """ Returns an input string as a C-formatted comment, otherwise a default
         copyright statement if the input is None.
     """
     return comment_for_c(copyright_text or get_default_copyright_text())
 
 
-def get_copyright_for_xml(copyright_text: Optional[str] = None) -> str:
+def get_copyright_for_xml(copyright_text: str | None = None) -> str:
     """ Returns an input string as an xml comment, otherwise a default
         copyright statement if the input is None.
     """

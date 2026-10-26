@@ -17,7 +17,7 @@
 import random
 import string
 from collections import defaultdict
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from hvcc.types.compiler import CompilerMsg, CompilerNotif
 from hvcc.types.Heavy import Heavy
@@ -37,7 +37,7 @@ class PdObject:
     def __init__(
         self,
         obj_type: str,
-        obj_args: Optional[list] = None,
+        obj_args: list | None = None,
         pos_x: int = 0,
         pos_y: int = 0
     ) -> None:
@@ -51,7 +51,7 @@ class PdObject:
         self.pos_y = pos_y
 
         # this is set when the object is added to a graph
-        self.parent_graph: Optional['PdGraph'] = None
+        self.parent_graph: 'PdGraph' | None = None
 
         self._inlet_connections: dict = defaultdict(list)
         self._outlet_connections: dict = defaultdict(list)
@@ -118,14 +118,14 @@ class PdObject:
     def get_outlet_connections(self) -> dict:
         return self._outlet_connections
 
-    def get_inlet_connection_type(self, inlet_index: int) -> Optional[str]:
+    def get_inlet_connection_type(self, inlet_index: int) -> str | None:
         """ Returns the inlet connection type of this Pd object.
             For the sake of convenience, the connection type is reported in
             Heavy's format.
         """
         return "~f>" if self.obj_type.endswith("~") else "-->"
 
-    def get_outlet_connection_type(self, outlet_index: int) -> Optional[str]:
+    def get_outlet_connection_type(self, outlet_index: int) -> str | None:
         """ Returns the outlet connection type of this Pd object.
             For the sake of convenience, the connection type is reported in
             Heavy's format.

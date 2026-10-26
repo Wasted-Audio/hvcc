@@ -14,7 +14,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from typing import Optional
 
 from .HeavyGraph import HeavyGraph
 from .HeavyIrObject import HeavyIrObject
@@ -30,7 +29,7 @@ class HLangMessage(HeavyLangObject):
         obj_type: str,
         args: dict,
         graph: 'HeavyGraph',
-        annotations: Optional[dict] = None
+        annotations: dict | None = None
     ) -> None:
         assert obj_type == "message"
         super().__init__(obj_type, args, graph,

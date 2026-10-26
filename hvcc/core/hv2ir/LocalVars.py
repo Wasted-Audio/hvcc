@@ -17,7 +17,6 @@
 import os
 from collections import defaultdict
 from pathlib import Path
-from typing import Optional, Union
 
 from .HeavyException import HeavyException
 from .HeavyLangObject import HeavyLangObject
@@ -37,7 +36,7 @@ class LocalVars:
         # the list of globally declared paths
         self.declared_paths = [stdlib_dir]  # initialise with the standard library directory
 
-    def find_path_for_abstraction(self, name: str) -> Optional[Path]:
+    def find_path_for_abstraction(self, name: str) -> Path | None:
         # the file name based on the abstraction name
         file_name = f"{name}.hv.json"
 
@@ -74,7 +73,7 @@ class LocalVars:
 
         self.__REGISTERED_OBJ_DICT[name].remove(obj)
 
-    def get_objects_for_name(self, name: str, obj_types: Union[str, list]) -> list:
+    def get_objects_for_name(self, name: str, obj_types: str | list) -> list:
         """ Returns a list of objects registered under a name in this scope.
         """
 

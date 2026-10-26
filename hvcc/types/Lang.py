@@ -3,7 +3,7 @@
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
-from typing import Literal, Optional, Union
+from typing import Literal
 
 from pydantic import BaseModel, RootModel
 
@@ -14,9 +14,9 @@ LangValueType = Literal["float", "int", "string", "bool", "dict", "floatarray", 
 
 class LangArg(BaseModel):
     name: str
-    value_type: Optional[LangValueType] = None
+    value_type: LangValueType | None = None
     description: str
-    default: Union[float, int, str, dict, list, None] = None
+    default: float | int | str | dict | list | None = None
     required: bool
 
 

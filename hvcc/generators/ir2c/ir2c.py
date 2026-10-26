@@ -20,7 +20,6 @@ import shutil
 import time
 from collections import Counter, OrderedDict
 from pathlib import Path
-from typing import Optional, Union
 
 import jinja2
 
@@ -137,7 +136,7 @@ class ir2c:
     }
 
     @classmethod
-    def filter_hvhash(cls, x: Union[float, str]) -> str:
+    def filter_hvhash(cls, x: float | str) -> str:
         """ Return the hash string of an object.
         """
         return HeavyObject.get_hash_string(x)
@@ -170,8 +169,8 @@ class ir2c:
         static_dir: Path,
         output_dir: Path,
         externs: ExternInfo,
-        copyright: Optional[str] = None,
-        nodsp: Optional[bool] = False
+        copyright: str | None = None,
+        nodsp: bool | None = False
     ) -> CompilerResp:
         """ Compiles a HeavyIR file into a C.
             Returns a tuple of compile time in seconds, a notification dictionary,

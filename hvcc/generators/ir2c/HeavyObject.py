@@ -15,7 +15,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from struct import pack, unpack
-from typing import Optional, Union
 from collections.abc import Callable
 
 from hvcc.types.IR import IRBuffer, IRObjectdict, IROnMessage, IRSignalList
@@ -125,7 +124,7 @@ class HeavyObject:
         return []
 
     @classmethod
-    def get_C_gen_header_code(cls, obj_type: str, obj_id: str, args: dict) -> Optional[tuple[str, str]]:
+    def get_C_gen_header_code(cls, obj_type: str, obj_id: str, args: dict) -> tuple[str, str] | None:
         return None
 
     @classmethod
@@ -165,7 +164,7 @@ class HeavyObject:
                 buffer_dict.index)
 
     @classmethod
-    def get_hash(cls, x: Union[float, str, int]) -> int:
+    def get_hash(cls, x: float | str | int) -> int:
         """ Compute the message element hash used by msg_getHash(). Returns a 32-bit integer.
         """
         if isinstance(x, (float, int)) and not isinstance(x, str):
@@ -208,7 +207,7 @@ class HeavyObject:
             raise Exception("Message element hashes can only be computed for float and string types.")
 
     @classmethod
-    def get_hash_string(cls, x: Union[float, str]) -> str:
+    def get_hash_string(cls, x: float | str) -> str:
         """ Returns the hash as a hex string.
         """
         return f"0x{cls.get_hash(x):X}"

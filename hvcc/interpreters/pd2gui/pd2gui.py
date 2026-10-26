@@ -6,7 +6,6 @@
 import argparse
 import time
 from pathlib import Path
-from typing import Optional
 
 from hvcc.interpreters.pd2gui.PdGUIParser import PdGUIParser
 from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
@@ -33,7 +32,7 @@ class pd2gui:
         cls,
         pd_path: Path,
         ir_file: Path,
-        search_paths: Optional[list] = None,
+        search_paths: list | None = None,
         verbose: bool = False
     ):
         tick = time.time()

@@ -18,7 +18,6 @@ import platform
 import shutil
 import subprocess
 from pathlib import Path
-from typing import Optional
 
 import numpy
 from scipy.io import wavfile
@@ -32,10 +31,10 @@ class TestPdSignalBase(HvBaseTest):
         self,
         source_files: list[Path],
         out_dir: Path,
-        sample_rate: Optional[int] = None,
-        block_size: Optional[int] = None,
-        num_iterations: Optional[int] = None,
-        flag: Optional[str] = None
+        sample_rate: int | None = None,
+        block_size: int | None = None,
+        num_iterations: int | None = None,
+        flag: str | None = None
     ):
         exe_path = self._compile_and_run(source_files, out_dir, flag)
 
@@ -56,7 +55,7 @@ class TestPdSignalBase(HvBaseTest):
         out_dir: Path,
         c_sources: list[Path],
         golden_path: Path,
-        flag: Optional[str] = None
+        flag: str | None = None
     ):
         # http://stackoverflow.com/questions/10580676/comparing-two-numpy-arrays-for-equality-element-wise
         # http://docs.scipy.org/doc/numpy/reference/routines.testing.html

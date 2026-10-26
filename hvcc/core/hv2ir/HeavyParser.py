@@ -17,7 +17,7 @@
 import json
 import random
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 from hvcc.types.Heavy import Heavy
 
@@ -68,10 +68,10 @@ class HeavyParser:
     def graph_from_file(
         cls,
         hv_file: Path,
-        graph: Optional[HeavyGraph] = None,
-        graph_args: Optional[dict] = None,
-        path_stack: Optional[set[Path]] = None,
-        xname: Optional[str] = None
+        graph: HeavyGraph | None = None,
+        graph_args: dict | None = None,
+        path_stack: set[Path] | None = None,
+        xname: str | None = None
     ) -> HeavyGraph:
         """ Read a graph object from a file.
 
@@ -103,9 +103,9 @@ class HeavyParser:
         hv_file: Path,
         json_heavy: Heavy,
         path_stack: set[Path],
-        graph: Optional[HeavyGraph] = None,
-        graph_args: Optional[dict] = None,
-        xname: Optional[str] = None
+        graph: HeavyGraph | None = None,
+        graph_args: dict | None = None,
+        xname: str | None = None
     ) -> HeavyGraph:
 
         """ Parse a graph object.
@@ -236,7 +236,7 @@ class HLangIf(HeavyLangObject):
         obj_type: str,
         args: dict,
         graph: HeavyGraph,
-        annotations: Optional[dict] = None
+        annotations: dict | None = None
     ) -> None:
         assert obj_type == "if"
         super().__init__("if", args, graph, num_inlets=2, num_outlets=2, annotations=annotations)
@@ -266,7 +266,7 @@ class HLangNoise(HeavyLangObject):
         obj_type: str,
         args: dict,
         graph: HeavyGraph,
-        annotations: Optional[dict] = None
+        annotations: dict | None = None
     ) -> None:
         assert obj_type == "noise"
         super().__init__("noise", args, graph, num_inlets=1, num_outlets=1, annotations=annotations)

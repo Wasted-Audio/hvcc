@@ -16,7 +16,6 @@
 import shutil
 import time
 from pathlib import Path
-from typing import Optional
 
 import jinja2
 
@@ -44,10 +43,10 @@ from .nanovg_render import nanovg_render, open_gui_json
 
 
 def _normalize_port_groups(
-        port_groups: Optional[DPFPortGroups],
+        port_groups: DPFPortGroups | None,
         num_input_channels: int,
         num_output_channels: int
-) -> Optional[DPFPortGroups]:
+) -> DPFPortGroups | None:
     """Convert 1-based PD port indices to 0-based DPF channel indices."""
     if port_groups is None:
         return None
@@ -98,8 +97,8 @@ class c2dpf(Generator):
         patch_meta: Meta = Meta(),
         num_input_channels: int = 0,
         num_output_channels: int = 0,
-        copyright: Optional[str] = None,
-        verbose: Optional[bool] = False
+        copyright: str | None = None,
+        verbose: bool | None = False
     ) -> CompilerResp:
 
         tick = time.time()

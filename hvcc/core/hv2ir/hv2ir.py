@@ -19,7 +19,6 @@ import json
 import os
 import time
 from pathlib import Path
-from typing import Optional
 
 from hvcc.core.hv2ir.HeavyException import HeavyException
 from hvcc.core.hv2ir.HeavyParser import HeavyParser
@@ -33,7 +32,7 @@ class hv2ir:
         cls,
         hv_file: Path,
         ir_file: Path,
-        patch_name: Optional[str] = None,
+        patch_name: str | None = None,
         verbose: bool = False
     ) -> CompilerResp:
         """ Compiles a HeavyLang file into a HeavyIR file.

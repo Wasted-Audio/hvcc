@@ -14,7 +14,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from typing import Optional
 
 from .HeavyException import HeavyException
 from .HeavyGraph import HeavyGraph
@@ -29,12 +28,12 @@ class HLangVario(HeavyLangObject):
         obj_type: str,
         args: dict,
         graph: 'HeavyGraph',
-        annotations: Optional[dict] = None
+        annotations: dict | None = None
     ) -> None:
         assert obj_type == "vario"
         super().__init__(obj_type, args, graph, annotations=annotations)
 
-    def reduce(self) -> Optional[tuple]:
+    def reduce(self) -> tuple | None:
         if self.graph is not None and self.name is not None:
             var_obj = self.graph.resolve_object_for_name(self.name, "var")
             if var_obj is None:

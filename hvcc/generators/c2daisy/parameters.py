@@ -1,6 +1,6 @@
 import json
 from copy import deepcopy
-from typing import Any, Optional
+from typing import Any
 
 from hvcc.core.hv2ir.HeavyLangObject import HeavyLangObject
 from hvcc.types.compiler import ExternParams
@@ -10,8 +10,8 @@ def filter_match(
     set: dict,
     key: str,
     match: str,
-    key_exclude: Optional[str] = None,
-    match_exclude: Optional[str] = None
+    key_exclude: str | None = None,
+    match_exclude: str | None = None
 ) -> filter:
     if (key_exclude is not None and match_exclude is not None):
         return filter(lambda x: x.get(key, '') == match and x.get(key_exclude, '') != match_exclude, set)
@@ -272,7 +272,7 @@ def display_parameters(description_file: str) -> dict[str, str]:
         return params
 
 
-def display_processor(description_file: Optional[str] = None) -> str:
+def display_processor(description_file: str | None = None) -> str:
     """
     Try to load display processing code from file.
     """

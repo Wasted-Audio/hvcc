@@ -17,7 +17,7 @@
 import re
 from collections import Counter
 from pathlib import Path
-from typing import Optional, Union
+from typing import Optional
 
 from hvcc.types.compiler import CompilerNotif
 from hvcc.types.IR import (
@@ -54,7 +54,7 @@ class HeavyGraph(HeavyIrObject):
     def __init__(
         self,
         graph: Optional['HeavyGraph'] = None,
-        graph_args: Optional[dict] = None,
+        graph_args: dict | None = None,
         file: Path = Path(),
         xname: str = "heavy"
     ) -> None:
@@ -92,7 +92,7 @@ class HeavyGraph(HeavyIrObject):
         self.signal_order: list = []
 
         # a pool of signal buffers for use during signal ordering and buffer assignment
-        self.buffer_pool: Optional[BufferPool] = None
+        self.buffer_pool: BufferPool | None = None
 
     def resolve_arguments(self, obj_args: dict) -> dict:
         """ Resolves the object arguments based on values from the local graph.
@@ -179,7 +179,7 @@ class HeavyGraph(HeavyIrObject):
     def add_object(
         self,
         obj: HeavyIrObject,
-        obj_id: Optional[Union[int, str]] = None
+        obj_id: int | str | None = None
     ) -> None:
         """ Add an object to the graph based on the given id.
             Per-object bookkeeping is performed.
@@ -228,7 +228,7 @@ class HeavyGraph(HeavyIrObject):
     def __register_named_object(
         self,
         obj: HeavyIrObject,
-        name: Optional[str] = None,
+        name: str | None = None,
         static: bool = False,
         unique: bool = False
     ) -> None:
@@ -254,7 +254,7 @@ class HeavyGraph(HeavyIrObject):
     def __unregister_named_object(
         self,
         obj: HeavyIrObject,
-        name: Optional[str] = None,
+        name: str | None = None,
         static: bool = False,
         unique: bool = False
     ) -> None:
@@ -279,7 +279,7 @@ class HeavyGraph(HeavyIrObject):
     def resolve_objects_for_name(
         self,
         name: str,
-        obj_types: Union[list, str],
+        obj_types: list | str,
         local_graph: Optional['HeavyGraph'] = None
     ) -> list:
         """ Returns all objects with the given name and type that are visible
@@ -303,9 +303,9 @@ class HeavyGraph(HeavyIrObject):
     def resolve_object_for_name(
         self,
         name: str,
-        obj_types: Union[list, str],
+        obj_types: list | str,
         local_graph: Optional['HeavyGraph'] = None
-    ) -> Optional[HeavyIrObject]:
+    ) -> HeavyIrObject | None:
         """ Returns the first object with the given name and type that is visible
             from this graph. Returns None if no objects are available.
             This is a convenience method.
@@ -330,7 +330,7 @@ class HeavyGraph(HeavyIrObject):
             # NOTE(dromer): we should never get here
             raise Exception
 
-    def find_path_for_abstraction(self, obj_type: str) -> Optional[Path]:
+    def find_path_for_abstraction(self, obj_type: str) -> Path | None:
         """ Travels up the graph heirarchy looking for a file path to an abstraction.
             Returns None if no abstraction is found.
         """
@@ -340,7 +340,7 @@ class HeavyGraph(HeavyIrObject):
         else:
             return self.graph.find_path_for_abstraction(obj_type) if self.graph is not None else None
 
-    def remove_object(self, o: HeavyIrObject, obj_id: Optional[str] = None) -> None:
+    def remove_object(self, o: HeavyIrObject, obj_id: str | None = None) -> None:
         """ Removes an object and all of its connections from the graph.
             A custom id for the object to be removed can be given.
         """
@@ -508,7 +508,7 @@ class HeavyGraph(HeavyIrObject):
             raise HeavyException(f"{self} has multiple incident connections of differing type.\
                                   The outlet type cannot be explicitly resolved.")
 
-    def _resolve_connection_types(self, obj_stack: Optional[set] = None) -> None:
+    def _resolve_connection_types(self, obj_stack: set | None = None) -> None:
         """ Resolves the type of all connections before reduction to IR object types.
             If connections incident on an object are incompatible, they are either
             resolved, potentially by inserting conversion objects, or pruned.
@@ -812,7 +812,7 @@ class HeavyGraph(HeavyIrObject):
         # retain only objects that process a signal
         self.signal_order = [o for o in self.signal_order if o.does_process_signal]
 
-    def assign_signal_buffers(self, buffer_pool: Optional[BufferPool] = None) -> None:
+    def assign_signal_buffers(self, buffer_pool: BufferPool | None = None) -> None:
         # the top-level graph owns the buffer pool
         if buffer_pool is not None:
             self.buffer_pool = buffer_pool
@@ -874,7 +874,7 @@ class HeavyGraph(HeavyIrObject):
     # Intermediate Representation generators
     #
 
-    def to_ir(self) -> Optional[IRGraph]:
+    def to_ir(self) -> IRGraph | None:
         """ Returns Heavy intermediate representation.
         """
 

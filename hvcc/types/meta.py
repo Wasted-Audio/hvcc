@@ -5,7 +5,7 @@
 
 import re
 from enum import IntEnum
-from typing import Literal, Optional, Union
+from typing import Literal
 
 from pydantic import BaseModel, HttpUrl, model_validator
 from typing import Self
@@ -16,7 +16,7 @@ DaisyBoards = Literal['pod', 'petal', 'patch', 'patch_init', 'field']
 DaisyBootloader = Literal['BOOT_NONE', 'BOOT_SRAM', 'BOOT_QSPI']
 DPFFormats = Literal['lv2', 'lv2_sep', 'vst2', 'vst3', 'clap', 'jack', 'dssi', 'ladspa', 'au']
 
-DPFPortGroupConfig = dict[str, Union[int, tuple[int, bool]]]
+DPFPortGroupConfig = dict[str, int | tuple[int, bool]]
 
 
 def slugify(value: str) -> str:
@@ -26,14 +26,14 @@ def slugify(value: str) -> str:
 
 class Daisy(BaseModel):
     board:          DaisyBoards = 'pod'
-    board_file:     Optional[str] = None
-    libdaisy_path:  Union[str, int] = 2
+    board_file:     str | None = None
+    libdaisy_path:  str | int = 2
     usb_midi:       bool = False
     debug_printing: bool = False
     samplerate:     int = 48000
-    blocksize:      Optional[int] = None
+    blocksize:      int | None = None
     linker_script:  str = ''
-    bootloader:     Optional[DaisyBootloader] = None
+    bootloader:     DaisyBootloader | None = None
 
 
 class DPFUISize(BaseModel):
@@ -97,31 +97,31 @@ class DPFPortGroups(BaseModel):
 
 class DPF(BaseModel):
     dpf_path:           str = ""
-    description:        Optional[str] = None
+    description:        str | None = None
     makefile_dep:       list[str] = []
-    enable_ui:          Optional[DPFUIType] = DPFUIType.NONE
+    enable_ui:          DPFUIType | None = DPFUIType.NONE
     enable_modgui:      bool = False
-    ui_size:            Optional[DPFUISize] = None
+    ui_size:            DPFUISize | None = None
     ui_theme_set:       bool = False
-    ui_theme:           Optional[str] = None
-    ui_themes:          Optional[dict[str, Theme]] = None
+    ui_theme:           str | None = None
+    ui_themes:          dict[str, Theme] | None = None
     midi_input:         bool = False
     midi_output:        bool = False
-    port_groups:        Optional[DPFPortGroups] = None
-    enumerators:        Optional[dict[str, list[str]]] = None
+    port_groups:        DPFPortGroups | None = None
+    enumerators:        dict[str, list[str]] | None = None
     denormals:          bool = True
-    version:            Optional[str] = None
-    license:            Optional[str] = None
-    maker:              Optional[str] = None
-    brand_id:           Optional[str] = None
-    brand_id_no_vst3:   Optional[bool] = False
-    unique_id:          Optional[str] = None
-    homepage:           Optional[HttpUrl] = None
-    plugin_uri:         Optional[str] = None
-    plugin_clap_id:     Optional[str] = None
+    version:            str | None = None
+    license:            str | None = None
+    maker:              str | None = None
+    brand_id:           str | None = None
+    brand_id_no_vst3:   bool | None = False
+    unique_id:          str | None = None
+    homepage:           HttpUrl | None = None
+    plugin_uri:         str | None = None
+    plugin_clap_id:     str | None = None
     plugin_formats:     list[DPFFormats] = []
-    lv2_info:           Optional[str] = None
-    vst3_info:          Optional[str] = None
+    lv2_info:           str | None = None
+    vst3_info:          str | None = None
     clap_info:          list[str] = []
 
     @model_validator(mode='after')
@@ -135,8 +135,8 @@ class DPF(BaseModel):
 
 
 class Meta(BaseModel):
-    name: Optional[str] = None
-    nosimd: Optional[bool] = False
+    name: str | None = None
+    nosimd: bool | None = False
     daisy: Daisy = Daisy()
     dpf: DPF = DPF()
-    external: Optional[dict] = None
+    external: dict | None = None

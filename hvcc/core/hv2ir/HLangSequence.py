@@ -14,7 +14,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from typing import Optional
 
 from .Connection import Connection
 from .HeavyException import HeavyException
@@ -30,7 +29,7 @@ class HLangSequence(HeavyLangObject):
         obj_type: str,
         args: dict,
         graph: 'HeavyGraph',
-        annotations: Optional[dict] = None
+        annotations: dict | None = None
     ) -> None:
         # get the number of outlets that this object has
         num_outlets = len(args[self._HEAVY_LANG_DICT[obj_type].args[0].name])

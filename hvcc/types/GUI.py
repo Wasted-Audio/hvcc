@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 from enum import IntEnum
-from typing import Literal, Optional, Union
+from typing import Literal
 
 from pydantic import BaseModel
 from pydantic_extra_types.color import Color
@@ -68,18 +68,18 @@ class Label(BaseModel):
 class Comment(BaseUI):
     type: Literal["comment"] = "comment"
     text: str
-    width: Optional[int] = 0
+    width: int | None = 0
 
 
 class Canvas(BaseUI):
     type: Literal["canvas"] = "canvas"
-    label: Optional[Label] = None
+    label: Label | None = None
     bg_color: Color
 
 
 class Bang(BaseParam):
     type: Literal["bang"] = "bang"
-    label: Optional[Label] = None
+    label: Label | None = None
     flash_time: int
     fg_color: Color
     bg_color: Color
@@ -87,14 +87,14 @@ class Bang(BaseParam):
 
 class Toggle(BaseParam):
     type: Literal["toggle"] = "toggle"
-    label: Optional[Label] = None
+    label: Label | None = None
     fg_color: Color
     bg_color: Color
     non_zero: float
 
 
 class Radio(BaseParam):
-    label: Optional[Label] = None
+    label: Label | None = None
     fg_color: Color
     bg_color: Color
     options: int
@@ -109,7 +109,7 @@ class HRadio(Radio):
 
 
 class Slider(BaseParam):
-    label: Optional[Label] = None
+    label: Label | None = None
     min: float
     max: float
     fg_color: Color
@@ -153,7 +153,7 @@ class Knob(BaseParam):
 
 class Number(BaseParam):
     type: Literal["number"] = "number"
-    label: Optional[Label] = None
+    label: Label | None = None
     fg_color: Color
     bg_color: Color
     log_mode: bool
@@ -180,18 +180,18 @@ class Popmenu(BaseParam):
     options: list[str]
 
 
-GUIObjects = Union[Bang, Toggle, Radio, Slider, Knob, Number, Float, Comment, Canvas, Popmenu]
+GUIObjects = Bang | Toggle | Radio | Slider | Knob | Number | Float | Comment | Canvas | Popmenu
 
 
 class Theme(BaseModel):
-    obj_corner_radius: Optional[float] = None
-    cnv_color: Optional[Color] = None
-    cnv_txt_color: Optional[Color] = None
-    io_color: Optional[Color] = None
-    bg_color: Optional[Color] = None
-    sel_color: Optional[Color] = None
-    com_txt_color: Optional[Color] = None
-    out_color: Optional[Color] = None
+    obj_corner_radius: float | None = None
+    cnv_color: Color | None = None
+    cnv_txt_color: Color | None = None
+    io_color: Color | None = None
+    bg_color: Color | None = None
+    sel_color: Color | None = None
+    com_txt_color: Color | None = None
+    out_color: Color | None = None
 
 
 class GraphBase(BaseModel):
@@ -208,5 +208,5 @@ class Graph(GraphBase):
 
 class GraphRoot(GraphBase):
     size: Size
-    theme: Optional[Theme] = Theme()
+    theme: Theme | None = Theme()
     version: str = VERSION

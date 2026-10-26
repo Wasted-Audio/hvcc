@@ -30,9 +30,9 @@ class HIrReceive(HeavyIrObject):
     def __init__(
         self,
         obj_type: str,
-        args: Optional[dict] = None,
+        args: dict | None = None,
         graph: Optional['HeavyGraph'] = None,
-        annotations: Optional[dict] = None
+        annotations: dict | None = None
     ) -> None:
         super().__init__("__receive", args=args, graph=graph, annotations=annotations)
         # externed receivers must contain only alphanumeric characters or underscores,

@@ -21,7 +21,7 @@ import os
 import re
 import sys
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 from hvcc.core.hv2ir import hv2ir
 from hvcc.generators.c2daisy import c2daisy
@@ -203,7 +203,7 @@ def generate_extern_info(hvir: IRGraph, results: CompilerResults) -> ExternInfo:
     )
 
 
-def load_ext_generator(module_name: str, verbose: bool) -> Optional[Generator]:
+def load_ext_generator(module_name: str, verbose: bool) -> Generator | None:
     # add the current directory to the module search path
     sys.path.insert(0, str(Path.cwd()))
 
@@ -224,14 +224,14 @@ def compile_dataflow(
     in_path: Path,
     out_dir: Path,
     patch_name: str = "heavy",
-    patch_meta_file: Optional[Path] = None,
-    search_paths: Optional[list[Path]] = None,
-    generators: Optional[list[str]] = None,
-    ext_generators: Optional[list[str]] = None,
+    patch_meta_file: Path | None = None,
+    search_paths: list[Path] | None = None,
+    generators: list[str] | None = None,
+    ext_generators: list[str] | None = None,
     verbose: bool = False,
-    copyright: Optional[str] = None,
-    nodsp: Optional[bool] = False,
-    gui: Optional[bool] = False
+    copyright: str | None = None,
+    nodsp: bool | None = False,
+    gui: bool | None = False
 ) -> CompilerResults:
     results = CompilerResults(root={})
     patch_meta = Meta()

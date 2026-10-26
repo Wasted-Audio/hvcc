@@ -14,7 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from pathlib import Path
-from typing import Optional
 
 from hvcc.types.IR import IRSignalList
 
@@ -112,7 +111,7 @@ class SignalNam(HeavyObject):
         ]
 
     @classmethod
-    def get_C_gen_header_code(cls, obj_type: str, obj_id: str, args: dict) -> Optional[tuple[str, str]]:
+    def get_C_gen_header_code(cls, obj_type: str, obj_id: str, args: dict) -> tuple[str, str] | None:
         nam_file = Path(args["nam"])
         header_name = f"{to_symbol_stem(nam_file)}.h"
 

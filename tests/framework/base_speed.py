@@ -19,7 +19,6 @@ import os
 import shutil
 import subprocess
 from pathlib import Path
-from typing import Optional
 
 from tests.framework.base_test import HvBaseTest
 
@@ -30,10 +29,10 @@ class TestPdSpeedBase(HvBaseTest):
         self,
         source_files: list[Path],
         out_dir: Path,
-        sample_rate: Optional[int] = None,
-        block_size: Optional[int] = None,
-        num_iterations: Optional[int] = None,
-        flag: Optional[str] = None
+        sample_rate: int | None = None,
+        block_size: int | None = None,
+        num_iterations: int | None = None,
+        flag: str | None = None
     ):
         exe_path = self._compile_and_run_clang(source_files, out_dir, flag)
 

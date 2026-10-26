@@ -19,7 +19,7 @@ import os
 import re
 from collections import Counter, OrderedDict
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 from collections.abc import Generator
 
 from .HeavyGraph import HeavyGraph  # pre-converted Heavy graphs
@@ -91,7 +91,7 @@ class PdParser:
         """
         num_canvas = -1
         hv_arg_dict = OrderedDict()
-        hv_arg_list: Optional[list] = None
+        hv_arg_list: list | None = None
         with open(pd_path, "r") as f:
             for li in f:
                 if li.startswith("#N canvas"):
@@ -146,7 +146,7 @@ class PdParser:
         ).absolute()
         return self.add_absolute_search_directory(search_dir)
 
-    def find_abstraction_path(self, local_dir: Path, abs_name: str) -> Optional[Path]:
+    def find_abstraction_path(self, local_dir: Path, abs_name: str) -> Path | None:
         """ Finds the full path for an abstraction.
             Checks the local directory first, then all declared paths.
         """
@@ -169,7 +169,7 @@ class PdParser:
     def graph_from_file(
         self,
         file_path: Path,
-        obj_args: Optional[list] = None,
+        obj_args: list | None = None,
         pos_x: int = 0,
         pos_y: int = 0,
         is_root: bool = True,
@@ -235,7 +235,7 @@ class PdParser:
             @param canvas_line  The "#N canvas" which initiates this canvas.
             @param pd_graph_class  The python class to handle specific graph types
         """
-        obj_array: Optional[HeavyObject] = None  # an #A (table) object which is currently being parsed
+        obj_array: HeavyObject | None = None  # an #A (table) object which is currently being parsed
 
         def finalize_array(array: HeavyObject) -> None:
             declared_size = array.obj_dict["size"]

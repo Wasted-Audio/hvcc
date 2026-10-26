@@ -15,7 +15,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 from hvcc.types.compiler import CompilerNotif
 from hvcc.types.Heavy import Heavy, HvPos
@@ -54,7 +54,7 @@ class PdGraph(PdObject):
 
         # the subpatch name of this graph
         # only used is this graph is actually a subpatch
-        self.subpatch_name: Optional[str] = None
+        self.subpatch_name: str | None = None
 
         # TODO(dromer) these are virtual attributes that are only instantiated with internal representation
         self._PdGraph__connections: list[Connection] = []
@@ -126,7 +126,7 @@ class PdGraph(PdObject):
         arg_index: int,
         name: str,
         value_type: str,
-        default_value: Optional[Any],
+        default_value: Any | None,
         required: bool
     ) -> None:
         """ Add a Heavy argument to the graph. Indicies are from zero (not one, like Pd).

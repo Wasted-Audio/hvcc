@@ -14,7 +14,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from typing import Optional
 
 from hvcc.types.IR import IROnMessage
 
@@ -29,9 +28,9 @@ class HIrOutlet(HeavyIrObject):
     def __init__(
         self,
         obj_type: str,
-        args: Optional[dict] = None,
-        graph: Optional[HeavyGraph] = None,
-        annotations: Optional[dict] = None
+        args: dict | None = None,
+        graph: HeavyGraph | None = None,
+        annotations: dict | None = None
     ) -> None:
         super().__init__("__outlet", args=args, graph=graph, annotations=annotations)
 

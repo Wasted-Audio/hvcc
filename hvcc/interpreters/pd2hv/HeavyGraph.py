@@ -16,7 +16,6 @@
 
 import json
 from pathlib import Path
-from typing import Optional
 
 from hvcc.types.Heavy import Heavy
 
@@ -28,7 +27,7 @@ class HeavyGraph(PdObject):
     def __init__(
         self,
         hv_path: Path,
-        obj_args: Optional[list] = None,
+        obj_args: list | None = None,
         pos_x: int = 0,
         pos_y: int = 0
     ) -> None:
