@@ -18,9 +18,9 @@ import decimal
 import os
 import re
 from collections import Counter, OrderedDict
+from collections.abc import Generator
 from pathlib import Path
 from typing import Any
-from collections.abc import Generator
 
 from .HeavyGraph import HeavyGraph  # pre-converted Heavy graphs
 from .HeavyObject import HeavyObject

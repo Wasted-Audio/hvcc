@@ -14,8 +14,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from struct import pack, unpack
 from collections.abc import Callable
+from struct import pack, unpack
 
 from hvcc.types.IR import IRBuffer, IRObjectdict, IROnMessage, IRSignalList
 

@@ -5,8 +5,8 @@
 
 import re
 from collections import Counter
-from pathlib import Path
 from collections.abc import Generator
+from pathlib import Path
 
 from hvcc.interpreters.pd2hv.PdParser import PdParser
 from hvcc.types.GUI import (

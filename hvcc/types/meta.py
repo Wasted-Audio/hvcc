@@ -5,10 +5,9 @@
 
 import re
 from enum import IntEnum
-from typing import Literal
+from typing import Literal, Self
 
 from pydantic import BaseModel, HttpUrl, model_validator
-from typing import Self
 
 from hvcc.types.GUI import Theme
 
