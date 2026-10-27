@@ -53,7 +53,7 @@ class c2owl(Generator):
                     jdata.append((key, name, 'RECV', f"0x{heavy_hash(name):X}",
                                   0, 1, None, key in OWL_BUTTONS))
 
-            for _, obj in ir.objects.items():
+            for obj in ir.objects.values():
                 try:
                     if obj.type == '__send':
                         name = obj.args['name']

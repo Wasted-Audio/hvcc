@@ -262,7 +262,7 @@ class ir2c:
 
         # generate static table data initialisers
         table_data_list: list = []
-        for k, v in ir.tables.items():
+        for v in ir.tables.values():
             o = ir.objects[v.id]
             obj_class = ir2c.get_class(o.type)
             table_data_list.extend(obj_class.get_table_data_decl(
