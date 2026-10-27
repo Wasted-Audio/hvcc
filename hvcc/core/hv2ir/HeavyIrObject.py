@@ -15,19 +15,24 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import json
-
-from typing import Dict, List, Optional, TYPE_CHECKING
 from pathlib import Path
+from typing import TYPE_CHECKING, Optional
 
-
-from .Connection import Connection
-from .HeavyException import HeavyException
-from .HeavyLangObject import HeavyLangObject
-from .BufferPool import BufferPool
-
-from hvcc.types.IR import HeavyIRType, IRNode, IRObjectdict, IRSendMessage, IROnMessage, IRSignalList, IRBuffer
+from hvcc.types.IR import (
+    HeavyIRType,
+    IRBuffer,
+    IRNode,
+    IRObjectdict,
+    IROnMessage,
+    IRSendMessage,
+    IRSignalList,
+)
 from hvcc.types.Lang import LangLetType
 
+from .BufferPool import BufferPool
+from .Connection import Connection
+from .HeavyIrException import HeavyIrException
+from .HeavyLangObject import HeavyLangObject
 
 if TYPE_CHECKING:
     from .HeavyGraph import HeavyGraph
@@ -46,11 +51,11 @@ class HeavyIrObject(HeavyLangObject):
     def __init__(
         self,
         obj_type: str,
-        args: Optional[Dict] = None,
+        args: dict | None = None,
         graph: Optional['HeavyGraph'] = None,
         num_inlets: int = -1,
         num_outlets: int = -1,
-        annotations: Optional[Dict] = None
+        annotations: dict | None = None
     ) -> None:
         # allow the number of inlets and outlets to be overridden
         num_inlets = (len(self.__HEAVY_OBJS_IR_DICT[obj_type].inlets)
@@ -78,7 +83,7 @@ class HeavyIrObject(HeavyLangObject):
         """ Resolves missing default arguments. Also checks to make sure that all
             required arguments are present.
         """
-        if self.type in self.__HEAVY_OBJS_IR_DICT.keys():
+        if self.type in self.__HEAVY_OBJS_IR_DICT:
             for arg in self.__obj_desc.args:
                 if arg.name not in self.args:
                     # if a defined argument is not in the argument dictionary
@@ -100,7 +105,7 @@ class HeavyIrObject(HeavyLangObject):
     def is_ir(cls, obj_type: str) -> bool:
         """Returns true if the type is an IR object. False otherwise.
         """
-        return obj_type in cls.__HEAVY_OBJS_IR_DICT.keys()
+        return obj_type in cls.__HEAVY_OBJS_IR_DICT
 
     @property
     def does_process_signal(self) -> bool:
@@ -124,11 +129,11 @@ class HeavyIrObject(HeavyLangObject):
         """
         return self.__obj_desc.outlets[inlet_index] in {"~i>", "~f>"}
 
-    def reduce(self) -> Optional[tuple]:
+    def reduce(self) -> tuple | None:
         # A Heavy IR object is already reduced. Returns itself and no connection changes.
         return ({self}, [])
 
-    def get_parent_order(self) -> List:
+    def get_parent_order(self) -> list:
         """ Returns a list of all objects in process order, with this object at the end.
         """
         if self.__is_ordered:
@@ -144,7 +149,7 @@ class HeavyIrObject(HeavyLangObject):
                 order_list.append(self)
                 return order_list
 
-    def assign_signal_buffers(self, buffer_pool: Optional[BufferPool]) -> None:
+    def assign_signal_buffers(self, buffer_pool: BufferPool | None) -> None:
         if buffer_pool is not None:
             # assign the inlet buffers
             for cc in self.inlet_connections:
@@ -163,7 +168,7 @@ class HeavyIrObject(HeavyLangObject):
                     # decrease the retain count of the buffer
                     buffer_pool.release_buffer(buf)
                 else:
-                    raise HeavyException(f"This object has {len(cc)} (> 1) signal inputs.")
+                    raise HeavyIrException(f"This object has {len(cc)} (> 1) signal inputs.")
 
             # assign the output buffers
             exclude_set: set = set()
@@ -188,7 +193,7 @@ class HeavyIrObject(HeavyLangObject):
                     if len(self.outlet_connections[i]) == 0:
                         exclude_set.add(b)
 
-    def _resolved_outlet_type(self, outlet_index: int = 0) -> Optional[LangLetType]:
+    def _resolved_outlet_type(self, outlet_index: int = 0) -> LangLetType | None:
         """ Returns the connection type at the given outlet.
             This information is always well-defined for IR objects.
         """
@@ -198,7 +203,7 @@ class HeavyIrObject(HeavyLangObject):
     # Intermediate Representation generators
     #
 
-    def get_object_dict(self) -> Dict[str, IRObjectdict]:
+    def get_object_dict(self) -> dict[str, IRObjectdict]:
         """ Returns a dictionary of all constituent low-level objects,
             indexed by id, including their arguments and type.
         """
@@ -209,12 +214,12 @@ class HeavyIrObject(HeavyLangObject):
             )
         }
 
-    def get_ir_init_list(self) -> List[str]:
+    def get_ir_init_list(self) -> list[str]:
         """ Returns a list of all object id for objects that need initialisation.
         """
         return [self.id] if self.__obj_desc.ir.init else []
 
-    def get_ir_on_message(self, inlet_index: int = 0) -> List[IROnMessage]:
+    def get_ir_on_message(self, inlet_index: int = 0) -> list[IROnMessage]:
         """ Returns an array of dictionaries containing the information for the
             corresponding on_message call.
         """
@@ -223,7 +228,7 @@ class HeavyIrObject(HeavyLangObject):
             inletIndex=inlet_index
         )]
 
-    def get_ir_control_list(self) -> List[IRSendMessage]:
+    def get_ir_control_list(self) -> list[IRSendMessage]:
         """ Returns the intermediate representation for object control functions.
             Basically, does sendMessage() need to be written?
         """
@@ -243,7 +248,7 @@ class HeavyIrObject(HeavyLangObject):
         else:
             return []
 
-    def get_ir_signal_list(self) -> List[IRSignalList]:
+    def get_ir_signal_list(self) -> list[IRSignalList]:
         """ Returns the intermediate representation for object process functions.
             Only outputs buffer information for lets that require a signal.
         """

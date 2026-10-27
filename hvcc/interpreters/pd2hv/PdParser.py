@@ -17,32 +17,30 @@
 import decimal
 import os
 import re
-
-from collections import Counter
-from collections import OrderedDict
+from collections import Counter, OrderedDict
+from collections.abc import Generator
 from pathlib import Path
-from typing import Optional, Type, Any, Generator
+from typing import Any, ClassVar
 
+from .HeavyGraph import HeavyGraph  # pre-converted Heavy graphs
 from .HeavyObject import HeavyObject
-from .HeavyGraph import HeavyGraph              # pre-converted Heavy graphs
-from .HvSwitchcase import HvSwitchcase          # __switchcase
-from .PdAudioIoObject import PdAudioIoObject    # adc~/dac~
-from .PdBinopObject import PdBinopObject        # binary arithmatic operators
-from .PdExprObject import PdExprObject          # expr/expr~
-from .PdGraph import PdGraph                    # canvas
-from .PdLetObject import PdLetObject            # inlet/inlet~/outlet/outlet~
-from .PdMessageObject import PdMessageObject    # msg
-from .PdPackObject import PdPackObject          # pack
-from .PdReceiveObject import PdReceiveObject    # r/r~/receive/receive~/catch~
-from .PdRouteObject import PdRouteObject        # route
-from .PdSelectObject import PdSelectObject      # select/sel
-from .PdSendObject import PdSendObject          # s/s~/send/send~/throw~
-from .PdTriggerObject import PdTriggerObject    # trigger/t
-from .PdTableObject import PdTableObject        # table
-from .PdUnpackObject import PdUnpackObject      # unpack
-from .PdLibSignalGraph import PdLibSignalGraph  # pd/lib abstraction connection checks
-
+from .HvSwitchcase import HvSwitchcase  # __switchcase
 from .NotificationEnum import NotificationEnum
+from .PdAudioIoObject import PdAudioIoObject  # adc~/dac~
+from .PdBinopObject import PdBinopObject  # binary arithmatic operators
+from .PdExprObject import PdExprObject  # expr/expr~
+from .PdGraph import PdGraph  # canvas
+from .PdLetObject import PdLetObject  # inlet/inlet~/outlet/outlet~
+from .PdLibSignalGraph import PdLibSignalGraph  # pd/lib abstraction connection checks
+from .PdMessageObject import PdMessageObject  # msg
+from .PdPackObject import PdPackObject  # pack
+from .PdReceiveObject import PdReceiveObject  # r/r~/receive/receive~/catch~
+from .PdRouteObject import PdRouteObject  # route
+from .PdSelectObject import PdSelectObject  # select/sel
+from .PdSendObject import PdSendObject  # s/s~/send/send~/throw~
+from .PdTableObject import PdTableObject  # table
+from .PdTriggerObject import PdTriggerObject  # trigger/t
+from .PdUnpackObject import PdUnpackObject  # unpack
 
 
 class PdParser:
@@ -93,7 +91,7 @@ class PdParser:
         """
         num_canvas = -1
         hv_arg_dict = OrderedDict()
-        hv_arg_list: Optional[list] = None
+        hv_arg_list: list | None = None
         with open(pd_path, "r") as f:
             for li in f:
                 if li.startswith("#N canvas"):
@@ -148,7 +146,7 @@ class PdParser:
         ).absolute()
         return self.add_absolute_search_directory(search_dir)
 
-    def find_abstraction_path(self, local_dir: Path, abs_name: str) -> Optional[Path]:
+    def find_abstraction_path(self, local_dir: Path, abs_name: str) -> Path | None:
         """ Finds the full path for an abstraction.
             Checks the local directory first, then all declared paths.
         """
@@ -171,11 +169,11 @@ class PdParser:
     def graph_from_file(
         self,
         file_path: Path,
-        obj_args: Optional[list] = None,
+        obj_args: list | None = None,
         pos_x: int = 0,
         pos_y: int = 0,
         is_root: bool = True,
-        pd_graph_class: Type[PdGraph] = PdGraph
+        pd_graph_class: type[PdGraph] = PdGraph
     ) -> Any:
         """ Instantiate a PdGraph from a file.
             Note that obj_args does not include $0.
@@ -228,7 +226,7 @@ class PdParser:
         pos_x: int = 0,
         pos_y: int = 0,
         is_root: bool = False,
-        pd_graph_class: Type[PdGraph] = PdGraph
+        pd_graph_class: type[PdGraph] = PdGraph
     ) -> Any:
         """ Instantiate a PdGraph from an existing canvas.
             Note that graph_args includes $0.
@@ -237,7 +235,7 @@ class PdParser:
             @param canvas_line  The "#N canvas" which initiates this canvas.
             @param pd_graph_class  The python class to handle specific graph types
         """
-        obj_array: Optional[HeavyObject] = None  # an #A (table) object which is currently being parsed
+        obj_array: HeavyObject | None = None  # an #A (table) object which is currently being parsed
 
         def finalize_array(array: HeavyObject) -> None:
             declared_size = array.obj_dict["size"]
@@ -576,7 +574,7 @@ class PdParser:
                             "else/popmenu": (7, 6),
                         }
 
-                        if obj_type in arg_index.keys():
+                        if obj_type in arg_index:
                             send_index = arg_index[obj_type][0]
                             recv_index = arg_index[obj_type][1]
 
@@ -726,7 +724,7 @@ class PdParser:
             # bubble the Exception back to the root graph where the graph
             # will be returned
             if not g.is_root:
-                raise e
+                raise
             else:
                 # NOTE(mhroth): should the exception be added as an error?
                 # Sometimes it's all that we have, so perhaps it's a good idea.
@@ -794,7 +792,7 @@ class PdParser:
         return resolved_obj_args
 
     # a mapping of Pd objects to the classes that will parse them
-    __PD_CLASSES = {
+    __PD_CLASSES: ClassVar[dict[str, type]] = {
         "adc~": PdAudioIoObject,
         "dac~": PdAudioIoObject,
         "expr": PdExprObject,
@@ -835,7 +833,7 @@ class PdParser:
         try:
             float(x)
             return True
-        except Exception:
+        except ValueError:
             return False
 
     def __create_send_recv(
@@ -846,11 +844,11 @@ class PdParser:
         gui_recv: dict
     ) -> PdGraph:
         # parse remote messages
-        for index in msg_send.keys():
+        for index, remotes in msg_send.items():
             first_msg = g.get_object(index)
             conns = first_msg.get_inlet_connections()
 
-            for remote in msg_send[index]:
+            for remote in remotes:
                 self.obj_counter["msg"] += 1
                 msg = PdMessageObject("msg", [" ".join(msg for msg in remote["message"])])
                 msg_index = g.add_object(msg)
@@ -868,17 +866,17 @@ class PdParser:
                 g.add_parsed_connection(msg_index, 0, send_index, 0)
 
         # parse gui sends
-        for index in gui_send.keys():
+        for index, receivers in gui_send.items():
             self.obj_counter["send"] += 1
-            send = PdSendObject('send', gui_send[index].split())
+            send = PdSendObject('send', receivers.split())
             send_index = g.add_object(send)
 
             g.add_parsed_connection(index, 0, send_index, 0)
 
         # parse gui receives
-        for index in gui_recv.keys():
+        for index, receivers in gui_recv.items():
             self.obj_counter["receive"] += 1
-            recv = PdReceiveObject('receive', gui_recv[index].split())
+            recv = PdReceiveObject('receive', receivers.split())
             recv_index = g.add_object(recv)
 
             g.add_parsed_connection(recv_index, 0, index, 0)

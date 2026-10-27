@@ -39,7 +39,7 @@ scipy = [
 ]
 
 pytest-cov = ">=5,<8"
-ruff = "^0.15.22"
+ruff = "^0.17.1"
 mypy = "^1.11.2"
 pytest = ">=8.3.3,<10.0.0"
 
@@ -57,4 +57,15 @@ build-backend = "poetry.core.masonry.api"
 [tool.mypy]
 plugins = [
   "pydantic.mypy"
+]
+
+[tool.ruff]
+line-length = 120
+exclude = [".tox", ".venv", "venv", "build", "examples", "hvcc/generators/ir2c/static/MicroNam/*"]
+
+[tool.ruff.lint]
+ignore = [
+    "N999",
+    "UP030",
+    "UP032",
 ]

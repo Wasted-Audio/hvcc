@@ -14,15 +14,16 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from typing import Optional, Any
 from pathlib import Path
-
-from .Connection import Connection
-from .NotificationEnum import NotificationEnum
-from .PdObject import PdObject
+from typing import Any
 
 from hvcc.types.compiler import CompilerNotif
 from hvcc.types.Heavy import Heavy, HvPos
+
+from ..HeavyPdException import HeavyPdException
+from .Connection import Connection
+from .NotificationEnum import NotificationEnum
+from .PdObject import PdObject
 
 
 class PdGraph(PdObject):
@@ -54,7 +55,7 @@ class PdGraph(PdObject):
 
         # the subpatch name of this graph
         # only used is this graph is actually a subpatch
-        self.subpatch_name: Optional[str] = None
+        self.subpatch_name: str | None = None
 
         # TODO(dromer) these are virtual attributes that are only instantiated with internal representation
         self._PdGraph__connections: list[Connection] = []
@@ -115,7 +116,7 @@ class PdGraph(PdObject):
             # (generally used for reporting and validation purposes)
             self.__objs[from_index].add_connection(c)
             self.__objs[to_index].add_connection(c)
-        except Exception:
+        except (HeavyPdException, IndexError, AssertionError):
             self.add_error("There was an error while connecting two objects. "
                            "Have all objects been correctly instantiated? "
                            "Have all inlets and outlets been declared?",
@@ -126,7 +127,7 @@ class PdGraph(PdObject):
         arg_index: int,
         name: str,
         value_type: str,
-        default_value: Optional[Any],
+        default_value: Any | None,
         required: bool
     ) -> None:
         """ Add a Heavy argument to the graph. Indicies are from zero (not one, like Pd).
@@ -208,7 +209,7 @@ class PdGraph(PdObject):
             return self.parent_graph.get_graph_heirarchy() + [str(self)]
         else:
             # NOTE(dromer): we should never get here
-            raise Exception("parent_graph argument is None")
+            raise HeavyPdException("parent_graph argument is None")
 
     def get_depth(self) -> int:
         """ Returns the depth of this graph, with the root being at 1.
@@ -219,7 +220,7 @@ class PdGraph(PdObject):
             return 1 + self.parent_graph.get_depth()
         else:
             # NOTE(dromer): we should never get here
-            raise Exception("parent_graph argument is None")
+            raise HeavyPdException("parent_graph argument is None")
 
     def to_hv(self, export_args: bool = False) -> Heavy:
         # NOTE(mhroth): hv_args are not returned. Because all arguments have

@@ -16,12 +16,18 @@
 
 import json
 import random
-
-from typing import Any, Dict, List, Optional, Set, Tuple
 from pathlib import Path
+from typing import Any
 
 from hvcc.types.Heavy import Heavy
 
+from .Connection import Connection
+from .HeavyGraph import HeavyGraph
+
+# from .HLangIf import HLangIf  # circular import. moved here
+from .HeavyIrException import HeavyIrException
+from .HeavyIrObject import HeavyIrObject
+from .HeavyLangObject import HeavyLangObject
 from .HIrConvolution import HIrConvolution
 from .HIrExpr import HIrExpr
 from .HIrInlet import HIrInlet
@@ -33,23 +39,19 @@ from .HIrSwitchcase import HIrSwitchcase
 from .HIrTabhead import HIrTabhead
 from .HIrTabread import HIrTabread
 from .HIrTabwrite import HIrTabwrite
-
 from .HLangAdc import HLangAdc
 from .HLangBinop import HLangBinop
 from .HLangBiquad import HLangBiquad
 from .HLangDac import HLangDac
 from .HLangDelay import HLangDelay
-# from .HLangIf import HLangIf  # circular import. moved here
-from .HeavyException import HeavyException
-from .HeavyIrObject import HeavyIrObject
-from .HeavyLangObject import HeavyLangObject
 from .HLangLine import HLangLine
 from .HLangMessage import HLangMessage
+
 # from .HLangNoise import HLangNoise  # circular import. moved here
 from .HLangPhasor import HLangPhasor
 from .HLangPrint import HLangPrint
-from .HLangReceive import HLangReceive
 from .HLangRandom import HLangRandom
+from .HLangReceive import HLangReceive
 from .HLangSend import HLangSend
 from .HLangSequence import HLangSequence
 from .HLangSlice import HLangSlice
@@ -59,9 +61,6 @@ from .HLangUnop import HLangUnop
 from .HLangVar import HLangVar
 from .HLangVario import HLangVario
 
-from .HeavyGraph import HeavyGraph
-from .Connection import Connection
-
 
 class HeavyParser:
 
@@ -69,10 +68,10 @@ class HeavyParser:
     def graph_from_file(
         cls,
         hv_file: Path,
-        graph: Optional[HeavyGraph] = None,
-        graph_args: Optional[Dict] = None,
-        path_stack: Optional[set[Path]] = None,
-        xname: Optional[str] = None
+        graph: HeavyGraph | None = None,
+        graph_args: dict | None = None,
+        path_stack: set[Path] | None = None,
+        xname: str | None = None
     ) -> HeavyGraph:
         """ Read a graph object from a file.
 
@@ -88,7 +87,7 @@ class HeavyParser:
         # copy the path stack such that no changes are made to the calling stack
         path_stack = path_stack or set()
         if hv_file in path_stack:
-            raise HeavyException(f"Abstraction recursion detected. Rereading {hv_file} on stack {path_stack}.")
+            raise HeavyIrException(f"Abstraction recursion detected. Rereading {hv_file} on stack {path_stack}.")
         else:
             path_stack.add(hv_file)
 
@@ -104,9 +103,9 @@ class HeavyParser:
         hv_file: Path,
         json_heavy: Heavy,
         path_stack: set[Path],
-        graph: Optional[HeavyGraph] = None,
-        graph_args: Optional[Dict] = None,
-        xname: Optional[str] = None
+        graph: HeavyGraph | None = None,
+        graph_args: dict | None = None,
+        xname: str | None = None
     ) -> HeavyGraph:
 
         """ Parse a graph object.
@@ -119,12 +118,12 @@ class HeavyParser:
         graph_args = graph_args or {}
 
         if not isinstance(json_heavy.args, list):
-            raise HeavyException("Graph arguments must be a list.")
+            raise HeavyIrException("Graph arguments must be a list.")
 
         for a in json_heavy.args:
             if a["name"] not in graph_args:
                 if a["required"]:
-                    raise HeavyException(f"Required argument \"{a['name']}\" not present.")
+                    raise HeavyIrException(f"Required argument \"{a['name']}\" not present.")
                 else:
                     graph_args[a["name"]] = a["default"]
             else:
@@ -199,13 +198,13 @@ class HeavyParser:
                     conn_type=c.type
                 ))
 
-        except HeavyException as e:
+        except HeavyIrException as e:
             if g.is_root_graph():
                 # add the notification dictionary at the top level
                 e.notes = g.get_notices()
                 e.notes.has_error = True
                 e.notes.exception = e
-            raise e
+            raise
 
         if (g.graph is None) or (g.graph.file != g.file):
             # remove this graph from the stack when finished.
@@ -235,14 +234,14 @@ class HLangIf(HeavyLangObject):
     def __init__(
         self,
         obj_type: str,
-        args: Dict,
+        args: dict,
         graph: HeavyGraph,
-        annotations: Optional[Dict] = None
+        annotations: dict | None = None
     ) -> None:
         assert obj_type == "if"
         super().__init__("if", args, graph, num_inlets=2, num_outlets=2, annotations=annotations)
 
-    def reduce(self) -> Tuple[Set, List]:
+    def reduce(self) -> tuple[set, list]:
         if self.has_inlet_connection_format(["cc", "_c", "c_", "__"]):
             x = HeavyIrObject("__if", self.args)
         elif self.has_inlet_connection_format("ff"):
@@ -253,7 +252,7 @@ class HLangIf(HeavyLangObject):
             x = HeavyParser.graph_from_file(Path("./hvlib/if~i.hv.json"))
         else:
             fmt = self._get_connection_format(self.inlet_connections)
-            raise HeavyException(f"Unhandled connection configuration to object [if]: {fmt}")
+            raise HeavyIrException(f"Unhandled connection configuration to object [if]: {fmt}")
 
         return ({x}, self.get_connection_move_list(x))
 
@@ -265,14 +264,14 @@ class HLangNoise(HeavyLangObject):
     def __init__(
         self,
         obj_type: str,
-        args: Dict,
+        args: dict,
         graph: HeavyGraph,
-        annotations: Optional[Dict] = None
+        annotations: dict | None = None
     ) -> None:
         assert obj_type == "noise"
         super().__init__("noise", args, graph, num_inlets=1, num_outlets=1, annotations=annotations)
 
-    def reduce(self) -> Tuple[Set, List]:
+    def reduce(self) -> tuple[set, list]:
         seed = int(random.uniform(1, 2147483647))  # assign a random 32-bit seed
         noise_path = Path(Path(__file__).parent, "./hvlib/noise.hv.json")
         x = HeavyParser.graph_from_file(noise_path, graph_args={"seed": seed})

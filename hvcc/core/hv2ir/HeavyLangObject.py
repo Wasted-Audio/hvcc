@@ -18,16 +18,15 @@ import decimal
 import json
 import random
 import string
-
-from struct import unpack, pack
-from typing import Optional, Union, List, Dict, Any, TYPE_CHECKING
 from pathlib import Path
-
-from .Connection import Connection
-from .HeavyException import HeavyException
+from struct import pack, unpack
+from typing import TYPE_CHECKING, Any, Optional
 
 from hvcc.types.compiler import CompilerMsg, CompilerNotif
-from hvcc.types.Lang import HeavyLangType, LangNode, LangLet, LangLetType, LangValueType
+from hvcc.types.Lang import HeavyLangType, LangLet, LangLetType, LangNode, LangValueType
+
+from .Connection import Connection
+from .HeavyIrException import HeavyIrException
 
 if TYPE_CHECKING:
     from .HeavyGraph import HeavyGraph
@@ -48,11 +47,11 @@ class HeavyLangObject:
     def __init__(
         self,
         obj_type: str,
-        args: Optional[Dict] = None,
+        args: dict | None = None,
         graph: Optional['HeavyGraph'] = None,
         num_inlets: int = -1,
         num_outlets: int = -1,
-        annotations: Optional[Dict] = None
+        annotations: dict | None = None
     ) -> None:
         # set the object type
         self.type = obj_type
@@ -64,25 +63,25 @@ class HeavyLangObject:
         self.graph = graph
 
         # set local arguments
-        self.args: Dict = args or {}
+        self.args: dict = args or {}
 
         # set local annotations
-        self.annotations: Dict = annotations or {}
+        self.annotations: dict = annotations or {}
 
         # a list of locally generated warnings and errors (notifications)
-        self.warnings: List[CompilerMsg] = []
-        self.errors: List[CompilerMsg] = []
+        self.warnings: list[CompilerMsg] = []
+        self.errors: list[CompilerMsg] = []
 
         # resolve arguments and fill in missing defaults for HeavyLang objects
         self.__resolve_default_lang_args()
 
         # the list of connections at each inlet
         num_inlets = num_inlets if num_inlets >= 0 else len(self._obj_desc.inlets)
-        self.inlet_connections: List = [[] for _ in range(num_inlets)]
+        self.inlet_connections: list = [[] for _ in range(num_inlets)]
 
         # the list of connections at each outlet
         num_outlets = num_outlets if num_outlets >= 0 else len(self._obj_desc.outlets)
-        self.outlet_connections: List = [[] for _ in range(num_outlets)]
+        self.outlet_connections: list = [[] for _ in range(num_outlets)]
 
     @property
     def scope(self) -> str:
@@ -104,7 +103,7 @@ class HeavyLangObject:
         return self.annotations.get("const", False)
 
     @property
-    def name(self) -> Optional[str]:
+    def name(self) -> str | None:
         """ Returns the name of this object. Returns None if there is no name.
         """
         return self.args.get("name", None)
@@ -135,7 +134,7 @@ class HeavyLangObject:
         """ Add an error to this object and raise an exception.
         """
         self.errors.append(CompilerMsg(message=error))
-        raise HeavyException(error)
+        raise HeavyIrException(error)
 
     def get_notices(self) -> CompilerNotif:
         """ Returns a dictionary of all warnings and errors at this object.
@@ -150,7 +149,7 @@ class HeavyLangObject:
     def force_arg_type(
         cls,
         value: LangValueType,
-        value_type: Optional[str] = None,
+        value_type: str | None = None,
         graph: Optional['HeavyGraph'] = None
     ) -> Any:
         """ Attempts to convert a value to a given value type. Raises an Exception otherwise.
@@ -159,10 +158,13 @@ class HeavyLangObject:
         if value_type == "float":
             try:
                 return float(value)
-            except Exception:
-                raise Exception(f"Cannot convert argument \"{value}\" into float.")
+            except (ValueError, TypeError, OverflowError):
+                raise HeavyIrException(f"Cannot convert argument \"{value}\" into float.")
         elif value_type == "int":
-            return int(decimal.Decimal(value))
+            try:
+                return int(decimal.Decimal(value))
+            except (ValueError, TypeError, decimal.InvalidOperation, OverflowError):
+                raise HeavyIrException(f"Cannot convert argument \"{value}\" into int.")
         elif value_type == "string":
             return str(value) if value is not None else None
         elif value_type == "bool":
@@ -176,21 +178,21 @@ class HeavyLangObject:
             if isinstance(value, str):
                 return [float(v) for v in value.split()]
             else:
-                raise HeavyException(f"Cannot convert value to type floatarray: {value}")
+                raise HeavyIrException(f"Cannot convert value to type floatarray: {value}")
         elif value_type == "intarray":
             if isinstance(value, list):
                 return [int(v) for v in value]
             if isinstance(value, str):
                 return [int(v) for v in value.split()]
             else:
-                raise HeavyException(f"Cannot convert value to type intarray: {value}")
+                raise HeavyIrException(f"Cannot convert value to type intarray: {value}")
         elif value_type == "stringarray":
             if isinstance(value, list):
                 return [str(v) for v in value]
             if isinstance(value, str):
                 return [str(v) for v in value.split()]
             else:
-                raise HeavyException(f"Cannot convert value to type stringarray: {value}")
+                raise HeavyIrException(f"Cannot convert value to type stringarray: {value}")
         else:
             # NOTE(mhroth): if value_type is not a known type or None, that is
             # not necessarily an error. It may simply be that the value should
@@ -204,7 +206,7 @@ class HeavyLangObject:
         """ Resolves missing default arguments. Also checks to make sure that all
             required arguments are present. Does nothing if the object is IR.
         """
-        if self.type in self._HEAVY_LANG_DICT.keys():
+        if self.type in self._HEAVY_LANG_DICT:
             for arg in self._obj_desc.args:
                 if arg.name not in self.args:
                     # if a defined argument is not in the argument dictionary
@@ -237,9 +239,9 @@ class HeavyLangObject:
             elif c.from_object is self:
                 self.outlet_connections[c.outlet_index].append(c)
             else:
-                raise HeavyException(f"Connection {c} does not connect to this object {self}.")
-        except Exception as exc:
-            raise HeavyException(f"Connection {c} connects to out-of-range let: {exc}")
+                raise HeavyIrException(f"Connection {c} does not connect to this object {self}.")
+        except IndexError as exc:
+            raise HeavyIrException(f"Connection {c} connects to out-of-range let: {exc}")
 
     def remove_connection(self, c: Connection) -> None:
         """ Remove a connection to this object.
@@ -249,9 +251,9 @@ class HeavyLangObject:
         elif c.from_object is self:
             self.outlet_connections[c.outlet_index].remove(c)
         else:
-            raise HeavyException(f"Connection {c} does not connect to this object {self}.")
+            raise HeavyIrException(f"Connection {c} does not connect to this object {self}.")
 
-    def replace_connection(self, c: Connection, n_list: List) -> None:
+    def replace_connection(self, c: Connection, n_list: list) -> None:
         """ Replaces connection c with connection list n_list, maintaining connection order
         """
         if c.from_object is self:
@@ -266,9 +268,9 @@ class HeavyLangObject:
             self.inlet_connections[c.inlet_index].remove(c)
             self.inlet_connections[c.inlet_index].extend(n_list)
         else:
-            raise HeavyException(f"Connections must have a common endpoint: {c} / {n_list}")
+            raise HeavyIrException(f"Connections must have a common endpoint: {c} / {n_list}")
 
-    def get_connection_move_list(self, o: 'HeavyIrObject', connection_type_filter: str = "-~>") -> List:
+    def get_connection_move_list(self, o: 'HeavyIrObject', connection_type_filter: str = "-~>") -> list:
         """ Create a list of commands to move all connections from this object
             to the given object o.
         """
@@ -279,7 +281,7 @@ class HeavyLangObject:
             m.append((c, [c.copy(from_object=o)]))
         return m
 
-    def _get_connection_format(self, connections_list: List) -> str:
+    def _get_connection_format(self, connections_list: list) -> str:
         fmt = []
         for cc in connections_list:
             s = {c.type for c in cc}
@@ -293,20 +295,20 @@ class HeavyLangObject:
                 elif "~i>" in s:
                     fmt.append("i")
                 else:
-                    raise Exception(f"Unknown connection type in set {cc} in file {cc[0].from_object.graph.file}.")
+                    raise HeavyIrException(f"Unknown connection type in set {cc} in file {cc[0].from_object.graph.file}.")
             elif s in [{"~f>", "-->"}, {"~i>", "-->"}]:
                 fmt.append("m")
             else:
                 fmt.append("m")
         return "".join(fmt)
 
-    def has_inlet_connection_format(self, fmts: Optional[Union[str, List]] = None) -> bool:
+    def has_inlet_connection_format(self, fmts: str | list | None = None) -> bool:
         """ Returns true if the object has given format at its inlets.
         """
         fmts = fmts if isinstance(fmts, list) else [fmts]
         return self._get_connection_format(self.inlet_connections) in fmts
 
-    def has_outlet_connection_format(self, fmts: Optional[Union[str, List]] = None) -> bool:
+    def has_outlet_connection_format(self, fmts: str | list | None = None) -> bool:
         """ Returns true if the object has given format at its outlets.
             Take either litteral or list as input.
         """
@@ -323,7 +325,7 @@ class HeavyLangObject:
         """
         return all(len(c) == 0 for c in self.inlet_connections)
 
-    def _resolved_outlet_type(self, outlet_index: int = 0) -> Optional[LangLetType]:
+    def _resolved_outlet_type(self, outlet_index: int = 0) -> LangLetType | None:
         """ Returns the connection type expected at the given outlet.
             The result may be influenced by the state of the input connections.
         """
@@ -336,7 +338,7 @@ class HeavyLangObject:
             if len(connection_type_set) == 0:
                 return "-->"
             elif len(connection_type_set) == 1:
-                return list(connection_type_set)[0]
+                return next(iter(connection_type_set))
             elif len(connection_type_set) == 2:
                 if {"-->", "~f>"} == connection_type_set:
                     return "~f>"
@@ -350,7 +352,7 @@ class HeavyLangObject:
 
         return None
 
-    def _resolve_connection_types(self, obj_stack: Optional[set] = None) -> None:
+    def _resolve_connection_types(self, obj_stack: set | None = None) -> None:
         """ Resolves the type of all connections before reduction to IR object types.
             If connections incident on an object are incompatible, they are either
             resolved, potentially by inserting conversion objects, or pruned.
@@ -375,7 +377,7 @@ class HeavyLangObject:
                 c.to_object._resolve_connection_types(obj_stack)  # turtle all the way down
 
     @classmethod
-    def get_hash(cls, x: Union[str, float, int]) -> int:
+    def get_hash(cls, x: str | float) -> int:
         """ Compute the message element hash used by msg_getHash(). Returns a 32-bit integer.
         """
         if isinstance(x, (float, int)) and not isinstance(x, str):
@@ -415,7 +417,7 @@ class HeavyLangObject:
             h ^= h >> 15
             return h
         else:
-            raise Exception("Message element hashes can only be computed for float and string types.")
+            raise HeavyIrException("Message element hashes can only be computed for float and string types.")
 
     def __repr__(self) -> str:
         arg_str = " ".join([f"{k}:{o}" for (k, o) in self.args.items()])

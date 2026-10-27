@@ -6,7 +6,7 @@
 import pytest
 
 from hvcc.interpreters.pd2gui.PdGUIParser import PdGUIParser
-from hvcc.types.GUI import Graph, Coords, Size, GUIObjects
+from hvcc.types.GUI import Coords, Graph, GUIObjects, Size
 
 
 def test_filter_graph(cnv_vis1):

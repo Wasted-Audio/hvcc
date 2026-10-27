@@ -13,13 +13,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from typing import Dict, Optional
 from pathlib import Path
 
-from .HeavyIrObject import HeavyIrObject
-from .HeavyGraph import HeavyGraph
-
 from hvcc.generators.ir2c.SignalNamHeader import ModelNet, load_nam_file
+
+from .HeavyGraph import HeavyGraph
+from .HeavyIrObject import HeavyIrObject
 
 
 class HIrNam(HeavyIrObject):
@@ -29,9 +28,9 @@ class HIrNam(HeavyIrObject):
     def __init__(
         self,
         obj_type: str,
-        args: Optional[Dict] = None,
-        graph: Optional[HeavyGraph] = None,
-        annotations: Optional[Dict] = None
+        args: dict | None = None,
+        graph: HeavyGraph | None = None,
+        annotations: dict | None = None
     ) -> None:
         assert obj_type == "__nam~f"
 

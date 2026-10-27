@@ -17,9 +17,9 @@
 import argparse
 import platform
 import unittest
+from pathlib import Path
 
 from tests.framework.base_control import TestPdControlBase
-from pathlib import Path
 
 
 class TestPdControlExprPatches(TestPdControlBase):

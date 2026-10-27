@@ -4,9 +4,9 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 import json
-
 from pathlib import Path
 
+from hvcc.interpreters.HeavyPdException import HeavyPdException
 from hvcc.interpreters.pd2gui.pd2gui import pd2gui
 from hvcc.version import VERSION
 
@@ -28,7 +28,7 @@ class TestPdGuiParser:
         )
 
         if response.notifs.has_error:
-            raise Exception(response.notifs.errors[0])
+            raise HeavyPdException(f"{response.notifs.errors[0]}")
 
         with open(gui_path, "r") as f:
             gui = json.loads(f.read())

@@ -13,27 +13,40 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import jinja2
 import shutil
 import time
-
-from typing import Optional
 from pathlib import Path
+
+import jinja2
+
+from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
+from hvcc.types.compiler import (
+    CompilerMsg,
+    CompilerNotif,
+    CompilerResp,
+    ExternInfo,
+    Generator,
+)
+from hvcc.types.meta import (
+    DPF,
+    DPFPortGroupConfig,
+    DPFPortGroups,
+    DPFUISize,
+    DPFUIType,
+    Meta,
+    slugify,
+)
 
 from ..copyright import copyright_manager
 from ..filters import filter_uniqueid
-
-from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
-from hvcc.types.compiler import Generator, CompilerResp, CompilerMsg, CompilerNotif, ExternInfo
-from hvcc.types.meta import DPFPortGroups, DPFPortGroupConfig, Meta, DPF, DPFUIType, DPFUISize, slugify
-from .nanovg_render import open_gui_json, nanovg_render
+from .nanovg_render import nanovg_render, open_gui_json
 
 
 def _normalize_port_groups(
-        port_groups: Optional[DPFPortGroups],
+        port_groups: DPFPortGroups | None,
         num_input_channels: int,
         num_output_channels: int
-) -> Optional[DPFPortGroups]:
+) -> DPFPortGroups | None:
     """Convert 1-based PD port indices to 0-based DPF channel indices."""
     if port_groups is None:
         return None
@@ -81,14 +94,15 @@ class c2dpf(Generator):
         out_dir: Path,
         externs: ExternInfo,
         patch_name: str,
-        patch_meta: Meta = Meta(),
+        patch_meta: Meta,
         num_input_channels: int = 0,
         num_output_channels: int = 0,
-        copyright: Optional[str] = None,
-        verbose: Optional[bool] = False
+        copyright: str | None = None,
+        verbose: bool | None = False
     ) -> CompilerResp:
 
         tick = time.time()
+        patch_meta = patch_meta or Meta()
 
         out_dir = Path(out_dir, "plugin")
         receiver_list = externs.parameters.inParam
@@ -245,7 +259,7 @@ class c2dpf(Generator):
                 compile_time=time.time() - tick
             )
 
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001
             return CompilerResp(
                 stage="c2dpf",
                 notifs=CompilerNotif(

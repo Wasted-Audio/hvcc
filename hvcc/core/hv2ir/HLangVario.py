@@ -14,12 +14,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from typing import Optional, Dict
 
-from .HeavyException import HeavyException
+from .HeavyGraph import HeavyGraph
+from .HeavyIrException import HeavyIrException
 from .HeavyIrObject import HeavyIrObject
 from .HeavyLangObject import HeavyLangObject
-from .HeavyGraph import HeavyGraph
 
 
 class HLangVario(HeavyLangObject):
@@ -27,18 +26,18 @@ class HLangVario(HeavyLangObject):
     def __init__(
         self,
         obj_type: str,
-        args: Dict,
+        args: dict,
         graph: 'HeavyGraph',
-        annotations: Optional[Dict] = None
+        annotations: dict | None = None
     ) -> None:
         assert obj_type == "vario"
         super().__init__(obj_type, args, graph, annotations=annotations)
 
-    def reduce(self) -> Optional[tuple]:
+    def reduce(self) -> tuple | None:
         if self.graph is not None and self.name is not None:
             var_obj = self.graph.resolve_object_for_name(self.name, "var")
             if var_obj is None:
-                raise HeavyException(
+                raise HeavyIrException(
                     f"No corresponding \"var\" object found for object {self} in file {self.graph.file}"
                 )
 
@@ -59,6 +58,6 @@ class HLangVario(HeavyLangObject):
                 return {x}, self.get_connection_move_list(x)
 
             else:
-                raise Exception()
+                raise HeavyIrException("Unsupported connection format for HLangVario")
 
         return None

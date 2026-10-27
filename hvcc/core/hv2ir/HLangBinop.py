@@ -14,48 +14,50 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from typing import Optional, Dict
+from collections.abc import Mapping
+from types import MappingProxyType
+from typing import Final, Optional
 
 from .Connection import Connection
-from .HeavyLangObject import HeavyLangObject
-from .HeavyIrObject import HeavyIrObject
 from .HeavyGraph import HeavyGraph
+from .HeavyIrObject import HeavyIrObject
+from .HeavyLangObject import HeavyLangObject
 
 
 class HLangBinop(HeavyLangObject):
 
-    __HEAVY_DICT = {
-        "+": ["__add", "__add_k", "__add~f", "__add~i"],
-        "-": ["__sub", "__sub_k", "__sub~f", "__sub~i"],
-        "*": ["__mul", "__mul_k", "__mul~f", "__mul~i"],
-        "/": ["__div", "__div_k", "__div~f", "__div~i"],
-        "max": ["__max", "__max_k", "__max~f", "__max~i"],
-        "min": ["__min", "__min_k", "__min~f", "__min~i"],
-        ">": ["__gt", "__gt_k", "__gt~f", "__gt~i"],
-        ">=": ["__gte", "__gte_k", "__gte~f", "__gte~i"],
-        "==": ["__eq", "__eq_k", "__eq~f", "__eq~i"],
-        "!=": ["__neq", "__neq_k", "__neq~f", "__neq~i"],
-        "<": ["__lt", "__lt_k", "__lt~f", "__lt~i"],
-        "<=": ["__lte", "__lte_k", "__lte~f", "__lte~i"],
-        "&": ["__and", "__and_k", "__and~f", "__and~i"],  # binary and
-        "&&": ["__logand", "__logand_k"],  # logical or
-        "&!": ["__andnot", "__andnot~f", "__andnot~i"],
-        "|": ["__or", "__or_k", "__or~f", "__or~i"],  # binary or
-        "||": ["__logor", "__logor_k"],  # logical or
-        "pow": ["__pow", "__pow_k", "__pow~f", "__pow~i"],
-        "atan2": ["__atan2", "__atan2_k", "__atan2~f"],
-        "mod": ["__unimod", "__unimod_k"],
-        "%": ["__bimod", "__bimod_k"],
-        ">>": ["__shiftright", "__shiftright_k"],  # binary right shift
-        "<<": ["__shiftleft", "__shiftleft_k"]  # binary left shift
-    }
+    __HEAVY_DICT: Final[Mapping[str, tuple[str, ...]]] = MappingProxyType({
+        "+": ("__add", "__add_k", "__add~f", "__add~i"),
+        "-": ("__sub", "__sub_k", "__sub~f", "__sub~i"),
+        "*": ("__mul", "__mul_k", "__mul~f", "__mul~i"),
+        "/": ("__div", "__div_k", "__div~f", "__div~i"),
+        "max": ("__max", "__max_k", "__max~f", "__max~i"),
+        "min": ("__min", "__min_k", "__min~f", "__min~i"),
+        ">": ("__gt", "__gt_k", "__gt~f", "__gt~i"),
+        ">=": ("__gte", "__gte_k", "__gte~f", "__gte~i"),
+        "==": ("__eq", "__eq_k", "__eq~f", "__eq~i"),
+        "!=": ("__neq", "__neq_k", "__neq~f", "__neq~i"),
+        "<": ("__lt", "__lt_k", "__lt~f", "__lt~i"),
+        "<=": ("__lte", "__lte_k", "__lte~f", "__lte~i"),
+        "&": ("__and", "__and_k", "__and~f", "__and~i"),    # binary and
+        "&&": ("__logand", "__logand_k"),                   # logical or
+        "&!": ("__andnot", "__andnot~f", "__andnot~i"),
+        "|": ("__or", "__or_k", "__or~f", "__or~i"),        # binary or
+        "||": ("__logor", "__logor_k"),                     # logical or
+        "pow": ("__pow", "__pow_k", "__pow~f", "__pow~i"),
+        "atan2": ("__atan2", "__atan2_k", "__atan2~f"),
+        "mod": ("__unimod", "__unimod_k"),
+        "%": ("__bimod", "__bimod_k"),
+        ">>": ("__shiftright", "__shiftright_k"),           # binary right shift
+        "<<": ("__shiftleft", "__shiftleft_k")              # binary left shift
+    })
 
     def __init__(
         self,
         obj_type: str,
-        args: Optional[Dict] = None,
+        args: dict | None = None,
         graph: Optional['HeavyGraph'] = None,
-        annotations: Optional[Dict] = None
+        annotations: dict | None = None
     ) -> None:
         super().__init__(obj_type, args, graph,
                          num_inlets=2,
@@ -68,7 +70,7 @@ class HLangBinop(HeavyLangObject):
         """
         return obj_type in HLangBinop.__HEAVY_DICT
 
-    def reduce(self) -> Optional[tuple]:
+    def reduce(self) -> tuple | None:
         if self.has_inlet_connection_format("__") or \
                 self.has_inlet_connection_format("_c") or \
                 self.has_inlet_connection_format("_f") or \
@@ -77,12 +79,12 @@ class HLangBinop(HeavyLangObject):
             return (set(), [])  # remove this object
 
         if self.has_inlet_connection_format("ff"):
-            ir_type = [x for x in HLangBinop.__HEAVY_DICT[self.type] if x.endswith("~f")][0]
+            ir_type = next(x for x in HLangBinop.__HEAVY_DICT[self.type] if x.endswith("~f"))
             x = HeavyIrObject(ir_type)
             return ({x}, self.get_connection_move_list(x))
 
         elif self.has_inlet_connection_format("fc"):
-            ir_type = [x for x in HLangBinop.__HEAVY_DICT[self.type] if x.endswith("~f")][0]
+            ir_type = next(x for x in HLangBinop.__HEAVY_DICT[self.type] if x.endswith("~f"))
             x = HeavyIrObject(ir_type)
             y = HeavyIrObject("__var~f", {"k": self.args[self.name_for_arg()]})
             z = HeavyIrObject("__varread~f", {"var_id": y.id})
@@ -96,7 +98,7 @@ class HLangBinop(HeavyLangObject):
             return ({x, y, z}, connections)
 
         elif self.has_inlet_connection_format("f_"):
-            ir_type = [x for x in HLangBinop.__HEAVY_DICT[self.type] if x.endswith("~f")][0]
+            ir_type = next(x for x in HLangBinop.__HEAVY_DICT[self.type] if x.endswith("~f"))
 
             # handle identity-operations
             if (self.type == "+" and self.args["k"] == 0.0) or \
@@ -146,12 +148,12 @@ class HLangBinop(HeavyLangObject):
             return ({x, y}, connections)
 
         elif self.has_inlet_connection_format("ii"):
-            ir_type = [x for x in HLangBinop.__HEAVY_DICT[self.type] if x.endswith("~i")][0]
+            ir_type = next(x for x in HLangBinop.__HEAVY_DICT[self.type] if x.endswith("~i"))
             x = HeavyIrObject(ir_type)
             return ({x}, self.get_connection_move_list(x))
 
         elif self.has_inlet_connection_format("ic"):
-            ir_type = [x for x in HLangBinop.__HEAVY_DICT[self.type] if x.endswith("~i")][0]
+            ir_type = next(x for x in HLangBinop.__HEAVY_DICT[self.type] if x.endswith("~i"))
             x = HeavyIrObject(ir_type)
             y = HeavyIrObject("__var~i", {"k": self.args[self.name_for_arg()]})
             z = HeavyIrObject("__varread~i", {"var_id": y.id})
@@ -165,7 +167,7 @@ class HLangBinop(HeavyLangObject):
             return ({x, y, z}, connections)
 
         elif self.has_inlet_connection_format("i_"):
-            ir_type = [x for x in HLangBinop.__HEAVY_DICT[self.type] if x.endswith("~i")][0]
+            ir_type = next(x for x in HLangBinop.__HEAVY_DICT[self.type] if x.endswith("~i"))
             x = HeavyIrObject(ir_type)
             # add constant generator
             y = HeavyIrObject(
@@ -189,19 +191,19 @@ class HLangBinop(HeavyLangObject):
 
         elif self.has_inlet_connection_format("c_"):
             # if the right inlet is empty, generate a constant variation of the object
-            ir_type = [x for x in HLangBinop.__HEAVY_DICT[self.type] if x.endswith("_k")][0]
+            ir_type = next(x for x in HLangBinop.__HEAVY_DICT[self.type] if x.endswith("_k"))
             # standardise the operation's constant argument name to "k"
             args = {"k": self.args[self.name_for_arg()]}
             x = HeavyIrObject(ir_type, args)
             return ({x}, self.get_connection_move_list(x))
 
         elif self.has_inlet_connection_format("cf"):
-            ir_type = [x for x in HLangBinop.__HEAVY_DICT[self.type] if x.endswith("~f")][0]
+            ir_type = next(x for x in HLangBinop.__HEAVY_DICT[self.type] if x.endswith("~f"))
             x = HeavyIrObject(ir_type)
             v = HeavyIrObject("__var~f")
             vr = HeavyIrObject("__varread~f", args={"var_id": v.id})
 
-            obj_set = set([x, v, vr])
+            obj_set = {x, v, vr}
             connections = [(None, [Connection(vr, 0, x, 0, "~f>")])]
             for c in self.inlet_connections[0]:
                 connections.append((c, [c.copy(to_object=v, inlet_index=0)]))

@@ -14,16 +14,19 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from typing import Dict, List
-
-from .HeavyObject import HeavyObject
+from collections.abc import Mapping
+from types import MappingProxyType
+from typing import Final
 
 from hvcc.types.IR import IRSignalList
+
+from ..HeavyGenException import HeavyGenException
+from .HeavyObject import HeavyObject
 
 
 class SignalVar(HeavyObject):
 
-    __OPERATION_DICT = {
+    __OPERATION_DICT: Final[Mapping[str, str]] = MappingProxyType({
         "__var~f": "sVarf",
         "__var~i": "sVari",
         "__var_k~f": "__hv_var_k_f",
@@ -32,7 +35,7 @@ class SignalVar(HeavyObject):
         "__varwrite~i": "__hv_varwrite_i",
         "__varread~f": "__hv_varread_f",
         "__varread~i": "__hv_varread_i"
-    }
+    })
 
     @classmethod
     def get_C_struct(cls, obj_type: str = "") -> str:
@@ -41,7 +44,7 @@ class SignalVar(HeavyObject):
         elif obj_type == "__var~i":
             return "SignalVari"
         else:
-            raise Exception()
+            raise HeavyGenException(f"Incorrect obj_type {obj_type} for SignalVar")
 
     @classmethod
     def get_preamble(cls, obj_type: str) -> str:
@@ -62,7 +65,7 @@ class SignalVar(HeavyObject):
         return {"HvSignalVar.h", "HvSignalVar.c"}
 
     @classmethod
-    def get_C_init(cls, obj_type: str, obj_id: str, args: Dict) -> List[str]:
+    def get_C_init(cls, obj_type: str, obj_id: str, args: dict) -> list[str]:
         assert obj_type in ["__var~f", "__var~i"], obj_type
         return [
             "{0}_init(&{0}_{1}, {2}, {3}, {4});".format(
@@ -73,11 +76,11 @@ class SignalVar(HeavyObject):
                 "true" if args["reverse"] else "false")]
 
     @classmethod
-    def get_C_free(cls, obj_type: str, obj_id: str, args: Dict) -> List[str]:
+    def get_C_free(cls, obj_type: str, obj_id: str, args: dict) -> list[str]:
         return []
 
     @classmethod
-    def get_C_onMessage(cls, obj_type: str, obj_id: str, inlet_index: int, args: Dict) -> List[str]:
+    def get_C_onMessage(cls, obj_type: str, obj_id: str, inlet_index: int, args: dict) -> list[str]:
         assert obj_type in ["__var~f", "__var~i"]
         return [
             "{0}_onMessage(_c, &Context(_c)->{0}_{1}, m);".format(
@@ -85,7 +88,7 @@ class SignalVar(HeavyObject):
                 obj_id)]
 
     @classmethod
-    def get_C_process(cls, process_dict: IRSignalList, obj_type: str, obj_id: str, args: Dict) -> List[str]:
+    def get_C_process(cls, process_dict: IRSignalList, obj_type: str, obj_id: str, args: dict) -> list[str]:
         fmt = obj_type[-1]
         if obj_type in ["__var~f", "__var~i"]:
             # NOTE(mhroth): signal rate variables do not process anything
@@ -118,4 +121,4 @@ class SignalVar(HeavyObject):
                     cls._c_buffer(process_dict.outputBuffers[0])
                 )]
         else:
-            raise Exception("")
+            raise HeavyGenException(f"Incorrect obj_type {obj_type} for SignalVar")

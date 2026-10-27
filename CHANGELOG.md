@@ -1,6 +1,14 @@
 CHANGELOG
 =====
 
+Next Release
+-----
+
+Updates:
+
+* Python typing syntax
+* Custom Exceptions
+
 0.17.3
 -----
 

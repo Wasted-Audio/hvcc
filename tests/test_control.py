@@ -16,7 +16,6 @@
 
 import argparse
 import unittest
-
 from pathlib import Path
 
 from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum

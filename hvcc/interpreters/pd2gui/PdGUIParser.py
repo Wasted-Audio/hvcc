@@ -4,17 +4,37 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 import re
-
 from collections import Counter
-from typing import Generator, Optional, Union
+from collections.abc import Generator
 from pathlib import Path
 
 from hvcc.interpreters.pd2hv.PdParser import PdParser
 from hvcc.types.GUI import (
-    Size, Coords, Font, LabelShow, LabelPos, Label, Color, Canvas,
-    Bang, Toggle, VRadio, HRadio, VSlider, HSlider, Knob,  Number, Float,
-    Comment, Popmenu, GUIObjects, Graph, GraphRoot
+    Bang,
+    Canvas,
+    Color,
+    Comment,
+    Coords,
+    Float,
+    Font,
+    Graph,
+    GraphRoot,
+    GUIObjects,
+    HRadio,
+    HSlider,
+    Knob,
+    Label,
+    LabelPos,
+    LabelShow,
+    Number,
+    Popmenu,
+    Size,
+    Toggle,
+    VRadio,
+    VSlider,
 )
+
+from ..HeavyPdException import HeavyPdException
 
 
 class PdGUIParser(PdParser):
@@ -33,9 +53,9 @@ class PdGUIParser(PdParser):
     def gui_from_file(
         self,
         file_path: Path,
-        obj_args: Optional[list] = None,
+        obj_args: list | None = None,
         is_root: bool = True
-    ) -> tuple[Optional[Union[Graph, GraphRoot]], bool]:
+    ) -> tuple[Graph | GraphRoot | None, bool]:
         if is_root:
             self.search_paths.append(file_path)
 
@@ -46,7 +66,7 @@ class PdGUIParser(PdParser):
         graph_args = [self.__DOLLAR_ZERO] + (obj_args or [])
 
         if not canvas_line.startswith("#N canvas"):
-            raise Exception(f"Pd files must begin with \"#N canvas\": {canvas_line}")
+            raise HeavyPdException(f"Pd files must begin with \"#N canvas\": {canvas_line}")
 
         g, gop = self.gui_from_canvas(
             file_iterator,
@@ -65,11 +85,11 @@ class PdGUIParser(PdParser):
         graph_args: list,
         pd_path: Path,
         is_root: bool = False
-    ) -> tuple[Optional[Union[Graph, GraphRoot]], bool]:
+    ) -> tuple[Graph | GraphRoot | None, bool]:
 
         objects: list[GUIObjects] = []
         graphs: list[Graph] = []
-        x: Optional[GUIObjects] = None
+        x: GUIObjects | None = None
 
         # graph on parent settings
         gop: bool = False
@@ -78,121 +98,117 @@ class PdGUIParser(PdParser):
         obj_type = ""
         obj_args = []
 
-        try:
-            for li in file_iterator:
-                line = self.split_line(li)
+        for li in file_iterator:
+            line = self.split_line(li)
 
-                if line[0] == "#N":
-                    if line[1] == "canvas":
-                        g, gop = self.gui_from_canvas(
-                            file_iterator=file_iterator,
-                            canvas_line=li,
+            if line[0] == "#N":
+                if line[1] == "canvas":
+                    g, gop = self.gui_from_canvas(
+                        file_iterator=file_iterator,
+                        canvas_line=li,
+                        graph_args=graph_args,
+                        pd_path=pd_path
+                    )
+                    if gop:
+                        assert isinstance(g, Graph)
+                        graphs.append(g)
+
+            elif line[0] == "#X":
+                if line[1] == "coords":
+                    try:
+                        if int(line[8]) > 0:
+                            # canvas is active
+                            gop = True
+                            gop_start = Coords(x=int(line[9]), y=int(line[10]))
+                            gop_size = Size(x=int(line[6]), y=int(line[7]))
+                    except IndexError:
+                        continue
+
+                elif line[1] == "restore":
+                    if gop:
+                        objects = self.filter_invisible_objects(objects, gop_start, gop_size)
+                        graphs = self.filter_invisible_graphs(graphs, gop_start, gop_size)
+                        self.object_counter["graph"] += 1
+
+                        return Graph(
+                            id=f"graph{self.object_counter['graph']}",
+                            position=Coords(
+                                x=int(line[2]),
+                                y=int(line[3])
+                            ),
+                            gop_start=gop_start,
+                            gop_size=gop_size,
+                            objects=objects,
+                            graphs=graphs
+                        ), gop
+                    else:
+                        return None, False
+
+                elif line[1] == "text":
+                    x = self.add_comment(line)
+
+                elif line[1] == "floatatom":
+                    obj_args = self.__resolve_object_args(
+                        obj_args=line[1:],
+                        graph_args=graph_args,
+                        is_root=is_root
+                    )
+
+                    # replace args with resolved args
+                    line = line[:1] + obj_args
+                    x = self.add_float(line)
+
+                elif line[1] == "obj":
+                    if len(line) > 4:
+                        obj_type = line[4]
+                        # sometimes objects have $ arguments in them as well
+                        obj_type = self.__resolve_object_args(
+                            obj_args=[obj_type],
                             graph_args=graph_args,
-                            pd_path=pd_path
-                        )
-                        if gop:
-                            assert isinstance(g, Graph)
-                            graphs.append(g)
-
-                elif line[0] == "#X":
-                    if line[1] == "coords":
-                        try:
-                            if int(line[8]) > 0:
-                                # canvas is active
-                                gop = True
-                                gop_start = Coords(x=int(line[9]), y=int(line[10]))
-                                gop_size = Size(x=int(line[6]), y=int(line[7]))
-                        except IndexError:
-                            continue
-
-                    elif line[1] == "restore":
-                        if gop:
-                            objects = self.filter_invisible_objects(objects, gop_start, gop_size)
-                            graphs = self.filter_invisible_graphs(graphs, gop_start, gop_size)
-                            self.object_counter["graph"] += 1
-
-                            return Graph(
-                                id=f"graph{self.object_counter['graph']}",
-                                position=Coords(
-                                    x=int(line[2]),
-                                    y=int(line[3])
-                                ),
-                                gop_start=gop_start,
-                                gop_size=gop_size,
-                                objects=objects,
-                                graphs=graphs
-                            ), gop
-                        else:
-                            return None, False
-
-                    elif line[1] == "text":
-                        x = self.add_comment(line)
-
-                    elif line[1] == "floatatom":
+                            is_root=is_root)[0]
                         obj_args = self.__resolve_object_args(
-                            obj_args=line[1:],
+                            obj_args=line[5:],
                             graph_args=graph_args,
                             is_root=is_root
                         )
 
                         # replace args with resolved args
-                        line = line[:1] + obj_args
-                        x = self.add_float(line)
+                        line = line[:5] + obj_args
 
-                    elif line[1] == "obj":
-                        if len(line) > 4:
-                            obj_type = line[4]
-                            # sometimes objects have $ arguments in them as well
-                            obj_type = self.__resolve_object_args(
-                                obj_args=[obj_type],
-                                graph_args=graph_args,
-                                is_root=is_root)[0]
-                            obj_args = self.__resolve_object_args(
-                                obj_args=line[5:],
-                                graph_args=graph_args,
-                                is_root=is_root
+                    abs_path = self.find_abstraction_path(pd_path.parent, obj_type)
+
+                    if abs_path is not None:
+                        g, gop = self.gui_from_file(abs_path, obj_args=obj_args, is_root=False)
+
+                        if gop:
+                            assert isinstance(g, Graph)
+                            # set object coordinates
+                            g.position = Coords(
+                                x=int(line[2]),
+                                y=int(line[3])
                             )
+                            graphs.append(g)
 
-                            # replace args with resolved args
-                            line = line[:5] + obj_args
+                    if obj_type == "cnv":
+                        x = self.add_canvas(line)
+                    elif obj_type == "bng":
+                        x = self.add_bang(line)
+                    elif obj_type == "tgl":
+                        x = self.add_toggle(line)
+                    elif obj_type == "vradio" or obj_type == "hradio":
+                        x = self.add_radio(line)
+                    elif obj_type == "vsl" or obj_type == "hsl":
+                        x = self.add_slider(line)
+                    elif obj_type == "knob" or obj_type == "else/knob":
+                        x = self.add_knob(line)
+                    elif obj_type == "nbx":
+                        x = self.add_number(line)
+                    elif obj_type == "popmenu" or obj_type == "else/popmenu":
+                        x = self.add_popmenu(line)
 
-                        abs_path = self.find_abstraction_path(pd_path.parent, obj_type)
-
-                        if abs_path is not None:
-                            g, gop = self.gui_from_file(abs_path, obj_args=obj_args, is_root=False)
-
-                            if gop:
-                                assert isinstance(g, Graph)
-                                # set object coordinates
-                                g.position = Coords(
-                                    x=int(line[2]),
-                                    y=int(line[3])
-                                )
-                                graphs.append(g)
-
-                        if obj_type == "cnv":
-                            x = self.add_canvas(line)
-                        elif obj_type == "bng":
-                            x = self.add_bang(line)
-                        elif obj_type == "tgl":
-                            x = self.add_toggle(line)
-                        elif obj_type == "vradio" or obj_type == "hradio":
-                            x = self.add_radio(line)
-                        elif obj_type == "vsl" or obj_type == "hsl":
-                            x = self.add_slider(line)
-                        elif obj_type == "knob" or obj_type == "else/knob":
-                            x = self.add_knob(line)
-                        elif obj_type == "nbx":
-                            x = self.add_number(line)
-                        elif obj_type == "popmenu" or obj_type == "else/popmenu":
-                            x = self.add_popmenu(line)
-
-                    if x is not None:
-                        objects.append(x)
-                        x = None
-
-        except Exception as e:
-            raise e
+                if x is not None:
+                    objects.append(x)
+                    x = None
 
         if is_root:
             line = self.split_line(canvas_line)
@@ -297,12 +313,12 @@ class PdGUIParser(PdParser):
         )
 
     @classmethod
-    def filter_params(cls, param_recv: str, param_send: str) -> tuple[Optional[str], bool]:
+    def filter_params(cls, param_recv: str, param_send: str) -> tuple[str | None, bool]:
         """ Only allow external parameters.
             Returns (identifier, is_send).
         """
 
-        def externed(param: str) -> Optional[str]:
+        def externed(param: str) -> str | None:
             if "@hv_param" in param or "@hv_event" in param:
                 return param.split()[0]
             else:
@@ -383,7 +399,7 @@ class PdGUIParser(PdParser):
         )
 
     @classmethod
-    def add_bang(cls, line: list[str]) -> Optional[Bang]:
+    def add_bang(cls, line: list[str]) -> Bang | None:
         param, send = cls.filter_params(line[10], line[9])
         if param is None:
             return None
@@ -417,7 +433,7 @@ class PdGUIParser(PdParser):
         )
 
     @classmethod
-    def add_toggle(cls, line: list[str]) -> Optional[Toggle]:
+    def add_toggle(cls, line: list[str]) -> Toggle | None:
         param, send = cls.filter_params(line[8], line[7])
         if param is None:
             return None
@@ -451,14 +467,14 @@ class PdGUIParser(PdParser):
         )
 
     @classmethod
-    def add_radio(cls, line: list[str]) -> Optional[Union[VRadio, HRadio]]:
+    def add_radio(cls, line: list[str]) -> VRadio | HRadio | None:
         param, send = cls.filter_params(line[10], line[9])
         if param is None:
             return None
 
         radio_type = line[4]
 
-        radio_obj: dict[str, type[Union[VRadio, HRadio]]] = {
+        radio_obj: dict[str, type[VRadio | HRadio]] = {
             "vradio": VRadio,
             "hradio": HRadio
         }
@@ -492,12 +508,12 @@ class PdGUIParser(PdParser):
         )
 
     @classmethod
-    def add_slider(cls, line: list[str]) -> Optional[Union[VSlider, HSlider]]:
+    def add_slider(cls, line: list[str]) -> VSlider | HSlider | None:
         param, send = cls.filter_params(line[12], line[11])
         if param is None:
             return None
 
-        slider: dict[str, type[Union[VSlider, HSlider]]] = {
+        slider: dict[str, type[VSlider | HSlider]] = {
             "vsl": VSlider,
             "hsl": HSlider
         }
@@ -534,7 +550,7 @@ class PdGUIParser(PdParser):
         )
 
     @classmethod
-    def add_knob(cls, line: list[str]) -> Optional[Knob]:
+    def add_knob(cls, line: list[str]) -> Knob | None:
         param, send = cls.filter_params(line[11], line[10])
         if param is None:
             return None
@@ -586,7 +602,7 @@ class PdGUIParser(PdParser):
         )
 
     @classmethod
-    def add_number(cls, line: list[str]) -> Optional[Number]:
+    def add_number(cls, line: list[str]) -> Number | None:
         param, send = cls.filter_params(line[12], line[11])
         if param is None:
             return None
@@ -652,7 +668,7 @@ class PdGUIParser(PdParser):
         )
 
     @classmethod
-    def add_float(cls, line: list[str]) -> Optional[Float]:
+    def add_float(cls, line: list[str]) -> Float | None:
         param, send = cls.filter_params(line[9], line[10])
         if param is None:
             return None
@@ -678,7 +694,7 @@ class PdGUIParser(PdParser):
         )
 
     @classmethod
-    def add_popmenu(cls, line: list[str]) -> Optional[Popmenu]:
+    def add_popmenu(cls, line: list[str]) -> Popmenu | None:
         param, send = cls.filter_params(line[11], line[12])
         if param is None:
             return None

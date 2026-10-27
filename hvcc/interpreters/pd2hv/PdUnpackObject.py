@@ -14,18 +14,17 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from typing import Optional
+
+from hvcc.types.Heavy import Heavy, HvConn, HvConnFrom, HvConnTo, HvPos
 
 from .PdObject import PdObject
-
-from hvcc.types.Heavy import Heavy, HvPos, HvConn, HvConnFrom, HvConnTo
 
 
 class PdUnpackObject(PdObject):
     def __init__(
         self,
         obj_type: str,
-        obj_args: Optional[list] = None,
+        obj_args: list | None = None,
         pos_x: int = 0,
         pos_y: int = 0
     ) -> None:
@@ -34,7 +33,7 @@ class PdUnpackObject(PdObject):
 
         if len(self.obj_args) == 0:
             self.add_error("Unpack requires at least one argument.")
-        if not (set(self.obj_args) <= set(["f", "s"])):
+        if not (set(self.obj_args) <= {"f", "s"}):
             self.add_warning("Heavy only supports arguments 'f' and 's' to unpack.")
 
     def to_hv(self) -> Heavy:

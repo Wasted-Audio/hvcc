@@ -15,7 +15,6 @@
 
 import argparse
 import unittest
-
 from pathlib import Path
 
 from tests.framework.base_control import TestPdControlBase
