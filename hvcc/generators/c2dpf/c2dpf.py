@@ -259,7 +259,7 @@ class c2dpf(Generator):
                 compile_time=time.time() - tick
             )
 
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001
             return CompilerResp(
                 stage="c2dpf",
                 notifs=CompilerNotif(

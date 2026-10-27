@@ -158,12 +158,12 @@ class HeavyLangObject:
         if value_type == "float":
             try:
                 return float(value)
-            except Exception:
+            except ValueError:
                 raise HeavyIrException(f"Cannot convert argument \"{value}\" into float.")
         elif value_type == "int":
             try:
                 return int(decimal.Decimal(value))
-            except Exception:
+            except ValueError:
                 raise HeavyIrException(f"Cannot convert argument \"{value}\" into int.")
         elif value_type == "string":
             return str(value) if value is not None else None
@@ -240,7 +240,7 @@ class HeavyLangObject:
                 self.outlet_connections[c.outlet_index].append(c)
             else:
                 raise HeavyIrException(f"Connection {c} does not connect to this object {self}.")
-        except Exception as exc:
+        except IndexError as exc:
             raise HeavyIrException(f"Connection {c} connects to out-of-range let: {exc}")
 
     def remove_connection(self, c: Connection) -> None:

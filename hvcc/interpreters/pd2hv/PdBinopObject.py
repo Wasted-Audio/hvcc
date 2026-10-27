@@ -128,7 +128,7 @@ class PdBinopObject(PdObject):
         if len(self.obj_args) > 0:
             try:
                 self.__k = float(self.obj_args[0])
-            except Exception:
+            except (IndexError, ValueError):
                 self.add_warning(f"\"{self.obj_args[0]}\" cannot be resolved to a number. Defaulting to zero.")
                 self.__k = 0.0
         else:

@@ -68,6 +68,4 @@ ignore = [
     "N999",
     "UP030",
     "UP032",
-    # enable this later
-    "BLE001",
 ]

@@ -833,7 +833,7 @@ class PdParser:
         try:
             float(x)
             return True
-        except Exception:
+        except ValueError:
             return False
 
     def __create_send_recv(

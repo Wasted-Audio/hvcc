@@ -252,8 +252,8 @@ def compile_dataflow(
             try:
                 patch_meta_json = json.load(json_file)
                 patch_meta = Meta(**patch_meta_json)
-            except Exception as e:
-                return add_error(results, f"Unable to open json_file: {e}")
+            except (ValueError, TypeError) as e:
+                return add_error(results, f"Invalid patch metadata in {patch_meta_file}: {e}")
 
     patch_name = patch_meta.name or patch_name
     generators = ["c"] if generators is None else [x.lower() for x in generators]
@@ -306,6 +306,8 @@ def compile_dataflow(
         application_path = Path(sys._MEIPASS, 'hvcc')
     elif __file__:
         application_path = Path(__file__).parent
+    else:
+        raise RuntimeError("Unable to determine application path")
 
     c_src_dir = Path(out_dir, "c")
     results.root["ir2c"] = ir2c.ir2c.compile(

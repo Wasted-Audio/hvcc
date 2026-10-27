@@ -62,7 +62,7 @@ class pd2gui:
                 out_file=ir_file,
                 compile_time=(time.time() - tick)
             )
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001
             return CompilerResp(
                 stage="pd2gui",
                 notifs=CompilerNotif(

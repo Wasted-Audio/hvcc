@@ -19,6 +19,7 @@ from pathlib import Path
 
 from hvcc.types.Heavy import Heavy
 
+from ..HeavyPdException import HeavyPdException
 from .HeavyObject import HeavyObject
 from .PdObject import PdObject
 
@@ -54,7 +55,7 @@ class HeavyGraph(PdObject):
 
             try:
                 arg_value = HeavyObject.force_arg_type(arg_value, a["value_type"])
-            except Exception as e:
+            except HeavyPdException as e:
                 self.add_error(
                     f"Heavy {self.obj_type} cannot convert argument \"{a['name']}\""
                     f" with value \"{arg_value}\" to type {a['value_type']}: {e}")

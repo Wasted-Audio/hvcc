@@ -58,7 +58,7 @@ class ControlMessage(HeavyObject):
                 try:
                     # is the message a float?
                     send_message_list.append(f"msg_setFloat(m, {i}, {float(e)}f);")
-                except Exception:
+                except ValueError:
                     if e in ["bang"]:
                         # is the message a bang?
                         send_message_list.append(f"msg_setBang(m, {i});")

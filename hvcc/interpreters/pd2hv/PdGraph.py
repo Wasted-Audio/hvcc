@@ -116,7 +116,7 @@ class PdGraph(PdObject):
             # (generally used for reporting and validation purposes)
             self.__objs[from_index].add_connection(c)
             self.__objs[to_index].add_connection(c)
-        except Exception:
+        except (HeavyPdException, IndexError):
             self.add_error("There was an error while connecting two objects. "
                            "Have all objects been correctly instantiated? "
                            "Have all inlets and outlets been declared?",

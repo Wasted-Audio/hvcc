@@ -88,7 +88,7 @@ class HeavyObject(PdObject):
                     self.obj_dict[arg.name] = self.force_arg_type(
                         obj_args[i],
                         arg.value_type)
-                except Exception as e:
+                except HeavyPdException as e:
                     self.add_error(
                         f"Heavy {obj_type} cannot convert argument \"{arg.name}\""
                         f" with value \"{obj_args[i]}\" to type {arg.value_type}: {e}")
@@ -121,7 +121,7 @@ class HeavyObject(PdObject):
         if value_type == "auto":
             try:
                 return float(value)
-            except Exception:
+            except ValueError:
                 return str(value)
         elif value_type == "float":
             return float(value)
