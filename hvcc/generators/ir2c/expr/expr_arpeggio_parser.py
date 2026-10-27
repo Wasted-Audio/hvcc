@@ -29,11 +29,11 @@ class ExprNode:
         self,
         node_type: NodeType,
         value: str,
-        nodes: list = []
+        nodes: list | None = None
     ) -> None:
         self.type = node_type
         self.value = value
-        self.nodes: list[ExprNode] = nodes
+        self.nodes: list[ExprNode] = nodes or []
 
     def __str__(self, depth: int = 0) -> str:
         this = f"{'  '*depth}{self.type}:{self.value}\n"
