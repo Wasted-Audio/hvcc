@@ -156,13 +156,13 @@ class HeavyGraph(HeavyIrObject):
             as connect_objects(). If n is empty, this method acts as disconnect_objects().
         """
         if c is not None and len(n_list) > 0:
-            if all([c.from_object is n.from_object for n in n_list]):
+            if all(c.from_object is n.from_object for n in n_list):
                 # connections start at the same point
                 c.from_object.replace_connection(c, n_list)
                 c.to_object.remove_connection(c)
                 for n in n_list:
                     n.to_object.add_connection(n)
-            elif all([c.to_object is n.to_object for n in n_list]):
+            elif all(c.to_object is n.to_object for n in n_list):
                 # connections end at the same point
                 c.to_object.replace_connection(c, n_list)
                 c.from_object.remove_connection(c)
