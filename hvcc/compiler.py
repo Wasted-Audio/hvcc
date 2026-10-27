@@ -238,7 +238,7 @@ def compile_dataflow(
 
     # basic error checking on input
     if in_path.is_file():
-        if not str(in_path).endswith((".pd")):
+        if not str(in_path).endswith(".pd"):
             return add_error(results, "Can only process Pd files.")
     elif in_path.is_dir():
         if not os.path.basename("c"):

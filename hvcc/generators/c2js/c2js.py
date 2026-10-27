@@ -105,8 +105,8 @@ class c2js(Generator):
             "-Wall"
         ]
 
-        c_src_paths = [Path(c_src_dir, c) for c in os.listdir(c_src_dir) if c.endswith((".c"))]
-        cpp_src_paths = [Path(c_src_dir, cpp) for cpp in os.listdir(c_src_dir) if cpp.endswith((".cpp"))]
+        c_src_paths = [Path(c_src_dir, c) for c in os.listdir(c_src_dir) if c.endswith(".c")]
+        cpp_src_paths = [Path(c_src_dir, cpp) for cpp in os.listdir(c_src_dir) if cpp.endswith(".cpp")]
         obj_paths = []
         cmd = ""
 
