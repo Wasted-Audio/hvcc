@@ -16,7 +16,7 @@
 
 from collections import defaultdict
 
-from .HeavyException import HeavyException
+from .HeavyIrException import HeavyIrException
 
 
 class BufferPool:
@@ -39,7 +39,7 @@ class BufferPool:
         elif connection_type in self.pool:
             return sum(len(v) for v in self.pool[connection_type].values())
         else:
-            raise HeavyException(f"Unknown connection type: \"{connection_type}\"")
+            raise HeavyIrException(f"Unknown connection type: \"{connection_type}\"")
 
     def get_buffer(self, connection_type: str, count: int = 1, excludeSet: set | None = None) -> tuple[str, int]:
         """ Returns a currently unused buffer. The buffer can be assigned a retain count. An optional
@@ -72,7 +72,7 @@ class BufferPool:
                     v.remove(b)
                     pool[k + count].append(b)
                     return k + count  # return the new retain count
-            raise HeavyException(f"{b} not found in BufferPool!")
+            raise HeavyIrException(f"{b} not found in BufferPool!")
 
     def release_buffer(self, b: tuple[str, int], count: int = 1) -> int:
         """ Reduces the retain count of the buffer. Returns the new count.
@@ -89,7 +89,7 @@ class BufferPool:
                     v.remove(b)
                     pool[k - count].append(b)
                     return k - count  # return the new retain count
-            raise HeavyException(f"{b} not found in BufferPool!")
+            raise HeavyIrException(f"{b} not found in BufferPool!")
 
     def __repr__(self) -> str:
         return self.pool["~f>"].__repr__() + self.pool["~i>"].__repr__()

@@ -34,6 +34,8 @@ from hvcc.types.GUI import (
     VSlider,
 )
 
+from ..HeavyPdException import HeavyPdException
+
 
 class PdGUIParser(PdParser):
     # retain width by overriding this regex with a pattern that never matches
@@ -64,7 +66,7 @@ class PdGUIParser(PdParser):
         graph_args = [self.__DOLLAR_ZERO] + (obj_args or [])
 
         if not canvas_line.startswith("#N canvas"):
-            raise Exception(f"Pd files must begin with \"#N canvas\": {canvas_line}")
+            raise HeavyPdException(f"Pd files must begin with \"#N canvas\": {canvas_line}")
 
         g, gop = self.gui_from_canvas(
             file_iterator,

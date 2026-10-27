@@ -16,6 +16,7 @@
 
 
 from .HeavyGraph import HeavyGraph
+from .HeavyIrException import HeavyIrException
 from .HeavyIrObject import HeavyIrObject
 from .HeavyLangObject import HeavyLangObject
 
@@ -64,6 +65,6 @@ class HLangVar(HeavyLangObject):
         elif self.has_inlet_connection_format(["_", "c"]) and self.has_outlet_connection_format(["_", "c"]):
             x = HeavyIrObject("__var", self.args)
         else:
-            raise Exception()
+            raise HeavyIrException("Unsupported connection format for HLangVar")
 
         return ({x}, self.get_connection_move_list(x))

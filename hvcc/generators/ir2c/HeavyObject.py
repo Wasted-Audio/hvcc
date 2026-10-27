@@ -21,6 +21,8 @@ from typing import Final
 
 from hvcc.types.IR import IRBuffer, IRObjectdict, IROnMessage, IRSignalList
 
+from ..HeavyGenException import HeavyGenException
+
 
 class HeavyObject:
 
@@ -206,7 +208,7 @@ class HeavyObject:
             h ^= h >> 15
             return h
         else:
-            raise Exception("Message element hashes can only be computed for float and string types.")
+            raise HeavyGenException("Message element hashes can only be computed for float and string types.")
 
     @classmethod
     def get_hash_string(cls, x: float | str) -> str:

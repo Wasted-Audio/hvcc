@@ -70,5 +70,4 @@ ignore = [
     "UP032",
     # enable this later
     "BLE001",
-    "TRY002"
 ]

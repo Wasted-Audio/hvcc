@@ -14,8 +14,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-from .HeavyException import HeavyException
 from .HeavyGraph import HeavyGraph
+from .HeavyIrException import HeavyIrException
 from .HeavyIrObject import HeavyIrObject
 
 
@@ -39,5 +39,5 @@ class HIrExpr(HeavyIrObject):
         """ Overriding HeavyIrObject to deal with variable number of inlets
         """
         if inlet_index >= self.num_inlets:
-            raise HeavyException(f"inlet_index: {inlet_index} is greater than number of inlets")
+            raise HeavyIrException(f"inlet_index: {inlet_index} is greater than number of inlets")
         return True

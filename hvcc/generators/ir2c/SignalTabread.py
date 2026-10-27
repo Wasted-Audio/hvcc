@@ -17,6 +17,7 @@
 
 from hvcc.types.IR import IRSignalList
 
+from ..HeavyGenException import HeavyGenException
 from .HeavyObject import HeavyObject
 
 
@@ -86,4 +87,4 @@ class SignalTabread(HeavyObject):
                     ", ".join([f"VOf({cls._c_buffer(b)})" for b in process_dict.outputBuffers])
                 )]
         else:
-            raise Exception()
+            raise HeavyGenException(f"Incorrect obj_type {obj_type} for SignalTabread")

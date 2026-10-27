@@ -22,6 +22,7 @@ from typing import TYPE_CHECKING
 from hvcc.types.compiler import CompilerMsg, CompilerNotif
 from hvcc.types.Heavy import Heavy
 
+from ..HeavyPdException import HeavyPdException
 from .Connection import Connection
 from .NotificationEnum import NotificationEnum
 
@@ -140,7 +141,7 @@ class PdObject:
         elif c.to_id == self.obj_id:
             self._inlet_connections[str(c.inlet_index)].append(c)
         else:
-            raise Exception("Adding a connection to the wrong object!")
+            raise HeavyPdException("Adding a connection to the wrong object!")
 
     def remove_connection(self, c: Connection) -> None:
         """ Remove a connection to this object.
@@ -150,7 +151,7 @@ class PdObject:
         elif c.from_obj is self:
             self._outlet_connections[str(c.outlet_index)].remove(c)
         else:
-            raise Exception(f"Connection {c} does not connect to this object {self}.")
+            raise HeavyPdException(f"Connection {c} does not connect to this object {self}.")
 
     def get_graph_heirarchy(self) -> list:
         """ Returns an indication of the graph "path" of this object.

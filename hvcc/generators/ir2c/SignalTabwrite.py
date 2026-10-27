@@ -17,6 +17,7 @@
 
 from hvcc.types.IR import IRSignalList
 
+from ..HeavyGenException import HeavyGenException
 from .HeavyObject import HeavyObject
 
 
@@ -62,4 +63,4 @@ class SignalTabwrite(HeavyObject):
                     ", ".join([f"VIf({cls._c_buffer(b)})" for b in process_dict.inputBuffers])
                 )]
         else:
-            raise Exception()
+            raise HeavyGenException(f"Incorrect obj_type {obj_type} for SignalTabwrite")

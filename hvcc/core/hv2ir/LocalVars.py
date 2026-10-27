@@ -18,7 +18,7 @@ import os
 from collections import defaultdict
 from pathlib import Path
 
-from .HeavyException import HeavyException
+from .HeavyIrException import HeavyIrException
 from .HeavyLangObject import HeavyLangObject
 
 
@@ -60,7 +60,7 @@ class LocalVars:
         if (unique and len(objs) > 0) or (static and len(objs) > 1):
             # if there is already a registered object of this type and the new
             # object is not declared as static, throw an error
-            raise HeavyException(f"Object {obj} with name \"{name}\" already exists, "
+            raise HeavyIrException(f"Object {obj} with name \"{name}\" already exists, "
                                  "and the new object is static or unique.")
         elif len(objs) == 1 and static:
             pass  # the static object has already been registered, move on

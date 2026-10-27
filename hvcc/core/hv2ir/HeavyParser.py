@@ -22,10 +22,10 @@ from typing import Any
 from hvcc.types.Heavy import Heavy
 
 from .Connection import Connection
+from .HeavyGraph import HeavyGraph
 
 # from .HLangIf import HLangIf  # circular import. moved here
-from .HeavyException import HeavyException
-from .HeavyGraph import HeavyGraph
+from .HeavyIrException import HeavyIrException
 from .HeavyIrObject import HeavyIrObject
 from .HeavyLangObject import HeavyLangObject
 from .HIrConvolution import HIrConvolution
@@ -87,7 +87,7 @@ class HeavyParser:
         # copy the path stack such that no changes are made to the calling stack
         path_stack = path_stack or set()
         if hv_file in path_stack:
-            raise HeavyException(f"Abstraction recursion detected. Rereading {hv_file} on stack {path_stack}.")
+            raise HeavyIrException(f"Abstraction recursion detected. Rereading {hv_file} on stack {path_stack}.")
         else:
             path_stack.add(hv_file)
 
@@ -118,12 +118,12 @@ class HeavyParser:
         graph_args = graph_args or {}
 
         if not isinstance(json_heavy.args, list):
-            raise HeavyException("Graph arguments must be a list.")
+            raise HeavyIrException("Graph arguments must be a list.")
 
         for a in json_heavy.args:
             if a["name"] not in graph_args:
                 if a["required"]:
-                    raise HeavyException(f"Required argument \"{a['name']}\" not present.")
+                    raise HeavyIrException(f"Required argument \"{a['name']}\" not present.")
                 else:
                     graph_args[a["name"]] = a["default"]
             else:
@@ -198,7 +198,7 @@ class HeavyParser:
                     conn_type=c.type
                 ))
 
-        except HeavyException as e:
+        except HeavyIrException as e:
             if g.is_root_graph():
                 # add the notification dictionary at the top level
                 e.notes = g.get_notices()
@@ -252,7 +252,7 @@ class HLangIf(HeavyLangObject):
             x = HeavyParser.graph_from_file(Path("./hvlib/if~i.hv.json"))
         else:
             fmt = self._get_connection_format(self.inlet_connections)
-            raise HeavyException(f"Unhandled connection configuration to object [if]: {fmt}")
+            raise HeavyIrException(f"Unhandled connection configuration to object [if]: {fmt}")
 
         return ({x}, self.get_connection_move_list(x))
 

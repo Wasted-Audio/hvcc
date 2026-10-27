@@ -15,8 +15,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-from .HeavyException import HeavyException
 from .HeavyGraph import HeavyGraph
+from .HeavyIrException import HeavyIrException
 from .HeavyIrObject import HeavyIrObject
 from .HeavyLangObject import HeavyLangObject
 
@@ -37,7 +37,7 @@ class HLangVario(HeavyLangObject):
         if self.graph is not None and self.name is not None:
             var_obj = self.graph.resolve_object_for_name(self.name, "var")
             if var_obj is None:
-                raise HeavyException(
+                raise HeavyIrException(
                     f"No corresponding \"var\" object found for object {self} in file {self.graph.file}"
                 )
 
@@ -58,6 +58,6 @@ class HLangVario(HeavyLangObject):
                 return {x}, self.get_connection_move_list(x)
 
             else:
-                raise Exception()
+                raise HeavyIrException("Unsupported connection format for HLangVario")
 
         return None

@@ -38,7 +38,7 @@ from hvcc.types.Lang import LangLetType
 
 from .BufferPool import BufferPool
 from .Connection import Connection
-from .HeavyException import HeavyException
+from .HeavyIrException import HeavyIrException
 from .HeavyIrObject import HeavyIrObject
 from .HeavyLangObject import HeavyLangObject
 from .HIrReceive import HIrReceive
@@ -169,7 +169,7 @@ class HeavyGraph(HeavyIrObject):
                 for n in n_list:
                     n.from_object.add_connection(n)
             else:
-                raise HeavyException(f"Connections must have a common endpoint: {c} / {n_list}")
+                raise HeavyIrException(f"Connections must have a common endpoint: {c} / {n_list}")
         elif c is not None and len(n_list) == 0:
             self.disconnect_objects(c)  # remove connection c
         elif c is None and len(n_list) > 0:
@@ -241,9 +241,9 @@ class HeavyGraph(HeavyIrObject):
             elif obj.scope == "public" or static:
                 self.get_root_graph().local_vars.register_object(obj, name, static, unique)
             else:
-                raise HeavyException(f"Unknown scope \"{obj.scope}\" for object {obj}.")
+                raise HeavyIrException(f"Unknown scope \"{obj.scope}\" for object {obj}.")
         else:
-            raise HeavyException(f"Unknown scope \"{obj.scope}\" for object {obj}.")
+            raise HeavyIrException(f"Unknown scope \"{obj.scope}\" for object {obj}.")
 
     def __unregister_named_object(
         self,
@@ -266,9 +266,9 @@ class HeavyGraph(HeavyIrObject):
             elif obj.scope == "public" or static:
                 self.get_root_graph().local_vars.unregister_object(obj, name)
             else:
-                raise HeavyException(f"Unknown scope \"{obj.scope}\" for object {obj}.")
+                raise HeavyIrException(f"Unknown scope \"{obj.scope}\" for object {obj}.")
         else:
-            raise HeavyException(f"Unknown scope \"{obj.scope}\" for object {obj}.")
+            raise HeavyIrException(f"Unknown scope \"{obj.scope}\" for object {obj}.")
 
     def resolve_objects_for_name(
         self,
@@ -322,7 +322,7 @@ class HeavyGraph(HeavyIrObject):
             return self.graph.get_root_graph()
         else:
             # NOTE(dromer): we should never get here
-            raise Exception
+            raise HeavyIrException("Failed to get root graph.")
 
     def find_path_for_abstraction(self, obj_type: str) -> Path | None:
         """ Travels up the graph heirarchy looking for a file path to an abstraction.
@@ -468,7 +468,7 @@ class HeavyGraph(HeavyIrObject):
             # and does so recursively over all objects and subgraphs.
             # All objects are ordered before buffers are assigned.
             self.assign_signal_buffers()
-        except HeavyException as e:
+        except HeavyIrException as e:
             e.notes = self.get_notices()
             e.notes.has_error = True
             e.notes.exception = e
@@ -499,7 +499,7 @@ class HeavyGraph(HeavyIrObject):
         elif len(connection_type_set) == 1:
             return next(iter(connection_type_set))
         else:
-            raise HeavyException(f"{self} has multiple incident connections of differing type.\
+            raise HeavyIrException(f"{self} has multiple incident connections of differing type.\
                                   The outlet type cannot be explicitly resolved.")
 
     def _resolve_connection_types(self, obj_stack: set | None = None) -> None:
@@ -835,7 +835,7 @@ class HeavyGraph(HeavyIrObject):
                 self.buffer_pool.retain_buffer(buf,
                                                len([c for c in inlet_obj.outlet_connections[0] if c.is_signal]) - 1)
             else:
-                raise HeavyException(
+                raise HeavyIrException(
                     f"Object {inlet_obj} in graph {inlet_obj.graph.file} has {len(c_list)} (> 1) signal inputs.")
 
         # for all objects in the signal order
@@ -854,7 +854,7 @@ class HeavyGraph(HeavyIrObject):
                 self.outlet_buffers[i] = buf
                 self.buffer_pool.retain_buffer(buf, len(self.outlet_connections[i]) - 1)
             else:
-                raise HeavyException(
+                raise HeavyIrException(
                     f"Object {outlet_obj} in graph {outlet_obj.graph.file} has {len(c_list)} (> 1) signal inputs.")
 
     def __repr__(self) -> str:
@@ -903,7 +903,7 @@ class HeavyGraph(HeavyIrObject):
             )
         else:
             # we should never get here
-            raise Exception
+            raise HeavyIrException("Buffer pool is not initialized.")
 
     def get_object_dict(self) -> dict[str, IRObjectdict]:
         # d = {o.id: o.get_object_dict() for o in self.objs.values() if o.type not in

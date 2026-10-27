@@ -24,6 +24,7 @@ from hvcc.types.Heavy import Heavy, HvPos
 from hvcc.types.IR import HeavyIRType, IRArg, IRNode
 from hvcc.types.Lang import HeavyLangType, LangArg, LangNode
 
+from ..HeavyPdException import HeavyPdException
 from .Connection import Connection
 from .NotificationEnum import NotificationEnum
 from .PdObject import PdObject
@@ -139,21 +140,21 @@ class HeavyObject(PdObject):
             if isinstance(value, str):
                 return [float(v) for v in value.split()]
             else:
-                raise Exception(f"Cannot convert value to type floatarray: {value}")
+                raise HeavyPdException(f"Cannot convert value to type floatarray: {value}")
         elif value_type == "intarray":
             if isinstance(value, list):
                 return [int(v) for v in value]
             if isinstance(value, str):
                 return [int(v) for v in value.split()]
             else:
-                raise Exception(f"Cannot convert value to type intarray: {value}")
+                raise HeavyPdException(f"Cannot convert value to type intarray: {value}")
         elif value_type == "stringarray":
             if isinstance(value, list):
                 return [str(v) for v in value]
             if isinstance(value, str):
                 return [str(v) for v in value.split()]
             else:
-                raise Exception(f"Cannot convert value to type stringarray: {value}")
+                raise HeavyPdException(f"Cannot convert value to type stringarray: {value}")
         else:
             # NOTE(mhroth): if value_type is not a known type or None, that is
             # not necessarily an error. It may simply be that the value should
@@ -221,7 +222,7 @@ class HeavyObject(PdObject):
                     f"Connection made to non-existent inlet at [{self.obj_type} {self.obj_dict}]:{c.inlet_index}.",
                     enum=NotificationEnum.ERROR_UNABLE_TO_CONNECT_OBJECTS)
         else:
-            raise Exception("Adding a connection to the wrong object!")
+            raise HeavyPdException("Adding a connection to the wrong object!")
 
     def to_hv(self) -> Heavy:
         return Heavy(

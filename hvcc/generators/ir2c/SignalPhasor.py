@@ -17,6 +17,7 @@
 
 from hvcc.types.IR import IRSignalList
 
+from ..HeavyGenException import HeavyGenException
 from .HeavyObject import HeavyObject
 
 
@@ -40,7 +41,7 @@ class SignalPhasor(HeavyObject):
         elif obj_type == "__phasor_k~f":
             return [f"sPhasor_k_init(&sPhasor_{obj_id}, {args['frequency']}f, sampleRate);"]
         else:
-            raise Exception()
+            raise HeavyGenException(f"Incorrect obj_type {obj_type} for SignalPhasor")
 
     @classmethod
     def get_C_free(cls, obj_type: str, obj_id: str, args: dict) -> list[str]:
@@ -53,7 +54,7 @@ class SignalPhasor(HeavyObject):
         elif obj_type == "__phasor_k~f":
             return [f"sPhasor_k_onMessage(_c, &Context(_c)->sPhasor_{obj_id}, {inlet_index}, m);"]
         else:
-            raise Exception()
+            raise HeavyGenException(f"Incorrect obj_type {obj_type} for SignalPhasor")
 
     @classmethod
     def get_C_process(cls, process_dict: IRSignalList, obj_type: str, obj_id: str, args: dict) -> list[str]:
@@ -73,4 +74,4 @@ class SignalPhasor(HeavyObject):
                 )
             ]
         else:
-            raise Exception(f"Unknown object type \"{obj_type}\".")
+            raise HeavyGenException(f"Unknown object type \"{obj_type}\".")

@@ -26,7 +26,7 @@ from hvcc.types.compiler import CompilerMsg, CompilerNotif
 from hvcc.types.Lang import HeavyLangType, LangLet, LangLetType, LangNode, LangValueType
 
 from .Connection import Connection
-from .HeavyException import HeavyException
+from .HeavyIrException import HeavyIrException
 
 if TYPE_CHECKING:
     from .HeavyGraph import HeavyGraph
@@ -134,7 +134,7 @@ class HeavyLangObject:
         """ Add an error to this object and raise an exception.
         """
         self.errors.append(CompilerMsg(message=error))
-        raise HeavyException(error)
+        raise HeavyIrException(error)
 
     def get_notices(self) -> CompilerNotif:
         """ Returns a dictionary of all warnings and errors at this object.
@@ -159,9 +159,12 @@ class HeavyLangObject:
             try:
                 return float(value)
             except Exception:
-                raise Exception(f"Cannot convert argument \"{value}\" into float.")
+                raise HeavyIrException(f"Cannot convert argument \"{value}\" into float.")
         elif value_type == "int":
-            return int(decimal.Decimal(value))
+            try:
+                return int(decimal.Decimal(value))
+            except Exception:
+                raise HeavyIrException(f"Cannot convert argument \"{value}\" into int.")
         elif value_type == "string":
             return str(value) if value is not None else None
         elif value_type == "bool":
@@ -175,21 +178,21 @@ class HeavyLangObject:
             if isinstance(value, str):
                 return [float(v) for v in value.split()]
             else:
-                raise HeavyException(f"Cannot convert value to type floatarray: {value}")
+                raise HeavyIrException(f"Cannot convert value to type floatarray: {value}")
         elif value_type == "intarray":
             if isinstance(value, list):
                 return [int(v) for v in value]
             if isinstance(value, str):
                 return [int(v) for v in value.split()]
             else:
-                raise HeavyException(f"Cannot convert value to type intarray: {value}")
+                raise HeavyIrException(f"Cannot convert value to type intarray: {value}")
         elif value_type == "stringarray":
             if isinstance(value, list):
                 return [str(v) for v in value]
             if isinstance(value, str):
                 return [str(v) for v in value.split()]
             else:
-                raise HeavyException(f"Cannot convert value to type stringarray: {value}")
+                raise HeavyIrException(f"Cannot convert value to type stringarray: {value}")
         else:
             # NOTE(mhroth): if value_type is not a known type or None, that is
             # not necessarily an error. It may simply be that the value should
@@ -236,9 +239,9 @@ class HeavyLangObject:
             elif c.from_object is self:
                 self.outlet_connections[c.outlet_index].append(c)
             else:
-                raise HeavyException(f"Connection {c} does not connect to this object {self}.")
+                raise HeavyIrException(f"Connection {c} does not connect to this object {self}.")
         except Exception as exc:
-            raise HeavyException(f"Connection {c} connects to out-of-range let: {exc}")
+            raise HeavyIrException(f"Connection {c} connects to out-of-range let: {exc}")
 
     def remove_connection(self, c: Connection) -> None:
         """ Remove a connection to this object.
@@ -248,7 +251,7 @@ class HeavyLangObject:
         elif c.from_object is self:
             self.outlet_connections[c.outlet_index].remove(c)
         else:
-            raise HeavyException(f"Connection {c} does not connect to this object {self}.")
+            raise HeavyIrException(f"Connection {c} does not connect to this object {self}.")
 
     def replace_connection(self, c: Connection, n_list: list) -> None:
         """ Replaces connection c with connection list n_list, maintaining connection order
@@ -265,7 +268,7 @@ class HeavyLangObject:
             self.inlet_connections[c.inlet_index].remove(c)
             self.inlet_connections[c.inlet_index].extend(n_list)
         else:
-            raise HeavyException(f"Connections must have a common endpoint: {c} / {n_list}")
+            raise HeavyIrException(f"Connections must have a common endpoint: {c} / {n_list}")
 
     def get_connection_move_list(self, o: 'HeavyIrObject', connection_type_filter: str = "-~>") -> list:
         """ Create a list of commands to move all connections from this object
@@ -292,7 +295,7 @@ class HeavyLangObject:
                 elif "~i>" in s:
                     fmt.append("i")
                 else:
-                    raise Exception(f"Unknown connection type in set {cc} in file {cc[0].from_object.graph.file}.")
+                    raise HeavyIrException(f"Unknown connection type in set {cc} in file {cc[0].from_object.graph.file}.")
             elif s in [{"~f>", "-->"}, {"~i>", "-->"}]:
                 fmt.append("m")
             else:
@@ -414,7 +417,7 @@ class HeavyLangObject:
             h ^= h >> 15
             return h
         else:
-            raise Exception("Message element hashes can only be computed for float and string types.")
+            raise HeavyIrException("Message element hashes can only be computed for float and string types.")
 
     def __repr__(self) -> str:
         arg_str = " ".join([f"{k}:{o}" for (k, o) in self.args.items()])

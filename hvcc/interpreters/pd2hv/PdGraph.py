@@ -20,6 +20,7 @@ from typing import Any
 from hvcc.types.compiler import CompilerNotif
 from hvcc.types.Heavy import Heavy, HvPos
 
+from ..HeavyPdException import HeavyPdException
 from .Connection import Connection
 from .NotificationEnum import NotificationEnum
 from .PdObject import PdObject
@@ -208,7 +209,7 @@ class PdGraph(PdObject):
             return self.parent_graph.get_graph_heirarchy() + [str(self)]
         else:
             # NOTE(dromer): we should never get here
-            raise Exception("parent_graph argument is None")
+            raise HeavyPdException("parent_graph argument is None")
 
     def get_depth(self) -> int:
         """ Returns the depth of this graph, with the root being at 1.
@@ -219,7 +220,7 @@ class PdGraph(PdObject):
             return 1 + self.parent_graph.get_depth()
         else:
             # NOTE(dromer): we should never get here
-            raise Exception("parent_graph argument is None")
+            raise HeavyPdException("parent_graph argument is None")
 
     def to_hv(self, export_args: bool = False) -> Heavy:
         # NOTE(mhroth): hv_args are not returned. Because all arguments have

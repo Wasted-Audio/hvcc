@@ -23,7 +23,6 @@ from typing import Final
 
 import jinja2
 
-from hvcc.core.hv2ir.HeavyException import HeavyException
 from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
 from hvcc.types.compiler import (
     CompilerMsg,
@@ -35,6 +34,7 @@ from hvcc.types.compiler import (
 from hvcc.types.meta import Meta
 
 from ..copyright import copyright_manager
+from ..HeavyGenException import HeavyGenException
 
 
 class c2js(Generator):
@@ -94,7 +94,7 @@ class c2js(Generator):
             emcc_path = which("emcc")
 
         if emcc_path is None:
-            raise HeavyException("emcc is not in the PATH")
+            raise HeavyGenException("emcc is not in the PATH")
 
         c_flags = [
             f"-I {c_src_dir}",

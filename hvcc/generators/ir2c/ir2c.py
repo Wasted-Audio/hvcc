@@ -72,6 +72,8 @@ from hvcc.generators.ir2c.SignalVar import SignalVar
 from hvcc.types.compiler import CompilerResp, ExternInfo
 from hvcc.types.IR import IRGraph
 
+from ..HeavyGenException import HeavyGenException
+
 
 class ir2c:
 
@@ -163,7 +165,7 @@ class ir2c:
         elif obj_type in ir2c.__OBJECT_CLASS_DICT:
             return ir2c.__OBJECT_CLASS_DICT[obj_type]
         else:
-            raise Exception(f"No class found for object type \"{obj_type}\".")
+            raise HeavyGenException(f"No class found for object type \"{obj_type}\".")
 
     @classmethod
     def compile(

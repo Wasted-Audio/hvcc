@@ -17,6 +17,7 @@
 
 from hvcc.types.IR import IRSignalList
 
+from ..HeavyGenException import HeavyGenException
 from .HeavyObject import HeavyObject
 
 
@@ -42,7 +43,7 @@ class SignalBiquad(HeavyObject):
         elif obj_type == "__biquad~f":
             return [f"SignalBiquad sBiquad_s_{obj_id};"]
         else:
-            raise Exception()
+            raise HeavyGenException(f"Incorrect obj_type {obj_type} for SignalBiquad")
 
     @classmethod
     def get_C_init(cls, obj_type: str, obj_id: str, args: dict) -> list[str]:
@@ -57,7 +58,7 @@ class SignalBiquad(HeavyObject):
         elif obj_type == "__biquad~f":
             return [f"sBiquad_init(&sBiquad_s_{obj_id});"]
         else:
-            raise Exception()
+            raise HeavyGenException(f"Incorrect obj_type {obj_type} for SignalBiquad")
 
     @classmethod
     def get_C_free(cls, obj_type: str, obj_id: str, args: dict) -> list[str]:
@@ -84,4 +85,4 @@ class SignalBiquad(HeavyObject):
                     ", ".join([f"VOf({cls._c_buffer(b)})" for b in process_dict.outputBuffers])
                 )]
         else:
-            raise Exception(f"Incorrect obj_type {obj_type} for SignalBiquad")
+            raise HeavyGenException(f"Incorrect obj_type {obj_type} for SignalBiquad")

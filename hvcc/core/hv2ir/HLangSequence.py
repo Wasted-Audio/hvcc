@@ -16,8 +16,8 @@
 
 
 from .Connection import Connection
-from .HeavyException import HeavyException
 from .HeavyGraph import HeavyGraph
+from .HeavyIrException import HeavyIrException
 from .HeavyIrObject import HeavyIrObject
 from .HeavyLangObject import HeavyLangObject
 
@@ -50,7 +50,7 @@ class HLangSequence(HeavyLangObject):
             elif a in {"s", "symbol"}:
                 cast_objs.append(HeavyIrObject("__cast_s", {}))
             else:
-                raise HeavyException(f"Unsupported cast type '{a}'.")
+                raise HeavyIrException(f"Unsupported cast type '{a}'.")
 
         connections = []
 

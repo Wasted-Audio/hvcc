@@ -20,6 +20,7 @@ from typing import Final
 
 from hvcc.types.IR import IRSignalList
 
+from ..HeavyGenException import HeavyGenException
 from .HeavyObject import HeavyObject
 
 
@@ -43,7 +44,7 @@ class SignalVar(HeavyObject):
         elif obj_type == "__var~i":
             return "SignalVari"
         else:
-            raise Exception()
+            raise HeavyGenException(f"Incorrect obj_type {obj_type} for SignalVar")
 
     @classmethod
     def get_preamble(cls, obj_type: str) -> str:
@@ -120,4 +121,4 @@ class SignalVar(HeavyObject):
                     cls._c_buffer(process_dict.outputBuffers[0])
                 )]
         else:
-            raise Exception("")
+            raise HeavyGenException(f"Incorrect obj_type {obj_type} for SignalVar")

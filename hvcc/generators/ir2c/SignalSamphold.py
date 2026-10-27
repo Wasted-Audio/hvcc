@@ -17,6 +17,7 @@
 
 from hvcc.types.IR import IRSignalList
 
+from ..HeavyGenException import HeavyGenException
 from .HeavyObject import HeavyObject
 
 
@@ -43,7 +44,7 @@ class SignalSamphold(HeavyObject):
 
     @classmethod
     def get_C_onMessage(cls, obj_type: str, obj_id: str, inlet_index: int, args: dict) -> list[str]:
-        raise Exception()
+        raise HeavyGenException(f"Incorrect obj_type {obj_type} for SignalSamphold")
 
     @classmethod
     def get_C_process(cls, process_dict: IRSignalList, obj_type: str, obj_id: str, args: dict) -> list[str]:

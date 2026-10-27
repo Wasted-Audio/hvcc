@@ -31,7 +31,7 @@ from hvcc.types.Lang import LangLetType
 
 from .BufferPool import BufferPool
 from .Connection import Connection
-from .HeavyException import HeavyException
+from .HeavyIrException import HeavyIrException
 from .HeavyLangObject import HeavyLangObject
 
 if TYPE_CHECKING:
@@ -168,7 +168,7 @@ class HeavyIrObject(HeavyLangObject):
                     # decrease the retain count of the buffer
                     buffer_pool.release_buffer(buf)
                 else:
-                    raise HeavyException(f"This object has {len(cc)} (> 1) signal inputs.")
+                    raise HeavyIrException(f"This object has {len(cc)} (> 1) signal inputs.")
 
             # assign the output buffers
             exclude_set: set = set()

@@ -17,7 +17,7 @@
 from hvcc.types.compiler import CompilerNotif
 
 
-class HeavyException(Exception):
+class HeavyIrException(Exception):
     """ This exception is raised if anything goes wrong during the hv2ir compilation process.
     """
 

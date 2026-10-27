@@ -4,6 +4,8 @@ from pathlib import Path
 
 import jinja2
 
+from hvcc.generators.HeavyGenException import HeavyGenException
+
 
 def map_load(pair: list, json_defs_file: Path):
     """
@@ -25,7 +27,7 @@ def map_load(pair: list, json_defs_file: Path):
             if k not in pair[1]:
                 pair[1][k] = component[k]
     else:
-        raise Exception(f'unknown component "{pair[1]["component"]}"')
+        raise HeavyGenException(f'unknown component "{pair[1]["component"]}"')
 
     return pair[1]
 

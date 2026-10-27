@@ -16,8 +16,8 @@
 
 import re
 
-from .HeavyException import HeavyException
 from .HeavyGraph import HeavyGraph
+from .HeavyIrException import HeavyIrException
 from .HeavyIrObject import HeavyIrObject
 from .HeavyLangObject import HeavyLangObject
 
@@ -54,4 +54,4 @@ class HLangBiquad(HeavyLangObject):
             return {x}, self.get_connection_move_list(x)
 
         else:
-            raise HeavyException(f"Unsupported connection format to biquad: {fmt}")
+            raise HeavyIrException(f"Unsupported connection format to biquad: {fmt}")

@@ -20,7 +20,7 @@ import os
 import time
 from pathlib import Path
 
-from hvcc.core.hv2ir.HeavyException import HeavyException
+from hvcc.core.hv2ir.HeavyIrException import HeavyIrException
 from hvcc.core.hv2ir.HeavyParser import HeavyParser
 from hvcc.types.compiler import CompilerMsg, CompilerNotif, CompilerResp
 
@@ -49,7 +49,7 @@ class hv2ir:
         try:
             # parse heavy file
             hv_graph = HeavyParser.graph_from_file(hv_file=hv_file, xname=patch_name)
-        except HeavyException as e:
+        except HeavyIrException as e:
             return CompilerResp(
                 stage="hv2ir",
                 compile_time=time.time() - tick,
@@ -78,7 +78,7 @@ class hv2ir:
 
             # generate Heavy.IR
             ir = hv_graph.to_ir()
-        except HeavyException as e:
+        except HeavyIrException as e:
             return CompilerResp(
                 stage="hv2ir",
                 compile_time=time.time() - tick,

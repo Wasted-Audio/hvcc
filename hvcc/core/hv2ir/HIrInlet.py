@@ -18,8 +18,8 @@
 from hvcc.types.IR import IROnMessage
 from hvcc.types.Lang import LangLetType
 
-from .HeavyException import HeavyException
 from .HeavyGraph import HeavyGraph
+from .HeavyIrException import HeavyIrException
 from .HeavyIrObject import HeavyIrObject
 
 
@@ -55,7 +55,7 @@ class HIrInlet(HeavyIrObject):
             if len(signal_types) == 1:
                 return next(iter(signal_types))
             elif len(signal_types) > 1:
-                raise HeavyException(
+                raise HeavyIrException(
                     f"{self} has multiple incident signal connections of differing type. "
                     "The outlet type cannot be explicitly resolved.")
             else:

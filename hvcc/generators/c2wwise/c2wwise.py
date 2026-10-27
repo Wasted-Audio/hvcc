@@ -32,6 +32,7 @@ from hvcc.types.meta import Meta
 
 from ..copyright import copyright_manager
 from ..filters import filter_plugin_id
+from ..HeavyGenException import HeavyGenException
 
 
 class c2wwise(Generator):
@@ -94,11 +95,11 @@ class c2wwise(Generator):
             elif num_output_channels == 12:
                 channel_config = "AK_SPEAKER_SETUP_DOLBY_7_1_4"
             else:
-                raise Exception("Wwise plugins support only mono, stereo, 5.1, 7.1, "
+                raise HeavyGenException("Wwise plugins support only mono, stereo, 5.1, 7.1, "
                                 "and 7.1.4 (Atmos) configurations, number of [dac~] channels should be appropriate")
 
             if plugin_type == "FX" and  num_input_channels != num_output_channels:
-                raise Exception("Wwise FX plugins require the same input/output channel"
+                raise HeavyGenException("Wwise FX plugins require the same input/output channel"
                                 "configuration (i.e. [adc~ 1] -> [dac~ 1]).")
 
             patch_src_dir = Path(out_dir, "SoundEnginePlugin", "Heavy")
