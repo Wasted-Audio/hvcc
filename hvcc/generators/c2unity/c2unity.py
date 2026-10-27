@@ -87,7 +87,7 @@ class c2unity(Generator):
                 shutil.rmtree(patch_src_dir)
             shutil.copytree(c_src_dir, patch_src_dir)
 
-            heavy_src_files = [f for f in os.listdir(c_src_dir) if f.endswith(".c") or f.endswith(".cpp")]
+            heavy_src_files = [f for f in os.listdir(c_src_dir) if f.endswith((".c", ".cpp"))]
 
             # generate files from templates
             for f in env.list_templates(filter_func=filter_templates):

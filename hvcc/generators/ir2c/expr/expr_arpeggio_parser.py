@@ -42,7 +42,7 @@ class ExprNode:
         return this
 
 
-class ExprArpeggioParser():
+class ExprArpeggioParser:
     """
     These two methods are the "public" API
     """

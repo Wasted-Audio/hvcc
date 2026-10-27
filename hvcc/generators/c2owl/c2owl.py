@@ -5,7 +5,7 @@ from pathlib import Path
 
 import jinja2
 
-import hvcc.core.hv2ir.HeavyLangObject as HeavyLangObject
+from hvcc.core.hv2ir import HeavyLangObject
 from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
 from hvcc.types.compiler import (
     CompilerMsg,
@@ -29,7 +29,7 @@ class c2owl(Generator):
 
     @classmethod
     def make_jdata(cls, patch_ir: Path) -> list:
-        jdata = list()
+        jdata = []
 
         with open(patch_ir, mode="r") as f:
             ir = IRGraph(**json.load(f))

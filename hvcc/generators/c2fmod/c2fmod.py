@@ -71,7 +71,7 @@ class c2fmod(Generator):
                 shutil.rmtree(patch_src_dir)
             shutil.copytree(c_src_dir, patch_src_dir)
 
-            heavy_src_files = [f for f in os.listdir(c_src_dir) if f.endswith(".c") or f.endswith(".cpp")]
+            heavy_src_files = [f for f in os.listdir(c_src_dir) if f.endswith((".c", ".cpp"))]
 
             src_ext_list = ["h", "hpp", "c", "cpp", "js", "md", "txt"]
 

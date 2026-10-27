@@ -181,7 +181,7 @@ def parse_parameters(
     replacements['hook_write_out'] = []
     replacements['callback_write_in'] = []
 
-    for param_name in params_in.keys():
+    for param_name in params_in:
         root = get_root_component(
             param_name, params_in_original_names[param_name], components)
         component = next(iter(filter_match(components, 'name', root)))
@@ -207,7 +207,7 @@ def parse_parameters(
             {"process": process, "bool": mapping.get('bool', False),
                 "hash_enum": params_in_original_names[param_name]})
 
-    for param_name in params_out.keys():
+    for param_name in params_out:
         root = get_root_component(
             param_name, params_out_original_names[param_name], components)
         component = next(iter(filter_match(components, 'name', root)))

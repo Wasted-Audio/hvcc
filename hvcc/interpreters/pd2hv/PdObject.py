@@ -170,7 +170,6 @@ class PdObject:
             parsing and before it is returned to the user. The program may assume
             that all parameters and variables have been set.
         """
-        pass
 
     @classmethod
     def get_supported_objects(cls) -> set:

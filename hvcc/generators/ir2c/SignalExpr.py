@@ -75,7 +75,7 @@ class SignalExpr(HeavyObject):
         num_buffers = expr_parser.num_simd_buffers()
         buffer_declaration = "\t// no extra buffers needed"
         if num_buffers > 0:
-            buffers = ", ".join([f"Bf{i}" for i in range(0, num_buffers)])
+            buffers = ", ".join([f"Bf{i}" for i in range(num_buffers)])
             buffer_declaration = f"\thv_bufferf_t {buffers};"
 
         func_name = f"Heavy_{{{{name}}}}::{cls.preamble}_{obj_id}_evaluate"
