@@ -14,6 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import decimal
 import json
 from pathlib import Path
 
@@ -55,7 +56,7 @@ class HeavyGraph(PdObject):
 
             try:
                 arg_value = HeavyObject.force_arg_type(arg_value, a["value_type"])
-            except (HeavyPdException, TypeError, ValueError) as e:
+            except (HeavyPdException, TypeError, ValueError, OverflowError, decimal.InvalidOperation) as e:
                 self.add_error(
                     f"Heavy {self.obj_type} cannot convert argument \"{a['name']}\""
                     f" with value \"{arg_value}\" to type {a['value_type']}: {e}")
