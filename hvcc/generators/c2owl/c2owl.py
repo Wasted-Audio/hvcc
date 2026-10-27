@@ -80,7 +80,7 @@ class c2owl(Generator):
         out_dir: Path,
         externs: ExternInfo,
         patch_name: str,
-        patch_meta: Meta = Meta(),
+        patch_meta: Meta,
         num_input_channels: int = 0,
         num_output_channels: int = 0,
         copyright: str | None = None,
@@ -88,6 +88,7 @@ class c2owl(Generator):
     ) -> CompilerResp:
 
         tick = time.time()
+        patch_meta = patch_meta or Meta()
 
         out_dir = Path(out_dir, "Source")
         patch_name = patch_name or "heavy"

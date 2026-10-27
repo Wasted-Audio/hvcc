@@ -33,13 +33,14 @@ class c2fmod(Generator):
         out_dir: Path,
         externs: ExternInfo,
         patch_name: str,
-        patch_meta: Meta = Meta(),
+        patch_meta: Meta,
         num_input_channels: int = 0,
         num_output_channels: int = 0,
         copyright: str | None = None,
         verbose: bool | None = False,
     ) -> CompilerResp:
         tick = time.time()
+        patch_meta = patch_meta or Meta()
 
         patch_name = patch_name.lower() if patch_name is not None else "heavy"
 

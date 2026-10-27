@@ -173,7 +173,7 @@ class c2js(Generator):
         out_dir: Path,
         externs: ExternInfo,
         patch_name: str,
-        patch_meta: Meta = Meta(),
+        patch_meta: Meta,
         num_input_channels: int = 0,
         num_output_channels: int = 0,
         copyright: str | None = None,
@@ -181,6 +181,7 @@ class c2js(Generator):
     ) -> CompilerResp:
 
         tick = time.time()
+
 
         parameter_list = externs.parameters.inParam
         parameter_out_list = externs.parameters.outParam
