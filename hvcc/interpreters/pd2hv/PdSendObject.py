@@ -47,7 +47,7 @@ class PdSendObject(PdObject):
                     self.__extern_type = "param"
                 elif self.obj_args[1] == "@hv_event":
                     self.__extern_type = "event"
-        except Exception:
+        except IndexError:
             pass
 
         if self.__extern_type == "param":
@@ -65,7 +65,7 @@ class PdSendObject(PdObject):
             except ValueError:
                 self.add_warning(
                     f"Minimum, maximum, and default values for Parameter {self.__send_name}  must be numbers.")
-            except Exception:
+            except IndexError:
                 pass
 
             if not (self.__attributes["min"] <= self.__attributes["default"]):

@@ -35,7 +35,7 @@ class HvSwitchcase(PdObject):
         for i, a in enumerate(self.obj_args):
             try:
                 self.obj_args[i] = float(a)
-            except Exception:
+            except ValueError:
                 pass
 
     def get_outlet_connection_type(self, outlet_index: int = 0) -> str:

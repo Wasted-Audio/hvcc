@@ -39,19 +39,16 @@ class PdTableObject(PdObject):
 
         try:
             self.__table_name = self.obj_args[0]
-        except Exception:
+        except IndexError:
             self.add_error(
                 "Missing \"name\" argument for table",
                 NotificationEnum.ERROR_MISSING_REQUIRED_ARGUMENT)
 
+        # optional arguments
         try:
-            # optional arguments
-            try:
-                self.__size = int(self.obj_args[1])
-                self.__extern = (self.obj_args[2] == "@hv_table")
-            except Exception:
-                pass
-        except Exception:
+            self.__size = int(self.obj_args[1])
+            self.__extern = (self.obj_args[2] == "@hv_table")
+        except (IndexError, ValueError):
             pass
 
     def to_hv(self) -> Heavy:

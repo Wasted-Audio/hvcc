@@ -68,7 +68,7 @@ class c2owl(Generator):
                             key = name.split('Channel-', 1)[1]
                             jdata.append((key, f'{name}>', 'SEND', f"0x{heavy_hash(name):X}",
                                           0, 1, None, key in OWL_BUTTONS))
-                except Exception:
+                except KeyError:
                     pass
 
             return jdata

@@ -57,7 +57,7 @@ class PdReceiveObject(PdObject):
                     self.__extern_type = "event"
                 elif int(self.obj_args[1]):
                     self.__priority = int(self.obj_args[1])
-        except Exception:
+        except (IndexError, ValueError):
             pass
 
         if self.__extern_type == "param":
@@ -75,7 +75,7 @@ class PdReceiveObject(PdObject):
             except ValueError:
                 self.add_warning(
                     f"Minimum, maximum, and default values for Parameter {self.__receiver_name}  must be numbers.")
-            except Exception:
+            except IndexError:
                 pass
 
             if not (self.__attributes["min"] <= self.__attributes["default"]):

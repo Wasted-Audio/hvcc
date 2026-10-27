@@ -53,7 +53,7 @@ class PdRouteObject(PdObject):
             for i, a in enumerate(self.obj_args):
                 try:
                     self.obj_args[i] = float(a)
-                except Exception:
+                except ValueError:
                     pass
 
     def validate_configuration(self) -> None:
