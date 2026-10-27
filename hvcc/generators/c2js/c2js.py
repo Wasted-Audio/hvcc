@@ -280,11 +280,11 @@ class c2js(Generator):
                 stage="c2js",
                 in_dir=c_src_dir,
                 out_dir=out_dir,
-                out_file=js_out_file,
+                out_file=Path(js_out_file),
                 compile_time=time.time() - tick
             )
 
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001
             return CompilerResp(
                 stage="c2js",
                 notifs=CompilerNotif(

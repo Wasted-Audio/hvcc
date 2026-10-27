@@ -55,10 +55,7 @@ class TestPdSpeedBase(HvBaseTest):
         else:
             golden = {}
 
-        try:
-            out_dir = self._run_hvcc(pd_path)
-        except Exception as e:
-            self.fail(str(e))
+        out_dir = self._run_hvcc(pd_path)
 
         assert out_dir
         c_src_dir = Path(out_dir, "c")

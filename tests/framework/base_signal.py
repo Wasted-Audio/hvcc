@@ -86,10 +86,7 @@ class TestPdSignalBase(HvBaseTest):
         golden_path = Path(self.TEST_DIR, f"{patch_name}.golden.wav")
         self.assertTrue(golden_path.exists(), f"File not found: {golden_path}")
 
-        try:
-            out_dir = self._run_hvcc(pd_path)
-        except Exception as e:
-            self.fail(str(e))
+        out_dir = self._run_hvcc(pd_path)
 
         # copy over additional C assets
         assert out_dir

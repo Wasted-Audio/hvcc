@@ -46,8 +46,8 @@ class TestPdMIDIBase(HvBaseTest):
 
     def create_fail_message(
         self,
-        result: str,
-        golden: str,
+        result: list[str],
+        golden: list[str],
         flag: str | None = None
     ) -> str:
         return "\nResult ({0})\n-----------\n{1}\n\nGolden\n-----------\n{2}".format(
@@ -61,11 +61,7 @@ class TestPdMIDIBase(HvBaseTest):
         expected_enum: NotificationEnum
     ) -> None:
         pd_path = Path(self.TEST_DIR, pd_file)
-
-        try:
-            self._run_hvcc(pd_path, expect_fail=True, expected_enum=expected_enum)
-        except Exception as e:
-            self.fail(str(e))
+        self._run_hvcc(pd_path, expect_fail=True, expected_enum=expected_enum)
 
     def _test_control_patch_expect_warning(
         self,
@@ -74,11 +70,7 @@ class TestPdMIDIBase(HvBaseTest):
     ) -> None:
         # setup
         pd_path = Path(self.TEST_DIR, pd_file)
-
-        try:
-            self._run_hvcc(pd_path, expect_warning=True, expected_enum=expected_enum)
-        except Exception as e:
-            self.fail(str(e))
+        self._run_hvcc(pd_path, expect_warning=True, expected_enum=expected_enum)
 
     def _test_midi_patch(
         self,
@@ -94,11 +86,7 @@ class TestPdMIDIBase(HvBaseTest):
 
         # setup
         pd_path = Path(self.TEST_DIR, pd_file)
-
-        try:
-            out_dir = self._run_hvcc(pd_path)
-        except Exception as e:
-            self.fail(str(e))
+        out_dir = self._run_hvcc(pd_path)
 
         # copy over additional C assets
         assert out_dir

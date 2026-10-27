@@ -60,5 +60,5 @@ class PdTriggerObject(PdObject):
         try:
             float(x)
             return True
-        except Exception:
+        except ValueError:
             return False

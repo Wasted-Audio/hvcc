@@ -143,7 +143,7 @@ class c2wwise(Generator):
                 compile_time=time.time() - tick
             )
 
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001
             return CompilerResp(
                 stage="c2wwise",
                 notifs=CompilerNotif(
