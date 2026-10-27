@@ -374,7 +374,7 @@ class HeavyLangObject:
                 c.to_object._resolve_connection_types(obj_stack)  # turtle all the way down
 
     @classmethod
-    def get_hash(cls, x: str | float | int) -> int:
+    def get_hash(cls, x: str | float) -> int:
         """ Compute the message element hash used by msg_getHash(). Returns a 32-bit integer.
         """
         if isinstance(x, (float, int)) and not isinstance(x, str):

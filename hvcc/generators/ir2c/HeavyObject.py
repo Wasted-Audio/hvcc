@@ -166,7 +166,7 @@ class HeavyObject:
                 buffer_dict.index)
 
     @classmethod
-    def get_hash(cls, x: float | str | int) -> int:
+    def get_hash(cls, x: float | str) -> int:
         """ Compute the message element hash used by msg_getHash(). Returns a 32-bit integer.
         """
         if isinstance(x, (float, int)) and not isinstance(x, str):
