@@ -81,10 +81,11 @@ class DPFPortGroups(BaseModel):
             for group, gConfig in direction.items():
                 for port, value in gConfig.items():
                     index = value[0] if isinstance(value, (tuple, list)) else value
+                    if not isinstance(index, int):
+                        raise ValueError(  # noqa: TRY004
+                            f"Port index for port '{port}' in group '{group}' must be an integer")
                     if index < 1:
                         raise ValueError(f"port index must start at 1 (PD numbering), got {index} in group '{group}'")
-                    if not isinstance(index, int):
-                        raise TypeError(f"Port index for port '{port}' in group '{group}' must be an integer")
                     if index in iseen:
                         raise ValueError(
                             f"Port index '{index}' in group '{group}' is already used by group '{iseen[index]}'"

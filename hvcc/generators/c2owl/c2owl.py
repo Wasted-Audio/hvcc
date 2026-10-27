@@ -5,7 +5,8 @@ from pathlib import Path
 
 import jinja2
 
-from hvcc.core.hv2ir import HeavyLangObject
+from hvcc.core.hv2ir.HeavyIrException import HeavyIrException
+from hvcc.core.hv2ir.HeavyLangObject import HeavyLangObject
 from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
 from hvcc.types.compiler import (
     CompilerMsg,
@@ -19,7 +20,7 @@ from hvcc.types.meta import Meta
 
 from ..copyright import copyright_manager
 
-heavy_hash = HeavyLangObject.HeavyLangObject.get_hash
+heavy_hash = HeavyLangObject.get_hash
 OWL_BUTTONS = ['Push', 'B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8', 'B9', 'B10', 'B11', 'Red', 'Green']
 
 
@@ -68,7 +69,7 @@ class c2owl(Generator):
                             key = name.split('Channel-', 1)[1]
                             jdata.append((key, f'{name}>', 'SEND', f"0x{heavy_hash(name):X}",
                                           0, 1, None, key in OWL_BUTTONS))
-                except KeyError:
+                except (IndexError, KeyError, HeavyIrException):
                     pass
 
             return jdata

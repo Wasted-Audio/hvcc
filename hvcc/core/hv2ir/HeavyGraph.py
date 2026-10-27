@@ -210,7 +210,7 @@ class HeavyGraph(HeavyIrObject):
                 self.output_channel_set.update(obj.args["channels"])
             elif obj.type in {"receive", "__receive", "send", "__send"}:
                 self.__register_named_object(obj, obj.name)
-            elif obj.type in {"table", "__table", "var"} and obj.name is not None:
+            elif obj.type in {"table", "__table"} or (obj.type == "var" and obj.name is not None):
                 self.__register_named_object(
                     obj,
                     obj.name,
