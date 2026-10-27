@@ -158,12 +158,12 @@ class HeavyLangObject:
         if value_type == "float":
             try:
                 return float(value)
-            except ValueError:
+            except (ValueError, TypeError, OverflowError):
                 raise HeavyIrException(f"Cannot convert argument \"{value}\" into float.")
         elif value_type == "int":
             try:
                 return int(decimal.Decimal(value))
-            except ValueError:
+            except (ValueError, TypeError, decimal.InvalidOperation, OverflowError):
                 raise HeavyIrException(f"Cannot convert argument \"{value}\" into int.")
         elif value_type == "string":
             return str(value) if value is not None else None

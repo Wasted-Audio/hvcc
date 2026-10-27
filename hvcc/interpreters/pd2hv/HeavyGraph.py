@@ -55,7 +55,7 @@ class HeavyGraph(PdObject):
 
             try:
                 arg_value = HeavyObject.force_arg_type(arg_value, a["value_type"])
-            except HeavyPdException as e:
+            except (HeavyPdException, TypeError, ValueError) as e:
                 self.add_error(
                     f"Heavy {self.obj_type} cannot convert argument \"{a['name']}\""
                     f" with value \"{arg_value}\" to type {a['value_type']}: {e}")

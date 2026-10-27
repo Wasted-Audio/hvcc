@@ -88,7 +88,7 @@ class HeavyObject(PdObject):
                     self.obj_dict[arg.name] = self.force_arg_type(
                         obj_args[i],
                         arg.value_type)
-                except HeavyPdException as e:
+                except (HeavyPdException, TypeError, ValueError, OverflowError, decimal.InvalidOperation) as e:
                     self.add_error(
                         f"Heavy {obj_type} cannot convert argument \"{arg.name}\""
                         f" with value \"{obj_args[i]}\" to type {arg.value_type}: {e}")
