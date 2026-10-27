@@ -59,6 +59,10 @@ plugins = [
   "pydantic.mypy"
 ]
 
+[tool.ruff]
+line-length = 120
+exclude = [".tox", ".venv", "venv", "build", "examples", "hvcc/generators/ir2c/static/MicroNam/*"]
+
 [tool.ruff.lint]
 ignore = [
     "N999",
