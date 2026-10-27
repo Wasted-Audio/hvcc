@@ -103,8 +103,8 @@ class SignalExpr(HeavyObject):
             "",
             "\t// !!! declare this buffer once outside the loop",
             f"\thv_bInf_t input_args_{obj_id}[{args['num_inlets']}] = {{{', '.join(input_args)}}};",
-            f"\t{cls.preamble}_evaluators[{len(cls.obj_eval_functions)}](input_args_{obj_id}, {out_buf});"
-            "",
+            (f"\t{cls.preamble}_evaluators[{len(cls.obj_eval_functions)}](input_args_{obj_id}, {out_buf});"
+            ""),
         ]
 
         return call

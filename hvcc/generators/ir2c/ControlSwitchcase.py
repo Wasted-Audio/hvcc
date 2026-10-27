@@ -37,8 +37,8 @@ class ControlSwitchcase(HeavyObject):
     @classmethod
     def get_C_decl(cls, obj_type: str, obj_id: str, args: dict) -> list[str]:
         return [
-            f"cSwitchcase_{obj_id}_onMessage(HeavyContextInterface *, void *, int letIn, "
-            "const HvMessage *const, void *);"
+            (f"cSwitchcase_{obj_id}_onMessage(HeavyContextInterface *, void *, int letIn, "
+            "const HvMessage *const, void *);")
         ]
 
     @classmethod
@@ -57,8 +57,8 @@ class ControlSwitchcase(HeavyObject):
     ) -> list[str]:
         # generate the onMessage implementation
         out_list = [
-            f"cSwitchcase_{obj_id}_onMessage(HeavyContextInterface *_c, void *o, int letIn, "
-            f"const HvMessage *const m, void *sendMessage) {{"
+            (f"cSwitchcase_{obj_id}_onMessage(HeavyContextInterface *_c, void *o, int letIn, "
+            f"const HvMessage *const m, void *sendMessage) {{")
         ]
         out_list.append("int msgIndex = 0;")
         out_list.append("switch (msg_getHash(m, msgIndex)) {")
