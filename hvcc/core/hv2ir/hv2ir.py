@@ -101,7 +101,7 @@ class hv2ir:
                 json.dump(ir.model_dump(), f, indent=4)
 
             if verbose and ir is not None and len(ir.signal.processOrder) > 0:
-                print("")
+                print()
                 print("=== Signal Order ===")
                 for so in ir.signal.processOrder:
                     o = ir.objects[so.id]
