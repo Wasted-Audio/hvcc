@@ -844,11 +844,11 @@ class PdParser:
         gui_recv: dict
     ) -> PdGraph:
         # parse remote messages
-        for index in msg_send:
+        for index, remotes in msg_send.items():
             first_msg = g.get_object(index)
             conns = first_msg.get_inlet_connections()
 
-            for remote in msg_send[index]:
+            for remote in remotes:
                 self.obj_counter["msg"] += 1
                 msg = PdMessageObject("msg", [" ".join(msg for msg in remote["message"])])
                 msg_index = g.add_object(msg)
@@ -866,17 +866,17 @@ class PdParser:
                 g.add_parsed_connection(msg_index, 0, send_index, 0)
 
         # parse gui sends
-        for index in gui_send:
+        for index, receivers in gui_send.items():
             self.obj_counter["send"] += 1
-            send = PdSendObject('send', gui_send[index].split())
+            send = PdSendObject('send', receivers.split())
             send_index = g.add_object(send)
 
             g.add_parsed_connection(index, 0, send_index, 0)
 
         # parse gui receives
-        for index in gui_recv:
+        for index, receivers in gui_recv.items():
             self.obj_counter["receive"] += 1
-            recv = PdReceiveObject('receive', gui_recv[index].split())
+            recv = PdReceiveObject('receive', receivers.split())
             recv_index = g.add_object(recv)
 
             g.add_parsed_connection(recv_index, 0, index, 0)
