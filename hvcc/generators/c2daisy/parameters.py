@@ -116,8 +116,8 @@ def de_alias(
     potential_aliases = list(filter(lambda x: x in low, aliases))
     for alias in potential_aliases:
         try:
-            target_component = list(filter_match(
-                components, 'name', aliases[alias]))[0]
+            target_component = next(iter(filter_match(
+                components, 'name', aliases[alias])))
             # The CVOuts setup really bothers me
             if target_component['component'] != 'CVOuts':
                 for mapping in target_component['mapping']:
@@ -184,7 +184,7 @@ def parse_parameters(
     for param_name in params_in.keys():
         root = get_root_component(
             param_name, params_in_original_names[param_name], components)
-        component = list(filter_match(components, 'name', root))[0]
+        component = next(iter(filter_match(components, 'name', root)))
         param_struct = {
             "hash_enum": params_in_original_names[param_name], 'name': root, 'type': component['component'].upper()}
         replacements['parameters'].append(param_struct)
@@ -210,7 +210,7 @@ def parse_parameters(
     for param_name in params_out.keys():
         root = get_root_component(
             param_name, params_out_original_names[param_name], components)
-        component = list(filter_match(components, 'name', root))[0]
+        component = next(iter(filter_match(components, 'name', root)))
 
         mapping = get_component_mapping(
             param_name, params_out_original_names[param_name], component, components)

@@ -503,7 +503,7 @@ class HeavyGraph(HeavyIrObject):
         if len(connection_type_set) == 0:
             return "-->"  # object has no incident connections, default to -->
         elif len(connection_type_set) == 1:
-            return list(connection_type_set)[0]
+            return next(iter(connection_type_set))
         else:
             raise HeavyException(f"{self} has multiple incident connections of differing type.\
                                   The outlet type cannot be explicitly resolved.")
@@ -757,9 +757,9 @@ class HeavyGraph(HeavyIrObject):
         for name, receivers in self.local_vars.get_registered_objects_for_type("__receive").items():
 
             # ensure that all receiver arguments are consistent
-            extern = list(set([r.args["extern"] for r in receivers]) - {None})
+            extern = list({r.args["extern"] for r in receivers} - {None})
             attributes = [r.args["attributes"] for r in receivers if len(r.args["attributes"]) > 0]
-            scope = list(set([r.annotations["scope"] for r in receivers]))
+            scope = list({r.annotations["scope"] for r in receivers})
 
             if len(extern) > 1:
                 self.add_error(f"Parameter \"{name}\" has conflicting extern types: {extern[0]} != {extern[1]}")

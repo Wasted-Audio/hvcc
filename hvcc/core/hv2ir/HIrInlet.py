@@ -53,7 +53,7 @@ class HIrInlet(HeavyIrObject):
             connections = self.graph.inlet_connections[self.args["index"]]
             signal_types = {c.type for c in connections if c.is_signal}
             if len(signal_types) == 1:
-                return list(signal_types)[0]
+                return next(iter(signal_types))
             elif len(signal_types) > 1:
                 raise HeavyException(
                     f"{self} has multiple incident signal connections of differing type. "
@@ -64,10 +64,10 @@ class HIrInlet(HeavyIrObject):
                     # object has no incident connections.
                     return "-->"  # outlet type defaults to control (-->)
                 elif len(connection_type_set) == 1:
-                    return list(connection_type_set)[0]
+                    return next(iter(connection_type_set))
                 else:
                     control_types = [t for t in connection_type_set if t == "-->"]
                     if control_types:
                         return "-->"
-                    return list(connection_type_set)[0]
+                    return next(iter(connection_type_set))
         return None

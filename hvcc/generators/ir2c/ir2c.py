@@ -208,10 +208,10 @@ class ir2c:
         SignalExpr.obj_eval_functions = {}
 
         # generate set of header files to include
-        include_set = set([x for o in ir.objects.values() for x in ir2c.get_class(o.type).get_C_header_set()])
+        include_set = {x for o in ir.objects.values() for x in ir2c.get_class(o.type).get_C_header_set()}
 
         # generate set of files to add to project
-        file_set = set([x for o in ir.objects.values() for x in ir2c.get_class(o.type).get_C_file_set()])
+        file_set = {x for o in ir.objects.values() for x in ir2c.get_class(o.type).get_C_file_set()}
         file_set.update(ir2c.__BASE_FILE_SET)
 
         # generate object definition and initialisation list

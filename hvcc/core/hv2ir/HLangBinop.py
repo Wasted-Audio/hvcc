@@ -79,12 +79,12 @@ class HLangBinop(HeavyLangObject):
             return (set(), [])  # remove this object
 
         if self.has_inlet_connection_format("ff"):
-            ir_type = [x for x in HLangBinop.__HEAVY_DICT[self.type] if x.endswith("~f")][0]
+            ir_type = next(x for x in HLangBinop.__HEAVY_DICT[self.type] if x.endswith("~f"))
             x = HeavyIrObject(ir_type)
             return ({x}, self.get_connection_move_list(x))
 
         elif self.has_inlet_connection_format("fc"):
-            ir_type = [x for x in HLangBinop.__HEAVY_DICT[self.type] if x.endswith("~f")][0]
+            ir_type = next(x for x in HLangBinop.__HEAVY_DICT[self.type] if x.endswith("~f"))
             x = HeavyIrObject(ir_type)
             y = HeavyIrObject("__var~f", {"k": self.args[self.name_for_arg()]})
             z = HeavyIrObject("__varread~f", {"var_id": y.id})
@@ -98,7 +98,7 @@ class HLangBinop(HeavyLangObject):
             return ({x, y, z}, connections)
 
         elif self.has_inlet_connection_format("f_"):
-            ir_type = [x for x in HLangBinop.__HEAVY_DICT[self.type] if x.endswith("~f")][0]
+            ir_type = next(x for x in HLangBinop.__HEAVY_DICT[self.type] if x.endswith("~f"))
 
             # handle identity-operations
             if (self.type == "+" and self.args["k"] == 0.0) or \
@@ -148,12 +148,12 @@ class HLangBinop(HeavyLangObject):
             return ({x, y}, connections)
 
         elif self.has_inlet_connection_format("ii"):
-            ir_type = [x for x in HLangBinop.__HEAVY_DICT[self.type] if x.endswith("~i")][0]
+            ir_type = next(x for x in HLangBinop.__HEAVY_DICT[self.type] if x.endswith("~i"))
             x = HeavyIrObject(ir_type)
             return ({x}, self.get_connection_move_list(x))
 
         elif self.has_inlet_connection_format("ic"):
-            ir_type = [x for x in HLangBinop.__HEAVY_DICT[self.type] if x.endswith("~i")][0]
+            ir_type = next(x for x in HLangBinop.__HEAVY_DICT[self.type] if x.endswith("~i"))
             x = HeavyIrObject(ir_type)
             y = HeavyIrObject("__var~i", {"k": self.args[self.name_for_arg()]})
             z = HeavyIrObject("__varread~i", {"var_id": y.id})
@@ -167,7 +167,7 @@ class HLangBinop(HeavyLangObject):
             return ({x, y, z}, connections)
 
         elif self.has_inlet_connection_format("i_"):
-            ir_type = [x for x in HLangBinop.__HEAVY_DICT[self.type] if x.endswith("~i")][0]
+            ir_type = next(x for x in HLangBinop.__HEAVY_DICT[self.type] if x.endswith("~i"))
             x = HeavyIrObject(ir_type)
             # add constant generator
             y = HeavyIrObject(
@@ -191,14 +191,14 @@ class HLangBinop(HeavyLangObject):
 
         elif self.has_inlet_connection_format("c_"):
             # if the right inlet is empty, generate a constant variation of the object
-            ir_type = [x for x in HLangBinop.__HEAVY_DICT[self.type] if x.endswith("_k")][0]
+            ir_type = next(x for x in HLangBinop.__HEAVY_DICT[self.type] if x.endswith("_k"))
             # standardise the operation's constant argument name to "k"
             args = {"k": self.args[self.name_for_arg()]}
             x = HeavyIrObject(ir_type, args)
             return ({x}, self.get_connection_move_list(x))
 
         elif self.has_inlet_connection_format("cf"):
-            ir_type = [x for x in HLangBinop.__HEAVY_DICT[self.type] if x.endswith("~f")][0]
+            ir_type = next(x for x in HLangBinop.__HEAVY_DICT[self.type] if x.endswith("~f"))
             x = HeavyIrObject(ir_type)
             v = HeavyIrObject("__var~f")
             vr = HeavyIrObject("__varread~f", args={"var_id": v.id})

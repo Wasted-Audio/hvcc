@@ -335,7 +335,7 @@ class HeavyLangObject:
             if len(connection_type_set) == 0:
                 return "-->"
             elif len(connection_type_set) == 1:
-                return list(connection_type_set)[0]
+                return next(iter(connection_type_set))
             elif len(connection_type_set) == 2:
                 if {"-->", "~f>"} == connection_type_set:
                     return "~f>"

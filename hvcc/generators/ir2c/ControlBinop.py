@@ -97,7 +97,7 @@ class ControlBinop(HeavyObject):
         if obj_type.endswith("_k"):
             return []
         else:
-            obj_arg = float(list(args.values())[0])
+            obj_arg = float(next(iter(args.values())))
             return [f"cBinop_init(&cBinop_{obj_id}, {obj_arg}f); // {obj_type}"]
 
     @classmethod

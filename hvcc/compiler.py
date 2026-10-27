@@ -279,7 +279,7 @@ def compile_dataflow(
             verbose=verbose)
 
     # check for errors
-    response: CompilerResp = list(results.root.values())[0]
+    response: CompilerResp = next(iter(results.root.values()))
 
     if response.notifs.has_error:
         return results

@@ -28,13 +28,12 @@ class PrettyfyC:
         step: int = 2,
         delete_input_on_finish: bool = False
     ) -> None:
-        with open(file_in, "r") as f:
-            with open(file_out, "w") as g:
-                for line in f:
-                    indent -= line.count("}")
-                    new_line = (" " * (step * indent)) + line
-                    g.write(new_line + os.linesep)
-                    indent += line.count("{")
+        with open(file_in, "r") as f, open(file_out, "w") as g:
+            for line in f:
+                indent -= line.count("}")
+                new_line = (" " * (step * indent)) + line
+                g.write(new_line + os.linesep)
+                indent += line.count("{")
 
         if delete_input_on_finish:
             os.remove(file_in)
