@@ -368,7 +368,7 @@ class ir2c:
                 shutil.copy2(
                     src=Path(static_dir, str(f)),
                     dst=Path(output_dir, str(f)))
-            except IOError:
+            except OSError:
                 Path.mkdir(Path(output_dir, str(f)).parent, parents=True)
                 shutil.copy2(
                     src=Path(static_dir, str(f)),

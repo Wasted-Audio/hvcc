@@ -724,7 +724,7 @@ class PdParser:
             # bubble the Exception back to the root graph where the graph
             # will be returned
             if not g.is_root:
-                raise e
+                raise
             else:
                 # NOTE(mhroth): should the exception be added as an error?
                 # Sometimes it's all that we have, so perhaps it's a good idea.

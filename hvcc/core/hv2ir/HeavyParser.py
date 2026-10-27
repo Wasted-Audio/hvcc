@@ -204,7 +204,7 @@ class HeavyParser:
                 e.notes = g.get_notices()
                 e.notes.has_error = True
                 e.notes.exception = e
-            raise e
+            raise
 
         if (g.graph is None) or (g.graph.file != g.file):
             # remove this graph from the stack when finished.

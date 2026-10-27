@@ -84,7 +84,7 @@ class DPFPortGroups(BaseModel):
                     if index < 1:
                         raise ValueError(f"port index must start at 1 (PD numbering), got {index} in group '{group}'")
                     if not isinstance(index, int):
-                        raise ValueError(f"Port index for port '{port}' in group '{group}' must be an integer")
+                        raise TypeError(f"Port index for port '{port}' in group '{group}' must be an integer")
                     if index in iseen:
                         raise ValueError(
                             f"Port index '{index}' in group '{group}' is already used by group '{iseen[index]}'"

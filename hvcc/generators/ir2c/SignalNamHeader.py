@@ -72,7 +72,7 @@ def load_nam_file(nam_file: Path) -> tuple[ModelNet, int, list[float]]:
     weights = payload["weights"]
     for idx, value in enumerate(weights):
         if not isinstance(value, (int, float)):
-            raise ValueError(f"weights[{idx}] is not numeric")
+            raise TypeError(f"weights[{idx}] is not numeric")
 
     weights_len = len(weights)
 

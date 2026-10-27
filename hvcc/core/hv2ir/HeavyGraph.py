@@ -472,7 +472,7 @@ class HeavyGraph(HeavyIrObject):
             e.notes = self.get_notices()
             e.notes.has_error = True
             e.notes.exception = e
-            raise e
+            raise
 
     def _remove_unused_inlet_connections(self) -> None:
         """ Remove connections from inlet object, if there are no incoming
