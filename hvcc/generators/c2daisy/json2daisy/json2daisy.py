@@ -77,7 +77,7 @@ def filter_map_init(
     match_exclude: bool = False
 ) -> str:
     filtered = filter_match(component_set, key, match, key_exclude=key_exclude, match_exclude=match_exclude)
-    return "\n    ".join(map(lambda x: x['map_init'].format_map(x), filtered))
+    return "\n    ".join((x['map_init'].format_map(x) for x in filtered))
 
 
 # this function is not used anywhere?
@@ -90,7 +90,7 @@ def filter_map_set(
 ) -> str:
     filtered = filter_match(component_set, key, match, key_exclude=key_exclude, match_exclude=match_exclude)
     return "\n    ".join(
-        map(lambda x: x['mapping'][0]['set'].format_map(x['mapping'][0]['name'].format_map(x)), filtered)
+        (x['mapping'][0]['set'].format_map(x['mapping'][0]['name'].format_map(x)) for x in filtered)
     )
 
 
@@ -104,7 +104,7 @@ def filter_map_ctrl(
 ) -> str:
     component_filt = filter_matches(component_set, key, matches, key_exclude=key_exclude, match_exclude=match_exclude)
     component_map = map(lambda x, i: {**x, 'i': i}, component_filt, range(1000))
-    return "\n    ".join(map(lambda x: x[init_key].format_map(x), component_map))
+    return "\n    ".join((x[init_key].format_map(x) for x in component_map))
 
 
 # filter out the components with a certain field, then fill in the template
@@ -115,7 +115,7 @@ def filter_map_template(
     match_exclude: bool = False
 ) -> str:
     filtered = filter_has(component_set, name, key_exclude=key_exclude, match_exclude=match_exclude)
-    return "\n    ".join(map(lambda x: x[name].format_map(x), filtered))
+    return "\n    ".join((x[name].format_map(x) for x in filtered))
 
 
 def flatten_pin_dicts(comp: dict) -> dict:
@@ -177,7 +177,7 @@ def generate_header(board_description_dict: dict) -> 'tuple[str, dict]':
 
     # alphabetize by component name
     components = sorted(components.items(), key=lambda x: x[1]['component'])
-    components = list(map(lambda p: map_load(p, json_defs_file), components))
+    components = [map_load(p, json_defs_file) for p in components]
 
     # flatten pin dicts into multiple entries
     # e.g. "pin": {"a": 12} => "pin_a": 12
@@ -239,7 +239,7 @@ def generate_header(board_description_dict: dict) -> 'tuple[str, dict]':
         replacements['display'] = f"""
         daisy::OledDisplay<{target['display']['driver']}>::Config display_config;
         display_config.driver_config.transport_config.Defaults();
-        {"".join(map(lambda x: x, target['display'].get('config', {})))}
+        {"".join((x for x in target['display'].get('config', {})))}
         display.Init(display_config);
           display.Fill(0);
           display.Update();
@@ -273,14 +273,14 @@ def generate_header(board_description_dict: dict) -> 'tuple[str, dict]':
 
     if len(component_declarations) > 0:
         replacements['comps'] = ";\n  ".join(
-            map(lambda x: x['typename'].format_map(x) + ' ' + x['name'], component_declarations)
+            (x['typename'].format_map(x) + ' ' + x['name'] for x in component_declarations)
         ) + ';'
 
     non_class_declarations = list(filter(lambda x: 'non_class_decl' in x, component_declarations))
 
     if len(non_class_declarations) > 0:
         replacements['non_class_declarations'] = "\n".join(
-            map(lambda x: x['non_class_decl'].format_map(x), non_class_declarations)
+            (x['non_class_decl'].format_map(x) for x in non_class_declarations)
         )
 
     # env_opts = {"trim_blocks": True, "lstrip_blocks": True}
