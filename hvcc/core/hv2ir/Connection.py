@@ -14,7 +14,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from .HeavyIrObject import HeavyIrObject
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from .HeavyIrObject import HeavyIrObject
 
 
 class Connection:
@@ -23,9 +26,9 @@ class Connection:
 
     def __init__(
         self,
-        from_object: HeavyIrObject,
+        from_object: 'HeavyIrObject',
         outlet_index: int,
-        to_object: HeavyIrObject,
+        to_object: 'HeavyIrObject',
         inlet_index: int,
         conn_type: str
     ) -> None:

@@ -16,7 +16,6 @@
 
 import json
 from pathlib import Path
-from typing import TYPE_CHECKING, Optional
 
 from hvcc.types.IR import (
     HeavyIRType,
@@ -31,11 +30,9 @@ from hvcc.types.Lang import LangLetType
 
 from .BufferPool import BufferPool
 from .Connection import Connection
+from .HeavyGraph import HeavyGraph
 from .HeavyIrException import HeavyIrException
 from .HeavyLangObject import HeavyLangObject
-
-if TYPE_CHECKING:
-    from .HeavyGraph import HeavyGraph
 
 
 class HeavyIrObject(HeavyLangObject):
@@ -52,7 +49,7 @@ class HeavyIrObject(HeavyLangObject):
         self,
         obj_type: str,
         args: dict | None = None,
-        graph: Optional['HeavyGraph'] = None,
+        graph: HeavyGraph | None = None,
         num_inlets: int = -1,
         num_outlets: int = -1,
         annotations: dict | None = None
