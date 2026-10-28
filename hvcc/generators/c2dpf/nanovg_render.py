@@ -1,11 +1,10 @@
 import json
-
 from pathlib import Path
 
 import jinja2
 
+from hvcc.types.GUI import Canvas, Comment, Graph, GraphRoot, GUIObjects
 from hvcc.types.meta import DPF
-from hvcc.types.GUI import Canvas, Comment, GraphRoot, Graph, GUIObjects
 
 
 def open_gui_json(
@@ -58,6 +57,8 @@ def nanovg_render(
 
     def generate_gui_objects(graphs: list[Graph], objects: list[GUIObjects], parent: str):
         for w in objects:
+            if w.type == "popmenu":
+                continue
             widgets[w.type].append(w.id if isinstance(w, (Canvas, Comment)) else w.parameter)
 
         gui_objects_render.append(env.get_template("gui_objects.cpp").render(

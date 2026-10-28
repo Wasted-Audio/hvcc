@@ -5,7 +5,8 @@ It's possible to implement custom generators without modifying HVCC. For this, y
 * subclass `hvcc.types.compiler.Generator` abstract class in your module (e.g. a Python file)
 * add `-G your_module_name` command-line argument when executing `hvcc`
 
-It's recommended to have only one Generator subclass per module, otherwise any one of them can be executed.
+> [!TIP]
+> Maintain only one `Generator` subclass per module; otherwise any one of them may be executed unpredictably.
 
 Check out `hvcc.generators.c2daisy.c2daisy` or `hvcc.generators.c2dpf.c2dpf` modules for reference implementations.
 
@@ -33,13 +34,15 @@ class ExampleHvccGenerator(Generator):
         out_dir: Path,
         externs: ExternInfo,
         patch_name: str,
-        patch_meta: Meta = Meta(),
+        patch_meta: Meta,
         num_input_channels: int = 0,
         num_output_channels: int = 0,
         copyright: Optional[str] = None,
         verbose: Optional[bool] = False
     ) -> CompilerResp:
         begin_time = time.time()
+        patch_meta = patch_meta or Meta()
+        
         print("--> Invoking ExampleHvccGenerator")
         time.sleep(1)
         end_time = time.time()

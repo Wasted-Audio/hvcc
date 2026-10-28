@@ -1,6 +1,7 @@
 # ADR-006: gui2dpf Templates
 
 Date: 2026-05-13
+
 Issue: https://github.com/Wasted-Audio/hvcc/issues/296
 
 ## Context

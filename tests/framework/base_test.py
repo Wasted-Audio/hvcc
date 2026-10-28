@@ -14,18 +14,15 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import jinja2
 import shutil
 import subprocess
 import unittest
-
-from typing import List, Optional
 from pathlib import Path
 
+import jinja2
+
 import hvcc
-
 from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
-
 
 simd_flags = {
     "HV_SIMD_NONE": ["-DHV_SIMD_NONE"],
@@ -52,7 +49,7 @@ class HvBaseTest(unittest.TestCase):
         expect_warning: bool = False,
         expect_fail: bool = False,
         expected_enum: NotificationEnum = NotificationEnum.EMPTY
-    ) -> Optional[Path]:
+    ) -> Path | None:
         """Run hvcc on a Pd file. Returns the output directory.
         """
 
@@ -64,14 +61,13 @@ class HvBaseTest(unittest.TestCase):
         hvcc_results = hvcc.compile_dataflow(pd_path, out_dir, verbose=False)
 
         for r in hvcc_results.root.values():
-            if not expect_fail:
-                # if there are any errors from hvcc, fail immediately
-                # TODO(mhroth): standardise how errors and warnings are returned between stages
-                if r.notifs.has_error:
-                    if r.stage == "pd2hv":
-                        self.fail(hvcc_results.root["pd2hv"].notifs.errors[0])
-                    else:
-                        self.fail(str(r.notifs))
+            # if there are any errors from hvcc, fail immediately
+            # TODO(mhroth): standardise how errors and warnings are returned between stages
+            if not expect_fail and r.notifs.has_error:
+                if r.stage == "pd2hv":
+                    self.fail(hvcc_results.root["pd2hv"].notifs.errors[0])
+                else:
+                    self.fail(str(r.notifs))
 
             if expect_warning:
                 for r in hvcc_results.root.values():
@@ -97,9 +93,9 @@ class HvBaseTest(unittest.TestCase):
 
     def _compile_and_run(
         self,
-        source_files: List[Path],
+        source_files: list[Path],
         out_dir: Path,
-        flag: Optional[str] = None
+        flag: str | None = None
     ):
         exe_path = Path(out_dir, "heavy")
 
@@ -119,9 +115,9 @@ class HvBaseTest(unittest.TestCase):
 
     def _compile_and_run_clang(
         self,
-        source_files: List[Path],
+        source_files: list[Path],
         out_dir: Path,
-        flag: Optional[str] = None,
+        flag: str | None = None,
     ):
         flag = flag or "HV_SIMD_NONE"
         self.assertTrue(flag in simd_flags, f"Unknown compiler flag: {flag}")

@@ -1,3 +1,4 @@
+from hvcc.core.hv2ir.HeavyIrException import HeavyIrException
 from hvcc.core.hv2ir.HeavyLangObject import HeavyLangObject
 
 
@@ -12,5 +13,5 @@ def test_diacritics_in_hash():
     name = "sómething"
     try:
         HeavyLangObject.get_hash(name)
-    except Exception:
+    except HeavyIrException:
         assert False

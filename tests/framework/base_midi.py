@@ -17,8 +17,6 @@
 import platform
 import shutil
 import subprocess
-
-from typing import List, Optional
 from pathlib import Path
 
 from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
@@ -30,11 +28,11 @@ class TestPdMIDIBase(HvBaseTest):
 
     def compile_and_run(
         self,
-        source_files: List[Path],
+        source_files: list[Path],
         out_dir: Path,
         num_iterations: int,
-        flag: Optional[str] = None
-    ) -> List[str]:
+        flag: str | None = None
+    ) -> list[str]:
         exe_path = self._compile_and_run(source_files, out_dir, flag)
 
         # run executable (returns stdout)
@@ -48,9 +46,9 @@ class TestPdMIDIBase(HvBaseTest):
 
     def create_fail_message(
         self,
-        result: str,
-        golden: str,
-        flag: Optional[str] = None
+        result: list[str],
+        golden: list[str],
+        flag: str | None = None
     ) -> str:
         return "\nResult ({0})\n-----------\n{1}\n\nGolden\n-----------\n{2}".format(
             flag or "",
@@ -63,11 +61,7 @@ class TestPdMIDIBase(HvBaseTest):
         expected_enum: NotificationEnum
     ) -> None:
         pd_path = Path(self.TEST_DIR, pd_file)
-
-        try:
-            self._run_hvcc(pd_path, expect_fail=True, expected_enum=expected_enum)
-        except Exception as e:
-            self.fail(str(e))
+        self._run_hvcc(pd_path, expect_fail=True, expected_enum=expected_enum)
 
     def _test_control_patch_expect_warning(
         self,
@@ -76,18 +70,14 @@ class TestPdMIDIBase(HvBaseTest):
     ) -> None:
         # setup
         pd_path = Path(self.TEST_DIR, pd_file)
-
-        try:
-            self._run_hvcc(pd_path, expect_warning=True, expected_enum=expected_enum)
-        except Exception as e:
-            self.fail(str(e))
+        self._run_hvcc(pd_path, expect_warning=True, expected_enum=expected_enum)
 
     def _test_midi_patch(
         self,
         pd_file: str,
         num_iterations: int = 1,
         allow_warnings: bool = True,
-        fail_message: Optional[str] = None
+        fail_message: str | None = None
     ) -> None:
         """Compiles, runs, and tests a control patch.
         Allows warnings by default, always fails on errors.
@@ -96,11 +86,7 @@ class TestPdMIDIBase(HvBaseTest):
 
         # setup
         pd_path = Path(self.TEST_DIR, pd_file)
-
-        try:
-            out_dir = self._run_hvcc(pd_path)
-        except Exception as e:
-            self.fail(str(e))
+        out_dir = self._run_hvcc(pd_path)
 
         # copy over additional C assets
         assert out_dir

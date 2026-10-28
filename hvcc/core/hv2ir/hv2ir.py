@@ -18,14 +18,11 @@ import argparse
 import json
 import os
 import time
-
-from typing import Optional
 from pathlib import Path
 
-from hvcc.core.hv2ir.HeavyException import HeavyException
+from hvcc.core.hv2ir.HeavyIrException import HeavyIrException
 from hvcc.core.hv2ir.HeavyParser import HeavyParser
-
-from hvcc.types.compiler import CompilerResp, CompilerNotif, CompilerMsg
+from hvcc.types.compiler import CompilerMsg, CompilerNotif, CompilerResp
 
 
 class hv2ir:
@@ -35,7 +32,7 @@ class hv2ir:
         cls,
         hv_file: Path,
         ir_file: Path,
-        patch_name: Optional[str] = None,
+        patch_name: str | None = None,
         verbose: bool = False
     ) -> CompilerResp:
         """ Compiles a HeavyLang file into a HeavyIR file.
@@ -52,7 +49,7 @@ class hv2ir:
         try:
             # parse heavy file
             hv_graph = HeavyParser.graph_from_file(hv_file=hv_file, xname=patch_name)
-        except HeavyException as e:
+        except HeavyIrException as e:
             return CompilerResp(
                 stage="hv2ir",
                 compile_time=time.time() - tick,
@@ -81,7 +78,7 @@ class hv2ir:
 
             # generate Heavy.IR
             ir = hv_graph.to_ir()
-        except HeavyException as e:
+        except HeavyIrException as e:
             return CompilerResp(
                 stage="hv2ir",
                 compile_time=time.time() - tick,
@@ -103,18 +100,17 @@ class hv2ir:
             with open(ir_file, "w") as f:
                 json.dump(ir.model_dump(), f, indent=4)
 
-            if verbose and ir is not None:
-                if len(ir.signal.processOrder) > 0:
-                    print("")
-                    print("=== Signal Order ===")
-                    for so in ir.signal.processOrder:
-                        o = ir.objects[so.id]
-                        if len(o.args) > 0:
-                            print("{0} {{{1}}}".format(
-                                o.type,
-                                " ".join([f"{k}:{v}" for k, v in o.args.items()])))
-                        else:
-                            print(o.type)
+            if verbose and ir is not None and len(ir.signal.processOrder) > 0:
+                print()
+                print("=== Signal Order ===")
+                for so in ir.signal.processOrder:
+                    o = ir.objects[so.id]
+                    if len(o.args) > 0:
+                        print("{0} {{{1}}}".format(
+                            o.type,
+                            " ".join([f"{k}:{v}" for k, v in o.args.items()])))
+                    else:
+                        print(o.type)
 
         return CompilerResp(
             stage="hv2ir",

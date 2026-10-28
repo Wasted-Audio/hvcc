@@ -14,7 +14,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import re
-from typing import List, Union
+from collections.abc import Mapping
+from types import MappingProxyType
+from typing import Final
 
 from .expr_arpeggio_parser import ExprArpeggioParser, ExprNode, ParseExpr
 
@@ -53,7 +55,7 @@ class ExprCWriter:
         self.expression = expression
         self.expr_tree: ExprNode = ExprArpeggioParser.parse_to_ast(expression)
         self.parse_tree: ParseExpr = ExprArpeggioParser.parse(expression)
-        self.num_buffers: Union[int, None] = None
+        self.num_buffers: int | None = None
 
     def to_ast(self) -> ExprNode:
         return self.expr_tree
@@ -63,9 +65,9 @@ class ExprCWriter:
 
     def to_c_simd(
         self,
-        vv_in: Union[str, None] = None,
+        vv_in: str | None = None,
         v_out: str = ""
-    ) -> List[str]:
+    ) -> list[str]:
         self._simd_bind_variables(vv_in)
         self._simd_replace_constants()
         return self._to_c_simd(v_out)
@@ -94,7 +96,7 @@ class ExprCWriter:
             else:
                 self._simd_replace_constants_R(node)
 
-    def _simd_bind_variables(self, a_name: Union[str, None] = "A") -> None:
+    def _simd_bind_variables(self, a_name: str | None = "A") -> None:
         assert a_name
         self._bind_vars_R(self.expr_tree, a_name)
 
@@ -113,11 +115,11 @@ class ExprCWriter:
         node.value = f"{a_name}[{int(parts[2])-1}]"
         node.type = "bound_var"
 
-    def _to_c_simd(self, v_out: str) -> List[str]:
+    def _to_c_simd(self, v_out: str) -> list[str]:
         ba = BufferAllocator()
-        lines: List[str] = []
+        lines: list[str] = []
 
-        def _to_c_simd_R(expr_tree: ExprNode, r_vec: Union[str, None] = None) -> str:
+        def _to_c_simd_R(expr_tree: ExprNode, r_vec: str | None = None) -> str:
             if expr_tree.value == "-" and len(expr_tree.nodes) == 1:
                 # Unary minus, treat as (0-arg) by inserting a 0-const node.
                 zero_node = ExprNode("func", "_load_f", [ExprNode("num_f", "0.0f")])
@@ -177,7 +179,7 @@ class ExprCWriter:
 
 
 class ExprOpMap:
-    op_map = {
+    __OP_MAP: Final[Mapping[str, str]] = MappingProxyType({
         "~":            "hv_bit_not_f",
         "!":            "hv_not_f",
         "*":            "hv_mul_f",
@@ -251,12 +253,12 @@ class ExprOpMap:
         "trunc":        "hv_cast_fi_expr",
         "_load_f":      "hv_var_k_f",
         "_load_i":      "hv_var_k_i",
-    }
+    })
 
     @classmethod
     def get_hv_func(cls, symbol: str) -> str:
-        return cls.op_map[symbol]
+        return cls.__OP_MAP[symbol]
 
     @classmethod
     def get_hv_func_simd(cls, symbol: str) -> str:
-        return f"__{cls.op_map[symbol]}"
+        return f"__{cls.__OP_MAP[symbol]}"

@@ -14,11 +14,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from typing import Optional, Dict
+from typing import Optional
 
+from .HeavyGraph import HeavyGraph
 from .HeavyIrObject import HeavyIrObject
 from .HeavyLangObject import HeavyLangObject
-from .HeavyGraph import HeavyGraph
 
 
 class HLangDelay(HeavyLangObject):
@@ -28,9 +28,9 @@ class HLangDelay(HeavyLangObject):
     def __init__(
         self,
         obj_type: str,
-        args: Optional[Dict] = None,
+        args: dict | None = None,
         graph: Optional['HeavyGraph'] = None,
-        annotations: Optional[Dict] = None
+        annotations: dict | None = None
     ) -> None:
         assert obj_type == "delay"
         super().__init__("delay", args, graph,

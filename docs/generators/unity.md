@@ -38,7 +38,8 @@ Ensure that the platform settings have been applied to each plugin binary you wi
 
 When building for mobile devices it's generally best to download the plugin target for your development platform (windows/macos) _and_ the device platform (ios/android). The development platform plugins will allow testing in the Unity editor and standalone builds. See the Android/iOS specific instructions below for more information.
 
-**Note:** Unity has to be restarted each time the plugin file changes on the local hard disk.
+> [!NOTE]
+> Unity has to be restarted each time the plugin file changes on the local hard disk.
 
 ## Exposing and Setting Parameters
 

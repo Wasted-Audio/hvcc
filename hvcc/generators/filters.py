@@ -40,7 +40,7 @@ def filter_string_cap(s: str, li: int) -> str:
 
 
 def filter_templates(template_name: str) -> bool:
-    return False if os.path.basename(template_name) in [".DS_Store"] else True
+    return not os.path.basename(template_name) in [".DS_Store"]
 
 
 def filter_uniqueid(s: str) -> str:

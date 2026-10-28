@@ -15,7 +15,7 @@ FILES_UI = HeavyDPF_{{name}}_UI.cpp
 FILES_UI += ../../{{dpf_path}}dpf-widgets/opengl/DearImGui.cpp
 	{%- elif meta.enable_ui == 2 %}
 FILES_UI += $(wildcard ../../{{dpf_path}}pdvg/src/*.cpp)
-FILES_UI += ../../{{dpf_path}}pdvg/src/Fonts/*.cpp
+FILES_UI += $(wildcard ../../{{dpf_path}}pdvg/src/Fonts/*.cpp)
 	{%- endif %}
 {%- endif %}
 

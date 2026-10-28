@@ -13,12 +13,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from typing import Optional
 from pathlib import Path
+
+from hvcc.types.IR import IRSignalList
 
 from .HeavyObject import HeavyObject
 from .SignalNamHeader import convert_nam_to_header, to_symbol_stem
-from hvcc.types.IR import IRSignalList
 
 
 class UnknownModelException(Exception):
@@ -111,7 +111,7 @@ class SignalNam(HeavyObject):
         ]
 
     @classmethod
-    def get_C_gen_header_code(cls, obj_type: str, obj_id: str, args: dict) -> Optional[tuple[str, str]]:
+    def get_C_gen_header_code(cls, obj_type: str, obj_id: str, args: dict) -> tuple[str, str] | None:
         nam_file = Path(args["nam"])
         header_name = f"{to_symbol_stem(nam_file)}.h"
 

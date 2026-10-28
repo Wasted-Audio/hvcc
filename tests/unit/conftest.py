@@ -1,7 +1,6 @@
 from pytest import fixture
 
-
-from hvcc.types.GUI import Coords, Size, Color, Canvas, VRadio, HRadio
+from hvcc.types.GUI import Canvas, Color, Coords, HRadio, Size, VRadio
 
 
 @fixture

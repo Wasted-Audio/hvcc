@@ -5,13 +5,11 @@
 
 import argparse
 import time
-
-from typing import Optional
 from pathlib import Path
 
-from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
 from hvcc.interpreters.pd2gui.PdGUIParser import PdGUIParser
-from hvcc.types.compiler import CompilerResp, CompilerNotif, CompilerMsg
+from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
+from hvcc.types.compiler import CompilerMsg, CompilerNotif, CompilerResp
 
 
 class Colours:
@@ -34,7 +32,7 @@ class pd2gui:
         cls,
         pd_path: Path,
         ir_file: Path,
-        search_paths: Optional[list] = None,
+        search_paths: list | None = None,
         verbose: bool = False
     ):
         tick = time.time()
@@ -64,7 +62,7 @@ class pd2gui:
                 out_file=ir_file,
                 compile_time=(time.time() - tick)
             )
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001
             return CompilerResp(
                 stage="pd2gui",
                 notifs=CompilerNotif(

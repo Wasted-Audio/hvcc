@@ -104,3 +104,45 @@ You can inspect the [JSON descriptions](https://github.com/Wasted-Audio/hvcc/tre
 | led_key_a1 ... led_key_a8 | --- | LED | --- |
 | led_key_b1 ... led_key_b8 | --- | LED | --- |
 | led_knob_1 ... led_knob_8 | --- | LED | --- |
+
+## desktop devkit
+
+| Name | Aliases | Type | Variants |
+| --- | --- | --- | --- |
+| s1 ... s16 | sw1, button1 ... sw16, button16 | CD4021Switch | s1_press, s1_fall |
+| sw17 | s17 | Switch | sw17_press, sw17_fall, sw17_seconds |
+| sw18 | s18 | Switch3 | --- |
+| pot1 ... pot8 | knob1, vr1 ... knob8, vr8 | Voltage Input | --- |
+| d1 ... d16 | led1 | LED | --- |
+| detect_l | --- | Switch | detect_l_press, detect_l_fall, detect_l_seconds |
+| detect_r | --- | Switch | detect_r_press, detect_r_fall, detect_r_seconds |
+| sd_detect | --- | Switch | sd_detect_press, sd_detect_fall, sd_detect_seconds |
+
+## eurorack devkit
+
+| Name | Aliases | Type | Variants |
+| --- | --- | --- | --- |
+| sw1 | --- | Switch | sw1_press, sw1_fall, sw1_seconds |
+| sw2 | --- | Switch | sw2_press, sw2_fall, sw2_seconds |
+| sw3 | --- | Switch3 | --- |
+| pot1 ... pot8 | knob1, vr1 ... knob8, vr8| Voltage Input | --- |
+| cv1 ... cv4 | --- | Bipolar Voltage Input | --- |
+| gate_in1 | --- | Gate In | gate_in1_trig |
+| gate_in2 | --- | Gate In | gate_in2_trig |
+| led1 | --- | RGB LED | led1_red, led1_green, led1_blue, led1_white |
+| led2 | --- | LED | --- |
+| cvout1 | --- | CV Out | --- |
+| cvout2 | --- | CV Out | --- |
+
+## pedal devkit
+
+| Name | Aliases | Type | Variants |
+| --- | --- | --- | --- |
+| sw1 | --- | Switch3 | --- |
+| sw2 ... sw5 | --- | Switch | sw2_press, sw2_fall, sw2_seconds |
+| fsw1 | --- | Switch | fsw1_press, fsw1_fall, fsw1_seconds |
+| fsw2 | --- | Switch | fsw2_press, fsw2_fall, fsw2_seconds |
+| pot1 ... pot6 | knob1, vr1 ... knob6, vr6| Voltage Input | --- |
+| expression | --- | Voltage Input | --- |
+| led1 | --- | LED | --- |
+| led2 | --- | RGB LED | led2_red, led2_green, led2_blue, led2_white |

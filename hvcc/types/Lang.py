@@ -3,9 +3,9 @@
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
-from pydantic import BaseModel, RootModel
-from typing import List, Optional, Dict, Literal, Union
+from typing import Literal
 
+from pydantic import BaseModel, RootModel
 
 LangConnectionType = Literal["-->", "-~>", "~f>"]
 LangLetType = Literal["-->", "-~>", "~i>", "~f>", "signal"]
@@ -14,9 +14,9 @@ LangValueType = Literal["float", "int", "string", "bool", "dict", "floatarray", 
 
 class LangArg(BaseModel):
     name: str
-    value_type: Optional[LangValueType] = None
+    value_type: LangValueType | None = None
     description: str
-    default: Union[float, int, str, Dict, List, None] = None
+    default: float | int | str | dict | list | None = None
     required: bool
 
 
@@ -28,15 +28,15 @@ class LangLet(BaseModel):
 
 class LangNode(BaseModel):
     description: str
-    inlets: List[LangLet]
-    outlets: List[LangLet]
-    args: List[LangArg]
-    alias: List[str]
-    tags: List[str]
+    inlets: list[LangLet]
+    outlets: list[LangLet]
+    args: list[LangArg]
+    alias: list[str]
+    tags: list[str]
 
 
 class HeavyLangType(RootModel):
-    root: Dict[str, LangNode]
+    root: dict[str, LangNode]
 
 
 if __name__ == "__main__":

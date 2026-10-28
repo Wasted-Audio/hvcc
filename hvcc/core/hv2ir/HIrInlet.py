@@ -14,14 +14,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from typing import Dict, Optional
 
-from .HeavyException import HeavyException
-from .HeavyIrObject import HeavyIrObject
-from .HeavyGraph import HeavyGraph
-
-from hvcc.types.Lang import LangLetType
 from hvcc.types.IR import IROnMessage
+from hvcc.types.Lang import LangLetType
+
+from .HeavyGraph import HeavyGraph
+from .HeavyIrException import HeavyIrException
+from .HeavyIrObject import HeavyIrObject
+
 
 class HIrInlet(HeavyIrObject):
     """ A specific implementation of the inlet object.
@@ -30,9 +30,9 @@ class HIrInlet(HeavyIrObject):
     def __init__(
         self,
         obj_type: str,
-        args: Optional[Dict] = None,
-        graph: Optional[HeavyGraph] = None,
-        annotations: Optional[Dict] = None
+        args: dict | None = None,
+        graph: HeavyGraph | None = None,
+        annotations: dict | None = None
     ) -> None:
         super().__init__("__inlet", args=args, graph=graph, annotations=annotations)
 
@@ -46,16 +46,16 @@ class HIrInlet(HeavyIrObject):
                     x.extend(c.to_object.get_ir_on_message(c.inlet_index))
         return x
 
-    def _resolved_outlet_type(self, outlet_index: int = 0) -> Optional[LangLetType]:
+    def _resolved_outlet_type(self, outlet_index: int = 0) -> LangLetType | None:
         if outlet_index == 1:
             return "-->"
         if self.graph is not None:
             connections = self.graph.inlet_connections[self.args["index"]]
             signal_types = {c.type for c in connections if c.is_signal}
             if len(signal_types) == 1:
-                return list(signal_types)[0]
+                return next(iter(signal_types))
             elif len(signal_types) > 1:
-                raise HeavyException(
+                raise HeavyIrException(
                     f"{self} has multiple incident signal connections of differing type. "
                     "The outlet type cannot be explicitly resolved.")
             else:
@@ -64,10 +64,10 @@ class HIrInlet(HeavyIrObject):
                     # object has no incident connections.
                     return "-->"  # outlet type defaults to control (-->)
                 elif len(connection_type_set) == 1:
-                    return list(connection_type_set)[0]
+                    return next(iter(connection_type_set))
                 else:
                     control_types = [t for t in connection_type_set if t == "-->"]
                     if control_types:
                         return "-->"
-                    return list(connection_type_set)[0]
+                    return next(iter(connection_type_set))
         return None

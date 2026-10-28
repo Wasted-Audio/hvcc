@@ -36,7 +36,7 @@ The same principle applies for sending MIDI data out of the heavy context. If yo
 | [midiout]      | __hv_midiout      | 0x6511DE55 |
 | [midiout]      | __hv_midioutport  | 0x165707E4 |
 
-## Note
+## Notes
 
 * Channel numbering in the generator is expect to start at 0. For this reason the midi wrapper objects internally `[+ 1]` and `[- 1]` since Pure Data starts channel numbering at 1 and this keeps some expected patch compatibility in place.
 * Also for compatibility reasons `[bendout]` uses -8192 to 8191 range (and resets the offset with an internal `[+ 8192]`). This ensures expected behaviour with pd-vanilla patches.
@@ -46,9 +46,11 @@ The same principle applies for sending MIDI data out of the heavy context. If yo
 
 Some framework targets like [DPF](../generators/dpf.md) already have implementations available. However, if you're integrating the C/C++ code on a custom platform then you'll need to provide your own conversion process.
 
+## DPF
+
 Here's the `DPF` implementation as an example.
 
-## Handling MIDI Input
+### Handling MIDI Input
 
 The MIDI input is called during the DPF `run()` loop where it receives `MidiEvent` messages.
 
@@ -56,7 +58,7 @@ The MIDI input is called during the DPF `run()` loop where it receives `MidiEven
 
 [Source code (handleMidiInput)](https://github.com/Wasted-Audio/hvcc/blob/develop/hvcc/generators/c2dpf/templates/midiInput.cpp)
 
-## Handling MIDI Output
+### Handling MIDI Output
 
 For MIDI output you will need to set a heavy sendhook function that will trigger `DPF` MIDI output events from the heavy context:
 

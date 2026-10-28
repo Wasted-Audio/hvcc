@@ -13,20 +13,74 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import jinja2
 import shutil
 import time
-
-from typing import Optional
 from pathlib import Path
+
+import jinja2
+
+from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
+from hvcc.types.compiler import (
+    CompilerMsg,
+    CompilerNotif,
+    CompilerResp,
+    ExternInfo,
+    Generator,
+)
+from hvcc.types.meta import (
+    DPF,
+    DPFPortGroupConfig,
+    DPFPortGroups,
+    DPFUISize,
+    DPFUIType,
+    Meta,
+    slugify,
+)
 
 from ..copyright import copyright_manager
 from ..filters import filter_uniqueid
+from .nanovg_render import nanovg_render, open_gui_json
 
-from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
-from hvcc.types.compiler import Generator, CompilerResp, CompilerMsg, CompilerNotif, ExternInfo
-from hvcc.types.meta import Meta, DPF, DPFUIType, DPFUISize
-from .nanovg_render import open_gui_json, nanovg_render
+
+def _normalize_port_groups(
+        port_groups: DPFPortGroups | None,
+        num_input_channels: int,
+        num_output_channels: int
+) -> DPFPortGroups | None:
+    """Convert 1-based PD port indices to 0-based DPF channel indices."""
+    if port_groups is None:
+        return None
+
+    def shift(
+        direction: dict[str, DPFPortGroupConfig],
+        num_channels: int
+    ) -> dict[str, DPFPortGroupConfig]:
+        out: dict[str, DPFPortGroupConfig] = {}
+
+        for group, gConfig in direction.items():
+            shifted: DPFPortGroupConfig = {}
+            for port, value in gConfig.items():
+                if isinstance(value, (list, tuple)):
+                    index, is_cv = value[0], value[1]
+                else:
+                    index, is_cv = value, False
+
+                dpf_index = index - 1
+
+                if not (0 <= dpf_index < num_channels):
+                    raise ValueError(
+                        f"Port group '{group}' references port {index} "
+                        f"({port}), which is out of range for {num_channels} channels."
+                    )
+                shifted[port] = (dpf_index, is_cv) if is_cv else dpf_index
+            out[group] = shifted
+        return out
+
+    return DPFPortGroups.model_construct(
+        input=shift(port_groups.input, num_input_channels),
+        output=shift(port_groups.output, num_output_channels),
+        params=port_groups.params
+    )
 
 
 class c2dpf(Generator):
@@ -40,14 +94,15 @@ class c2dpf(Generator):
         out_dir: Path,
         externs: ExternInfo,
         patch_name: str,
-        patch_meta: Meta = Meta(),
+        patch_meta: Meta,
         num_input_channels: int = 0,
         num_output_channels: int = 0,
-        copyright: Optional[str] = None,
-        verbose: Optional[bool] = False
+        copyright: str | None = None,
+        verbose: bool | None = False
     ) -> CompilerResp:
 
         tick = time.time()
+        patch_meta = patch_meta or Meta()
 
         out_dir = Path(out_dir, "plugin")
         receiver_list = externs.parameters.inParam
@@ -81,9 +136,16 @@ class c2dpf(Generator):
                     height=gui_json.size.y
                 )
 
+            port_groups = _normalize_port_groups(
+                dpf_meta.port_groups,
+                num_input_channels=num_input_channels,
+                num_output_channels=num_output_channels) or DPFPortGroups()
+            param_group_map = {param: group for group, params in port_groups.params.items() for param in params}
+
             # initialize the jinja template environment
             env = jinja2.Environment()
             env.filters["uniqueid"] = filter_uniqueid
+            env.filters["slugify"] = slugify
 
             env.loader = jinja2.FileSystemLoader(Path(__file__).parent / "templates")
 
@@ -106,6 +168,8 @@ class c2dpf(Generator):
                 f.write(env.get_template("HeavyDPF.cpp").render(
                     name=patch_name,
                     meta=dpf_meta,
+                    port_groups=port_groups,
+                    param_group_map=param_group_map,
                     class_name=f"HeavyDPF_{patch_name}",
                     num_input_channels=num_input_channels,
                     num_output_channels=num_output_channels,
@@ -124,6 +188,8 @@ class c2dpf(Generator):
                         class_name=f"HeavyDPF_{patch_name}",
                         receivers=receiver_list,
                         senders=sender_list,
+                        events=event_list,
+                        out_events=out_event_list,
                         copyright=copyright_c))
             elif dpf_meta.enable_ui == DPFUIType.NANOVG:
                 gui_json, widgets, gui_objects_render = nanovg_render(
@@ -156,6 +222,7 @@ class c2dpf(Generator):
                         receivers=receiver_list,
                         senders=sender_list,
                         events=event_list,
+                        out_events=out_event_list,
                         copyright=copyright_c))
 
             dpf_h_path = Path(source_dir, "DistrhoPluginInfo.h")
@@ -192,7 +259,7 @@ class c2dpf(Generator):
                 compile_time=time.time() - tick
             )
 
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001
             return CompilerResp(
                 stage="c2dpf",
                 notifs=CompilerNotif(
