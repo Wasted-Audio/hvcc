@@ -6,22 +6,19 @@
 import shutil
 import tempfile
 import time
-import jinja2
-
 from pathlib import Path
-from typing import Optional
 
-from pydantic import BaseModel
+import jinja2
 from PIL import Image
+from pydantic import BaseModel
 
 from hvcc.generators.copyright import copyright_manager
 from hvcc.generators.filters import filter_uniqueid
-
 from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
-from hvcc.types.compiler import Generator, CompilerResp, CompilerMsg, CompilerNotif, ExternInfo
+from hvcc.types.compiler import CompilerMsg, CompilerNotif, CompilerResp, ExternInfo, Generator
 from hvcc.types.meta import Meta, MetaModule
 
-from .meta_types import Knob, Input, Output, Led, Assets, UIElement
+from .meta_types import Assets, Input, Knob, Led, Output, UIElement
 from .panel import layout_panel_assets
 
 
@@ -38,7 +35,7 @@ def ensure_panel_assets(
     num_input_channels: int,
     num_output_channels: int,
     tmp_dir: Path,
-    verbose: Optional[bool] = False
+    verbose: bool | None = False
 ) -> Assets:
     """Return the module's assets, generating a default panel if none exist."""
     if not mm_meta.modules:
@@ -116,14 +113,15 @@ class c2meta(Generator):
         out_dir: Path,
         externs: ExternInfo,
         patch_name: str,
-        patch_meta: Meta = Meta(),
+        patch_meta: Meta,
         num_input_channels: int = 0,
         num_output_channels: int = 0,
-        copyright: Optional[str] = None,
-        verbose: Optional[bool] = False
+        copyright: str | None = None,
+        verbose: bool | None = False
     ) -> CompilerResp:
 
         tick = time.time()
+        patch_meta = patch_meta or Meta()
 
         out_dir = Path(out_dir, "plugin")
         receiver_list = externs.parameters.inParam
@@ -249,7 +247,7 @@ class c2meta(Generator):
                 compile_time=time.time() - tick
             )
 
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001
             return CompilerResp(
                 stage="c2meta",
                 notifs=CompilerNotif(

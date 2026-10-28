@@ -9,8 +9,8 @@ from typing import Literal
 
 from pydantic import BaseModel, HttpUrl, model_validator
 
-from hvcc.types.GUI import Theme
 from hvcc.generators.c2meta.meta_types import Assets
+from hvcc.types.GUI import Theme
 
 DaisyBoards = Literal['pod', 'petal', 'patch', 'patch_init', 'field']
 DaisyBootloader = Literal['BOOT_NONE', 'BOOT_SRAM', 'BOOT_QSPI']

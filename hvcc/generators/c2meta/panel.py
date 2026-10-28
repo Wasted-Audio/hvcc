@@ -4,17 +4,14 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 import math
-
 from dataclasses import dataclass, field
-from functools import lru_cache
+from functools import cache
 from pathlib import Path
-from typing import Optional
 
 from PIL import Image
 from pydantic_extra_types.color import Color
 
-from hvcc.generators.c2meta.meta_types import Coords, Panel, Assets, Size, UIElement
-
+from hvcc.generators.c2meta.meta_types import Assets, Coords, Panel, Size, UIElement
 
 PANEL_HEIGHT = 240
 PANEL_MIN_WIDTH = 20
@@ -27,7 +24,7 @@ MARGIN_Y = 20
 DEFAULT_PANEL_COLOR = (60, 60, 60)
 
 
-@lru_cache(maxsize=None)
+@cache
 def image_size(image: Path) -> tuple[int, int]:
     with Image.open(image) as im:
         return im.size
@@ -138,7 +135,7 @@ def _distribute_extra_rows(cat_infos: list[CategoryInfo], available_h: int) -> N
     while True:
         total_h = sum(c.height_at_current_rows for c in cat_infos)
 
-        best_candidate: Optional[CategoryInfo] = None
+        best_candidate: CategoryInfo | None = None
         best_items_per_row = 0
 
         for c in cat_infos:

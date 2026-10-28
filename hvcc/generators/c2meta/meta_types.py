@@ -4,7 +4,6 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 from pathlib import Path
-from typing import Optional, Union
 
 from pydantic import BaseModel, Field, field_validator
 from pydantic_extra_types.color import Color
@@ -25,14 +24,14 @@ class Size(XY):
 
 class Knob(BaseModel):
     param: str
-    coords: Optional[Coords] = None
+    coords: Coords | None = None
     image: Path = Field(default=Path(__file__).parent / 'assets/knob.png')
 
 
 class Jack(BaseModel):
     id: int
-    name: Optional[str] = None
-    coords: Optional[Coords] = None
+    name: str | None = None
+    coords: Coords | None = None
     image: Path = Field(default=Path(__file__).parent / 'assets/jack.png')
 
 
@@ -46,14 +45,14 @@ class Output(Jack):
 
 class Led(BaseModel):
     led: str
-    coords: Optional[Coords] = None
+    coords: Coords | None = None
     image: Path = Field(default=Path(__file__).parent / 'assets/led.png')
 
 
 class Panel(BaseModel):
-    image: Optional[Path] = None
-    size: Optional[Size] = None
-    color: Optional[Color] = None
+    image: Path | None = None
+    size: Size | None = None
+    color: Color | None = None
 
     @field_validator('size', mode='before')
     def validate_size(cls, v):
@@ -62,11 +61,11 @@ class Panel(BaseModel):
         return v
 
 class Assets(BaseModel):
-    panel: Optional[Panel] = None
+    panel: Panel | None = None
     knobs: list[Knob] = []
     inputs: list[Input] = []
     outputs: list[Output] = []
     leds: list[Led] = []
 
 
-UIElement = Union[Knob, Input, Output, Led]
+UIElement = Knob | Input | Output| Led
