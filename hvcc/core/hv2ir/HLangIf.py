@@ -32,7 +32,7 @@
 #         obj_type: str,
 #         args: Dict,
 #         graph: HeavyGraph,
-#         annotations: Optional[Dict] = None
+#         annotations: Dict | None = None
 #     ) -> None:
 #         assert obj_type == "if"
 #         super().__init__("if", args, graph, num_inlets=2, num_outlets=2, annotations=annotations)

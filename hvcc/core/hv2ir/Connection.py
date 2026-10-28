@@ -14,10 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from typing import TYPE_CHECKING, Optional
-
-if TYPE_CHECKING:
-    from .HeavyIrObject import HeavyIrObject
+from .HeavyIrObject import HeavyIrObject
 
 
 class Connection:
@@ -26,9 +23,9 @@ class Connection:
 
     def __init__(
         self,
-        from_object: 'HeavyIrObject',
+        from_object: HeavyIrObject,
         outlet_index: int,
-        to_object: 'HeavyIrObject',
+        to_object: HeavyIrObject,
         inlet_index: int,
         conn_type: str
     ) -> None:
@@ -46,9 +43,9 @@ class Connection:
 
     def copy(
         self,
-        from_object: Optional['HeavyIrObject'] = None,
+        from_object: HeavyIrObject | None = None,
         outlet_index: int | None = None,
-        to_object: Optional['HeavyIrObject'] = None,
+        to_object: HeavyIrObject | None = None,
         inlet_index: int | None = None,
         type: str | None = None
     ) -> 'Connection':
