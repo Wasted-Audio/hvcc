@@ -14,6 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from arpeggio import (  # type: ignore
+    EOF,
     ParserPython,
     StrMatch,
     ZeroOrMore,  # type: ignore
@@ -28,7 +29,8 @@ class SuppressStrMatch(StrMatch):
 hide = SuppressStrMatch
 
 
-def expr():     return none  # EOF
+def start():    return expr, EOF
+def expr():     return none,
 def none():     return lor, ZeroOrMore(" ", lor)  # needed for logical `or`: `||`
 def lor():      return land, ZeroOrMore("||", land)
 def land():     return bor, ZeroOrMore("&&", bor)
