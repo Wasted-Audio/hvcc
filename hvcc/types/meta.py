@@ -9,6 +9,7 @@ from typing import Literal
 
 from pydantic import BaseModel, HttpUrl, model_validator
 
+from hvcc.generators.c2meta.meta_types import Assets
 from hvcc.types.GUI import Theme
 
 DaisyBoards = Literal['pod', 'petal', 'patch', 'patch_init', 'field']
@@ -134,9 +135,30 @@ class DPF(BaseModel):
         return self
 
 
+class metaPlugin(BaseModel):
+    slug:        str = "module-slug"
+    name:        str = "Module Name"
+    description: str = "Description of the module"
+    tags:        list[str] = []
+    assets:      Assets | None = None
+
+
+class MetaModule(BaseModel):
+    sdk_path:    str | None = None
+    slug:        str = "plugin-slug"
+    name:        str = "Plugin Name"
+    version:     str = "1.0.0"
+    license:     str = "GPL-3.0-only"
+    brand:       str = "Heavy"
+    author:      str = "Heavy"
+    description: str = "Description of the plugin"
+    modules:     list[metaPlugin] = [metaPlugin()]
+
+
 class Meta(BaseModel):
-    name: str | None = None
-    nosimd: bool | None = False
-    daisy: Daisy = Daisy()
-    dpf: DPF = DPF()
+    name:     str | None = None
+    nosimd:   bool | None = False
+    daisy:    Daisy = Daisy()
+    dpf:      DPF = DPF()
+    meta:     MetaModule = MetaModule()
     external: dict | None = None
