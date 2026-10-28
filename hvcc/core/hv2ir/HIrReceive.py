@@ -15,12 +15,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import re
-from typing import TYPE_CHECKING, Optional
 
+from .HeavyGraph import HeavyGraph
 from .HeavyIrObject import HeavyIrObject
-
-if TYPE_CHECKING:
-    from .HeavyGraph import HeavyGraph
 
 
 class HIrReceive(HeavyIrObject):
@@ -31,7 +28,7 @@ class HIrReceive(HeavyIrObject):
         self,
         obj_type: str,
         args: dict | None = None,
-        graph: Optional['HeavyGraph'] = None,
+        graph: HeavyGraph | None = None,
         annotations: dict | None = None
     ) -> None:
         super().__init__("__receive", args=args, graph=graph, annotations=annotations)

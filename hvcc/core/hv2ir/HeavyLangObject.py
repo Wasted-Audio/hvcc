@@ -20,17 +20,15 @@ import random
 import string
 from pathlib import Path
 from struct import pack, unpack
-from typing import TYPE_CHECKING, Any, Optional
+from typing import Any
 
 from hvcc.types.compiler import CompilerMsg, CompilerNotif
 from hvcc.types.Lang import HeavyLangType, LangLet, LangLetType, LangNode, LangValueType
 
 from .Connection import Connection
+from .HeavyGraph import HeavyGraph
 from .HeavyIrException import HeavyIrException
-
-if TYPE_CHECKING:
-    from .HeavyGraph import HeavyGraph
-    from .HeavyIrObject import HeavyIrObject
+from .HeavyIrObject import HeavyIrObject
 
 
 class HeavyLangObject:
@@ -48,7 +46,7 @@ class HeavyLangObject:
         self,
         obj_type: str,
         args: dict | None = None,
-        graph: Optional['HeavyGraph'] = None,
+        graph: HeavyGraph | None = None,
         num_inlets: int = -1,
         num_outlets: int = -1,
         annotations: dict | None = None
@@ -150,7 +148,7 @@ class HeavyLangObject:
         cls,
         value: LangValueType,
         value_type: str | None = None,
-        graph: Optional['HeavyGraph'] = None
+        graph: HeavyGraph | None = None
     ) -> Any:
         """ Attempts to convert a value to a given value type. Raises an Exception otherwise.
             If the value_type is unknown and a graph is provided, a warning will be registered.
