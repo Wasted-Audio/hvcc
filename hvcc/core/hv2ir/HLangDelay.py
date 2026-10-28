@@ -14,8 +14,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from typing import Optional
-
 from .HeavyGraph import HeavyGraph
 from .HeavyIrObject import HeavyIrObject
 from .HeavyLangObject import HeavyLangObject
@@ -29,7 +27,7 @@ class HLangDelay(HeavyLangObject):
         self,
         obj_type: str,
         args: dict | None = None,
-        graph: Optional['HeavyGraph'] = None,
+        graph: HeavyGraph | None = None,
         annotations: dict | None = None
     ) -> None:
         assert obj_type == "delay"
