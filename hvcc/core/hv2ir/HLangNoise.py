@@ -33,7 +33,7 @@
 #         obj_type: str,
 #         args: Dict,
 #         graph: HeavyGraph,
-#         annotations: Optional[Dict] = None
+#         annotations: Dict | None = None
 #     ) -> None:
 #         assert obj_type == "noise"
 #         super().__init__("noise", args, graph, num_inlets=1, num_outlets=1, annotations=annotations)

@@ -16,7 +16,7 @@
 
 from collections.abc import Mapping
 from types import MappingProxyType
-from typing import Final, Optional
+from typing import Final
 
 from .Connection import Connection
 from .HeavyGraph import HeavyGraph
@@ -56,7 +56,7 @@ class HLangBinop(HeavyLangObject):
         self,
         obj_type: str,
         args: dict | None = None,
-        graph: Optional['HeavyGraph'] = None,
+        graph: HeavyGraph | None = None,
         annotations: dict | None = None
     ) -> None:
         super().__init__(obj_type, args, graph,
