@@ -9,6 +9,10 @@ Updates:
 * Python typing syntax
 * Custom Exceptions
 
+Bugfixes:
+
+* Drop empty expressions (#441)
+
 0.17.3
 -----
 
