@@ -501,7 +501,8 @@ class PdParser:
 
                             # split expressions into separate objects
                             if obj_type in ['expr', 'expr~']:
-                                expressions = [e.strip() for e in " ".join(obj_args).split("\\;")]
+                                parts = " ".join(obj_args).split("\\;")
+                                expressions = [p.strip() for p in parts if p.strip()]
                                 if obj_type == 'expr':
                                     # only expr seems to require this (see tests)
                                     expressions.reverse()
