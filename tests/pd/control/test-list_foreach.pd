@@ -19,7 +19,6 @@
 #X obj 31 102 t b b b b b b b b;
 #X obj 31 577 print foreach;
 #X obj 111 542 print index;
-#X msg 252 413 0;
 #X connect 0 0 1 0;
 #X connect 1 0 17 0;
 #X connect 2 0 12 0;
@@ -54,4 +53,3 @@
 #X connect 17 5 14 0;
 #X connect 17 6 13 0;
 #X connect 17 7 11 0;
-#X connect 20 0 12 1;

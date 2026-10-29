@@ -22,6 +22,8 @@ hv_size_t cList_init(ControlList *o, hvListType type) {
   o->list = HV_MESSAGE_ON_HEAP(1);
   hv_assert(o->list != NULL);
   msg_initWithBang(o->list, 0);
+  o->stride = 0;
+  o->delim = " ";
   return numBytes;
 }
 
@@ -282,6 +284,10 @@ static void cList_onForeach(HeavyContextInterface *_c, ControlList *o, const HvM
   if (trimmed) msg_free(m1);
 }
 
+static void cList_onJoin(HeavyContextInterface *_c, ControlList *o, const HvMessage *m, void
+  (*sendMessage)(HeavyContextInterface *, int, const HvMessage *)) {
+}
+
 // ---- Store handlers
 
 static void cList_store_get(HeavyContextInterface *_c, ControlList *o, const HvMessage *m1, int numElements,
@@ -535,6 +541,9 @@ void cList_onMessage(HeavyContextInterface *_c, ControlList *o, int letIn, const
         case HV_LIST_FOREACH: {
           cList_onForeach(_c, o, m, sendMessage); break;
         }
+        case HV_LIST_JOIN: {
+          cList_onJoin(_c, o, m, sendMessage); break;
+        }
         default: break;
       }
       break;
@@ -558,6 +567,11 @@ void cList_onMessage(HeavyContextInterface *_c, ControlList *o, int letIn, const
         case HV_LIST_FOREACH: {
           if (msg_isFloat(m, 0))
             o->stride = (int)msg_getFloat(m, 0);
+          break;
+        }
+        case HV_LIST_JOIN: {
+          if (msg_isSymbol(m, 0))
+            o->delim = (char*)msg_getSymbol(m, 0);
           break;
         }
         default: break;
