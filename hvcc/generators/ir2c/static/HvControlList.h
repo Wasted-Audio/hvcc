@@ -29,11 +29,13 @@ typedef enum {
     HV_LIST_SPLIT,
     HV_LIST_STORE,
     HV_LIST_TRIM,
-    HV_LIST_LENGTH
+    HV_LIST_LENGTH,
+    HV_LIST_FOREACH
 } hvListType;
 
 typedef struct ControlList {
   hvListType type;
+  int stride;
   HvMessage* list;
 } ControlList;
 

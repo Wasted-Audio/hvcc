@@ -1,0 +1,144 @@
+[@ 0.000] index: 0
+[@ 0.000] foreach: 1 2
+[@ 0.000] index: 2
+[@ 0.000] foreach: 3 4
+[@ 0.000] index: 0
+[@ 0.000] foreach: 1 2
+[@ 0.000] index: 2
+[@ 0.000] foreach: 3
+[@ 0.000] index: 0
+[@ 0.000] foreach: 1 2
+[@ 0.000] index: 0
+[@ 0.000] foreach: 1 2
+[@ 0.000] index: 2
+[@ 0.000] foreach: list so are
+[@ 0.000] index: 4
+[@ 0.000] foreach: symbol you
+[@ 0.000] index: 0
+[@ 0.000] foreach: symbol a
+[@ 0.000] index: 0
+[@ 0.000] foreach: 1
+[@ 0.000] index: 0
+[@ 0.000] foreach: list cis boom
+[@ 0.000] index: 2
+[@ 0.000] foreach: symbol bah
+[@ 0.000] index: 0
+[@ 0.000] foreach: list walk the
+[@ 0.000] index: 2
+[@ 0.000] foreach: symbol dog
+[@ 0.000] index: 0
+[@ 0.000] foreach: 1
+[@ 0.000] index: 1
+[@ 0.000] foreach: 2
+[@ 0.000] index: 2
+[@ 0.000] foreach: 3
+[@ 0.000] index: 3
+[@ 0.000] foreach: 4
+[@ 0.000] index: 0
+[@ 0.000] foreach: 1
+[@ 0.000] index: 1
+[@ 0.000] foreach: 2
+[@ 0.000] index: 2
+[@ 0.000] foreach: 3
+[@ 0.000] index: 0
+[@ 0.000] foreach: 1
+[@ 0.000] index: 1
+[@ 0.000] foreach: 2
+[@ 0.000] index: 0
+[@ 0.000] foreach: 1
+[@ 0.000] index: 1
+[@ 0.000] foreach: 2
+[@ 0.000] index: 2
+[@ 0.000] foreach: symbol so
+[@ 0.000] index: 3
+[@ 0.000] foreach: symbol are
+[@ 0.000] index: 4
+[@ 0.000] foreach: symbol you
+[@ 0.000] index: 0
+[@ 0.000] foreach: symbol a
+[@ 0.000] index: 0
+[@ 0.000] foreach: 1
+[@ 0.000] index: 0
+[@ 0.000] foreach: symbol cis
+[@ 0.000] index: 1
+[@ 0.000] foreach: symbol boom
+[@ 0.000] index: 2
+[@ 0.000] foreach: symbol bah
+[@ 0.000] index: 0
+[@ 0.000] foreach: symbol walk
+[@ 0.000] index: 1
+[@ 0.000] foreach: symbol the
+[@ 0.000] index: 2
+[@ 0.000] foreach: symbol dog
+[@ 0.000] index: 2
+[@ 0.000] foreach: 3 4
+[@ 0.000] index: 0
+[@ 0.000] foreach: 1 2
+[@ 0.000] index: 1
+[@ 0.000] foreach: 2 3
+[@ 0.000] index: 0
+[@ 0.000] foreach: 1
+[@ 0.000] index: 0
+[@ 0.000] foreach: 1 2
+[@ 0.000] index: 3
+[@ 0.000] foreach: list are you
+[@ 0.000] index: 1
+[@ 0.000] foreach: 2 so
+[@ 0.000] index: 0
+[@ 0.000] foreach: 1
+[@ 0.000] index: 0
+[@ 0.000] foreach: symbol a
+[@ 0.000] index: 0
+[@ 0.000] foreach: 1
+[@ 0.000] index: 1
+[@ 0.000] foreach: list boom bah
+[@ 0.000] index: 0
+[@ 0.000] foreach: symbol cis
+[@ 0.000] index: 1
+[@ 0.000] foreach: list the dog
+[@ 0.000] index: 0
+[@ 0.000] foreach: symbol walk
+[@ 0.000] index: 3
+[@ 0.000] foreach: 4
+[@ 0.000] index: 2
+[@ 0.000] foreach: 3
+[@ 0.000] index: 1
+[@ 0.000] foreach: 2
+[@ 0.000] index: 0
+[@ 0.000] foreach: 1
+[@ 0.000] index: 2
+[@ 0.000] foreach: 3
+[@ 0.000] index: 1
+[@ 0.000] foreach: 2
+[@ 0.000] index: 0
+[@ 0.000] foreach: 1
+[@ 0.000] index: 1
+[@ 0.000] foreach: 2
+[@ 0.000] index: 0
+[@ 0.000] foreach: 1
+[@ 0.000] index: 4
+[@ 0.000] foreach: symbol you
+[@ 0.000] index: 3
+[@ 0.000] foreach: symbol are
+[@ 0.000] index: 2
+[@ 0.000] foreach: symbol so
+[@ 0.000] index: 1
+[@ 0.000] foreach: 2
+[@ 0.000] index: 0
+[@ 0.000] foreach: 1
+[@ 0.000] index: 0
+[@ 0.000] foreach: symbol a
+[@ 0.000] index: 0
+[@ 0.000] foreach: 1
+[@ 0.000] index: 2
+[@ 0.000] foreach: symbol bah
+[@ 0.000] index: 1
+[@ 0.000] foreach: symbol boom
+[@ 0.000] index: 0
+[@ 0.000] foreach: symbol cis
+[@ 0.000] index: 2
+[@ 0.000] foreach: symbol dog
+[@ 0.000] index: 1
+[@ 0.000] foreach: symbol the
+[@ 0.000] index: 0
+[@ 0.000] foreach: symbol walk

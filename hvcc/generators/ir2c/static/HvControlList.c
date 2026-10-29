@@ -231,6 +231,57 @@ static void cList_onLength(HeavyContextInterface *_c, ControlList *o, const HvMe
 }
 
 
+static void cList_onForeach(HeavyContextInterface *_c, ControlList *o, const HvMessage *m, void
+  (*sendMessage)(HeavyContextInterface *, int, const HvMessage *)) {
+  HvMessage *m1 = cList_trim(m);
+  const bool trimmed = (m1 != m);
+  const int numElements = msg_getNumElements(m1);
+
+  // nothing to iterate (a bang carries no elements)
+  if (msg_isBang(m1, 0)) {
+    if (trimmed) msg_free(m1);
+    return;
+  }
+
+  // a stride of 0 is a chunk of 1; |stride| is clamped to the list length so
+  // there is always at least one chunk and never an empty one
+  int stride = o->stride;
+  if (stride == 0) stride = 1;
+  if (stride > numElements) stride = numElements;
+  else if (stride < -numElements) stride = -numElements;
+
+  const int step = (stride < 0) ? -stride : stride;
+  const int numChunks = (numElements + step - 1) / step;
+
+  for (int k = 0; k < numChunks; k++) {
+    int start, end;
+    if (stride > 0) {
+      // forward: chunks cut from the head, so the short remainder is last
+      start = k * step;
+      end = hv_min_i(start + step, numElements);
+    } else {
+      // backward: the chunks are cut from the tail and emitted in reverse, so
+      // the short remainder comes first and every piece keeps its element order
+      start = numElements - (k + 1) * step;
+      end = hv_min_i(start + step, numElements);
+      if (start < 0) start = 0;
+    }
+
+    // the index of this chunk's first element goes out first, on outlet 1
+    HvMessage *idx = HV_MESSAGE_ON_HEAP(1);
+    hv_assert(idx != NULL);
+    msg_initWithFloat(idx, msg_getTimestamp(m1), (float) start);
+    sendMessage(_c, 1, idx);
+    msg_free(idx);
+
+    HvMessage *n = cList_slice(m1, start, end);
+    sendMessage(_c, 0, n);
+    msg_free(n);
+  }
+
+  if (trimmed) msg_free(m1);
+}
+
 // ---- Store handlers
 
 static void cList_store_get(HeavyContextInterface *_c, ControlList *o, const HvMessage *m1, int numElements,
@@ -481,6 +532,9 @@ void cList_onMessage(HeavyContextInterface *_c, ControlList *o, int letIn, const
         case HV_LIST_LENGTH: {
           cList_onLength(_c, o, m, sendMessage); break;
         }
+        case HV_LIST_FOREACH: {
+          cList_onForeach(_c, o, m, sendMessage); break;
+        }
         default: break;
       }
       break;
@@ -499,6 +553,11 @@ void cList_onMessage(HeavyContextInterface *_c, ControlList *o, int letIn, const
         }
         case HV_LIST_SPLIT: {
           cList_copy_message(m, 0, o->list, 0);
+          break;
+        }
+        case HV_LIST_FOREACH: {
+          if (msg_isFloat(m, 0))
+            o->stride = (int)msg_getFloat(m, 0);
           break;
         }
         default: break;
