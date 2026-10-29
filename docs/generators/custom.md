@@ -19,7 +19,6 @@ This is `example_hvcc_generator.py`:
 ```python
 import time
 
-from typing import Optional
 from pathlib import Path
 
 from hvcc.types.compiler import CompilerResp, ExternInfo, Generator
@@ -37,12 +36,12 @@ class ExampleHvccGenerator(Generator):
         patch_meta: Meta,
         num_input_channels: int = 0,
         num_output_channels: int = 0,
-        copyright: Optional[str] = None,
-        verbose: Optional[bool] = False
+        copyright: str | None = None,
+        verbose: bool | False = False
     ) -> CompilerResp:
         begin_time = time.time()
         patch_meta = patch_meta or Meta()
-        
+
         print("--> Invoking ExampleHvccGenerator")
         time.sleep(1)
         end_time = time.time()
