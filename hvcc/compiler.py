@@ -28,6 +28,7 @@ from hvcc.generators.c2daisy import c2daisy
 from hvcc.generators.c2dpf import c2dpf
 from hvcc.generators.c2fmod import c2fmod
 from hvcc.generators.c2js import c2js
+from hvcc.generators.c2meta import c2meta
 from hvcc.generators.c2owl import c2owl
 from hvcc.generators.c2pdext import c2pdext
 from hvcc.generators.c2unity import c2unity
@@ -213,10 +214,10 @@ def load_ext_generator(module_name: str, verbose: bool) -> Generator | None:
             if inspect.isclass(member) and not inspect.isabstract(member) and issubclass(member, Generator):
                 return member()
         if verbose:
-            print(f"---> Module {module_name} does not contain a class derived from hvcc.types.Compiler")
+            print(f"--> Module {module_name} does not contain a class derived from hvcc.types.Compiler")
         return None
     except ModuleNotFoundError:
-        print(f"---> Module {module_name} not found")
+        print(f"--> Module {module_name} not found")
         return None
 
 
@@ -360,6 +361,11 @@ def compile_dataflow(
         if verbose:
             print("--> Generating DPF plugin")
         results.root["c2dpf"] = c2dpf.c2dpf.compile(**gen_args)
+
+    if "meta" in generators:
+        if verbose:
+            print("--> Generating Meta module")
+        results.root["c2meta"] = c2meta.c2meta.compile(**gen_args)
 
     if "owl" in generators:
         if verbose:
