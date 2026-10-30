@@ -41,8 +41,18 @@ typedef struct ControlList {
   hvListType type;
   int stride;
   char delim[HV_MAX_DELIM_LEN];
-  HvMessage* list;
+  HvMessage *list;
 } ControlList;
+
+typedef struct CListInput {
+  // Helper struct for Unjoin operation
+  HvMessage *trimmed;   // owned if != m
+  bool       trimmedIsOwned;
+  bool       symbolLike;
+  char      *src;       // owned
+  hv_size_t  srcLen;
+  bool       emitBang;  // empty or numeric: caller just sends bang
+} CListInput;
 
 hv_size_t cList_init(ControlList *o, hvListType type);
 
