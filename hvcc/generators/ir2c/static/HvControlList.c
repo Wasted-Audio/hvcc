@@ -14,6 +14,9 @@
  * PERFORMANCE OF THIS SOFTWARE.
  */
 
+#include <ctype.h>
+#include <string.h>
+
 #include "HvControlList.h"
 
 hv_size_t cList_init(ControlList *o, hvListType type) {
@@ -160,6 +163,61 @@ static HvMessage *cList_slice(const HvMessage *m1, int start, int end) {
 }
 
 
+// Escapes a bare space with a backslash (an already-escaped "\ " is left alone).
+// With dst == NULL it only counts. Returns the number of bytes written/needed.
+static size_t cList_put_delim(char *dst, const char *delim) {
+  size_t n = 0;
+  for (size_t k = 0; delim[k] != '\0'; k++) {
+    if (delim[k] == ' ' && (k == 0 || delim[k - 1] != '\\')) {
+      if (dst) dst[n] = '\\';
+      n++;
+    }
+    if (dst) dst[n] = delim[k];
+    n++;
+  }
+  return n;
+}
+
+
+// Walks the message and builds the joined string. Pass dst == NULL to measure,
+// then call again with a buffer of (size + 1) bytes. Returns the length.
+static size_t cList_join_build(const HvMessage *m, const char *delim, char *dst) {
+  const int numElements = msg_getNumElements(m);
+  size_t n = 0;
+  bool first = true;
+
+  for (int i = 0; i < numElements; i++) {
+    const char *s = NULL;
+    char numbuf[32];
+
+    if (msg_isSymbol(m, i)) {
+      s = msg_getSymbol(m, i);
+      if (i == 0) {
+        while (*s && isspace((unsigned char)*s)) s++;  // leading edge
+      }
+    } else if (msg_isFloat(m, i)) {
+      hv_snprintf(numbuf, sizeof(numbuf), "%g", (double) msg_getFloat(m, i));
+      s = numbuf;
+    } else {
+      continue;  // bang / hash carry no text
+    }
+
+    size_t len = strlen(s);
+    if (i == numElements - 1) {
+      while (len > 0 && isspace((unsigned char)s[len - 1])) len--;  // trailing edge
+    }
+
+    if (!first) n += cList_put_delim(dst ? dst + n : NULL, delim);
+    first = false;
+
+    if (dst) memcpy(dst + n, s, len);
+    n += len;
+  }
+
+  if (dst) dst[n] = '\0';
+  return n;
+}
+
 // ---- Message handlers
 
 static void cList_onAppend(HeavyContextInterface *_c, ControlList *o, const HvMessage *m,
@@ -284,8 +342,35 @@ static void cList_onForeach(HeavyContextInterface *_c, ControlList *o, const HvM
   if (trimmed) msg_free(m1);
 }
 
+
 static void cList_onJoin(HeavyContextInterface *_c, ControlList *o, const HvMessage *m, void
   (*sendMessage)(HeavyContextInterface *, int, const HvMessage *)) {
+  HvMessage *m1 = cList_trim(m);
+  const bool trimmed = (m1 != m);
+
+  if (msg_getNumElements(m1) == 0 || msg_isBang(m1, 0)) {
+    if (trimmed) msg_free(m1);
+    return;
+  }
+
+  const size_t size = cList_join_build(m1, o->delim, NULL);
+  char *str = (char *) hv_malloc(size + 1);
+  hv_assert(str != NULL);
+  cList_join_build(m1, o->delim, str);
+
+  HvMessage *sym = HV_MESSAGE_ON_HEAP(1);
+  hv_assert(sym != NULL);
+  msg_initWithSymbol(sym, msg_getTimestamp(m1), str);
+
+  // wrap as ["symbol", <str>] like the other outputs in this file
+  HvMessage *out = cList_wrap_symbol(sym);
+  sendMessage(_c, 0, out);
+
+  // sendMessage is synchronous, so the buffer can go once it returns
+  msg_free(out);
+  msg_free(sym);
+  hv_free(str);
+  if (trimmed) msg_free(m1);
 }
 
 // ---- Store handlers
@@ -542,6 +627,13 @@ void cList_onMessage(HeavyContextInterface *_c, ControlList *o, int letIn, const
           cList_onForeach(_c, o, m, sendMessage); break;
         }
         case HV_LIST_JOIN: {
+          if (msg_isBang(m, 0)) {
+            HvMessage *n = HV_MESSAGE_ON_HEAP(1);
+            msg_initWithSymbol(n, 0, "symbol");
+            sendMessage(_c, 0, n);
+            msg_free(n);
+            break;
+          }
           cList_onJoin(_c, o, m, sendMessage); break;
         }
         default: break;
@@ -570,8 +662,13 @@ void cList_onMessage(HeavyContextInterface *_c, ControlList *o, int letIn, const
           break;
         }
         case HV_LIST_JOIN: {
-          if (msg_isSymbol(m, 0))
-            o->delim = (char*)msg_getSymbol(m, 0);
+          if (msg_isSymbol(m, 0)) {
+            if (msg_getNumElements(m) > 1) {
+              o->delim = (char*) msg_getSymbol(m, 1);
+            } else {
+              o->delim = "";
+            }
+          }
           break;
         }
         default: break;

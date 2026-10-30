@@ -637,9 +637,16 @@ class PdParser:
 
                     elif line[1] == "msg":
                         self.obj_counter["msg"] += 1
+                        obj_args = line[4:]
+
+                        if len(obj_args) == 2 and obj_args[1] == " ":
+                            obj_args = [obj_args[0] + " " + r"\ "]
+                        else:
+                            obj_args = [" ".join(obj_args)]
+
                         msg = PdMessageObject(
                             obj_type="msg",
-                            obj_args=[" ".join(line[4:])],
+                            obj_args=obj_args,
                             pos_x=int(line[2]),
                             pos_y=int(line[3]))
 

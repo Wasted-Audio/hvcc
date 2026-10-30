@@ -31,8 +31,7 @@ typedef enum {
     HV_LIST_TRIM,
     HV_LIST_LENGTH,
     HV_LIST_FOREACH,
-    HV_LIST_JOIN,
-    HV_LIST_UNJOIN
+    HV_LIST_JOIN
 } hvListType;
 
 typedef struct ControlList {
