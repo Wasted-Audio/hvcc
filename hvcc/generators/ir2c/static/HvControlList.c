@@ -14,7 +14,6 @@
  * PERFORMANCE OF THIS SOFTWARE.
  */
 
-
 #include "HvControlList.h"
 
 hv_size_t cList_init(ControlList *o, hvListType type) {
@@ -178,9 +177,9 @@ static size_t cList_put_delim(char *dst, const char *delim) {
 }
 
 
-// Walks the message and builds the joined string. Pass dst == NULL to measure,
-// then call again with a buffer of (size + 1) bytes. Returns the length.
-// Trim leading and trailing whitespace from each element before joining.
+// Builds the joined string, trimming spaces at the outer edges of the list
+// only; interior element spaces are preserved. Pass dst == NULL to measure,
+// then call again with a buffer of (size + 1) bytes. Returns the length
 static size_t cList_join_build(const HvMessage *m, const char *delim, char *dst) {
   const int numElements = msg_getNumElements(m);
   size_t n = 0;
