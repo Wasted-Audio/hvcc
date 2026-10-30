@@ -639,7 +639,8 @@ class PdParser:
                         self.obj_counter["msg"] += 1
                         obj_args = line[4:]
 
-                        # Handle escaped space for symbol messages
+                        # A lone escaped space arrives as two separate elements: ["symbol", " "]
+                        # re-encode as a single symbol so it survives into IR.
                         if len(obj_args) == 2 and obj_args[0] == "symbol" and obj_args[1] == " ":
                             obj_args = [obj_args[0] + " " + r"\ "]
                         else:

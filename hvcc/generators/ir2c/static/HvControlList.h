@@ -23,6 +23,8 @@
 extern "C" {
 #endif
 
+#define HV_MAX_DELIM_LEN 64
+
 typedef enum {
     HV_LIST_APPEND,
     HV_LIST_PREPEND,
@@ -37,7 +39,7 @@ typedef enum {
 typedef struct ControlList {
   hvListType type;
   int stride;
-  char* delim;
+  char delim[HV_MAX_DELIM_LEN];
   HvMessage* list;
 } ControlList;
 
