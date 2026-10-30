@@ -1,0 +1,32 @@
+[@ 0.000] unjoin: 1 2 3 4
+[@ 0.000] unjoin: bang
+[@ 0.000] unjoin: bang
+[@ 0.000] unjoin: symbol 1:2:so:are:you
+[@ 0.000] unjoin: symbol a
+[@ 0.000] unjoin: bang
+[@ 0.000] unjoin: list cis boom bah
+[@ 0.000] unjoin: symbol walk:the:dog
+[@ 0.000] unjoin: 1 2 3 4
+[@ 0.000] unjoin: bang
+[@ 0.000] unjoin: bang
+[@ 0.000] unjoin: symbol 1:2:so:are:you
+[@ 0.000] unjoin: symbol a
+[@ 0.000] unjoin: bang
+[@ 0.000] unjoin: list cis boom bah
+[@ 0.000] unjoin: symbol walk:the:dog
+[@ 0.000] unjoin: 1 \  2 \  3 \  4
+[@ 0.000] unjoin: bang
+[@ 0.000] unjoin: bang
+[@ 0.000] unjoin: 1 : 2 : s o : a r e : y o u
+[@ 0.000] unjoin: symbol a
+[@ 0.000] unjoin: bang
+[@ 0.000] unjoin: list c i s \  b o o m \  b a h
+[@ 0.000] unjoin: list w a l k : t h e : d o g
+[@ 0.000] unjoin: symbol 1\ 2\ 3\ 4
+[@ 0.000] unjoin: bang
+[@ 0.000] unjoin: bang
+[@ 0.000] unjoin: 1 2 so are you
+[@ 0.000] unjoin: symbol a
+[@ 0.000] unjoin: bang
+[@ 0.000] unjoin: symbol cis\ boom\ bah
+[@ 0.000] unjoin: list walk the dog
