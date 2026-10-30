@@ -14,8 +14,6 @@
  * PERFORMANCE OF THIS SOFTWARE.
  */
 
-#include <ctype.h>
-#include <string.h>
 
 #include "HvControlList.h"
 
@@ -26,8 +24,8 @@ hv_size_t cList_init(ControlList *o, hvListType type) {
   hv_assert(o->list != NULL);
   msg_initWithBang(o->list, 0);
   o->stride = 0;
-  o->delim[0] = ' '; // default delimiter is a space
-  o->delim[1] = '\0';
+  o->delim[0] = ' ';  // default delimiter is a space
+  o->delim[1] = '\0'; // null-terminate the delimiter string
   return numBytes;
 }
 
@@ -182,6 +180,7 @@ static size_t cList_put_delim(char *dst, const char *delim) {
 
 // Walks the message and builds the joined string. Pass dst == NULL to measure,
 // then call again with a buffer of (size + 1) bytes. Returns the length.
+// Trim leading and trailing whitespace from each element before joining.
 static size_t cList_join_build(const HvMessage *m, const char *delim, char *dst) {
   const int numElements = msg_getNumElements(m);
   size_t n = 0;
@@ -194,7 +193,7 @@ static size_t cList_join_build(const HvMessage *m, const char *delim, char *dst)
     if (msg_isSymbol(m, i)) {
       s = msg_getSymbol(m, i);
       if (i == 0) {
-        while (*s && isspace((unsigned char)*s)) s++;  // leading edge
+        while (*s == ' ') s++;  // leading edge
       }
     } else if (msg_isFloat(m, i)) {
       hv_snprintf(numbuf, sizeof(numbuf), "%g", (double) msg_getFloat(m, i));
@@ -205,7 +204,7 @@ static size_t cList_join_build(const HvMessage *m, const char *delim, char *dst)
 
     size_t len = strlen(s);
     if (i == numElements - 1) {
-      while (len > 0 && isspace((unsigned char)s[len - 1])) len--;  // trailing edge
+      while (len > 0 && s[len - 1] == ' ') len--;  // trailing edge
     }
 
     if (!first) n += cList_put_delim(dst ? dst + n : NULL, delim);
@@ -615,7 +614,7 @@ void cList_onMessage(HeavyContextInterface *_c, ControlList *o, int letIn, const
           cList_onForeach(_c, o, m, sendMessage); break;
         }
         case HV_LIST_JOIN: {
-            if (msg_getNumElements(m) == 0 || msg_isBang(m, 0)) {
+          if (msg_getNumElements(m) == 0 || msg_isBang(m, 0)) {
             HvMessage *n = HV_MESSAGE_ON_HEAP(1);
             msg_initWithSymbol(n, msg_getTimestamp(m), "symbol");
             sendMessage(_c, 0, n);
