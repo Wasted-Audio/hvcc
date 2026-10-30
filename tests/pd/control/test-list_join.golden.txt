@@ -1,6 +1,15 @@
 [@ 0.000] join: symbol 1\ 2\ 3\ 4
-[@ 0.000] join: symbol 1\ 2\ 3
-[@ 0.000] join: symbol 1\ 2
+[@ 0.000] join: symbol 1\ 2.87236\ 3
+[@ 0.000] join: symbol 1\ 0.000123457
+[@ 0.000] join: symbol 1\ 2\ so\ are\ you
+[@ 0.000] join: symbol a
+[@ 0.000] join: symbol 1
+[@ 0.000] join: symbol
+[@ 0.000] join: symbol cis\ boom\ bah
+[@ 0.000] join: symbol walk\ the\ dog
+[@ 0.000] join: symbol 1\ 2\ 3\ 4
+[@ 0.000] join: symbol 1\ 2.87236\ 3
+[@ 0.000] join: symbol 1\ 0.000123457
 [@ 0.000] join: symbol 1\ 2\ so\ are\ you
 [@ 0.000] join: symbol a
 [@ 0.000] join: symbol 1
@@ -8,8 +17,8 @@
 [@ 0.000] join: symbol cis\ boom\ bah
 [@ 0.000] join: symbol walk\ the\ dog
 [@ 0.000] join: symbol 1234
-[@ 0.000] join: symbol 123
-[@ 0.000] join: symbol 12
+[@ 0.000] join: symbol 12.872363
+[@ 0.000] join: symbol 10.000123457
 [@ 0.000] join: symbol 12soareyou
 [@ 0.000] join: symbol a
 [@ 0.000] join: symbol 1
@@ -17,8 +26,8 @@
 [@ 0.000] join: symbol cisboombah
 [@ 0.000] join: symbol walkthedog
 [@ 0.000] join: symbol 1:2:3:4
-[@ 0.000] join: symbol 1:2:3
-[@ 0.000] join: symbol 1:2
+[@ 0.000] join: symbol 1:2.87236:3
+[@ 0.000] join: symbol 1:0.000123457
 [@ 0.000] join: symbol 1:2:so:are:you
 [@ 0.000] join: symbol a
 [@ 0.000] join: symbol 1
