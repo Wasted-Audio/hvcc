@@ -164,29 +164,29 @@ static HvMessage *cList_slice(const HvMessage *m1, int start, int end) {
 
 // ---- Join helpers
 
-static size_t cList_join_put_delim(char *dst, const char *delim) {
+static hv_size_t cList_join_put_delim(char *dst, const char *delim) {
   // Escapes a bare space with a backslash (an already-escaped "\ " is left alone).
   // With dst == NULL it only counts. Returns the number of bytes written/needed.
-  size_t n = 0;
-  for (size_t k = 0; delim[k] != '\0'; k++) {
+  hv_size_t size = 0;
+  for (hv_size_t k = 0; delim[k] != '\0'; k++) {
     if (delim[k] == ' ' && (k == 0 || delim[k - 1] != '\\')) {
-      if (dst) dst[n] = '\\';
-      n++;
+      if (dst) dst[size] = '\\';
+      size++;
     }
-    if (dst) dst[n] = delim[k];
-    n++;
+    if (dst) dst[size] = delim[k];
+    size++;
   }
-  return n;
+  return size;
 }
 
 
-static size_t cList_join_build(const HvMessage *m, const char *delim, char *dst) {
+static hv_size_t cList_join_build(const HvMessage *m, const char *delim, char *dst) {
   // Builds the joined string, trimming spaces at the outer edges of the list
   // only; interior element spaces are preserved.
   // If dst == NULL, only measures and returns required size.
   // Otherwise, writes to dst (caller must ensure dst has size+1 bytes for NUL terminator)
   const int numElements = msg_getNumElements(m);
-  size_t n = 0;
+  hv_size_t size = 0;
   bool first = true;
 
   for (int i = 0; i < numElements; i++) {
@@ -205,26 +205,26 @@ static size_t cList_join_build(const HvMessage *m, const char *delim, char *dst)
       continue;  // bang / hash carry no text
     }
 
-    size_t len = strlen(s);
+    hv_size_t len = strlen(s);
     if (i == numElements - 1) {
       while (len > 0 && s[len - 1] == ' ') len--;  // trailing edge
     }
 
-    if (!first) n += cList_join_put_delim(dst ? dst + n : NULL, delim);
+    if (!first) size += cList_join_put_delim(dst ? dst + size : NULL, delim);
     first = false;
 
-    if (dst) memcpy(dst + n, s, len);
-    n += len;
+    if (dst) memcpy(dst + size, s, len);
+    size += len;
   }
 
-  if (dst) dst[n] = '\0';
-  return n;
+  if (dst) dst[size] = '\0';
+  return size;
 }
 
 // ---- Unjoin helpers
 
-static size_t cList_unjoin_match_delim(const char *s, const char *str, size_t strLen,
-    const char *delim, size_t rawLen) {
+static hv_size_t cList_unjoin_match_delim(const char *s, const char *str, hv_size_t strLen,
+    const char *delim, hv_size_t rawLen) {
   // Bare-space delimiter, PD style: an escaped "\ " and a plain " " both split.
   if (rawLen == 1 && delim[0] == ' ') {
     if (s[0] == '\\' && s[1] == ' ') return 2;
@@ -239,7 +239,7 @@ static size_t cList_unjoin_match_delim(const char *s, const char *str, size_t st
 
 static bool cList_unjoin_is_number(const char *s) {
   // True if the entire string is a valid number (the inverse of join's "%g").
-  const size_t len = strlen(s);
+  const hv_size_t len = strlen(s);
   if (len == 0) return false;
 
   const char *validchars = "0123456789+-.eE";
@@ -261,14 +261,14 @@ static void cList_unjoin_set_token(HvMessage *n, int k, const char *tok) {
 }
 
 
-static char *cList_unjoin_message_to_string(const HvMessage *m, bool symbolLike, size_t *outLen) {
+static char *cList_unjoin_message_to_string(const HvMessage *m, bool symbolLike, hv_size_t *outLen) {
   // Flattens m into one heap string. symbolLike: the message is one symbol, so
   // atoms are joined with an escaped space "\ " and any bare space inside an
   // atom is escaped too. Otherwise atoms are joined with a plain space.
   // Floats use "%g", bangs/hashes are skipped. Caller must hv_free() the result.
   const int numElements = msg_getNumElements(m);
 
-  size_t total = 1;
+  hv_size_t total = 1;
   for (int i = 0; i < numElements; i++) {
     if (msg_isSymbol(m, i)) total += 2 * strlen(msg_getSymbol(m, i)) + 2;
     else if (msg_isFloat(m, i)) total += HV_FLOAT_STR_MAX;
@@ -277,7 +277,7 @@ static char *cList_unjoin_message_to_string(const HvMessage *m, bool symbolLike,
   char *buf = (char *) hv_malloc(total);
   hv_assert(buf != NULL);
 
-  size_t pos = 0;
+  hv_size_t pos = 0;
   bool first = true;
   for (int i = 0; i < numElements; i++) {
     const char *s = NULL;
@@ -298,7 +298,7 @@ static char *cList_unjoin_message_to_string(const HvMessage *m, bool symbolLike,
     }
     first = false;
 
-    for (size_t k = 0; s[k] != '\0'; k++) {
+    for (hv_size_t k = 0; s[k] != '\0'; k++) {
       if (symbolLike && s[k] == ' ' && (k == 0 || s[k - 1] != '\\')) buf[pos++] = '\\';
       buf[pos++] = s[k];
     }
@@ -336,7 +336,7 @@ static void cList_unjoin_sendBang(HeavyContextInterface *_c, hv_uint32_t timesta
 }
 
 
-static HvMessage *cList_unjoin_splitByChar(const char *src, size_t srcLen, hv_uint32_t timestamp,
+static HvMessage *cList_unjoin_splitByChar(const char *src, hv_size_t srcLen, hv_uint32_t timestamp,
 char **backingOut) {
   // One token per character. An escaped space "\ " counts as ONE token.
   // We use a scratch buffer because each token needs its own NUL terminator,
@@ -345,8 +345,8 @@ char **backingOut) {
   hv_assert(chars != NULL);
 
   int numTokens = 0;
-  size_t w = 0;
-  for (size_t i = 0; i < srcLen; ) {
+  hv_size_t w = 0;
+  for (hv_size_t i = 0; i < srcLen; ) {
     if (src[i] == '\\' && src[i + 1] == ' ') {
       chars[w++] = '\\'; chars[w++] = ' '; chars[w++] = '\0';
       i += 2;
@@ -372,12 +372,12 @@ char **backingOut) {
 }
 
 
-static HvMessage *cList_unjoin_splitByDelim(char *src, size_t srcLen, const char *delim,
+static HvMessage *cList_unjoin_splitByDelim(char *src, hv_size_t srcLen, const char *delim,
   hv_uint32_t timestamp, char **escOut) {
-  const size_t rawLen = strlen(delim);
+  const hv_size_t rawLen = strlen(delim);
   // Build the delimiter with its escape characters expanded,
   // e.g. "\," -> the sequence cList_join_put_delim produces for ','.
-  const size_t strLen = cList_join_put_delim(NULL, delim);
+  const hv_size_t strLen = cList_join_put_delim(NULL, delim);
   char *str = (char *) hv_malloc(strLen + 1);
   hv_assert(str != NULL);
   cList_join_put_delim(str, delim);
@@ -385,8 +385,8 @@ static HvMessage *cList_unjoin_splitByDelim(char *src, size_t srcLen, const char
 
   // Pass 1: count tokens.
   int numTokens = 1;
-  for (size_t i = 0; i < srcLen; ) {
-    const size_t d = cList_unjoin_match_delim(src + i, str, strLen, delim, rawLen);
+  for (hv_size_t i = 0; i < srcLen; ) {
+    const hv_size_t d = cList_unjoin_match_delim(src + i, str, strLen, delim, rawLen);
     if (d) { numTokens++; i += d; }
     else i++;
   }
@@ -398,9 +398,9 @@ static HvMessage *cList_unjoin_splitByDelim(char *src, size_t srcLen, const char
   // Pass 2: split in place, writing NULs into src.
   char *tok = src;
   int k = 0;
-  size_t i = 0;
+  hv_size_t i = 0;
   for (;;) {
-    const size_t d = (i < srcLen)
+    const hv_size_t d = (i < srcLen)
         ? cList_unjoin_match_delim(src + i, str, strLen, delim, rawLen) : 0;
     if (d == 0 && i < srcLen) { i++; continue; }
 
@@ -553,7 +553,7 @@ static void cList_onJoin(HeavyContextInterface *_c, ControlList *o, const HvMess
   HvMessage *m1 = cList_trim(m);
   const bool trimmed = (m1 != m);
 
-  const size_t size = cList_join_build(m1, o->delim, NULL);
+  const hv_size_t size = cList_join_build(m1, o->delim, NULL);
   char *str = (char *) hv_malloc(size + 1);
   hv_assert(str != NULL);
   cList_join_build(m1, o->delim, str);
