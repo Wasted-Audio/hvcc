@@ -24,6 +24,7 @@ extern "C" {
 #endif
 
 #define HV_MAX_DELIM_LEN 64
+#define HV_FLOAT_STR_MAX 32
 
 typedef enum {
     HV_LIST_APPEND,

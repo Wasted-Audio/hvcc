@@ -162,7 +162,7 @@ static HvMessage *cList_slice(const HvMessage *m1, int start, int end) {
   return n;
 }
 
-// ----- Join helpers
+// ---- Join helpers
 
 static size_t cList_join_put_delim(char *dst, const char *delim) {
   // Escapes a bare space with a backslash (an already-escaped "\ " is left alone).
@@ -182,15 +182,16 @@ static size_t cList_join_put_delim(char *dst, const char *delim) {
 
 static size_t cList_join_build(const HvMessage *m, const char *delim, char *dst) {
   // Builds the joined string, trimming spaces at the outer edges of the list
-  // only; interior element spaces are preserved. Pass dst == NULL to measure,
-  // then call again with a buffer of (size + 1) bytes. Returns the length
+  // only; interior element spaces are preserved.
+  // If dst == NULL, only measures and returns required size.
+  // Otherwise, writes to dst (caller must ensure dst has size+1 bytes for NUL terminator)
   const int numElements = msg_getNumElements(m);
   size_t n = 0;
   bool first = true;
 
   for (int i = 0; i < numElements; i++) {
     const char *s = NULL;
-    char numbuf[32];
+    char numbuf[HV_FLOAT_STR_MAX];
 
     if (msg_isSymbol(m, i)) {
       s = msg_getSymbol(m, i);
@@ -220,7 +221,7 @@ static size_t cList_join_build(const HvMessage *m, const char *delim, char *dst)
   return n;
 }
 
-// ----- Unjoin helpers
+// ---- Unjoin helpers
 
 static size_t cList_unjoin_match_delim(const char *s, const char *str, size_t strLen,
     const char *delim, size_t rawLen) {
@@ -239,7 +240,11 @@ static size_t cList_unjoin_match_delim(const char *s, const char *str, size_t st
 static bool cList_unjoin_is_number(const char *s) {
   // True if the entire string is a valid number (the inverse of join's "%g").
   const size_t len = strlen(s);
-  if (len == 0 || strspn(s, "0123456789+-.eE") != len) return false;
+  if (len == 0) return false;
+
+  const char *validchars = "0123456789+-.eE";
+  if (strspn(s, validchars) != len) return false;
+
   char *end = NULL;
   strtod(s, &end);
   return end == s + len;
@@ -247,9 +252,7 @@ static bool cList_unjoin_is_number(const char *s) {
 
 
 static void cList_unjoin_set_token(HvMessage *n, int k, const char *tok) {
-  // Stores a NUL-terminated token at index k: a float if the whole token is a
-  // number, otherwise a symbol. The symbol pointer is stored, not copied, so tok
-  // must outlive the message.
+  // tok must outlive the message (symbols are not copied)
   if (cList_unjoin_is_number(tok)) {
     msg_setFloat(n, k, (float) strtod(tok, NULL));
   } else {
@@ -268,7 +271,7 @@ static char *cList_unjoin_message_to_string(const HvMessage *m, bool symbolLike,
   size_t total = 1;
   for (int i = 0; i < numElements; i++) {
     if (msg_isSymbol(m, i)) total += 2 * strlen(msg_getSymbol(m, i)) + 2;
-    else if (msg_isFloat(m, i)) total += 34;
+    else if (msg_isFloat(m, i)) total += HV_FLOAT_STR_MAX;
   }
 
   char *buf = (char *) hv_malloc(total);
@@ -278,7 +281,8 @@ static char *cList_unjoin_message_to_string(const HvMessage *m, bool symbolLike,
   bool first = true;
   for (int i = 0; i < numElements; i++) {
     const char *s = NULL;
-    char numbuf[32];
+    char numbuf[HV_FLOAT_STR_MAX];
+
     if (msg_isSymbol(m, i)) {
       s = msg_getSymbol(m, i);
     } else if (msg_isFloat(m, i)) {
@@ -372,7 +376,7 @@ static HvMessage *cList_unjoin_splitByDelim(char *src, size_t srcLen, const char
   hv_uint32_t timestamp, char **escOut) {
   const size_t rawLen = strlen(delim);
   // Build the delimiter with its escape characters expanded,
-  // e.g. "\," -> the sequence cList_put_delim produces for ','.
+  // e.g. "\," -> the sequence cList_join_put_delim produces for ','.
   const size_t strLen = cList_join_put_delim(NULL, delim);
   char *str = (char *) hv_malloc(strLen + 1);
   hv_assert(str != NULL);
@@ -569,27 +573,27 @@ static void cList_onJoin(HeavyContextInterface *_c, ControlList *o, const HvMess
 
 static void cList_onUnjoin(HeavyContextInterface *_c, ControlList *o, const HvMessage *m, void
   (*sendMessage)(HeavyContextInterface *, int, const HvMessage *)) {
-  CListInput in;
-  cList_unjoin_prepareInput(m, &in);
-  const hv_uint32_t ts = msg_getTimestamp(in.trimmed);
+  CListInput input = {0};
+  cList_unjoin_prepareInput(m, &input);
+  const hv_uint32_t ts = msg_getTimestamp(input.trimmed);
 
-  // Empty input, or an input that is entirely a number, yields a bang
-  if (in.emitBang) {
+  if (input.emitBang) {
+    // PD convention: empty input or pure numeric string: output bang
     cList_unjoin_sendBang(_c, ts, sendMessage);
-    cList_unjoin_freeInput(&in);
+    cList_unjoin_freeInput(&input);
     return;
   }
 
   char *backing = NULL;
   HvMessage *n = (strlen(o->delim) == 0)
-      ? cList_unjoin_splitByChar(in.src, in.srcLen, ts, &backing)
-      : cList_unjoin_splitByDelim(in.src, in.srcLen, o->delim, ts, &backing);
+      ? cList_unjoin_splitByChar(input.src, input.srcLen, ts, &backing)
+      : cList_unjoin_splitByDelim(input.src, input.srcLen, o->delim, ts, &backing);
 
-  cList_unjoin_emitTokens(_c, n, in.symbolLike, sendMessage);
+  cList_unjoin_emitTokens(_c, n, input.symbolLike, sendMessage);
 
   msg_free(n);
   hv_free(backing);
-  cList_unjoin_freeInput(&in);
+  cList_unjoin_freeInput(&input);
 }
 
 
