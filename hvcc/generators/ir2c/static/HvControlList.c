@@ -22,6 +22,9 @@ hv_size_t cList_init(ControlList *o, hvListType type) {
   o->list = HV_MESSAGE_ON_HEAP(1);
   hv_assert(o->list != NULL);
   msg_initWithBang(o->list, 0);
+  o->stride = 0;
+  o->delim[0] = ' ';  // default delimiter is a space
+  o->delim[1] = '\0'; // null-terminate the delimiter string
   return numBytes;
 }
 
@@ -29,7 +32,9 @@ void cList_free(ControlList *o) {
   msg_free(o->list);
 }
 
-void cList_copy_message(const HvMessage *m, int i, HvMessage *tmp, int j) {
+// ---- Utilities
+
+static void cList_copy_message(const HvMessage *m, int i, HvMessage *tmp, int j) {
   switch (msg_getType(m, i)) {
     case HV_MSG_FLOAT: msg_setFloat(tmp, j, msg_getFloat(m, i)); break;
     case HV_MSG_SYMBOL: msg_setSymbol(tmp, j, msg_getSymbol(m, i)); break;
@@ -40,7 +45,7 @@ void cList_copy_message(const HvMessage *m, int i, HvMessage *tmp, int j) {
 }
 
 
-HvMessage *cList_combine_lists(const HvMessage *a, const HvMessage *b) {
+static HvMessage *cList_combine_lists(const HvMessage *a, const HvMessage *b) {
    const int aIsEmpty = (msg_getNumElements(a) == 1 && msg_isBang(a, 0));
    const int bIsEmpty = (msg_getNumElements(b) == 1 && msg_isBang(b, 0));
 
@@ -157,6 +162,272 @@ static HvMessage *cList_slice(const HvMessage *m1, int start, int end) {
   return n;
 }
 
+// ---- Join helpers
+
+static hv_size_t cList_join_put_delim(char *dst, const char *delim) {
+  // Escapes a bare space with a backslash (an already-escaped "\ " is left alone).
+  // With dst == NULL it only counts. Returns the number of bytes written/needed.
+  hv_size_t size = 0;
+  for (hv_size_t k = 0; delim[k] != '\0'; k++) {
+    if (delim[k] == ' ' && (k == 0 || delim[k - 1] != '\\')) {
+      if (dst) dst[size] = '\\';
+      size++;
+    }
+    if (dst) dst[size] = delim[k];
+    size++;
+  }
+  return size;
+}
+
+
+static hv_size_t cList_join_build(const HvMessage *m, const char *delim, char *dst) {
+  // Builds the joined string, trimming spaces at the outer edges of the list
+  // only; interior element spaces are preserved.
+  // If dst == NULL, only measures and returns required size.
+  // Otherwise, writes to dst (caller must ensure dst has size+1 bytes for NUL terminator)
+  const int numElements = msg_getNumElements(m);
+  hv_size_t size = 0;
+  bool first = true;
+
+  for (int i = 0; i < numElements; i++) {
+    const char *s = NULL;
+    char numbuf[HV_FLOAT_STR_MAX];
+
+    if (msg_isSymbol(m, i)) {
+      s = msg_getSymbol(m, i);
+      if (i == 0) {
+        while (*s == ' ') s++;  // leading edge
+      }
+    } else if (msg_isFloat(m, i)) {
+      hv_snprintf(numbuf, sizeof(numbuf), "%g", (double) msg_getFloat(m, i));
+      s = numbuf;
+    } else {
+      continue;  // bang / hash carry no text
+    }
+
+    hv_size_t len = strlen(s);
+    if (i == numElements - 1) {
+      while (len > 0 && s[len - 1] == ' ') len--;  // trailing edge
+    }
+
+    if (!first) size += cList_join_put_delim(dst ? dst + size : NULL, delim);
+    first = false;
+
+    if (dst) memcpy(dst + size, s, len);
+    size += len;
+  }
+
+  if (dst) dst[size] = '\0';
+  return size;
+}
+
+// ---- Unjoin helpers
+
+static hv_size_t cList_unjoin_match_delim(const char *s, const char *str, hv_size_t strLen,
+    const char *delim, hv_size_t rawLen) {
+  // Bare-space delimiter, PD style: an escaped "\ " and a plain " " both split.
+  if (rawLen == 1 && delim[0] == ' ') {
+    if (s[0] == '\\' && s[1] == ' ') return 2;
+    if (s[0] == ' ') return 1;
+    return 0;
+  }
+  if (strLen > 0 && !strncmp(s, str, strLen)) return strLen;
+  if (rawLen > 0 && !strncmp(s, delim, rawLen)) return rawLen;
+  return 0;
+}
+
+
+static bool cList_unjoin_is_number(const char *s) {
+  // True if the entire string is a valid number (the inverse of join's "%g").
+  const hv_size_t len = strlen(s);
+  if (len == 0) return false;
+
+  const char *validchars = "0123456789+-.eE";
+  if (strspn(s, validchars) != len) return false;
+
+  char *end = NULL;
+  strtod(s, &end);
+  return end == s + len;
+}
+
+
+static void cList_unjoin_set_token(HvMessage *n, int k, const char *tok) {
+  // tok must outlive the message (symbols are not copied)
+  if (cList_unjoin_is_number(tok)) {
+    msg_setFloat(n, k, (float) strtod(tok, NULL));
+  } else {
+    msg_setSymbol(n, k, tok);
+  }
+}
+
+
+static char *cList_unjoin_message_to_string(const HvMessage *m, bool symbolLike, hv_size_t *outLen) {
+  // Flattens m into one heap string. symbolLike: the message is one symbol, so
+  // atoms are joined with an escaped space "\ " and any bare space inside an
+  // atom is escaped too. Otherwise atoms are joined with a plain space.
+  // Floats use "%g", bangs/hashes are skipped. Caller must hv_free() the result.
+  const int numElements = msg_getNumElements(m);
+
+  hv_size_t total = 1;
+  for (int i = 0; i < numElements; i++) {
+    if (msg_isSymbol(m, i)) total += 2 * strlen(msg_getSymbol(m, i)) + 2;
+    else if (msg_isFloat(m, i)) total += HV_FLOAT_STR_MAX;
+  }
+
+  char *buf = (char *) hv_malloc(total);
+  hv_assert(buf != NULL);
+
+  hv_size_t pos = 0;
+  bool first = true;
+  for (int i = 0; i < numElements; i++) {
+    const char *s = NULL;
+    char numbuf[HV_FLOAT_STR_MAX];
+
+    if (msg_isSymbol(m, i)) {
+      s = msg_getSymbol(m, i);
+    } else if (msg_isFloat(m, i)) {
+      hv_snprintf(numbuf, sizeof(numbuf), "%g", (double) msg_getFloat(m, i));
+      s = numbuf;
+    } else {
+      continue;
+    }
+
+    if (!first) {
+      if (symbolLike) buf[pos++] = '\\';
+      buf[pos++] = ' ';
+    }
+    first = false;
+
+    for (hv_size_t k = 0; s[k] != '\0'; k++) {
+      if (symbolLike && s[k] == ' ' && (k == 0 || s[k - 1] != '\\')) buf[pos++] = '\\';
+      buf[pos++] = s[k];
+    }
+  }
+  buf[pos] = '\0';
+  *outLen = pos;
+  return buf;
+}
+
+
+static void cList_unjoin_prepareInput(const HvMessage *m, CListInput *in) {
+  // "symbol a\ b" may arrive as [symbol a b( or as one symbol; both are ONE symbol
+  const bool tagged = msg_isSymbol(m, 0) && !hv_strcmp(msg_getSymbol(m, 0), "symbol");
+  in->trimmed = cList_trim(m);
+  in->trimmedIsOwned = (in->trimmed != m);
+  in->symbolLike = tagged || (msg_getNumElements(in->trimmed) == 1 && msg_isSymbol(in->trimmed, 0));
+  in->src = cList_unjoin_message_to_string(in->trimmed, in->symbolLike, &in->srcLen);
+  in->emitBang = (in->srcLen == 0 || cList_unjoin_is_number(in->src));
+}
+
+
+static void cList_unjoin_freeInput(CListInput *in) {
+  if (in->trimmedIsOwned) msg_free(in->trimmed);
+  hv_free(in->src);
+}
+
+
+static void cList_unjoin_sendBang(HeavyContextInterface *_c, hv_uint32_t timestamp,
+  void (*sendMessage)(HeavyContextInterface *, int, const HvMessage *)) {
+  HvMessage *n = HV_MESSAGE_ON_HEAP(1);
+  hv_assert(n != NULL);
+  msg_initWithBang(n, timestamp);
+  sendMessage(_c, 0, n);
+  msg_free(n);
+}
+
+
+static HvMessage *cList_unjoin_splitByChar(const char *src, hv_size_t srcLen, hv_uint32_t timestamp,
+char **backingOut) {
+  // One token per character. An escaped space "\ " counts as ONE token.
+  // We use a scratch buffer because each token needs its own NUL terminator,
+  // and "\ " is two bytes in src but one token.
+  char *chars = (char *) hv_malloc(3 * srcLen + 1);
+  hv_assert(chars != NULL);
+
+  int numTokens = 0;
+  hv_size_t w = 0;
+  for (hv_size_t i = 0; i < srcLen; ) {
+    if (src[i] == '\\' && src[i + 1] == ' ') {
+      chars[w++] = '\\'; chars[w++] = ' '; chars[w++] = '\0';
+      i += 2;
+    } else {
+      chars[w++] = src[i]; chars[w++] = '\0';
+      i++;
+    }
+    numTokens++;
+  }
+
+  HvMessage *n = HV_MESSAGE_ON_HEAP(numTokens);
+  hv_assert(n != NULL);
+  msg_init(n, numTokens, timestamp);
+
+  const char *tok = chars;
+  for (int k = 0; k < numTokens; k++) {
+    cList_unjoin_set_token(n, k, tok);
+    tok += strlen(tok) + 1;
+  }
+
+  *backingOut = chars; // caller frees AFTER the message is done
+  return n;
+}
+
+
+static HvMessage *cList_unjoin_splitByDelim(char *src, hv_size_t srcLen, const char *delim,
+  hv_uint32_t timestamp, char **escOut) {
+  const hv_size_t rawLen = strlen(delim);
+  // Build the delimiter with its escape characters expanded,
+  // e.g. "\," -> the sequence cList_join_put_delim produces for ','.
+  const hv_size_t strLen = cList_join_put_delim(NULL, delim);
+  char *str = (char *) hv_malloc(strLen + 1);
+  hv_assert(str != NULL);
+  cList_join_put_delim(str, delim);
+  str[strLen] = '\0';
+
+  // Pass 1: count tokens.
+  int numTokens = 1;
+  for (hv_size_t i = 0; i < srcLen; ) {
+    const hv_size_t d = cList_unjoin_match_delim(src + i, str, strLen, delim, rawLen);
+    if (d) { numTokens++; i += d; }
+    else i++;
+  }
+
+  HvMessage *n = HV_MESSAGE_ON_HEAP(numTokens);
+  hv_assert(n != NULL);
+  msg_init(n, numTokens, timestamp);
+
+  // Pass 2: split in place, writing NULs into src.
+  char *tok = src;
+  int k = 0;
+  hv_size_t i = 0;
+  for (;;) {
+    const hv_size_t d = (i < srcLen)
+        ? cList_unjoin_match_delim(src + i, str, strLen, delim, rawLen) : 0;
+    if (d == 0 && i < srcLen) { i++; continue; }
+
+    src[i] = '\0';
+    cList_unjoin_set_token(n, k++, tok);
+    if (i >= srcLen) break;
+    i += d;
+    tok = src + i;
+  }
+
+  *escOut = str; // caller frees AFTER the message is done
+  return n;
+}
+
+
+static void cList_unjoin_emitTokens(HeavyContextInterface *_c, HvMessage *m, bool symbolLike,
+  void (*sendMessage)(HeavyContextInterface *, int, const HvMessage *)) {
+  if (symbolLike) {
+    // list/symbol tagging convention (untrim leaves a float-first result untagged)
+    HvMessage *out = cList_untrim(m);
+    sendMessage(_c, 0, out);
+    if (out != m) msg_free(out); // m freed by caller
+  } else {
+    // true multi-atom output like [1 2 3 4(: no tag
+    sendMessage(_c, 0, m);
+  }
+}
 
 // ---- Message handlers
 
@@ -228,6 +499,101 @@ static void cList_onLength(HeavyContextInterface *_c, ControlList *o, const HvMe
   msg_initWithFloat(n, msg_getTimestamp(m), (float) numElements);
   sendMessage(_c, 0, n);
   msg_free(n);
+}
+
+
+static void cList_onForeach(HeavyContextInterface *_c, ControlList *o, const HvMessage *m, void
+  (*sendMessage)(HeavyContextInterface *, int, const HvMessage *)) {
+  HvMessage *m1 = cList_trim(m);
+  const bool trimmed = (m1 != m);
+  const int numElements = msg_getNumElements(m1);
+
+  // a stride of 0 is a chunk of 1; |stride| is clamped to the list length so
+  // there is always at least one chunk and never an empty one
+  int stride = o->stride;
+  if (stride == 0) stride = 1;
+  if (stride > numElements) stride = numElements;
+  else if (stride < -numElements) stride = -numElements;
+
+  const int step = (stride < 0) ? -stride : stride;
+  const int numChunks = (numElements + step - 1) / step;
+
+  for (int k = 0; k < numChunks; k++) {
+    int start, end;
+    if (stride > 0) {
+      // forward: chunks cut from the head, so the short remainder is last
+      start = k * step;
+      end = hv_min_i(start + step, numElements);
+    } else {
+      // backward: the chunks are cut from the tail and emitted in reverse, so
+      // the short remainder comes first and every piece keeps its element order
+      start = numElements - (k + 1) * step;
+      end = hv_min_i(start + step, numElements);
+      if (start < 0) start = 0;
+    }
+
+    // the index of this chunk's first element goes out first, on outlet 1
+    HvMessage *idx = HV_MESSAGE_ON_HEAP(1);
+    hv_assert(idx != NULL);
+    msg_initWithFloat(idx, msg_getTimestamp(m1), (float) start);
+    sendMessage(_c, 1, idx);
+    msg_free(idx);
+
+    HvMessage *n = cList_slice(m1, start, end);
+    sendMessage(_c, 0, n);
+    msg_free(n);
+  }
+
+  if (trimmed) msg_free(m1);
+}
+
+
+static void cList_onJoin(HeavyContextInterface *_c, ControlList *o, const HvMessage *m, void
+  (*sendMessage)(HeavyContextInterface *, int, const HvMessage *)) {
+  HvMessage *m1 = cList_trim(m);
+  const bool trimmed = (m1 != m);
+
+  const hv_size_t size = cList_join_build(m1, o->delim, NULL);
+  char *str = (char *) hv_malloc(size + 1);
+  hv_assert(str != NULL);
+  cList_join_build(m1, o->delim, str);
+
+  HvMessage sym;
+  msg_initWithSymbol(&sym, msg_getTimestamp(m1), str);
+
+  // wrap as ["symbol", <str>] like the other outputs in this file
+  HvMessage *out = cList_wrap_symbol(&sym);
+  sendMessage(_c, 0, out);
+
+  msg_free(out);
+  hv_free(str);
+  if (trimmed) msg_free(m1);
+}
+
+
+static void cList_onUnjoin(HeavyContextInterface *_c, ControlList *o, const HvMessage *m, void
+  (*sendMessage)(HeavyContextInterface *, int, const HvMessage *)) {
+  CListInput input = {0};
+  cList_unjoin_prepareInput(m, &input);
+  const hv_uint32_t ts = msg_getTimestamp(input.trimmed);
+
+  if (input.emitBang) {
+    // PD convention: empty input or pure numeric string: output bang
+    cList_unjoin_sendBang(_c, ts, sendMessage);
+    cList_unjoin_freeInput(&input);
+    return;
+  }
+
+  char *backing = NULL;
+  HvMessage *n = (strlen(o->delim) == 0)
+      ? cList_unjoin_splitByChar(input.src, input.srcLen, ts, &backing)
+      : cList_unjoin_splitByDelim(input.src, input.srcLen, o->delim, ts, &backing);
+
+  cList_unjoin_emitTokens(_c, n, input.symbolLike, sendMessage);
+
+  msg_free(n);
+  hv_free(backing);
+  cList_unjoin_freeInput(&input);
 }
 
 
@@ -481,6 +847,24 @@ void cList_onMessage(HeavyContextInterface *_c, ControlList *o, int letIn, const
         case HV_LIST_LENGTH: {
           cList_onLength(_c, o, m, sendMessage); break;
         }
+        case HV_LIST_FOREACH: {
+          if (msg_isBang(m, 0)) break;
+          cList_onForeach(_c, o, m, sendMessage); break;
+        }
+        case HV_LIST_JOIN: {
+          if (msg_getNumElements(m) == 0 || msg_isBang(m, 0)) {
+            HvMessage *n = HV_MESSAGE_ON_HEAP(1);
+            msg_initWithSymbol(n, msg_getTimestamp(m), "symbol");
+            sendMessage(_c, 0, n);
+            msg_free(n);
+            break;
+          }
+          cList_onJoin(_c, o, m, sendMessage); break;
+        }
+        case HV_LIST_UNJOIN: {
+          if (msg_isBang(m, 0)) break;
+          cList_onUnjoin(_c, o, m, sendMessage); break;
+        }
         default: break;
       }
       break;
@@ -499,6 +883,23 @@ void cList_onMessage(HeavyContextInterface *_c, ControlList *o, int letIn, const
         }
         case HV_LIST_SPLIT: {
           cList_copy_message(m, 0, o->list, 0);
+          break;
+        }
+        case HV_LIST_FOREACH: {
+          if (msg_isFloat(m, 0))
+            o->stride = (int)msg_getFloat(m, 0);
+          break;
+        }
+        case HV_LIST_JOIN:
+        case HV_LIST_UNJOIN: {
+          if (msg_isSymbol(m, 0)) {
+            if (msg_getNumElements(m) > 1) {
+              hv_strncpy(o->delim, msg_getSymbol(m, 1), HV_MAX_DELIM_LEN - 1);
+              o->delim[HV_MAX_DELIM_LEN - 1] = '\0';
+            } else {
+              o->delim[0] = '\0';
+            }
+          }
           break;
         }
         default: break;
