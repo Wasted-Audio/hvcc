@@ -508,6 +508,12 @@ static void cList_onForeach(HeavyContextInterface *_c, ControlList *o, const HvM
   const bool trimmed = (m1 != m);
   const int numElements = msg_getNumElements(m1);
 
+  // If an empty list is dropped to a bang, return early
+  if (numElements == 0 && msg_isBang(m1, 0)) {
+    if (trimmed) msg_free(m1);
+    return;
+  }
+
   // a stride of 0 is a chunk of 1; |stride| is clamped to the list length so
   // there is always at least one chunk and never an empty one
   int stride = o->stride;
