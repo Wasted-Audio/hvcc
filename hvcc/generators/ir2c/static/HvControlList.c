@@ -893,7 +893,7 @@ void cList_onMessage(HeavyContextInterface *_c, ControlList *o, int letIn, const
         case HV_LIST_JOIN:
         case HV_LIST_UNJOIN: {
           if (msg_isSymbol(m, 0)) {
-            if (msg_getNumElements(m) > 1) {
+            if (msg_getNumElements(m) > 1 && msg_isSymbol(m, 1)) {
               hv_strncpy(o->delim, msg_getSymbol(m, 1), HV_MAX_DELIM_LEN - 1);
               o->delim[HV_MAX_DELIM_LEN - 1] = '\0';
             } else {
