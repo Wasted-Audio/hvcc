@@ -11,28 +11,26 @@ from pydantic_extra_types.color import Color
 
 
 class XY(BaseModel):
-    x: int
-    y: int
+    x: int | None = None
+    y: int | None = None
+
+    @model_validator(mode='after')
+    def validate_xy(self) -> 'XY':
+        if self.x is None and self.y is None:
+            return self
+        if self.x is None or self.y is None:
+            raise ValueError('Both x and y must be specified')
+        return self
 
 
-class Coords(XY):
-    pass
-
-
-class Size(XY):
-    pass
-
-
-class Knob(BaseModel):
+class Knob(XY, BaseModel):
     param: str
-    coords: Coords | None = None
     image: Path = Field(default=Path(__file__).parent / '../generators/c2meta/assets/knob.png')
 
 
-class Jack(BaseModel):
+class Jack(XY, BaseModel):
     id: int
     name: str | None = None
-    coords: Coords | None = None
     image: Path = Field(default=Path(__file__).parent / '../generators/c2meta/assets/jack.png')
 
 
@@ -44,22 +42,20 @@ class Output(Jack):
     pass
 
 
-class Led(BaseModel):
+class Led(XY, BaseModel):
     led: str
-    coords: Coords | None = None
     image: Path = Field(default=Path(__file__).parent / '../generators/c2meta/assets/led.png')
 
 
-class Panel(BaseModel):
+class Panel(XY, BaseModel):
     image: Path | None = None
-    size: Size | None = None
     color: Color | None = None
 
-    @field_validator('size', mode='before')
-    def validate_size(cls, v):
-        if v is not None and (v.y != 240):
+    @field_validator('y', mode='before')
+    def validate_size_y(cls, y: int | None) -> int | None:
+        if y is not None and (y != 240):
             raise ValueError('Panel height must be 240 pixels')
-        return v
+        return y
 
 class Assets(BaseModel):
     panel: Panel | None = None

@@ -19,8 +19,8 @@ void init_{{ name|lower }}() {
 
 {% for knob in assets.knobs %}
   MetaModule::Knob {{knob.param}};
-  {{knob.param}}.x_mm = {{((knob.coords.x/ratio)|round(2))}};
-  {{knob.param}}.y_mm = {{((knob.coords.y/ratio)|round(2))}};
+  {{knob.param}}.x_mm = {{((knob.x/ratio)|round(2))}};
+  {{knob.param}}.y_mm = {{((knob.y/ratio)|round(2))}};
   {{knob.param}}.coords = MetaModule::Coords::TopLeft;
   {{knob.param}}.image = "{{name}}/components/{{knob.image.name}}";
   {{knob.param}}.short_name = "{{knob.param}}";
@@ -31,8 +31,8 @@ void init_{{ name|lower }}() {
 
 {%- for input in assets.inputs %}
   MetaModule::JackInput injack{{input.id - 1}};
-  injack{{input.id - 1}}.x_mm = {{((input.coords.x/ratio)|round(2))}};
-  injack{{input.id - 1}}.y_mm = {{((input.coords.y/ratio)|round(2))}};
+  injack{{input.id - 1}}.x_mm = {{((input.x/ratio)|round(2))}};
+  injack{{input.id - 1}}.y_mm = {{((input.y/ratio)|round(2))}};
   injack{{input.id - 1}}.coords = MetaModule::Coords::TopLeft;
   injack{{input.id - 1}}.image = "{{name}}/components/{{input.image.name}}";
   {%- if input.name is not none %}
@@ -47,8 +47,8 @@ void init_{{ name|lower }}() {
 
 {%- for output in assets.outputs %}
   MetaModule::JackOutput outjack{{output.id - 1}};
-  outjack{{output.id - 1}}.x_mm = {{((output.coords.x/ratio)|round(2))}};
-  outjack{{output.id - 1}}.y_mm = {{((output.coords.y/ratio)|round(2))}};
+  outjack{{output.id - 1}}.x_mm = {{((output.x/ratio)|round(2))}};
+  outjack{{output.id - 1}}.y_mm = {{((output.y/ratio)|round(2))}};
   outjack{{output.id - 1}}.coords = MetaModule::Coords::TopLeft;
   outjack{{output.id - 1}}.image = "{{name}}/components/{{output.image.name}}";
   {%- if output.name is not none %}
@@ -63,8 +63,8 @@ void init_{{ name|lower }}() {
 
 {%- for led in assets.leds %}
   MetaModule::MonoLight led{{led.led}};
-  led{{led.led}}.x_mm = {{((led.coords.x/ratio)|round(2))}};
-  led{{led.led}}.y_mm = {{((led.coords.y/ratio)|round(2))}};
+  led{{led.led}}.x_mm = {{((led.x/ratio)|round(2))}};
+  led{{led.led}}.y_mm = {{((led.y/ratio)|round(2))}};
   led{{led.led}}.coords = MetaModule::Coords::TopLeft;
   led{{led.led}}.image = "{{name}}/components/{{led.image.name}}";
   led{{led.led}}.short_name = "LED {{led.led}}";

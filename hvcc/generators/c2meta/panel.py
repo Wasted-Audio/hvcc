@@ -11,7 +11,7 @@ from pathlib import Path
 from PIL import Image
 from pydantic_extra_types.color import Color
 
-from hvcc.types.metamodule import Assets, Coords, Panel, Size, UIElement
+from hvcc.types.metamodule import Assets, Panel, UIElement
 
 PANEL_HEIGHT = 240
 PANEL_MIN_WIDTH = 20
@@ -185,19 +185,17 @@ def _place_shelf_items(
         # Whole panel is one column wide -> center this lone item on the panel.
         item = shelf.items[0]
         img_w, img_h = image_size(item.image)
-        item.coords = Coords(
-            x=round((panel_width - img_w) / 2.0),
-            y=round(shelf_center_y - img_h / 2.0),
-        )
+        item.x=round((panel_width - img_w) / 2.0)
+        item.y=round(shelf_center_y - img_h / 2.0)
+
         return
 
     # Otherwise align each item to its column's center axis.
     for col, item in enumerate(shelf.items):
         img_w, img_h = image_size(item.image)
-        item.coords = Coords(
-            x=round(col_center_x[col] - img_w / 2.0),
-            y=round(shelf_center_y - img_h / 2.0),
-        )
+        item.x=round(col_center_x[col] - img_w / 2.0)
+        item.y=round(shelf_center_y - img_h / 2.0)
+
 
 
 def _place_items(
@@ -240,7 +238,7 @@ def layout_panel_assets(assets: Assets) -> Assets:
     )
 
     if not any(c.count for c in cat_infos):
-        assets.panel = Panel(size=Size(x=PANEL_MIN_WIDTH, y=PANEL_HEIGHT), color=color)
+        assets.panel = Panel(x=PANEL_MIN_WIDTH, y=PANEL_HEIGHT, color=color)
         return assets
 
     available_h = PANEL_HEIGHT - (MARGIN_Y * 2)
@@ -254,6 +252,6 @@ def layout_panel_assets(assets: Assets) -> Assets:
     allocated_heights = _allocate_heights(cat_infos, available_h)
     _place_items(cat_infos, allocated_heights, grid)
 
-    assets.panel = Panel(size=Size(x=grid.panel_width, y=PANEL_HEIGHT), color=color)
+    assets.panel = Panel(x=grid.panel_width, y=PANEL_HEIGHT, color=color)
 
     return assets

@@ -58,43 +58,35 @@ You can also optionally supply a dictionary of assets that make the panel, contr
         "knobs": [
             {
                 "param": "<receiver_name>",
-                "coords": {
-                    "x": 20,
-                    "y": 20
-                },
-                "image": "path/to/knob_image.png"
+                "image": "path/to/knob_image.png",
+                "x": 20,
+                "y": 20
             }
         ],
         "inputs": [
             {
-                "id": 0,
+                "id": 1,
                 "name": "input 1",
-                "coords": {
-                    "x": 18,
-                    "y": 60
-                },
-                "image": "path/to/socket_image.png"
+                "image": "path/to/socket_image.png",
+                "x": 18,
+                "y": 60
             }
         ],
         "outputs": [
             {
-                "id": 0,
+                "id": 1,
                 "name": "output 1",
-                "coords": {
-                    "x": 18,
-                    "y": 100
-                },
-                "image": "path/to/socket_image.png"
+                "image": "path/to/socket_image.png",
+                "x": 18,
+                "y": 100
             }
         ],
         "leds": [
             {
                 "led": "<sender_name>",
-                "coords": {
-                    "x": 25,
-                    "y": 40
-                },
-                "image": "path/to/led_image.png"
+                "image": "path/to/led_image.png",
+                "x": 25,
+                "y": 40
             }
         ]
     }

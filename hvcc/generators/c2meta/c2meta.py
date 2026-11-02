@@ -46,7 +46,8 @@ def ensure_panel_assets(
     if module.assets is not None and \
             module.assets.panel is not None and \
             module.assets.panel.image is not None and \
-            module.assets.panel.size is not None:
+            module.assets.panel.x is not None and \
+            module.assets.panel.y is not None:
         return module.assets
 
     if verbose:
@@ -65,10 +66,10 @@ def ensure_panel_assets(
     )
     panel_assets = layout_panel_assets(assets)
 
-    assert panel_assets.panel and panel_assets.panel.size and panel_assets.panel.color
+    assert panel_assets.panel and panel_assets.panel.x and panel_assets.panel.y and panel_assets.panel.color
     panel_img = Image.new(
         "RGBA",
-        (panel_assets.panel.size.x, panel_assets.panel.size.y),
+        (panel_assets.panel.x, panel_assets.panel.y),
         panel_assets.panel.color.as_rgb_tuple(),
     )
 
@@ -95,9 +96,9 @@ def write_asset_files(assets: Assets, out_dir: Path) -> None:
         for element in elements:
             shutil.copyfile(element.image, components_dir / element.image.name)
 
-            assert element.coords
+            assert element.x and element.y
             with Image.open(element.image) as img:
-                screenshot.alpha_composite(img, (element.coords.x, element.coords.y))
+                screenshot.alpha_composite(img, (element.x, element.y))
 
         screenshot.save(out_dir / "screenshot.png")
 
