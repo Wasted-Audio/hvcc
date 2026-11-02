@@ -30,34 +30,34 @@ void init_{{ name|lower }}() {
 {%- endfor %}
 
 {%- for input in assets.inputs %}
-  MetaModule::JackInput injack{{input.id}};
-  injack{{input.id}}.x_mm = {{((input.coords.x/ratio)|round(2))}};
-  injack{{input.id}}.y_mm = {{((input.coords.y/ratio)|round(2))}};
-  injack{{input.id}}.coords = MetaModule::Coords::TopLeft;
-  injack{{input.id}}.image = "{{name}}/components/{{input.image.name}}";
+  MetaModule::JackInput injack{{input.id - 1}};
+  injack{{input.id - 1}}.x_mm = {{((input.coords.x/ratio)|round(2))}};
+  injack{{input.id - 1}}.y_mm = {{((input.coords.y/ratio)|round(2))}};
+  injack{{input.id - 1}}.coords = MetaModule::Coords::TopLeft;
+  injack{{input.id - 1}}.image = "{{name}}/components/{{input.image.name}}";
   {%- if input.name is not none %}
-  injack{{input.id}}.short_name = "{{input.name}}";
+  injack{{input.id - 1}}.short_name = "{{input.name}}";
   {%- else %}
-  injack{{input.id}}.short_name = "Input {{input.id}}";
+  injack{{input.id - 1}}.short_name = "Input {{input.id}}";
   {%- endif %}
-  elements[{{ns.counter}}] = injack{{input.id}};
-  indices[{{ns.counter}}] = {.input_idx = InputID{{input.id}}};
+  elements[{{ns.counter}}] = injack{{input.id - 1}};
+  indices[{{ns.counter}}] = {.input_idx = InputID{{input.id - 1}}};
   {% set ns.counter = ns.counter + 1 %}
 {%- endfor %}
 
 {%- for output in assets.outputs %}
-  MetaModule::JackOutput outjack{{output.id}};
-  outjack{{output.id}}.x_mm = {{((output.coords.x/ratio)|round(2))}};
-  outjack{{output.id}}.y_mm = {{((output.coords.y/ratio)|round(2))}};
-  outjack{{output.id}}.coords = MetaModule::Coords::TopLeft;
-  outjack{{output.id}}.image = "{{name}}/components/{{output.image.name}}";
+  MetaModule::JackOutput outjack{{output.id - 1}};
+  outjack{{output.id - 1}}.x_mm = {{((output.coords.x/ratio)|round(2))}};
+  outjack{{output.id - 1}}.y_mm = {{((output.coords.y/ratio)|round(2))}};
+  outjack{{output.id - 1}}.coords = MetaModule::Coords::TopLeft;
+  outjack{{output.id - 1}}.image = "{{name}}/components/{{output.image.name}}";
   {%- if output.name is not none %}
-  outjack{{output.id}}.short_name = "{{output.name}}";
+  outjack{{output.id - 1}}.short_name = "{{output.name}}";
   {%- else %}
-  outjack{{output.id}}.short_name = "Output {{output.id}}";
+  outjack{{output.id - 1}}.short_name = "Output {{output.id}}";
   {%- endif %}
-  elements[{{ns.counter}}] = outjack{{output.id}};
-  indices[{{ns.counter}}] = {.output_idx = OutputID{{output.id}}};
+  elements[{{ns.counter}}] = outjack{{output.id - 1}};
+  indices[{{ns.counter}}] = {.output_idx = OutputID{{output.id - 1}}};
   {% set ns.counter = ns.counter + 1 %}
 {%- endfor %}
 

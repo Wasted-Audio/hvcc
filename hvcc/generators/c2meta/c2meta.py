@@ -17,8 +17,8 @@ from hvcc.generators.filters import filter_uniqueid
 from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
 from hvcc.types.compiler import CompilerMsg, CompilerNotif, CompilerResp, ExternInfo, Generator
 from hvcc.types.meta import Meta, MetaModule
+from hvcc.types.metamodule import Assets, Input, Knob, Led, Output, UIElement
 
-from .meta_types import Assets, Input, Knob, Led, Output, UIElement
 from .panel import layout_panel_assets
 
 
@@ -55,8 +55,8 @@ def ensure_panel_assets(
     assets = Assets(
         panel=module.assets.panel if module.assets is not None else None,
         knobs=[Knob(param=p.display) for _, p in externs.parameters.inParam],
-        inputs=[Input(id=i) for i in range(num_input_channels)],
-        outputs=[Output(id=i) for i in range(num_output_channels)],
+        inputs=[Input(id=i+1) for i in range(num_input_channels)],
+        outputs=[Output(id=i+1) for i in range(num_output_channels)],
         leds=[
             Led(led=p.display)
             for _, p in externs.parameters.outParam
@@ -136,9 +136,6 @@ class c2meta(Generator):
             out_dir = out_dir.absolute()
             if out_dir.exists():
                 shutil.rmtree(out_dir)
-
-            # copy over static files
-            shutil.copytree(Path(Path(__file__).parent, "static"), out_dir)
 
             # copy over generated C source files
             source_dir = Path(out_dir, "source")

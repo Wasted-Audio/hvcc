@@ -11,7 +11,7 @@ from pathlib import Path
 from PIL import Image
 from pydantic_extra_types.color import Color
 
-from hvcc.generators.c2meta.meta_types import Assets, Coords, Panel, Size, UIElement
+from hvcc.types.metamodule import Assets, Coords, Panel, Size, UIElement
 
 PANEL_HEIGHT = 240
 PANEL_MIN_WIDTH = 20

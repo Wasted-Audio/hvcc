@@ -5,7 +5,6 @@ file(GLOB C_SOURCES "source/*.c")
 file(GLOB CPP_SOURCES "source/*.cpp")
 
 target_sources({{ name }} PRIVATE
-    compat.cpp
     ${C_SOURCES}
     ${CPP_SOURCES}
 )

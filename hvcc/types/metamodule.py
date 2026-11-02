@@ -3,9 +3,10 @@
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
+from collections.abc import Iterable
 from pathlib import Path
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 from pydantic_extra_types.color import Color
 
 
@@ -25,14 +26,14 @@ class Size(XY):
 class Knob(BaseModel):
     param: str
     coords: Coords | None = None
-    image: Path = Field(default=Path(__file__).parent / 'assets/knob.png')
+    image: Path = Field(default=Path(__file__).parent / '../generators/c2meta/assets/knob.png')
 
 
 class Jack(BaseModel):
     id: int
     name: str | None = None
     coords: Coords | None = None
-    image: Path = Field(default=Path(__file__).parent / 'assets/jack.png')
+    image: Path = Field(default=Path(__file__).parent / '../generators/c2meta/assets/jack.png')
 
 
 class Input(Jack):
@@ -46,7 +47,7 @@ class Output(Jack):
 class Led(BaseModel):
     led: str
     coords: Coords | None = None
-    image: Path = Field(default=Path(__file__).parent / 'assets/led.png')
+    image: Path = Field(default=Path(__file__).parent / '../generators/c2meta/assets/led.png')
 
 
 class Panel(BaseModel):
@@ -66,6 +67,22 @@ class Assets(BaseModel):
     inputs: list[Input] = []
     outputs: list[Output] = []
     leds: list[Led] = []
+
+    @model_validator(mode='after')
+    def check_ports(self) -> 'Assets':
+        def _probe_jack_ids(self, ports: Iterable[Input|Output]) -> None:
+            ids: list[int] = []
+            for port in ports:
+                if port.id < 1:
+                    raise ValueError('Jack index must start at 1 (PD numbering)')
+                if port.id in ids:
+                    raise ValueError(f"Jack index '{port.id}' used more than once")
+                ids.append(port.id)
+
+        _probe_jack_ids(self, self.inputs)
+        _probe_jack_ids(self, self.outputs)
+
+        return self
 
 
 UIElement = Knob | Input | Output| Led
