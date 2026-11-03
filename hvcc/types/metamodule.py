@@ -3,7 +3,6 @@
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
-from collections.abc import Iterable
 from pathlib import Path
 
 from pydantic import BaseModel, Field, field_validator, model_validator
@@ -57,6 +56,7 @@ class Panel(XY, BaseModel):
             raise ValueError('Panel height must be 240 pixels')
         return y
 
+
 class Assets(BaseModel):
     panel: Panel | None = None
     knobs: list[Knob] = []
@@ -66,7 +66,7 @@ class Assets(BaseModel):
 
     @model_validator(mode='after')
     def check_ports(self) -> 'Assets':
-        def _probe_jack_ids(self, ports: Iterable[Input|Output]) -> None:
+        def _probe_jack_ids(ports: list[Input] | list[Output]) -> None:
             ids: list[int] = []
             for port in ports:
                 if port.id < 1:
@@ -75,8 +75,8 @@ class Assets(BaseModel):
                     raise ValueError(f"Jack index '{port.id}' used more than once")
                 ids.append(port.id)
 
-        _probe_jack_ids(self, self.inputs)
-        _probe_jack_ids(self, self.outputs)
+        _probe_jack_ids(self.inputs)
+        _probe_jack_ids(self.outputs)
 
         return self
 
