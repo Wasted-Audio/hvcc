@@ -4,6 +4,10 @@ CHANGELOG
 Next Release
 -----
 
+Features:
+
+* Support '[list]' foreach/join/unjoin functions
+
 Updates:
 
 * Python typing syntax

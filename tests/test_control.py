@@ -361,6 +361,15 @@ class TestPdControlPatches(TestPdControlBase):
     def test_list_store3(self):
         self._test_control_patch("test-list_store3.pd")
 
+    def test_list_foreach(self):
+        self._test_control_patch("test-list_foreach.pd")
+
+    def test_list_join(self):
+        self._test_control_patch("test-list_join.pd")
+
+    def test_list_unjoin(self):
+        self._test_control_patch("test-list_unjoin.pd")
+
     # Threshold
 
     def test_threshold(self):

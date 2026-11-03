@@ -68,6 +68,9 @@ class ControlMessage(HeavyObject):
                         # NOTE(mhroth): messages can contain special arguments
                         # which are interpreted differently than other strings
                         send_message_list.append(f"msg_setFloat(m, {i},  static_cast<float>(HV_N_SIMD));")
+                    elif e == "\\":
+                        # Handle escaped space
+                        send_message_list.append(f"msg_setSymbol(m, {i}, \" \");")
                     else:
                         send_message_list.append(f"msg_setSymbol(m, {i}, \"{e}\");")
 
