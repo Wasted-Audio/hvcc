@@ -16,6 +16,10 @@ Send objects will become LEDs on the panel. These can also have a range, but wil
 
 All audio inputs and outputs will become jack sockets. Values are normalized from `-10:10` to `-1:1` and back to match typical PD audio operations with the MetaModule CV standard. You will need to do additional scaling in your patch if you want to use the raw CV values internally (e.g. for Pitch calculations).
 
+### Jack Detection
+
+Using the receivers `[r __mm_in_patched]` and `[r __mm_out_patched]` you can get a tuple of input/output jack number and patched status (0 or 1).
+
 ## Metadata
 
 In order to set custom information you should supply a `metadata.json` using `-m`. We will use the `meta` subsection:
@@ -47,7 +51,7 @@ In order to set custom information you should supply a `metadata.json` using `-m
 
 You can optionally set the `sdk_path` to an absolute or relative path where you have your `metamodule-plugin-sdk` folder. By default this is expected one level above the root of the output folder. Make sure that it has a trailing slash `/`.
 
-You can also optionally supply a dictionary of assets that make the panel, controls and sockets of your module. If you don't add the `assets` section a panel will be generated automatically. Make sure that your description here is exact and complete. You have to use the same names for all receivers and senders and use the correct amount of input and output IDs. Do note that audio i/o starts counting from 0, where PD counts from 1.
+You can also optionally supply a dictionary of assets that make the panel, controls and sockets of your module. If you don't add the `assets` section a panel will be generated automatically. Make sure that your description here is exact and complete. You have to use the same names for all receivers and senders and use the correct amount of input and output IDs. Audio i/o starts counting from 1 just like in PD.
 
 ```json
     {

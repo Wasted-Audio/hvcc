@@ -23,6 +23,5 @@ The user should be able to generate a full MetaModule project, build it and run 
 ## Future Improvements
 
 - Allow sliders, switches and encoders
-- Send jack connection status to the patch
 - Display table contents on the panel
 - Somehow build/export multiple modules in a single plugin
