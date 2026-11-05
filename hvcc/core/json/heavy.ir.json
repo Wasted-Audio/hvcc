@@ -2026,6 +2026,13 @@
       "description": "path to NAM file",
       "default": "",
       "required": true
+    },
+    {
+      "name": "size",
+      "value_type": "string",
+      "description": "size of the A2 network (lite or full)",
+      "default": "full",
+      "required": false
     }],
     "perf": {}
   },
@@ -2131,6 +2138,13 @@
       "description": "path to NAM file",
       "default": "",
       "required": true
+    },
+    {
+      "name": "size",
+      "value_type": "string",
+      "description": "size of the A2 network (lite or full)",
+      "default": "full",
+      "required": false
     }],
     "perf": {}
   },
@@ -2152,6 +2166,13 @@
       "description": "path to NAM file",
       "default": "",
       "required": true
+    },
+    {
+      "name": "size",
+      "value_type": "string",
+      "description": "size of the A2 network (lite or full)",
+      "default": "full",
+      "required": false
     }],
     "perf": {}
   },
