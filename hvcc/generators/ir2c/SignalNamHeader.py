@@ -36,6 +36,8 @@ class ModelNet(Enum):
     Feather = 2
     Lite = 3
     Standard = 4
+    A2Lite = 5
+    A2Full = 6
 
 
 def to_symbol_stem(nam_path: Path) -> str:
@@ -62,40 +64,106 @@ def format_float(value: float) -> str:
     return f"{format(value, '.17g')}f"
 
 
-def load_nam_file(nam_file: Path) -> tuple[ModelNet, int, list[float]]:
+def load_nam_file(nam_file: Path, size: str | None = None) -> tuple[ModelNet, int, list[float]]:
+    if size is not None and size not in ("lite", "full"):
+        raise ValueError(f"Invalid size: {size}, expected 'lite', 'full' or None")
+
     with nam_file.open("r", encoding="utf-8") as f:
         payload = json.load(f)
 
-    if "weights" not in payload or not isinstance(payload["weights"], list):
-        raise ValueError("Input .nam file must contain a 'weights' array")
+    if payload.get("weights") is not None and \
+        isinstance(payload.get("weights"), list) and \
+        payload['weights']:
 
-    weights = payload["weights"]
-    for idx, value in enumerate(weights):
-        if not isinstance(value, (int, float)):
-            raise TypeError(f"weights[{idx}] is not numeric")
+        weights = payload['weights']
 
-    weights_len = len(weights)
+        weights_len = len(weights)
 
-    if weights_len == 842:
-        model_net = ModelNet.Nano
-    elif weights_len == 3026:
-        model_net = ModelNet.Feather
-    elif weights_len == 6554:
-        model_net = ModelNet.Lite
-    elif weights_len == 13802:
-        model_net = ModelNet.Standard
-    else:
-        raise ValueError(f"Invalid weights length: {weights_len}")
+        if weights_len == 842:
+            model_net = ModelNet.Nano
+        elif weights_len == 3026:
+            model_net = ModelNet.Feather
+        elif weights_len == 6554:
+            model_net = ModelNet.Lite
+        elif weights_len == 13802:
+            model_net = ModelNet.Standard
+        elif weights_len == 1871:
+            model_net = ModelNet.A2Lite
+        elif weights_len == 12146:
+            model_net = ModelNet.A2Full
+        else:
+            raise ValueError(f"Invalid weights length: {weights_len}")
 
-    return model_net, weights_len, weights
+        return model_net, weights_len, weights
+
+    config = payload.get("config")
+    submodules = config.get("submodels") if config else None
+
+    if not isinstance(submodules, list):
+        raise TypeError("Invalid or missing submodules in config")
+
+    # Without a size, use the highest quality submodel: that is how the exporter
+    # orders them, by max_value. Sizing the loop down to that one submodel lets
+    # the loop below do the matching, instead of duplicating it.
+    if size is None:
+        best = None
+        for sub in submodules:
+            if best is None or sub.get("max_value", -1) > best.get("max_value", -1):
+                best = sub
+        if best is None:
+            raise ValueError("No submodules in config")
+        submodules = [best]
+
+    for sub in submodules:
+        if sub.get("model") is None:
+            continue
+
+        model = sub["model"]
+        model_config = model.get("config")
+        if not model_config:
+            continue
+        if "layers" not in model_config or not isinstance(model_config["layers"], list) \
+            or not model_config["layers"]:
+            continue
+
+        layers = model_config["layers"]
+        channels = layers[0]["channels"]
+
+        is_lite = channels == 3
+        is_full = channels == 8
+
+        # Submodels that are not A2 wave-nets are skipped: a container can hold
+        # other architectures next to the ones we want.
+        if not is_lite and not is_full:
+            continue
+
+        if size == "lite" and not is_lite:
+            continue
+        if size == "full" and not is_full:
+            continue
+
+        model_net = ModelNet.A2Lite if is_lite else ModelNet.A2Full
+
+        # The weights are on the submodel's model, not on the submodel itself.
+        weights = model.get("weights")
+        if not weights:
+            raise ValueError(f"Submodel with {channels} channels has no weights")
+
+        weights_len = len(weights)
+
+        return model_net, weights_len, weights
+
+    if size is None:
+        raise ValueError("No A2 lite or full submodel in config")
+    raise ValueError(f"No '{size}' submodel in config")
 
 
-def convert_nam_to_header(nam_file: Path) -> str:
+def convert_nam_to_header(nam_file: Path, size: str | None = None) -> str:
     symbol_stem = to_symbol_stem(nam_file)
     count_name = f"{symbol_stem}WeightsCount"
     weights_name = f"{symbol_stem}Weights"
 
-    _, weights_len, weights = load_nam_file(nam_file)
+    _, weights_len, weights = load_nam_file(nam_file, size=size)
 
     lines = [
         "#pragma once",

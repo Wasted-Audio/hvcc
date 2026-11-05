@@ -62,3 +62,27 @@ hv_size_t sNam_standard_init(SignalNamStandard *o, const float* weights) {
 void sNam_standard_free(SignalNamStandard *o) {
   MicroNAM_StandardNet_Destroy(o->standardnet);
 }
+
+
+hv_size_t sNam_a2lite_init(SignalNamA2Lite *o, const float* weights) {
+  MicroNAM_A2LiteNet* a2litenet = MicroNAM_A2LiteNet_Create();
+  MicroNAM_A2LiteNet_LoadWeights(a2litenet, weights);
+  o->a2litenet = a2litenet;
+  return sizeof(float) * 1871;
+}
+
+void sNam_a2lite_free(SignalNamA2Lite *o) {
+  MicroNAM_A2LiteNet_Destroy(o->a2litenet);
+}
+
+
+hv_size_t sNam_a2full_init(SignalNamA2Full *o, const float* weights) {
+  MicroNAM_A2FullNet* a2fullnet = MicroNAM_A2FullNet_Create();
+  MicroNAM_A2FullNet_LoadWeights(a2fullnet, weights);
+  o->a2fullnet = a2fullnet;
+  return sizeof(float) * 12146;
+}
+
+void sNam_a2full_free(SignalNamA2Full *o) {
+  MicroNAM_A2FullNet_Destroy(o->a2fullnet);
+}

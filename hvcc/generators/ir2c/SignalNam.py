@@ -40,6 +40,10 @@ class SignalNam(HeavyObject):
             return "SignalNamLite"
         elif obj_type == '__nam_standard~f':
             return "SignalNamStandard"
+        elif obj_type == '__nam_a2lite~f':
+            return "SignalNamA2Lite"
+        elif obj_type == '__nam_a2full~f':
+            return "SignalNamA2Full"
         else:
             raise UnknownModelException()
 
@@ -58,7 +62,9 @@ class SignalNam(HeavyObject):
             "MicroNam/include/StandardNet.h",
             "MicroNam/include/NanoNet.h",
             "MicroNam/include/LiteNet.h",
-            "MicroNam/include/FeatherNet.h"
+            "MicroNam/include/FeatherNet.h",
+            "MicroNam/include/A2LiteNet.h",
+            "MicroNam/include/A2FullNet.h"
         }
 
     @classmethod
@@ -74,6 +80,10 @@ class SignalNam(HeavyObject):
             return [f"sNam_lite_init(&sNam_{obj_id}, {weights}Weights);"]
         elif obj_type == '__nam_standard~f':
             return [f"sNam_standard_init(&sNam_{obj_id}, {weights}Weights);"]
+        elif obj_type == '__nam_a2lite~f':
+            return [f"sNam_a2lite_init(&sNam_{obj_id}, {weights}Weights);"]
+        elif obj_type == '__nam_a2full~f':
+            return [f"sNam_a2full_init(&sNam_{obj_id}, {weights}Weights);"]
         else:
             raise UnknownModelException()
 
@@ -87,6 +97,10 @@ class SignalNam(HeavyObject):
             return [f"sNam_lite_free(&sNam_{obj_id});"]
         elif obj_type == '__nam_standard~f':
             return [f"sNam_standard_free(&sNam_{obj_id});"]
+        elif obj_type == '__nam_a2lite~f':
+            return [f"sNam_a2lite_free(&sNam_{obj_id});"]
+        elif obj_type == '__nam_a2full~f':
+            return [f"sNam_a2full_free(&sNam_{obj_id});"]
         else:
             raise UnknownModelException()
 
@@ -100,6 +114,10 @@ class SignalNam(HeavyObject):
             function = "__hv_nam_lite_f(&sNam_{0}, VIf({1}), VOf({2}));"
         elif obj_type == '__nam_standard~f':
             function = "__hv_nam_standard_f(&sNam_{0}, VIf({1}), VOf({2}));"
+        elif obj_type == '__nam_a2lite~f':
+            function = "__hv_nam_a2lite_f(&sNam_{0}, VIf({1}), VOf({2}));"
+        elif obj_type == '__nam_a2full~f':
+            function = "__hv_nam_a2full_f(&sNam_{0}, VIf({1}), VOf({2}));"
         else:
             raise UnknownModelException()
 
@@ -113,8 +131,9 @@ class SignalNam(HeavyObject):
     @classmethod
     def get_C_gen_header_code(cls, obj_type: str, obj_id: str, args: dict) -> tuple[str, str] | None:
         nam_file = Path(args["nam"])
+        size = args.get("size", "full")
         header_name = f"{to_symbol_stem(nam_file)}.h"
 
-        header_str = convert_nam_to_header(nam_file)
+        header_str = convert_nam_to_header(nam_file, size=size)
 
         return header_name, header_str

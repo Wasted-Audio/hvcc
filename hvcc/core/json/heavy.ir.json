@@ -2113,6 +2113,48 @@
     }],
     "perf": {}
   },
+    "__nam_a2lite~f": {
+    "inlets": [
+      "~f>"
+    ],
+    "ir": {
+      "control": false,
+      "signal": true,
+      "init": true
+    },
+    "outlets": [
+      "~f>"
+    ],
+    "args": [{
+      "name": "nam",
+      "value_type": "string",
+      "description": "path to NAM file",
+      "default": "",
+      "required": true
+    }],
+    "perf": {}
+  },
+    "__nam_a2full~f": {
+    "inlets": [
+      "~f>"
+    ],
+    "ir": {
+      "control": false,
+      "signal": true,
+      "init": true
+    },
+    "outlets": [
+      "~f>"
+    ],
+    "args": [{
+      "name": "nam",
+      "value_type": "string",
+      "description": "path to NAM file",
+      "default": "",
+      "required": true
+    }],
+    "perf": {}
+  },
   "__neq": {
     "inlets": [
       "-->",
