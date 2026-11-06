@@ -104,6 +104,8 @@ class ir2c:
         "__nam_feather~f": SignalNam,
         "__nam_lite~f": SignalNam,
         "__nam_standard~f": SignalNam,
+        "__nam_a2lite~f": SignalNam,
+        "__nam_a2full~f": SignalNam,
         "__del1~f": SignalDel1,
         "__tabread~if": SignalTabread,
         "__tabread~f": SignalTabread,

@@ -11,6 +11,8 @@ typedef struct MicroNAM_NanoNet MicroNAM_NanoNet;
 typedef struct MicroNAM_FeatherNet MicroNAM_FeatherNet;
 typedef struct MicroNAM_LiteNet MicroNAM_LiteNet;
 typedef struct MicroNAM_StandardNet MicroNAM_StandardNet;
+typedef struct MicroNAM_A2LiteNet MicroNAM_A2LiteNet;
+typedef struct MicroNAM_A2FullNet MicroNAM_A2FullNet;
 
 // --- NanoNet API ---
 MicroNAM_NanoNet* MicroNAM_NanoNet_Create(void);
@@ -39,6 +41,21 @@ void MicroNAM_StandardNet_Destroy(MicroNAM_StandardNet* net);
 void MicroNAM_StandardNet_Reset(MicroNAM_StandardNet* net);
 void MicroNAM_StandardNet_LoadWeights(MicroNAM_StandardNet* net, const float* weights);
 void MicroNAM_StandardNet_Process(MicroNAM_StandardNet* net, float* input, float* output);
+
+// --- A2 Lite API ---
+MicroNAM_A2LiteNet* MicroNAM_A2LiteNet_Create(void);
+void MicroNAM_A2LiteNet_Destroy(MicroNAM_A2LiteNet* net);
+void MicroNAM_A2LiteNet_Reset(MicroNAM_A2LiteNet* net);
+void MicroNAM_A2LiteNet_LoadWeights(MicroNAM_A2LiteNet* net, const float* weights);
+void MicroNAM_A2LiteNet_Process(MicroNAM_A2LiteNet* net, float* input, float* output);
+
+// --- A2 Full API ---
+MicroNAM_A2FullNet* MicroNAM_A2FullNet_Create(void);
+void MicroNAM_A2FullNet_Destroy(MicroNAM_A2FullNet* net);
+void MicroNAM_A2FullNet_Reset(MicroNAM_A2FullNet* net);
+void MicroNAM_A2FullNet_LoadWeights(MicroNAM_A2FullNet* net, const float* weights);
+void MicroNAM_A2FullNet_Process(MicroNAM_A2FullNet* net, float* input, float* output);
+
 
 #ifdef __cplusplus
 }

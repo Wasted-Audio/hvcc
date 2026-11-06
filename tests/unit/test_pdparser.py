@@ -96,5 +96,5 @@ def test_nam_path(tmp_path: Path):
     graph = PdParser().graph_from_file(pd_path)
     assert not graph.get_notices().has_error
 
-    nam_object = graph.get_objects()[0].get_objects()[1]
+    nam_object = graph.get_objects()[0].get_objects()[3]
     assert Path(nam_object.obj_dict["nam"]) == tmp_path / "test.nam"
