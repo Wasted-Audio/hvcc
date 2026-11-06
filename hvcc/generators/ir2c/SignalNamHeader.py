@@ -150,6 +150,9 @@ def load_nam_file(nam_file: Path, size: str | None = None) -> tuple[ModelNet, in
             raise ValueError(f"Submodel with {channels} channels has no weights")
 
         weights_len = len(weights)
+        expected_len = 1871 if is_lite else 12146
+        if weights_len != expected_len:
+            raise ValueError(f"Invalid weights length: {weights_len}, expected: {expected_len}")
 
         return model_net, weights_len, weights
 
@@ -160,8 +163,8 @@ def load_nam_file(nam_file: Path, size: str | None = None) -> tuple[ModelNet, in
 
 def convert_nam_to_header(nam_file: Path, size: str | None = None) -> str:
     symbol_stem = to_symbol_stem(nam_file)
-    count_name = f"{symbol_stem}WeightsCount"
-    weights_name = f"{symbol_stem}Weights"
+    count_name = f"{symbol_stem}{size or ''}WeightsCount"
+    weights_name = f"{symbol_stem}{size or ''}Weights"
 
     _, weights_len, weights = load_nam_file(nam_file, size=size)
 

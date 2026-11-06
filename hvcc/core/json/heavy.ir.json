@@ -2143,7 +2143,7 @@
       "name": "size",
       "value_type": "string",
       "description": "size of the A2 network (lite or full)",
-      "default": "full",
+      "default": "lite",
       "required": false
     }],
     "perf": {}

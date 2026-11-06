@@ -70,7 +70,7 @@ class SignalNam(HeavyObject):
     @classmethod
     def get_C_init(cls, obj_type: str, obj_id: str, args: dict) -> list[str]:
         nam_file = Path(args["nam"])
-        weights = to_symbol_stem(nam_file)
+        weights = to_symbol_stem(nam_file) + (args.get("size") or "")
 
         if obj_type == '__nam_nano~f':
             return [f"sNam_nano_init(&sNam_{obj_id}, {weights}Weights);"]
@@ -132,7 +132,7 @@ class SignalNam(HeavyObject):
     def get_C_gen_header_code(cls, obj_type: str, obj_id: str, args: dict) -> tuple[str, str] | None:
         nam_file = Path(args["nam"])
         size = args.get("size", "full")
-        header_name = f"{to_symbol_stem(nam_file)}.h"
+        header_name = f"{to_symbol_stem(nam_file)}{size or ''}.h"
 
         header_str = convert_nam_to_header(nam_file, size=size)
 

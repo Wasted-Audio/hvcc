@@ -6,6 +6,6 @@
 #X obj 37 37 inlet~;
 #X obj 37 145 outlet~;
 #X restore 39 89 pd @hv_obj __nam~f \$1 \$2;
-#X text 39 197 @hv_arg \$2 size string "full" false;
+#X text 39 197 @hv_arg \$2 size string full false;
 #X connect 0 0 3 0;
 #X connect 3 0 1 0;
