@@ -776,7 +776,8 @@ static inline void __hv_fms_f(hv_bInf_t bIn0, hv_bInf_t bIn1, hv_bInf_t bIn2, hv
 #endif // HV_SIMD_FMA
 #elif HV_SIMD_NEON
 #if __ARM_ARCH >= 8
-  *bOut = vfmsq_f32(bIn2, bIn0, bIn1);
+  // NOTE: vfmsq_f32(a, b, c) computes a - b*c, so negate the addend and use fma for b*c - a
+  *bOut = vfmaq_f32(vnegq_f32(bIn2), bIn0, bIn1);
 #else
   // NOTE(mhroth): it turns out, fma SUUUUCKS on lesser ARM architectures
   *bOut = vsubq_f32(vmulq_f32(bIn0, bIn1), bIn2);
