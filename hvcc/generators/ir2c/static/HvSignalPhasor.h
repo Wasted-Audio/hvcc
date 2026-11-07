@@ -25,8 +25,10 @@ extern "C" {
 
 typedef struct SignalPhasor {
 #if HV_SIMD_AVX
-  __m256 phase; // current phase
-  __m256 inc;   // phase increment
+  // AVX has no 256-bit integer instructions: the 32-bit fixed-point phase of the
+  // SSE version is kept as two halves (lanes 0-3 and 4-7)
+  __m128i phase[2];
+  __m128i inc;
 #elif HV_SIMD_SSE
   __m128i phase;
   __m128i inc;
@@ -51,37 +53,27 @@ void sPhasor_k_onMessage(HeavyContextInterface *_c, SignalPhasor *o, int letIn, 
 
 void sPhasor_onMessage(HeavyContextInterface *_c, SignalPhasor *o, int letIn, const HvMessage *m);
 
+#if HV_SIMD_AVX
+// 32-bit fixed-point phase -> float in [0,1)
+static inline __m128 __hv_phasor_to_f_sse(__m128i p) {
+  return _mm_sub_ps(_mm_castsi128_ps(_mm_or_si128(_mm_srli_epi32(p, 9), _mm_set1_epi32(0x3F800000))),
+      _mm_set1_ps(1.0f));
+}
+#endif
+
 static inline void __hv_phasor_f(SignalPhasor *o, hv_bInf_t bIn, hv_bOutf_t bOut) {
 #if HV_SIMD_AVX
-  __m256 p = _mm256_mul_ps(bIn, _mm256_set1_ps(o->step.f2sc)); // a b c d e f g h
-
-  __m256 z = _mm256_setzero_ps();
-
-  // http://stackoverflow.com/questions/11906814/how-to-rotate-an-sse-avx-vector
-  __m256 a = _mm256_permute_ps(p, _MM_SHUFFLE(2,1,0,3)); // d a b c h e f g
-  __m256 b = _mm256_permute2f128_ps(a, a, 0x01);         // h e f g d a b c
-  __m256 c = _mm256_blend_ps(a, b, 0x10);                // d a b c d e f g
-  __m256 d = _mm256_blend_ps(c, z, 0x01);                // 0 a b c d e f g
-  __m256 e = _mm256_add_ps(p, d); // a (a+b) (b+c) (c+d) (d+e) (e+f) (f+g) (g+h)
-
-  __m256 f = _mm256_permute_ps(e, _MM_SHUFFLE(1,0,3,2)); // (b+c) (c+d) a (a+b) (f+g) (g+h) (d+e) (e+f)
-  __m256 g = _mm256_permute2f128_ps(f, f, 0x01);         // (f+g) (g+h) (d+e) (e+f) (b+c) (c+d) a (a+b)
-  __m256 h = _mm256_blend_ps(f, g, 0x33);                // (b+c) (c+d) a (a+b) (b+c) (c+d) (d+e) (e+f)
-  __m256 i = _mm256_blend_ps(h, z, 0x03);                // 0 0 a (a+b) (b+c) (c+d) (d+e) (e+f)
-  __m256 j = _mm256_add_ps(e, i); // a (a+b) (a+b+c) (a+b+c+d) (b+c+d+e) (c+d+e+f) (d+e+f+g) (e+f+g+h)
-
-  __m256 k = _mm256_permute2f128_ps(j, z, 0x02);         // 0 0 0 0 a (a+b) (a+b+c) (a+b+c+d) (b+c+d+e)
-  __m256 m = _mm256_add_ps(j, k); // a (a+b) (a+b+c) (a+b+c+d) (a+b+c+d+e) (a+b+c+d+e+f) (a+b+c+d+e+f+g) (a+b+c+d+e+f+g+h)
-
-  __m256 n = _mm256_or_ps(_mm256_andnot_ps(
-      _mm256_set1_ps(-INFINITY),
-      _mm256_add_ps(o->phase, m)),
-      _mm256_set1_ps(1.0f));
-
-  *bOut = _mm256_sub_ps(n, _mm256_set1_ps(1.0f));
-
-  __m256 x = _mm256_permute_ps(n, _MM_SHUFFLE(3,3,3,3));
-  o->phase = _mm256_permute2f128_ps(x, x, 0x11);
+  const __m128 f2sc = _mm_set1_ps(o->step.f2sc);
+  __m128i lo = _mm_cvtps_epi32(_mm_mul_ps(_mm256_castps256_ps128(bIn), f2sc)); // convert frequency to step
+  __m128i hi = _mm_cvtps_epi32(_mm_mul_ps(_mm256_extractf128_ps(bIn, 1), f2sc));
+  lo = _mm_add_epi32(lo, _mm_slli_si128(lo, 4)); // prefix sum of the steps, as in the SSE version
+  lo = _mm_add_epi32(lo, _mm_slli_si128(lo, 8));
+  hi = _mm_add_epi32(hi, _mm_slli_si128(hi, 4));
+  hi = _mm_add_epi32(hi, _mm_slli_si128(hi, 8));
+  lo = _mm_add_epi32(o->phase[0], lo);
+  hi = _mm_add_epi32(_mm_shuffle_epi32(lo, _MM_SHUFFLE(3,3,3,3)), hi);
+  *bOut = _mm256_insertf128_ps(_mm256_castps128_ps256(__hv_phasor_to_f_sse(lo)), __hv_phasor_to_f_sse(hi), 1);
+  o->phase[0] = _mm_shuffle_epi32(hi, _MM_SHUFFLE(3,3,3,3));
 #elif HV_SIMD_SSE
   __m128i p = _mm_cvtps_epi32(_mm_mul_ps(bIn, _mm_set1_ps(o->step.f2sc))); // convert frequency to step
   p = _mm_add_epi32(p, _mm_slli_si128(p, 4)); // add incremental steps to phase (prefix sum)
@@ -109,11 +101,10 @@ static inline void __hv_phasor_f(SignalPhasor *o, hv_bInf_t bIn, hv_bOutf_t bOut
 
 static inline void __hv_phasor_k_f(SignalPhasor *o, hv_bOutf_t bOut) {
 #if HV_SIMD_AVX
-  *bOut = _mm256_sub_ps(o->phase, _mm256_set1_ps(1.0f));
-  o->phase = _mm256_or_ps(_mm256_andnot_ps(
-      _mm256_set1_ps(-INFINITY),
-      _mm256_add_ps(o->phase, o->inc)),
-      _mm256_set1_ps(1.0f));
+  *bOut = _mm256_insertf128_ps(_mm256_castps128_ps256(
+      __hv_phasor_to_f_sse(o->phase[0])), __hv_phasor_to_f_sse(o->phase[1]), 1);
+  o->phase[0] = _mm_add_epi32(o->phase[0], o->inc);
+  o->phase[1] = _mm_add_epi32(o->phase[1], o->inc);
 #elif HV_SIMD_SSE
   *bOut = _mm_sub_ps(_mm_castsi128_ps(
       _mm_or_si128(_mm_srli_epi32(o->phase, 9),
