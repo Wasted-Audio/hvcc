@@ -31,6 +31,14 @@ class TestPdSignalPatches(TestPdSignalBase):
     def test_phasor_control(self):
         self._test_signal_patch("test-phasor-control.pd")
 
+    def test_delread4(self):
+        # golden file rendered with Pd vanilla 0.56-2 (tests/render_pd_golden.py)
+        self._test_signal_patch("test-delread4.pd")
+
+    def test_tabread4(self):
+        # golden file rendered with Pd vanilla 0.56-2 (tests/render_pd_golden.py)
+        self._test_signal_patch("test-tabread4.pd")
+
 
 def main():
     parser = argparse.ArgumentParser(
