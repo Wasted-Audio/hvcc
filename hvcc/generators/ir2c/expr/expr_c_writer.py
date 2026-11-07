@@ -88,7 +88,9 @@ class ExprCWriter:
         for i in range(len(tree.nodes)):
             node = tree.nodes[i]
             if node.type == "num_i":
-                tree.nodes[i] = ExprNode("func", "_load_i", [node])
+                # all SIMD buffers of expr~ are float: an integer vector would be
+                # reinterpreted bit by bit (e.g. on NEON), so load integers as floats
+                tree.nodes[i] = ExprNode("func", "_load_f", [ExprNode("num_f", f"{node.value}.0f")])
             elif node.type == "num_f":
                 tree.nodes[i] = ExprNode("func", "_load_f", [node])
             else:
@@ -256,6 +258,16 @@ class ExprOpMap:
     def get_hv_func(cls, symbol: str) -> str:
         return cls.op_map[symbol]
 
+    # SIMD comparisons return a bit mask, expr~ needs 1.0 or 0.0
+    simd_op_map = {
+        "<":            "__hv_lt_expr_f",
+        "<=":           "__hv_lte_expr_f",
+        ">":            "__hv_gt_expr_f",
+        ">=":           "__hv_gte_expr_f",
+        "==":           "__hv_eq_expr_f",
+        "!=":           "__hv_neq_expr_f",
+    }
+
     @classmethod
     def get_hv_func_simd(cls, symbol: str) -> str:
-        return f"__{cls.op_map[symbol]}"
+        return cls.simd_op_map.get(symbol, f"__{cls.op_map[symbol]}")
