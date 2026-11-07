@@ -15,6 +15,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
+import re
 import platform
 import shutil
 import subprocess
@@ -43,6 +44,27 @@ class TestPdControlBase(HvBaseTest):
         ).splitlines()
 
         return [x.decode('utf-8') for x in output]
+
+    # samples per vector for each SIMD flag; the sample rate is set in tests/src/test_control.c
+    SIMD_WIDTH = {"HV_SIMD_NONE": 1, "HV_SIMD_SSE": 4, "HV_SIMD_SSE_FMA": 4, "HV_SIMD_AVX": 8, "HV_SIMD_NEON": 4}
+    SAMPLE_RATE = 48000.0
+
+    def align_vector_timestamps(self, result: List[str], golden: List[str], flag: str) -> List[str]:
+        """Messages from signal objects (e.g. snapshot~) are timed at vector boundaries, so with
+        SIMD they can arrive up to one vector later than in the golden file (HV_SIMD_NONE).
+        Returns the result with such timestamps replaced by the golden ones; any other
+        difference is left for assertEqual to report.
+        """
+        tolerance = 1000.0 * self.SIMD_WIDTH[flag] / self.SAMPLE_RATE + 0.001  # + rounding of %.3f
+        stamp = re.compile(r"^\[@ ([0-9.]+)\] ")
+        aligned = []
+        for r, g in zip(result, golden):
+            mr, mg = stamp.match(r), stamp.match(g)
+            if mr and mg and r[mr.end():] == g[mg.end():] \
+                    and 0.0 <= float(mr.group(1)) - float(mg.group(1)) < tolerance:
+                r = g
+            aligned.append(r)
+        return aligned + result[len(golden):]
 
     def create_fail_message(
         self,
@@ -124,22 +146,26 @@ class TestPdControlBase(HvBaseTest):
                 if platform.machine().startswith("x86"):
                     # SSE
                     result = self.compile_and_run(c_sources, out_dir, num_iterations, "HV_SIMD_SSE")
+                    result = self.align_vector_timestamps(result, golden, "HV_SIMD_SSE")
                     message = fail_message or self.create_fail_message(result, golden, "HV_SIMD_SSE")
                     self.assertEqual(result, golden, message)
 
                     # SSE with FMA
                     result = self.compile_and_run(c_sources, out_dir, num_iterations, "HV_SIMD_SSE_FMA")
+                    result = self.align_vector_timestamps(result, golden, "HV_SIMD_SSE_FMA")
                     message = fail_message or self.create_fail_message(result, golden, "HV_SIMD_SSE_FMA")
                     self.assertEqual(result, golden, message)
 
                     # AVX (with FMA)
                     result = self.compile_and_run(c_sources, out_dir, num_iterations, "HV_SIMD_AVX")
+                    result = self.align_vector_timestamps(result, golden, "HV_SIMD_AVX")
                     message = fail_message or self.create_fail_message(result, golden, "HV_SIMD_AVX")
                     self.assertEqual(result, golden, message)
 
                 elif platform.machine().startswith(ARM_MACHINES):
                     # NEON
                     result = self.compile_and_run(c_sources, out_dir, num_iterations, "HV_SIMD_NEON")
+                    result = self.align_vector_timestamps(result, golden, "HV_SIMD_NEON")
                     message = fail_message or self.create_fail_message(result, golden, "HV_SIMD_NEON")
                     self.assertEqual(result, golden, message)
 
