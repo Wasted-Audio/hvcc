@@ -717,6 +717,48 @@ static inline void __hv_neq_f(hv_bInf_t bIn0, hv_bInf_t bIn1, hv_bOutf_t bOut) {
 #endif
 }
 
+// expr~ comparisons: 1.0f or 0.0f, like HV_SIMD_NONE and Pd (the SIMD versions above return a bit mask)
+static inline void __hv_mask_to_one_f(hv_bInf_t bIn, hv_bOutf_t bOut) {
+#if HV_SIMD_AVX
+  *bOut = _mm256_and_ps(bIn, _mm256_set1_ps(1.0f));
+#elif HV_SIMD_SSE
+  *bOut = _mm_and_ps(bIn, _mm_set1_ps(1.0f));
+#elif HV_SIMD_NEON
+  *bOut = vreinterpretq_f32_u32(vandq_u32(vreinterpretq_u32_f32(bIn), vreinterpretq_u32_f32(vdupq_n_f32(1.0f))));
+#else // HV_SIMD_NONE
+  *bOut = bIn; // already 1.0f or 0.0f
+#endif
+}
+
+static inline void __hv_gt_expr_f(hv_bInf_t bIn0, hv_bInf_t bIn1, hv_bOutf_t bOut) {
+  __hv_gt_f(bIn0, bIn1, bOut);
+  __hv_mask_to_one_f(*bOut, bOut);
+}
+
+static inline void __hv_gte_expr_f(hv_bInf_t bIn0, hv_bInf_t bIn1, hv_bOutf_t bOut) {
+  __hv_gte_f(bIn0, bIn1, bOut);
+  __hv_mask_to_one_f(*bOut, bOut);
+}
+
+static inline void __hv_lt_expr_f(hv_bInf_t bIn0, hv_bInf_t bIn1, hv_bOutf_t bOut) {
+  __hv_lt_f(bIn0, bIn1, bOut);
+  __hv_mask_to_one_f(*bOut, bOut);
+}
+
+static inline void __hv_lte_expr_f(hv_bInf_t bIn0, hv_bInf_t bIn1, hv_bOutf_t bOut) {
+  __hv_lte_f(bIn0, bIn1, bOut);
+  __hv_mask_to_one_f(*bOut, bOut);
+}
+
+static inline void __hv_eq_expr_f(hv_bInf_t bIn0, hv_bInf_t bIn1, hv_bOutf_t bOut) {
+  __hv_eq_f(bIn0, bIn1, bOut);
+  __hv_mask_to_one_f(*bOut, bOut);
+}
+
+static inline void __hv_neq_expr_f(hv_bInf_t bIn0, hv_bInf_t bIn1, hv_bOutf_t bOut) {
+  __hv_neq_f(bIn0, bIn1, bOut);
+  __hv_mask_to_one_f(*bOut, bOut);
+}
 
 static inline void __hv_or_f(hv_bInf_t bIn0, hv_bInf_t bIn1, hv_bOutf_t bOut) {
 #if HV_SIMD_AVX
