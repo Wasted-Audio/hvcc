@@ -20,7 +20,7 @@ import subprocess
 from pathlib import Path
 
 from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
-from tests.framework.base_test import HvBaseTest
+from tests.framework.base_test import ARM_MACHINES, HvBaseTest
 
 
 class TestPdControlBase(HvBaseTest):
@@ -132,7 +132,7 @@ class TestPdControlBase(HvBaseTest):
                         self.create_fail_message(result, golden, "HV_SIMD_AVX")
                     self.assertEqual(result, golden, message)
 
-                elif platform.machine().startswith("arm"):
+                elif platform.machine().startswith(ARM_MACHINES):
                     # NEON
                     result = self.compile_and_run(c_sources, out_dir, num_iterations, "HV_SIMD_NEON")
                     message = fail_message or \
