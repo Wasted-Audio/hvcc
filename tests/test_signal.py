@@ -30,6 +30,10 @@ class TestPdSignalPatches(TestPdSignalBase):
     def test_phasor_control(self):
         self._test_signal_patch("test-phasor-control.pd")
 
+    def test_fms(self):
+        # [*~ k] -> [-~ k] is fused into __fms~f; golden file rendered with Pd vanilla 0.56-2
+        self._test_signal_patch("test-fms.pd")
+
 
 def main():
     parser = argparse.ArgumentParser(
