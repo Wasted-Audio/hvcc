@@ -149,6 +149,7 @@ class Knob(BaseParam):
     arc_color: Color
     arc_start: float
     arc_show: bool
+    transparent: bool
 
 
 class Number(BaseParam):
