@@ -24,7 +24,7 @@ from typing import List, Optional
 
 from scipy.io import wavfile
 
-from tests.framework.base_test import HvBaseTest
+from tests.framework.base_test import HvBaseTest, ARM_MACHINES
 
 
 class TestPdSignalBase(HvBaseTest):
@@ -110,7 +110,7 @@ class TestPdSignalBase(HvBaseTest):
             self._compare_wave_output(out_dir, source_files, golden_path, "HV_SIMD_SSE_FMA")
             self._compare_wave_output(out_dir, source_files, golden_path, "HV_SIMD_AVX")
 
-        elif platform.machine().startswith("arm"):
+        elif platform.machine().startswith(ARM_MACHINES):
             self._compare_wave_output(out_dir, source_files, golden_path, "HV_SIMD_NEON")
 
         # don't delete the output dir
