@@ -28,7 +28,8 @@ from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
 simd_flags = {
     "HV_SIMD_NONE": ["-DHV_SIMD_NONE"],
     "HV_SIMD_SSE": ["-msse", "-msse2", "-msse3", "-mssse3", "-msse4.1", "-msse4.2"],
-    "HV_SIMD_SSE_FMA": ["-msse", "-msse2", "-msse3", "-mssse3", "-msse4.1", "-msse4.2", "-mfma"],
+    # -mfma implies AVX, which heavy would otherwise select: force the SSE code path
+    "HV_SIMD_SSE_FMA": ["-msse", "-msse2", "-msse3", "-mssse3", "-msse4.1", "-msse4.2", "-mfma", "-DHV_SIMD_SSE=1"],
     "HV_SIMD_AVX": ["-msse", "-msse2", "-msse3", "-mssse3", "-msse4.1", "-msse4.2", "-mavx", "-mfma"],
     # 64-bit ARM always has NEON; -mcpu=cortex-a7 is a 32-bit target that clang rejects there
     "HV_SIMD_NEON": (["-DHV_SIMD_NEON"] if platform.machine() in ("arm64", "aarch64")
