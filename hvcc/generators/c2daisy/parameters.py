@@ -123,7 +123,7 @@ def de_alias(
                 for mapping in target_component['mapping']:
                     if mapping['name'].format_map({'name': alias}) == low:
                         return mapping['name'].format_map({'name': aliases[alias]})
-        except IndexError:
+        except (IndexError, StopIteration):
             # No matching alias from filter
             pass
     # otherwise, it's a direct parameter or unkown one
