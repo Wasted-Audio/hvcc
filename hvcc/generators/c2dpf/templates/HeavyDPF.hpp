@@ -9,6 +9,8 @@
 
 START_NAMESPACE_DISTRHO
 
+#define HV_DPF_NUM_PARAMETER {{receivers|length + events|length + senders|length + out_events|length}}
+
 static void hvSendHookFunc(HeavyContextInterface *c, const char *sendName, uint32_t sendHash, const HvMessage *m);
 static void hvPrintHookFunc(HeavyContextInterface *c, const char *printLabel, const char *msgString, const HvMessage *m);
 
@@ -17,25 +19,17 @@ class {{class_name}} : public Plugin
 public:
   enum Parameters
   {
-    {% for k, v in receivers -%}
+    {%- for k, v in receivers + events + senders + out_events %}
       param{{v.display}},
-    {% endfor %}
-    {% for k, v in senders -%}
-      param{{v.display}},
-    {% endfor %}
+    {%- endfor %}
   };
 
 {% if meta.port_groups != None %}
   enum PortGroups
   {
-{%- if meta.port_groups.input|length %}
-  {%- for group, value in meta.port_groups.input.items() %}
-    kPortGroup{{group}},
-  {%- endfor %}
-{%- endif %}
-{%- if meta.port_groups.output|length %}
-  {%- for group, value in meta.port_groups.output.items() %}
-    kPortGroup{{group}},
+{%- if meta.port_groups.input|length or meta.port_groups.output|length or meta.port_groups.params|length %}
+  {%- for group, value in (meta.port_groups.input.items()|list) + (meta.port_groups.output.items()|list) + (meta.port_groups.params.items()|list) %}
+    kPortGroup{{group|slugify}},
   {%- endfor %}
 {%- endif %}
     kPortGroupCount
@@ -48,6 +42,7 @@ public:
   void handleMidiInput(uint32_t frames, const MidiEvent* midiEvents, uint32_t midiEventCount);
   void handleMidiSend(uint32_t sendHash, const HvMessage *m);
   void hostTransportEvents(uint32_t frames);
+  void setOutputEvent(uint32_t id);
   void setOutputParameter(uint32_t sendHash, const HvMessage *m);
 
 protected:
@@ -140,10 +135,19 @@ protected:
   // -------------------------------------------------------------------
 
 private:
-  {%- if (receivers|length > 0) or senders|length > 0 %}
+{%- if (receivers|length > 0) or (senders|length > 0) or (events|length > 0) or (out_events|length > 0) %}
   // parameters
-  float _parameters[{{receivers|length + senders|length}}]; // in range of [0,1]
-  {%- endif %}
+  float _parameters[HV_DPF_NUM_PARAMETER];
+{%- endif %}
+
+{%- if out_events|length > 0 %}
+  struct OutputEvent {
+    uint32_t id = 0;
+    uint32_t holdSamples = 0;
+  };
+
+  OutputEvent outputEvents[{{receivers|length + events|length + senders|length + out_events|length}}];
+{%- endif %}
 
   // transport values
   bool wasPlaying = false;

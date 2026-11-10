@@ -1,5 +1,5 @@
 # Copyright (C) 2014-2018 Enzien Audio, Ltd.
-# Copyright (C) 2023-2024 Wasted Audio
+# Copyright (C) 2023-2026 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -18,13 +18,11 @@ import argparse
 import json
 import os
 import time
+from pathlib import Path
 
-from typing import Optional
-
-from hvcc.core.hv2ir.HeavyException import HeavyException
+from hvcc.core.hv2ir.HeavyIrException import HeavyIrException
 from hvcc.core.hv2ir.HeavyParser import HeavyParser
-
-from hvcc.types.compiler import CompilerResp, CompilerNotif, CompilerMsg
+from hvcc.types.compiler import CompilerMsg, CompilerNotif, CompilerResp
 
 
 class hv2ir:
@@ -32,9 +30,9 @@ class hv2ir:
     @classmethod
     def compile(
         cls,
-        hv_file: str,
-        ir_file: str,
-        patch_name: Optional[str] = None,
+        hv_file: Path,
+        ir_file: Path,
+        patch_name: str | None = None,
         verbose: bool = False
     ) -> CompilerResp:
         """ Compiles a HeavyLang file into a HeavyIR file.
@@ -45,13 +43,13 @@ class hv2ir:
         # keep track of the total compile time
         tick = time.time()
 
-        hv_file = os.path.abspath(os.path.expanduser(hv_file))
-        ir_file = os.path.abspath(os.path.expanduser(ir_file))
+        hv_file = hv_file.expanduser().absolute()
+        ir_file = ir_file.expanduser().absolute()
 
         try:
             # parse heavy file
             hv_graph = HeavyParser.graph_from_file(hv_file=hv_file, xname=patch_name)
-        except HeavyException as e:
+        except HeavyIrException as e:
             return CompilerResp(
                 stage="hv2ir",
                 compile_time=time.time() - tick,
@@ -61,10 +59,10 @@ class hv2ir:
                     errors=[CompilerMsg(message=e.message)],
                     warnings=[]
                 ),
-                in_file=os.path.basename(hv_file),
-                in_dir=os.path.dirname(hv_file),
-                out_file=os.path.basename(ir_file),
-                out_dir=os.path.dirname(ir_file)
+                in_file=hv_file,
+                in_dir=hv_file.parent,
+                out_file=ir_file,
+                out_dir=ir_file.parent
             )
 
         try:
@@ -75,12 +73,12 @@ class hv2ir:
             hv_graph.prepare()
 
             # ensure that the output directory exists
-            if not os.path.exists(os.path.dirname(ir_file)):
-                os.makedirs(os.path.dirname(ir_file))
+            if not ir_file.parent.exists():
+                os.makedirs(ir_file.parent)
 
             # generate Heavy.IR
             ir = hv_graph.to_ir()
-        except HeavyException as e:
+        except HeavyIrException as e:
             return CompilerResp(
                 stage="hv2ir",
                 compile_time=time.time() - tick,
@@ -90,10 +88,10 @@ class hv2ir:
                     errors=[CompilerMsg(message=e.message)],
                     warnings=[]
                 ),
-                in_file=os.path.basename(hv_file),
-                in_dir=os.path.dirname(hv_file),
-                out_file=os.path.basename(ir_file),
-                out_dir=os.path.dirname(ir_file),
+                in_file=hv_file,
+                in_dir=hv_file.parent,
+                out_file=ir_file,
+                out_dir=ir_file.parent,
                 obj_counter=hv_counter
             )
 
@@ -102,27 +100,26 @@ class hv2ir:
             with open(ir_file, "w") as f:
                 json.dump(ir.model_dump(), f, indent=4)
 
-            if verbose and ir is not None:
-                if len(ir.signal.processOrder) > 0:
-                    print("")
-                    print("=== Signal Order ===")
-                    for so in ir.signal.processOrder:
-                        o = ir.objects[so.id]
-                        if len(o.args) > 0:
-                            print("{0} {{{1}}}".format(
-                                o.type,
-                                " ".join([f"{k}:{v}" for k, v in o.args.items()])))
-                        else:
-                            print(o.type)
+            if verbose and ir is not None and len(ir.signal.processOrder) > 0:
+                print()
+                print("=== Signal Order ===")
+                for so in ir.signal.processOrder:
+                    o = ir.objects[so.id]
+                    if len(o.args) > 0:
+                        print("{0} {{{1}}}".format(
+                            o.type,
+                            " ".join([f"{k}:{v}" for k, v in o.args.items()])))
+                    else:
+                        print(o.type)
 
         return CompilerResp(
             stage="hv2ir",
             compile_time=time.time() - tick,  # record the total compile time
             notifs=hv_graph.get_notices(),
-            in_file=os.path.basename(hv_file),
-            in_dir=os.path.dirname(hv_file),
-            out_file=os.path.basename(ir_file),
-            out_dir=os.path.dirname(ir_file),
+            in_file=hv_file,
+            in_dir=hv_file.parent,
+            out_file=ir_file,
+            out_dir=ir_file.parent,
             obj_counter=hv_counter,
             ir=ir
         )

@@ -1,5 +1,5 @@
 # Copyright (C) 2014-2018 Enzien Audio, Ltd.
-# Copyright (C) 2021-2024 Wasted Audio
+# Copyright (C) 2021-2026 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,18 +14,25 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import jinja2
 import os
 import shutil
 import time
-from typing import Optional
+from pathlib import Path
+
+import jinja2
+
+from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
+from hvcc.types.compiler import (
+    CompilerMsg,
+    CompilerNotif,
+    CompilerResp,
+    ExternInfo,
+    Generator,
+)
+from hvcc.types.meta import Meta
 
 from ..copyright import copyright_manager
 from ..filters import filter_templates
-
-from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
-from hvcc.types.compiler import Generator, CompilerResp, CompilerNotif, CompilerMsg, ExternInfo
-from hvcc.types.meta import Meta
 
 
 class c2unity(Generator):
@@ -35,18 +42,19 @@ class c2unity(Generator):
     @classmethod
     def compile(
         cls,
-        c_src_dir: str,
-        out_dir: str,
+        c_src_dir: Path,
+        out_dir: Path,
         externs: ExternInfo,
-        patch_name: Optional[str] = None,
-        patch_meta: Meta = Meta(),
+        patch_name: str,
+        patch_meta: Meta,
         num_input_channels: int = 0,
         num_output_channels: int = 0,
-        copyright: Optional[str] = None,
-        verbose: Optional[bool] = False
+        copyright: str | None = None,
+        verbose: bool | None = False
     ) -> CompilerResp:
 
         tick = time.time()
+        patch_meta = patch_meta or Meta()
 
         in_parameter_list = externs.parameters.inParam
         out_parameter_list = externs.parameters.outParam
@@ -54,12 +62,12 @@ class c2unity(Generator):
         out_event_list = externs.events.outEvent
         table_list = externs.tables
 
-        out_dir = os.path.join(out_dir, "unity")
+        out_dir = Path(out_dir, "unity")
         patch_name = patch_name.lower() if patch_name is not None else "heavy"
 
         copyright_c = copyright_manager.get_copyright_for_c(copyright)
 
-        templates_dir = os.path.join(os.path.dirname(__file__), "templates")
+        templates_dir = Path(Path(__file__).parent, "templates")
 
         # initialise the jinja template environment
         env = jinja2.Environment()
@@ -70,24 +78,24 @@ class c2unity(Generator):
 
         try:
             # ensure that the output directory does not exist
-            out_dir = os.path.abspath(out_dir)
-            if os.path.exists(out_dir):
+            out_dir = out_dir.absolute()
+            if out_dir.exists():
                 shutil.rmtree(out_dir)
 
-            patch_src_dir = os.path.join(out_dir, "include", "Heavy")
-            if os.path.exists(patch_src_dir):
+            patch_src_dir = Path(out_dir, "include", "Heavy")
+            if patch_src_dir.exists():
                 shutil.rmtree(patch_src_dir)
             shutil.copytree(c_src_dir, patch_src_dir)
 
-            heavy_src_files = [f for f in os.listdir(c_src_dir) if f.endswith(".c") or f.endswith(".cpp")]
+            heavy_src_files = [f for f in os.listdir(c_src_dir) if f.endswith((".c", ".cpp"))]
 
             # generate files from templates
             for f in env.list_templates(filter_func=filter_templates):
-                file_path = os.path.join(out_dir, f)
-                file_path = file_path.replace("{{name}}", patch_name)
+                file_path = Path(out_dir, f)
+                file_path = Path(str(file_path).replace("{{name}}", patch_name))
 
-                if not os.path.exists(os.path.dirname(file_path)):
-                    os.makedirs(os.path.dirname(file_path))
+                if not file_path.parent.exists():
+                    os.makedirs(file_path.parent)
 
                 with open(file_path, "w") as g:
                     g.write(env.get_template(f).render(
@@ -110,7 +118,7 @@ class c2unity(Generator):
                 compile_time=time.time() - tick
             )
 
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001
             return CompilerResp(
                 stage="c2unity",
                 notifs=CompilerNotif(

@@ -14,7 +14,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from typing import Optional, List, Dict
+from collections.abc import Mapping
+from types import MappingProxyType
+from typing import Final
+
+from hvcc.types.Heavy import Heavy, HvPos
 
 from .Connection import Connection
 from .HeavyObject import HeavyObject
@@ -23,7 +27,7 @@ from .PdObject import PdObject
 
 class PdBinopObject(PdObject):
     # a translation dictionary from a Pd object to corresponding heavy object
-    __PD_HEAVY_DICT = {
+    __PD_HEAVY_DICT_PD: Final[Mapping[str, str]] = MappingProxyType({
         "+": "+",
         "+~": "+",
         "-": "-",
@@ -51,13 +55,34 @@ class PdBinopObject(PdObject):
         "pow": "pow",
         "pow~": "pow",
         ">>": ">>",
-        "<<": "<<"
-    }
+        "<<": "<<",
+    })
+
+    __PD_HEAVY_DICT_CYCLONE: Final[Mapping[str, str]] = MappingProxyType({
+        ">~": ">",
+        "greaterthan~": ">",
+        ">=~": ">=",
+        "greaterthaneq~": ">=",
+        "<~": "<",
+        "lessthan~": "<",
+        "<=~": "<=",
+        "lessthaneq~": "<=",
+        "==~": "==",
+        "equals~": "==",
+        "!=~": "!=",
+        "notequals~": "!="
+    })
+
+    __PD_HEAVY_DICT: Final[Mapping[str, str]] = MappingProxyType({
+        **__PD_HEAVY_DICT_PD,
+        **__PD_HEAVY_DICT_CYCLONE,
+        **{f"cyclone/{k}": v for k, v in __PD_HEAVY_DICT_CYCLONE.items()},
+    })
 
     def __init__(
         self,
         obj_type: str,
-        obj_args: Optional[List] = None,
+        obj_args: list | None = None,
         pos_x: int = 0,
         pos_y: int = 0
     ) -> None:
@@ -103,13 +128,13 @@ class PdBinopObject(PdObject):
         if len(self.obj_args) > 0:
             try:
                 self.__k = float(self.obj_args[0])
-            except Exception:
+            except (TypeError, ValueError):
                 self.add_warning(f"\"{self.obj_args[0]}\" cannot be resolved to a number. Defaulting to zero.")
                 self.__k = 0.0
         else:
             self.__k = 0.0
 
-    def convert_ctrl_to_sig_connections_at_inlet(self, connection_list: List, inlet_index: int) -> None:
+    def convert_ctrl_to_sig_connections_at_inlet(self, connection_list: list, inlet_index: int) -> None:
         """ Auto insert heavy var object inbetween control connections.
         """
         sig_obj = HeavyObject(obj_type="var",
@@ -145,14 +170,11 @@ class PdBinopObject(PdObject):
                 from_obj.remove_connection(old_conn)
                 self.remove_connection(old_conn)
 
-    def to_hv(self) -> Dict:
-        return {
-            "type": self.__PD_HEAVY_DICT[self.obj_type],
-            "args": {
+    def to_hv(self) -> Heavy:
+        return Heavy(
+            type=self.__PD_HEAVY_DICT[self.obj_type],
+            args={
                 "k": self.__k
             },
-            "properties": {
-                "x": self.pos_x,
-                "y": self.pos_y
-            }
-        }
+            properties=HvPos(x=self.pos_x, y=self.pos_y)
+        )

@@ -14,12 +14,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from typing import Dict, List, Optional
-
-from .HeavyIrObject import HeavyIrObject
-from .HeavyGraph import HeavyGraph
 
 from hvcc.types.IR import IROnMessage
+
+from .HeavyGraph import HeavyGraph
+from .HeavyIrObject import HeavyIrObject
 
 
 class HIrOutlet(HeavyIrObject):
@@ -29,13 +28,13 @@ class HIrOutlet(HeavyIrObject):
     def __init__(
         self,
         obj_type: str,
-        args: Optional[Dict] = None,
-        graph: Optional[HeavyGraph] = None,
-        annotations: Optional[Dict] = None
+        args: dict | None = None,
+        graph: HeavyGraph | None = None,
+        annotations: dict | None = None
     ) -> None:
         super().__init__("__outlet", args=args, graph=graph, annotations=annotations)
 
-    def get_ir_on_message(self, inlet_index: int = 0) -> List[IROnMessage]:
+    def get_ir_on_message(self, inlet_index: int = 0) -> list[IROnMessage]:
         x = []
         if self.graph is not None:
             for c in self.graph.outlet_connections[self.args["index"]]:

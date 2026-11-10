@@ -1,5 +1,5 @@
 # Copyright (C) 2014-2018 Enzien Audio, Ltd.
-# Copyright (C) 2021-2024 Wasted Audio
+# Copyright (C) 2021-2026 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,23 +20,32 @@ import json
 import os
 import re
 import sys
-from typing import Any, List, Dict, Optional
+from pathlib import Path
+from typing import Any
 
-from hvcc.interpreters.pd2gui import pd2gui
-from hvcc.interpreters.pd2hv import pd2hv
 from hvcc.core.hv2ir import hv2ir
-from hvcc.generators.ir2c import ir2c, ir2c_perf
-from hvcc.generators.c2js import c2js
 from hvcc.generators.c2daisy import c2daisy
 from hvcc.generators.c2dpf import c2dpf
+from hvcc.generators.c2fmod import c2fmod
+from hvcc.generators.c2js import c2js
 from hvcc.generators.c2owl import c2owl
 from hvcc.generators.c2pdext import c2pdext
-from hvcc.generators.c2wwise import c2wwise
 from hvcc.generators.c2unity import c2unity
-from hvcc.generators.c2fmod import c2fmod
+from hvcc.generators.c2wwise import c2wwise
+from hvcc.generators.ir2c import ir2c, ir2c_perf
+from hvcc.interpreters.pd2gui import pd2gui
+from hvcc.interpreters.pd2hv import pd2hv
 from hvcc.types.compiler import (
-    CompilerResults, CompilerResp, CompilerNotif, CompilerMsg, Generator,
-    ExternInfo, ExternMemoryPool, ExternMidi, ExternEvents, ExternParams
+    CompilerMsg,
+    CompilerNotif,
+    CompilerResp,
+    CompilerResults,
+    ExternEvents,
+    ExternInfo,
+    ExternMemoryPool,
+    ExternMidi,
+    ExternParams,
+    Generator,
 )
 from hvcc.types.IR import IRGraph
 from hvcc.types.meta import Meta
@@ -59,7 +68,7 @@ def add_error(
     return results
 
 
-def check_extern_name_conflicts(extern_type: str, extern_list: List, results: CompilerResults) -> None:
+def check_extern_name_conflicts(extern_type: str, extern_list: list, results: CompilerResults) -> None:
     """ In most of the generator code extern names become capitalised when used
         as enums. This method makes sure that there are no cases where two unique
         keys become the same after being capitalised.
@@ -74,7 +83,7 @@ def check_extern_name_conflicts(extern_type: str, extern_list: List, results: Co
                           "capital letters are not the only difference.")
 
 
-def count_midi_objects(hvir: IRGraph) -> Dict[str, List[str]]:
+def count_midi_objects(hvir: IRGraph) -> dict[str, list[str]]:
     in_midi = []
     out_midi = []
 
@@ -100,7 +109,7 @@ def count_midi_objects(hvir: IRGraph) -> Dict[str, List[str]]:
         '__hv_touchout',
     ]
 
-    for recv in hvir.control.receivers.keys():
+    for recv in hvir.control.receivers:
         if recv in midi_in_objs:
             in_midi.append(recv)
 
@@ -114,11 +123,11 @@ def count_midi_objects(hvir: IRGraph) -> Dict[str, List[str]]:
     }
 
 
-def filter_midi_from_out_parameters(output_parameter_list: List, midi_out_objects: List) -> List:
+def filter_midi_from_out_parameters(output_parameter_list: list, midi_out_objects: list) -> list:
     new_out_list = []
 
     for item in output_parameter_list:
-        if not item[0] in midi_out_objects:
+        if item[0] not in midi_out_objects:
             new_out_list.append(item)
 
     return new_out_list
@@ -194,7 +203,10 @@ def generate_extern_info(hvir: IRGraph, results: CompilerResults) -> ExternInfo:
     )
 
 
-def load_ext_generator(module_name: str, verbose: bool) -> Optional[Generator]:
+def load_ext_generator(module_name: str, verbose: bool) -> Generator | None:
+    # add the current directory to the module search path
+    sys.path.insert(0, str(Path.cwd()))
+
     try:
         module = importlib.import_module(module_name)
         for _, member in inspect.getmembers(module):
@@ -209,39 +221,39 @@ def load_ext_generator(module_name: str, verbose: bool) -> Optional[Generator]:
 
 
 def compile_dataflow(
-    in_path: str,
-    out_dir: str,
+    in_path: Path,
+    out_dir: Path,
     patch_name: str = "heavy",
-    patch_meta_file: Optional[str] = None,
-    search_paths: Optional[List[str]] = None,
-    generators: Optional[List[str]] = None,
-    ext_generators: Optional[List[str]] = None,
+    patch_meta_file: Path | None = None,
+    search_paths: list[Path] | None = None,
+    generators: list[str] | None = None,
+    ext_generators: list[str] | None = None,
     verbose: bool = False,
-    copyright: Optional[str] = None,
-    nodsp: Optional[bool] = False
+    copyright: str | None = None,
+    nodsp: bool | None = False,
+    gui: bool | None = False
 ) -> CompilerResults:
     results = CompilerResults(root={})
     patch_meta = Meta()
 
     # basic error checking on input
-    if os.path.isfile(in_path):
-        if not in_path.endswith((".pd")):
+    if in_path.is_file():
+        if not str(in_path).endswith(".pd"):
             return add_error(results, "Can only process Pd files.")
-    elif os.path.isdir(in_path):
+    elif in_path.is_dir():
         if not os.path.basename("c"):
             return add_error(results, "Can only process c directories.")
     else:
         return add_error(results, f"Unknown input path {in_path}")
 
     # meta-data file
-    if patch_meta_file:
-        if os.path.isfile(patch_meta_file):
-            with open(patch_meta_file) as json_file:
-                try:
-                    patch_meta_json = json.load(json_file)
-                    patch_meta = Meta(**patch_meta_json)
-                except Exception as e:
-                    return add_error(results, f"Unable to open json_file: {e}")
+    if patch_meta_file is not None and patch_meta_file.is_file():
+        with open(patch_meta_file) as json_file:
+            try:
+                patch_meta_json = json.load(json_file)
+                patch_meta = Meta(**patch_meta_json)
+            except (ValueError, TypeError) as e:
+                return add_error(results, f"Invalid patch metadata in {patch_meta_file}: {e}")
 
     patch_name = patch_meta.name or patch_name
     generators = ["c"] if generators is None else [x.lower() for x in generators]
@@ -250,29 +262,32 @@ def compile_dataflow(
         print("--> Generating C")
     results.root["pd2hv"] = pd2hv.pd2hv.compile(
         pd_path=in_path,
-        hv_dir=os.path.join(out_dir, "hv"),
+        hv_dir=Path(out_dir, "hv"),
         search_paths=search_paths,
         verbose=verbose)
 
-    if verbose:
-        print("--> Generating GUI IR")
-    results.root["pd2gui"] = pd2gui.pd2gui.compile(
-        pd_path=in_path,
-        ir_dir=os.path.join(out_dir, "ir"),
-        search_paths=search_paths,
-        verbose=verbose)
+    # ensure that the ir filenames have no funky characters in it
+    subst_name = re.sub(r'\W', '_', patch_name)
+
+    if gui:
+        if verbose:
+            print("--> Generating GUI IR")
+        results.root["pd2gui"] = pd2gui.pd2gui.compile(
+            pd_path=in_path,
+            ir_file=Path(out_dir, "ir", f"{subst_name}.heavy.gui.json"),
+            search_paths=search_paths,
+            verbose=verbose)
 
     # check for errors
-    response: CompilerResp = list(results.root.values())[0]
+    response: CompilerResp = next(iter(results.root.values()))
 
     if response.notifs.has_error:
         return results
 
-    subst_name = re.sub(r'\W', '_', patch_name)
     results.root["hv2ir"] = hv2ir.hv2ir.compile(
-        hv_file=os.path.join(response.out_dir, response.out_file),
+        hv_file=Path(response.out_dir, response.out_file),
         # ensure that the ir filename has no funky characters in it
-        ir_file=os.path.join(out_dir, "ir", f"{subst_name}.heavy.ir.json"),
+        ir_file=Path(out_dir, "ir", f"{subst_name}.heavy.ir.json"),
         patch_name=patch_name,
         verbose=verbose)
 
@@ -288,14 +303,16 @@ def compile_dataflow(
 
     # get application path
     if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
-        application_path = os.path.join(sys._MEIPASS, 'hvcc')
+        application_path = Path(sys._MEIPASS, 'hvcc')
     elif __file__:
-        application_path = os.path.dirname(__file__)
+        application_path = Path(__file__).parent
+    else:
+        raise RuntimeError("Unable to determine application path")
 
-    c_src_dir = os.path.join(out_dir, "c")
+    c_src_dir = Path(out_dir, "c")
     results.root["ir2c"] = ir2c.ir2c.compile(
-        hv_ir_path=os.path.join(results.root["hv2ir"].out_dir, results.root["hv2ir"].out_file),
-        static_dir=os.path.join(application_path, "generators/ir2c/static"),
+        hv_ir_path=Path(results.root["hv2ir"].out_dir, results.root["hv2ir"].out_file),
+        static_dir=Path(application_path, "generators/ir2c/static"),
         output_dir=c_src_dir,
         externs=externs,
         copyright=copyright,
@@ -317,7 +334,7 @@ def compile_dataflow(
     num_input_channels = hvir.signal.numInputBuffers
     num_output_channels = hvir.signal.numOutputBuffers
 
-    gen_args: Dict[str, Any] = {
+    gen_args: dict[str, Any] = {
         'c_src_dir': c_src_dir,
         'out_dir': out_dir,
         'patch_name': patch_name,

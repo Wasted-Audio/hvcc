@@ -1,37 +1,63 @@
 # Heavy Compiler Collection
-# Copyright (C) 2025 Wasted Audio
+# Copyright (C) 2025-2026 Wasted Audio
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
-import os
-
-from typing import Generator, Optional, Union
+import re
+from collections import Counter
+from collections.abc import Generator
+from pathlib import Path
 
 from hvcc.interpreters.pd2hv.PdParser import PdParser
 from hvcc.types.GUI import (
-    Size, Coords, Font, LabelShow, LabelPos, Label, Color, Canvas,
-    Bang, Toggle, VRadio, HRadio, VSlider, HSlider, Knob,  Number, Float,
-    Comment, GUIObjects, Graph, GraphRoot
+    Bang,
+    Canvas,
+    Color,
+    Comment,
+    Coords,
+    Float,
+    Font,
+    Graph,
+    GraphRoot,
+    GUIObjects,
+    HRadio,
+    HSlider,
+    Knob,
+    Label,
+    LabelPos,
+    LabelShow,
+    Number,
+    Popmenu,
+    Size,
+    Toggle,
+    VRadio,
+    VSlider,
 )
+
+from ..HeavyPdException import HeavyPdException
 
 
 class PdGUIParser(PdParser):
+    # retain width by overriding this regex with a pattern that never matches
+    RE_WIDTH = re.compile(r"$^")
+
     def __init__(self) -> None:
         # the current global value of $0
         # Note(joe): set a high starting value to avoid potential user naming conflicts
         self.__DOLLAR_ZERO = 1000
+        self.object_counter: Counter = Counter()
 
         # search paths at this graph level
-        self.search_paths: list[str] = []
+        self.search_paths: list[Path] = []
 
     def gui_from_file(
         self,
-        file_path: str,
-        obj_args: Optional[list] = None,
+        file_path: Path,
+        obj_args: list | None = None,
         is_root: bool = True
-    ) -> tuple[Union[Graph, GraphRoot], bool]:
+    ) -> tuple[Graph | GraphRoot | None, bool]:
         if is_root:
-            self.search_paths.append(os.path.dirname(file_path))
+            self.search_paths.append(file_path)
 
         file_iterator = self.get_pd_line(file_path)
         canvas_line: str = file_iterator.__next__()
@@ -40,7 +66,7 @@ class PdGUIParser(PdParser):
         graph_args = [self.__DOLLAR_ZERO] + (obj_args or [])
 
         if not canvas_line.startswith("#N canvas"):
-            raise Exception(f"Pd files must begin with \"#N canvas\": {canvas_line}")
+            raise HeavyPdException(f"Pd files must begin with \"#N canvas\": {canvas_line}")
 
         g, gop = self.gui_from_canvas(
             file_iterator,
@@ -57,13 +83,13 @@ class PdGUIParser(PdParser):
         file_iterator: Generator,
         canvas_line: str,
         graph_args: list,
-        pd_path: str,
+        pd_path: Path,
         is_root: bool = False
-    ) -> tuple[Union[Graph, GraphRoot], bool]:
+    ) -> tuple[Graph | GraphRoot | None, bool]:
 
         objects: list[GUIObjects] = []
         graphs: list[Graph] = []
-        x: Optional[GUIObjects] = None
+        x: GUIObjects | None = None
 
         # graph on parent settings
         gop: bool = False
@@ -72,38 +98,40 @@ class PdGUIParser(PdParser):
         obj_type = ""
         obj_args = []
 
-        try:
-            for li in file_iterator:
-                line = self.split_line(li)
+        for li in file_iterator:
+            line = self.split_line(li)
 
-                if line[0] == "#N":
-                    if line[1] == "canvas":
-                        g, gop = self.gui_from_canvas(
-                            file_iterator=file_iterator,
-                            canvas_line=li,
-                            graph_args=graph_args,
-                            pd_path=pd_path
-                        )
-                        if gop:
-                            assert isinstance(g, Graph)
-                            graphs.append(g)
+            if line[0] == "#N":
+                if line[1] == "canvas":
+                    g, gop = self.gui_from_canvas(
+                        file_iterator=file_iterator,
+                        canvas_line=li,
+                        graph_args=graph_args,
+                        pd_path=pd_path
+                    )
+                    if gop:
+                        assert isinstance(g, Graph)
+                        graphs.append(g)
 
-                elif line[0] == "#X":
-                    if line[1] == "coords":
-                        try:
-                            if int(line[8]) > 0:
-                                # canvas is active
-                                gop = True
-                                gop_start = Coords(x=int(line[9]), y=int(line[10]))
-                                gop_size = Size(x=int(line[6]), y=int(line[7]))
-                        except IndexError:
-                            continue
+            elif line[0] == "#X":
+                if line[1] == "coords":
+                    try:
+                        if int(line[8]) > 0:
+                            # canvas is active
+                            gop = True
+                            gop_start = Coords(x=int(line[9]), y=int(line[10]))
+                            gop_size = Size(x=int(line[6]), y=int(line[7]))
+                    except IndexError:
+                        continue
 
-                    elif line[1] == "restore" and gop:
+                elif line[1] == "restore":
+                    if gop:
                         objects = self.filter_invisible_objects(objects, gop_start, gop_size)
                         graphs = self.filter_invisible_graphs(graphs, gop_start, gop_size)
+                        self.object_counter["graph"] += 1
 
                         return Graph(
+                            id=f"graph{self.object_counter['graph']}",
                             position=Coords(
                                 x=int(line[2]),
                                 y=int(line[3])
@@ -113,73 +141,74 @@ class PdGUIParser(PdParser):
                             objects=objects,
                             graphs=graphs
                         ), gop
+                    else:
+                        return None, False
 
-                    elif line[1] == "text":
-                        x = self.add_comment(line)
+                elif line[1] == "text":
+                    x = self.add_comment(line)
 
-                    elif line[1] == "floatatom":
+                elif line[1] == "floatatom":
+                    obj_args = self.__resolve_object_args(
+                        obj_args=line[1:],
+                        graph_args=graph_args,
+                        is_root=is_root
+                    )
+
+                    # replace args with resolved args
+                    line = line[:1] + obj_args
+                    x = self.add_float(line)
+
+                elif line[1] == "obj":
+                    if len(line) > 4:
+                        obj_type = line[4]
+                        # sometimes objects have $ arguments in them as well
+                        obj_type = self.__resolve_object_args(
+                            obj_args=[obj_type],
+                            graph_args=graph_args,
+                            is_root=is_root)[0]
                         obj_args = self.__resolve_object_args(
-                            obj_args=line[1:],
+                            obj_args=line[5:],
                             graph_args=graph_args,
                             is_root=is_root
                         )
 
                         # replace args with resolved args
-                        line = line[:1] + obj_args
-                        x = self.add_float(line)
+                        line = line[:5] + obj_args
 
-                    elif line[1] == "obj":
-                        if len(line) > 4:
-                            obj_type = line[4]
-                            # sometimes objects have $ arguments in them as well
-                            obj_type = self.__resolve_object_args(
-                                obj_args=[obj_type],
-                                graph_args=graph_args,
-                                is_root=is_root)[0]
-                            obj_args = self.__resolve_object_args(
-                                obj_args=line[5:],
-                                graph_args=graph_args,
-                                is_root=is_root
+                    abs_path = self.find_abstraction_path(pd_path.parent, obj_type)
+
+                    if abs_path is not None:
+                        g, gop = self.gui_from_file(abs_path, obj_args=obj_args, is_root=False)
+
+                        if gop:
+                            assert isinstance(g, Graph)
+                            # set object coordinates
+                            g.position = Coords(
+                                x=int(line[2]),
+                                y=int(line[3])
                             )
+                            graphs.append(g)
 
-                            # replace args with resolved args
-                            line = line[:5] + obj_args
+                    if obj_type == "cnv":
+                        x = self.add_canvas(line)
+                    elif obj_type == "bng":
+                        x = self.add_bang(line)
+                    elif obj_type == "tgl":
+                        x = self.add_toggle(line)
+                    elif obj_type == "vradio" or obj_type == "hradio":
+                        x = self.add_radio(line)
+                    elif obj_type == "vsl" or obj_type == "hsl":
+                        x = self.add_slider(line)
+                    elif obj_type == "knob" or obj_type == "else/knob":
+                        x = self.add_knob(line)
+                    elif obj_type == "nbx":
+                        x = self.add_number(line)
+                    elif obj_type == "popmenu" or obj_type == "else/popmenu":
+                        x = self.add_popmenu(line)
 
-                        abs_path = self.find_abstraction_path(os.path.dirname(pd_path), obj_type)
-
-                        if abs_path is not None:
-                            g, gop = self.gui_from_file(abs_path, obj_args=obj_args, is_root=False)
-
-                            if gop:
-                                assert isinstance(g, Graph)
-                                # set object coordinates
-                                g.position = Coords(
-                                    x=int(line[2]),
-                                    y=int(line[3])
-                                )
-                                graphs.append(g)
-
-                        if obj_type == "cnv":
-                            x = self.add_canvas(line)
-                        elif obj_type == "bng":
-                            x = self.add_bang(line)
-                        elif obj_type == "tgl":
-                            x = self.add_toggle(line)
-                        elif obj_type == "vradio" or obj_type == "hradio":
-                            x = self.add_radio(line)
-                        elif obj_type == "vsl" or obj_type == "hsl":
-                            x = self.add_slider(line)
-                        elif obj_type == "knob" or obj_type == "else/knob":
-                            x = self.add_knob(line)
-                        elif obj_type == "nbx":
-                            x = self.add_number(line)
-
-                    if x is not None:
-                        objects.append(x)
-                        x = None
-
-        except Exception as e:
-            raise e
+                if x is not None:
+                    objects.append(x)
+                    x = None
 
         if is_root:
             line = self.split_line(canvas_line)
@@ -201,8 +230,10 @@ class PdGUIParser(PdParser):
         else:
             objects = self.filter_invisible_objects(objects, gop_start, gop_size)
             graphs = self.filter_invisible_graphs(graphs, gop_start, gop_size)
+            self.object_counter["graph"] += 1
 
             return Graph(
+                id=f"graph{self.object_counter['graph']}",
                 position=Coords(
                     x=int(line[2]),
                     y=int(line[3])
@@ -282,14 +313,23 @@ class PdGUIParser(PdParser):
         )
 
     @classmethod
-    def filter_params(cls, param: str) -> Optional[str]:
-        """ Only allow externed parameters
+    def filter_params(cls, param_recv: str, param_send: str) -> tuple[str | None, bool]:
+        """ Only allow external parameters.
+            Returns (identifier, is_send).
         """
 
-        if "@hv_param" in param:
-            return param.split(" ")[0]
-        else:
-            return None
+        def externed(param: str) -> str | None:
+            if "@hv_param" in param or "@hv_event" in param:
+                return param.split()[0]
+            else:
+                return None
+
+        recv, send = externed(param_recv), externed(param_send)
+
+        if recv and send:
+            raise ValueError("You cannot have both external receive and send parameter on this object.")
+
+        return send or recv, bool(send)
 
     @classmethod
     def __resolve_object_args(
@@ -330,8 +370,9 @@ class PdGUIParser(PdParser):
             resolved_obj_args[i] = a
         return resolved_obj_args
 
-    @classmethod
-    def add_canvas(cls, line: list[str]) -> Canvas:
+    def add_canvas(self, line: list[str]) -> Canvas:
+        self.object_counter["canvas"] += 1
+
         label = Label(
             text=line[10],
             color=Color(line[16]),
@@ -340,10 +381,11 @@ class PdGUIParser(PdParser):
                 y=int(line[12])
             ),
             font=Font(int(line[13])),
-            font_size=int(line[14])
+            font_size=int(line[14]) + 2
         ) if line[10] != "empty" else None
 
         return Canvas(
+            id=f"canvas{self.object_counter['canvas']}",
             position=Coords(
                 x=int(line[2]),
                 y=int(line[3])
@@ -357,8 +399,8 @@ class PdGUIParser(PdParser):
         )
 
     @classmethod
-    def add_bang(cls, line: list[str]) -> Optional[Bang]:
-        param = cls.filter_params(line[10])
+    def add_bang(cls, line: list[str]) -> Bang | None:
+        param, send = cls.filter_params(line[10], line[9])
         if param is None:
             return None
 
@@ -370,7 +412,7 @@ class PdGUIParser(PdParser):
                 y=int(line[13])
             ),
             font=Font(int(line[14])),
-            font_size=int(line[15])
+            font_size=int(line[15]) + 2
         ) if line[11] != "empty" else None
 
         return Bang(
@@ -383,14 +425,16 @@ class PdGUIParser(PdParser):
                 y=int(line[5])
             ),
             parameter=param,
+            send=send,
             label=label,
+            flash_time=int(line[6]),
             bg_color=Color(line[16]),
             fg_color=Color(line[17])
         )
 
     @classmethod
-    def add_toggle(cls, line: list[str]) -> Optional[Toggle]:
-        param = cls.filter_params(line[8])
+    def add_toggle(cls, line: list[str]) -> Toggle | None:
+        param, send = cls.filter_params(line[8], line[7])
         if param is None:
             return None
 
@@ -402,7 +446,7 @@ class PdGUIParser(PdParser):
                 y=int(line[11])
             ),
             font=Font(int(line[12])),
-            font_size=int(line[13])
+            font_size=int(line[13]) + 2
         ) if line[9] != "empty" else None
 
         return Toggle(
@@ -415,6 +459,7 @@ class PdGUIParser(PdParser):
                 y=int(line[5])
             ),
             parameter=param,
+            send=send,
             label=label,
             bg_color=Color(line[14]),
             fg_color=Color(line[15]),
@@ -422,14 +467,14 @@ class PdGUIParser(PdParser):
         )
 
     @classmethod
-    def add_radio(cls, line: list[str]) -> Optional[Union[VRadio, HRadio]]:
-        param = cls.filter_params(line[10])
+    def add_radio(cls, line: list[str]) -> VRadio | HRadio | None:
+        param, send = cls.filter_params(line[10], line[9])
         if param is None:
             return None
 
         radio_type = line[4]
 
-        radio_obj: dict[str, type[Union[VRadio, HRadio]]] = {
+        radio_obj: dict[str, type[VRadio | HRadio]] = {
             "vradio": VRadio,
             "hradio": HRadio
         }
@@ -442,7 +487,7 @@ class PdGUIParser(PdParser):
                 y=int(line[13])
             ),
             font=Font(int(line[14])),
-            font_size=int(line[15])
+            font_size=int(line[15]) + 2
         ) if line[11] != "empty" else None
 
         return radio_obj[radio_type](
@@ -455,6 +500,7 @@ class PdGUIParser(PdParser):
                 y=int(line[5]) * (int(line[8]) if radio_type == "vradio" else 1)
             ),
             parameter=param,
+            send=send,
             label=label,
             bg_color=Color(line[16]),
             fg_color=Color(line[17]),
@@ -462,12 +508,12 @@ class PdGUIParser(PdParser):
         )
 
     @classmethod
-    def add_slider(cls, line: list[str]) -> Optional[Union[VSlider, HSlider]]:
-        param = cls.filter_params(line[12])
+    def add_slider(cls, line: list[str]) -> VSlider | HSlider | None:
+        param, send = cls.filter_params(line[12], line[11])
         if param is None:
             return None
 
-        slider: dict[str, type[Union[VSlider, HSlider]]] = {
+        slider: dict[str, type[VSlider | HSlider]] = {
             "vsl": VSlider,
             "hsl": HSlider
         }
@@ -480,7 +526,7 @@ class PdGUIParser(PdParser):
                 y=int(line[15])
             ),
             font=Font(int(line[16])),
-            font_size=int(line[17])
+            font_size=int(line[17]) + 2
         ) if line[13] != "empty" else None
 
         return slider[line[4]](
@@ -493,6 +539,7 @@ class PdGUIParser(PdParser):
                 y=int(line[6])
             ),
             parameter=param,
+            send=send,
             label=label,
             bg_color=Color(line[18]),
             fg_color=Color(line[19]),
@@ -503,8 +550,8 @@ class PdGUIParser(PdParser):
         )
 
     @classmethod
-    def add_knob(cls, line: list[str]) -> Optional[Knob]:
-        param = cls.filter_params(line[11])
+    def add_knob(cls, line: list[str]) -> Knob | None:
+        param, send = cls.filter_params(line[11], line[10])
         if param is None:
             return None
 
@@ -527,6 +574,7 @@ class PdGUIParser(PdParser):
                 y=int(line[5])
             ),
             parameter=param,
+            send=send,
             label_size=int(line[27]),
             label_pos=Coords(
                 x=int(line[28]),
@@ -548,14 +596,14 @@ class PdGUIParser(PdParser):
             circular=bool(int(line[16])),
             jump=bool(0),
             square=bool(int(line[15])),
-            arc=Color(line[13]),
+            arc_color=Color(line[13]),
             arc_start=float(line[23]),
             arc_show=bool(int(line[19]))
         )
 
     @classmethod
-    def add_number(cls, line: list[str]) -> Optional[Number]:
-        param = cls.filter_params(line[12])
+    def add_number(cls, line: list[str]) -> Number | None:
+        param, send = cls.filter_params(line[12], line[11])
         if param is None:
             return None
 
@@ -567,7 +615,7 @@ class PdGUIParser(PdParser):
                 y=int(line[15])
             ),
             font=Font(0),
-            font_size=int(line[17])
+            font_size=int(line[17]) + 2
         ) if line[13] != "empty" else None
 
         return Number(
@@ -576,36 +624,56 @@ class PdGUIParser(PdParser):
                 y=int(line[3])
             ),
             size=Size(
-                x=int(line[5])*int(line[17]),
+                x=int(line[5])*int(line[17])+8,
                 y=int(line[6])
             ),
             parameter=param,
+            send=send,
             label=label,
             bg_color=Color(line[18]),
             fg_color=Color(line[19]),
             log_mode=bool(int(line[9])),
-            log_height=int(line[21])
+            log_height=int(line[22]),
+            min=float(line[7]),
+            max=float(line[8])
         )
 
-    @classmethod
-    def add_comment(cls, line: list[str]) -> Comment:
-        text = " ".join(line[4:])
+    def add_comment(self, line: list[str]) -> Comment:
+        self.object_counter["comment"] += 1
+
+        # get width and clean up remaining text
+        if line[-2] == "f" \
+                and line[-3][-1] == ",":
+            width = int(line[-1])
+            text = " ".join(line[4:-2])[:-1]
+        else:
+            width = None
+            text = " ".join(line[4:])
+
+        # escape characters
+        text = text.replace("\"", "\\\"")
+        # text = text.replace("\\": "\\\\")  # backslash is already removed by self.split_line()
+
         return Comment(
+            id=f"comment{self.object_counter['comment']}",
             position=Coords(
                 x=int(line[2]),
                 y=int(line[3])
             ),
             text=text,
+            width=width,
             size=Size(
                 x=10*len(text), y=10
             )
         )
 
     @classmethod
-    def add_float(cls, line: list[str]) -> Optional[Float]:
-        param = cls.filter_params(line[9])
+    def add_float(cls, line: list[str]) -> Float | None:
+        param, send = cls.filter_params(line[9], line[10])
         if param is None:
             return None
+
+        font_height = int(line[11]) if line[11] != "0" else 8
 
         return Float(
             position=Coords(
@@ -613,13 +681,38 @@ class PdGUIParser(PdParser):
                 y=int(line[3])
             ),
             size=Size(
-                x=int(line[4]) * int(line[11]),
-                y=int(line[11])
+                x=int(line[4]) * (font_height - 4),
+                y=font_height
             ),
             parameter=param,
-            label_text=line[8],
-            font_size=int(line[11]),
+            send=send,
+            label_text=line[8] if line[8] != "-" else "",
+            font_height=font_height,
             label_pos=LabelPos(int(line[7])),
             min=float(line[5]),
             max=float(line[6])
+        )
+
+    @classmethod
+    def add_popmenu(cls, line: list[str]) -> Popmenu | None:
+        param, send = cls.filter_params(line[11], line[12])
+        if param is None:
+            return None
+
+        return Popmenu(
+            position=Coords(
+                x=int(line[2]),
+                y=int(line[3])
+            ),
+            size=Size(
+                x=int(line[5]),
+                y=int(line[6])
+            ),
+            parameter=param,
+            send=send,
+            font_height=int(line[7]),
+            no_select=line[10],
+            fg_color=Color(line[9]),
+            bg_color=Color(line[8]),
+            options=line[26:],
         )

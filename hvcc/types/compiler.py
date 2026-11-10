@@ -1,17 +1,17 @@
 # Heavy Compiler Collection
-# Copyright (C) 2024 Wasted Audio
+# Copyright (C) 2024-2026 Wasted Audio
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
 from abc import ABC, abstractmethod
 from collections import Counter, defaultdict
-from typing import Dict, List, Optional, Tuple
+from pathlib import Path
 
 from pydantic import BaseModel, RootModel
 
 from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
-from hvcc.types.meta import Meta
 from hvcc.types.IR import IRGraph, IRReceiver, IRSendMessage, IRTable
+from hvcc.types.meta import Meta
 
 
 class CompilerMsg(BaseModel):
@@ -21,41 +21,41 @@ class CompilerMsg(BaseModel):
 
 class CompilerNotif(BaseModel, arbitrary_types_allowed=True):
     has_error: bool = False
-    exception: Optional[Exception] = None
-    warnings: List[CompilerMsg] = []
-    errors: List[CompilerMsg] = []
+    exception: Exception | None = None
+    warnings: list[CompilerMsg] = []
+    errors: list[CompilerMsg] = []
 
 
 class CompilerResp(BaseModel):
     stage: str
     notifs: CompilerNotif = CompilerNotif()
-    in_dir: str = ""
-    in_file: str = ""
-    out_dir: str = ""
-    out_file: str = ""
+    in_dir: Path = Path()
+    in_file: Path = Path()
+    out_dir: Path = Path()
+    out_file: Path = Path()
     compile_time: float = 0.0
     obj_counter: Counter = Counter()
-    obj_perf: Dict[str, Dict[str, float]] = defaultdict(lambda: defaultdict(float))
-    ir: Optional[IRGraph] = None
+    obj_perf: dict[str, dict[str, float]] = defaultdict(lambda: defaultdict(float))
+    ir: IRGraph | None = None
 
 
 class CompilerResults(RootModel):
-    root: Dict[str, CompilerResp]
+    root: dict[str, CompilerResp]
 
 
 class ExternParams(BaseModel):
-    inParam: List[Tuple[str, IRReceiver]] = []
-    outParam: List[Tuple[str, IRSendMessage]] = []
+    inParam: list[tuple[str, IRReceiver]] = []
+    outParam: list[tuple[str, IRSendMessage]] = []
 
 
 class ExternEvents(BaseModel):
-    inEvent: List[Tuple[str, IRReceiver]] = []
-    outEvent: List[Tuple[str, IRSendMessage]] = []
+    inEvent: list[tuple[str, IRReceiver]] = []
+    outEvent: list[tuple[str, IRSendMessage]] = []
 
 
 class ExternMidi(BaseModel):
-    inMidi: List[str] = []
-    outMidi: List[str] = []
+    inMidi: list[str] = []
+    outMidi: list[str] = []
 
 
 class ExternMemoryPool(BaseModel):
@@ -68,7 +68,7 @@ class ExternInfo(BaseModel):
     parameters: ExternParams = ExternParams()
     events: ExternEvents = ExternEvents()
     midi: ExternMidi = ExternMidi()
-    tables: List[Tuple[str, IRTable]] = []
+    tables: list[tuple[str, IRTable]] = []
     memoryPoolSizesKb: ExternMemoryPool = ExternMemoryPool()
 
 
@@ -78,14 +78,14 @@ class Generator(ABC):
     @abstractmethod
     def compile(
         cls,
-        c_src_dir: str,
-        out_dir: str,
+        c_src_dir: Path,
+        out_dir: Path,
         externs: ExternInfo,
-        patch_name: Optional[str] = None,
-        patch_meta: Meta = Meta(),
+        patch_name: str,
+        patch_meta: Meta,
         num_input_channels: int = 0,
         num_output_channels: int = 0,
-        copyright: Optional[str] = None,
-        verbose: Optional[bool] = False
+        copyright: str | None = None,
+        verbose: bool | None = False
     ) -> CompilerResp:
         raise NotImplementedError

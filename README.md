@@ -14,49 +14,56 @@ The goal was to leverage Pure Data as a design interface and statically interpre
 
 It has since then been expanded to provide further support for many different platforms and frameworks, targeting game audio design, daw plugins and embedded production tools. In 2021 Wasted Audio took over maintenance of the project.
 
+> [!IMPORTANT]
+> **Using HVCC in a (commercial) product, hardware device, game, or research?**
+>
+> We are collecting information on how HVCC is used in the wild to better understand ecosystem needs and ensure long-term sustainability. [**Tell us about your use case!**](#use-cases-and-commercial-users)
+
 ## Documentation
 
-* [Introduction](/docs/01.introduction.md)
-  * [What is heavy?](/docs/01.introduction.md#what-is-heavy)
-  * [Supported patch formats](/docs/01.introduction.md#supported-patch-formats)
-  * [Supported platforms](/docs/01.introduction.md#supported-platforms)
-  * [Supported frameworks](/docs/01.introduction.md#supported-frameworks)
-  * [Licensing](/docs/01.introduction.md#licensing)
-* [Getting Started](/docs/02.getting_started.md)
-* [Generators](/docs/03.generators.md)
-* [MIDI](/docs/04.midi.md)
-* [C API](/docs/05.c.md)
-* [C++ API](/docs/06.cpp.md)
-* [Heavy Lang Info](/docs/07.heavy_lang.md)
-* [Heavy IR Info](/docs/08.heavy_ir_lang.md)
-* [Heavy GUI IR Info](/docs/11.heavy_gui_ir.md)
-* [Supported vanilla objects](/docs/09.supported_vanilla_objects.md)
-* [Unsupported vanilla objects](/docs/10.unsupported_vanilla_objects.md)
+- [Introduction](docs/getting-started/index.md)
+  - [What is heavy?](docs/getting-started/index.md#what-is-heavy)
+  - [Supported patch formats](docs/getting-started/index.md#supported-patch-formats)
+  - [Supported platforms](docs/getting-started/index.md#supported-platforms)
+  - [Supported frameworks](docs/getting-started/index.md#supported-frameworks)
+  - [Licensing](docs/getting-started/index.md#licensing)
+- [Getting Started](docs/getting-started/patching.md)
+- [Generators](docs/generators/index.md)
+- [MIDI](docs/reference/midi.md)
+- [C API](docs/reference/c.md)
+- [C++ API](docs/reference/cpp.md)
+- [Heavy Lang Info](docs/reference/ir/heavy_lang.md)
+- [Heavy IR Info](docs/reference/ir/heavy_ir.md)
+- [Heavy GUI IR Info](docs/reference/ir/heavy_gui_ir.md)
+- [Supported vanilla objects](docs/reference/objects/supported.md)
+- [Unsupported vanilla objects](docs/reference/objects/unsupported.md)
 
 ## Integrations
 
 hvcc has been integrated into several projects and services. This allows to easily compile patches without having to install hvcc manually.
 
-* [plugdata](https://plugdata.org/) - Modern interface for Pure Data. Includes a full cross-platform toolchain and targets Daisy, DPF and PD Externals.
-* [mod-cloud-builder](https://github.com/moddevices/mod-cloud-builder) - Online service for building LV2 plugins for the MOD platform.
-* [OWL Patch Library](https://www.rebeltech.org/patch-library) - Online service for building OWL plugins (uses an old fork).
+- [plugdata](https://plugdata.org/) - Modern interface for Pure Data. Includes a full cross-platform toolchain and targets Daisy, DPF and PD Externals.
+- [mod-cloud-builder](https://github.com/moddevices/mod-cloud-builder) - Online service for building LV2 plugins for the MOD platform (uses a fork).
+- [OWL Patch Library](https://www.rebeltech.org/patch-library) - Online service for building OWL plugins (uses an old fork).
+- [Bela](https://learn.bela.io/tutorials/pure-data/advanced/using-the-heavy-compiler/) - Embedded platform for sound experimentation (uses a fork).
+- [Boochow Web Apps](https://app.boochow.com/) - Online service for building Korg Logue SDK plugins (custom wrapper).
 
 ## Requirements
 
-Python 3.9 up to 3.14
+Python 3.10 up to 3.15
 
-* `jinja2` (for generator templating)
-* `pydantic` (for data types)
-* `pydantic-extra-types` (for data types)
-* `arpeggio` (for `expr~` translation)
+- `jinja2` (for generator templating)
+- `pydantic` (for data types)
+- `pydantic-extra-types` (for data types)
+- `arpeggio` (for `expr~` translation)
 
 For tests:
 
-* `tox` (python install)
-* `numpy/scipy` (dev dependencies)
-* `midifile` (git submodule)
-* `tinywav` (git submodule)
-* `clang/clang++` (system install)
+- `tox` (python install)
+- `numpy/scipy` (dev dependencies)
+- `midifile` (git submodule)
+- `tinywav` (git submodule)
+- `clang/clang++` (system install)
 
 ## Installation
 
@@ -74,9 +81,9 @@ cd hvcc/
 pip3 install -e .
 ```
 
-Also review our [Contribution Guide](/CONTRIBUTING.md) before opening a pull request.
+Also review our [Contribution Guide](CONTRIBUTING.md) before opening a pull request.
 
-## Usage
+## Basic Usage
 
 `hvcc` requires at least one argument that determines the top-level patch file to be loaded.
 
@@ -88,9 +95,9 @@ hvcc ~/myProject/_main.pd
 
 This command will generate the following directories:
 
-* `~/myProject/hv` heavylang representation of the input pd patch(es)
-* `~/myProject/ir` heavyir representation of the heavylang patch
-* `~/myProject/c` final generated C/C++ source files (this is what you would use in your project)
+- `~/myProject/hv` heavylang representation of the input pd patch(es)
+- `~/myProject/ir` heavyir representation of the heavylang patch
+- `~/myProject/c` final generated C/C++ source files (this is what you would use in your project)
 
 ### `-o` Select output directory
 
@@ -132,7 +139,7 @@ It is also possible to pass a list of generators:
 hvcc ~/myProject/_main.pd -o ~/Desktop/somewhere/else/ -n mySynth -g unity wwise js
 ```
 
-A list of available generator options can be found [here](/docs/03.generators.md)
+A list of available generator options can be found [here](docs/generators/index.md)
 
 ### `-p` Search Paths
 
@@ -166,21 +173,41 @@ hvcc ~/myProject/_main.pd -o ~/Desktop/somewhere/else/ -n mySynth --copyright "C
 
 Displays all the available parameters and options for hvcc.
 
+For more information see [CLI & Tools](docs/getting-started/tools.md)
+
 ## Contact
 
-The Heavy community aims to be safe and inclusive, please read our [Code of Conduct](/CODE_OF_CONDUCT.md) before engaging.
+The Heavy community aims to be safe and inclusive, please read our [Code of Conduct](CODE_OF_CONDUCT.md) before engaging.
+
+### Use Cases and Commercial Users
+
+We are actively gathering information from individuals and companies using HVCC in production, commercial products, embedded hardware, or research.
+
+Sharing your experience helps guide future development, highlight real-world adoption, and support the project's sustainability.
+
+If you or your organization use HVCC, please reach out to:
+
+- **Email (Private):** [`contact@wasted.audio`](mailto:contact@wasted.audio)
+- **GitHub Discussions (Public):** Share your work in [HVCC Discussions](https://github.com/Wasted-Audio/hvcc/discussions)
+
+**Helpful details to include:**
+
+- Company or project name (and whether you'd like to be publicly featured or kept confidential)
+- Target framework or hardware (e.g., Daisy, DPF/VST/LV2, Unity/Wwise, custom embedded C/C++)
+- Any features or improvements that would most benefit your workflow
+
+### Community and Chat
 
 There are several places where heavy/hvcc conversation is happening:
 
-* [Discord](https://discord.gg/fmxJveg)
-* [IRC](https://web.libera.chat/#hvcc)
-* A number of forums:
-  * [Bela](https://forum.bela.io/?q=hvcc)
-  * [Rebel Technology](https://community.rebeltech.org/tags/puredata)
-  * [Daisy](https://forum.electro-smith.com/c/integrations/pure-data/32)
-  * [MOD](https://forum.moddevices.com/c/developers/pure-data/56)
-
-Or you can use the [discussions](https://github.com/Wasted-Audio/hvcc/discussions) tab of this repository
+- [Discord](https://discord.gg/fmxJveg)
+- [IRC](https://web.libera.chat/#hvcc) (`#hvcc` on Libera.Chat)
+- Forums:
+  - [Bela](https://forum.bela.io/?q=hvcc)
+  - [Rebel Technology](https://community.rebeltech.org/tags/puredata)
+  - [Daisy](https://forum.electro-smith.com/c/integrations/pure-data/32)
+  - [MOD](https://forum.moddevices.com/c/developers/pure-data/56)
+- [Github Discussions](https://github.com/Wasted-Audio/hvcc/discussions)
 
 ## Funding
 

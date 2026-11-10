@@ -1,21 +1,26 @@
-# import datetime
-import os
+import json
 import shutil
 import time
-import jinja2
-import json
-from typing import List, Optional
+from pathlib import Path
 
-import hvcc.core.hv2ir.HeavyLangObject as HeavyLangObject
+import jinja2
+
+from hvcc.core.hv2ir.HeavyIrException import HeavyIrException
+from hvcc.core.hv2ir.HeavyLangObject import HeavyLangObject
+from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
+from hvcc.types.compiler import (
+    CompilerMsg,
+    CompilerNotif,
+    CompilerResp,
+    ExternInfo,
+    Generator,
+)
+from hvcc.types.IR import IRGraph
+from hvcc.types.meta import Meta
+
 from ..copyright import copyright_manager
 
-from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
-from hvcc.types.compiler import Generator, CompilerResp, CompilerNotif, CompilerMsg, ExternInfo
-from hvcc.types.meta import Meta
-from hvcc.types.IR import IRGraph
-
-
-heavy_hash = HeavyLangObject.HeavyLangObject.get_hash
+heavy_hash = HeavyLangObject.get_hash
 OWL_BUTTONS = ['Push', 'B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8', 'B9', 'B10', 'B11', 'Red', 'Green']
 
 
@@ -24,8 +29,8 @@ class c2owl(Generator):
     """
 
     @classmethod
-    def make_jdata(cls, patch_ir: str) -> List:
-        jdata = list()
+    def make_jdata(cls, patch_ir: Path) -> list:
+        jdata = []
 
         with open(patch_ir, mode="r") as f:
             ir = IRGraph(**json.load(f))
@@ -49,7 +54,7 @@ class c2owl(Generator):
                     jdata.append((key, name, 'RECV', f"0x{heavy_hash(name):X}",
                                   0, 1, None, key in OWL_BUTTONS))
 
-            for _, obj in ir.objects.items():
+            for obj in ir.objects.values():
                 try:
                     if obj.type == '__send':
                         name = obj.args['name']
@@ -64,7 +69,7 @@ class c2owl(Generator):
                             key = name.split('Channel-', 1)[1]
                             jdata.append((key, f'{name}>', 'SEND', f"0x{heavy_hash(name):X}",
                                           0, 1, None, key in OWL_BUTTONS))
-                except Exception:
+                except (IndexError, KeyError, HeavyIrException):
                     pass
 
             return jdata
@@ -72,54 +77,54 @@ class c2owl(Generator):
     @classmethod
     def compile(
         cls,
-        c_src_dir: str,
-        out_dir: str,
+        c_src_dir: Path,
+        out_dir: Path,
         externs: ExternInfo,
-        patch_name: Optional[str] = None,
-        patch_meta: Meta = Meta(),
+        patch_name: str,
+        patch_meta: Meta,
         num_input_channels: int = 0,
         num_output_channels: int = 0,
-        copyright: Optional[str] = None,
-        verbose: Optional[bool] = False
+        copyright: str | None = None,
+        verbose: bool | None = False
     ) -> CompilerResp:
 
         tick = time.time()
+        patch_meta = patch_meta or Meta()
 
-        out_dir = os.path.join(out_dir, "Source")
+        out_dir = Path(out_dir, "Source")
         patch_name = patch_name or "heavy"
         copyright_c = copyright_manager.get_copyright_for_c(copyright)
 
         try:
             # ensure that the output directory does not exist
-            out_dir = os.path.abspath(out_dir)
-            if os.path.exists(out_dir):
+            out_dir = out_dir.absolute()
+            if out_dir.exists():
                 shutil.rmtree(out_dir)
 
             # copy over generated C source files
             shutil.copytree(c_src_dir, out_dir)
 
             # copy over deps
-            shutil.copytree(os.path.join(os.path.dirname(__file__), "deps"), out_dir, dirs_exist_ok=True)
+            shutil.copytree(Path(Path(__file__).parent, "deps"), out_dir, dirs_exist_ok=True)
 
             # initialize the jinja template environment
             env = jinja2.Environment()
 
-            env.loader = jinja2.FileSystemLoader(
-                os.path.join(os.path.dirname(os.path.abspath(__file__)), "templates"))
+            env.loader = jinja2.FileSystemLoader(Path(__file__).parent / "templates")
 
             # construct jdata from ir
-            ir_dir = os.path.join(c_src_dir, "../ir")
-            patch_ir = os.path.join(ir_dir, f"{patch_name}.heavy.ir.json")
+            ir_dir = Path(c_src_dir, "../ir")
+            patch_ir = Path(ir_dir, f"{patch_name}.heavy.ir.json")
             jdata = cls.make_jdata(patch_ir)
 
             # generate OWL wrapper from template
-            owl_hpp_path = os.path.join(out_dir, f"HeavyOWL_{patch_name}.hpp")
+            owl_hpp_path = Path(out_dir, f"HeavyOWL_{patch_name}.hpp")
             with open(owl_hpp_path, "w") as f:
                 f.write(env.get_template("HeavyOwl.hpp").render(
                     jdata=jdata,
                     name=patch_name,
                     copyright=copyright_c))
-            owl_h_path = os.path.join(out_dir, "HeavyOwlConstants.h")
+            owl_h_path = Path(out_dir, "HeavyOwlConstants.h")
             with open(owl_h_path, "w") as f:
                 f.write(env.get_template("HeavyOwlConstants.h").render(
                     jdata=jdata,
@@ -131,11 +136,11 @@ class c2owl(Generator):
                 stage="c2owl",
                 in_dir=c_src_dir,
                 out_dir=out_dir,
-                out_file=os.path.basename(owl_h_path),
+                out_file=owl_h_path,
                 compile_time=time.time() - tick
             )
 
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001
             return CompilerResp(
                 stage="c2owl",
                 notifs=CompilerNotif(

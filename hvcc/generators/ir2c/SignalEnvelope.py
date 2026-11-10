@@ -14,11 +14,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from typing import Dict, List
-
-from .HeavyObject import HeavyObject
 
 from hvcc.types.IR import IRSignalList
+
+from .HeavyObject import HeavyObject
 
 
 class SignalEnvelope(HeavyObject):
@@ -35,7 +34,7 @@ class SignalEnvelope(HeavyObject):
         return {"HvSignalEnvelope.h", "HvSignalEnvelope.c"}
 
     @classmethod
-    def get_C_init(cls, obj_type: str, obj_id: str, args: Dict) -> List[str]:
+    def get_C_init(cls, obj_type: str, obj_id: str, args: dict) -> list[str]:
         return [
             "sEnv_init(&sEnv_{0}, {1}, {2});".format(
                 obj_id,
@@ -44,7 +43,7 @@ class SignalEnvelope(HeavyObject):
         ]
 
     @classmethod
-    def get_C_process(cls, process_dict: IRSignalList, obj_type: str, obj_id: str, args: Dict) -> List[str]:
+    def get_C_process(cls, process_dict: IRSignalList, obj_type: str, obj_id: str, args: dict) -> list[str]:
         return [
             "sEnv_process(this, &sEnv_{0}, VIf({1}), &sEnv_{0}_sendMessage);".format(
                 process_dict.id,

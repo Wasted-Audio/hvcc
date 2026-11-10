@@ -1,5 +1,5 @@
 # Copyright (C) 2014-2018 Enzien Audio, Ltd.
-# Copyright (C) 2023 Wasted Audio
+# Copyright (C) 2023-2026 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,9 +16,9 @@
 
 import os
 from collections import defaultdict
-from typing import Optional, Union, Dict, List
+from pathlib import Path
 
-from .HeavyException import HeavyException
+from .HeavyIrException import HeavyIrException
 from .HeavyLangObject import HeavyLangObject
 
 
@@ -31,23 +31,23 @@ class LocalVars:
         # the data structure is a list map
         # key is the name under which the object is registered, value is a
         # list of all objects who are registered with that name
-        self.__REGISTERED_OBJ_DICT: Dict = defaultdict(list)
+        self.__REGISTERED_OBJ_DICT: dict = defaultdict(list)
 
         # the list of globally declared paths
         self.declared_paths = [stdlib_dir]  # initialise with the standard library directory
 
-    def find_path_for_abstraction(self, name: str) -> Optional[str]:
+    def find_path_for_abstraction(self, name: str) -> Path | None:
         # the file name based on the abstraction name
         file_name = f"{name}.hv.json"
 
         # iterate in order through the declared paths in order to find the file
         for d in self.declared_paths:
-            file_path = os.path.join(d, file_name)
-            if os.path.exists(file_path):
+            file_path = Path(d, file_name)
+            if file_path.exists():
                 return file_path  # if a matching abstraction is found, return the path
         return None  # otherwise return None
 
-    def add_import_paths(self, path_list: List) -> None:
+    def add_import_paths(self, path_list: list) -> None:
         """ Add import paths. Paths are expanded and made as explicit as possible.
         """
         self.declared_paths.extend([os.path.abspath(os.path.expanduser(p)) for p in path_list])
@@ -60,7 +60,7 @@ class LocalVars:
         if (unique and len(objs) > 0) or (static and len(objs) > 1):
             # if there is already a registered object of this type and the new
             # object is not declared as static, throw an error
-            raise HeavyException(f"Object {obj} with name \"{name}\" already exists, "
+            raise HeavyIrException(f"Object {obj} with name \"{name}\" already exists, "
                                  "and the new object is static or unique.")
         elif len(objs) == 1 and static:
             pass  # the static object has already been registered, move on
@@ -73,14 +73,14 @@ class LocalVars:
 
         self.__REGISTERED_OBJ_DICT[name].remove(obj)
 
-    def get_objects_for_name(self, name: str, obj_types: Union[str, List]) -> List:
+    def get_objects_for_name(self, name: str, obj_types: str | list) -> list:
         """ Returns a list of objects registered under a name in this scope.
         """
 
         obj_types = obj_types if isinstance(obj_types, list) else [obj_types]
         return [o for o in self.__REGISTERED_OBJ_DICT[name] if o.type in obj_types]
 
-    def get_registered_objects_for_type(self, obj_type: str) -> Dict:
+    def get_registered_objects_for_type(self, obj_type: str) -> dict:
         """ Returns a list-dictionary for all objects of the given type, indexed by name.
         """
 

@@ -1,10 +1,10 @@
 # Heavy Compiler Collection
-# Copyright (C) 2025 Wasted Audio
+# Copyright (C) 2025-2026 Wasted Audio
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
 from enum import IntEnum
-from typing import Literal, Optional, Union
+from typing import Literal
 
 from pydantic import BaseModel
 from pydantic_extra_types.color import Color
@@ -31,8 +31,8 @@ class Font(IntEnum):
 class LabelShow(IntEnum):
     never = 0
     always = 1
-    when_active = 2
-    when_typing = 3
+    active = 2
+    typing = 3
 
 
 class LabelPos(IntEnum):
@@ -48,8 +48,13 @@ class Base(BaseModel):
     size: Size
 
 
+class BaseUI(Base):
+    id: str = ""
+
+
 class BaseParam(Base):
     parameter: str
+    send: bool = False
 
 
 class Label(BaseModel):
@@ -60,34 +65,36 @@ class Label(BaseModel):
     font_size: int
 
 
-class Comment(Base):
+class Comment(BaseUI):
     type: Literal["comment"] = "comment"
     text: str
+    width: int | None = 0
 
 
-class Canvas(Base):
+class Canvas(BaseUI):
     type: Literal["canvas"] = "canvas"
-    label: Optional[Label] = None
+    label: Label | None = None
     bg_color: Color
 
 
 class Bang(BaseParam):
     type: Literal["bang"] = "bang"
-    label: Optional[Label] = None
+    label: Label | None = None
+    flash_time: int
     fg_color: Color
     bg_color: Color
 
 
 class Toggle(BaseParam):
     type: Literal["toggle"] = "toggle"
-    label: Optional[Label] = None
+    label: Label | None = None
     fg_color: Color
     bg_color: Color
     non_zero: float
 
 
 class Radio(BaseParam):
-    label: Optional[Label] = None
+    label: Label | None = None
     fg_color: Color
     bg_color: Color
     options: int
@@ -102,7 +109,7 @@ class HRadio(Radio):
 
 
 class Slider(BaseParam):
-    label: Optional[Label] = None
+    label: Label | None = None
     min: float
     max: float
     fg_color: Color
@@ -139,33 +146,56 @@ class Knob(BaseParam):
     circular: bool
     jump: bool
     square: bool
-    arc: Color
+    arc_color: Color
     arc_start: float
     arc_show: bool
 
 
 class Number(BaseParam):
     type: Literal["number"] = "number"
-    label: Optional[Label] = None
+    label: Label | None = None
     fg_color: Color
     bg_color: Color
     log_mode: bool
     log_height: int
+    min: float
+    max: float
 
 
 class Float(BaseParam):
     type: Literal["float"] = "float"
-    font_size: int
+    font_height: int
     label_text: str
     label_pos: LabelPos
     min: float
     max: float
 
 
-GUIObjects = Union[Bang, Toggle, Radio, Slider, Knob, Number, Float, Comment, Canvas]
+class Popmenu(BaseParam):
+    type: Literal["popmenu"] = "popmenu"
+    font_height: int
+    no_select: str
+    fg_color: Color
+    bg_color: Color
+    options: list[str]
+
+
+GUIObjects = Bang | Toggle | Radio | Slider | Knob | Number | Float | Comment | Canvas | Popmenu
+
+
+class Theme(BaseModel):
+    obj_corner_radius: float | None = None
+    cnv_color: Color | None = None
+    cnv_txt_color: Color | None = None
+    io_color: Color | None = None
+    bg_color: Color | None = None
+    sel_color: Color | None = None
+    com_txt_color: Color | None = None
+    out_color: Color | None = None
 
 
 class GraphBase(BaseModel):
+    id: str = "mainPatch"
     objects: list[GUIObjects]
     graphs: list["Graph"]
 
@@ -178,4 +208,5 @@ class Graph(GraphBase):
 
 class GraphRoot(GraphBase):
     size: Size
+    theme: Theme | None = Theme()
     version: str = VERSION

@@ -14,7 +14,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from typing import Optional, List, Dict
+
+from hvcc.types.Heavy import Heavy, HvPos
 
 from .NotificationEnum import NotificationEnum
 from .PdObject import PdObject
@@ -25,7 +26,7 @@ class PdTableObject(PdObject):
     def __init__(
         self,
         obj_type: str,
-        obj_args: Optional[List] = None,
+        obj_args: list | None = None,
         pos_x: int = 0,
         pos_y: int = 0
     ) -> None:
@@ -38,35 +39,29 @@ class PdTableObject(PdObject):
 
         try:
             self.__table_name = self.obj_args[0]
-        except Exception:
+        except IndexError:
             self.add_error(
                 "Missing \"name\" argument for table",
                 NotificationEnum.ERROR_MISSING_REQUIRED_ARGUMENT)
 
+        # optional arguments
         try:
-            # optional arguments
-            try:
-                self.__size = int(self.obj_args[1])
-                self.__extern = (self.obj_args[2] == "@hv_table")
-            except Exception:
-                pass
-        except Exception:
+            self.__size = int(self.obj_args[1])
+            self.__extern = (self.obj_args[2] == "@hv_table")
+        except (IndexError, ValueError):
             pass
 
-    def to_hv(self) -> Dict:
-        return {
-            "type": "table",
-            "args": {
+    def to_hv(self) -> Heavy:
+        return Heavy(
+            type="table",
+            args={
                 "name": self.__table_name,
                 "size": self.__size,
                 "values": [],
                 "extern": self.__extern
             },
-            "properties": {
-                "x": self.pos_x,
-                "y": self.pos_y
-            },
-            "annotations": {
+            properties=HvPos(x=self.pos_x, y=self.pos_y),
+            annotations={
                 "scope": "public"
             }
-        }
+        )

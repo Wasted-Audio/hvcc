@@ -15,7 +15,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import re
-from typing import Dict, Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 
 from .HeavyIrObject import HeavyIrObject
 
@@ -30,14 +30,13 @@ class HIrReceive(HeavyIrObject):
     def __init__(
         self,
         obj_type: str,
-        args: Optional[Dict] = None,
+        args: dict | None = None,
         graph: Optional['HeavyGraph'] = None,
-        annotations: Optional[Dict] = None
+        annotations: dict | None = None
     ) -> None:
         super().__init__("__receive", args=args, graph=graph, annotations=annotations)
-        if args is not None and args["extern"]:
-            # externed receivers must contain only alphanumeric characters or underscores,
-            # so that the names can be easily and transparently turned into code
-            if re.search(r"\W", args["name"]):
-                self.add_error(f"Parameter and Event names may only contain \
-                                alphanumeric characters or underscore: '{args['name']}'")
+        # externed receivers must contain only alphanumeric characters or underscores,
+        # so that the names can be easily and transparently turned into code
+        if args is not None and args["extern"] and re.search(r"\W", args["name"]):
+            self.add_error(f"Parameter and Event names may only contain \
+                            alphanumeric characters or underscore: '{args['name']}'")

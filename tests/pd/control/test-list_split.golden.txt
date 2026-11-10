@@ -1,0 +1,15 @@
+[@ 0.000] split2: 3 4
+[@ 0.000] split1: 1 2
+[@ 0.000] split2: 3
+[@ 0.000] split1: 1 2
+[@ 0.000] split2: bang
+[@ 0.000] split1: 1 2
+[@ 0.000] split2: list so are you
+[@ 0.000] split1: 1 2
+[@ 0.000] split3: symbol a
+[@ 0.000] split3: 1
+[@ 0.000] split3: bang
+[@ 0.000] split2: symbol bah
+[@ 0.000] split1: list cis boom
+[@ 0.000] split2: symbol dog
+[@ 0.000] split1: list walk the

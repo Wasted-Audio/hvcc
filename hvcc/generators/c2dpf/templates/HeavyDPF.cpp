@@ -8,8 +8,6 @@
 {% endif %}
 
 
-#define HV_DPF_NUM_PARAMETER {{receivers|length + senders|length}}
-
 #define HV_HASH_NOTEIN          0x67E37CA3
 #define HV_HASH_CTLIN           0x41BE0f9C
 #define HV_HASH_POLYTOUCHIN     0xBC530F59
@@ -84,9 +82,13 @@ static void hvPrintHookFunc(HeavyContextInterface *c, const char *printLabel, co
 {{class_name}}::{{class_name}}()
  : Plugin(HV_DPF_NUM_PARAMETER, 0, 0)
 {
-  {% for k, v in receivers + senders -%}
+  {% for k, v in receivers + events + senders + out_events -%}
+    {%- if v.attributes %}
   _parameters[{{loop.index-1}}] = {{v.attributes.default}}f;
-  {% endfor %}
+    {%- else %}
+  _parameters[{{loop.index-1}}] = 0.0f;
+    {%- endif %}
+  {%- endfor %}
 
   _context = hv_{{name}}_new_with_options(getSampleRate(), {{pool_sizes_kb.internal}}, {{pool_sizes_kb.inputQueue}}, {{pool_sizes_kb.outputQueue}});
   _context->setUserData(this);
@@ -111,11 +113,11 @@ static void hvPrintHookFunc(HeavyContextInterface *c, const char *printLabel, co
 
 void {{class_name}}::initParameter(uint32_t index, Parameter& parameter)
 {
-  {%- if (receivers|length > 0) or (senders|length > 0) -%}
+  {%- if (receivers|length > 0) or (events|length > 0) or (senders|length > 0) or (out_events|length > 0) -%}
   // initialise parameters with defaults
   switch (index)
   {
-    {% for k, v in receivers + senders %}
+    {% for k, v in receivers + events + senders + out_events %}
 {% include 'initParameter.cpp' %}
     {% endfor -%}
   }
@@ -127,7 +129,7 @@ void {{class_name}}::initParameter(uint32_t index, Parameter& parameter)
 
 float {{class_name}}::getParameterValue(uint32_t index) const
 {
-  {%- if (receivers|length > 0) or (senders|length > 0) %}
+  {%- if (receivers|length > 0) or (events|length > 0) or (senders|length > 0) or (out_events|length > 0) %}
   return _parameters[index];
   {% else %}
   return 0.0f;
@@ -136,13 +138,18 @@ float {{class_name}}::getParameterValue(uint32_t index) const
 
 void {{class_name}}::setParameterValue(uint32_t index, float value)
 {
-  {%- if receivers|length > 0 %}
+  {%- if (receivers|length > 0) or (events|length > 0) %}
   switch (index) {
-    {% for k, v  in receivers -%}
+    {%- for k, v  in receivers + events %}
     case {{loop.index-1}}: {
+      {%- if v.extern == "event" %}
+      if (value == 1)
+        _context->sendBangToReceiver(Heavy_{{name}}::Event::In::{{k|upper}});
+      {%- else %}
       _context->sendFloatToReceiver(
-          Heavy_{{name}}::Parameter::In::{{k|upper}},
-          value);
+        Heavy_{{name}}::Parameter::In::{{k|upper}},
+        value);
+      {%- endif %}
       break;
     }
     {% endfor %}
@@ -154,13 +161,27 @@ void {{class_name}}::setParameterValue(uint32_t index, float value)
   {%- endif %}
 }
 
+{%- if out_events|length > 0 %}
+void {{class_name}}::setOutputEvent(uint32_t id)
+{
+  OutputEvent& p = outputEvents[id];
+  p.id = id;
+  p.holdSamples = (uint32_t)(getSampleRate() * 0.05f); // ~50 ms hold
+  _parameters[id] = 1.0f;
+}
+{%- endif %}
+
 void {{class_name}}::setOutputParameter(uint32_t sendHash, const HvMessage *m)
 {
-  {%- if senders|length > 0 %}
+  {%- if (senders|length > 0) or (out_events|length > 0) %}
   switch (sendHash) {
-    {% for k, v in senders -%}
+    {% for k, v in senders + out_events -%}
     case {{v.hash}}: // {{v.display}}
+      {%- if v.extern == "event" %}
+      setOutputEvent(param{{v.display}});
+      {%- else %}
       _parameters[param{{v.display}}] = hv_msg_getFloat(m, 0);
+      {%- endif %}
       break;
     {% endfor %}
   }
@@ -207,12 +228,24 @@ void {{class_name}}::run(const float** inputs, float** outputs, uint32_t frames,
 void {{class_name}}::run(const float** inputs, float** outputs, uint32_t frames)
 {
 #endif
+
+{%- if out_events|length > 0 %}
+  for (auto& p : outputEvents)
+  {
+    if (p.holdSamples > 0)
+    {
+      if (p.holdSamples > frames) p.holdSamples -= frames;
+      else { p.holdSamples = 0; _parameters[p.id] = 0.0f; }
+    }
+  }
+{%- endif %}
+
   hostTransportEvents(frames);
 {% if meta.denormals is sameas false %}
   const ScopedDenormalDisable sdd;
 {% endif %}
   const TimePosition& timePos(getTimePosition());
-  if (timePos.playing && timePos.bbt.valid)
+  if (timePos.bbt.valid)
     _context->sendMessageToReceiverV(HV_HASH_DPF_BPM, 0, "f", timePos.bbt.beatsPerMinute);
 
   _context->process((float**)inputs, outputs, frames);

@@ -15,7 +15,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
-from typing import List
 
 
 class PrettyfyC:
@@ -29,13 +28,12 @@ class PrettyfyC:
         step: int = 2,
         delete_input_on_finish: bool = False
     ) -> None:
-        with open(file_in, "r") as f:
-            with open(file_out, "w") as g:
-                for line in f:
-                    indent -= line.count("}")
-                    new_line = (" " * (step * indent)) + line
-                    g.write(new_line + os.linesep)
-                    indent += line.count("{")
+        with open(file_in, "r") as f, open(file_out, "w") as g:
+            for line in f:
+                indent -= line.count("}")
+                new_line = (" " * (step * indent)) + line
+                g.write(new_line + os.linesep)
+                indent += line.count("{")
 
         if delete_input_on_finish:
             os.remove(file_in)
@@ -43,10 +41,10 @@ class PrettyfyC:
     @classmethod
     def prettyfy_list(
         cls,
-        list_in: List,
+        list_in: list,
         indent: int = 0,
         step: int = 2
-    ) -> List:
+    ) -> list:
         g = []
         for line in list_in:
             indent -= line.count("}")

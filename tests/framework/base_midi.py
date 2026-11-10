@@ -1,5 +1,5 @@
 # Copyright (C) 2014-2018 Enzien Audio, Ltd.
-# Copyright (C) 2022 Wasted Audio
+# Copyright (C) 2022-2026 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,42 +14,41 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
 import platform
 import shutil
 import subprocess
-
-from typing import List, Optional
+from pathlib import Path
 
 from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
 from tests.framework.base_test import HvBaseTest
 
 
 class TestPdMIDIBase(HvBaseTest):
+    MIDI_RUNNER_SOURCE = "test_midi.cpp"
 
     def compile_and_run(
         self,
-        source_files: List[str],
-        out_dir: str,
+        source_files: list[Path],
+        out_dir: Path,
         num_iterations: int,
-        flag: Optional[str] = None
-    ) -> List[str]:
+        flag: str | None = None
+    ) -> list[str]:
         exe_path = self._compile_and_run(source_files, out_dir, flag)
 
         # run executable (returns stdout)
         output = subprocess.check_output([
             exe_path,
             # str(num_iterations),
-            os.path.join(out_dir, '../src/test_midi.mid')]
+            Path(out_dir, '../src/test_midi.mid')]
         ).splitlines()
 
         return [x.decode('utf-8') for x in output]
 
     def create_fail_message(
         self,
-        result: str,
-        golden: str,
-        flag: Optional[str] = None
+        result: list[str],
+        golden: list[str],
+        flag: str | None = None
     ) -> str:
         return "\nResult ({0})\n-----------\n{1}\n\nGolden\n-----------\n{2}".format(
             flag or "",
@@ -61,12 +60,8 @@ class TestPdMIDIBase(HvBaseTest):
         pd_file: str,
         expected_enum: NotificationEnum
     ) -> None:
-        pd_path = os.path.join(self.TEST_DIR, pd_file)
-
-        try:
-            self._run_hvcc(pd_path, expect_fail=True, expected_enum=expected_enum)
-        except Exception as e:
-            self.fail(str(e))
+        pd_path = Path(self.TEST_DIR, pd_file)
+        self._run_hvcc(pd_path, expect_fail=True, expected_enum=expected_enum)
 
     def _test_control_patch_expect_warning(
         self,
@@ -74,19 +69,15 @@ class TestPdMIDIBase(HvBaseTest):
         expected_enum: NotificationEnum
     ) -> None:
         # setup
-        pd_path = os.path.join(self.TEST_DIR, pd_file)
-
-        try:
-            self._run_hvcc(pd_path, expect_warning=True, expected_enum=expected_enum)
-        except Exception as e:
-            self.fail(str(e))
+        pd_path = Path(self.TEST_DIR, pd_file)
+        self._run_hvcc(pd_path, expect_warning=True, expected_enum=expected_enum)
 
     def _test_midi_patch(
         self,
         pd_file: str,
         num_iterations: int = 1,
         allow_warnings: bool = True,
-        fail_message: Optional[str] = None
+        fail_message: str | None = None
     ) -> None:
         """Compiles, runs, and tests a control patch.
         Allows warnings by default, always fails on errors.
@@ -94,65 +85,66 @@ class TestPdMIDIBase(HvBaseTest):
         """
 
         # setup
-        pd_path = os.path.join(self.TEST_DIR, pd_file)
-        patch_name = os.path.splitext(os.path.basename(pd_path))[0]
-
-        try:
-            out_dir = self._run_hvcc(pd_path)
-        except Exception as e:
-            self.fail(str(e))
+        pd_path = Path(self.TEST_DIR, pd_file)
+        out_dir = self._run_hvcc(pd_path)
 
         # copy over additional C assets
-        c_src_dir = os.path.join(out_dir, "c")
-        shutil.copy2(os.path.join(self.SCRIPT_DIR, "src/test_midi.cpp"), c_src_dir)
-        shutil.copy2(os.path.join(self.SCRIPT_DIR, "src/midifile/include/MidiFile.h"), c_src_dir)
-        shutil.copy2(os.path.join(self.SCRIPT_DIR, "src/midifile/include/MidiEventList.h"), c_src_dir)
-        shutil.copy2(os.path.join(self.SCRIPT_DIR, "src/midifile/include/MidiEvent.h"), c_src_dir)
-        shutil.copy2(os.path.join(self.SCRIPT_DIR, "src/midifile/include/MidiMessage.h"), c_src_dir)
-        shutil.copy2(os.path.join(self.SCRIPT_DIR, "src/midifile/include/Binasc.h"), c_src_dir)
-        shutil.copy2(os.path.join(self.SCRIPT_DIR, "src/midifile/src/MidiFile.cpp"), c_src_dir)
-        shutil.copy2(os.path.join(self.SCRIPT_DIR, "src/midifile/src/MidiEventList.cpp"), c_src_dir)
-        shutil.copy2(os.path.join(self.SCRIPT_DIR, "src/midifile/src/MidiEvent.cpp"), c_src_dir)
-        shutil.copy2(os.path.join(self.SCRIPT_DIR, "src/midifile/src/MidiMessage.cpp"), c_src_dir)
-        shutil.copy2(os.path.join(self.SCRIPT_DIR, "src/midifile/src/Binasc.cpp"), c_src_dir)
+        assert out_dir
+        c_src_dir = Path(out_dir, "c")
+        shutil.copy2(Path(self.SCRIPT_DIR, f"src/{self.MIDI_RUNNER_SOURCE}"), c_src_dir)
+        shutil.copy2(Path(self.SCRIPT_DIR, "src/midifile/include/MidiFile.h"), c_src_dir)
+        shutil.copy2(Path(self.SCRIPT_DIR, "src/midifile/include/MidiEventList.h"), c_src_dir)
+        shutil.copy2(Path(self.SCRIPT_DIR, "src/midifile/include/MidiEvent.h"), c_src_dir)
+        shutil.copy2(Path(self.SCRIPT_DIR, "src/midifile/include/MidiMessage.h"), c_src_dir)
+        shutil.copy2(Path(self.SCRIPT_DIR, "src/midifile/include/Binasc.h"), c_src_dir)
+        shutil.copy2(Path(self.SCRIPT_DIR, "src/midifile/src/MidiFile.cpp"), c_src_dir)
+        shutil.copy2(Path(self.SCRIPT_DIR, "src/midifile/src/MidiEventList.cpp"), c_src_dir)
+        shutil.copy2(Path(self.SCRIPT_DIR, "src/midifile/src/MidiEvent.cpp"), c_src_dir)
+        shutil.copy2(Path(self.SCRIPT_DIR, "src/midifile/src/MidiMessage.cpp"), c_src_dir)
+        shutil.copy2(Path(self.SCRIPT_DIR, "src/midifile/src/Binasc.cpp"), c_src_dir)
 
         # prepare the clang command
-        c_sources = os.listdir(c_src_dir)
+        c_sources = [Path(child) for child in Path(c_src_dir).iterdir()]
 
         # don't delete the output dir
         # if the test fails, we can examine the output
 
-        golden_path = os.path.join(os.path.dirname(pd_path), f"{patch_name.split('.')[0]}.golden.txt")
-        if os.path.exists(golden_path):
+        golden_path = Path(Path(pd_path).parent, f"{pd_path.stem}.golden.txt")
+        if golden_path.exists():
             with open(golden_path, "r") as f:
                 golden = "".join(f.readlines()).splitlines()
 
                 # NO SIMD (always test this case)
                 result = self.compile_and_run(c_sources, out_dir, num_iterations, "HV_SIMD_NONE")
-                message = fail_message or self.create_fail_message(result, golden, "HV_SIMD_NONE")
+                message = fail_message or \
+                    self.create_fail_message(result, golden, "HV_SIMD_NONE")
                 self.assertEqual(result, golden, message)
 
                 if platform.machine().startswith("x86"):
                     # SSE
                     result = self.compile_and_run(c_sources, out_dir, num_iterations, "HV_SIMD_SSE")
-                    message = fail_message or self.create_fail_message(result, golden, "HV_SIMD_SSE")
+                    message = fail_message or \
+                        self.create_fail_message(result, golden, "HV_SIMD_SSE")
                     self.assertEqual(result, golden, message)
 
                     # SSE with FMA
                     result = self.compile_and_run(c_sources, out_dir, num_iterations, "HV_SIMD_SSE_FMA")
-                    message = fail_message or self.create_fail_message(result, golden, "HV_SIMD_SSE_FMA")
+                    message = fail_message or \
+                        self.create_fail_message(result, golden, "HV_SIMD_SSE_FMA")
                     self.assertEqual(result, golden, message)
 
                     # AVX (with FMA)
                     result = self.compile_and_run(c_sources, out_dir, num_iterations, "HV_SIMD_AVX")
-                    message = fail_message or self.create_fail_message(result, golden, "HV_SIMD_AVX")
+                    message = fail_message or \
+                        self.create_fail_message(result, golden, "HV_SIMD_AVX")
                     self.assertEqual(result, golden, message)
 
                 elif platform.machine().startswith("arm"):
                     # NEON
                     result = self.compile_and_run(c_sources, out_dir, num_iterations, "HV_SIMD_NEON")
-                    message = fail_message or self.create_fail_message(result, golden, "HV_SIMD_NEON")
+                    message = fail_message or \
+                        self.create_fail_message(result, golden, "HV_SIMD_NEON")
                     self.assertEqual(result, golden, message)
 
         else:
-            self.fail(f"{os.path.basename(golden_path)} could not be found.")
+            self.fail(f"{golden_path.name} could not be found.")

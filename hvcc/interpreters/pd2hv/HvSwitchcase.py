@@ -14,7 +14,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from typing import Optional, List, Dict
+
+from hvcc.types.Heavy import Heavy, HvPos
 
 from .PdObject import PdObject
 
@@ -23,7 +24,7 @@ class HvSwitchcase(PdObject):
     def __init__(
         self,
         obj_type: str,
-        obj_args: Optional[List] = None,
+        obj_args: list | None = None,
         pos_x: int = 0,
         pos_y: int = 0
     ) -> None:
@@ -34,20 +35,17 @@ class HvSwitchcase(PdObject):
         for i, a in enumerate(self.obj_args):
             try:
                 self.obj_args[i] = float(a)
-            except Exception:
+            except ValueError:
                 pass
 
     def get_outlet_connection_type(self, outlet_index: int = 0) -> str:
         return "-->"
 
-    def to_hv(self) -> Dict:
-        return {
-            "type": "__switchcase",
-            "args": {
+    def to_hv(self) -> Heavy:
+        return Heavy(
+            type="__switchcase",
+            args={
                 "cases": self.obj_args
             },
-            "properties": {
-                "x": self.pos_x,
-                "y": self.pos_y
-            }
-        }
+            properties=HvPos(x=self.pos_x, y=self.pos_y)
+        )

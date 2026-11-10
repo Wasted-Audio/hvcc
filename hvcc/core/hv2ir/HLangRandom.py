@@ -15,11 +15,10 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import random
-from typing import Optional, Dict
 
-from .HeavyLangObject import HeavyLangObject
-from .HeavyIrObject import HeavyIrObject
 from .HeavyGraph import HeavyGraph
+from .HeavyIrObject import HeavyIrObject
+from .HeavyLangObject import HeavyLangObject
 
 
 class HLangRandom(HeavyLangObject):
@@ -29,9 +28,9 @@ class HLangRandom(HeavyLangObject):
     def __init__(
         self,
         obj_type: str,
-        args: Dict,
+        args: dict,
         graph: 'HeavyGraph',
-        annotations: Optional[Dict] = None
+        annotations: dict | None = None
     ) -> None:
         assert obj_type == "random"
         super().__init__(obj_type, args, graph,

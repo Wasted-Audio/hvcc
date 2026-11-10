@@ -14,46 +14,48 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from typing import Optional, Dict
+from collections.abc import Mapping
+from types import MappingProxyType
+from typing import Final
 
-from .HeavyLangObject import HeavyLangObject
-from .HeavyIrObject import HeavyIrObject
 from .HeavyGraph import HeavyGraph
+from .HeavyIrObject import HeavyIrObject
+from .HeavyLangObject import HeavyLangObject
 
 
 class HLangUnop(HeavyLangObject):
 
-    __HEAVY_DICT = {
-        "log": ["__log"],
-        "log10": ["__log10"],
-        "log2": ["__log2", "__log2~f"],
-        "cos": ["__cos", "__cos~f"],
-        "acos": ["__acos", "__acos~f"],
-        "cosh": ["__cosh", "__cosh~f"],
-        "acosh": ["__acosh", "__acosh~f"],
-        "sin": ["__sin", "__sin~f"],
-        "asin": ["__asin", "__asin~f"],
-        "sinh": ["__sinh", "__sinh~f"],
-        "asinh": ["__asinh", "__asin~f"],
-        "tan": ["__tan", "__tan~f"],
-        "atan": ["__atan", "__atan~f"],
-        "tanh": ["__tanh", "__tanh~f"],
-        "atanh": ["__atanh", "__atanh~f"],
-        "exp": ["__exp", "__exp~f"],
-        "sqrt": ["__sqrt", "__sqrt~f"],
-        "abs": ["__abs", "__abs~f", "__abs~i"],
-        "floor": ["__floor", "__floor~f"],
-        "ceil": ["__ceil", "__ceil~f"],
-        "cast_fi": ["__cast~fi"],
-        "cast_if": ["__cast~if"]
-    }
+    __HEAVY_DICT: Final[Mapping[str, tuple[str, ...]]] = MappingProxyType({
+        "log": ("__log",),
+        "log10": ("__log10",),
+        "log2": ("__log2", "__log2~f"),
+        "cos": ("__cos", "__cos~f"),
+        "acos": ("__acos", "__acos~f"),
+        "cosh": ("__cosh", "__cosh~f"),
+        "acosh": ("__acosh", "__acosh~f"),
+        "sin": ("__sin", "__sin~f"),
+        "asin": ("__asin", "__asin~f"),
+        "sinh": ("__sinh", "__sinh~f"),
+        "asinh": ("__asinh", "__asin~f"),
+        "tan": ("__tan", "__tan~f"),
+        "atan": ("__atan", "__atan~f"),
+        "tanh": ("__tanh", "__tanh~f"),
+        "atanh": ("__atanh", "__atanh~f"),
+        "exp": ("__exp", "__exp~f"),
+        "sqrt": ("__sqrt", "__sqrt~f"),
+        "abs": ("__abs", "__abs~f", "__abs~i"),
+        "floor": ("__floor", "__floor~f"),
+        "ceil": ("__ceil", "__ceil~f"),
+        "cast_fi": ("__cast~fi",),
+        "cast_if": ("__cast~if",)
+    })
 
     def __init__(
         self,
         obj_type: str,
-        args: Dict,
+        args: dict,
         graph: 'HeavyGraph',
-        annotations: Optional[Dict] = None
+        annotations: dict | None = None
     ) -> None:
         assert self.handles_type(obj_type)
         super().__init__(obj_type, args, graph,
@@ -67,7 +69,7 @@ class HLangUnop(HeavyLangObject):
         """
         return obj_type in HLangUnop.__HEAVY_DICT
 
-    def reduce(self) -> Optional[tuple]:
+    def reduce(self) -> tuple | None:
         if len(self.inlet_connections[0]) == 0:
             self.add_error("Unary operator objects must have an input.")
 

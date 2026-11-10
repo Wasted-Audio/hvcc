@@ -14,11 +14,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from typing import Dict, List
-
-from .HeavyObject import HeavyObject
 
 from hvcc.types.IR import IRSignalList
+
+from .HeavyObject import HeavyObject
 
 
 class SignalRFFT(HeavyObject):
@@ -35,7 +34,7 @@ class SignalRFFT(HeavyObject):
         return {"HvSignalRFFT.h", "HvSignalRFFT.c"}
 
     @classmethod
-    def get_C_init(cls, obj_type: str, obj_id: str, args: Dict) -> List[str]:
+    def get_C_init(cls, obj_type: str, obj_id: str, args: dict) -> list[str]:
         return [
             "sRFFT_init(&sRFFT_{0}, {1});".format(
                 obj_id,
@@ -43,7 +42,7 @@ class SignalRFFT(HeavyObject):
         ]
 
     @classmethod
-    def get_C_onMessage(cls, obj_type: str, obj_id: str, inlet_index: int, args: Dict) -> List[str]:
+    def get_C_onMessage(cls, obj_type: str, obj_id: str, inlet_index: int, args: dict) -> list[str]:
         return [
             "sRFFT_onMessage(_c, &Context(_c)->sRFFT_{0}, {1}, m, NULL);".format(
                 obj_id,
@@ -51,7 +50,7 @@ class SignalRFFT(HeavyObject):
         ]
 
     @classmethod
-    def get_C_process(cls, process_dict: IRSignalList, obj_type: str, obj_id: str, args: Dict) -> List[str]:
+    def get_C_process(cls, process_dict: IRSignalList, obj_type: str, obj_id: str, args: dict) -> list[str]:
         if obj_type == "__rfft~f":
             return [
                 "__hv_rfft_f(&sRFFT_{0}, VIf({1}), VOf({2}), VOf({3}));".format(
@@ -62,7 +61,7 @@ class SignalRFFT(HeavyObject):
                 )
             ]
         else:
-            raise Exception
+            raise TypeError(f"Unsupported object type: {obj_type}")
 
 
 class SignalRIFFT(HeavyObject):
@@ -79,7 +78,7 @@ class SignalRIFFT(HeavyObject):
         return {"HvSignalRFFT.h", "HvSignalRFFT.c"}
 
     @classmethod
-    def get_C_init(cls, obj_type: str, obj_id: str, args: Dict) -> List[str]:
+    def get_C_init(cls, obj_type: str, obj_id: str, args: dict) -> list[str]:
         return [
             "sRIFFT_init(&sRIFFT_{0}, {1});".format(
                 obj_id,
@@ -87,7 +86,7 @@ class SignalRIFFT(HeavyObject):
         ]
 
     @classmethod
-    def get_C_onMessage(cls, obj_type: str, obj_id: str, inlet_index: int, args: Dict) -> List[str]:
+    def get_C_onMessage(cls, obj_type: str, obj_id: str, inlet_index: int, args: dict) -> list[str]:
         return [
             "sRIFFT_onMessage(_c, &Context(_c)->sRIFFT_{0}, {1}, m, NULL);".format(
                 obj_id,
@@ -95,7 +94,7 @@ class SignalRIFFT(HeavyObject):
         ]
 
     @classmethod
-    def get_C_process(cls, process_dict: IRSignalList, obj_type: str, obj_id: str, args: Dict) -> List[str]:
+    def get_C_process(cls, process_dict: IRSignalList, obj_type: str, obj_id: str, args: dict) -> list[str]:
         if obj_type == "__rifft~f":
             return [
                 "__hv_rifft_f(&sRIFFT_{0}, VIf({1}), VIf({2}), VOf({3}));".format(
@@ -106,4 +105,4 @@ class SignalRIFFT(HeavyObject):
                 )
             ]
         else:
-            raise Exception
+            raise TypeError(f"Unsupported object type: {obj_type}")

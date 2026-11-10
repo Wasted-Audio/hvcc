@@ -1,18 +1,38 @@
-import jinja2
-import os
+# Copyright (C) 2021-2026 Wasted Audio
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 import shutil
 import time
+from pathlib import Path
+from typing import Any
 
-from typing import Any, Dict, Optional
-
-from ..copyright import copyright_manager
-from .parameters import parse_parameters, display_parameters, display_processor
-from .json2daisy import generate_header_from_file, generate_header_from_name
+import jinja2
 
 from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
-from hvcc.types.compiler import Generator, CompilerResp, CompilerNotif, CompilerMsg, ExternInfo
-from hvcc.types.meta import Meta, Daisy
+from hvcc.types.compiler import (
+    CompilerMsg,
+    CompilerNotif,
+    CompilerResp,
+    ExternInfo,
+    Generator,
+)
+from hvcc.types.meta import Daisy, Meta
 
+from ..copyright import copyright_manager
+from .json2daisy import generate_header_from_file, generate_header_from_name
+from .parameters import display_parameters, display_processor, parse_parameters
 
 hv_midi_messages = [
     "__hv_noteout",
@@ -33,21 +53,22 @@ class c2daisy(Generator):
     @classmethod
     def compile(
         cls,
-        c_src_dir: str,
-        out_dir: str,
+        c_src_dir: Path,
+        out_dir: Path,
         externs: ExternInfo,
-        patch_name: Optional[str] = None,
-        patch_meta: Meta = Meta(),
+        patch_name: str,
+        patch_meta: Meta,
         num_input_channels: int = 0,
         num_output_channels: int = 0,
-        copyright: Optional[str] = None,
-        verbose: Optional[bool] = False
+        copyright: str | None = None,
+        verbose: bool | None = False
     ) -> CompilerResp:
 
         tick = time.time()
         warnings = []
+        patch_meta = patch_meta or Meta()
 
-        out_dir = os.path.join(out_dir, "daisy")
+        out_dir = Path(out_dir, "daisy")
 
         daisy_meta: Daisy = patch_meta.daisy
         board = daisy_meta.board
@@ -56,41 +77,36 @@ class c2daisy(Generator):
 
         try:
             # ensure that the output directory does not exist
-            out_dir = os.path.abspath(out_dir)
-            if os.path.exists(out_dir):
+            out_dir = out_dir.absolute()
+            if out_dir.exists():
                 shutil.rmtree(out_dir)
 
             # copy over static files
-            shutil.copytree(os.path.join(os.path.dirname(__file__), "static"), out_dir)
+            shutil.copytree(Path(Path(__file__).parent, "static"), out_dir)
 
             # copy over generated C source files
-            source_dir = os.path.join(out_dir, "source")
+            source_dir = Path(out_dir, "source")
             shutil.copytree(c_src_dir, source_dir)
 
             if daisy_meta.board_file is not None:
-                header, board_info = generate_header_from_file(daisy_meta.board_file)
+                header, board_info = generate_header_from_file(Path(daisy_meta.board_file))
                 display_params = display_parameters(daisy_meta.board_file)
             else:
                 header, board_info = generate_header_from_name(board)
                 display_params = {}
-                warnings.append(
-                    CompilerMsg(
-                        enum=NotificationEnum.WARNING_GENERIC,
-                        message=f"Unable to load board description from {daisy_meta.board_file}. Using fallback."
-                    )
-                )
 
             # inject display process code
             try:
                 display_process = display_processor(daisy_meta.board_file)
             except (FileNotFoundError, KeyError, ValueError):
                 display_process = board_info['displayprocess']
-                warnings.append(
-                    CompilerMsg(
-                        enum=NotificationEnum.WARNING_GENERIC,
-                        message=f"Unable to load display code from {daisy_meta.board_file}. Using fallback."
+                if display_process is not None:
+                    warnings.append(
+                        CompilerMsg(
+                            enum=NotificationEnum.WARNING_GENERIC,
+                            message=f"Unable to load display code from {board_info['name']}. Using fallback."
+                        )
                     )
-                )
 
             # remove heavy out params from externs
             externs.parameters.outParam = [
@@ -134,19 +150,19 @@ class c2daisy(Generator):
 
             component_glue['copyright'] = copyright_c
 
-            daisy_h_path = os.path.join(source_dir, f"HeavyDaisy_{patch_name}.hpp")
+            daisy_h_path = Path(source_dir, f"HeavyDaisy_{patch_name}.hpp")
             with open(daisy_h_path, "w") as f:
                 f.write(header)
 
-            loader = jinja2.FileSystemLoader(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates'))
+            loader = jinja2.FileSystemLoader(Path(__file__).parent / 'templates')
             env = jinja2.Environment(loader=loader, trim_blocks=True, lstrip_blocks=True)
-            daisy_cpp_path = os.path.join(source_dir, f"HeavyDaisy_{patch_name}.cpp")
+            daisy_cpp_path = Path(source_dir, f"HeavyDaisy_{patch_name}.cpp")
 
             rendered_cpp = env.get_template('HeavyDaisy.cpp').render(component_glue)
             with open(daisy_cpp_path, 'w') as f:
                 f.write(rendered_cpp)
 
-            makefile_replacements: Dict[str, Any] = {'name': patch_name}
+            makefile_replacements: dict[str, Any] = {'name': patch_name}
             makefile_replacements['linker_script'] = daisy_meta.linker_script
 
             # libdaisy path
@@ -160,7 +176,7 @@ class c2daisy(Generator):
             makefile_replacements['debug_printing'] = daisy_meta.debug_printing
 
             rendered_makefile = env.get_template('Makefile').render(makefile_replacements)
-            with open(os.path.join(source_dir, "Makefile"), "w") as f:
+            with open(Path(source_dir, "Makefile"), "w") as f:
                 f.write(rendered_makefile)
 
             # ======================================================================================
@@ -172,11 +188,11 @@ class c2daisy(Generator):
                 ),
                 in_dir=c_src_dir,
                 out_dir=out_dir,
-                out_file=os.path.basename(daisy_h_path),
+                out_file=daisy_h_path,
                 compile_time=time.time() - tick
             )
 
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001
             return CompilerResp(
                 stage="c2daisy",
                 notifs=CompilerNotif(

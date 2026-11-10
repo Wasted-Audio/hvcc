@@ -13,11 +13,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from typing import Dict, Optional
 
-from .HeavyIrObject import HeavyIrObject
-from .HeavyException import HeavyException
 from .HeavyGraph import HeavyGraph
+from .HeavyIrException import HeavyIrException
+from .HeavyIrObject import HeavyIrObject
 
 
 class HIrExpr(HeavyIrObject):
@@ -27,9 +26,9 @@ class HIrExpr(HeavyIrObject):
     def __init__(
         self,
         obj_type: str,
-        args: Optional[Dict] = None,
-        graph: Optional[HeavyGraph] = None,
-        annotations: Optional[Dict] = None
+        args: dict | None = None,
+        graph: HeavyGraph | None = None,
+        annotations: dict | None = None
     ) -> None:
         super().__init__(obj_type, args=args, graph=graph,
                          num_inlets=args["num_inlets"] if args is not None else 1,
@@ -40,5 +39,5 @@ class HIrExpr(HeavyIrObject):
         """ Overriding HeavyIrObject to deal with variable number of inlets
         """
         if inlet_index >= self.num_inlets:
-            raise HeavyException(f"inlet_index: {inlet_index} is greater than number of inlets")
+            raise HeavyIrException(f"inlet_index: {inlet_index} is greater than number of inlets")
         return True

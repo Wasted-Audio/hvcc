@@ -1,4 +1,5 @@
 # Copyright (C) 2014-2018 Enzien Audio, Ltd.
+# Copyright (C) 2021-2026 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,24 +15,23 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import datetime
-import os
-from typing import Optional
+from pathlib import Path
 
 
 def get_default_copyright_text() -> str:
-    with open(os.path.join(os.path.dirname(__file__), "default_template.txt"), "r") as f:
+    with open(Path(Path(__file__).parent, "default_template.txt"), "r") as f:
         copyright = f.read().format(datetime.datetime.now().year)
     return copyright
 
 
-def get_copyright_for_c(copyright_text: Optional[str] = None) -> str:
+def get_copyright_for_c(copyright_text: str | None = None) -> str:
     """ Returns an input string as a C-formatted comment, otherwise a default
         copyright statement if the input is None.
     """
     return comment_for_c(copyright_text or get_default_copyright_text())
 
 
-def get_copyright_for_xml(copyright_text: Optional[str] = None) -> str:
+def get_copyright_for_xml(copyright_text: str | None = None) -> str:
     """ Returns an input string as an xml comment, otherwise a default
         copyright statement if the input is None.
     """

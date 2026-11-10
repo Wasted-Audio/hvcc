@@ -1,19 +1,20 @@
-import jinja2
 import json
-import os
-
 from importlib import resources
-from typing import Optional
+from pathlib import Path
+
+import jinja2
+
+from hvcc.generators.HeavyGenException import HeavyGenException
 
 
-def map_load(pair: list, json_defs_file: str):
+def map_load(pair: list, json_defs_file: Path):
     """
     Helper for loading and processing the definitions, component list, etc
     """
 
     # load the default components
-    comp_string = resources.files(__package__).joinpath(json_defs_file).read_text()
-    component_defs = json.loads(comp_string)
+    comp_string = Path(Path(__file__).parent, json_defs_file)
+    component_defs = json.loads(comp_string.read_bytes())
 
     pair[1]['name'] = pair[0]
 
@@ -26,7 +27,7 @@ def map_load(pair: list, json_defs_file: str):
             if k not in pair[1]:
                 pair[1][k] = component[k]
     else:
-        raise Exception(f'unknown component "{pair[1]["component"]}"')
+        raise HeavyGenException(f'unknown component "{pair[1]["component"]}"')
 
     return pair[1]
 
@@ -35,7 +36,7 @@ def filter_match(
     component_set: list,
     key: str,
     match: str,
-    key_exclude: Optional[str] = None,
+    key_exclude: str | None = None,
     match_exclude: bool = False
 ) -> filter:
     if (key_exclude is not None and match_exclude):
@@ -48,7 +49,7 @@ def filter_matches(
     component_set: list,
     key: str,
     matches: list,
-    key_exclude: Optional[str] = None,
+    key_exclude: str | None = None,
     match_exclude: bool = False
 ) -> filter:
     if (key_exclude is not None and match_exclude):
@@ -60,7 +61,7 @@ def filter_matches(
 def filter_has(
     component_set: list,
     key: str,
-    key_exclude: Optional[str] = None,
+    key_exclude: str | None = None,
     match_exclude: bool = False
 ) -> filter:
     if (key_exclude is not None and match_exclude):
@@ -74,11 +75,11 @@ def filter_map_init(
     component_set: list,
     key: str,
     match: str,
-    key_exclude: Optional[str] = None,
+    key_exclude: str | None = None,
     match_exclude: bool = False
 ) -> str:
     filtered = filter_match(component_set, key, match, key_exclude=key_exclude, match_exclude=match_exclude)
-    return "\n    ".join(map(lambda x: x['map_init'].format_map(x), filtered))
+    return "\n    ".join(x['map_init'].format_map(x) for x in filtered)
 
 
 # this function is not used anywhere?
@@ -86,12 +87,12 @@ def filter_map_set(
     component_set: list,
     key: str,
     match: str,
-    key_exclude: Optional[str] = None,
+    key_exclude: str | None = None,
     match_exclude: bool = False
 ) -> str:
     filtered = filter_match(component_set, key, match, key_exclude=key_exclude, match_exclude=match_exclude)
     return "\n    ".join(
-        map(lambda x: x['mapping'][0]['set'].format_map(x['mapping'][0]['name'].format_map(x)), filtered)
+        x['mapping'][0]['set'].format_map(x['mapping'][0]['name'].format_map(x)) for x in filtered
     )
 
 
@@ -100,23 +101,23 @@ def filter_map_ctrl(
     key: str,
     matches: list,
     init_key: str,
-    key_exclude: Optional[str] = None,
+    key_exclude: str | None = None,
     match_exclude: bool = False
 ) -> str:
     component_filt = filter_matches(component_set, key, matches, key_exclude=key_exclude, match_exclude=match_exclude)
     component_map = map(lambda x, i: {**x, 'i': i}, component_filt, range(1000))
-    return "\n    ".join(map(lambda x: x[init_key].format_map(x), component_map))
+    return "\n    ".join(x[init_key].format_map(x) for x in component_map)
 
 
 # filter out the components with a certain field, then fill in the template
 def filter_map_template(
     component_set: list,
     name: str,
-    key_exclude: Optional[str] = None,
+    key_exclude: str | None = None,
     match_exclude: bool = False
 ) -> str:
     filtered = filter_has(component_set, name, key_exclude=key_exclude, match_exclude=match_exclude)
-    return "\n    ".join(map(lambda x: x[name].format_map(x), filtered))
+    return "\n    ".join(x[name].format_map(x) for x in filtered)
 
 
 def flatten_pin_dicts(comp: dict) -> dict:
@@ -165,9 +166,9 @@ def generate_header(board_description_dict: dict) -> 'tuple[str, dict]':
         parents[key]['is_parent'] = True
     components.update(parents)
 
-    seed_defs = os.path.join("resources", 'component_defs.json')
-    patchsm_defs = os.path.join("resources", 'component_defs_patchsm.json')
-    petalsm_defs = os.path.join("resources", 'component_defs_petalsm.json')
+    seed_defs = Path("resources", 'component_defs.json')
+    patchsm_defs = Path("resources", 'component_defs_patchsm.json')
+    petalsm_defs = Path("resources", 'component_defs_petalsm.json')
     definitions = {'seed': seed_defs, 'patch_sm': patchsm_defs, 'petal_125b_sm': petalsm_defs}
     som = target.get('som', 'seed')
 
@@ -178,7 +179,7 @@ def generate_header(board_description_dict: dict) -> 'tuple[str, dict]':
 
     # alphabetize by component name
     components = sorted(components.items(), key=lambda x: x[1]['component'])
-    components = list(map(lambda p: map_load(p, json_defs_file), components))
+    components = [map_load(p, json_defs_file) for p in components]
 
     # flatten pin dicts into multiple entries
     # e.g. "pin": {"a": 12} => "pin_a": 12
@@ -227,8 +228,8 @@ def generate_header(board_description_dict: dict) -> 'tuple[str, dict]':
         components, 'component', ['AnalogControl', 'AnalogControlBipolar'],
         'map_init', key_exclude='default', match_exclude=True)
 
-    comp_string = resources.files(__package__).joinpath(json_defs_file).read_text()
-    definitions_dict = json.loads(comp_string)
+    comp_string = Path(Path(__file__).parent, json_defs_file)
+    definitions_dict = json.loads(comp_string.read_bytes())
 
     for name in definitions_dict:
         if name not in ('AnalogControl', 'AnalogControlBipolar', 'CD4051'):
@@ -240,7 +241,7 @@ def generate_header(board_description_dict: dict) -> 'tuple[str, dict]':
         replacements['display'] = f"""
         daisy::OledDisplay<{target['display']['driver']}>::Config display_config;
         display_config.driver_config.transport_config.Defaults();
-        {"".join(map(lambda x: x, target['display'].get('config', {})))}
+        {"".join(x for x in target['display'].get('config', {}))}
         display.Init(display_config);
           display.Fill(0);
           display.Update();
@@ -248,9 +249,9 @@ def generate_header(board_description_dict: dict) -> 'tuple[str, dict]':
     else:
         replacements['display'] = ''
 
-    if 'defines' in target:
-        # deprecate old oopsy syntax at some point
-        if target['defines'].get('HAS_MIDI') or target['defines'].get('OOPSY_TARGET_HAS_MIDI_INPUT'):
+    if 'defines' in target and \
+        (target['defines'].get('HAS_MIDI') or target['defines'].get('OOPSY_TARGET_HAS_MIDI_INPUT')):
+            # deprecate old oopsy syntax at some point
             target['has_midi'] = True
             replacements['midi'] = """daisy::MidiUartHandler midi;"""
 
@@ -274,14 +275,14 @@ def generate_header(board_description_dict: dict) -> 'tuple[str, dict]':
 
     if len(component_declarations) > 0:
         replacements['comps'] = ";\n  ".join(
-            map(lambda x: x['typename'].format_map(x) + ' ' + x['name'], component_declarations)
+            x['typename'].format_map(x) + ' ' + x['name'] for x in component_declarations
         ) + ';'
 
     non_class_declarations = list(filter(lambda x: 'non_class_decl' in x, component_declarations))
 
     if len(non_class_declarations) > 0:
         replacements['non_class_declarations'] = "\n".join(
-            map(lambda x: x['non_class_decl'].format_map(x), non_class_declarations)
+            x['non_class_decl'].format_map(x) for x in non_class_declarations
         )
 
     # env_opts = {"trim_blocks": True, "lstrip_blocks": True}
@@ -292,7 +293,7 @@ def generate_header(board_description_dict: dict) -> 'tuple[str, dict]':
     # rendered_header = env.get_template('daisy.h').render(replacements)
 
     # This following works, but is really annoying
-    header_str = resources.files(__package__).joinpath(os.path.join('templates', 'daisy.h')).read_text()
+    header_str = Path(Path(__file__).parent, Path('templates', 'daisy.h')).read_text()
     header_env = jinja2.Environment(
         loader=jinja2.BaseLoader(),
         trim_blocks=True,
@@ -321,13 +322,13 @@ def generate_header(board_description_dict: dict) -> 'tuple[str, dict]':
         'aliases': target['aliases'],
         'channels': audio_channels,
         'has_midi': target.get('has_midi', False),
-        'displayprocess': target.get('displayprocess', '')
+        'displayprocess': target.get('displayprocess', '') if 'display' in target else None
       }
 
     return rendered_header, board_info
 
 
-def generate_header_from_file(description_file: str) -> 'tuple[str, dict]':
+def generate_header_from_file(description_file: Path) -> 'tuple[str, dict]':
     """
     Generate a C++ Daisy board header from a JSON description file.
 
@@ -358,9 +359,9 @@ def generate_header_from_name(board_name: str) -> 'tuple[str, dict]':
     """
 
     try:
-        description_file = os.path.join('resources', f'{board_name}.json')
-        daisy_description = resources.files(__package__).joinpath(description_file).read_text()
-        daisy_description_dict = json.loads(daisy_description)
+        description_file = Path('resources', f'{board_name}.json')
+        daisy_description = Path(Path(__file__).parent, description_file)
+        daisy_description_dict = json.loads(daisy_description.read_bytes())
     except FileNotFoundError:
         raise FileNotFoundError(f'Unknown Daisy board   "{board_name}"')
 

@@ -14,10 +14,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from typing import Callable, Dict, List
-from .HeavyObject import HeavyObject
+from collections.abc import Callable
 
-from hvcc.types.IR import IROnMessage, IRObjectdict
+from hvcc.types.IR import IRObjectdict, IROnMessage
+
+from .HeavyObject import HeavyObject
 
 
 class ControlSwitchcase(HeavyObject):
@@ -26,22 +27,22 @@ class ControlSwitchcase(HeavyObject):
     preamble = "cSwichcase"
 
     @classmethod
-    def get_C_def(cls, obj_type: str, obj_id: str) -> List[str]:
+    def get_C_def(cls, obj_type: str, obj_id: str) -> list[str]:
         return []
 
     @classmethod
-    def get_C_free(cls, obj_type: str, obj_id: str, args: Dict) -> List[str]:
+    def get_C_free(cls, obj_type: str, obj_id: str, args: dict) -> list[str]:
         return []
 
     @classmethod
-    def get_C_decl(cls, obj_type: str, obj_id: str, args: Dict) -> List[str]:
+    def get_C_decl(cls, obj_type: str, obj_id: str, args: dict) -> list[str]:
         return [
-            f"cSwitchcase_{obj_id}_onMessage(HeavyContextInterface *, void *, int letIn, "
-            "const HvMessage *const, void *);"
+            (f"cSwitchcase_{obj_id}_onMessage(HeavyContextInterface *, void *, int letIn, "
+            "const HvMessage *const, void *);")
         ]
 
     @classmethod
-    def get_C_onMessage(cls, obj_type: str, obj_id: str, inlet_index: int, args: Dict) -> List[str]:
+    def get_C_onMessage(cls, obj_type: str, obj_id: str, inlet_index: int, args: dict) -> list[str]:
         return [f"cSwitchcase_{obj_id}_onMessage(_c, NULL, {inlet_index}, m, NULL);"]
 
     @classmethod
@@ -49,15 +50,15 @@ class ControlSwitchcase(HeavyObject):
         cls,
         obj_type: str,
         obj_id: str,
-        on_message_list: List[List[IROnMessage]],
+        on_message_list: list[list[IROnMessage]],
         get_obj_class: Callable,
-        objects: Dict[str, IRObjectdict],
-        args: Dict
-    ) -> List[str]:
+        objects: dict[str, IRObjectdict],
+        args: dict
+    ) -> list[str]:
         # generate the onMessage implementation
         out_list = [
-            f"cSwitchcase_{obj_id}_onMessage(HeavyContextInterface *_c, void *o, int letIn, "
-            f"const HvMessage *const m, void *sendMessage) {{"
+            (f"cSwitchcase_{obj_id}_onMessage(HeavyContextInterface *_c, void *o, int letIn, "
+            f"const HvMessage *const m, void *sendMessage) {{")
         ]
         out_list.append("int msgIndex = 0;")
         out_list.append("switch (msg_getHash(m, msgIndex)) {")
@@ -67,8 +68,25 @@ class ControlSwitchcase(HeavyObject):
         out_list.append("}")  # end symbol case
         out_list.append("}")  # end type switch
 
-        out_list.append("switch (msg_getHash(m, msgIndex)) {")
         cases = objects[obj_id].args["cases"]
+
+        # special float case, if present route float messages on first switch
+        if objects[obj_id].args.get("is_route", False) and cases[0] == "float":
+            out_list.append("if (msg_getNumElements(m) == 1 && msg_getType(m, 0) == HV_MSG_FLOAT) {")
+            out_list.append("HvMessage *n = HV_MESSAGE_ON_STACK(2);")
+            out_list.append("msg_init(n, 2, msg_getTimestamp(m));")
+            out_list.append("msg_setSymbol(n, 0, \"float\");")
+            out_list.append('msg_setElementToFrom(n, 1, m, 0);')
+
+            om_list = []
+            for om in on_message_list[0]:
+                om_list.append(f"cSlice_onMessage(_c, &Context(_c)->cSlice_{om.id}, {om.inletIndex}, "
+                               f"n, &cSlice_{om.id}_sendMessage);")
+            out_list.extend(om_list)
+            out_list.append("return;")
+            out_list.append("}")
+
+        out_list.append("switch (msg_getHash(m, msgIndex)) {")
         for i, c in enumerate(cases):
             hv_hash = cls.get_hash_string(c)
             out_list.append(f"case {hv_hash}: {{ // \"{c}\"")

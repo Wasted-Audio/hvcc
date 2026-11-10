@@ -14,11 +14,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from typing import Optional, Dict
 
+from .HeavyGraph import HeavyGraph
 from .HeavyIrObject import HeavyIrObject
 from .HeavyLangObject import HeavyLangObject
-from .HeavyGraph import HeavyGraph
 
 
 class HLangPhasor(HeavyLangObject):
@@ -28,9 +27,9 @@ class HLangPhasor(HeavyLangObject):
     def __init__(
         self,
         obj_type: str,
-        args: Dict,
+        args: dict,
         graph: 'HeavyGraph',
-        annotations: Optional[Dict] = None
+        annotations: dict | None = None
     ) -> None:
         assert obj_type == "phasor"
         super().__init__(obj_type, args, graph, annotations=annotations)

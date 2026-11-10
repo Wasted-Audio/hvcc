@@ -1,5 +1,5 @@
 # Copyright (C) 2014-2018 Enzien Audio, Ltd.
-# Copyright (C) 2023-2024 Wasted Audio
+# Copyright (C) 2023-2026 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,42 +17,42 @@
 import decimal
 import os
 import re
-from collections import Counter
-from collections import OrderedDict
+from collections import Counter, OrderedDict
+from collections.abc import Generator
 from pathlib import Path
-from typing import Optional, Type, Any, Generator
+from typing import Any, ClassVar
 
+from .HeavyGraph import HeavyGraph  # pre-converted Heavy graphs
 from .HeavyObject import HeavyObject
-from .HeavyGraph import HeavyGraph              # pre-converted Heavy graphs
-from .HvSwitchcase import HvSwitchcase          # __switchcase
-from .PdAudioIoObject import PdAudioIoObject    # adc~/dac~
-from .PdBinopObject import PdBinopObject        # binary arithmatic operators
-from .PdExprObject import PdExprObject          # expr/expr~
-from .PdGraph import PdGraph                    # canvas
-from .PdLetObject import PdLetObject            # inlet/inlet~/outlet/outlet~
-from .PdMessageObject import PdMessageObject    # msg
-from .PdPackObject import PdPackObject          # pack
-from .PdReceiveObject import PdReceiveObject    # r/r~/receive/receive~/catch~
-from .PdRouteObject import PdRouteObject        # route
-from .PdSelectObject import PdSelectObject      # select/sel
-from .PdSendObject import PdSendObject          # s/s~/send/send~/throw~
-from .PdTriggerObject import PdTriggerObject    # trigger/t
-from .PdTableObject import PdTableObject        # table
-from .PdUnpackObject import PdUnpackObject      # unpack
-from .PdLibSignalGraph import PdLibSignalGraph  # pd/lib abstraction connection checks
-
+from .HvSwitchcase import HvSwitchcase  # __switchcase
 from .NotificationEnum import NotificationEnum
+from .PdAudioIoObject import PdAudioIoObject  # adc~/dac~
+from .PdBinopObject import PdBinopObject  # binary arithmatic operators
+from .PdExprObject import PdExprObject  # expr/expr~
+from .PdGraph import PdGraph  # canvas
+from .PdLetObject import PdLetObject  # inlet/inlet~/outlet/outlet~
+from .PdLibSignalGraph import PdLibSignalGraph  # pd/lib abstraction connection checks
+from .PdMessageObject import PdMessageObject  # msg
+from .PdPackObject import PdPackObject  # pack
+from .PdReceiveObject import PdReceiveObject  # r/r~/receive/receive~/catch~
+from .PdRouteObject import PdRouteObject  # route
+from .PdSelectObject import PdSelectObject  # select/sel
+from .PdSendObject import PdSendObject  # s/s~/send/send~/throw~
+from .PdTableObject import PdTableObject  # table
+from .PdTriggerObject import PdTriggerObject  # trigger/t
+from .PdUnpackObject import PdUnpackObject  # unpack
 
 
 class PdParser:
 
     # library search paths
-    __LIB_DIR = os.path.join(os.path.dirname(__file__), "libs")
-    __HVLIB_DIR = os.path.join(os.path.dirname(__file__), "libs", "heavy")
-    __HVLIB_CONVERTED_DIR = os.path.join(os.path.dirname(__file__), "libs", "heavy_converted")
-    __PDLIB_DIR = os.path.join(os.path.dirname(__file__), "libs", "pd")
-    __ELSELIB_DIR = os.path.join(os.path.dirname(__file__), "libs", "else")
-    __PDLIB_CONVERTED_DIR = os.path.join(os.path.dirname(__file__), "libs", "pd_converted")
+    __LIB_DIR = Path(Path(__file__).parent, "libs")
+    __HVLIB_DIR = Path(Path(__file__).parent, "libs", "heavy")
+    __HVLIB_CONVERTED_DIR = Path(Path(__file__).parent, "libs", "heavy_converted")
+    __PDLIB_DIR = Path(Path(__file__).parent, "libs", "pd")
+    __ELSELIB_DIR = Path(Path(__file__).parent, "libs", "else")
+    __CYCLONE_DIR = Path(Path(__file__).parent, "libs", "cyclone")
+    __PDLIB_CONVERTED_DIR = Path(Path(__file__).parent, "libs", "pd_converted")
 
     # detect a dollar argument in a string
     RE_DOLLAR = re.compile(r"\$(\d+)")
@@ -72,7 +72,7 @@ class PdParser:
         self.obj_counter: Counter = Counter()
 
         # search paths at this graph level
-        self.search_paths: list = []
+        self.search_paths: list[Path] = []
 
     @classmethod
     def get_supported_objects(cls) -> list:
@@ -80,17 +80,18 @@ class PdParser:
         """
         pd_objects = [os.path.splitext(f)[0] for f in os.listdir(cls.__PDLIB_DIR) if f.endswith(".pd")]
         pd_objects += [f"else/{os.path.splitext(f)[0]}" for f in os.listdir(cls.__ELSELIB_DIR) if f.endswith(".pd")]
+        pd_objects += [f"cyclone/{os.path.splitext(f)[0]}" for f in os.listdir(cls.__CYCLONE_DIR) if f.endswith(".pd")]
         pd_objects.extend(cls.__PD_CLASSES.keys())
         return pd_objects
 
     @classmethod
-    def __get_hv_args(cls, pd_path: str) -> OrderedDict:
+    def __get_hv_args(cls, pd_path: Path) -> OrderedDict:
         """ Pre-parse the file for Heavy arguments, such that they are available
             as soon as a graph is created.
         """
         num_canvas = -1
         hv_arg_dict = OrderedDict()
-        hv_arg_list: Optional[list] = None
+        hv_arg_list: list | None = None
         with open(pd_path, "r") as f:
             for li in f:
                 if li.startswith("#N canvas"):
@@ -105,7 +106,7 @@ class PdParser:
         return hv_arg_dict
 
     @classmethod
-    def get_pd_line(cls, pd_path: str) -> Generator:
+    def get_pd_line(cls, pd_path: Path) -> Generator:
         concat = ""  # concatination state
         with open(pd_path, "r") as f:
             for li in f:
@@ -131,20 +132,21 @@ class PdParser:
 
         return line
 
-    def add_absolute_search_directory(self, search_dir: str) -> bool:
-        if os.path.isdir(search_dir):
+    def add_absolute_search_directory(self, search_dir: Path) -> bool:
+        if search_dir.is_dir():
             self.search_paths.append(search_dir)
             return True
         else:
             return False
 
-    def add_relative_search_directory(self, search_dir: str) -> bool:
-        search_dir = os.path.abspath(os.path.join(
+    def add_relative_search_directory(self, search_dir: Path) -> bool:
+        search_dir = Path(
             self.search_paths[0],
-            search_dir))
+            search_dir
+        ).absolute()
         return self.add_absolute_search_directory(search_dir)
 
-    def find_abstraction_path(self, local_dir: str, abs_name: str) -> Optional[str]:
+    def find_abstraction_path(self, local_dir: Path, abs_name: str) -> Path | None:
         """ Finds the full path for an abstraction.
             Checks the local directory first, then all declared paths.
         """
@@ -152,26 +154,26 @@ class PdParser:
         abs_filename = f"{abs_name}.pd"
 
         # check local directory first
-        abs_path = os.path.join(os.path.abspath(local_dir), abs_filename)
-        if os.path.isfile(abs_path):
+        abs_path = Path(local_dir.absolute(), abs_filename)
+        if abs_path.is_file():
             return abs_path
 
         # check search paths in reverse order (last added search path first)
         for d in reversed(self.search_paths):
-            abs_path = os.path.join(d, abs_filename)
-            if os.path.isfile(abs_path):
+            abs_path = Path(d, abs_filename)
+            if abs_path.is_file():
                 return abs_path
 
         return None
 
     def graph_from_file(
         self,
-        file_path: str,
-        obj_args: Optional[list] = None,
+        file_path: Path,
+        obj_args: list | None = None,
         pos_x: int = 0,
         pos_y: int = 0,
         is_root: bool = True,
-        pd_graph_class: Type[PdGraph] = PdGraph
+        pd_graph_class: type[PdGraph] = PdGraph
     ) -> Any:
         """ Instantiate a PdGraph from a file.
             Note that obj_args does not include $0.
@@ -181,7 +183,7 @@ class PdParser:
         # assumed to be the root path of the whole system
 
         if is_root:
-            self.search_paths.append(os.path.dirname(file_path))
+            self.search_paths.append(file_path.parent)
 
         file_hv_arg_dict = self.__get_hv_args(file_path)
         file_iterator = self.get_pd_line(file_path)
@@ -220,11 +222,11 @@ class PdParser:
         file_hv_arg_dict: dict[str, list[str]],
         canvas_line: str,
         graph_args: list,
-        pd_path: str,
+        pd_path: Path,
         pos_x: int = 0,
         pos_y: int = 0,
         is_root: bool = False,
-        pd_graph_class: Type[PdGraph] = PdGraph
+        pd_graph_class: type[PdGraph] = PdGraph
     ) -> Any:
         """ Instantiate a PdGraph from an existing canvas.
             Note that graph_args includes $0.
@@ -233,13 +235,34 @@ class PdParser:
             @param canvas_line  The "#N canvas" which initiates this canvas.
             @param pd_graph_class  The python class to handle specific graph types
         """
-        obj_array: Optional[HeavyObject] = None  # an #A (table) object which is currently being parsed
+        obj_array: HeavyObject | None = None  # an #A (table) object which is currently being parsed
+
+        def finalize_array(array: HeavyObject) -> None:
+            declared_size = array.obj_dict["size"]
+            values_size = len(array.obj_dict["values"])
+            if declared_size != values_size:
+                new_size = max(declared_size, values_size)
+                array.add_warning(
+                    "Table \"{0}\" was declared as having {1} values, "
+                    "but {2} were supplied. It will be resized to {3} "
+                    "values (any unsupplied values will be zeroed).".format(
+                        array.obj_dict["name"],
+                        declared_size,
+                        values_size,
+                        new_size))
+                array.obj_dict["size"] = new_size
+                if new_size < declared_size:
+                    array.obj_dict["values"] = obj_args["values"][:new_size]
+                else:
+                    array.obj_dict["values"].extend([0.0 for _ in range(new_size - declared_size)])
 
         g = pd_graph_class(graph_args, pd_path, pos_x, pos_y)
 
         msg_send: dict = {}
         gui_send: dict = {}
         gui_recv: dict = {}
+        pd_index_to_graph_indices: dict[int, list[int]] = {}
+        pd_obj_counter: int = 0
 
         # parse and add all Heavy arguments to the graph
         for li in file_hv_arg_dict[canvas_line]:
@@ -268,7 +291,9 @@ class PdParser:
                             pd_path=pd_path,
                             pos_x=int(line[2]),
                             pos_y=int(line[3]))
-                        g.add_object(x)
+                        index = g.add_object(x)
+                        pd_index_to_graph_indices[pd_obj_counter] = [index]
+                        pd_obj_counter += 1
 
                 elif line[0] == "#X":
                     if line[1] == "restore":
@@ -295,28 +320,13 @@ class PdParser:
                             # are we restoring an array object?
                             # do some final sanity checks
                             if obj_array is not None:
-                                declared_size = obj_array.obj_dict["size"]
-                                values_size = len(obj_array.obj_dict["values"])
-                                if declared_size != values_size:
-                                    new_size = max(declared_size, values_size)
-                                    obj_array.add_warning(
-                                        "Table \"{0}\" was declared as having {1} values, "
-                                        "but {2} were supplied. It will be resized to {3} "
-                                        "values (any unsupplied values will be zeroed).".format(
-                                            obj_array.obj_dict["name"],
-                                            declared_size,
-                                            values_size,
-                                            new_size))
-                                    obj_array.obj_dict["size"] = new_size
-                                    if new_size < declared_size:
-                                        obj_array.obj_dict["values"] = obj_args["values"][:new_size]
-                                    else:
-                                        obj_array.obj_dict["values"].extend([0.0 for _ in
-                                                                             range(new_size - declared_size)])
+                                finalize_array(obj_array)
+
                                 obj_array = None  # done parsing the array
 
                             # set the subpatch name
                             g.subpatch_name = " ".join(line[5:]) if len(line) > 5 else "subpatch"
+                            g = self.__create_send_recv(g, msg_send, gui_send, gui_recv)
                             return g  # pop the graph
 
                     elif line[1] == "text":
@@ -329,6 +339,7 @@ class PdParser:
                             obj_args=[" ".join(line[4:])],
                             pos_x=int(line[2]),
                             pos_y=int(line[3])))
+                        pd_obj_counter += 1
 
                     elif line[1] == "obj":
                         x = None  # a PdObject
@@ -353,6 +364,7 @@ class PdParser:
                                 obj_args=["null object placeholder"],
                                 pos_x=int(line[2]),
                                 pos_y=int(line[3])))
+                            pd_obj_counter += 1
                             continue
 
                         if obj_type in ('block~',):
@@ -369,10 +381,11 @@ class PdParser:
                                 obj_args=[f"{obj_type} object placeholder"],
                                 pos_x=int(line[2]),
                                 pos_y=int(line[3])))
+                            pd_obj_counter += 1
                             continue
 
                         # do we have an abstraction for this object?
-                        abs_path = self.find_abstraction_path(os.path.dirname(pd_path), obj_type)
+                        abs_path = self.find_abstraction_path(pd_path.parent, obj_type)
                         if abs_path is not None and not g.is_abstraction_on_call_stack(abs_path):
                             # ensure that infinite recursion into abstractions is not possible
                             x = self.graph_from_file(
@@ -382,27 +395,27 @@ class PdParser:
                                 is_root=False)
 
                         # is this object in lib/pd_converted?
-                        elif os.path.isfile(os.path.join(self.__PDLIB_CONVERTED_DIR, f"{obj_type}.hv.json")):
+                        elif Path(self.__PDLIB_CONVERTED_DIR, f"{obj_type}.hv.json").is_file():
                             self.obj_counter[obj_type] += 1
-                            hv_path = os.path.join(self.__PDLIB_CONVERTED_DIR, f"{obj_type}.hv.json")
+                            hv_path = Path(self.__PDLIB_CONVERTED_DIR, f"{obj_type}.hv.json")
                             x = HeavyGraph(
                                 hv_path=hv_path,
                                 obj_args=obj_args,
                                 pos_x=int(line[2]), pos_y=int(line[3]))
 
                         # is this object in lib/heavy_converted?
-                        elif os.path.isfile(os.path.join(self.__HVLIB_CONVERTED_DIR, f"{obj_type}.hv.json")):
+                        elif Path(self.__HVLIB_CONVERTED_DIR, f"{obj_type}.hv.json").is_file():
                             self.obj_counter[obj_type] += 1
-                            hv_path = os.path.join(self.__HVLIB_CONVERTED_DIR, f"{obj_type}.hv.json")
+                            hv_path = Path(self.__HVLIB_CONVERTED_DIR, f"{obj_type}.hv.json")
                             x = HeavyGraph(
                                 hv_path=hv_path,
                                 obj_args=obj_args,
                                 pos_x=int(line[2]), pos_y=int(line[3]))
 
                         # is this object in lib/pd?
-                        elif os.path.isfile(os.path.join(self.__PDLIB_DIR, f"{obj_type}.pd")):
+                        elif Path(self.__PDLIB_DIR, f"{obj_type}.pd").is_file():
                             self.obj_counter[obj_type] += 1
-                            pdlib_path = os.path.join(self.__PDLIB_DIR, f"{obj_type}.pd")
+                            pdlib_path = Path(self.__PDLIB_DIR, f"{obj_type}.pd")
 
                             # mapping of pd/lib abstraction objects to classes
                             # for checking connection validity
@@ -440,9 +453,17 @@ class PdParser:
                                     "Arguments and control connections are ignored.")
 
                         # is this object in lib/heavy?
-                        elif os.path.isfile(os.path.join(self.__HVLIB_DIR, f"{obj_type}.pd")):
+                        elif Path(self.__HVLIB_DIR, f"{obj_type}.pd").is_file():
                             self.obj_counter[obj_type] += 1
-                            hvlib_path = os.path.join(self.__HVLIB_DIR, f"{obj_type}.pd")
+                            hvlib_path = Path(self.__HVLIB_DIR, f"{obj_type}.pd")
+
+                            # make sure that the nam file argument is an absolute path
+                            if obj_type == "pdnam~":
+                                path = Path(obj_args[0])
+                                if not path.is_absolute():
+                                    path = pd_path.parent / path
+                                obj_args = [str(path)]
+
                             x = self.graph_from_file(
                                 file_path=hvlib_path,
                                 obj_args=obj_args,
@@ -450,9 +471,19 @@ class PdParser:
                                 is_root=False)
 
                         # is this object in lib/else?
-                        elif os.path.isfile(os.path.join(self.__ELSELIB_DIR, f"{obj_type}.pd")):
+                        elif Path(self.__ELSELIB_DIR, f"{obj_type}.pd").is_file():
                             self.obj_counter[obj_type] += 1
-                            hvlib_path = os.path.join(self.__ELSELIB_DIR, f"{obj_type}.pd")
+                            hvlib_path = Path(self.__ELSELIB_DIR, f"{obj_type}.pd")
+                            x = self.graph_from_file(
+                                file_path=hvlib_path,
+                                obj_args=obj_args,
+                                pos_x=int(line[2]), pos_y=int(line[3]),
+                                is_root=False)
+
+                        # is this object in lib/cyclone?
+                        elif Path(self.__CYCLONE_DIR, f"{obj_type}.pd").is_file():
+                            self.obj_counter[obj_type] += 1
+                            hvlib_path = Path(self.__CYCLONE_DIR, f"{obj_type}.pd")
                             x = self.graph_from_file(
                                 file_path=hvlib_path,
                                 obj_args=obj_args,
@@ -460,9 +491,9 @@ class PdParser:
                                 is_root=False)
 
                         # is this object in lib? (sub-directory)
-                        elif os.path.isfile(os.path.join(self.__LIB_DIR, f"{obj_type}.pd")):
+                        elif Path(self.__LIB_DIR, f"{obj_type}.pd").is_file():
                             self.obj_counter[obj_type] += 1
-                            hvlib_path = os.path.join(self.__LIB_DIR, f"{obj_type}.pd")
+                            hvlib_path = Path(self.__LIB_DIR, f"{obj_type}.pd")
                             x = self.graph_from_file(
                                 file_path=hvlib_path,
                                 obj_args=obj_args,
@@ -471,12 +502,44 @@ class PdParser:
 
                         # is this an object that must be programatically parsed?
                         elif obj_type in self.__PD_CLASSES:
-                            self.obj_counter[obj_type] += 1
-                            obj_class = self.__PD_CLASSES[obj_type]
-                            x = obj_class(
-                                obj_type,
-                                obj_args,
-                                pos_x=int(line[2]), pos_y=int(line[3]))
+
+                            # split expressions into separate objects
+                            if obj_type in ['expr', 'expr~']:
+                                parts = " ".join(obj_args).split("\\;")
+                                expressions = [p.strip() for p in parts if p.strip()]
+                                if obj_type == 'expr':
+                                    # only expr seems to require this (see tests)
+                                    expressions.reverse()
+                                split_indices = []
+
+                                # find the highest inlet reference across all expressions
+                                all_args = " ".join(expressions)
+                                max_inlet = max(
+                                    (int(m[2:]) for m in re.findall(r'\$[fisv]\d+', all_args)),
+                                    default=1
+                                )
+
+                                if max_inlet > 100:
+                                    g.add_error("Heavy expr supports up to 100 variables")
+
+                                for i in expressions:
+                                    self.obj_counter[obj_type] += 1
+                                    obj_class = self.__PD_CLASSES[obj_type]
+                                    x = obj_class(obj_type, [i], pos_x=int(line[2]), pos_y=int(line[3]))
+                                    x.num_inlets = max_inlet  # override with the shared inlet count
+                                    assert x is not None
+                                    split_indices.append(g.add_object(x))
+
+                                pd_index_to_graph_indices[pd_obj_counter] = split_indices
+                                pd_obj_counter += 1
+                                continue
+                            else:
+                                self.obj_counter[obj_type] += 1
+                                obj_class = self.__PD_CLASSES[obj_type]
+                                x = obj_class(
+                                    obj_type,
+                                    obj_args,
+                                    pos_x=int(line[2]), pos_y=int(line[3]))
 
                         elif self.__is_float(obj_type):
                             # parse float literals
@@ -498,21 +561,25 @@ class PdParser:
 
                         assert x is not None
                         index = g.add_object(x)
+                        pd_index_to_graph_indices[pd_obj_counter] = [index]
+                        pd_obj_counter += 1
 
                         # add gui send/receive objects
                         arg_index = {
-                            "nbx":       (6, 7),
-                            "vsl":       (6, 7),
-                            "hsl":       (6, 7),
-                            "vradio":    (4, 5),
-                            "hradio":    (4, 5),
-                            "bng":       (4, 5),
-                            "tgl":       (2, 3),
-                            "knob":      (5, 6),
-                            "else/knob": (5, 6),
+                            "nbx":          (6, 7),
+                            "vsl":          (6, 7),
+                            "hsl":          (6, 7),
+                            "vradio":       (4, 5),
+                            "hradio":       (4, 5),
+                            "bng":          (4, 5),
+                            "tgl":          (2, 3),
+                            "knob":         (5, 6),
+                            "else/knob":    (5, 6),
+                            "popmenu":      (7, 6),
+                            "else/popmenu": (7, 6),
                         }
 
-                        if obj_type in arg_index.keys():
+                        if obj_type in arg_index:
                             send_index = arg_index[obj_type][0]
                             recv_index = arg_index[obj_type][1]
 
@@ -529,11 +596,13 @@ class PdParser:
                                 graph=g,
                                 is_root=is_root)
                         x = self.graph_from_file(
-                            file_path=os.path.join(self.__PDLIB_DIR, f"{line[1]}.pd"),
+                            file_path=Path(self.__PDLIB_DIR, f"{line[1]}.pd"),
                             obj_args=obj_args,
                             pos_x=int(line[2]), pos_y=int(line[3]),
                             is_root=False)
                         index = g.add_object(x)
+                        pd_index_to_graph_indices[pd_obj_counter] = [index]
+                        pd_obj_counter += 1
 
                         # symbolatom is not supported
                         # due to symbol/__var implementation
@@ -545,7 +614,10 @@ class PdParser:
                                 gui_recv[index] = obj_args[8]
 
                     elif line[1] == "array":
-                        assert obj_array is None, "#X array object is already being parsed."
+                        # are we still parsing a previous array? finalize it.
+                        if obj_array is not None:
+                            finalize_array(obj_array)
+
                         # array names can have dollar arguments in them.
                         # ensure that they are resolved
                         table_def = self.__resolve_object_args(
@@ -576,6 +648,8 @@ class PdParser:
                             pos_y=int(line[3]))
 
                         index = g.add_object(msg)
+                        pd_index_to_graph_indices[pd_obj_counter] = [index]
+                        pd_obj_counter += 1
 
                         if len(msg.obj_dict) > 0:
                             msg_send[index] = []
@@ -584,11 +658,30 @@ class PdParser:
                                 msg_send[index].append(remote)
 
                     elif line[1] == "connect":
-                        g.add_parsed_connection(
-                            from_index=int(line[2]),
-                            from_outlet=int(line[3]),
-                            to_index=int(line[4]),
-                            to_inlet=int(line[5]))
+                        from_pd = int(line[2])
+                        from_outlet = int(line[3])
+                        to_pd = int(line[4])
+                        to_inlet = int(line[5])
+
+                        # remap outlet: outlet N -> split object N, outlet 0
+                        from_graph_indices = pd_index_to_graph_indices.get(from_pd)
+                        if from_graph_indices is not None and len(from_graph_indices) > 1:
+                            if from_outlet < len(from_graph_indices):
+                                from_index = from_graph_indices[from_outlet]
+                            else:
+                                from_index = from_graph_indices[0]
+                            from_outlet = 0
+                        else:
+                            from_index = from_graph_indices[0] if from_graph_indices else from_pd
+
+                        # fan out inlet connections to all split objects
+                        to_graph_indices = pd_index_to_graph_indices.get(to_pd)
+                        if to_graph_indices is not None and len(to_graph_indices) > 1:
+                            for to_index in to_graph_indices:
+                                g.add_parsed_connection(from_index, from_outlet, to_index, to_inlet)
+                        else:
+                            to_index = to_graph_indices[0] if to_graph_indices else to_pd
+                            g.add_parsed_connection(from_index, from_outlet, to_index, to_inlet)
 
                     elif line[1] == "declare":
                         if not is_root:
@@ -596,8 +689,8 @@ class PdParser:
                                 "[declare] objects are not supported in abstractions. "
                                 "They can only be in the root canvas.")
                         elif len(line) >= 4 and line[2] == "-path":
-                            pd_parent = Path(pd_path).parent
-                            pd_search = os.path.join(pd_parent, line[3])
+                            pd_parent = pd_path.parent
+                            pd_search = Path(pd_parent, line[3])
                             did_add = self.add_relative_search_directory(pd_search)
                             if not did_add:
                                 g.add_warning(
@@ -622,7 +715,12 @@ class PdParser:
                         g.add_error(f"Don't know how to parse line: {' '.join(line)}")
 
                 elif line[0] == "#A" and obj_array is not None:
-                    obj_array.obj_dict["values"].extend([float(f) for f in line[2:]])
+                    # Test that we have an array continuation and extend the array values.
+                    try:
+                        float(line[1])
+                        obj_array.obj_dict["values"].extend([float(f) for f in line[2:] if f != ""])
+                    except ValueError:
+                        continue
 
                 else:
                     g.add_error(f"Don't know how to parse line: {' '.join(line)}")
@@ -631,49 +729,13 @@ class PdParser:
             # bubble the Exception back to the root graph where the graph
             # will be returned
             if not g.is_root:
-                raise e
+                raise
             else:
                 # NOTE(mhroth): should the exception be added as an error?
                 # Sometimes it's all that we have, so perhaps it's a good idea.
                 g.add_error(str(e), NotificationEnum.ERROR_EXCEPTION)
 
-        # parse remote messages
-        for index in msg_send.keys():
-            first_msg = g.get_object(index)
-            conns = first_msg.get_inlet_connections()
-
-            for remote in msg_send[index]:
-                self.obj_counter["msg"] += 1
-                msg = PdMessageObject("msg", [" ".join(msg for msg in remote["message"])])
-                msg_index = g.add_object(msg)
-
-                self.obj_counter["send"] += 1
-                send = PdSendObject("send", [remote["receiver"]])
-                send_index = g.add_object(send)
-
-                # connect new message to upstream objects of first message
-                for conn in conns["0"]:
-                    up_obj = conn.from_obj
-                    up_index = g.get_objects().index(up_obj)
-                    g.add_parsed_connection(up_index, 0, msg_index, 0)
-
-                g.add_parsed_connection(msg_index, 0, send_index, 0)
-
-        # parse gui sends
-        for index in gui_send.keys():
-            self.obj_counter["send"] += 1
-            send = PdSendObject('send', gui_send[index].split())
-            send_index = g.add_object(send)
-
-            g.add_parsed_connection(index, 0, send_index, 0)
-
-        # parse gui receives
-        for index in gui_recv.keys():
-            self.obj_counter["receive"] += 1
-            recv = PdReceiveObject('receive', gui_recv[index].split())
-            recv_index = g.add_object(recv)
-
-            g.add_parsed_connection(recv_index, 0, index, 0)
+        g = self.__create_send_recv(g, msg_send, gui_send, gui_recv)
 
         return g
 
@@ -735,7 +797,7 @@ class PdParser:
         return resolved_obj_args
 
     # a mapping of Pd objects to the classes that will parse them
-    __PD_CLASSES = {
+    __PD_CLASSES: ClassVar[dict[str, type]] = {
         "adc~": PdAudioIoObject,
         "dac~": PdAudioIoObject,
         "expr": PdExprObject,
@@ -776,5 +838,52 @@ class PdParser:
         try:
             float(x)
             return True
-        except Exception:
+        except ValueError:
             return False
+
+    def __create_send_recv(
+        self,
+        g: PdGraph,
+        msg_send: dict,
+        gui_send: dict,
+        gui_recv: dict
+    ) -> PdGraph:
+        # parse remote messages
+        for index, remotes in msg_send.items():
+            first_msg = g.get_object(index)
+            conns = first_msg.get_inlet_connections()
+
+            for remote in remotes:
+                self.obj_counter["msg"] += 1
+                msg = PdMessageObject("msg", [" ".join(msg for msg in remote["message"])])
+                msg_index = g.add_object(msg)
+
+                self.obj_counter["send"] += 1
+                send = PdSendObject("send", [remote["receiver"]])
+                send_index = g.add_object(send)
+
+                # connect new message to upstream objects of first message
+                for conn in conns["0"]:
+                    up_obj = conn.from_obj
+                    up_index = g.get_objects().index(up_obj)
+                    g.add_parsed_connection(up_index, 0, msg_index, 0)
+
+                g.add_parsed_connection(msg_index, 0, send_index, 0)
+
+        # parse gui sends
+        for index, receivers in gui_send.items():
+            self.obj_counter["send"] += 1
+            send = PdSendObject('send', receivers.split())
+            send_index = g.add_object(send)
+
+            g.add_parsed_connection(index, 0, send_index, 0)
+
+        # parse gui receives
+        for index, receivers in gui_recv.items():
+            self.obj_counter["receive"] += 1
+            recv = PdReceiveObject('receive', receivers.split())
+            recv_index = g.add_object(recv)
+
+            g.add_parsed_connection(recv_index, 0, index, 0)
+
+        return g

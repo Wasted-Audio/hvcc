@@ -1,0 +1,5 @@
+[@ 100.000] rest: bang
+[@ 500.000] trigger: bang
+[@ 600.000] rest: bang
+[@ 1000.000] trigger: bang
+[@ 2500.000] rest: bang

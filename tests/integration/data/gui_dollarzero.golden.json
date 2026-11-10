@@ -1,4 +1,5 @@
 {
+  "id": "mainPatch",
   "objects": [
     {
       "type": "vslider",
@@ -11,6 +12,7 @@
         "y": 128
       },
       "parameter": "1001_vol",
+      "send": false,
       "label": null,
       "min": 0.0,
       "max": 127.0,
@@ -24,6 +26,16 @@
   "size": {
     "x": 734,
     "y": 565
+  },
+  "theme": {
+    "obj_corner_radius": null,
+    "cnv_color": null,
+    "cnv_txt_color": null,
+    "io_color": null,
+    "bg_color": null,
+    "sel_color": null,
+    "com_txt_color": null,
+    "out_color": null
   },
   "version": "0.14.0"
 }

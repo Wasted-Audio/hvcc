@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from typing import Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 
 if TYPE_CHECKING:
     from .HeavyIrObject import HeavyIrObject
@@ -47,10 +47,10 @@ class Connection:
     def copy(
         self,
         from_object: Optional['HeavyIrObject'] = None,
-        outlet_index: Optional[int] = None,
+        outlet_index: int | None = None,
         to_object: Optional['HeavyIrObject'] = None,
-        inlet_index: Optional[int] = None,
-        type: Optional[str] = None
+        inlet_index: int | None = None,
+        type: str | None = None
     ) -> 'Connection':
         """ Create a new connection based on the existing one, changing the given values.
         """
@@ -81,7 +81,7 @@ class Connection:
         return self.type == "-~>"
 
     @classmethod
-    def is_signal_type(cls, type: Optional[str]) -> bool:
+    def is_signal_type(cls, type: str | None) -> bool:
         return type in {"~i>", "~f>"}
 
     def __eq__(self, other: object) -> bool:

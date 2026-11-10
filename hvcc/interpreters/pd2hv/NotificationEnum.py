@@ -57,19 +57,19 @@ class NotificationEnum(Enum):
     ERROR_TRIGGER_ABFS = 2003
 
     # only arguments 'f', 'float' and numeric values are supported for pack object
-    ERROR_PACK_FLOAT_ARGUMENTS = 2003
+    ERROR_PACK_FLOAT_ARGUMENTS = 2004
 
     # a value cannot be resolved because the required argument is missing
-    ERROR_MISSING_REQUIRED_ARGUMENT = 2004
+    ERROR_MISSING_REQUIRED_ARGUMENT = 2005
 
     # unique arguments are required for this object
-    ERROR_UNIQUE_ARGUMENTS_REQUIRED = 2005
+    ERROR_UNIQUE_ARGUMENTS_REQUIRED = 2006
 
     # two objects cannot be connected
-    ERROR_UNABLE_TO_CONNECT_OBJECTS = 2006
+    ERROR_UNABLE_TO_CONNECT_OBJECTS = 2007
 
     # a particular connection (type?) is not supported
-    ERROR_UNSUPPORTED_CONNECTION = 2007
+    ERROR_UNSUPPORTED_CONNECTION = 2008
 
     # Exception
 

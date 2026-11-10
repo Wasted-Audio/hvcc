@@ -1,0 +1,2 @@
+[@ 0.000] print: list c 4 b 6 1 a 3
+[@ 0.000] print: 4 b 6 1 a 3

@@ -1,5 +1,5 @@
 # Copyright (C) 2014-2018 Enzien Audio, Ltd.
-# Copyright (C) 2022 Wasted Audio
+# Copyright (C) 2022-2026 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,14 +16,14 @@
 
 import argparse
 import os
-import shutil
+from pathlib import Path
 
 from tests.framework.base_signal import TestPdSignalBase
 
 
 class TestPdSignalPatches(TestPdSignalBase):
-    SCRIPT_DIR = os.path.dirname(__file__)
-    TEST_DIR = os.path.join(os.path.dirname(__file__), "pd", "signal")
+    SCRIPT_DIR = Path(__file__).parent
+    TEST_DIR = Path(Path(__file__).parent, "pd", "signal")
 
     def test_line(self):
         self._test_signal_patch("test-line.pd")
@@ -68,11 +68,8 @@ def main():
     out_dir = test_patch._run_hvcc(args.pd_path)
     assert out_dir is not None
 
-    c_src_dir = os.path.join(out_dir, "c")
-    shutil.copy2(os.path.join(test_patch.SCRIPT_DIR, "src/test_signal.c"), c_src_dir)
-    shutil.copy2(os.path.join(test_patch.SCRIPT_DIR, "src/tinywav/tinywav.h"), c_src_dir)
-    shutil.copy2(os.path.join(test_patch.SCRIPT_DIR, "src/tinywav/tinywav.c"), c_src_dir)
-    c_sources = os.listdir(c_src_dir)
+    c_src_dir = Path(out_dir, "c")
+    c_sources = [Path(c_src_dir, c) for c in os.listdir(c_src_dir) if c.endswith(".c")]
 
     wav_path = test_patch.compile_and_run(
         source_files=c_sources,

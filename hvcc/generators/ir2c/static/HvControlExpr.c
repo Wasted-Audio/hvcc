@@ -37,7 +37,7 @@ void cExpr_onMessage(HeavyContextInterface *_c, ControlExpr *o, int letIn, const
       if (msg_isBang(m,0)) {
         ; // pass through to sending the msg below
       } else {
-        for (int i = hv_min_i(numElements, msg_getNumElements(m))-1; i >= 0; --i) {
+        for (int i = hv_min_i(numElements, MAX_EXPR_ARGS)-1; i >= 0; --i) {
           if (msg_isFloat(m, i)) {
             o->args[i] = msg_getFloat(m, i);
           }

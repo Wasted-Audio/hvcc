@@ -14,7 +14,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from typing import Optional, List, Dict
+
+from hvcc.types.Heavy import Heavy, HvPos
 
 from .PdObject import PdObject
 
@@ -23,7 +24,7 @@ class PdLetObject(PdObject):
     def __init__(
         self,
         obj_type: str,
-        obj_args: Optional[List] = None,
+        obj_args: list | None = None,
         pos_x: int = 0,
         pos_y: int = 0
     ) -> None:
@@ -31,22 +32,21 @@ class PdLetObject(PdObject):
         super().__init__(obj_type, obj_args, pos_x, pos_y)
         self.let_index = 0
 
-    def get_outlet_connection_type(self, outlet_index: int) -> Optional[str]:
+    def get_outlet_connection_type(self, outlet_index: int) -> str | None:
         if len(self.obj_args) > 0 and self.obj_args[0] in {"-->", "~f>", "~i>", "-~>"}:
             return self.obj_args[0]
+        elif self.obj_type == "inlet~" and outlet_index == 1:
+            return "-->"
         else:
             return super().get_outlet_connection_type(outlet_index)
 
-    def to_hv(self) -> Dict:
-        return {
-            "type": self.obj_type.strip("~"),
-            "args": {
+    def to_hv(self) -> Heavy:
+        return Heavy(
+            type=self.obj_type.strip("~"),
+            args={
                 "name": "",  # Pd does not give an inlet name
                 "index": self.let_index,
-                "type": self.get_outlet_connection_type(self.let_index)
+                "type": self.get_outlet_connection_type(0)  # evaluate the primary outlet for the type
             },
-            "properties": {
-                "x": self.pos_x,
-                "y": self.pos_y
-            }
-        }
+            properties=HvPos(x=self.pos_x, y=self.pos_y)
+        )
