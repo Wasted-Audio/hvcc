@@ -1,5 +1,4 @@
-# Copyright (C) 2014-2018 Enzien Audio, Ltd.
-# Copyright (C) 2023 Wasted Audio
+# Copyright (C) 2023-2026 Wasted Audio
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -31,7 +30,16 @@ class SignalRFFT(HeavyObject):
 
     @classmethod
     def get_C_file_set(cls) -> set:
-        return {"HvSignalRFFT.h", "HvSignalRFFT.c"}
+        return {
+            "HvSignalRFFT.h",
+            "HvSignalRFFT.c",
+            "kissfft/kiss_fft.h",
+            "kissfft/kiss_fft.c",
+            "kissfft/kiss_fftr.h",
+            "kissfft/kiss_fftr.c",
+            "kissfft/_kiss_fft_guts.h",
+            "kissfft/kiss_fft_log.h"
+        }
 
     @classmethod
     def get_C_init(cls, obj_type: str, obj_id: str, args: dict) -> list[str]:

@@ -8,6 +8,7 @@ FILES_DSP = $(filter-out HeavyDPF_{{name}}_UI.cpp, $(wildcard *.cpp))
 FILES_DSP = $(wildcard *.cpp)
 {%- endif %}
 FILES_DSP += $(wildcard *.c)
+FILES_DSP += $(wildcard */*.c)
 
 {%- if meta.enable_ui > 0 %}
 FILES_UI = HeavyDPF_{{name}}_UI.cpp

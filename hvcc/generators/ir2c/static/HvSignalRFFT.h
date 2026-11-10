@@ -23,11 +23,23 @@
 extern "C" {
 #endif
 
-
 typedef struct SignalRFFT {
+  // one block of time domain input samples
   struct HvTable input;
+
+  // two blocks of spectrum, each (size) samples long: bins 0..size/2 followed
+  // by silence, which is how Pd lays out the outlets of [rfft~]. Two slots
+  // because the result of block k-1 is released while block k is accumulated.
   struct HvTable outputReal;
   struct HvTable outputImagin;
+
+  // size/2+1 complex bins of transform output
+  struct HvTable scratch;
+
+  void *cfgFwd;
+  hv_uint32_t size;
+  hv_uint32_t head; // sample offset within the current block
+  hv_uint32_t blk;  // number of completed blocks
 } SignalRFFT;
 
 hv_size_t sRFFT_init(SignalRFFT *o, const int size);
@@ -36,9 +48,20 @@ void sRFFT_onMessage(HeavyContextInterface *_c, SignalRFFT *o, int letIndex, con
 void __hv_rfft_f(SignalRFFT *o, hv_bInf_t bIn, hv_bOutf_t bOut0, hv_bOutf_t bOut1);
 
 typedef struct SignalRIFFT {
+  // one block each of real and imaginary bins, (size) samples long
   struct HvTable inputReal;
   struct HvTable inputImagin;
+
+  // two blocks of time domain output samples
   struct HvTable output;
+
+  // size/2+1 complex bins handed to the inverse transform
+  struct HvTable scratch;
+
+  void *cfgInv;
+  hv_uint32_t size;
+  hv_uint32_t head;
+  hv_uint32_t blk;
 } SignalRIFFT;
 
 hv_size_t sRIFFT_init(SignalRIFFT *o, const int size);
