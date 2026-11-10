@@ -14,7 +14,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
 import shutil
 import time
 from pathlib import Path
@@ -87,7 +86,11 @@ class c2unity(Generator):
                 shutil.rmtree(patch_src_dir)
             shutil.copytree(c_src_dir, patch_src_dir)
 
-            heavy_src_files = [f for f in os.listdir(c_src_dir) if f.endswith((".c", ".cpp"))]
+            heavy_src_files = [
+                p for p in Path(c_src_dir).rglob("*")
+                if p.suffix in (".c", ".cpp")
+            ]
+
 
             # generate files from templates
             for f in env.list_templates(filter_func=filter_templates):
@@ -95,7 +98,7 @@ class c2unity(Generator):
                 file_path = Path(str(file_path).replace("{{name}}", patch_name))
 
                 if not file_path.parent.exists():
-                    os.makedirs(file_path.parent)
+                    file_path.parent.mkdir()
 
                 with open(file_path, "w") as g:
                     g.write(env.get_template(f).render(
