@@ -70,15 +70,15 @@ The files that `hvcc` generates are split into two types:
 
 ### Includes
 
-Additional libraries are included by Heavy:
+These additional libraries are included by Heavy:
 
-- MicroNAM - under `MIT` license
-- KissFFT - under `BSD3` license
+- [MicroNAM](https://github.com/jaffco/MicroNAM) - under `MIT` license
+- [KissFFT](https://github.com/mborgerding/kissfft) - under `BSD3` license
 
-For testing we use the following additional libraries:
+For testing we use the following libraries:
 
-- tinywav - under `ISC` license
-- midifilu - under `BSD2` license
+- [tinywav](https://github.com/mhroth/tinywav) - under `ISC` license
+- [midifile](https://github.com/craigsapp/midifile) - under `BSD2` license
 
 ### Generators
 
