@@ -116,13 +116,13 @@ class HeavyParser:
             @param hv_file  The Heavy file where this graph can be found.
         """
         # resolve default graph arguments
-        graph_args = graph_args or {}
+        graph_args = dict(graph_args) if graph_args else {}
 
         if not isinstance(json_heavy.args, list):
             raise HeavyIrException("Graph arguments must be a list.")
 
         # set the block size
-        graph_args["block_size"] = int(json_heavy.block_size or 64)
+        graph_args["block_size"] = int(json_heavy.block_size or graph_args.get("block_size", 64))
 
         for a in json_heavy.args:
             if a["name"] not in graph_args:
