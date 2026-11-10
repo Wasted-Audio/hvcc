@@ -182,7 +182,7 @@
       }
     ],
     "alias": [
-      "divide"
+      "mult"
     ],
     "tags": [
       "math",
@@ -220,7 +220,7 @@
       }
     ],
     "alias": [
-      "sub"
+      "add"
     ],
     "tags": [
       "math",
@@ -258,7 +258,7 @@
       }
     ],
     "alias": [
-      "mult"
+      "sub"
     ],
     "tags": [
       "math",
@@ -296,7 +296,7 @@
       }
     ],
     "alias": [
-      "add"
+      "divide"
     ],
     "tags": [
       "math",

@@ -238,8 +238,8 @@ class HeavyLangObject:
                 self.outlet_connections[c.outlet_index].append(c)
             else:
                 raise HeavyException(f"Connection {c} does not connect to this object {self}.")
-        except Exception:
-            raise HeavyException(f"Connection {c} connects to out-of-range let.")
+        except Exception as exc:
+            raise HeavyException(f"Connection {c} connects to out-of-range let: {exc}")
 
     def remove_connection(self, c: Connection) -> None:
         """ Remove a connection to this object.

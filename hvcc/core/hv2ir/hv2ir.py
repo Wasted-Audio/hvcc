@@ -21,8 +21,8 @@ import time
 
 from typing import Optional
 
-from .HeavyException import HeavyException
-from .HeavyParser import HeavyParser
+from hvcc.core.hv2ir.HeavyException import HeavyException
+from hvcc.core.hv2ir.HeavyParser import HeavyParser
 
 from hvcc.types.compiler import CompilerResp, CompilerNotif, CompilerMsg
 
@@ -100,15 +100,7 @@ class hv2ir:
         if ir is not None:
             # write the hv.ir file
             with open(ir_file, "w") as f:
-                if verbose:
-                    json.dump(
-                        ir.model_dump(),
-                        f,
-                        sort_keys=True,
-                        indent=2,
-                        separators=(",", ": "))
-                else:
-                    json.dump(ir.model_dump(), f)
+                json.dump(ir.model_dump(), f, indent=4)
 
             if verbose and ir is not None:
                 if len(ir.signal.processOrder) > 0:

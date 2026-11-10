@@ -22,10 +22,10 @@ import re
 import sys
 from typing import Any, List, Dict, Optional
 
+from hvcc.interpreters.pd2gui import pd2gui
 from hvcc.interpreters.pd2hv import pd2hv
 from hvcc.core.hv2ir import hv2ir
-from hvcc.generators.ir2c import ir2c
-from hvcc.generators.ir2c import ir2c_perf
+from hvcc.generators.ir2c import ir2c, ir2c_perf
 from hvcc.generators.c2js import c2js
 from hvcc.generators.c2daisy import c2daisy
 from hvcc.generators.c2dpf import c2dpf
@@ -33,6 +33,7 @@ from hvcc.generators.c2owl import c2owl
 from hvcc.generators.c2pdext import c2pdext
 from hvcc.generators.c2wwise import c2wwise
 from hvcc.generators.c2unity import c2unity
+from hvcc.generators.c2fmod import c2fmod
 from hvcc.types.compiler import (
     CompilerResults, CompilerResp, CompilerNotif, CompilerMsg, Generator,
     ExternInfo, ExternMemoryPool, ExternMidi, ExternEvents, ExternParams
@@ -253,6 +254,14 @@ def compile_dataflow(
         search_paths=search_paths,
         verbose=verbose)
 
+    if verbose:
+        print("--> Generating GUI IR")
+    results.root["pd2gui"] = pd2gui.pd2gui.compile(
+        pd_path=in_path,
+        ir_dir=os.path.join(out_dir, "ir"),
+        search_paths=search_paths,
+        verbose=verbose)
+
     # check for errors
     response: CompilerResp = list(results.root.values())[0]
 
@@ -354,6 +363,11 @@ def compile_dataflow(
         if verbose:
             print("--> Generating Wwise plugin")
         results.root["c2wwise"] = c2wwise.c2wwise.compile(**gen_args)
+
+    if "fmod" in generators:
+        if verbose:
+            print("--> Generating Fmod plugin")
+        results.root["c2fmod"] = c2fmod.c2fmod.compile(**gen_args)
 
     if ext_generators:
         for module_name in ext_generators:

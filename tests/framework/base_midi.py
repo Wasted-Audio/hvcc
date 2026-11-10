@@ -19,6 +19,9 @@ import platform
 import shutil
 import subprocess
 
+from typing import List, Optional
+
+from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
 from tests.framework.base_test import HvBaseTest
 
 
@@ -26,11 +29,11 @@ class TestPdMIDIBase(HvBaseTest):
 
     def compile_and_run(
         self,
-        source_files,
-        out_dir,
-        num_iterations,
-        flag=None
-    ):
+        source_files: List[str],
+        out_dir: str,
+        num_iterations: int,
+        flag: Optional[str] = None
+    ) -> List[str]:
         exe_path = self._compile_and_run(source_files, out_dir, flag)
 
         # run executable (returns stdout)
@@ -42,13 +45,22 @@ class TestPdMIDIBase(HvBaseTest):
 
         return [x.decode('utf-8') for x in output]
 
-    def create_fail_message(self, result, golden, flag=None):
+    def create_fail_message(
+        self,
+        result: str,
+        golden: str,
+        flag: Optional[str] = None
+    ) -> str:
         return "\nResult ({0})\n-----------\n{1}\n\nGolden\n-----------\n{2}".format(
             flag or "",
             "\n".join(result),
             "\n".join(golden))
 
-    def _test_control_patch_expect_error(self, pd_file, expected_enum):
+    def _test_control_patch_expect_error(
+        self,
+        pd_file: str,
+        expected_enum: NotificationEnum
+    ) -> None:
         pd_path = os.path.join(self.TEST_DIR, pd_file)
 
         try:
@@ -56,7 +68,11 @@ class TestPdMIDIBase(HvBaseTest):
         except Exception as e:
             self.fail(str(e))
 
-    def _test_midi_patch_expect_warning(self, pd_file, expected_enum):
+    def _test_control_patch_expect_warning(
+        self,
+        pd_file: str,
+        expected_enum: NotificationEnum
+    ) -> None:
         # setup
         pd_path = os.path.join(self.TEST_DIR, pd_file)
 
@@ -65,7 +81,13 @@ class TestPdMIDIBase(HvBaseTest):
         except Exception as e:
             self.fail(str(e))
 
-    def _test_midi_patch(self, pd_file, num_iterations=1, allow_warnings=True, fail_message=None):
+    def _test_midi_patch(
+        self,
+        pd_file: str,
+        num_iterations: int = 1,
+        allow_warnings: bool = True,
+        fail_message: Optional[str] = None
+    ) -> None:
         """Compiles, runs, and tests a control patch.
         Allows warnings by default, always fails on errors.
         @param fail_message  An optional message displayed in case of test failure.

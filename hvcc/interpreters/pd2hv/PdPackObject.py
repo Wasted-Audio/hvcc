@@ -36,11 +36,11 @@ class PdPackObject(PdObject):
         if len(self.obj_args) == 0:
             self.values = [0.0, 0.0]
 
-        for x in self.obj_args:
+        for i, x in enumerate(self.obj_args):
             try:
                 self.values.append(float(x))
             except Exception:
-                if x in {"f", "float"}:
+                if x in ("f", "float") or (i > 0 and x in ("s", "symbol")):
                     self.values.append(0.0)
                 else:
                     self.add_error(

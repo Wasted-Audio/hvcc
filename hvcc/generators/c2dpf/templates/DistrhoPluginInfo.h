@@ -8,6 +8,20 @@
 {% else %}
 #define DISTRHO_PLUGIN_URI                  "urn:hvcc:{{name}}"
 {%- endif %}
+{%- if meta.maker != None %}
+#define DISTRHO_PLUGIN_BRAND                "{{meta.maker}}"
+{% else %}
+#define DISTRHO_PLUGIN_BRAND                "Heavy"
+{%- endif %}
+{%- if meta.brand_id != None %}
+#define DISTRHO_PLUGIN_BRAND_ID             {{meta.brand_id}}
+{%- endif %}
+{%- if meta.brand_id_no_vst3 is sameas true %}
+#define  DPF_VST3_DONT_USE_BRAND_ID         1
+{%- endif %}
+{%- if meta.unique_id != None %}
+#define DISTRHO_PLUGIN_UNIQUE_ID             {{meta.unique_id}}
+{%- endif %}
 {%- if meta.plugin_clap_id != None %}
 #define DISTRHO_PLUGIN_CLAP_ID              "{{meta.plugin_clap_id}}"
 {% else %}

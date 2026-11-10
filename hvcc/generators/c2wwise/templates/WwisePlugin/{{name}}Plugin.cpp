@@ -6,6 +6,8 @@
 #include "libnyquist/WavDecoder.h"
 #include "libnyquist/WavEncoder.h"
 
+#include <AK/Tools/Common/AkFNVHash.h>
+
 #include <locale>
 #include <codecvt>
 #include <iostream>

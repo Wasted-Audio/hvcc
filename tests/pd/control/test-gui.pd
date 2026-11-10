@@ -1,22 +1,14 @@
 #N canvas 430 45 695 566 10;
-#X obj 474 312 hradio 15 1 0 8 empty empty empty 0 -8 0 10 -262144
--1 -1 4;
-#X obj 228 314 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
--1 -1;
-#X obj 283 348 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 4
-1;
-#X obj 317 324 nbx 5 14 -1e+37 1e+37 0 0 empty empty empty 0 -8 0 10
--262144 -1 -1 4 256;
-#X obj 388 247 vsl 15 128 0 127 0 0 empty empty empty 0 -9 0 10 -262144
--1 -1 400 1;
-#X obj 476 280 hsl 128 15 0 127 0 0 empty empty empty -2 -8 0 10 -262144
--1 -1 400 1;
-#X obj 410 248 vradio 15 1 0 8 empty empty empty 0 -8 0 10 -262144
--1 -1 4;
-#X obj 471 145 cnv 15 100 60 empty empty empty 20 12 0 14 -233017 -66577
-0;
-#X floatatom 303 349 5 0 0 0 - - -, f 5;
-#X symbolatom 415 73 10 0 0 0 - - -, f 10;
+#X obj 474 312 hradio 15 1 0 8 empty empty empty 0 -8 0 10 #fcfcfc #000000 #000000 0;
+#X obj 228 314 bng 15 250 50 0 empty empty empty 17 7 0 10 #fcfcfc #000000 #000000;
+#X obj 283 348 tgl 15 0 empty empty empty 17 7 0 10 #fcfcfc #000000 #000000 0 1;
+#X obj 317 324 nbx 5 14 -1e+37 1e+37 0 0 empty empty empty 0 -8 0 10 #fcfcfc #000000 #000000 0 256;
+#X obj 388 247 vsl 15 128 0 127 0 0 empty empty empty 0 -9 0 10 #fcfcfc #000000 #000000 0 1;
+#X obj 476 280 hsl 128 15 0 127 0 0 empty empty empty -2 -8 0 10 #fcfcfc #000000 #000000 0 1;
+#X obj 410 248 vradio 15 1 0 8 empty empty empty 0 -8 0 10 #fcfcfc #000000 #000000 0;
+#X obj 471 145 cnv 15 100 60 empty empty empty 20 12 0 14 #e0e0e0 #404040 0;
+#X floatatom 303 349 5 0 0 0 - - - 0;
+#X symbolatom 415 73 10 0 0 0 - - - 0;
 #X obj 254 13 loadbang;
 #X obj 268 437 print;
 #X msg 254 82 4;

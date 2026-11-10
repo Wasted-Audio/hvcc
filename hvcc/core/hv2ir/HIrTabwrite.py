@@ -37,7 +37,7 @@ class HIrTabwrite(HeavyIrObject):
     def reduce(self) -> Optional[Tuple[Set, List]]:
         if self.graph is not None:
             table_obj = self.graph.resolve_object_for_name(
-                self.args["table"],
+                self.args["table"].split(" ")[0],
                 ["table", "__table"])
             if table_obj is not None:
                 self.args["table_id"] = table_obj.id

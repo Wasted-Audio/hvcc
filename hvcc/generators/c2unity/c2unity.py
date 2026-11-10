@@ -21,7 +21,7 @@ import time
 from typing import Optional
 
 from ..copyright import copyright_manager
-from ..filters import filter_string_cap, filter_templates, filter_xcode_build, filter_xcode_fileref
+from ..filters import filter_templates
 
 from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
 from hvcc.types.compiler import Generator, CompilerResp, CompilerNotif, CompilerMsg, ExternInfo
@@ -48,26 +48,25 @@ class c2unity(Generator):
 
         tick = time.time()
 
-        parameter_list = externs.parameters.inParam
+        in_parameter_list = externs.parameters.inParam
+        out_parameter_list = externs.parameters.outParam
         event_list = externs.events.inEvent
+        out_event_list = externs.events.outEvent
         table_list = externs.tables
 
         out_dir = os.path.join(out_dir, "unity")
-        patch_name = patch_name or "heavy"
+        patch_name = patch_name.lower() if patch_name is not None else "heavy"
 
-        copyright = copyright_manager.get_copyright_for_c(copyright)
+        copyright_c = copyright_manager.get_copyright_for_c(copyright)
+
+        templates_dir = os.path.join(os.path.dirname(__file__), "templates")
 
         # initialise the jinja template environment
         env = jinja2.Environment()
-        env.filters["xcode_build"] = filter_xcode_build
-        env.filters["xcode_fileref"] = filter_xcode_fileref
-        env.filters["cap"] = filter_string_cap
-        env.loader = jinja2.FileSystemLoader(
-            encoding="utf-8-sig",
-            searchpath=[os.path.join(os.path.dirname(os.path.abspath(__file__)), "templates")])
 
-        static_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "static")
-        src_out_dir = os.path.join(out_dir, "source")
+        env.loader = jinja2.FileSystemLoader(
+            encoding="utf-8-sig", searchpath=[templates_dir]
+        )
 
         try:
             # ensure that the output directory does not exist
@@ -75,12 +74,12 @@ class c2unity(Generator):
             if os.path.exists(out_dir):
                 shutil.rmtree(out_dir)
 
-            # copy over static files
-            shutil.copytree(static_dir, out_dir)
+            patch_src_dir = os.path.join(out_dir, "include", "Heavy")
+            if os.path.exists(patch_src_dir):
+                shutil.rmtree(patch_src_dir)
+            shutil.copytree(c_src_dir, patch_src_dir)
 
-            # copy over generated C source files
-            src_out_dir = os.path.join(out_dir, "source", "heavy")
-            shutil.copytree(c_src_dir, src_out_dir)
+            heavy_src_files = [f for f in os.listdir(c_src_dir) if f.endswith(".c") or f.endswith(".cpp")]
 
             # generate files from templates
             for f in env.list_templates(filter_func=filter_templates):
@@ -92,16 +91,17 @@ class c2unity(Generator):
 
                 with open(file_path, "w") as g:
                     g.write(env.get_template(f).render(
-                        patch_name=patch_name,
-                        files=os.listdir(src_out_dir),
-                        num_input_channels=num_input_channels,
-                        num_output_channels=num_output_channels,
-                        parameters=parameter_list,
+                        name=patch_name,
+                        in_params=in_parameter_list,
+                        out_params=out_parameter_list,
+                        out_events=out_event_list,
                         events=event_list,
                         tables=table_list,
                         pool_sizes_kb=externs.memoryPoolSizesKb,
-                        compile_files=os.listdir(src_out_dir),
-                        copyright=copyright))
+                        num_input_channels=num_input_channels,
+                        num_output_channels=num_output_channels,
+                        heavy_src_files=heavy_src_files,
+                        copyright=copyright_c))
 
             return CompilerResp(
                 stage="c2unity",

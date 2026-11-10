@@ -1,19 +1,52 @@
 CHANGELOG
 =====
 
-Next Release
+0.15.0
+-----
+
+Features:
+
+* Unity Generator: change build system to use CMake - thanks to @michaelhartung
+* Allow externing graphical arrays using `@hv_table`
+* DPF: support and documentation for Audio Unit format (macOS)
+* Daisy: support display parameters using `@hv_param`
+* New pd2gui parser that creates an Intermediate Representation JSON with exposed UI objects
+* Support for `expr` and most of its functions - thanks to @dgbillotte
+* Support for `expr~` and most of its functions - thanks to @dgbillotte
+* Add `HV_BARE_METAL` compiler macro for suppressing `HvUtils.h` warning
+
+Cleanup:
+
+* Daisy: allow more generic `HAS_MIDI` in the board.json
+
+Docs:
+
+* Add: Code Of Conduct
+* Add: Contributing Guide
+
+0.14.0
 -----
 
 Features:
 
 * Metadata: optional Dict for external generators
 * JS: audio inputs now work - thanks to @ZXMushroom63
+* Generator: new FMOD generator - thanks to @michaelhartung
+* Objects: support symbol in `[pack]` (not on first inlet!)
+* Objects: support receive/send configuration for GUI objects
 
 Bugfixes:
 
 * Core: dereferencing type-punned pointer warning - thanks to @grrr
 * Core: signed/unsigned mismatch in HvSignalTabwrite.h - thanks to @grrr
 * c2dpf: portGroup template fix with i/o port 0 as CV
+* c2wwise: use correct SDK header paths and allow any platform in the xml - thanks to @eu-ch
+
+Updates:
+
+* drop py3.8 - add py3.13
+* integrate json2daisy library, tests and documentation
+* move to libDaisy 8.x pin definitions
 
 0.13.4
 -----

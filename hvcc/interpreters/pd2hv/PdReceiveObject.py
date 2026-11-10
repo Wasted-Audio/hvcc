@@ -47,7 +47,7 @@ class PdReceiveObject(PdObject):
             self.__receiver_name = self.obj_args[0]
 
             # only extern control rate receivers
-            if obj_type in {"r", "receive"}:
+            if obj_type in ("r", "receive"):
                 # NOTE(mhroth): the second argument is _either_ externing the receiver or setting the priority
                 # This means that right now priority cannot be set on externed receivers
                 if self.obj_args[1] == "@hv_param":
@@ -99,7 +99,7 @@ class PdReceiveObject(PdObject):
                 self.add_error(str(e))
 
     def validate_configuration(self) -> None:
-        if self.obj_type in {"r~", "receive~"}:
+        if self.obj_type in ("r~", "receive~"):
             if len(self._inlet_connections.get("0", [])) > 0:
                 self.add_error("[receive~] inlet connections are not supported.")
 

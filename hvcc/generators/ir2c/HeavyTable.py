@@ -27,11 +27,11 @@ class HeavyTable(HeavyObject):
     preamble = "hTable"
 
     @classmethod
-    def get_C_header_set(self) -> set:
+    def get_C_header_set(cls) -> set:
         return {"HvTable.h"}
 
     @classmethod
-    def get_C_file_set(self) -> set:
+    def get_C_file_set(cls) -> set:
         return {"HvTable.h", "HvTable.c"}
 
     @classmethod

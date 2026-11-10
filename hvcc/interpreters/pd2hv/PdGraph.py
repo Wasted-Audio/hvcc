@@ -55,6 +55,9 @@ class PdGraph(PdObject):
         # only used is this graph is actually a subpatch
         self.subpatch_name: Optional[str] = None
 
+        # the block size of this graph (used for rfft window size)
+        self.block_size: Optional[int] = None
+
         # TODO(dromer) these are virtual attributes that are only instantiated with internal representation
         self._PdGraph__connections: List[Connection] = []
         self._PdGraph__pd_path: str = ""
@@ -227,6 +230,7 @@ class PdGraph(PdObject):
         assert all(a is not None for a in self.hv_args), "Graph is missing a @hv_arg."
         return {
             "type": "graph",
+            "block_size": self.block_size,
             "imports": [],
             "args": self.hv_args if export_args else [],
             "objects": {o.obj_id: o.to_hv() for o in self.__objs},

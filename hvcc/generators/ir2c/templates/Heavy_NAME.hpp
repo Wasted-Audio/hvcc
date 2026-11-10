@@ -85,6 +85,23 @@ class Heavy_{{name}} : public HeavyContext {
   HvTable *getTableForHash(hv_uint32_t tableHash) override;
   void scheduleMessageForReceiver(hv_uint32_t receiverHash, HvMessage *m) override;
 
+
+  /*
+  * Code for expr~ implementation
+  * Write out the generic header code
+  */
+
+  // per class code
+  {%- for line in class_header_lines %}
+  {{line}}
+  {%- endfor %}
+
+  // per object code
+  {%- for line in obj_header_lines %}
+  {{line}}
+  {%- endfor %}
+
+
   // static sendMessage functions
   {%- for d in decl_list %}
   static void {{d}}

@@ -22,6 +22,7 @@ from typing import List, Optional
 
 from hvcc.interpreters.pd2hv.PdParser import PdParser
 from hvcc.types.compiler import CompilerResp, CompilerNotif
+from .PdGraph import PdGraph
 
 
 class Colours:
@@ -60,7 +61,7 @@ class pd2hv:
             for p in search_paths:
                 parser.add_absolute_search_directory(p)
 
-        pd_graph = parser.graph_from_file(pd_path)
+        pd_graph: PdGraph = parser.graph_from_file(pd_path)
         notices = pd_graph.get_notices()
 
         # check for errors
@@ -84,14 +85,7 @@ class pd2hv:
         hv_file = f"{os.path.splitext(os.path.basename(pd_path))[0]}.hv.json"
         hv_path = os.path.join(hv_dir, hv_file)
         with open(hv_path, "w") as f:
-            if verbose:
-                json.dump(pd_graph.to_hv(export_args=export_args),
-                          f,
-                          sort_keys=True,
-                          indent=2,
-                          separators=(",", ": "))
-            else:
-                json.dump(pd_graph.to_hv(export_args=export_args), f)
+            json.dump(pd_graph.to_hv(export_args=export_args), f, indent=4)
 
         return CompilerResp(
             stage="pd2hv",
