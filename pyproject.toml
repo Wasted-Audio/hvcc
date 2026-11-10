@@ -58,10 +58,14 @@ build-backend = "poetry.core.masonry.api"
 plugins = [
   "pydantic.mypy"
 ]
+exclude = ["hvcc/generators/ir2c/static/kissfft/*"]
 
 [tool.ruff]
 line-length = 120
-exclude = [".tox", ".venv", "venv", "build", "examples", "hvcc/generators/ir2c/static/MicroNam/*"]
+exclude = [".tox", ".venv", "venv", "build", "examples",
+    "hvcc/generators/ir2c/static/MicroNam/*",
+    "hvcc/generators/ir2c/static/kissfft/*"
+]
 
 [tool.ruff.lint]
 ignore = [
