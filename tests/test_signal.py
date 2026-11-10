@@ -65,7 +65,7 @@ def main():
 
     test_patch = TestPdSignalPatches()
     test_patch.setUp()
-    out_dir = test_patch._run_hvcc(args.pd_path)
+    out_dir = test_patch._run_hvcc(Path(args.pd_path))
     assert out_dir is not None
 
     c_src_dir = Path(out_dir, "c")
