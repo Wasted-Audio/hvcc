@@ -40,7 +40,7 @@ hv_size_t sRFFT_init(SignalRFFT *o, const int size) {
 
   hv_size_t numBytes = hTable_init(&o->input, size);
   numBytes += hTable_init(&o->outputReal, size * 2);
-  numBytes += hTable_init(&o->outputImagin, size * 2);
+  numBytes += hTable_init(&o->outputImag, size * 2);
   numBytes += hTable_init(&o->scratch, size + 2); // (size/2+1) complex bins
 
   size_t len = 0;
@@ -55,7 +55,7 @@ hv_size_t sRFFT_init(SignalRFFT *o, const int size) {
 void sRFFT_free(SignalRFFT *o) {
   hTable_free(&o->input);
   hTable_free(&o->outputReal);
-  hTable_free(&o->outputImagin);
+  hTable_free(&o->outputImag);
   hTable_free(&o->scratch);
   hv_free(o->cfgFwd);
   o->cfgFwd = NULL;
@@ -72,7 +72,7 @@ void __hv_rfft_f(SignalRFFT *o, hv_bInf_t bIn, hv_bOutf_t bOut0, hv_bOutf_t bOut
   } else {
     const hv_uint32_t offset = ((o->blk - 1) & 1) * n + o->head;
     __hv_load_f(o->outputReal.buffer + offset, bOut0);
-    __hv_load_f(o->outputImagin.buffer + offset, bOut1);
+    __hv_load_f(o->outputImag.buffer + offset, bOut1);
   }
 
   // accumulate
@@ -85,7 +85,7 @@ void __hv_rfft_f(SignalRFFT *o, hv_bInf_t bIn, hv_bOutf_t bOut0, hv_bOutf_t bOut
     // the slot was cleared on init and everything past bin size/2 is never
     // written again, so the tail of the block stays silent
     float *re = o->outputReal.buffer + (o->blk & 1) * n;
-    float *im = o->outputImagin.buffer + (o->blk & 1) * n;
+    float *im = o->outputImag.buffer + (o->blk & 1) * n;
     kiss_fft_cpx *sp = (kiss_fft_cpx *) o->scratch.buffer;
 
     if (o->cfgFwd != NULL) {
@@ -118,7 +118,7 @@ hv_size_t sRIFFT_init(SignalRIFFT *o, const int size) {
   o->blk = 0;
 
   hv_size_t numBytes = hTable_init(&o->inputReal, size);
-  numBytes += hTable_init(&o->inputImagin, size);
+  numBytes += hTable_init(&o->inputImag, size);
   numBytes += hTable_init(&o->output, size * 2);
   numBytes += hTable_init(&o->scratch, size + 2);
 
@@ -133,7 +133,7 @@ hv_size_t sRIFFT_init(SignalRIFFT *o, const int size) {
 
 void sRIFFT_free(SignalRIFFT *o) {
   hTable_free(&o->inputReal);
-  hTable_free(&o->inputImagin);
+  hTable_free(&o->inputImag);
   hTable_free(&o->output);
   hTable_free(&o->scratch);
   hv_free(o->cfgInv);
@@ -150,7 +150,7 @@ void __hv_rifft_f(SignalRIFFT *o, hv_bInf_t bIn0, hv_bInf_t bIn1, hv_bOutf_t bOu
   }
 
   __hv_store_f(o->inputReal.buffer + o->head, bIn0);
-  __hv_store_f(o->inputImagin.buffer + o->head, bIn1);
+  __hv_store_f(o->inputImag.buffer + o->head, bIn1);
   o->head += HV_N_SIMD;
 
   if (o->head == n) {
@@ -158,7 +158,7 @@ void __hv_rifft_f(SignalRIFFT *o, hv_bInf_t bIn0, hv_bInf_t bIn1, hv_bOutf_t bOu
 
     kiss_fft_cpx *sp = (kiss_fft_cpx *) o->scratch.buffer;
     const float *re = o->inputReal.buffer;
-    const float *im = o->inputImagin.buffer;
+    const float *im = o->inputImag.buffer;
 
     for (hv_uint32_t k = 0; k <= n / 2; ++k) {
       sp[k].r = re[k];

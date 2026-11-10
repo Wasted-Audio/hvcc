@@ -14,8 +14,8 @@
  * PERFORMANCE OF THIS SOFTWARE.
  */
 
-#ifndef _SIGNAL_RFFT_H_
-#define _SIGNAL_RFFT_H_
+#ifndef _HEAVY_SIGNAL_RFFT_H_
+#define _HEAVY_SIGNAL_RFFT_H_
 
 #include "HvHeavyInternal.h"
 
@@ -31,7 +31,7 @@ typedef struct SignalRFFT {
   // by silence, which is how Pd lays out the outlets of [rfft~]. Two slots
   // because the result of block k-1 is released while block k is accumulated.
   struct HvTable outputReal;
-  struct HvTable outputImagin;
+  struct HvTable outputImag;
 
   // size/2+1 complex bins of transform output
   struct HvTable scratch;
@@ -51,7 +51,7 @@ void __hv_rfft_f(SignalRFFT *o, hv_bInf_t bIn, hv_bOutf_t bOut0, hv_bOutf_t bOut
 typedef struct SignalRIFFT {
   // one block each of real and imaginary bins, (size) samples long
   struct HvTable inputReal;
-  struct HvTable inputImagin;
+  struct HvTable inputImag;
 
   // two blocks of time domain output samples
   struct HvTable output;
@@ -75,4 +75,4 @@ void __hv_rifft_f(SignalRIFFT *o, hv_bInf_t bIn0, hv_bInf_t bIn1, hv_bOutf_t bOu
 } // extern "C"
 #endif
 
-#endif // _SIGNAL_RFFT_H_
+#endif // _HEAVY_SIGNAL_RFFT_H_
