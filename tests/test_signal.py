@@ -31,6 +31,9 @@ class TestPdSignalPatches(TestPdSignalBase):
     def test_phasor_control(self):
         self._test_signal_patch("test-phasor-control.pd")
 
+    def test_rfft(self):
+        # our right output channel is delayed by two blocks
+        self._test_signal_patch("test-rfft.pd")
 
 def main():
     parser = argparse.ArgumentParser(
