@@ -87,7 +87,7 @@ class c2unity(Generator):
             shutil.copytree(c_src_dir, patch_src_dir)
 
             heavy_src_files = [
-                p for p in Path(c_src_dir).rglob("*")
+                p.relative_to(c_src_dir).as_posix() for p in Path(c_src_dir).rglob("*")
                 if p.suffix in (".c", ".cpp")
             ]
 
