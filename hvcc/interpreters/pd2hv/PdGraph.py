@@ -57,8 +57,8 @@ class PdGraph(PdObject):
         # only used is this graph is actually a subpatch
         self.subpatch_name: str | None = None
 
-        # the block size of this graph (used for rfft window size)
-        self.block_size: int | None = None
+        # internal block size of this graph (used for rfft window size)
+        self._block_size: int | None = None
 
         # TODO(dromer) these are virtual attributes that are only instantiated with internal representation
         self._PdGraph__connections: list[Connection] = []
@@ -78,6 +78,27 @@ class PdGraph(PdObject):
             return False
         else:
             return self.parent_graph.__pd_path == self.__pd_path if not self.is_root else False
+
+    @property
+    def block_size(self) -> int | None:
+        """ Returns the block size of this graph. If not explicitly defined on
+            this graph, inherits from the parent graph.
+        """
+        if self._block_size is not None:
+            return self._block_size
+        if self.parent_graph is not None:
+            return self.parent_graph.block_size
+        return None
+
+    @block_size.setter
+    def block_size(self, value: int | str | None) -> None:
+        if value is not None:
+            try:
+                self._block_size = int(float(value))
+            except (ValueError, TypeError):
+                self._block_size = None
+        else:
+            self._block_size = None
 
     def add_object(self, obj: PdObject) -> int:
         obj.parent_graph = self
@@ -241,3 +262,10 @@ class PdGraph(PdObject):
 
     def __repr__(self) -> str:
         return self.subpatch_name or self.__pd_path.name
+
+    def propagate_block_size(self, inherited_block_size: int | None = None) -> None:
+        effective_block_size = self.block_size if self.block_size is not None else inherited_block_size
+        self.block_size = effective_block_size
+        for obj in self.__objs:
+            if isinstance(obj, PdGraph):
+                obj.propagate_block_size(effective_block_size)

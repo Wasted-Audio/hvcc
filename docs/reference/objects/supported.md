@@ -179,6 +179,8 @@ Here is a list of [unsupported Pd objects](unsupported.md).
 | rzero_rev~ | arguments and control connections are ignored |
 | rzero~ | arguments and control connections are ignored |
 | r~ | |
+| rfft~ | each instance causes one `block~` of latency |
+| rifft~ | each instance causes one `block~` of latency |
 | samphold~ | |
 | samplerate~ | |
 | send~ | |

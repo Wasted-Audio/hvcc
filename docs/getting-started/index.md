@@ -68,6 +68,18 @@ The files that `hvcc` generates are split into two types:
 
 - Generated: this relates to all the source files that use information about the input patch, for example `Heavy_{{name}}.cpp`. By default all these files will have a `Copyright (c) 2018 Enzien Audio, Ltd` header, but this can be modified with the [user copyright argument](../index.md#-copyright-user-copyright).
 
+### Includes
+
+These additional libraries are included by Heavy:
+
+- [MicroNAM](https://github.com/jaffco/MicroNAM) - under `MIT` license
+- [KissFFT](https://github.com/mborgerding/kissfft) - under `BSD3` license
+
+For testing we use the following libraries:
+
+- [tinywav](https://github.com/mhroth/tinywav) - under `ISC` license
+- [midifile](https://github.com/craigsapp/midifile) - under `BSD2` license
+
 ### Generators
 
 Some generators use other libraries and SDKs with different licensing:
