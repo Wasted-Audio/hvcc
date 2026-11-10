@@ -2026,6 +2026,13 @@
       "description": "path to NAM file",
       "default": "",
       "required": true
+    },
+    {
+      "name": "size",
+      "value_type": "string",
+      "description": "size of the A2 network (lite or full)",
+      "default": "full",
+      "required": false
     }],
     "perf": {}
   },
@@ -2110,6 +2117,62 @@
       "description": "path to NAM file",
       "default": "",
       "required": true
+    }],
+    "perf": {}
+  },
+    "__nam_a2lite~f": {
+    "inlets": [
+      "~f>"
+    ],
+    "ir": {
+      "control": false,
+      "signal": true,
+      "init": true
+    },
+    "outlets": [
+      "~f>"
+    ],
+    "args": [{
+      "name": "nam",
+      "value_type": "string",
+      "description": "path to NAM file",
+      "default": "",
+      "required": true
+    },
+    {
+      "name": "size",
+      "value_type": "string",
+      "description": "size of the A2 network (lite or full)",
+      "default": "lite",
+      "required": false
+    }],
+    "perf": {}
+  },
+    "__nam_a2full~f": {
+    "inlets": [
+      "~f>"
+    ],
+    "ir": {
+      "control": false,
+      "signal": true,
+      "init": true
+    },
+    "outlets": [
+      "~f>"
+    ],
+    "args": [{
+      "name": "nam",
+      "value_type": "string",
+      "description": "path to NAM file",
+      "default": "",
+      "required": true
+    },
+    {
+      "name": "size",
+      "value_type": "string",
+      "description": "size of the A2 network (lite or full)",
+      "default": "full",
+      "required": false
     }],
     "perf": {}
   },
