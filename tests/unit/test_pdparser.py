@@ -218,3 +218,26 @@ def test_block_size_propagation_pdlib_in_subpatch(tmp_path: Path):
     rfft_obj = next(o for o in subtest.get_objects() if isinstance(o, PdGraph))
     assert rfft_obj.block_size == 256
     assert rfft_obj.to_hv().block_size == 256
+
+
+def test_block_size_propagation_pdlib_in_subpatch_no_args(tmp_path: Path):
+    pd_path = tmp_path / "test_pdlib_sub.pd"
+    pd_path.write_text(
+        """#N canvas 1039 0 450 300 12;
+#N canvas 1216 43 450 300 subtest 1;
+#X obj 74 84 rfft~;
+#X obj 201 58 block~;
+#X restore 71 104 pd subtest;
+"""
+    )
+    graph = PdParser().graph_from_file(pd_path)
+    assert graph.block_size is None
+    assert graph.to_hv().block_size == 64
+
+    subtest = next(o for o in graph.get_objects() if getattr(o, "subpatch_name", None) == "subtest")
+    assert subtest.block_size == 64
+    assert subtest.to_hv().block_size == 64
+
+    rfft_obj = next(o for o in subtest.get_objects() if isinstance(o, PdGraph))
+    assert rfft_obj.block_size == 64
+    assert rfft_obj.to_hv().block_size == 64
