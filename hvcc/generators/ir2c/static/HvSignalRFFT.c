@@ -100,7 +100,7 @@ void __hv_rfft_f(SignalRFFT *o, hv_bInf_t bIn, hv_bOutf_t bOut0, hv_bOutf_t bOut
 }
 
 void sRFFT_onMessage(HeavyContextInterface *_c, SignalRFFT *o, int letIndex,
-    const HvMessage *m, void *sendMessage) {
+    const HvMessage *m, void (*sendMessage)(HeavyContextInterface *, int, const HvMessage *)) {
   (void) _c;
   (void) o;
   (void) m;
@@ -177,7 +177,7 @@ void __hv_rifft_f(SignalRIFFT *o, hv_bInf_t bIn0, hv_bInf_t bIn1, hv_bOutf_t bOu
 }
 
 void sRIFFT_onMessage(HeavyContextInterface *_c, SignalRIFFT *o, int letIndex,
-    const HvMessage *m, void *sendMessage) {
+    const HvMessage *m, void (*sendMessage)(HeavyContextInterface *, int, const HvMessage *)) {
   (void) _c;
   (void) o;
   (void) m;

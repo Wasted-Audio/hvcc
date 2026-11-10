@@ -370,7 +370,7 @@ class PdParser:
                         if obj_type in ('block~',):
                             if obj_type == 'block~':
                                 # grab the block size for this graph
-                                g.block_size = obj_args[0]
+                                g.block_size = obj_args[0] if len(obj_args) > 0 else None
 
                             # we ignore the object and continue
                             g.add_warning(

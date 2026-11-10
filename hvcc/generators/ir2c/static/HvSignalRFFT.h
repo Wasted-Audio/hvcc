@@ -44,7 +44,8 @@ typedef struct SignalRFFT {
 
 hv_size_t sRFFT_init(SignalRFFT *o, const int size);
 void sRFFT_free(SignalRFFT *o);
-void sRFFT_onMessage(HeavyContextInterface *_c, SignalRFFT *o, int letIndex, const HvMessage *m, void *sendMessage);
+void sRFFT_onMessage(HeavyContextInterface *_c, SignalRFFT *o, int letIndex, const HvMessage *m,
+  void (*sendMessage)(HeavyContextInterface *, int, const HvMessage *));
 void __hv_rfft_f(SignalRFFT *o, hv_bInf_t bIn, hv_bOutf_t bOut0, hv_bOutf_t bOut1);
 
 typedef struct SignalRIFFT {
@@ -66,7 +67,8 @@ typedef struct SignalRIFFT {
 
 hv_size_t sRIFFT_init(SignalRIFFT *o, const int size);
 void sRIFFT_free(SignalRIFFT *o);
-void sRIFFT_onMessage(HeavyContextInterface *_c, SignalRIFFT *o, int letIndex, const HvMessage *m, void *sendMessage);
+void sRIFFT_onMessage(HeavyContextInterface *_c, SignalRIFFT *o, int letIndex, const HvMessage *m,
+  void (*sendMessage)(HeavyContextInterface *, int, const HvMessage *));
 void __hv_rifft_f(SignalRIFFT *o, hv_bInf_t bIn0, hv_bInf_t bIn1, hv_bOutf_t bOut);
 
 #ifdef __cplusplus
