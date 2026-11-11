@@ -3129,6 +3129,26 @@
       "sse": 2
     }
   },
+  "__tabreceive~f": {
+    "inlets": [
+      "-->"
+    ],
+    "ir": {
+      "control": true,
+      "signal": false,
+      "init": true
+    },
+    "outlets": [
+      "~f>"
+    ],
+    "args": [{
+      "default": null,
+      "value_type": "string",
+      "name": "table",
+      "description": "The name of the table to reference.",
+      "required": true
+    }]
+  },
   "__tabwrite": {
     "inlets": [
       "-->",

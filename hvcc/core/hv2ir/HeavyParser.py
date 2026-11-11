@@ -314,6 +314,7 @@ LANG_CLASS_DICT = {
     "__tabread_stoppable~f": HIrTabread,
     "__tabreadu~f": HIrTabread,
     "__tabread": HIrTabread,
+    "__tabreceive~f": HIrTabread,
     "__tabhead~f": HIrTabhead,
     "__tabhead": HIrTabhead,
     "__tabwrite~f": HIrTabwrite,

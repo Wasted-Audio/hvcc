@@ -68,6 +68,7 @@ from hvcc.generators.ir2c.SignalSample import SignalSample
 from hvcc.generators.ir2c.SignalSchmitt import SignalSchmitt
 from hvcc.generators.ir2c.SignalTabhead import SignalTabhead
 from hvcc.generators.ir2c.SignalTabread import SignalTabread
+from hvcc.generators.ir2c.SignalTabreceive import SignalTabreceive
 from hvcc.generators.ir2c.SignalTabwrite import SignalTabwrite
 from hvcc.generators.ir2c.SignalVar import SignalVar
 from hvcc.types.compiler import CompilerResp, ExternInfo
@@ -110,6 +111,7 @@ class ir2c:
         "__tabread~f": SignalTabread,
         "__tabreadu~f": SignalTabread,
         "__tabread_stoppable~f": SignalTabread,
+        "__tabreceive~f": SignalTabreceive,
         "__tabhead~f": SignalTabhead,
         "__tabwrite~f": SignalTabwrite,
         "__tabwrite_stoppable~f": SignalTabwrite,
