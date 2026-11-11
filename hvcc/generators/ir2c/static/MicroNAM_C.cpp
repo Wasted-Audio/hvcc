@@ -3,7 +3,9 @@
 #include <new>
 
 // We use a block size of 1 for single-sample processing
-#define NAM_BLOCK_SIZE 1
+#ifndef NAM_BLOCK_SIZE
+  #define NAM_BLOCK_SIZE 1
+#endif
 
 using namespace MicroNAM;
 
@@ -119,6 +121,10 @@ void MicroNAM_A2LiteNet_LoadWeights(MicroNAM_A2LiteNet* net, const float* weight
 
 void MicroNAM_A2LiteNet_Process(MicroNAM_A2LiteNet* net, float* input, float* output) {
     reinterpret_cast<A2LiteNet<NAM_BLOCK_SIZE>*>(net)->forward(input, output);
+}
+
+void MicroNAM_A2LiteNet_ProcessBlock(MicroNAM_A2LiteNet* net, const float* input, float* output, int n) {
+    reinterpret_cast<A2LiteNet<NAM_BLOCK_SIZE>*>(net)->forward(input, output, n);
 }
 
 // --- A2FullNet ---

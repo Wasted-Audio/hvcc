@@ -48,6 +48,7 @@ void MicroNAM_A2LiteNet_Destroy(MicroNAM_A2LiteNet* net);
 void MicroNAM_A2LiteNet_Reset(MicroNAM_A2LiteNet* net);
 void MicroNAM_A2LiteNet_LoadWeights(MicroNAM_A2LiteNet* net, const float* weights);
 void MicroNAM_A2LiteNet_Process(MicroNAM_A2LiteNet* net, float* input, float* output);
+void MicroNAM_A2LiteNet_ProcessBlock(MicroNAM_A2LiteNet* net, const float* input, float* output, int n);
 
 // --- A2 Full API ---
 MicroNAM_A2FullNet* MicroNAM_A2FullNet_Create(void);

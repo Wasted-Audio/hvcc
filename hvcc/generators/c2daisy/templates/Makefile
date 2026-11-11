@@ -25,3 +25,12 @@ SYSTEM_FILES_DIR = $(LIBDAISY_DIR)/core
 include $(SYSTEM_FILES_DIR)/Makefile
 
 CFLAGS += -DHV_BARE_METAL
+
+# A2LiteNet Object - TODO: detect if used
+NAM_OBJ = $(BUILD_DIR)/A2LiteNet.o
+$(NAM_OBJ): CPPFLAGS += \
+  -O3 -fmove-loop-invariants -ffp-contract=fast \
+  -fno-math-errno -fno-trapping-math \
+  -fsingle-precision-constant -DNDEBUG
+
+$(NAM_OBJ): CPPFLAGS += -DNAM_BLOCK_SIZE=4

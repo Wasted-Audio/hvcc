@@ -104,9 +104,19 @@ static inline void __hv_nam_standard_f(SignalNamStandard *o, hv_bInf_t bIn0, hv_
 }
 
 
+#ifndef NAM_BUF
+  #define NAM_BUF 4
+#endif
+
+
 typedef struct SignalNamA2Lite {
   MicroNAM_A2LiteNet* a2litenet;
+  float in[NAM_BUF];    // block being filled
+  float out[NAM_BUF];   // last finished block
+  int   fill;           // samples waiting in in[]
+  int   rd;             // next sample to take from out[], -1 when empty
 } SignalNamA2Lite;
+
 
 hv_size_t sNam_a2lite_init(SignalNamA2Lite *o, const float* weights);
 void sNam_a2lite_free(SignalNamA2Lite *o);
@@ -119,7 +129,18 @@ static inline void __hv_nam_a2lite_f(SignalNamA2Lite *o, hv_bInf_t bIn0, hv_bOut
 #elif HV_SIMD_NEON
   hv_assert(0);
 #else // HV_SIMD_NONE
-  MicroNAM_A2LiteNet_Process(o->a2litenet, &bIn0, bOut);
+  o->in[o->fill++] = bIn0;
+  if (o->fill == NAM_BUF) {
+    o->fill = 0;
+    MicroNAM_A2LiteNet_ProcessBlock(o->a2litenet, o->in, o->out, NAM_BUF);
+    o->rd = 0;
+  }
+  if (o->rd >= 0) {
+    *bOut = o->out[o->rd];
+    if (++o->rd == NAM_BUF) o->rd = -1;
+  } else {
+    *bOut = 0.0f;
+  }
 #endif
 }
 
