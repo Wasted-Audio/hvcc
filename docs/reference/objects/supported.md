@@ -137,7 +137,7 @@ Here is a list of [unsupported Pd objects](unsupported.md).
 | adc~ | |
 | bang~ | |
 | biquad~ | |
-| block~ | Allowed to be used, but completely ignored. |
+| block~ | Allowed to be used, but mostly ignored.<sup>1</sup>|
 | bp~ | |
 | catch~ | |
 | clip~ | |
@@ -154,7 +154,7 @@ Here is a list of [unsupported Pd objects](unsupported.md).
 | delwrite~ | |
 | env~ | |
 | exp~ | |
-| expr~ | except some functions.<sup>1</sup> Only supports signal inputs. Does not work with SIMD optimizations! |
+| expr~ | except some functions.<sup>2</sup> Only supports signal inputs. Does not work with SIMD optimizations! |
 | ftom~ | |
 | hilbert~ | |
 | hip~ | |
@@ -200,7 +200,8 @@ Here is a list of [unsupported Pd objects](unsupported.md).
 | vd~ | |
 | wrap~ | |
 
-1. Does not support: `size()`, `sum()`, `Sum()`, `avg()`, `Avg()`, `mtof()`, `ftom()`, `dbtorms()`, `rmstodb()`, `powtodb()`, `dbtopow()`
+1. Heavy runs single sample (or per SIMD block) by default. Used to set the window size for `[rfft~]`, `[rifft~]` and `[tabreceive~]` objects.
+2. Does not support: `size()`, `sum()`, `Sum()`, `avg()`, `Avg()`, `mtof()`, `ftom()`, `dbtorms()`, `rmstodb()`, `powtodb()`, `dbtopow()`
 
 ## Cyclone
 
