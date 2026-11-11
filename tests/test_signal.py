@@ -31,6 +31,15 @@ class TestPdSignalPatches(TestPdSignalBase):
     def test_phasor_control(self):
         self._test_signal_patch("test-phasor-control.pd")
 
+    def test_rfft(self):
+        # our right output channel is delayed by two blocks
+        self._test_signal_patch("test-rfft.pd")
+
+    def test_tabreceive(self):
+        self._test_signal_patch("test-tabreceive.pd")
+
+    def test_tabreceive_subpatch(self):
+        self._test_signal_patch("test-tabreceive-subpatch.pd")
 
 def main():
     parser = argparse.ArgumentParser(
@@ -63,17 +72,20 @@ def main():
         action="count")
     args = parser.parse_args()
 
-    out_dir = TestPdSignalPatches._run_hvcc(args.pd_path)
+    test_patch = TestPdSignalPatches()
+    test_patch.setUp()
+    out_dir = test_patch._run_hvcc(Path(args.pd_path))
+    assert out_dir is not None
 
     c_src_dir = Path(out_dir, "c")
     c_sources = [Path(c_src_dir, c) for c in os.listdir(c_src_dir) if c.endswith(".c")]
 
-    wav_path = TestPdSignalPatches.compile_and_run(
-        out_dir,
-        c_sources,
-        args.samplerate,
-        args.blocksize,
-        args.numblocks,
+    wav_path = test_patch.compile_and_run(
+        source_files=c_sources,
+        out_dir=out_dir,
+        sample_rate=args.samplerate,
+        block_size=args.blocksize,
+        num_iterations=args.numblocks,
         flag=args.simd)
 
     if args.verbose:

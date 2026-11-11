@@ -96,7 +96,7 @@ class TestPdSignalBase(HvBaseTest):
         shutil.copy2(Path(self.SCRIPT_DIR, "src/tinywav/tinywav.c"), c_src_dir)
 
         # prepare the clang command
-        source_files = [Path(child) for child in Path(c_src_dir).iterdir()]
+        source_files = list(Path(c_src_dir).rglob("*"))
 
         # always test HV_SIMD_NONE
         self._compare_wave_output(out_dir, source_files, golden_path, "HV_SIMD_NONE")

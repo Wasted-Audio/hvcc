@@ -35,6 +35,7 @@ from .HIrLorenz import HIrLorenz
 from .HIrNam import HIrNam
 from .HIrOutlet import HIrOutlet
 from .HIrPack import HIrPack
+from .HIrRFFT import HIrRFFT
 from .HIrSwitchcase import HIrSwitchcase
 from .HIrTabhead import HIrTabhead
 from .HIrTabread import HIrTabread
@@ -115,10 +116,13 @@ class HeavyParser:
             @param hv_file  The Heavy file where this graph can be found.
         """
         # resolve default graph arguments
-        graph_args = graph_args or {}
+        graph_args = dict(graph_args) if graph_args else {}
 
         if not isinstance(json_heavy.args, list):
             raise HeavyIrException("Graph arguments must be a list.")
+
+        # set the block size
+        graph_args["block_size"] = int(json_heavy.block_size or graph_args.get("block_size", 64))
 
         for a in json_heavy.args:
             if a["name"] not in graph_args:
@@ -310,11 +314,14 @@ LANG_CLASS_DICT = {
     "__tabread_stoppable~f": HIrTabread,
     "__tabreadu~f": HIrTabread,
     "__tabread": HIrTabread,
+    "__tabreceive~f": HIrTabread,
     "__tabhead~f": HIrTabhead,
     "__tabhead": HIrTabhead,
     "__tabwrite~f": HIrTabwrite,
     "__tabwrite_stoppable~f": HIrTabwrite,
     "__tabwrite": HIrTabwrite,
+    "__rfft~f": HIrRFFT,
+    "__rifft~f": HIrRFFT,
     "receive": HLangReceive,
     "send": HLangSend,
     "__switchcase": HIrSwitchcase,

@@ -173,7 +173,8 @@ class PdParser:
         pos_x: int = 0,
         pos_y: int = 0,
         is_root: bool = True,
-        pd_graph_class: type[PdGraph] = PdGraph
+        pd_graph_class: type[PdGraph] = PdGraph,
+        parent_graph: PdGraph | None = None
     ) -> Any:
         """ Instantiate a PdGraph from a file.
             Note that obj_args does not include $0.
@@ -205,13 +206,15 @@ class PdParser:
             file_path,
             pos_x, pos_y,
             is_root,
-            pd_graph_class)
+            pd_graph_class,
+            parent_graph=parent_graph)
 
         if is_root:
             if g.get_notices().has_error:
                 # return the graph early here as there are already errors and it is
                 # clearly invalid, avoids triggering unrelated errors in validation
                 return g
+            g.propagate_block_size()
             g.validate_configuration()
 
         return g
@@ -226,7 +229,8 @@ class PdParser:
         pos_x: int = 0,
         pos_y: int = 0,
         is_root: bool = False,
-        pd_graph_class: type[PdGraph] = PdGraph
+        pd_graph_class: type[PdGraph] = PdGraph,
+        parent_graph: PdGraph | None = None
     ) -> Any:
         """ Instantiate a PdGraph from an existing canvas.
             Note that graph_args includes $0.
@@ -257,6 +261,8 @@ class PdParser:
                     array.obj_dict["values"].extend([0.0 for _ in range(new_size - declared_size)])
 
         g = pd_graph_class(graph_args, pd_path, pos_x, pos_y)
+        if parent_graph is not None:
+            g.parent_graph = parent_graph
 
         msg_send: dict = {}
         gui_send: dict = {}
@@ -290,7 +296,8 @@ class PdParser:
                             graph_args=graph_args,  # subpatch inherits parent graph arguments, including $0
                             pd_path=pd_path,
                             pos_x=int(line[2]),
-                            pos_y=int(line[3]))
+                            pos_y=int(line[3]),
+                            parent_graph=g)
                         index = g.add_object(x)
                         pd_index_to_graph_indices[pd_obj_counter] = [index]
                         pd_obj_counter += 1
@@ -368,6 +375,10 @@ class PdParser:
                             continue
 
                         if obj_type in ('block~',):
+                            if obj_type == 'block~':
+                                # grab the block size for this graph
+                                g.block_size = obj_args[0] if len(obj_args) > 0 else 64
+
                             # we ignore the object and continue
                             g.add_warning(
                                 f"This graph contains a {obj_type} object that is ignored.",
@@ -388,7 +399,8 @@ class PdParser:
                                 file_path=abs_path,
                                 obj_args=obj_args,
                                 pos_x=int(line[2]), pos_y=int(line[3]),
-                                is_root=False)
+                                is_root=False,
+                                parent_graph=g)
 
                         # is this object in lib/pd_converted?
                         elif Path(self.__PDLIB_CONVERTED_DIR, f"{obj_type}.hv.json").is_file():
@@ -440,7 +452,8 @@ class PdParser:
                                 obj_args=obj_args,
                                 pos_x=int(line[2]), pos_y=int(line[3]),
                                 is_root=False,
-                                pd_graph_class=pd_class)
+                                pd_graph_class=pd_class,
+                                parent_graph=g)
 
                             # register any object-specific warnings or errors
                             if obj_type in {"rzero~", "rzero_rev~", "czero~", "czero_rev~"}:
@@ -464,7 +477,8 @@ class PdParser:
                                 file_path=hvlib_path,
                                 obj_args=obj_args,
                                 pos_x=int(line[2]), pos_y=int(line[3]),
-                                is_root=False)
+                                is_root=False,
+                                parent_graph=g)
 
                         # is this object in lib/else?
                         elif Path(self.__ELSELIB_DIR, f"{obj_type}.pd").is_file():
@@ -474,7 +488,8 @@ class PdParser:
                                 file_path=hvlib_path,
                                 obj_args=obj_args,
                                 pos_x=int(line[2]), pos_y=int(line[3]),
-                                is_root=False)
+                                is_root=False,
+                                parent_graph=g)
 
                         # is this object in lib/cyclone?
                         elif Path(self.__CYCLONE_DIR, f"{obj_type}.pd").is_file():
@@ -484,7 +499,8 @@ class PdParser:
                                 file_path=hvlib_path,
                                 obj_args=obj_args,
                                 pos_x=int(line[2]), pos_y=int(line[3]),
-                                is_root=False)
+                                is_root=False,
+                                parent_graph=g)
 
                         # is this object in lib? (sub-directory)
                         elif Path(self.__LIB_DIR, f"{obj_type}.pd").is_file():
@@ -494,7 +510,8 @@ class PdParser:
                                 file_path=hvlib_path,
                                 obj_args=obj_args,
                                 pos_x=int(line[2]), pos_y=int(line[3]),
-                                is_root=False)
+                                is_root=False,
+                                parent_graph=g)
 
                         # is this an object that must be programatically parsed?
                         elif obj_type in self.__PD_CLASSES:
@@ -595,7 +612,8 @@ class PdParser:
                             file_path=Path(self.__PDLIB_DIR, f"{line[1]}.pd"),
                             obj_args=obj_args,
                             pos_x=int(line[2]), pos_y=int(line[3]),
-                            is_root=False)
+                            is_root=False,
+                            parent_graph=g)
                         index = g.add_object(x)
                         pd_index_to_graph_indices[pd_obj_counter] = [index]
                         pd_obj_counter += 1

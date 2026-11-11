@@ -78,13 +78,10 @@ Here is a list of [supported Pd objects](supported.md).
 | pd~ |
 | print~ |
 | readsf~ |
-| rfft~ |
-| rifft~ |
 | scope~ |
 | sigmund~ |
 | switch~ |
 | slop~ |
-| tabreceive~ |
 | tabsend~ |
 | vline~ |
 | vsnapshot~ |
