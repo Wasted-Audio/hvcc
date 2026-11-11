@@ -82,7 +82,6 @@ Here is a list of [supported Pd objects](supported.md).
 | sigmund~ |
 | switch~ |
 | slop~ |
-| tabreceive~ |
 | tabsend~ |
 | vline~ |
 | vsnapshot~ |

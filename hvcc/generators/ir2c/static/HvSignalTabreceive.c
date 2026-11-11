@@ -19,7 +19,6 @@
 hv_size_t sTabreceive_init(SignalTabreceive *o, HvTable *table, int blocksize) {
   o->table = table;
   o->head = 0;
-  o->end = hTable_getSize(o->table);
   o->blocksize = blocksize;
   return 0;
 }
@@ -28,10 +27,12 @@ void sTabreceive_onMessage(HeavyContextInterface *_c, SignalTabreceive *o, int l
     void (*sendMessage)(HeavyContextInterface *, int, const HvMessage *)) {
   switch (letIn) {
     case 0: {
-      if (msg_isHashLike(m,0)) {
-        o->table = hv_table_get(_c, msg_getHash(m,0));
-        o->head = 0;
-        o->end = hTable_getSize(o->table);
+      if (msg_isHashLike(m, 0)) {
+        HvTable *table = hv_table_get(_c, msg_getHash(m, 0));
+        if (table != NULL) {
+          o->table = table;
+          o->head = 0;
+        }
       }
       break;
     }

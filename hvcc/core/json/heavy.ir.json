@@ -3134,8 +3134,8 @@
       "-->"
     ],
     "ir": {
-      "control": true,
-      "signal": false,
+      "control": false,
+      "signal": true,
       "init": true
     },
     "outlets": [

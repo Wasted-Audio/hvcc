@@ -24,27 +24,37 @@ extern "C" {
 #endif
 
 typedef struct SignalTabreceive {
-  HvTable *table; // the table to read
+  HvTable *table;
   hv_uint32_t head;
-  hv_uint32_t end;
   int blocksize;
 } SignalTabreceive;
 
-// random access to a table
 hv_size_t sTabreceive_init(SignalTabreceive *o, HvTable *table, int blocksize);
 
 
-static inline void __hv_tabreceive_f(SignalTabreceive *o, hv_bIni_t bIn, hv_bOutf_t bOut) {
-  const float *const b = hTable_getBuffer(o->table);
-#if HV_SIMD_AVX
+static inline void __hv_tabreceive_f(SignalTabreceive *o, hv_bOutf_t bOut) {
+  const hv_uint32_t length = (o->table != NULL) ? hTable_getLength(o->table) : 0;
+  hv_uint32_t head = o->head;
 
-#elif HV_SIMD_SSE
+  if (head >= length) {
+    // beyond the table: rest of the block is silence
+    __hv_zero_f(bOut);
+  } else if (head + HV_N_SIMD <= length) {
+    // fully inside the table
+    __hv_load_f(hTable_getBuffer(o->table) + head, bOut);
+  } else {
+    // partial vector: copy valid samples, zero the remaining lanes
+    const hv_uint32_t n = length - head;
+    const float *const b = hTable_getBuffer(o->table) + head;
+    float tail[HV_N_SIMD];
+    for (hv_uint32_t i = 0; i < HV_N_SIMD; ++i) tail[i] = (i < n) ? b[i] : 0.0f;
+    __hv_load_f(tail, bOut);
+  }
 
-#elif HV_SIMD_NEON
-
-#else // HV_SIMD_NONE
-
-#endif
+  // window is [0, blocksize); wrap at the end of it
+  const hv_uint32_t bs = (o->blocksize > 0) ? (hv_uint32_t) o->blocksize : HV_N_SIMD;
+  head += HV_N_SIMD;
+  o->head = (head < bs) ? head : 0;
 }
 
 
