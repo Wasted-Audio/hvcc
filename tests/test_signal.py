@@ -35,6 +35,12 @@ class TestPdSignalPatches(TestPdSignalBase):
         # our right output channel is delayed by two blocks
         self._test_signal_patch("test-rfft.pd")
 
+    def test_tabreceive(self):
+        self._test_signal_patch("test-tabreceive.pd")
+
+    def test_tabreceive_subpatch(self):
+        self._test_signal_patch("test-tabreceive-subpatch.pd")
+
 def main():
     parser = argparse.ArgumentParser(
         description="A script used to generate golden files for signal tests.")

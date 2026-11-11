@@ -72,7 +72,8 @@ class HeavyObject(PdObject):
             "__tabread",
             "__tabread~f",
             "__tabread~if",
-            "__tabread_stoppable~f"
+            "__tabread_stoppable~f",
+            "__tabreceive~f"
         ):
             for i, a in enumerate(obj_args):
                 if isinstance(a, str):
