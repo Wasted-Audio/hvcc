@@ -83,9 +83,8 @@ class HvBaseTest(unittest.TestCase):
                 if r.stage == "pd2hv":
                     self.assertTrue(expected_enum in [e.enum for e in hvcc_results.root["pd2hv"].notifs.errors])
                     return
-                elif r.stage == "hvcc":
-                    if len(hvcc_results.root["hvcc"].notifs.errors) > 0:
-                        return  # hvcc isn't using Notification enums so just pass
+                elif r.stage == "hvcc" and  len(hvcc_results.root["hvcc"].notifs.errors) > 0:
+                    return  # hvcc isn't using Notification enums so just pass
 
                 self.fail(f"Expected error enum: {expected_enum}")
 
