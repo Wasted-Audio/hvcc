@@ -12,6 +12,7 @@ Updates:
 Bugfixes:
 
 * Drop empty expressions (#441)
+* Correctly initialize $arg2 of `delread~` to `0`
 
 0.17.3
 -----
