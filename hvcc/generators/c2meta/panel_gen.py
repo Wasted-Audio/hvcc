@@ -237,8 +237,16 @@ def layout_panel_assets(assets: Assets) -> Assets:
         [assets.knobs, assets.leds, assets.inputs, assets.outputs]
     )
 
+    # Without any components we return with only a panel
     if not any(c.count for c in cat_infos):
-        assets.panel = Panel(x=PANEL_MIN_WIDTH, y=PANEL_HEIGHT, color=color)
+        existing_image = assets.panel.image if assets.panel else None
+        panel_width = assets.panel.x if (assets.panel and assets.panel.x is not None) else PANEL_MIN_WIDTH
+        assets.panel = Panel(
+            x=panel_width,
+            y=PANEL_HEIGHT,
+            color=color,
+            image=existing_image
+        )
         return assets
 
     available_h = PANEL_HEIGHT - (MARGIN_Y * 2)
@@ -249,6 +257,17 @@ def layout_panel_assets(assets: Assets) -> Assets:
         _build_shelves(info)
 
     grid = _compute_grid(cat_infos)
+
+    # Validate that components fit within the users's supplied panel image (or user-specified width)
+    if assets.panel and (assets.panel.image or assets.panel.x is not None):
+        panel_w = assets.panel.x if assets.panel.x is not None else image_size(assets.panel.image)[0]
+        if grid.panel_width > panel_w:
+            label = f"panel image '{assets.panel.image.name}'" if assets.panel.image else "specified panel"
+            raise (ValueError(
+                f"--> c2meta: {label} width ({panel_w}px) is too small to fit all components "
+                f"(requires at least {grid.panel_width}yx)"
+            ))
+
     allocated_heights = _allocate_heights(cat_infos, available_h)
     _place_items(cat_infos, allocated_heights, grid)
 
