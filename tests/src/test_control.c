@@ -18,6 +18,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "HvUtils.h"
 #include "Heavy_heavy.h"
 
 #define BLOCK_SIZE 1024
@@ -33,13 +34,13 @@ int main(int argc, const char *argv[]) {
   HeavyContextInterface *context = hv_heavy_new(48000.0);
   hv_setPrintHook(context, &printHook);
 
-  float *outBuffers = (float *) malloc(numOutputChannels * BLOCK_SIZE * sizeof(float));
+  float *outBuffers = (float *) hv_malloc(numOutputChannels * BLOCK_SIZE * sizeof(float));
 
   for (int i = 0; i < numIterations; ++i) {
     hv_processInline(context, NULL, outBuffers, BLOCK_SIZE);
   }
 
   hv_delete(context);
-  free(outBuffers);
+  hv_free(outBuffers);
   return 0;
 }
