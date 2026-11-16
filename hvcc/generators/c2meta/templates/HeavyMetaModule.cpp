@@ -6,9 +6,9 @@
 #define MM_OUTPUT_PATCHED       0xB390A0FB  // __mm_out_patched
 
 
-float {{name}}MM::_leds[NUM_LEDS > 0 ? NUM_LEDS : 1] = {0.0f};
+float HeavyMM_{{name}}::_leds[NUM_LEDS > 0 ? NUM_LEDS : 1] = {0.0f};
 
-void {{name}}MM::hvSendHook(HeavyContextInterface *c, const char *sendName, uint32_t sendHash, const HvMessage *m) {
+void HeavyMM_{{name}}::hvSendHook(HeavyContextInterface *c, const char *sendName, uint32_t sendHash, const HvMessage *m) {
     {%- if senders|length > 0 %}
     switch (sendHash) {
         {% for k, v in senders -%}
@@ -22,13 +22,13 @@ void {{name}}MM::hvSendHook(HeavyContextInterface *c, const char *sendName, uint
     {%- endif %}
 }
 
-void {{name}}MM::hvPrintHook(HeavyContextInterface *c, const char *printLabel, const char *msgString, const HvMessage *m) {
+void HeavyMM_{{name}}::hvPrintHook(HeavyContextInterface *c, const char *printLabel, const char *msgString, const HvMessage *m) {
     char buf[64];
     snprintf(buf, sizeof(buf), "%.48s %s", printLabel, msgString);
     printf("> %s \n", buf);
 }
 
-{{name}}MM::{{name}}MM(double samplerate) {
+HeavyMM_{{name}}::HeavyMM_{{name}}(double samplerate) {
     hv_context = std::make_unique<Heavy_{{name}}>(samplerate);
     hv_context->setSendHook(&hvSendHook);
     hv_context->setPrintHook(&hvPrintHook);
@@ -39,7 +39,7 @@ void {{name}}MM::hvPrintHook(HeavyContextInterface *c, const char *printLabel, c
     {%- endfor %}
 }
 
-void {{name}}MM::update() {
+void HeavyMM_{{name}}::update() {
     if (!hv_context) return;
 
     static constexpr float kInputScale  = 0.1f;
@@ -58,7 +58,7 @@ void {{name}}MM::update() {
         current_outputs[i] = output_buffers[i] * kOutputScale;
 }
 
-void {{name}}MM::set_samplerate(float sr) {
+void HeavyMM_{{name}}::set_samplerate(float sr) {
     hv_context = std::make_unique<Heavy_{{name}}>(static_cast<double>(sr));
     hv_context->setSendHook(&hvSendHook);
     hv_context->setPrintHook(&hvPrintHook);
@@ -68,7 +68,7 @@ void {{name}}MM::set_samplerate(float sr) {
     {%- endfor %}
 }
 
-void {{name}}MM::set_param(int param_id, float val) {
+void HeavyMM_{{name}}::set_param(int param_id, float val) {
     if (param_id < 0 || param_id >= NUM_PARAMS) {
         return;
     }
@@ -86,7 +86,7 @@ void {{name}}MM::set_param(int param_id, float val) {
     }
 }
 
-float {{name}}MM::get_param(int param_id) const {
+float HeavyMM_{{name}}::get_param(int param_id) const {
     if (param_id < 0 || param_id >= NUM_PARAMS) {
         return 0.0f;
     }
@@ -94,7 +94,7 @@ float {{name}}MM::get_param(int param_id) const {
     return _params[param_id];
 }
 
-void {{name}}MM::set_input(int input_id, float val) {
+void HeavyMM_{{name}}::set_input(int input_id, float val) {
     if (input_id < 0 || input_id >= NUM_INPUTS) {
         return;
     }
@@ -102,7 +102,7 @@ void {{name}}MM::set_input(int input_id, float val) {
     input_buffers[input_id] = val;
 }
 
-float {{name}}MM::get_output(int output_id) const {
+float HeavyMM_{{name}}::get_output(int output_id) const {
     if (output_id < 0 || output_id >= NUM_OUTPUTS) {
         return 0.0f;
     }
@@ -110,7 +110,7 @@ float {{name}}MM::get_output(int output_id) const {
     return current_outputs[output_id];
 }
 
-float {{name}}MM::get_led_brightness(int led_id) const {
+float HeavyMM_{{name}}::get_led_brightness(int led_id) const {
     if (led_id < 0 || led_id >= NUM_LEDS) {
         return 0.0f;
     }
@@ -129,7 +129,7 @@ float {{name}}MM::get_led_brightness(int led_id) const {
 // Jack input and output detections
 // Converts internal 0 based ids to 1 based like PD
 
-void {{name}}MM::mark_input_unpatched(int input_id) {
+void HeavyMM_{{name}}::mark_input_unpatched(int input_id) {
     if (input_id < 0 || input_id >= NUM_INPUTS) {
         return;
     }
@@ -139,7 +139,7 @@ void {{name}}MM::mark_input_unpatched(int input_id) {
     );
 }
 
-void {{name}}MM::mark_input_patched(int input_id) {
+void HeavyMM_{{name}}::mark_input_patched(int input_id) {
     if (input_id < 0 || input_id >= NUM_INPUTS) {
         return;
     }
@@ -149,7 +149,7 @@ void {{name}}MM::mark_input_patched(int input_id) {
     );
 }
 
-void {{name}}MM::mark_output_unpatched(int output_id) {
+void HeavyMM_{{name}}::mark_output_unpatched(int output_id) {
     if (output_id < 0 || output_id >= NUM_OUTPUTS) {
         return;
     }
@@ -159,7 +159,7 @@ void {{name}}MM::mark_output_unpatched(int output_id) {
     );
 }
 
-void {{name}}MM::mark_output_patched(int output_id) {
+void HeavyMM_{{name}}::mark_output_patched(int output_id) {
     if (output_id < 0 || output_id >= NUM_OUTPUTS) {
         return;
     }

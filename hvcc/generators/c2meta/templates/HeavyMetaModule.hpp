@@ -41,10 +41,10 @@ enum {
 };
 {% endif %}
 
-class {{name}}MM : public CoreProcessor {
+class HeavyMM_{{name}} : public CoreProcessor {
 public:
-    explicit {{name}}MM(double samplerate = 48000.0);
-    ~{{name}}MM() override = default;
+    explicit HeavyMM_{{name}}(double samplerate = 48000.0);
+    ~HeavyMM_{{name}}() override = default;
 
     static float _leds[NUM_LEDS > 0 ? NUM_LEDS : 1];
 
