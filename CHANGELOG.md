@@ -4,6 +4,10 @@ CHANGELOG
 Next Release
 -----
 
+Features:
+
+* New MetaModule generator
+
 Updates:
 
 * Python typing syntax
