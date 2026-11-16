@@ -87,8 +87,11 @@ def write_asset_files(assets: Assets, out_dir: Path) -> None:
     components_dir = asset_dir / "components"
     components_dir.mkdir(parents=True, exist_ok=True)
 
+    # copy image and set permanent path
     assert assets.panel and assets.panel.image
-    shutil.copyfile(assets.panel.image, asset_dir / "panel.png")
+    panel_path = asset_dir / assets.panel.image.name
+    shutil.copyfile(assets.panel.image, panel_path)
+    assets.panel.image = panel_path
 
     with Image.open(assets.panel.image).convert('RGBA') as screenshot:
 
@@ -96,7 +99,7 @@ def write_asset_files(assets: Assets, out_dir: Path) -> None:
         for element in elements:
             shutil.copyfile(element.image, components_dir / element.image.name)
 
-            assert element.x and element.y
+            assert element.x is not None and element.y is not None
             with Image.open(element.image) as img:
                 screenshot.alpha_composite(img, (element.x, element.y))
 

@@ -75,7 +75,7 @@ void init_{{ name|lower }}() {
 
   MetaModule::ModuleInfoView info{
       .description = "{{ meta.description }}",
-      .width_hp = {{ (assets.panel.x / 7.5) | round | int }},
+      .width_hp = {{ (assets.panel.x / (ratio * 5.08)) | round | int }},
       .elements = elements,
       .indices = indices,
   };
