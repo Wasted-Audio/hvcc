@@ -196,6 +196,13 @@
   #endif
 #endif
 
+// SIMD-aligned stack buffers: hv_alloca only guarantees the ABI's stack alignment
+// (16 bytes on x86_64 and arm64), but AVX loads/stores need 32
+#define HV_SIMD_ALIGNMENT (HV_N_SIMD * sizeof(float))
+#define hv_is_simd_aligned(_p) ((((uintptr_t) (_p)) & (HV_SIMD_ALIGNMENT - 1)) == 0)
+#define hv_alloca_simd(_n) ((void *) ((((uintptr_t) hv_alloca((_n) + HV_SIMD_ALIGNMENT - 1)) \
+    + HV_SIMD_ALIGNMENT - 1) & ~((uintptr_t) HV_SIMD_ALIGNMENT - 1)))
+
 // Assert
 #include <assert.h>
 #define hv_assert(e) assert(e)
