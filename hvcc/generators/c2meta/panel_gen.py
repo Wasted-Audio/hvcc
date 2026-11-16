@@ -265,12 +265,17 @@ def layout_panel_assets(assets: Assets) -> Assets:
             label = f"panel image '{assets.panel.image.name}'" if assets.panel.image else "specified panel"
             raise (ValueError(
                 f"--> c2meta: {label} width ({panel_w}px) is too small to fit all components "
-                f"(requires at least {grid.panel_width}yx)"
+                f"(requires at least {grid.panel_width}px)"
             ))
 
     allocated_heights = _allocate_heights(cat_infos, available_h)
     _place_items(cat_infos, allocated_heights, grid)
 
-    assets.panel = Panel(x=grid.panel_width, y=PANEL_HEIGHT, color=color)
+    assets.panel = Panel(
+        x=assets.panel.x if (assets.panel and assets.panel.x is not None) else grid.panel_width,
+        y=PANEL_HEIGHT,
+        color=color,
+        image=assets.panel.image if assets.panel else None
+    )
 
     return assets
