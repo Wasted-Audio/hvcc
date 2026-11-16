@@ -52,9 +52,7 @@ static inline void __hv_lorenz_f(SignalLorenz *o,
   const float *const r = (float *) &bInR;
   const float *const b = (float *) &bInB;
 
-  float *const x = (float *) hv_alloca(3 * 8 * sizeof(float));
-  float *const y = x + 8;
-  float *const z = x + 16;
+  float x[8], y[8], z[8];
 
   __hv_lorenz_scalar_f(o->xm1, o->ym1, o->zm1, h[0], s[0], r[0], b[0], x, y, z);
   __hv_lorenz_scalar_f(x[0], y[0], z[0], h[1], s[1], r[1], b[1], x+1, y+1, z+1);
@@ -68,18 +66,16 @@ static inline void __hv_lorenz_f(SignalLorenz *o,
   o->xm1 = x[7];
   o->ym1 = y[7];
   o->zm1 = z[7];
-  __hv_load_f(x, bOutX);
-  __hv_load_f(y, bOutY);
-  __hv_load_f(z, bOutZ);
+  *bOutX = _mm256_loadu_ps(x);
+  *bOutY = _mm256_loadu_ps(y);
+  *bOutZ = _mm256_loadu_ps(z);
 #elif HV_SIMD_SSE
   const float *const h = (float *) &bInStep;
   const float *const s = (float *) &bInS;
   const float *const r = (float *) &bInR;
   const float *const b = (float *) &bInB;
 
-  float *const x = (float *) hv_alloca(3 * 4 * sizeof(float));
-  float *const y = x + 4;
-  float *const z = x + 8;
+  float x[4], y[4], z[4];
 
   __hv_lorenz_scalar_f(o->xm1, o->ym1, o->zm1, h[0], s[0], r[0], b[0], x, y, z);
   __hv_lorenz_scalar_f(x[0], y[0], z[0], h[1], s[1], r[1], b[1], x+1, y+1, z+1);
@@ -89,9 +85,9 @@ static inline void __hv_lorenz_f(SignalLorenz *o,
   o->xm1 = x[3];
   o->ym1 = y[3];
   o->zm1 = z[3];
-  __hv_load_f(x, bOutX);
-  __hv_load_f(y, bOutY);
-  __hv_load_f(z, bOutZ);
+  *bOutX = _mm_loadu_ps(x);
+  *bOutY = _mm_loadu_ps(y);
+  *bOutZ = _mm_loadu_ps(z);
 #elif HV_SIMD_NEON
   float *const x = (float *) hv_alloca(3 * 4 * sizeof(float));
   float *const y = x + 4;

@@ -370,14 +370,14 @@ static inline void __hv_neg_f(hv_bInf_t bIn, hv_bOutf_t bOut) {
 
 static inline void __hv_exp_f(hv_bInf_t bIn, hv_bOutf_t bOut) {
 #if HV_SIMD_AVX
-  float *const b = (float *) hv_alloca(HV_N_SIMD*sizeof(float));
-  _mm256_store_ps(b, bIn);
+  float b[HV_N_SIMD];
+  _mm256_storeu_ps(b, bIn);
   *bOut = _mm256_set_ps(
       hv_exp_f(b[7]), hv_exp_f(b[6]), hv_exp_f(b[5]), hv_exp_f(b[4]),
       hv_exp_f(b[3]), hv_exp_f(b[2]), hv_exp_f(b[1]), hv_exp_f(b[0]));
 #elif HV_SIMD_SSE
-  float *const b = (float *) hv_alloca(HV_N_SIMD*sizeof(float));
-  _mm_store_ps(b, bIn);
+  float b[HV_N_SIMD];
+  _mm_storeu_ps(b, bIn);
   *bOut = _mm_set_ps(hv_exp_f(b[3]), hv_exp_f(b[2]), hv_exp_f(b[1]), hv_exp_f(b[0]));
 #elif HV_SIMD_NEON
   *bOut = (float32x4_t) {
@@ -645,9 +645,9 @@ static inline void __hv_max_i(hv_bIni_t bIn0, hv_bIni_t bIn1, hv_bOuti_t bOut) {
 
 static inline void __hv_pow_f(hv_bInf_t bIn0, hv_bInf_t bIn1, hv_bOutf_t bOut) {
 #if HV_SIMD_AVX
-  float *b = (float *) hv_alloca(16*sizeof(float));
-  _mm256_store_ps(b, bIn0);
-  _mm256_store_ps(b+8, bIn1);
+  float b[16];
+  _mm256_storeu_ps(b, bIn0);
+  _mm256_storeu_ps(b+8, bIn1);
   *bOut = _mm256_set_ps(
       hv_pow_f(b[7], b[15]),
       hv_pow_f(b[6], b[14]),
@@ -658,9 +658,9 @@ static inline void __hv_pow_f(hv_bInf_t bIn0, hv_bInf_t bIn1, hv_bOutf_t bOut) {
       hv_pow_f(b[1], b[9]),
       hv_pow_f(b[0], b[8]));
 #elif HV_SIMD_SSE
-  float *b = (float *) hv_alloca(8*sizeof(float));
-  _mm_store_ps(b, bIn0);
-  _mm_store_ps(b+4, bIn1);
+  float b[8];
+  _mm_storeu_ps(b, bIn0);
+  _mm_storeu_ps(b+4, bIn1);
   *bOut = _mm_set_ps(
       hv_pow_f(b[3], b[7]),
       hv_pow_f(b[2], b[6]),
