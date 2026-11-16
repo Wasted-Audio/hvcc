@@ -18,7 +18,7 @@ Panel image height is restricted to `240px` which corresponds to eurorack `128.5
 
 In puredata audio levels are `-1:1` so we need to scale this to `-10:10` of MetaModule and eurorack levels for the `[adc~]/[dac~]` i/o.
 
-The user needs to at minimum provide the `metamodule-plugin-sdk` on the same level of the output folder, or overload this in the `meta.json`. They need to have `cmake` installed on their system and have `arm-none-eabi-gcc` version `15` in their current path.
+The user needs to at minimum provide the `metamodule-plugin-sdk` on the same level of the output folder, or overload this in the `meta.json`. They need to have `cmake`, version `3.22` or newer, installed on their system and have `arm-none-eabi-gcc` version `15` in their current path.
 
 ## MVP Definition
 
