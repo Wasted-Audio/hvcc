@@ -7,3 +7,6 @@
 [submodule "hvcc/generators/ir2c/static/MicroNam"]
 	path = hvcc/generators/ir2c/static/MicroNam
 	url = https://github.com/jaffco/MicroNAM.git
+[submodule "hvcc/generators/ir2c/static/kissfft"]
+	path = hvcc/generators/ir2c/static/kissfft
+	url = https://github.com/mborgerding/kissfft.git

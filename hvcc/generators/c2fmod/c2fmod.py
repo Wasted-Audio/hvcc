@@ -3,7 +3,6 @@
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
-import os
 import shutil
 import time
 from pathlib import Path
@@ -71,7 +70,10 @@ class c2fmod(Generator):
                 shutil.rmtree(patch_src_dir)
             shutil.copytree(c_src_dir, patch_src_dir)
 
-            heavy_src_files = [f for f in os.listdir(c_src_dir) if f.endswith((".c", ".cpp"))]
+            heavy_src_files = [
+                p.relative_to(c_src_dir).as_posix() for p in Path(c_src_dir).rglob("*")
+                if p.suffix in (".c", ".cpp")
+            ]
 
             src_ext_list = ["h", "hpp", "c", "cpp", "js", "md", "txt"]
 

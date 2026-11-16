@@ -2418,6 +2418,44 @@
       "-->"
     ]
   },
+  "__rfft~f": {
+    "inlets": [
+      "~f>"
+    ],
+    "ir": {
+      "control": false,
+      "signal": true,
+      "init": true
+    },
+    "outlets": [
+      "~f>",
+      "~f>"
+    ],
+    "args": [],
+    "perf": {
+      "avx": 0,
+      "sse": 0
+    }
+  },
+  "__rifft~f": {
+    "inlets": [
+      "~f>",
+      "~f>"
+    ],
+    "ir": {
+      "control": false,
+      "signal": true,
+      "init": true
+    },
+    "outlets": [
+      "~f>"
+    ],
+    "args": [],
+    "perf": {
+      "avx": 0,
+      "sse": 0
+    }
+  },
   "__rpole~f": {
     "inlets": [
       "~f>",
@@ -3090,6 +3128,26 @@
       "avx": 4,
       "sse": 2
     }
+  },
+  "__tabreceive~f": {
+    "inlets": [
+      "-->"
+    ],
+    "ir": {
+      "control": false,
+      "signal": true,
+      "init": true
+    },
+    "outlets": [
+      "~f>"
+    ],
+    "args": [{
+      "default": null,
+      "value_type": "string",
+      "name": "table",
+      "description": "The name of the table to reference.",
+      "required": true
+    }]
   },
   "__tabwrite": {
     "inlets": [

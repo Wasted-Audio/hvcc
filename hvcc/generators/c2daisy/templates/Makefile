@@ -17,8 +17,8 @@ LDFLAGS += -u _printf_float
 {% endif %}
 
 # Project Source
-C_SOURCES = $(wildcard *.c)
-CPP_SOURCES = $(wildcard *.cpp)
+C_SOURCES = $(wildcard *.c */*.c)
+CPP_SOURCES = $(wildcard *.cpp */*.cpp)
 
 # Core location, and generic makefile.
 SYSTEM_FILES_DIR = $(LIBDAISY_DIR)/core

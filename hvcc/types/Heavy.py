@@ -34,6 +34,7 @@ class Heavy(BaseModel):
     type: str
     imports: list = Field(default_factory=list)
     args: list | dict = Field(default_factory=list)  # we should make this more specific
+    block_size: int | None = None
     objects: dict[str, "Heavy"] = Field(default_factory=dict)
     connections: list[HvConn] = Field(default_factory=list)
     properties: HvPos = Field(default_factory=lambda: HvPos(x=0, y=0))

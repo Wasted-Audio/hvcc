@@ -30,11 +30,16 @@ class HIrTabread(HeavyIrObject):
         graph: HeavyGraph | None = None,
         annotations: dict | None = None
     ) -> None:
-        assert obj_type in {"__tabread~if", "__tabread~f", "__tabread_stoppable~f", "__tabreadu~f", "__tabread"}
+        assert obj_type in {
+            "__tabread~if", "__tabread~f", "__tabread_stoppable~f",
+            "__tabreadu~f", "__tabread", "__tabreceive~f"
+        }
         super().__init__(obj_type, args=args, graph=graph, annotations=annotations)
 
     def reduce(self) -> tuple[set, list] | None:
         if self.graph is not None:
+            self.args["block_size"] = self.graph.args["block_size"]
+
             table_obj = self.graph.resolve_object_for_name(
                 self.args["table"].split(" ")[0],
                 ["table", "__table"])
