@@ -20,3 +20,11 @@ create_plugin(
     SOURCE_ASSETS   ${CMAKE_CURRENT_LIST_DIR}/assets
     DESTINATION     ${CMAKE_CURRENT_LIST_DIR}/../metamodule-plugins/
 )
+
+add_custom_command(
+    TARGET plugin
+    POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy
+        ${CMAKE_CURRENT_LIST_DIR}/../metamodule-plugins/dattorro.mmplugin
+        ${CMAKE_CURRENT_LIST_DIR}/../metamodule-plugins/dattorro-v${PROJECT_VERSION}.mmplugin
+)
