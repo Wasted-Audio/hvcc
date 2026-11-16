@@ -1,6 +1,6 @@
 #N canvas 10 39 884 815 10;
 #X obj 300 10 loadbang -1;
-#X obj 300 35 t a a a;
+#X obj 300 35 t a a a a;
 #X msg 494 59 @HV_N_SIMD;
 #X obj 493 85 + 2;
 #X obj 380 60 symbol del-\$1;
@@ -181,6 +181,9 @@
 #X text 204 486 b;
 #X text 398 483 c;
 #X text 588 482 d;
+#X msg 650 565 1;
+#X obj 650 595 / 6;
+#X text 650 640 1/6 is computed at load: Pd saves the argument of [*~] with 6 digits only;
 #X connect 0 0 1 0;
 #X connect 1 0 10 0;
 #X connect 1 1 4 0;
@@ -266,3 +269,6 @@
 #X connect 67 0 68 1;
 #X connect 68 0 69 1;
 #X connect 69 0 53 0;
+#X connect 1 3 75 0;
+#X connect 75 0 76 0;
+#X connect 76 0 66 1;

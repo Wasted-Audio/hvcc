@@ -145,6 +145,10 @@
 #X text 375 527 -3b+2a+d;
 #X text 164 499 -3(c-b)+(d-a);
 #X text 701 487 1-f;
+#X obj 485 60 t a a;
+#X msg 760 450 1;
+#X obj 760 480 / 6;
+#X text 760 525 1/6 is computed at load: Pd saves the argument of [*~] with 6 digits only;
 #X connect 0 0 3 0;
 #X connect 0 0 17 0;
 #X connect 3 0 6 0;
@@ -153,7 +157,6 @@
 #X connect 6 0 27 1;
 #X connect 6 0 30 1;
 #X connect 6 0 33 1;
-#X connect 7 0 8 0;
 #X connect 8 0 9 0;
 #X connect 9 0 10 0;
 #X connect 10 0 11 0;
@@ -205,3 +208,8 @@
 #X connect 48 0 49 1;
 #X connect 49 0 50 1;
 #X connect 50 0 34 0;
+#X connect 7 0 62 0;
+#X connect 62 0 8 0;
+#X connect 62 1 63 0;
+#X connect 63 0 64 0;
+#X connect 64 0 47 1;
