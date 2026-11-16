@@ -77,11 +77,11 @@ def _is_configuration_complete(
         return False
 
     input_ids = {i.id for i in assets.inputs}
-    if not all(ch in input_ids for ch in range(1, num_inputs + 1)):
+    if input_ids != set(range(1, num_inputs + 1)):
         return False
 
     output_ids = {o.id for o in assets.outputs}
-    return all(ch in output_ids for ch in range(1, num_outputs + 1))
+    return output_ids == set(range(1, num_outputs + 1))
 
 
 def ensure_panel_assets(
