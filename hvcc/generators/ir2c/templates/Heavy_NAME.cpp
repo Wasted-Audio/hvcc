@@ -298,19 +298,26 @@ int Heavy_{{name}}::processInline(float *inputBuffers, float *outputBuffers, int
 }
 
 int Heavy_{{name}}::processInlineInterleaved(float *inputBuffers, float *outputBuffers, int n4) {
-  hv_assert(n4 & ~HV_N_SIMD_MASK); // ensure that n4 is a multiple of HV_N_SIMD
+  hv_assert(!(n4 & HV_N_SIMD_MASK)); // ensure that n4 is a multiple of HV_N_SIMD
+
+  // The caller's buffers may have any alignment: they are only accessed with unaligned
+  // loads/stores here. The heavy buffers passed to process() are SIMD-aligned.
 
   // define the heavy input buffer for {{signal.numInputBuffers}} channel(s), uninterleave
   {%- if signal.numInputBuffers == 0 %}
   float *const bIn = NULL;
   {%- elif signal.numInputBuffers == 1 %}
-  float *const bIn = inputBuffers;
+  float *bIn = inputBuffers;
+  if (!hv_is_simd_aligned(inputBuffers)) {
+    bIn = reinterpret_cast<float *>(hv_alloca_simd(n4*sizeof(float)));
+    hv_memcpy(bIn, inputBuffers, n4*sizeof(float));
+  }
   {%- elif signal.numInputBuffers == 2 %}
-  float *const bIn = reinterpret_cast<float *>(hv_alloca(2*n4*sizeof(float)));
+  float *const bIn = reinterpret_cast<float *>(hv_alloca_simd(2*n4*sizeof(float)));
   #if HV_SIMD_SSE || HV_SIMD_AVX
   for (int i = 0, j = 0; j < n4; j += 4, i += 8) {
-    __m128 a = _mm_load_ps(inputBuffers+i);                // LRLR
-    __m128 b = _mm_load_ps(inputBuffers+4+i);              // LRLR
+    __m128 a = _mm_loadu_ps(inputBuffers+i);               // LRLR
+    __m128 b = _mm_loadu_ps(inputBuffers+4+i);             // LRLR
     __m128 x = _mm_shuffle_ps(a, b, _MM_SHUFFLE(2,0,2,0)); // LLLL
     __m128 y = _mm_shuffle_ps(a, b, _MM_SHUFFLE(3,1,3,1)); // RRRR
     _mm_store_ps(bIn+j, x);
@@ -330,7 +337,7 @@ int Heavy_{{name}}::processInlineInterleaved(float *inputBuffers, float *outputB
   }
   #endif
   {%- else %}
-  float *const bIn = (float *) hv_alloca({{signal.numInputBuffers}}*n4*sizeof(float));
+  float *const bIn = reinterpret_cast<float *>(hv_alloca_simd({{signal.numInputBuffers}}*n4*sizeof(float)));
   for (int j = 0; j < n4; ++j) {
     {%- for i in range(signal.numInputBuffers) %}
     bIn[{{i}}*n4+j] = inputBuffers[{{i}}+{{signal.numInputBuffers}}*j];
@@ -342,23 +349,26 @@ int Heavy_{{name}}::processInlineInterleaved(float *inputBuffers, float *outputB
   {%- if signal.numOutputBuffers == 0 %}
   float *const bOut = NULL;
   {%- elif signal.numOutputBuffers == 1 %}
-  float *const bOut = outputBuffers;
+  float *const bOut = hv_is_simd_aligned(outputBuffers)
+      ? outputBuffers : reinterpret_cast<float *>(hv_alloca_simd(n4*sizeof(float)));
   {%- else %}
-  float *const bOut = reinterpret_cast<float *>(hv_alloca({{signal.numOutputBuffers}}*n4*sizeof(float)));
+  float *const bOut = reinterpret_cast<float *>(hv_alloca_simd({{signal.numOutputBuffers}}*n4*sizeof(float)));
   {%- endif %}
 
   int n = processInline(bIn, bOut, n4);
 
-  {% if signal.numOutputBuffers == 2 -%}
+  {% if signal.numOutputBuffers == 1 -%}
+  if (bOut != outputBuffers) hv_memcpy(outputBuffers, bOut, n4*sizeof(float));
+  {%- elif signal.numOutputBuffers == 2 -%}
   // interleave the heavy output into the output buffer
   #if HV_SIMD_AVX
   for (int i = 0, j = 0; j < n4; j += 8, i += 16) {
     __m256 x = _mm256_load_ps(bOut+j);    // LLLLLLLL
     __m256 y = _mm256_load_ps(bOut+n4+j); // RRRRRRRR
-    __m256 a = _mm256_unpacklo_ps(x, y);  // LRLRLRLR
-    __m256 b = _mm256_unpackhi_ps(x, y);  // LRLRLRLR
-    _mm256_store_ps(outputBuffers+i, a);
-    _mm256_store_ps(outputBuffers+8+i, b);
+    __m256 a = _mm256_unpacklo_ps(x, y);  // L0 R0 L1 R1 L4 R4 L5 R5
+    __m256 b = _mm256_unpackhi_ps(x, y);  // L2 R2 L3 R3 L6 R6 L7 R7
+    _mm256_storeu_ps(outputBuffers+i, _mm256_permute2f128_ps(a, b, 0x20));   // L0 R0 .. L3 R3
+    _mm256_storeu_ps(outputBuffers+8+i, _mm256_permute2f128_ps(a, b, 0x31)); // L4 R4 .. L7 R7
   }
   #elif HV_SIMD_SSE
   for (int i = 0, j = 0; j < n4; j += 4, i += 8) {
@@ -366,8 +376,8 @@ int Heavy_{{name}}::processInlineInterleaved(float *inputBuffers, float *outputB
     __m128 y = _mm_load_ps(bOut+n4+j); // RRRR
     __m128 a = _mm_unpacklo_ps(x, y);  // LRLR
     __m128 b = _mm_unpackhi_ps(x, y);  // LRLR
-    _mm_store_ps(outputBuffers+i, a);
-    _mm_store_ps(outputBuffers+4+i, b);
+    _mm_storeu_ps(outputBuffers+i, a);
+    _mm_storeu_ps(outputBuffers+4+i, b);
   }
   #elif HV_SIMD_NEON
   // https://community.arm.com/groups/processors/blog/2012/03/13/coding-for-neon--part-5-rearranging-vectors
