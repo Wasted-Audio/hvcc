@@ -4,7 +4,6 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 import shutil
-import tempfile
 import time
 from pathlib import Path
 
@@ -16,10 +15,10 @@ from hvcc.generators.copyright import copyright_manager
 from hvcc.generators.filters import filter_uniqueid
 from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
 from hvcc.types.compiler import CompilerMsg, CompilerNotif, CompilerResp, ExternInfo, Generator
-from hvcc.types.meta import Meta, MetaModule
-from hvcc.types.metamodule import Assets, Input, Knob, Led, Output, UIElement
+from hvcc.types.meta import Meta
+from hvcc.types.metamodule import Assets, UIElement
 
-from .panel import layout_panel_assets
+from .panel_val import ensure_panel_assets
 
 
 class mmJson(BaseModel):
@@ -29,57 +28,6 @@ class mmJson(BaseModel):
     MetaModuleDescription: str
 
 
-def ensure_panel_assets(
-    mm_meta: MetaModule,
-    externs: ExternInfo,
-    num_input_channels: int,
-    num_output_channels: int,
-    tmp_dir: Path,
-    verbose: bool | None = False
-) -> Assets:
-    """Return the module's assets, generating a default panel if none exist."""
-    if not mm_meta.modules:
-        raise ValueError("--> c2meta: meta.modules must contain at least one module")
-
-    module = mm_meta.modules[0]
-
-    if module.assets is not None and \
-            module.assets.panel is not None and \
-            module.assets.panel.image is not None and \
-            module.assets.panel.x is not None and \
-            module.assets.panel.y is not None:
-        return module.assets
-
-    if verbose:
-        print("--> c2meta: generating custom panel")
-
-    assets = Assets(
-        panel=module.assets.panel if module.assets is not None else None,
-        knobs=[Knob(param=p.display) for _, p in externs.parameters.inParam],
-        inputs=[Input(id=i+1) for i in range(num_input_channels)],
-        outputs=[Output(id=i+1) for i in range(num_output_channels)],
-        leds=[
-            Led(led=p.display)
-            for _, p in externs.parameters.outParam
-            if p.display is not None
-        ],
-    )
-    panel_assets = layout_panel_assets(assets)
-
-    assert panel_assets.panel and panel_assets.panel.x and panel_assets.panel.y and panel_assets.panel.color
-    panel_img = Image.new(
-        "RGBA",
-        (panel_assets.panel.x, panel_assets.panel.y),
-        panel_assets.panel.color.as_rgb_tuple(),
-    )
-
-    panel_path = tmp_dir / "panel.png"
-    panel_img.save(panel_path)
-    panel_assets.panel.image = panel_path
-
-    module.assets = panel_assets
-    return module.assets
-
 
 def write_asset_files(assets: Assets, out_dir: Path) -> None:
     """Copy the panel image and all component images into out_dir/assets."""
@@ -87,23 +35,41 @@ def write_asset_files(assets: Assets, out_dir: Path) -> None:
     components_dir = asset_dir / "components"
     components_dir.mkdir(parents=True, exist_ok=True)
 
-    # copy image and set permanent path
-    assert assets.panel and assets.panel.image
-    panel_path = asset_dir / assets.panel.image.name
-    shutil.copyfile(assets.panel.image, panel_path)
-    assets.panel.image = panel_path
+    assert assets.panel
+
+    # Panel image: generate directly in assets/ or copy custom image
+    if assets.panel.image is None:
+        panel_path = asset_dir / "panel.png"
+        color = assets.panel.color.as_rgb_tuple() if assets.panel.color else (60, 60, 60)
+        assert assets.panel.x is not None and assets.panel.y is not None
+        panel_img = Image.new("RGBA", (assets.panel.x, assets.panel.y), color)
+        panel_img.save(panel_path)
+        assets.panel.image = panel_path
+    elif assets.panel.image.parent != asset_dir:
+        dest_panel = asset_dir / assets.panel.image.name
+        shutil.copyfile(assets.panel.image, dest_panel)
+        assets.panel.image = dest_panel
+
+    # Components: copy unique component images into assets/components/
+    elements: list[UIElement] = [*assets.knobs, *assets.leds, *assets.inputs, *assets.outputs]
+    for img_path in {el.image for el in elements}:
+        shutil.copyfile(img_path, components_dir / img_path.name)
+
+
+def write_screenshot(assets, screenshot_path: Path) -> None:
+    """Render a visual composite of the panel and placed components."""
+    if not (assets.panel and assets.panel.image and assets.panel.image.exists()):
+        return
 
     with Image.open(assets.panel.image).convert('RGBA') as screenshot:
-
         elements: list[UIElement] = [*assets.knobs, *assets.leds, *assets.inputs, *assets.outputs]
         for element in elements:
-            shutil.copyfile(element.image, components_dir / element.image.name)
-
-            assert element.x is not None and element.y is not None
+            if element.x is None or element.y is None:
+                continue
             with Image.open(element.image) as img:
                 screenshot.alpha_composite(img, (element.x, element.y))
 
-        screenshot.save(out_dir / "screenshot.png")
+        screenshot.save(screenshot_path)
 
 
 class c2meta(Generator):
@@ -185,12 +151,14 @@ class c2meta(Generator):
                     name=patch_name
                 ))
 
-            # generate panel assets
-            with tempfile.TemporaryDirectory() as tmp_dir:
-                assets = ensure_panel_assets(
-                    mm_meta, externs, num_input_channels, num_output_channels, Path(tmp_dir), verbose
-                )
-                write_asset_files(assets, out_dir)
+            # plan layout and resolve assets
+            assets = ensure_panel_assets(mm_meta, externs, num_input_channels, num_output_channels, verbose)
+
+            # write runtime assets for plugin
+            write_asset_files(assets, out_dir)
+
+            # generate screenshot preview
+            write_screenshot(assets, out_dir / "screenshot.png")
 
             # generate elements.cpp
             elements_cpp = Path(source_dir, f"{patch_name.lower()}_elements.cpp")
