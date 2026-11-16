@@ -51,18 +51,18 @@ In order to set custom information you should supply a `metadata.json` using `-m
 
 You can optionally set the `sdk_path` to an absolute or relative path where you have your `metamodule-plugin-sdk` folder. By default this is expected one level above the root of the output folder. Make sure that it has a trailing slash `/`.
 
-You can also optionally supply a dictionary of assets that make the panel, controls and sockets of your module. If you don't add the `assets` section a panel will be generated automatically. Make sure that your description here is exact and complete. You have to use the same names for all receivers and senders and use the correct amount of input and output IDs. Audio i/o starts counting from 1 just like in PD.
+You can also optionally supply a dictionary of assets that make the panel, controls and sockets of your module. If you don't add the `assets` section a panel will be generated automatically. Make sure that your description here is exact and complete. You have to use the same names for all receivers and senders and use the correct amount of input and output IDs. Audio i/o IDs for the panel assets starts counting from 1 just like in PD.
 
 ```json
     {
         "panel": {
-            "image": "path/to/panel_image.png",
+            "image": "<path/to>/panel_image.png",
             "color": "#ff0000"
         },
         "knobs": [
             {
                 "param": "<receiver_name>",
-                "image": "path/to/knob_image.png",
+                "image": "<path/to>/knob_image.png",
                 "x": 20,
                 "y": 20
             }
@@ -71,7 +71,7 @@ You can also optionally supply a dictionary of assets that make the panel, contr
             {
                 "id": 1,
                 "name": "input 1",
-                "image": "path/to/socket_image.png",
+                "image": "<path/to>/socket_image.png",
                 "x": 18,
                 "y": 60
             }
@@ -80,7 +80,7 @@ You can also optionally supply a dictionary of assets that make the panel, contr
             {
                 "id": 1,
                 "name": "output 1",
-                "image": "path/to/socket_image.png",
+                "image": "<path/to>/socket_image.png",
                 "x": 18,
                 "y": 100
             }
@@ -88,7 +88,7 @@ You can also optionally supply a dictionary of assets that make the panel, contr
         "leds": [
             {
                 "led": "<sender_name>",
-                "image": "path/to/led_image.png",
+                "image": "<path/to>/led_image.png",
                 "x": 25,
                 "y": 40
             }
@@ -100,9 +100,15 @@ Object positions are in pixel position relative to the top-left of the panel and
 
 When only the optional `panel.color` is set, using either hexadecimal or an RGB tuple values, this will set the color of the generated panel.
 
-An additional `screenshot.png` will be generated based on the panel and assets and their positions.
+An additional `plugin/screenshot.png` will be generated based on the panel, assets and their positions.
 
 ## Building
+
+In order to build the generated MetaModule project you need:
+
+- [metamodule-plugin-sdk](https://github.com/4ms/metamodule-plugin-sdk) - either on the same level as the output directory or set using `sdk_path`
+- `cmake` version `3.22` or newer
+- `arm-none-eabi-gcc` version `15` in `$PATH`
 
 After generating the project go to the output directory and build the plugin:
 

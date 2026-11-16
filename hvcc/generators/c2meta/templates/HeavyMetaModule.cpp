@@ -127,6 +127,7 @@ float {{name}}MM::get_led_brightness(int led_id) const {
 
 
 // Jack input and output detections
+// Converts internal 0 based ids to 1 based like PD
 
 void {{name}}MM::mark_input_unpatched(int input_id) {
     if (input_id < 0 || input_id >= NUM_INPUTS) {
@@ -134,7 +135,7 @@ void {{name}}MM::mark_input_unpatched(int input_id) {
     }
 
     hv_context->sendMessageToReceiverV(MM_INPUT_PATCHED, 0, "ff",
-        (float) input_id, 0.0f
+        (float) input_id + 1.0f, 0.0f
     );
 }
 
@@ -144,7 +145,7 @@ void {{name}}MM::mark_input_patched(int input_id) {
     }
 
     hv_context->sendMessageToReceiverV(MM_INPUT_PATCHED, 0, "ff",
-        (float) input_id, 1.0f
+        (float) input_id + 1.0f, 1.0f
     );
 }
 
@@ -154,7 +155,7 @@ void {{name}}MM::mark_output_unpatched(int output_id) {
     }
 
     hv_context->sendMessageToReceiverV(MM_OUTPUT_PATCHED, 0, "ff",
-        (float) output_id, 0.0f
+        (float) output_id  + 1.0f, 0.0f
     );
 }
 
@@ -164,6 +165,6 @@ void {{name}}MM::mark_output_patched(int output_id) {
     }
 
     hv_context->sendMessageToReceiverV(MM_OUTPUT_PATCHED, 0, "ff",
-        (float) output_id, 1.0f
+        (float) output_id + 1.0f, 1.0f
     );
 }
