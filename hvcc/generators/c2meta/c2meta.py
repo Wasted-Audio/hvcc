@@ -52,7 +52,10 @@ def write_asset_files(assets: Assets, out_dir: Path) -> None:
 
     # Components: copy unique component images into assets/components/
     elements: list[UIElement] = [*assets.knobs, *assets.leds, *assets.inputs, *assets.outputs]
-    for img_path in {el.image for el in elements}:
+    component_images = {el.image.name: el.image for el in elements}
+    if len(component_images) != len({el.image for el in elements}):
+        raise ValueError("Component image filenames must be unique across different files")
+    for img_path in component_images.values():
         shutil.copyfile(img_path, components_dir / img_path.name)
 
 
