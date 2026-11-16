@@ -70,7 +70,7 @@ def write_screenshot(assets, screenshot_path: Path) -> None:
             if element.x is None or element.y is None:
                 continue
             with Image.open(element.image) as img:
-                screenshot.alpha_composite(img, (element.x, element.y))
+                screenshot.alpha_composite(img.convert('RGBA'), (element.x, element.y))
 
         screenshot.save(screenshot_path)
 
