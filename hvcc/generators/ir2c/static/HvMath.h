@@ -324,8 +324,17 @@ static inline void __hv_sqrt_f(hv_bInf_t bIn, hv_bOutf_t bOut) {
 #elif HV_SIMD_SSE
   *bOut = _mm_sqrt_ps(bIn);
 #elif HV_SIMD_NEON
-  const float32x4_t y = vrsqrteq_f32(bIn);
-  *bOut = vmulq_f32(bIn, vmulq_f32(vrsqrtsq_f32(vmulq_f32(bIn, y), y), y)); // numerical results may be inexact
+#if defined(__aarch64__)
+  *bOut = vsqrtq_f32(bIn);
+#else
+  // ARMv7 has no vector square root: x * 1/sqrt(x), with two Newton-Raphson steps on the
+  // estimate (about 12 bits after one step), and 0 for x == 0 (0 * inf would give NaN)
+  float32x4_t y = vrsqrteq_f32(bIn);
+  y = vmulq_f32(vrsqrtsq_f32(vmulq_f32(bIn, y), y), y);
+  y = vmulq_f32(vrsqrtsq_f32(vmulq_f32(bIn, y), y), y);
+  const uint32x4_t zero = vceqq_f32(bIn, vdupq_n_f32(0.0f));
+  *bOut = vreinterpretq_f32_u32(vbicq_u32(vreinterpretq_u32_f32(vmulq_f32(bIn, y)), zero));
+#endif
 #else // HV_SIMD_NONE
   *bOut = hv_sqrt_f(bIn);
 #endif
