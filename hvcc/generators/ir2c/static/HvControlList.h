@@ -24,7 +24,15 @@ extern "C" {
 #endif
 
 #define HV_MAX_DELIM_LEN 64
-#define HV_FLOAT_STR_MAX 128
+#define HV_FLOAT_STR_MAX 32
+// Raising these above the defaults on a 32-bit target requires the overflow guards
+// in cList_join_build / cList_unjoin_message_to_string / cList_unjoin_splitBy* to be correct
+#ifndef HV_MAX_LIST_TOKENS
+#define HV_MAX_LIST_TOKENS 256
+#endif
+#ifndef HV_MAX_LIST_MSG_BYTES
+#define HV_MAX_LIST_MSG_BYTES 16384
+#endif
 
 typedef enum {
     HV_LIST_APPEND,
