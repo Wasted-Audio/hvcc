@@ -17,6 +17,20 @@ Bugfixes:
 
 * Drop empty expressions (#441)
 * Correctly initialize $arg2 of `delread~` to `0`
+* NEON: correct sign of `__hv_fms_f` on ARMv8 (`[*~ k]` -> `[-~ k]` chains)
+* NEON/SSE/AVX: implement the `expr~` math functions, correct results for integer constants and comparisons
+* SIMD: signal comparisons (`<~`, `>~`, `==~`, ...) output `1.0` instead of a bit mask
+* NEON/SSE/AVX: implement `bitsafe~` (also used by cyclone's `cosx~`, `sinx~`, `tanx~`)
+* NEON: exact `sqrt` on AArch64, more accurate on ARMv7
+* AVX: `phasor~` no longer halves the phase at every wrap
+* AVX: no aligned 32-byte accesses to buffers that are only 16-byte aligned (`threshold~`, `exp`/`pow`, `lorenz~`, `processInlineInterleaved()`)
+* AVX: correct sample order in `processInlineInterleaved()`
+
+Tests:
+
+* Rebuild for every SIMD variant (SSE/AVX/NEON previously re-ran the plain C build), real NEON builds on arm64, `HV_SIMD_SSE_FMA` now tests SSE
+* Allow vector-granular timestamps for messages from signal objects in SIMD control tests
+* New tests for `fms` and interleaved processing
 
 0.17.3
 -----
