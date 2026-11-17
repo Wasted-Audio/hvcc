@@ -336,8 +336,29 @@ static void cList_unjoin_sendBang(HeavyContextInterface *_c, hv_uint32_t timesta
 }
 
 
+static bool cList_unjoin_check_output_size(int numTokens, bool symbolLike, bool firstIsSymbol,
+    hv_size_t stringBytes) {
+  // Check if the output list can be safely constructed given the number of tokens,
+  if (numTokens <= 0 || numTokens > HV_MAX_LIST_TOKENS) return false;
+
+  const bool willTag = symbolLike && firstIsSymbol;
+  const int finalNumElements = numTokens + (willTag ? 1 : 0);
+  if (finalNumElements > HV_MAX_LIST_TOKENS) return false;
+
+  const hv_size_t maxBytes = hv_min_ui((hv_size_t) HV_MAX_LIST_MSG_BYTES, (hv_size_t) 65535);
+  const hv_size_t coreSize = msg_getCoreSize(finalNumElements);
+  if (coreSize > maxBytes) return false;
+
+  const hv_size_t tagBytes = willTag ? ((numTokens == 1) ? 7 : 5) : 0;
+  if (stringBytes > maxBytes - coreSize - tagBytes) return false;
+
+  return true;
+}
+
+
 static HvMessage *cList_unjoin_splitByChar(const char *src, hv_size_t srcLen, hv_uint32_t timestamp,
-char **backingOut) {
+    char **backingOut, bool symbolLike) {
+  *backingOut = NULL;
   // One token per character. An escaped space "\ " counts as ONE token.
   // We use a scratch buffer because each token needs its own NUL terminator,
   // and "\ " is two bytes in src but one token.
@@ -355,13 +376,37 @@ char **backingOut) {
       i++;
     }
     numTokens++;
+    if (numTokens > HV_MAX_LIST_TOKENS) {
+      hv_free(chars);
+      return NULL;
+    }
+  }
+
+  if (numTokens == 0) {
+    hv_free(chars);
+    return NULL;
+  }
+
+  const bool firstIsSymbol = !cList_unjoin_is_number(chars);
+  hv_size_t stringBytes = 0;
+  const char *tok = chars;
+  for (int k = 0; k < numTokens; k++) {
+    if (!cList_unjoin_is_number(tok)) {
+      stringBytes += strlen(tok) + 1;
+    }
+    tok += strlen(tok) + 1;
+  }
+
+  if (!cList_unjoin_check_output_size(numTokens, symbolLike, firstIsSymbol, stringBytes)) {
+    hv_free(chars);
+    return NULL;
   }
 
   HvMessage *n = HV_MESSAGE_ON_HEAP(numTokens);
   hv_assert(n != NULL);
   msg_init(n, numTokens, timestamp);
 
-  const char *tok = chars;
+  tok = chars;
   for (int k = 0; k < numTokens; k++) {
     cList_unjoin_set_token(n, k, tok);
     tok += strlen(tok) + 1;
@@ -373,7 +418,8 @@ char **backingOut) {
 
 
 static HvMessage *cList_unjoin_splitByDelim(char *src, hv_size_t srcLen, const char *delim,
-  hv_uint32_t timestamp, char **escOut) {
+    hv_uint32_t timestamp, char **escOut, bool symbolLike) {
+  *escOut = NULL;
   const hv_size_t rawLen = strlen(delim);
   // Build the delimiter with its escape characters expanded,
   // e.g. "\," -> the sequence cList_join_put_delim produces for ','.
@@ -383,12 +429,49 @@ static HvMessage *cList_unjoin_splitByDelim(char *src, hv_size_t srcLen, const c
   cList_join_put_delim(str, delim);
   str[strLen] = '\0';
 
-  // Pass 1: count tokens.
-  int numTokens = 1;
-  for (hv_size_t i = 0; i < srcLen; ) {
+  // Pass 1: count tokens and calculate string bytes.
+  int numTokens = 0;
+  bool firstIsSymbol = false;
+  hv_size_t stringBytes = 0;
+  hv_size_t tokStart = 0;
+  hv_size_t i = 0;
+
+  while (i < srcLen) {
     const hv_size_t d = cList_unjoin_match_delim(src + i, str, strLen, delim, rawLen);
-    if (d) { numTokens++; i += d; }
-    else i++;
+    if (d > 0) {
+      const char saved = src[i];
+      src[i] = '\0';
+      const bool isNum = cList_unjoin_is_number(src + tokStart);
+      if (numTokens == 0) firstIsSymbol = !isNum;
+      if (!isNum) {
+        stringBytes += (i - tokStart) + 1;
+      }
+      src[i] = saved;
+      numTokens++;
+      if (numTokens > HV_MAX_LIST_TOKENS) {
+        hv_free(str);
+        return NULL;
+      }
+      i += d;
+      tokStart = i;
+    } else {
+      i++;
+    }
+  }
+
+  // Final token (from tokStart to srcLen)
+  {
+    const bool isNum = cList_unjoin_is_number(src + tokStart);
+    if (numTokens == 0) firstIsSymbol = !isNum;
+    if (!isNum) {
+      stringBytes += (srcLen - tokStart) + 1;
+    }
+    numTokens++;
+  }
+
+  if (!cList_unjoin_check_output_size(numTokens, symbolLike, firstIsSymbol, stringBytes)) {
+    hv_free(str);
+    return NULL;
   }
 
   HvMessage *n = HV_MESSAGE_ON_HEAP(numTokens);
@@ -398,7 +481,7 @@ static HvMessage *cList_unjoin_splitByDelim(char *src, hv_size_t srcLen, const c
   // Pass 2: split in place, writing NULs into src.
   char *tok = src;
   int k = 0;
-  hv_size_t i = 0;
+  i = 0;
   for (;;) {
     const hv_size_t d = (i < srcLen)
         ? cList_unjoin_match_delim(src + i, str, strLen, delim, rawLen) : 0;
@@ -560,6 +643,14 @@ static void cList_onJoin(HeavyContextInterface *_c, ControlList *o, const HvMess
   const bool trimmed = (m1 != m);
 
   const hv_size_t size = cList_join_build(m1, o->delim, NULL);
+  const hv_size_t maxBytes = hv_min_ui((hv_size_t) HV_MAX_LIST_MSG_BYTES, (hv_size_t) 65535);
+  // ["symbol", <str>] has 2 elements: coreSize(2) + "symbol\0" (7) + <str>\0 (size + 1)
+  const hv_size_t tagAndCore = msg_getCoreSize(2) + 8;
+  if (tagAndCore > maxBytes || size > maxBytes - tagAndCore) {
+    if (trimmed) msg_free(m1);
+    return;
+  }
+
   char *str = (char *) hv_malloc(size + 1);
   hv_assert(str != NULL);
   cList_join_build(m1, o->delim, str);
@@ -592,12 +683,14 @@ static void cList_onUnjoin(HeavyContextInterface *_c, ControlList *o, const HvMe
 
   char *backing = NULL;
   HvMessage *n = (strlen(o->delim) == 0)
-      ? cList_unjoin_splitByChar(input.src, input.srcLen, ts, &backing)
-      : cList_unjoin_splitByDelim(input.src, input.srcLen, o->delim, ts, &backing);
+      ? cList_unjoin_splitByChar(input.src, input.srcLen, ts, &backing, input.symbolLike)
+      : cList_unjoin_splitByDelim(input.src, input.srcLen, o->delim, ts, &backing, input.symbolLike);
 
-  cList_unjoin_emitTokens(_c, n, input.symbolLike, sendMessage);
+  if (n != NULL) {
+    cList_unjoin_emitTokens(_c, n, input.symbolLike, sendMessage);
+    msg_free(n);
+  }
 
-  msg_free(n);
   hv_free(backing);
   cList_unjoin_freeInput(&input);
 }
