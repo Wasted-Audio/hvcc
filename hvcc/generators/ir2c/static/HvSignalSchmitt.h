@@ -38,8 +38,9 @@ hv_size_t sSchmitt_init(SignalSchmitt *o, float tVal, float tDeb, float rVal, fl
 
 static inline void __hv_schmitt_f(HeavyContextInterface *_c, SignalSchmitt *o, hv_bInf_t bIn,
     void (*sendMessage)(HeavyContextInterface *, int, const HvMessage *)) {
+  // a local array is not SIMD-aligned, and __hv_store_f() is an aligned store
   float bIn_array[HV_N_SIMD];
-  __hv_store_f(bIn_array, bIn);
+  hv_memcpy(bIn_array, &bIn, sizeof(bIn_array));
 
   hv_uint32_t blockStart = hv_getCurrentSample(_c);
   if (o->lastBlockStart != blockStart) {
