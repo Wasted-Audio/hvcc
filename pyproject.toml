@@ -30,7 +30,7 @@ Jinja2 = ">=2.11"
 pydantic = ">=2.9.1"
 pydantic-extra-types = "^2.10.6"
 arpeggio = "^2.0.2"
-pillow = "11.3.0"
+pillow = "12.3.0"
 
 [tool.poetry.group.dev.dependencies]
 numpy = "^2.0.1"
