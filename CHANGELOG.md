@@ -7,6 +7,7 @@ Next Release
 Features:
 
 * New MetaModule generator
+* Support '[list]' foreach/join/unjoin functions
 
 Updates:
 

@@ -23,19 +23,37 @@
 extern "C" {
 #endif
 
+#define HV_MAX_DELIM_LEN 64
+#define HV_FLOAT_STR_MAX 128
+
 typedef enum {
     HV_LIST_APPEND,
     HV_LIST_PREPEND,
     HV_LIST_SPLIT,
     HV_LIST_STORE,
     HV_LIST_TRIM,
-    HV_LIST_LENGTH
+    HV_LIST_LENGTH,
+    HV_LIST_FOREACH,
+    HV_LIST_JOIN,
+    HV_LIST_UNJOIN
 } hvListType;
 
 typedef struct ControlList {
   hvListType type;
-  HvMessage* list;
+  int stride;
+  char delim[HV_MAX_DELIM_LEN];
+  HvMessage *list;
 } ControlList;
+
+typedef struct CListInput {
+  // Helper struct for Unjoin operation
+  HvMessage *trimmed;           // owned if != m (caller must free if trimmedIsOwned)
+  bool       trimmedIsOwned;    // true if trimmed != original message
+  bool       symbolLike;        // true if input is a symbol or tagged as "symbol"
+  char      *src;               // owned - allocated by cList_unjoin_message_to_string
+  hv_size_t  srcLen;            // length of src (excluding NUL terminator)
+  bool       emitBang;          // empty or numeric: caller just sends bang (PD convention)
+} CListInput;
 
 hv_size_t cList_init(ControlList *o, hvListType type);
 
