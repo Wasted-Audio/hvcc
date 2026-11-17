@@ -14,19 +14,18 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from typing import Optional
+
+from hvcc.types.Heavy import Heavy, HvPos
 
 from .NotificationEnum import NotificationEnum
 from .PdObject import PdObject
-
-from hvcc.types.Heavy import Heavy, HvPos
 
 
 class PdPackObject(PdObject):
     def __init__(
         self,
         obj_type: str,
-        obj_args: Optional[list] = None,
+        obj_args: list | None = None,
         pos_x: int = 0,
         pos_y: int = 0
     ) -> None:
@@ -41,7 +40,7 @@ class PdPackObject(PdObject):
         for i, x in enumerate(self.obj_args):
             try:
                 self.values.append(float(x))
-            except Exception:
+            except ValueError:
                 if x in ("f", "float") or (i > 0 and x in ("s", "symbol")):
                     self.values.append(0.0)
                 else:

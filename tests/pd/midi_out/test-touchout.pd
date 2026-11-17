@@ -1,0 +1,5 @@
+#N canvas 572 166 503 302 12;
+#X obj 97 61 touchin;
+#X obj 97 132 touchout;
+#X connect 0 0 1 0;
+#X connect 0 1 1 1;

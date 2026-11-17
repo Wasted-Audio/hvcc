@@ -85,12 +85,12 @@ So, a very simple but viable board description might look like:
 }
 ```
 
-### Notes
-
-- Components names are always turned to lower-case.
-  - It is best to use lower-case in both your board.json and patch file to minimize confusion!
-- Pin numbers are based on the Digital pin numbering on the [Seed pinout](https://daisy.audio/hardware/Seed/#pinout).
-  - This means that `"pin": 20` refers to `D20` on the Daisy Seed.
+> [!NOTE]
+>
+> - Components names are always turned to lower-case.
+>   - It is best to use lower-case in both your board.json and patch file to minimize confusion!
+> - Pin numbers are based on the Digital pin numbering on the [Seed pinout](https://daisy.audio/hardware/Seed/#pinout).
+>   - This means that `"pin": 20` refers to `D20` on the Daisy Seed.
 
 ### Component reference
 
@@ -103,7 +103,7 @@ So, a very simple but viable board description might look like:
 | Switch | _press | Returns a float representing the current state (1 = pressed, 0 = not pressed) |
 | Switch | _fall | Returns a bang on the signal's falling edge (i.e. when the switch is released). |
 | Switch | _seconds | Returns a float representing the number of seconds the switch has been held down. |
-| Switch3 | --- | Returns a float representing the current state, either 0 or 1. |
+| Switch3 | --- | Returns a float representing the current state. Either 0 (center), 1 (left/up) or 2 (right/down). |
 | Encoder | --- | Returns a 1 if turned one direction, -1 if turned in the other, and 0 otherwise. |
 | Encoder | \_rise | Returns a bang when the encoder is pressed. The special alias _EncSwitch_ is always bound to this. |
 | Encoder | _press | Same as switch _press. |
@@ -143,6 +143,8 @@ Some boards like the [Patch](https://github.com/Wasted-Audio/hvcc/blob/develop/h
 An empty `"display": {}` section triggers inclusion via the default configuration. However by itself it doesn't do anything. You can add several optional settings to use the oled.
 
 - `driver` - Which oled driver to use.
+- `config` - Additional [OLED configuration](https://github.com/electro-smith/libDaisy/blob/master/src/dev/oled_ssd130x.h#L30-L35) options as a dictionary.
+- `dim` - Specific OLED dimensions (defaults to `[128, 64]`)
 - `process` - Inline C++ code for the `Display()` function.
 - `process_file` - External C++ file with `Display()` function. This overrides the inline code.
 - `params` - List of `@hv_param` sends meant for display. These can be float values and available in the code prepended with `f`, like `fcustom1` for instance.
@@ -173,4 +175,19 @@ Example:
   hardware.display.WriteString(tmp, Font_6x8, true);
 
   hardware.display.Update();
+```
+
+You can also display a table from your patch. Here the name of the table is `scope`:
+
+```cpp
+    hardware.display.Fill(0);
+
+    float* table_buffer = hv->getBufferForTable(hv->getHashForString("scope"));
+    for (int i=0; i<128; i++)
+    {
+        int pixel = (int) ((table_buffer[i] * -1.0f + 1.0f) * 32.0f);
+        hardware.display.DrawPixel(i, pixel, true);
+    }
+
+    hardware.display.Update();
 ```

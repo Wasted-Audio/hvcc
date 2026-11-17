@@ -14,13 +14,16 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from typing import Dict, List
+from collections.abc import Mapping
+from types import MappingProxyType
+from typing import Final
+
 from .HeavyObject import HeavyObject
 
 
 class ControlBinop(HeavyObject):
     # a dictionary translating from the operation argument to the C case
-    __OPERATION_DICT = {
+    __OPERATION_DICT: Final[Mapping[str, str]] = MappingProxyType({
         "__add": "HV_BINOP_ADD",
         "__add_k": "HV_BINOP_ADD",
         "__sub": "HV_BINOP_SUBTRACT",
@@ -70,7 +73,7 @@ class ControlBinop(HeavyObject):
         "__unimod_k": "HV_BINOP_MOD_UNIPOLAR",
         "__bimod": "HV_BINOP_MOD_BIPOLAR",
         "__bimod_k": "HV_BINOP_MOD_BIPOLAR"
-    }
+    })
 
     c_struct = "ControlBinop"
     preamble = "cBinop"
@@ -90,19 +93,19 @@ class ControlBinop(HeavyObject):
         return {"HvControlBinop.h", "HvControlBinop.c"}
 
     @classmethod
-    def get_C_init(cls, obj_type: str, obj_id: str, args: Dict) -> List[str]:
+    def get_C_init(cls, obj_type: str, obj_id: str, args: dict) -> list[str]:
         if obj_type.endswith("_k"):
             return []
         else:
-            obj_arg = float(list(args.values())[0])
+            obj_arg = float(next(iter(args.values())))
             return [f"cBinop_init(&cBinop_{obj_id}, {obj_arg}f); // {obj_type}"]
 
     @classmethod
-    def get_C_free(cls, obj_type: str, obj_id: str, args: Dict) -> List[str]:
+    def get_C_free(cls, obj_type: str, obj_id: str, args: dict) -> list[str]:
         return []  # no need to free any control binop objects
 
     @classmethod
-    def get_C_onMessage(cls, obj_type: str, obj_id: str, inlet_index: int, args: Dict) -> List[str]:
+    def get_C_onMessage(cls, obj_type: str, obj_id: str, inlet_index: int, args: dict) -> list[str]:
         if obj_type.endswith("_k"):
             return [
                 "cBinop_k_onMessage(_c, NULL, {0}, {1}f, {2}, m, &cBinop_{3}_sendMessage);".format(

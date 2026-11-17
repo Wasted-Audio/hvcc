@@ -98,6 +98,7 @@ bool msg_hasFormat(const HvMessage *m, const char *fmt) {
   hv_assert(fmt != NULL);
   const int n = msg_getNumElements(m);
   for (int i = 0; i < n; ++i) {
+    if (fmt[i] == '\0') return false; // Stop if the format string is shorter than the message
     switch (fmt[i]) {
       case 'b': if (!msg_isBang(m, i)) return false; break;
       case 'f': if (!msg_isFloat(m, i)) return false; break;

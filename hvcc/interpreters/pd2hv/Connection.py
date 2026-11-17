@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from typing import Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from .PdObject import PdObject
@@ -29,7 +29,7 @@ class Connection:
         outlet_index: int,
         to_obj: 'PdObject',
         inlet_index: int,
-        conn_type: Optional[str]  # not actually Optional. This is due to the requirement in HeavyObject.
+        conn_type: str | None  # not actually Optional. This is due to the requirement in HeavyObject.
     ) -> None:
         assert from_obj is not None
         assert to_obj is not None

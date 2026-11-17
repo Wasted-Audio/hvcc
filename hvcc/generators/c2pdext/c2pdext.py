@@ -16,17 +16,22 @@
 
 import shutil
 import time
+from pathlib import Path
+
 import jinja2
 
-from typing import Optional
-from pathlib import Path
+from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
+from hvcc.types.compiler import (
+    CompilerMsg,
+    CompilerNotif,
+    CompilerResp,
+    ExternInfo,
+    Generator,
+)
+from hvcc.types.meta import Meta
 
 from ..copyright import copyright_manager
 from ..filters import filter_max
-
-from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
-from hvcc.types.compiler import Generator, CompilerResp, CompilerNotif, CompilerMsg, ExternInfo
-from hvcc.types.meta import Meta
 
 
 class c2pdext(Generator):
@@ -40,14 +45,15 @@ class c2pdext(Generator):
         out_dir: Path,
         externs: ExternInfo,
         patch_name: str,
-        patch_meta: Meta = Meta(),
+        patch_meta: Meta,
         num_input_channels: int = 0,
         num_output_channels: int = 0,
-        copyright: Optional[str] = None,
-        verbose: Optional[bool] = False
+        copyright: str | None = None,
+        verbose: bool | None = False
     ) -> CompilerResp:
 
         tick = time.time()
+        patch_meta = patch_meta or Meta()
 
         out_dir = Path(out_dir, "pdext")
         receiver_list = externs.parameters.inParam
@@ -102,7 +108,7 @@ class c2pdext(Generator):
                 compile_time=time.time() - tick
             )
 
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001
             return CompilerResp(
                 stage="c2pdext",
                 notifs=CompilerNotif(

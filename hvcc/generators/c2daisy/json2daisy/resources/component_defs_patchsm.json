@@ -64,7 +64,7 @@
 		"mapping": [
 			{
 				"name": "{name}",
-				"get": "({class_name}.{name}.Read()*0.5f+0.5f)",
+				"get": "({class_name}.{name}.Read())",
 				"range": [
 					0,
 					2

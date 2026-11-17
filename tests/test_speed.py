@@ -15,7 +15,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
-
 from pathlib import Path
 
 from tests.framework.base_speed import TestPdSpeedBase

@@ -16,17 +16,23 @@
 
 import shutil
 import time
+from pathlib import Path
+
 import jinja2
 
-from typing import Optional
-from pathlib import Path
+from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
+from hvcc.types.compiler import (
+    CompilerMsg,
+    CompilerNotif,
+    CompilerResp,
+    ExternInfo,
+    Generator,
+)
+from hvcc.types.meta import Meta
 
 from ..copyright import copyright_manager
 from ..filters import filter_plugin_id
-
-from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
-from hvcc.types.compiler import Generator, CompilerResp, CompilerNotif, CompilerMsg, ExternInfo
-from hvcc.types.meta import Meta
+from ..HeavyGenException import HeavyGenException
 
 
 class c2wwise(Generator):
@@ -40,14 +46,15 @@ class c2wwise(Generator):
         c_src_dir: Path,
         out_dir: Path,
         externs: ExternInfo,
-        patch_name: Optional[str] = None,
-        patch_meta: Meta = Meta(),
+        patch_name: str,
+        patch_meta: Meta,
         num_input_channels: int = 0,
         num_output_channels: int = 0,
-        copyright: Optional[str] = None,
-        verbose: Optional[bool] = False
+        copyright: str | None = None,
+        verbose: bool | None = False
     ) -> CompilerResp:
         tick = time.time()
+        patch_meta = patch_meta or Meta()
 
         in_parameter_list = externs.parameters.inParam
         out_parameter_list = externs.parameters.outParam
@@ -88,13 +95,12 @@ class c2wwise(Generator):
             elif num_output_channels == 12:
                 channel_config = "AK_SPEAKER_SETUP_DOLBY_7_1_4"
             else:
-                raise Exception("Wwise plugins support only mono, stereo, 5.1, 7.1, "
+                raise HeavyGenException("Wwise plugins support only mono, stereo, 5.1, 7.1, "
                                 "and 7.1.4 (Atmos) configurations, number of [dac~] channels should be appropriate")
 
-            if plugin_type == "FX":
-                if num_input_channels != num_output_channels:
-                    raise Exception("Wwise FX plugins require the same input/output channel"
-                                    "configuration (i.e. [adc~ 1] -> [dac~ 1]).")
+            if plugin_type == "FX" and  num_input_channels != num_output_channels:
+                raise HeavyGenException("Wwise FX plugins require the same input/output channel"
+                                "configuration (i.e. [adc~ 1] -> [dac~ 1]).")
 
             patch_src_dir = Path(out_dir, "SoundEnginePlugin", "Heavy")
             if patch_src_dir.exists():
@@ -137,7 +143,7 @@ class c2wwise(Generator):
                 compile_time=time.time() - tick
             )
 
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001
             return CompilerResp(
                 stage="c2wwise",
                 notifs=CompilerNotif(

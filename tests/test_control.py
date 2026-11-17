@@ -16,7 +16,6 @@
 
 import argparse
 import unittest
-
 from pathlib import Path
 
 from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
@@ -332,6 +331,9 @@ class TestPdControlPatches(TestPdControlBase):
 
     def test_extern_table(self):
         self._test_control_patch("test-extern_table.pd")
+
+    def test_inlet(self):
+        self._test_control_patch("test-inlet.pd")
 
     # list operations
 

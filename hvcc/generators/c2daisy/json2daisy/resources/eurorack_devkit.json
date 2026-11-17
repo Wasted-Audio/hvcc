@@ -1,0 +1,145 @@
+{
+    "name": "eurorack_devkit",
+    "som": "seed",
+    "defines": {
+        "HAS_MIDI": 1
+    },
+    "audio": {
+        "channels": 2
+    },
+    "parents": {
+        "pot_mux": {
+            "component": "CD4051",
+            "mux_count": 8,
+            "pin": {
+                "adc": 15,
+                "sel0": 24,
+                "sel1": 25,
+                "sel2": 26
+            }
+        }
+    },
+    "components": {
+        "sw1": {
+            "component": "Switch",
+            "pin": 0
+        },
+        "sw2": {
+            "component": "Switch",
+            "pin": 20
+        },
+        "sw3": {
+            "component": "Switch3",
+            "pin": {
+                "a": 27,
+                "b": 7
+            }
+        },
+        "sw4": {
+            "component": "Switch",
+            "pin": 12
+        },
+        "pot1": {
+            "component": "CD4051AnalogControl",
+            "index": 0,
+            "parent": "pot_mux"
+        },
+        "pot2": {
+            "component": "CD4051AnalogControl",
+            "index": 1,
+            "parent": "pot_mux"
+        },
+        "pot3": {
+            "component": "CD4051AnalogControl",
+            "index": 2,
+            "parent": "pot_mux"
+        },
+        "pot4": {
+            "component": "CD4051AnalogControl",
+            "index": 3,
+            "parent": "pot_mux"
+        },
+        "pot5": {
+            "component": "CD4051AnalogControl",
+            "index": 4,
+            "parent": "pot_mux"
+        },
+        "pot6": {
+            "component": "CD4051AnalogControl",
+            "index": 5,
+            "parent": "pot_mux"
+        },
+        "pot7": {
+            "component": "CD4051AnalogControl",
+            "index": 6,
+            "parent": "pot_mux"
+        },
+        "pot8": {
+            "component": "CD4051AnalogControl",
+            "index": 7,
+            "parent": "pot_mux"
+        },
+        "cv1": {
+            "component": "AnalogControlBipolar",
+            "pin": 18
+        },
+        "cv2": {
+            "component": "AnalogControlBipolar",
+            "pin": 17
+        },
+        "cv3": {
+            "component": "AnalogControlBipolar",
+            "pin": 16
+        },
+        "cv4": {
+            "component": "AnalogControlBipolar",
+            "pin": 19
+        },
+        "gate_in1": {
+            "component": "GateIn",
+            "pin": 10
+        },
+        "gate_in2": {
+            "component": "GateIn",
+            "pin": 21
+        },
+        "led1": {
+            "component": "RgbLed",
+            "pin": {
+                "r": 9,
+                "g": 28,
+                "b": 8
+            },
+            "invert": "false"
+        },
+        "led2": {
+            "component": "Led",
+            "pin": 11,
+            "invert": "false"
+        },
+        "cvout1": {
+            "component": "CVOuts"
+        },
+        "cvout2": {
+            "component": "CVOuts"
+        }
+    },
+    "aliases": {
+        "knob1": "pot1",
+        "vr1": "pot1",
+        "knob2": "pot2",
+        "vr2": "pot2",
+        "knob3": "pot3",
+        "vr3": "pot3",
+        "knob4": "pot4",
+        "vr4": "pot4",
+        "knob5": "pot5",
+        "vr5": "pot5",
+        "knob6": "pot6",
+        "vr6": "pot6",
+        "knob7": "pot7",
+        "vr7": "pot7",
+        "knob8": "pot8",
+        "vr8": "pot8"
+    }
+}

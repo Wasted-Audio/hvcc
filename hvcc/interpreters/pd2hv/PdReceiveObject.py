@@ -14,12 +14,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from typing import Optional
-
-from .PdObject import PdObject
-from .PdRaw import parse_pd_raw_args, PdRawException
 
 from hvcc.types.Heavy import Heavy, HvPos
+
+from .PdObject import PdObject
+from .PdRaw import PdRawException, parse_pd_raw_args
 
 
 class PdReceiveObject(PdObject):
@@ -29,7 +28,7 @@ class PdReceiveObject(PdObject):
     def __init__(
         self,
         obj_type: str,
-        obj_args: Optional[list] = None,
+        obj_args: list | None = None,
         pos_x: int = 0,
         pos_y: int = 0
     ) -> None:
@@ -58,7 +57,7 @@ class PdReceiveObject(PdObject):
                     self.__extern_type = "event"
                 elif int(self.obj_args[1]):
                     self.__priority = int(self.obj_args[1])
-        except Exception:
+        except (IndexError, ValueError):
             pass
 
         if self.__extern_type == "param":
@@ -76,7 +75,7 @@ class PdReceiveObject(PdObject):
             except ValueError:
                 self.add_warning(
                     f"Minimum, maximum, and default values for Parameter {self.__receiver_name}  must be numbers.")
-            except Exception:
+            except IndexError:
                 pass
 
             if not (self.__attributes["min"] <= self.__attributes["default"]):
@@ -101,9 +100,8 @@ class PdReceiveObject(PdObject):
                 self.add_error(str(e))
 
     def validate_configuration(self) -> None:
-        if self.obj_type in ("r~", "receive~"):
-            if len(self._inlet_connections.get("0", [])) > 0:
-                self.add_error("[receive~] inlet connections are not supported.")
+        if self.obj_type in ("r~", "receive~") and len(self._inlet_connections.get("0", [])) > 0:
+            self.add_error("[receive~] inlet connections are not supported.")
 
     def to_hv(self) -> Heavy:
         # note: control rate send objects should not modify their name argument

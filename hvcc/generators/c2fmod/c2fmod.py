@@ -3,16 +3,21 @@
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
-import jinja2
 import os
 import shutil
 import time
-
-from typing import Optional
 from pathlib import Path
 
+import jinja2
+
 from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
-from hvcc.types.compiler import Generator, CompilerResp, CompilerNotif, CompilerMsg, ExternInfo
+from hvcc.types.compiler import (
+    CompilerMsg,
+    CompilerNotif,
+    CompilerResp,
+    ExternInfo,
+    Generator,
+)
 from hvcc.types.meta import Meta
 
 from ..copyright import copyright_manager
@@ -28,13 +33,14 @@ class c2fmod(Generator):
         out_dir: Path,
         externs: ExternInfo,
         patch_name: str,
-        patch_meta: Meta = Meta(),
+        patch_meta: Meta,
         num_input_channels: int = 0,
         num_output_channels: int = 0,
-        copyright: Optional[str] = None,
-        verbose: Optional[bool] = False,
+        copyright: str | None = None,
+        verbose: bool | None = False,
     ) -> CompilerResp:
         tick = time.time()
+        patch_meta = patch_meta or Meta()
 
         patch_name = patch_name.lower() if patch_name is not None else "heavy"
 
@@ -65,7 +71,7 @@ class c2fmod(Generator):
                 shutil.rmtree(patch_src_dir)
             shutil.copytree(c_src_dir, patch_src_dir)
 
-            heavy_src_files = [f for f in os.listdir(c_src_dir) if f.endswith(".c") or f.endswith(".cpp")]
+            heavy_src_files = [f for f in os.listdir(c_src_dir) if f.endswith((".c", ".cpp"))]
 
             src_ext_list = ["h", "hpp", "c", "cpp", "js", "md", "txt"]
 
@@ -101,7 +107,7 @@ class c2fmod(Generator):
                 compile_time=time.time() - tick
             )
 
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001
             return CompilerResp(
                 stage="c2fmod",
                 notifs=CompilerNotif(

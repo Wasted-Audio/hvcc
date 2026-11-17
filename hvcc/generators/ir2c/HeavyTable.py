@@ -14,7 +14,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from typing import Dict, List
 
 from .HeavyObject import HeavyObject
 
@@ -35,7 +34,7 @@ class HeavyTable(HeavyObject):
         return {"HvTable.h", "HvTable.c"}
 
     @classmethod
-    def get_table_data_decl(cls, obj_type: str, obj_id: str, args: Dict) -> List[str]:
+    def get_table_data_decl(cls, obj_type: str, obj_id: str, args: dict) -> list[str]:
         if len(args.get("values", [])) > 0:
             return [
                 "float hTable_{0}_data[{1}] = {{{2}}};".format(
@@ -46,7 +45,7 @@ class HeavyTable(HeavyObject):
             return []
 
     @classmethod
-    def get_C_init(cls, obj_type: str, obj_id: str, args: Dict) -> List[str]:
+    def get_C_init(cls, obj_type: str, obj_id: str, args: dict) -> list[str]:
         if len(args.get("values", [])) > 0:
             return [
                 "hTable_initWithData(&hTable_{0}, {1}, hTable_{0}_data);".format(
@@ -59,13 +58,13 @@ class HeavyTable(HeavyObject):
                     int(args.get("size", 256)))]  # 1KB default memory allocation
 
     @classmethod
-    def get_C_free(cls, obj_type: str, obj_id: str, args: Dict) -> List[str]:
+    def get_C_free(cls, obj_type: str, obj_id: str, args: dict) -> list[str]:
         return ["{0}_free(&{0}_{1});".format(
             cls.preamble,
             obj_id)]
 
     @classmethod
-    def get_C_onMessage(cls, obj_type: str, obj_id: str, inlet_index: int, args: Dict) -> List[str]:
+    def get_C_onMessage(cls, obj_type: str, obj_id: str, inlet_index: int, args: dict) -> list[str]:
         return [
             f"hTable_onMessage(_c, &Context(_c)->hTable_{obj_id}, {inlet_index}, m, &hTable_{obj_id}_sendMessage);"
         ]

@@ -13,7 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from typing import Dict, List
 
 from .HeavyObject import HeavyObject
 
@@ -32,13 +31,13 @@ class ControlList(HeavyObject):
         return {"HvControlList.h", "HvControlList.c"}
 
     @classmethod
-    def get_C_init(cls, obj_type: str, obj_id: str, args: Dict) -> List[str]:
+    def get_C_init(cls, obj_type: str, obj_id: str, args: dict) -> list[str]:
         return ["{0}_init(&{0}_{1}, HV_LIST_{2});".format(
             cls.preamble, obj_id, args["type"].upper()
         )]
 
     @classmethod
-    def get_C_onMessage(cls, obj_type: str, obj_id: str, inlet_index: int, args: Dict) -> List[str]:
+    def get_C_onMessage(cls, obj_type: str, obj_id: str, inlet_index: int, args: dict) -> list[str]:
         return [
             "{0}_onMessage(_c, &Context(_c)->{0}_{1}, {2}, m, "
             "&{0}_{1}_sendMessage);".format(cls.preamble, obj_id, inlet_index)

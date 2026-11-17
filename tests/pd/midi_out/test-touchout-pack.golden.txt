@@ -1,0 +1,14 @@
+[@ 0.000] touchout: 0 0
+[@ 0.000] touchout: 0 1
+[@ 0.000] touchout: 1 0
+[@ 0.000] touchout: 1 1
+[@ 0.000] touchout: 2 0
+[@ 0.000] touchout: 2 1
+[@ 0.000] touchout: 3 0
+[@ 0.000] touchout: 4 0
+[@ 0.000] touchout: 3 1
+[@ 0.000] touchout: 4 1
+[@ 0.000] touchout: 5 0
+[@ 0.000] touchout: 3 1
+[@ 0.000] touchout: 2 1
+[@ 0.000] touchout: 1 1

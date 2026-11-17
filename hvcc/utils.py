@@ -13,14 +13,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import sys
 import argparse
 import json
+import sys
 
 from hvcc.core.hv2ir.HeavyLangObject import HeavyLangObject
 from hvcc.interpreters.pd2hv.PdParser import PdParser
-from hvcc.types.meta import Meta, DPF, Daisy
-
+from hvcc.types.meta import DPF, Daisy, Meta
 
 gens = {
     "dpf": DPF,

@@ -17,18 +17,24 @@
 import os
 import subprocess
 import time
+from pathlib import Path
+from shutil import which
+from typing import Final
+
 import jinja2
 
-from shutil import which
-from typing import Optional
-from pathlib import Path
-
-from hvcc.core.hv2ir.HeavyException import HeavyException
-from ..copyright import copyright_manager
-
 from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
-from hvcc.types.compiler import Generator, CompilerResp, CompilerNotif, CompilerMsg, ExternInfo
+from hvcc.types.compiler import (
+    CompilerMsg,
+    CompilerNotif,
+    CompilerResp,
+    ExternInfo,
+    Generator,
+)
 from hvcc.types.meta import Meta
+
+from ..copyright import copyright_manager
+from ..HeavyGenException import HeavyGenException
 
 
 class c2js(Generator):
@@ -36,7 +42,7 @@ class c2js(Generator):
     emscripten library to be installed - https://github.com/kripken/emscripten
     """
 
-    __HV_API = [
+    __HV_API: Final[tuple[str, ...]] = (
         "_hv_{0}_new",
         "_hv_{0}_new_with_options",
         "_hv_delete",
@@ -63,7 +69,7 @@ class c2js(Generator):
         "_hv_sendMessageToReceiverFF",
         "_hv_sendMessageToReceiverFFF",
         "_malloc"  # Rationale: https://github.com/emscripten-core/emscripten/issues/6882#issuecomment-406745898
-    ]
+    )
 
     @classmethod
     def run_emscripten(
@@ -88,7 +94,7 @@ class c2js(Generator):
             emcc_path = which("emcc")
 
         if emcc_path is None:
-            raise HeavyException("emcc is not in the PATH")
+            raise HeavyGenException("emcc is not in the PATH")
 
         c_flags = [
             f"-I {c_src_dir}",
@@ -99,8 +105,8 @@ class c2js(Generator):
             "-Wall"
         ]
 
-        c_src_paths = [Path(c_src_dir, c) for c in os.listdir(c_src_dir) if c.endswith((".c"))]
-        cpp_src_paths = [Path(c_src_dir, cpp) for cpp in os.listdir(c_src_dir) if cpp.endswith((".cpp"))]
+        c_src_paths = [Path(c_src_dir, c) for c in os.listdir(c_src_dir) if c.endswith(".c")]
+        cpp_src_paths = [Path(c_src_dir, cpp) for cpp in os.listdir(c_src_dir) if cpp.endswith(".cpp")]
         obj_paths = []
         cmd = ""
 
@@ -167,14 +173,15 @@ class c2js(Generator):
         out_dir: Path,
         externs: ExternInfo,
         patch_name: str,
-        patch_meta: Meta = Meta(),
+        patch_meta: Meta,
         num_input_channels: int = 0,
         num_output_channels: int = 0,
-        copyright: Optional[str] = None,
-        verbose: Optional[bool] = False
+        copyright: str | None = None,
+        verbose: bool | None = False
     ) -> CompilerResp:
 
         tick = time.time()
+
 
         parameter_list = externs.parameters.inParam
         parameter_out_list = externs.parameters.outParam
@@ -273,11 +280,11 @@ class c2js(Generator):
                 stage="c2js",
                 in_dir=c_src_dir,
                 out_dir=out_dir,
-                out_file=js_out_file,
+                out_file=Path(js_out_file),
                 compile_time=time.time() - tick
             )
 
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001
             return CompilerResp(
                 stage="c2js",
                 notifs=CompilerNotif(

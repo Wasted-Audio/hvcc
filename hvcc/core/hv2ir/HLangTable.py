@@ -15,11 +15,10 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import re
-from typing import Optional, Dict
 
-from .HeavyLangObject import HeavyLangObject
-from .HeavyIrObject import HeavyIrObject
 from .HeavyGraph import HeavyGraph
+from .HeavyIrObject import HeavyIrObject
+from .HeavyLangObject import HeavyLangObject
 
 
 class HLangTable(HeavyLangObject):
@@ -29,9 +28,9 @@ class HLangTable(HeavyLangObject):
     def __init__(
         self,
         obj_type: str,
-        args: Dict,
+        args: dict,
         graph: 'HeavyGraph',
-        annotations: Optional[Dict] = None
+        annotations: dict | None = None
     ) -> None:
         assert obj_type == "table"
         super().__init__(obj_type, args, graph, annotations=annotations)
@@ -40,12 +39,11 @@ class HLangTable(HeavyLangObject):
         if len(self.args.get("values", [])) > 0:
             self.args["size"] = len(self.args["values"])
 
-        if self.args["extern"]:
-            # externed tables must contain only alphanumeric characters or underscores,
-            # so that the names can be easily and transparently turned into code
-            if re.search(r"\W", args["name"]):
-                self.add_error(f"Table names may only contain alphanumeric characters \
-                                or underscore: '{args['name']}'")
+        # externed tables must contain only alphanumeric characters or underscores,
+        # so that the names can be easily and transparently turned into code
+        if self.args["extern"] and  re.search(r"\W", args["name"]):
+            self.add_error(f"Table names may only contain alphanumeric characters \
+                            or underscore: '{args['name']}'")
 
     def reduce(self) -> tuple:
         x = HeavyIrObject("__table", self.args)
