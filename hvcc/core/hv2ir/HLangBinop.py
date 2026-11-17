@@ -70,7 +70,34 @@ class HLangBinop(HeavyLangObject):
         """
         return obj_type in HLangBinop.__HEAVY_DICT
 
+    # signal comparisons: the IR objects return a bit mask with SIMD (all bits set for true),
+    # but Pd's <~, >~, ==~ etc. (and cyclone's lessthan~ etc.) output 1.0 or 0.0
+    __SIGNAL_COMPARISONS: Final[frozenset[str]] = frozenset({
+        "__gt~f", "__gte~f", "__eq~f", "__neq~f", "__lt~f", "__lte~f"})
+
     def reduce(self) -> tuple | None:
+        result = self._reduce()
+        if result is None:
+            return None
+        return self.__comparison_to_one(*result)
+
+    def __comparison_to_one(self, obj_set: set, connections: list) -> tuple:
+        """Mask the result of a float signal comparison with 1.0: [__lt~f] -> [__and~f 1.0].
+        With HV_SIMD_NONE the comparison already gives 1.0 or 0.0, and __and~f passes it through.
+        """
+        cmp = [x for x in obj_set if x.type in HLangBinop.__SIGNAL_COMPARISONS]
+        if not cmp:
+            return (obj_set, connections)
+        x = cmp[0]
+        a = HeavyIrObject("__and~f")
+        k = HeavyIrObject("__var_k~f", args={"k": 1.0})
+        moved = []
+        for old, new_conns in connections:
+            moved.append((old, [c.copy(from_object=a) if c.from_object is x else c for c in new_conns]))
+        moved.append((None, [Connection(x, 0, a, 0, "~f>"), Connection(k, 0, a, 1, "~f>")]))
+        return (obj_set | {a, k}, moved)
+
+    def _reduce(self) -> tuple | None:
         if self.has_inlet_connection_format("__") or \
                 self.has_inlet_connection_format("_c") or \
                 self.has_inlet_connection_format("_f") or \
