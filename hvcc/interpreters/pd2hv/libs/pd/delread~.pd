@@ -24,7 +24,7 @@
 #X obj 88 31 inlet;
 #X restore 87 436 pd @hv_obj __delay \$2;
 #X obj 75 520 outlet~;
-#X text 74 562 @hv_arg \$2 delay float 10 true;
+#X text 74 562 @hv_arg \$2 delay float 0 false;
 #X text 74 543 @hv_arg \$1 table string "" true;
 #X msg 95 407 clear;
 #X obj 224 469 t a a;
