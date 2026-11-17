@@ -1307,13 +1307,28 @@ static inline void __hv_ldexp_f(hv_bInf_t bIn0, hv_bInf_t bIn1, hv_bOutf_t bOut)
 #endif
 }
 
+// bitsafe: replace NaN and +/-inf by 0. The SIMD versions test the exponent bits (all set
+// for NaN and inf) instead of comparisons, which -ffast-math may optimise away.
+#if HV_SIMD_SSE || HV_SIMD_AVX
+static inline __m128 __hv_bitsafe_sse(__m128 x) {
+  const __m128i e = _mm_set1_epi32(0x7f800000);
+  __m128i nonfinite = _mm_cmpeq_epi32(_mm_and_si128(_mm_castps_si128(x), e), e);
+  return _mm_andnot_ps(_mm_castsi128_ps(nonfinite), x);
+}
+#endif
+
 static inline void __hv_bitsafe_f(hv_bInf_t bIn0, hv_bOutf_t bOut) {
 #if HV_SIMD_AVX
-  hv_assert(0); // __hv_bitsafe_f() not implemented
+  // AVX has no 256-bit integer operations: process both halves with SSE2
+  __m128 lo = __hv_bitsafe_sse(_mm256_castps256_ps128(bIn0));
+  __m128 hi = __hv_bitsafe_sse(_mm256_extractf128_ps(bIn0, 1));
+  *bOut = _mm256_insertf128_ps(_mm256_castps128_ps256(lo), hi, 1);
 #elif HV_SIMD_SSE
-  hv_assert(0); // __hv_bitsafe_f() not implemented
+  *bOut = __hv_bitsafe_sse(bIn0);
 #elif HV_SIMD_NEON
-  hv_assert(0); // __hv_bitsafe_f() not implemented
+  const uint32x4_t e = vdupq_n_u32(0x7f800000);
+  uint32x4_t nonfinite = vceqq_u32(vandq_u32(vreinterpretq_u32_f32(bIn0), e), e);
+  *bOut = vreinterpretq_f32_u32(vbicq_u32(vreinterpretq_u32_f32(bIn0), nonfinite));
 #else // HV_SIMD_NONE
   if (hv_isnan_f(bIn0) || hv_isinf_f(bIn0))
     *bOut = 0.0f;
