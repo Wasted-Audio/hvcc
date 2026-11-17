@@ -9,3 +9,4 @@ Features that are large, or have a significant impact on other parts of the code
 - [ADR-005: PDNAM External](ADR-005-PDNAM-External.md)
 - [ADR-006: gui2dpf Templates](ADR-006-gui2dpf-Templates.md)
 - [ADR-007: Metamodule Generator](ADR-007-MetaModule-Generator.md)
+- [ADR-008: Parameter Ordering](ADR-008-Parameter-Ordering.md)

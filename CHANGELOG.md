@@ -7,6 +7,7 @@ Next Release
 Features:
 
 * New MetaModule generator
+* Introduce syntax to order externed parameters and events (#57)
 
 Updates:
 
