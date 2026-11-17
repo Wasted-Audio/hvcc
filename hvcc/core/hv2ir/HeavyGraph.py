@@ -15,15 +15,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import re
-<<<<<<< HEAD
-
 from collections import Counter, OrderedDict
-from typing import Any, Optional, Union, Dict, List, Set, Tuple
-=======
-from collections import Counter
->>>>>>> develop
 from pathlib import Path
-from typing import Optional
+from typing import Any, Optional
 
 from hvcc.types.compiler import CompilerNotif
 from hvcc.types.IR import (

@@ -3,8 +3,8 @@
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
-from hvcc.interpreters.pd2hv.PdParser import PdParser
 from hvcc.core.hv2ir.HIrReceive import HIrReceive
+from hvcc.interpreters.pd2hv.PdParser import PdParser
 
 
 def test_re_dollar():
