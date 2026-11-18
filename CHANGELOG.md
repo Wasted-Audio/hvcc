@@ -17,6 +17,7 @@ Bugfixes:
 
 * Drop empty expressions (#441)
 * Correctly initialize $arg2 of `delread~` to `0`
+* NEON/SSE/AVX: implement `bitsafe~` (also used by cyclone's `cosx~`, `sinx~`, `tanx~`)
 
 0.17.3
 -----
