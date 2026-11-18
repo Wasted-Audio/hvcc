@@ -13,19 +13,17 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import functools
 import platform
 import shutil
 import subprocess
+from collections.abc import Callable
 from pathlib import Path
 
 import numpy
 from scipy.io import wavfile
 
 from tests.framework.base_test import HvBaseTest
-
-SAMPLE_RATE = 48000
-BLOCK_SIZE = 480
-NUM_ITERATIONS = 4
 
 
 def input_signal(channel: int, num_samples: int) -> numpy.ndarray:
@@ -40,7 +38,7 @@ class TestInterleavedProcessing(HvBaseTest):
     SCRIPT_DIR = Path(__file__).parent
     TEST_DIR = Path(Path(__file__).parent, "pd", "interleaved")
 
-    def _flags(self):
+    def _flags(self) -> list[str]:
         flags = ["HV_SIMD_NONE"]
         if platform.machine().startswith("x86"):
             flags += ["HV_SIMD_SSE", "HV_SIMD_SSE_FMA", "HV_SIMD_AVX"]
@@ -48,7 +46,45 @@ class TestInterleavedProcessing(HvBaseTest):
             flags += ["HV_SIMD_NEON"]
         return flags
 
-    def _test_interleaved_patch(self, pd_file: str, expected: numpy.ndarray):
+    def _run_interleaved(
+        self,
+        exe_path: Path,
+        out_dir: Path,
+        sample_rate: int | None = None,
+        block_size: int | None = None,
+        num_iterations: int | None = None,
+        flag: str | None = None,
+        offset: int = 0,
+        in_place: bool = False
+    ) -> Path:
+        # run executable
+        # e.g. $ /path/heavy /path/heavy.wav 48000 480 100 1 0
+        # offset: misalign the caller's buffers by this many floats; in_place: input buffer = output buffer
+        wav_path = Path(out_dir, f"heavy.{flag}.{offset}.{int(in_place)}.wav")
+        subprocess.check_output([
+            exe_path,
+            wav_path,
+            str(sample_rate or 48000),
+            str(block_size or 480),
+            str(num_iterations or 100),
+            str(offset),
+            str(int(in_place))])
+
+        return wav_path
+
+    def _test_interleaved_patch(
+        self,
+        pd_file: str,
+        expected: Callable[[Callable[[int], numpy.ndarray]], list[numpy.ndarray]],
+        sample_rate: int | None = None,
+        block_size: int | None = None,
+        num_iterations: int | None = None
+    ):
+        """Compiles and runs a patch through hv_processInlineInterleaved() for every SIMD variant of
+        this machine, with aligned and misaligned buffers, separate and in place.
+
+        expected(x) returns the output channels for the input channels x(0), x(1), ...
+        """
         out_dir = self._run_hvcc(Path(self.TEST_DIR, pd_file))
         assert out_dir is not None
         c_src_dir = Path(out_dir, "c")
@@ -60,29 +96,29 @@ class TestInterleavedProcessing(HvBaseTest):
         for flag in self._flags():
             exe_path = self._compile_and_run(source_files, out_dir, flag)
             for offset in (0, 1):
-                for in_place in (0, 1):
-                    wav_path = Path(out_dir, f"heavy.{flag}.{offset}.{in_place}.wav")
-                    subprocess.check_output([
-                        exe_path, wav_path, str(SAMPLE_RATE), str(BLOCK_SIZE), str(NUM_ITERATIONS),
-                        str(offset), str(in_place)])
+                for in_place in (False, True):
+                    wav_path = self._run_interleaved(
+                        exe_path, out_dir, sample_rate, block_size, num_iterations,
+                        flag=flag, offset=offset, in_place=in_place)
                     _, result = wavfile.read(wav_path)
+                    result = result.reshape(len(result), -1)
+                    golden = numpy.stack(
+                        expected(functools.partial(input_signal, num_samples=len(result))), axis=1)
                     numpy.testing.assert_array_equal(
-                        result.reshape(len(result), -1), expected,
+                        result, golden,
                         err_msg=f"{pd_file} with {flag}, offset {offset}, in-place {in_place}")
 
     def test_interleaved_1ch(self):
-        n = BLOCK_SIZE * NUM_ITERATIONS
-        self._test_interleaved_patch("test-interleaved-1ch.pd", numpy.stack([
-            input_signal(0, n) * numpy.float32(0.5)], axis=1))
+        self._test_interleaved_patch(
+            "test-interleaved-1ch.pd",
+            lambda x: [x(0) * numpy.float32(0.5)])
 
     def test_interleaved_2ch(self):
-        n = BLOCK_SIZE * NUM_ITERATIONS
-        x0, x1 = input_signal(0, n), input_signal(1, n)
-        self._test_interleaved_patch("test-interleaved-2ch.pd", numpy.stack([
-            x0 - x1, x0 * numpy.float32(0.25)], axis=1))
+        self._test_interleaved_patch(
+            "test-interleaved-2ch.pd",
+            lambda x: [x(0) - x(1), x(0) * numpy.float32(0.25)])
 
     def test_interleaved_3ch(self):
-        n = BLOCK_SIZE * NUM_ITERATIONS
-        x0, x1, x2 = input_signal(0, n), input_signal(1, n), input_signal(2, n)
-        self._test_interleaved_patch("test-interleaved-3ch.pd", numpy.stack([
-            x1 * numpy.float32(2), x2 * numpy.float32(3), x0 * numpy.float32(4)], axis=1))
+        self._test_interleaved_patch(
+            "test-interleaved-3ch.pd",
+            lambda x: [x(1) * numpy.float32(2), x(2) * numpy.float32(3), x(0) * numpy.float32(4)])
