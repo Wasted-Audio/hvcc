@@ -46,82 +46,10 @@ static inline void __hv_lorenz_scalar_f(
 static inline void __hv_lorenz_f(SignalLorenz *o,
     hv_bInf_t bInStep, hv_bInf_t bInS, hv_bInf_t bInR, hv_bInf_t bInB,
     hv_bOutf_t bOutX, hv_bOutf_t bOutY, hv_bOutf_t bOutZ) {
-#if HV_SIMD_AVX
-  const float *const h = (float *) &bInStep;
-  const float *const s = (float *) &bInS;
-  const float *const r = (float *) &bInR;
-  const float *const b = (float *) &bInB;
-
-  float *const x = (float *) hv_alloca(3 * 8 * sizeof(float));
-  float *const y = x + 8;
-  float *const z = x + 16;
-
-  __hv_lorenz_scalar_f(o->xm1, o->ym1, o->zm1, h[0], s[0], r[0], b[0], x, y, z);
-  __hv_lorenz_scalar_f(x[0], y[0], z[0], h[1], s[1], r[1], b[1], x+1, y+1, z+1);
-  __hv_lorenz_scalar_f(x[1], y[1], z[1], h[2], s[2], r[2], b[2], x+2, y+2, z+2);
-  __hv_lorenz_scalar_f(x[2], y[2], z[2], h[3], s[3], r[3], b[3], x+3, y+3, z+3);
-  __hv_lorenz_scalar_f(x[3], y[3], z[3], h[4], s[4], r[4], b[4], x+4, y+4, z+4);
-  __hv_lorenz_scalar_f(x[4], y[4], z[4], h[5], s[5], r[5], b[5], x+5, y+5, z+5);
-  __hv_lorenz_scalar_f(x[5], y[5], z[5], h[6], s[6], r[6], b[6], x+6, y+6, z+6);
-  __hv_lorenz_scalar_f(x[6], y[6], z[6], h[7], s[7], r[7], b[7], x+7, y+7, z+7);
-
-  o->xm1 = x[7];
-  o->ym1 = y[7];
-  o->zm1 = z[7];
-  __hv_load_f(x, bOutX);
-  __hv_load_f(y, bOutY);
-  __hv_load_f(z, bOutZ);
-#elif HV_SIMD_SSE
-  const float *const h = (float *) &bInStep;
-  const float *const s = (float *) &bInS;
-  const float *const r = (float *) &bInR;
-  const float *const b = (float *) &bInB;
-
-  float *const x = (float *) hv_alloca(3 * 4 * sizeof(float));
-  float *const y = x + 4;
-  float *const z = x + 8;
-
-  __hv_lorenz_scalar_f(o->xm1, o->ym1, o->zm1, h[0], s[0], r[0], b[0], x, y, z);
-  __hv_lorenz_scalar_f(x[0], y[0], z[0], h[1], s[1], r[1], b[1], x+1, y+1, z+1);
-  __hv_lorenz_scalar_f(x[1], y[1], z[1], h[2], s[2], r[2], b[2], x+2, y+2, z+2);
-  __hv_lorenz_scalar_f(x[2], y[2], z[2], h[3], s[3], r[3], b[3], x+3, y+3, z+3);
-
-  o->xm1 = x[3];
-  o->ym1 = y[3];
-  o->zm1 = z[3];
-  __hv_load_f(x, bOutX);
-  __hv_load_f(y, bOutY);
-  __hv_load_f(z, bOutZ);
-#elif HV_SIMD_NEON
-  float *const x = (float *) hv_alloca(3 * 4 * sizeof(float));
-  float *const y = x + 4;
-  float *const z = x + 8;
-
-  __hv_lorenz_scalar_f(o->xm1, o->ym1, o->zm1,
-      vgetq_lane_f32(bInStep,0), vgetq_lane_f32(bInS,0), vgetq_lane_f32(bInR,0), vgetq_lane_f32(bInB,0),
-      x, y, z);
-  __hv_lorenz_scalar_f(x[0], y[0], z[0],
-      vgetq_lane_f32(bInStep,1), vgetq_lane_f32(bInS,1), vgetq_lane_f32(bInR,1), vgetq_lane_f32(bInB,1),
-      x+1, y+1, z+1);
-  __hv_lorenz_scalar_f(x[1], y[1], z[1],
-      vgetq_lane_f32(bInStep,2), vgetq_lane_f32(bInS,2), vgetq_lane_f32(bInR,2), vgetq_lane_f32(bInB,2),
-      x+2, y+2, z+2);
-  __hv_lorenz_scalar_f(x[2], y[2], z[2],
-      vgetq_lane_f32(bInStep,3), vgetq_lane_f32(bInS,3), vgetq_lane_f32(bInR,3), vgetq_lane_f32(bInB,3),
-      x+3, y+3, z+3);
-
-  o->xm1 = x[3];
-  o->ym1 = y[3];
-  o->zm1 = z[3];
-  __hv_load_f(x, bOutX);
-  __hv_load_f(y, bOutY);
-  __hv_load_f(z, bOutZ);
-#else // HV_SIMD_NONE
   __hv_lorenz_scalar_f(o->xm1, o->ym1, o->zm1, bInStep, bInS, bInR, bInB, bOutX, bOutY, bOutZ);
   o->xm1 = *bOutX;
   o->ym1 = *bOutY;
   o->zm1 = *bOutZ;
-#endif
 }
 
 void sLorenz_onMessage(HeavyContextInterface *_c, SignalLorenz *o, int letIndex,

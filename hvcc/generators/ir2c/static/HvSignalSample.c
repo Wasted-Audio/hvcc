@@ -31,14 +31,7 @@ void __hv_sample_f(HeavyContextInterface *_c, SignalSample *o, hv_bInf_t bIn,
     void (*sendMessage)(HeavyContextInterface *, int, const HvMessage *)) {
   if (o->i != __HV_SAMPLE_NULL) {
 
-#if HV_SIMD_AVX || HV_SIMD_SSE
-    const float *const b = (float *) &bIn;
-    float out = b[o->i & HV_N_SIMD_MASK];
-#elif HV_SIMD_NEON
-    float out = bIn[o->i & HV_N_SIMD_MASK];
-#else // HV_SIMD_NONE
     float out = bIn;
-#endif
 
     HvMessage *n = HV_MESSAGE_ON_STACK(1);
     hv_uint32_t ts = (o->i + HV_N_SIMD) & ~HV_N_SIMD_MASK; // start of next block

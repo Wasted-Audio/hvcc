@@ -17,15 +17,7 @@
 #include "HvSignalSamphold.h"
 
 hv_size_t sSamphold_init(SignalSamphold *o) {
-#if HV_SIMD_AVX
-  o->s = _mm256_setzero_ps();
-#elif HV_SIMD_SSE
-  o->s = _mm_setzero_ps();
-#elif HV_SIMD_NEON
-  o->s = vdupq_n_f32(0.0f);
-#else
   o->s = 0.0f;
-#endif
   return 0;
 }
 
@@ -34,15 +26,7 @@ void sSamphold_onMessage(HeavyContextInterface *_c, SignalSamphold *o, int letIn
   switch (letIndex) {
     case 2: {
       if (msg_isFloat(m,0)) {
-#if HV_SIMD_AVX
-        o->s = _mm256_set1_ps(msg_getFloat(m,0));
-#elif HV_SIMD_SSE
-        o->s = _mm_set1_ps(msg_getFloat(m,0));
-#elif HV_SIMD_NEON
-        o->s = vdupq_n_f32(msg_getFloat(m,0));
-#else
         o->s = msg_getFloat(m,0);
-#endif
       }
       break;
     }

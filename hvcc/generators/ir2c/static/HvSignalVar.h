@@ -62,30 +62,11 @@ static inline void __hv_varwrite_i(SignalVari *o, hv_bIni_t bIn) {
 void sVari_onMessage(HeavyContextInterface *_c, SignalVari *o, const HvMessage *m);
 
 
-
 // __var_k~f, __var_k~i
-
-#if HV_SIMD_AVX
-#define __hv_var_k_i(_z,_a,_b,_c,_d,_e,_f,_g,_h) *_z=_mm256_set_epi32(_h,_g,_f,_e,_d,_c,_b,_a)
-#define __hv_var_k_i_r(_z,_a,_b,_c,_d,_e,_f,_g,_h) *_z=_mm256_set_epi32(_a,_b,_c,_d,_e,_f,_g,_h)
-#define __hv_var_k_f(_z,_a,_b,_c,_d,_e,_f,_g,_h) *_z=_mm256_set_ps(_h,_g,_f,_e,_d,_c,_b,_a)
-#define __hv_var_k_f_r(_z,_a,_b,_c,_d,_e,_f,_g,_h) *_z=_mm256_set_ps(_a,_b,_c,_d,_e,_f,_g,_h)
-#elif HV_SIMD_SSE
-#define __hv_var_k_i(_z,_a,_b,_c,_d,_e,_f,_g,_h) *_z=_mm_set_epi32(_d,_c,_b,_a)
-#define __hv_var_k_i_r(_z,_a,_b,_c,_d,_e,_f,_g,_h) *_z=_mm_set_epi32(_a,_b,_c,_d)
-#define __hv_var_k_f(_z,_a,_b,_c,_d,_e,_f,_g,_h) *_z=_mm_set_ps(_d,_c,_b,_a)
-#define __hv_var_k_f_r(_z,_a,_b,_c,_d,_e,_f,_g,_h) *_z=_mm_set_ps(_a,_b,_c,_d)
-#elif HV_SIMD_NEON
-#define __hv_var_k_i(_z,_a,_b,_c,_d,_e,_f,_g,_h) *_z=((int32x4_t) {_a,_b,_c,_d})
-#define __hv_var_k_i_r(_z,_a,_b,_c,_d,_e,_f,_g,_h) *_z=((int32x4_t) {_d,_c,_b,_a})
-#define __hv_var_k_f(_z,_a,_b,_c,_d,_e,_f,_g,_h) *_z=((float32x4_t) {_a,_b,_c,_d})
-#define __hv_var_k_f_r(_z,_a,_b,_c,_d,_e,_f,_g,_h) *_z=((float32x4_t) {_d,_c,_b,_a})
-#else // HV_SIMD_NONE
 #define __hv_var_k_i(_z,_a,_b,_c,_d,_e,_f,_g,_h) *_z=_a
 #define __hv_var_k_i_r(_z,_a,_b,_c,_d,_e,_f,_g,_h) *_z=_a
 #define __hv_var_k_f(_z,_a,_b,_c,_d,_e,_f,_g,_h) *_z=_a
 #define __hv_var_k_f_r(_z,_a,_b,_c,_d,_e,_f,_g,_h) *_z=_a
-#endif
 
 #ifdef __cplusplus
 } // extern "C"
