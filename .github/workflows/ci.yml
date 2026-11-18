@@ -24,7 +24,8 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip setuptools wheel
-          pip install -U tox tox-gh-actions poetry
+          pip install --no-cache-dir -U "tox>=4.67.15" tox-gh-actions poetry
+          pip list | grep -i -E "^(tox|pluggy|tox-gh-actions)"
       - name: Run tox
         run: tox
 
