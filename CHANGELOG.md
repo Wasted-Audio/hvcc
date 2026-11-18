@@ -17,6 +17,7 @@ Bugfixes:
 
 * Drop empty expressions (#441)
 * Correctly initialize $arg2 of `delread~` to `0`
+* AVX: no aligned 32-byte accesses to buffers that are only 16-byte aligned (`threshold~`, `exp`/`pow`, `lorenz~`)
 
 0.17.3
 -----
