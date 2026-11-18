@@ -18,6 +18,11 @@ Bugfixes:
 * Drop empty expressions (#441)
 * Correctly initialize $arg2 of `delread~` to `0`
 
+Tests:
+
+* Rebuild for every SIMD variant (SSE/AVX/NEON previously re-ran the plain C build), real NEON builds on arm64, `HV_SIMD_SSE_FMA` now tests SSE
+* Allow vector-granular timestamps for messages from signal objects in SIMD control tests
+
 0.17.3
 -----
 
