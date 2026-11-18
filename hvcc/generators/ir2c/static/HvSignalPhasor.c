@@ -19,8 +19,9 @@
 #define HV_PHASOR_2_32 4294967296.0
 
 #if HV_SIMD_AVX
-static void sPhasor_updatePhase(SignalPhasor *o, float p) {
-  o->phase = _mm256_set1_ps(p+1.0f); // o->phase is in range [1,2]
+static void sPhasor_updatePhase(SignalPhasor *o, hv_uint32_t p) {
+  o->phase[0] = _mm_set1_epi32(p);
+  o->phase[1] = _mm_set1_epi32(p);
 #elif HV_SIMD_SSE
   static void sPhasor_updatePhase(SignalPhasor *o, hv_uint32_t p) {
     o->phase = _mm_set1_epi32(p);
@@ -35,16 +36,10 @@ static void sPhasor_updatePhase(SignalPhasor *o, float p) {
 
 // input phase is in the range of [0,1]. It is independent of o->phase.
 #if HV_SIMD_AVX
-static void sPhasor_k_updatePhase(SignalPhasor *o, float p) {
-  o->phase = _mm256_set_ps(
-      p+1.0f+7.0f*o->step.f2sc, p+1.0f+6.0f*o->step.f2sc,
-      p+1.0f+5.0f*o->step.f2sc, p+1.0f+4.0f*o->step.f2sc,
-      p+1.0f+3.0f*o->step.f2sc, p+1.0f+2.0f*o->step.f2sc,
-      p+1.0f+o->step.f2sc,      p+1.0f);
-
-  // ensure that o->phase is still in range [1,2]
-  o->phase = _mm256_or_ps(_mm256_andnot_ps(
-      _mm256_set1_ps(-INFINITY), o->phase), _mm256_set1_ps(1.0f));
+static void sPhasor_k_updatePhase(SignalPhasor *o, hv_uint32_t p) {
+  // lane i of the 8 lanes holds the phase of sample i: p + i*step
+  o->phase[0] = _mm_set_epi32(3*o->step.s+p, 2*o->step.s+p, o->step.s+p, p);
+  o->phase[1] = _mm_set_epi32(7*o->step.s+p, 6*o->step.s+p, 5*o->step.s+p, 4*o->step.s+p);
 #elif HV_SIMD_SSE
 static void sPhasor_k_updatePhase(SignalPhasor *o, hv_uint32_t p) {
   o->phase = _mm_set_epi32(3*o->step.s+p, 2*o->step.s+p, o->step.s+p, p);
@@ -59,9 +54,10 @@ static void sPhasor_k_updatePhase(SignalPhasor *o, hv_uint32_t p) {
 
 static void sPhasor_k_updateFrequency(SignalPhasor *o, float f, double r) {
 #if HV_SIMD_AVX
-  o->step.f2sc = (float) (f/r);
-  o->inc = _mm256_set1_ps((float) (8.0f*f/r));
-  sPhasor_k_updatePhase(o, o->phase[0]);
+  o->step.s = (hv_int32_t) (f*(HV_PHASOR_2_32/r));
+  o->inc = _mm_set1_epi32(8*o->step.s); // one block of 8 samples
+  // restart the lanes from the current phase of lane 0 with the new step
+  sPhasor_k_updatePhase(o, (hv_uint32_t) _mm_cvtsi128_si32(o->phase[0]));
 #elif HV_SIMD_SSE
   o->step.s = (hv_int32_t) (f*(HV_PHASOR_2_32/r));
   o->inc = _mm_set1_epi32(4*o->step.s);
@@ -80,9 +76,10 @@ static void sPhasor_k_updateFrequency(SignalPhasor *o, float f, double r) {
 
 hv_size_t sPhasor_init(SignalPhasor *o, double samplerate) {
 #if HV_SIMD_AVX
-  o->phase = _mm256_set1_ps(1.0f);
-  o->inc = _mm256_setzero_ps();
-  o->step.f2sc = (float) (1.0/samplerate);
+  o->phase[0] = _mm_setzero_si128();
+  o->phase[1] = _mm_setzero_si128();
+  o->inc = _mm_setzero_si128();
+  o->step.f2sc = (float) (HV_PHASOR_2_32/samplerate); // frequency -> fixed-point step per sample
 #elif HV_SIMD_SSE
   o->phase = _mm_setzero_si128();
   o->inc = _mm_setzero_si128();
@@ -105,17 +102,15 @@ void sPhasor_onMessage(HeavyContextInterface *_c, SignalPhasor *o, int letIn, co
       float p = msg_getFloat(m,0);
       while (p < 0.0f) p += 1.0f; // wrap phase to [0,1]
       while (p > 1.0f) p -= 1.0f;
-#if HV_SIMD_AVX
-      sPhasor_updatePhase(o, p);
-#else // HV_SIMD_SSE || HV_SIMD_NEON || HV_SIMD_NONE
       sPhasor_updatePhase(o, (hv_uint32_t) (p * HV_PHASOR_2_32));
-#endif
     }
   }
 }
 
 hv_size_t sPhasor_k_init(SignalPhasor *o, float frequency, double samplerate) {
-  __hv_zero_i((hv_bOuti_t) &o->phase);
+  // not __hv_zero_i(): with AVX that is an aligned 32-byte store, and the object is
+  // not guaranteed to be 32-byte aligned
+  hv_memclear(&o->phase, sizeof(o->phase));
   sPhasor_k_updateFrequency(o, frequency, samplerate);
   return 0;
 }
@@ -128,11 +123,7 @@ void sPhasor_k_onMessage(HeavyContextInterface *_c, SignalPhasor *o, int letIn, 
         float p = msg_getFloat(m,0);
         while (p < 0.0f) p += 1.0f; // wrap phase to [0,1]
         while (p > 1.0f) p -= 1.0f;
-#if HV_SIMD_AVX
-        sPhasor_k_updatePhase(o, p);
-#else // HV_SIMD_SSE || HV_SIMD_NEON || HV_SIMD_NONE
         sPhasor_k_updatePhase(o, (hv_uint32_t) (p * HV_PHASOR_2_32));
-#endif
         break;
       }
       default: break;
