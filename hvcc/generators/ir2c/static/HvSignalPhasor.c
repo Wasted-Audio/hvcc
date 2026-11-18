@@ -37,6 +37,7 @@ static void sPhasor_updatePhase(SignalPhasor *o, hv_uint32_t p) {
 // input phase is in the range of [0,1]. It is independent of o->phase.
 #if HV_SIMD_AVX
 static void sPhasor_k_updatePhase(SignalPhasor *o, hv_uint32_t p) {
+  // lane i of the 8 lanes holds the phase of sample i: p + i*step
   o->phase[0] = _mm_set_epi32(3*o->step.s+p, 2*o->step.s+p, o->step.s+p, p);
   o->phase[1] = _mm_set_epi32(7*o->step.s+p, 6*o->step.s+p, 5*o->step.s+p, 4*o->step.s+p);
 #elif HV_SIMD_SSE
@@ -54,7 +55,8 @@ static void sPhasor_k_updatePhase(SignalPhasor *o, hv_uint32_t p) {
 static void sPhasor_k_updateFrequency(SignalPhasor *o, float f, double r) {
 #if HV_SIMD_AVX
   o->step.s = (hv_int32_t) (f*(HV_PHASOR_2_32/r));
-  o->inc = _mm_set1_epi32(8*o->step.s);
+  o->inc = _mm_set1_epi32(8*o->step.s); // one block of 8 samples
+  // restart the lanes from the current phase of lane 0 with the new step
   sPhasor_k_updatePhase(o, (hv_uint32_t) _mm_cvtsi128_si32(o->phase[0]));
 #elif HV_SIMD_SSE
   o->step.s = (hv_int32_t) (f*(HV_PHASOR_2_32/r));
@@ -77,7 +79,7 @@ hv_size_t sPhasor_init(SignalPhasor *o, double samplerate) {
   o->phase[0] = _mm_setzero_si128();
   o->phase[1] = _mm_setzero_si128();
   o->inc = _mm_setzero_si128();
-  o->step.f2sc = (float) (HV_PHASOR_2_32/samplerate);
+  o->step.f2sc = (float) (HV_PHASOR_2_32/samplerate); // frequency -> fixed-point step per sample
 #elif HV_SIMD_SSE
   o->phase = _mm_setzero_si128();
   o->inc = _mm_setzero_si128();
@@ -106,6 +108,8 @@ void sPhasor_onMessage(HeavyContextInterface *_c, SignalPhasor *o, int letIn, co
 }
 
 hv_size_t sPhasor_k_init(SignalPhasor *o, float frequency, double samplerate) {
+  // not __hv_zero_i(): with AVX that is an aligned 32-byte store, and the object is
+  // not guaranteed to be 32-byte aligned
   hv_memclear(&o->phase, sizeof(o->phase));
   sPhasor_k_updateFrequency(o, frequency, samplerate);
   return 0;
