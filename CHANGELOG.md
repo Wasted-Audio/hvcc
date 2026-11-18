@@ -17,6 +17,7 @@ Bugfixes:
 
 * Drop empty expressions (#441)
 * Correctly initialize $arg2 of `delread~` to `0`
+* AVX: `phasor~` no longer halves the phase at every wrap
 
 0.17.3
 -----
