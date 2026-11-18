@@ -17,6 +17,8 @@ Bugfixes:
 
 * Drop empty expressions (#441)
 * Correctly initialize $arg2 of `delread~` to `0`
+* NEON/SSE/AVX: implement the `expr~` math functions, correct results for integer constants and comparisons
+* NEON: exact `sqrt` on AArch64, more accurate on ARMv7
 
 0.17.3
 -----
