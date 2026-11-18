@@ -17,6 +17,7 @@ Bugfixes:
 
 * Drop empty expressions (#441)
 * Correctly initialize $arg2 of `delread~` to `0`
+* SIMD: signal comparisons (`<~`, `>~`, `==~`, ...) output `1.0` instead of a bit mask
 
 0.17.3
 -----
