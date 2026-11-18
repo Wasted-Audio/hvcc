@@ -17,6 +17,7 @@ Bugfixes:
 
 * Drop empty expressions (#441)
 * Correctly initialize $arg2 of `delread~` to `0`
+* `processInlineInterleaved()`: any buffer alignment, SIMD-aligned scratch buffers, correct sample order with AVX
 
 0.17.3
 -----
