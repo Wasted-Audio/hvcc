@@ -104,6 +104,46 @@ static inline void __hv_nam_standard_f(SignalNamStandard *o, hv_bInf_t bIn0, hv_
 }
 
 
+typedef struct SignalNamA2Lite {
+  MicroNAM_A2LiteNet* a2litenet;
+} SignalNamA2Lite;
+
+hv_size_t sNam_a2lite_init(SignalNamA2Lite *o, const float* weights);
+void sNam_a2lite_free(SignalNamA2Lite *o);
+
+static inline void __hv_nam_a2lite_f(SignalNamA2Lite *o, hv_bInf_t bIn0, hv_bOutf_t bOut) {
+#if HV_SIMD_AVX
+  hv_assert(0);
+#elif HV_SIMD_SSE
+  hv_assert(0);
+#elif HV_SIMD_NEON
+  hv_assert(0);
+#else // HV_SIMD_NONE
+  MicroNAM_A2LiteNet_Process(o->a2litenet, &bIn0, bOut);
+#endif
+}
+
+
+typedef struct SignalNamA2Full {
+  MicroNAM_A2FullNet* a2fullnet;
+} SignalNamA2Full;
+
+hv_size_t sNam_a2full_init(SignalNamA2Full *o, const float* weights);
+void sNam_a2full_free(SignalNamA2Full *o);
+
+static inline void __hv_nam_a2full_f(SignalNamA2Full *o, hv_bInf_t bIn0, hv_bOutf_t bOut) {
+#if HV_SIMD_AVX
+  hv_assert(0);
+#elif HV_SIMD_SSE
+  hv_assert(0);
+#elif HV_SIMD_NEON
+  hv_assert(0);
+#else // HV_SIMD_NONE
+  MicroNAM_A2FullNet_Process(o->a2fullnet, &bIn0, bOut);
+#endif
+}
+
+
 #ifdef __cplusplus
 } // extern "C"
 #endif
