@@ -26,9 +26,9 @@ class Connection:
 
     def __init__(
         self,
-        from_object: Optional['HeavyIrObject'],
+        from_object: 'HeavyIrObject',
         outlet_index: int,
-        to_object: Optional['HeavyIrObject'],
+        to_object: 'HeavyIrObject',
         inlet_index: int,
         conn_type: str
     ) -> None:
