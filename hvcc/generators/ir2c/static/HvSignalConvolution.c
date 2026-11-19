@@ -55,44 +55,7 @@ void sConv_onMessage(HeavyContextInterface *_c, SignalConvolution *o, int letInd
 }
 
 static hv_bInf_t sConv_kernel(hv_bInf_t bIn, hv_bInf_t bInPrev, hv_bInf_t bInCoeff) {
-#if HV_SIMD_AVX
-  hv_assert(false & "There is no AVX implementation of __hv_conv_f");
-  hv_bufferf_t d = _mm256_setzero_ps();
-#elif HV_SIMD_SSE
-  __m128 c0 = _mm_shuffle_ps(bInCoeff, bInCoeff, _MM_SHUFFLE(0,0,0,0));
-  __m128 c1 = _mm_shuffle_ps(bInCoeff, bInCoeff, _MM_SHUFFLE(1,1,1,1));
-  __m128 c2 = _mm_shuffle_ps(bInCoeff, bInCoeff, _MM_SHUFFLE(2,2,2,2));
-  __m128 c3 = _mm_shuffle_ps(bInCoeff, bInCoeff, _MM_SHUFFLE(3,3,3,3));
-
-  __m128 m0 = bIn;
-  __m128 m2 = _mm_shuffle_ps(bInPrev, bIn, _MM_SHUFFLE(1,0,3,2));
-  __m128 m1 = _mm_shuffle_ps(m2, bIn, _MM_SHUFFLE(2,1,2,1));
-  __m128 m3 = _mm_shuffle_ps(bInPrev, m2, _MM_SHUFFLE(2,1,2,1));
-
-  hv_bufferf_t a, b, c, d;
-  __hv_mul_f(c0, m0, &a);
-  __hv_fma_f(c1, m1, a, &b);
-  __hv_fma_f(c2, m2, b, &c);
-  __hv_fma_f(c3, m3, c, &d);
-#elif HV_SIMD_NEON
-  float32x4_t c0 = vdupq_lane_f32(vget_low_f32(bInCoeff), 0);
-  float32x4_t c1 = vdupq_lane_f32(vget_low_f32(bInCoeff), 1);
-  float32x4_t c2 = vdupq_lane_f32(vget_high_f32(bInCoeff), 0);
-  float32x4_t c3 = vdupq_lane_f32(vget_high_f32(bInCoeff), 1);
-
-  float32x4_t m0 = bIn;
-  float32x4_t m1 = vextq_f32(bInPrev, bIn, 0x3);
-  float32x4_t m2 = vextq_f32(bInPrev, bIn, 0x2);
-  float32x4_t m3 = vextq_f32(bInPrev, bIn, 0x1);
-
-  hv_bufferf_t a, b, c, d;
-  __hv_mul_f(c0, m0, &a);
-  __hv_fma_f(c1, m1, a, &b);
-  __hv_fma_f(c2, m2, b, &c);
-  __hv_fma_f(c3, m3, c, &d);
-#else // HV_SIMD_NONE
   hv_bufferf_t d = bIn * bInCoeff;
-#endif
 
   return d;
 }

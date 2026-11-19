@@ -77,57 +77,17 @@
   #include <arm_neon.h>
 #endif
 
-#if HV_SIMD_NEON // NEON
-  #define HV_N_SIMD 4
-  #define hv_bufferf_t float32x4_t
-  #define hv_bufferi_t int32x4_t
-  #define hv_bInf_t float32x4_t
-  #define hv_bOutf_t float32x4_t*
-  #define hv_bIni_t int32x4_t
-  #define hv_bOuti_t int32x4_t*
-  #define VIf(_x) (_x)
-  #define VOf(_x) (&_x)
-  #define VIi(_x) (_x)
-  #define VOi(_x) (&_x)
-#elif HV_SIMD_AVX // AVX
-  #define HV_N_SIMD 8
-  #define hv_bufferf_t __m256
-  #define hv_bufferi_t __m256i
-  #define hv_bInf_t __m256
-  #define hv_bOutf_t __m256*
-  #define hv_bIni_t __m256i
-  #define hv_bOuti_t __m256i*
-  #define VIf(_x) (_x)
-  #define VOf(_x) (&_x)
-  #define VIi(_x) (_x)
-  #define VOi(_x) (&_x)
-#elif HV_SIMD_SSE // SSE
-  #define HV_N_SIMD 4
-  #define hv_bufferf_t __m128
-  #define hv_bufferi_t __m128i
-  #define hv_bInf_t __m128
-  #define hv_bOutf_t __m128*
-  #define hv_bIni_t __m128i
-  #define hv_bOuti_t __m128i*
-  #define VIf(_x) (_x)
-  #define VOf(_x) (&_x)
-  #define VIi(_x) (_x)
-  #define VOi(_x) (&_x)
-#else // DEFAULT
-  #define HV_N_SIMD 1
-  #undef HV_SIMD_NONE
-  #define HV_SIMD_NONE 1
-  #define hv_bufferf_t float
-  #define hv_bufferi_t int
-  #define hv_bInf_t float
-  #define hv_bOutf_t float*
-  #define hv_bIni_t int
-  #define hv_bOuti_t int*
-  #define VIf(_x) (_x)
-  #define VOf(_x) (&_x)
-  #define VIi(_x) (_x)
-  #define VOi(_x) (&_x)
-#endif
+#define HV_N_SIMD 1
+#define hv_bufferf_t float
+#define hv_bufferi_t int
+#define hv_bInf_t float
+#define hv_bOutf_t float*
+#define hv_bIni_t int
+#define hv_bOuti_t int*
+#define VIf(_x) (_x)
+#define VOf(_x) (&_x)
+#define VIi(_x) (_x)
+#define VOi(_x) (&_x)
 
 #define HV_N_SIMD_MASK (HV_N_SIMD-1)
 
@@ -147,37 +107,13 @@
 #if HV_MSVC
   #include <malloc.h>
   #define hv_alloca(_n) _alloca(_n)
-  #if HV_SIMD_AVX
-    #define hv_malloc(_n) _aligned_malloc(_n, 32)
-    #define hv_realloc(a, b) _aligned_realloc(a, b, 32)
-    #define hv_free(x) _aligned_free(x)
-  #elif HV_SIMD_SSE || HV_SIMD_NEON
-    #define hv_malloc(_n) _aligned_malloc(_n, 16)
-    #define hv_realloc(a, b) _aligned_realloc(a, b, 16)
-    #define hv_free(x) _aligned_free(x)
-  #else // HV_SIMD_NONE
-    #define hv_malloc(_n) malloc(_n)
-    #define hv_free(_n) free(_n)
-  #endif
+  #define hv_malloc(_n) malloc(_n)
+  #define hv_free(_n) free(_n)
 #elif HV_APPLE
   #define hv_alloca(_n) alloca(_n)
   #define hv_realloc(a, b) realloc(a, b)
-  #if HV_SIMD_AVX
-    #include <mm_malloc.h>
-    #define hv_malloc(_n) _mm_malloc(_n, 32)
-    #define hv_free(x) _mm_free(x)
-  #elif HV_SIMD_SSE
-    #include <mm_malloc.h>
-    #define hv_malloc(_n) _mm_malloc(_n, 16)
-    #define hv_free(x) _mm_free(x)
-  #elif HV_SIMD_NEON
-    // malloc on ios always has 16-byte alignment
-    #define hv_malloc(_n) malloc(_n)
-    #define hv_free(x) free(x)
-  #else // HV_SIMD_NONE
-    #define hv_malloc(_n) malloc(_n)
-    #define hv_free(x) free(x)
-  #endif
+  #define hv_malloc(_n) malloc(_n)
+  #define hv_free(x) free(x)
 #elif defined ARM_CORTEX
   #include <alloca.h>
   #define hv_alloca(_n)  alloca(_n)
@@ -187,16 +123,8 @@
 #else
   #include <alloca.h>
   #define hv_alloca(_n)  alloca(_n)
-  #if HV_SIMD_AVX
-    #define hv_malloc(_n) aligned_alloc(32, _n)
-    #define hv_free(x) free(x)
-  #elif HV_SIMD_SSE || HV_SIMD_NEON
-    #define hv_malloc(_n) aligned_alloc(16, _n)
-    #define hv_free(x) free(x)
-  #else // HV_SIMD_NONE
-    #define hv_malloc(_n) malloc(_n)
-    #define hv_free(_n) free(_n)
-  #endif
+  #define hv_malloc(_n) malloc(_n)
+  #define hv_free(_n) free(_n)
 #endif
 
 // Assert

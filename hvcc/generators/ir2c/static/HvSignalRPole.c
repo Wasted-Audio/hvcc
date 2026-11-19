@@ -17,33 +17,7 @@
 #include "HvSignalRPole.h"
 
 hv_size_t sRPole_init(SignalRPole *o) {
-#if HV_SIMD_AVX
-  sDel1_init(&o->sDel1_fxiLN);
-  sDel1_init(&o->sDel1_kjkpV);
-  sDel1_init(&o->sDel1_dkIWc);
-  sDel1_init(&o->sDel1_bVeoW);
-  sDel1_init(&o->sDel1_PulZn);
-  sDel1_init(&o->sDel1_yTFig);
-  sDel1_init(&o->sDel1_Is9Qf);
-  sDel1_init(&o->sDel1_LIyNt);
-  sDel1_init(&o->sDel1_VqpU3);
-  sDel1_init(&o->sDel1_ZVYeg);
-  sDel1_init(&o->sDel1_IVAZh);
-  sDel1_init(&o->sDel1_F8WrY);
-  sDel1_init(&o->sDel1_rkFMy);
-  sDel1_init(&o->sDel1_BeqSK);
-  __hv_zero_f(&o->ym);
-#elif HV_SIMD_SSE || HV_SIMD_NEON
-  sDel1_init(&o->sDel1_i8Twk);
-  sDel1_init(&o->sDel1_KYibU);
-  sDel1_init(&o->sDel1_spa5V);
-  sDel1_init(&o->sDel1_3HXdb);
-  sDel1_init(&o->sDel1_Aj1oK);
-  sDel1_init(&o->sDel1_jNX1g);
-  __hv_zero_f(&o->ym);
-#else
   o->ym = 0.0f;
-#endif
   return 0;
 }
 
