@@ -7,6 +7,7 @@ Next Release
 Features:
 
 * New MetaModule generator
+* Allow full type names in `[trigger]` object
 
 Updates:
 

@@ -1,6 +1,7 @@
 from pathlib import Path
 
 from hvcc.interpreters.pd2hv.PdParser import PdParser
+from hvcc.interpreters.pd2hv.PdTriggerObject import PdTriggerObject
 
 
 def test_single_array_in_subpatch(tmp_path: Path):
@@ -98,3 +99,13 @@ def test_nam_path(tmp_path: Path):
 
     nam_object = graph.get_objects()[0].get_objects()[1]
     assert Path(nam_object.obj_dict["nam"]) == tmp_path / "test.nam"
+
+
+def test_trigger_convert_args():
+    convert_args = PdTriggerObject._PdTriggerObject__convert_args  # pyright: ignore
+
+    assert convert_args(["any"]) == ["a"]
+    assert convert_args(["float"]) == ["f"]
+    assert convert_args(["symbol"]) == ["s"]
+    assert convert_args(["bang"]) == ["b"]
+    assert convert_args(["unknown"]) == ["unknown"]
