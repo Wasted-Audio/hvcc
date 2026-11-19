@@ -598,7 +598,8 @@ class PdGUIParser(PdParser):
             square=bool(int(line[15])),
             arc_color=Color(line[13]),
             arc_start=float(line[23]),
-            arc_show=bool(int(line[19]))
+            arc_show=bool(int(line[19])),
+            transparent=bool(int(line[35]))
         )
 
     @classmethod
