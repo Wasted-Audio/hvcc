@@ -17,7 +17,8 @@ Updates:
 Bugfixes:
 
 * Drop empty expressions (#441)
-* Correctly initialize $arg2 of `delread~` to `0`
+* Correctly initialize default $arg2 of `delread~` to `0`
+* c2js: Fix for newer emsdk requiring `-sDEFAULT_TO_CXX=1`
 
 0.17.3
 -----
