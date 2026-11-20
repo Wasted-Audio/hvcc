@@ -19,6 +19,7 @@ Bugfixes:
 * Drop empty expressions (#441)
 * Correctly initialize default $arg2 of `delread~` to `0`
 * c2js: Fix for newer emsdk requiring `-sDEFAULT_TO_CXX=1`
+* NEON: correct sign of `__hv_fms_f` on ARMv8 (`[*~ k]` -> `[-~ k]` chains)
 
 0.17.3
 -----
