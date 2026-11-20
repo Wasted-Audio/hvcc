@@ -13,7 +13,8 @@ from pathlib import Path
 
 import pytest
 
-import hvcc
+from hvcc.compiler import compile_dataflow
+from hvcc.types.IR import IRBuffer, IRGraph, IRSignalList
 
 COMPARISONS = {
     "<~": "__lt~f",
@@ -25,7 +26,7 @@ COMPARISONS = {
 }
 
 
-def compile_ir(tmp_path: Path, obj: str, right_inlet: bool) -> dict:
+def compile_ir(tmp_path: Path, obj: str, right_inlet: bool) -> IRGraph:
     """Compile [adc~ 1 2] -> [obj] -> [dac~ 1] and return the IR.
 
     obj: the object's Pd text, or the lines of an @hv_obj subpatch ending in "#X restore".
@@ -42,41 +43,46 @@ def compile_ir(tmp_path: Path, obj: str, right_inlet: bool) -> dict:
         "#X connect 0 1 1 1;\n" if right_inlet else "",
         "#X connect 1 0 2 0;\n",
     ]
+
     pd_path.write_text("".join(lines))
     out_dir = tmp_path / "out"
-    results = hvcc.compile_dataflow(pd_path, out_dir, verbose=False)
+    results = compile_dataflow(pd_path, out_dir, verbose=False)
+
     for stage, result in results.root.items():
         assert not result.notifs.has_error, f"{stage}: {result.notifs}"
+
     with open(out_dir / "ir" / "heavy.heavy.ir.json") as f:
-        return json.load(f)
+        return IRGraph(**json.load(f))
 
 
-def first_reader(process_order: list[dict], start: int, buffer: dict) -> dict | None:
+def first_reader(process_order: list[IRSignalList], start: int, buffer: IRBuffer) -> IRSignalList | None:
     """The first object after process_order[start] that reads buffer, before it is overwritten."""
     for entry in process_order[start + 1:]:
-        if buffer in entry["inputBuffers"]:
+        if buffer in entry.inputBuffers:
             return entry
-        if buffer in entry["outputBuffers"]:
+        if buffer in entry.outputBuffers:
             return None
     return None
 
 
-def masked_comparisons(ir: dict, ir_type: str) -> list[bool]:
+def masked_comparisons(ir: IRGraph, ir_type: str) -> list[bool]:
     """For every IR object of ir_type: is its output masked with [__and~f] and the constant 1.0?"""
-    objects = ir["objects"]
-    order = ir["signal"]["processOrder"]
+    objects = ir.objects
+    order = ir.signal.processOrder
     masked = []
     for i, entry in enumerate(order):
-        if objects[entry["id"]]["type"] != ir_type:
+        if objects[entry.id].type != ir_type:
             continue
-        reader = first_reader(order, i, entry["outputBuffers"][0])
-        ok = reader is not None and objects[reader["id"]]["type"] == "__and~f"
+        reader = first_reader(order, i, entry.outputBuffers[0])
+        ok = reader is not None and objects[reader.id].type == "__and~f"
+        assert reader
+
         if ok:
             # the other input of __and~f is the constant 1.0
-            other = [b for b in reader["inputBuffers"] if b != entry["outputBuffers"][0]]
-            producers = [e for e in order[:order.index(reader)] if other and other[0] in e["outputBuffers"]]
-            ok = bool(producers) and objects[producers[-1]["id"]]["type"] == "__var_k~f" \
-                and objects[producers[-1]["id"]]["args"]["k"] == 1.0
+            other = [b for b in reader.inputBuffers if b != entry.outputBuffers[0]]
+            producers = [e for e in order[:order.index(reader)] if other and other[0] in e.outputBuffers]
+            ok = bool(producers) and objects[producers[-1].id].type == "__var_k~f" \
+                and objects[producers[-1].id].args["k"] == 1.0
         masked.append(ok)
     return masked
 
@@ -106,4 +112,4 @@ def test_ir_comparison_keeps_mask(tmp_path: Path):
     )
     ir = compile_ir(tmp_path, hv_obj, right_inlet=True)
     assert masked_comparisons(ir, "__lt~f") == [False]
-    assert not [o for o in ir["objects"].values() if o["type"] == "__and~f"]
+    assert not [o for o in ir.objects.values() if o.type == "__and~f"]
