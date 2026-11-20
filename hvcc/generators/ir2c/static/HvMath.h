@@ -1155,9 +1155,12 @@ static inline void __hv_ldexp_f(hv_bInf_t bIn0, hv_bInf_t bIn1, hv_bOutf_t bOut)
 
 // bitsafe: replace NaN and +/-inf by 0. The SIMD versions test the exponent bits (all set
 // for NaN and inf) instead of comparisons, which -ffast-math may optimise away.
+// HV_FLOAT_EXP_MASK equals the bit pattern of +inf, but an infinity constant would be
+// undefined under -ffinite-math-only.
+#define HV_FLOAT_EXP_MASK 0x7f800000
 #if HV_SIMD_SSE || HV_SIMD_AVX
 static inline __m128 __hv_bitsafe_sse(__m128 x) {
-  const __m128i e = _mm_set1_epi32(0x7f800000);
+  const __m128i e = _mm_set1_epi32(HV_FLOAT_EXP_MASK);
   __m128i nonfinite = _mm_cmpeq_epi32(_mm_and_si128(_mm_castps_si128(x), e), e);
   return _mm_andnot_ps(_mm_castsi128_ps(nonfinite), x);
 }
@@ -1172,7 +1175,7 @@ static inline void __hv_bitsafe_f(hv_bInf_t bIn0, hv_bOutf_t bOut) {
 #elif HV_SIMD_SSE
   *bOut = __hv_bitsafe_sse(bIn0);
 #elif HV_SIMD_NEON
-  const uint32x4_t e = vdupq_n_u32(0x7f800000);
+  const uint32x4_t e = vdupq_n_u32(HV_FLOAT_EXP_MASK);
   uint32x4_t nonfinite = vceqq_u32(vandq_u32(vreinterpretq_u32_f32(bIn0), e), e);
   *bOut = vreinterpretq_f32_u32(vbicq_u32(vreinterpretq_u32_f32(bIn0), nonfinite));
 #else // HV_SIMD_NONE
