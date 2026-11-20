@@ -52,6 +52,10 @@ class HLangBinop(HeavyLangObject):
         "<<": ("__shiftleft", "__shiftleft_k")              # binary left shift
     })
 
+    # Comparison IR objects used for Pd/Cyclone's <~, <=~, >~, >=~, ==~ and !=~.
+    __SIGNAL_COMPARISONS: Final[frozenset[str]] = frozenset({
+        "__gt~f", "__gte~f", "__eq~f", "__neq~f", "__lt~f", "__lte~f"})
+
     def __init__(
         self,
         obj_type: str,
@@ -68,9 +72,45 @@ class HLangBinop(HeavyLangObject):
     def handles_type(cls, obj_type: str) -> bool:
         """Returns True if this class handles the given object type. False otherwise.
         """
-        return obj_type in HLangBinop.__HEAVY_DICT
+        return obj_type in cls.__HEAVY_DICT
 
     def reduce(self) -> tuple | None:
+        result = self._reduce()
+        if result is None:
+            return None
+        return self._mask_comparison_result(*result)
+
+    def _mask_comparison_result(self, obj_set: set, connections: list) -> tuple:
+        """Turn the bit mask of a float signal comparison into Pd's 1.0 or 0.0.
+
+        The IR comparisons return a SIMD mask: all bits set for true, all clear
+        for false. Read as a float, the all-set mask is NaN. AND-ing with the
+        bit pattern of 1.0 (0x3F800000) gives 1.0 or 0.0:
+
+            0xFFFFFFFF & 0x3F800000 == 0x3F800000  # 1.0
+            0x00000000 & 0x3F800000 == 0x00000000  # 0.0
+
+        A no-op on HV_SIMD_NONE, where comparisons already yield 1.0 or 0.0.
+        """
+        cmp = next((x for x in obj_set if x.type in self.__SIGNAL_COMPARISONS), None)
+        if cmp is None:
+            return (obj_set, connections)
+
+        mask = HeavyIrObject("__and~f")
+        one = HeavyIrObject("__var_k~f", args={"k": 1.0})
+
+        rewired = [
+            (source, [c.copy(from_object=mask) if c.from_object is cmp else c for c in new_connections])
+            for source, new_connections in connections
+        ]
+
+        rewired.append((None, [
+            Connection(cmp, 0, mask, 0, "~f>"),
+            Connection(one, 0, mask, 1, "~f>")
+        ]))
+        return (obj_set | {mask, one}, rewired)
+
+    def _reduce(self) -> tuple | None:
         if self.has_inlet_connection_format("__") or \
                 self.has_inlet_connection_format("_c") or \
                 self.has_inlet_connection_format("_f") or \
@@ -79,12 +119,12 @@ class HLangBinop(HeavyLangObject):
             return (set(), [])  # remove this object
 
         if self.has_inlet_connection_format("ff"):
-            ir_type = next(x for x in HLangBinop.__HEAVY_DICT[self.type] if x.endswith("~f"))
+            ir_type = next(x for x in self.__HEAVY_DICT[self.type] if x.endswith("~f"))
             x = HeavyIrObject(ir_type)
             return ({x}, self.get_connection_move_list(x))
 
         elif self.has_inlet_connection_format("fc"):
-            ir_type = next(x for x in HLangBinop.__HEAVY_DICT[self.type] if x.endswith("~f"))
+            ir_type = next(x for x in self.__HEAVY_DICT[self.type] if x.endswith("~f"))
             x = HeavyIrObject(ir_type)
             y = HeavyIrObject("__var~f", {"k": self.args[self.name_for_arg()]})
             z = HeavyIrObject("__varread~f", {"var_id": y.id})
@@ -98,7 +138,7 @@ class HLangBinop(HeavyLangObject):
             return ({x, y, z}, connections)
 
         elif self.has_inlet_connection_format("f_"):
-            ir_type = next(x for x in HLangBinop.__HEAVY_DICT[self.type] if x.endswith("~f"))
+            ir_type = next(x for x in self.__HEAVY_DICT[self.type] if x.endswith("~f"))
 
             # handle identity-operations
             if (self.type == "+" and self.args["k"] == 0.0) or \
@@ -148,12 +188,12 @@ class HLangBinop(HeavyLangObject):
             return ({x, y}, connections)
 
         elif self.has_inlet_connection_format("ii"):
-            ir_type = next(x for x in HLangBinop.__HEAVY_DICT[self.type] if x.endswith("~i"))
+            ir_type = next(x for x in self.__HEAVY_DICT[self.type] if x.endswith("~i"))
             x = HeavyIrObject(ir_type)
             return ({x}, self.get_connection_move_list(x))
 
         elif self.has_inlet_connection_format("ic"):
-            ir_type = next(x for x in HLangBinop.__HEAVY_DICT[self.type] if x.endswith("~i"))
+            ir_type = next(x for x in self.__HEAVY_DICT[self.type] if x.endswith("~i"))
             x = HeavyIrObject(ir_type)
             y = HeavyIrObject("__var~i", {"k": self.args[self.name_for_arg()]})
             z = HeavyIrObject("__varread~i", {"var_id": y.id})
@@ -167,7 +207,7 @@ class HLangBinop(HeavyLangObject):
             return ({x, y, z}, connections)
 
         elif self.has_inlet_connection_format("i_"):
-            ir_type = next(x for x in HLangBinop.__HEAVY_DICT[self.type] if x.endswith("~i"))
+            ir_type = next(x for x in self.__HEAVY_DICT[self.type] if x.endswith("~i"))
             x = HeavyIrObject(ir_type)
             # add constant generator
             y = HeavyIrObject(
@@ -183,7 +223,7 @@ class HLangBinop(HeavyLangObject):
             return ({x, y}, connections)
 
         elif self.has_inlet_connection_format("cc"):
-            ir_type = HLangBinop.__HEAVY_DICT[self.type][0]
+            ir_type = self.__HEAVY_DICT[self.type][0]
             # standardise the operation's constant argument name to "k"
             args = {"k": self.args[self.name_for_arg()]}
             x = HeavyIrObject(ir_type, args)
@@ -191,14 +231,14 @@ class HLangBinop(HeavyLangObject):
 
         elif self.has_inlet_connection_format("c_"):
             # if the right inlet is empty, generate a constant variation of the object
-            ir_type = next(x for x in HLangBinop.__HEAVY_DICT[self.type] if x.endswith("_k"))
+            ir_type = next(x for x in self.__HEAVY_DICT[self.type] if x.endswith("_k"))
             # standardise the operation's constant argument name to "k"
             args = {"k": self.args[self.name_for_arg()]}
             x = HeavyIrObject(ir_type, args)
             return ({x}, self.get_connection_move_list(x))
 
         elif self.has_inlet_connection_format("cf"):
-            ir_type = next(x for x in HLangBinop.__HEAVY_DICT[self.type] if x.endswith("~f"))
+            ir_type = next(x for x in self.__HEAVY_DICT[self.type] if x.endswith("~f"))
             x = HeavyIrObject(ir_type)
             v = HeavyIrObject("__var~f")
             vr = HeavyIrObject("__varread~f", args={"var_id": v.id})
