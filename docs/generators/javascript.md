@@ -1,8 +1,11 @@
 # Javascript
 
+> [!WARNING]
 > Emscripten versions 3.1.42 until 3.1.47 contain a bug that breaks our builds.
 >
 > Use a version earlier or later with this Generator for functional output.
+
+This generator requires having [emsdk](https://github.com/emscripten-core/emsdk) installed and active in the path. Activating this generator automatically builds the webassembly target.
 
 ## Getting Started
 
@@ -48,7 +51,7 @@ The initial set up should look something like this:
   // construct a new patch module, this contains all the necessary libraries
   // make sure to replace {PATCH} with the name of your patch
   window.onload = function() {
-    {PANRT}_Module().then(loadedModule => {
+    {PATCH}_Module().then(loadedModule => {
       heavyModule = loadedModule;
       moduleLoaded();
     });
@@ -151,7 +154,8 @@ The JS target supports [exposing event and parameter](../getting-started/patchin
 </script>
 ```
 
-Note: these are calls directly to the `AudioLib` so make sure to include `.audiolib` when sending events or messages.
+> [!NOTE]
+> These are calls directly to the `AudioLib` so make sure to include `.audiolib` when sending events or messages.
 
 ## Loading Custom Samples
 

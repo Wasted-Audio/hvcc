@@ -15,12 +15,11 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import re
-from typing import Optional, Dict
 
-from .HeavyException import HeavyException
+from .HeavyGraph import HeavyGraph
+from .HeavyIrException import HeavyIrException
 from .HeavyIrObject import HeavyIrObject
 from .HeavyLangObject import HeavyLangObject
-from .HeavyGraph import HeavyGraph
 
 
 class HLangBiquad(HeavyLangObject):
@@ -34,9 +33,9 @@ class HLangBiquad(HeavyLangObject):
     def __init__(
         self,
         obj_type: str,
-        args: Dict,
+        args: dict,
         graph: 'HeavyGraph',
-        annotations: Optional[Dict] = None
+        annotations: dict | None = None
     ) -> None:
         assert obj_type == "biquad"
         super().__init__(obj_type, args, graph,
@@ -55,4 +54,4 @@ class HLangBiquad(HeavyLangObject):
             return {x}, self.get_connection_move_list(x)
 
         else:
-            raise HeavyException(f"Unsupported connection format to biquad: {fmt}")
+            raise HeavyIrException(f"Unsupported connection format to biquad: {fmt}")

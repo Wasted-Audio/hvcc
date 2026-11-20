@@ -15,19 +15,18 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from collections import Counter
-from typing import Optional
+
+from hvcc.types.Heavy import Heavy, HvConn, HvConnFrom, HvConnTo, HvPos
 
 from .NotificationEnum import NotificationEnum
 from .PdObject import PdObject
-
-from hvcc.types.Heavy import Heavy, HvPos, HvConn, HvConnFrom, HvConnTo
 
 
 class PdRouteObject(PdObject):
     def __init__(
         self,
         obj_type: str,
-        obj_args: Optional[list] = None,
+        obj_args: list | None = None,
         pos_x: int = 0,
         pos_y: int = 0
     ) -> None:
@@ -54,7 +53,7 @@ class PdRouteObject(PdObject):
             for i, a in enumerate(self.obj_args):
                 try:
                     self.obj_args[i] = float(a)
-                except Exception:
+                except ValueError:
                     pass
 
     def validate_configuration(self) -> None:

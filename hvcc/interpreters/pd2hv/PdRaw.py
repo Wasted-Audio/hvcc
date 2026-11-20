@@ -40,7 +40,7 @@ def parse_pd_raw_args(args: list) -> dict:
 
     args = replace_owl(args)  # TODO(dromer): deprecate @owl on next stable release
 
-    for raw_param in {'@raw', '@raw_min', '@raw_max', '@raw_default', '@raw_param'}:
+    for raw_param in ('@raw', '@raw_min', '@raw_max', '@raw_default', '@raw_param'):
         if raw_param not in args:
             continue
 

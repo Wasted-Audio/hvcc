@@ -13,9 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import unittest
 import subprocess
-
+import unittest
 from pathlib import Path
 
 from tests.framework.base_midi import TestPdMIDIBase
@@ -34,7 +33,7 @@ class TestPdMIDIOutPatches(TestPdMIDIBase):
             "-o create_test_midi ; " \
             "./create_test_midi"
 
-        subprocess.run(command, capture_output=True, shell=True)
+        subprocess.run(command, check=False, capture_output=True, shell=True)
 
     def test_noteout(self):
         self._test_midi_patch("test-noteout.pd")

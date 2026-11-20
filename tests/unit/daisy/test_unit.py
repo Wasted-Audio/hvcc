@@ -1,6 +1,6 @@
 import unittest
 
-from hvcc.generators.c2daisy.json2daisy import flatten_pin_dicts, flatten_index_dicts
+from hvcc.generators.c2daisy.json2daisy import flatten_index_dicts, flatten_pin_dicts
 
 
 # A simple comparison for strings / literals / dicts within dicts

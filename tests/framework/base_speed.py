@@ -14,12 +14,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
 import json
+import os
 import shutil
 import subprocess
-
-from typing import List, Optional
 from pathlib import Path
 
 from tests.framework.base_test import HvBaseTest
@@ -29,12 +27,12 @@ class TestPdSpeedBase(HvBaseTest):
 
     def compile_and_run(
         self,
-        source_files: List[Path],
+        source_files: list[Path],
         out_dir: Path,
-        sample_rate: Optional[int] = None,
-        block_size: Optional[int] = None,
-        num_iterations: Optional[int] = None,
-        flag: Optional[str] = None
+        sample_rate: int | None = None,
+        block_size: int | None = None,
+        num_iterations: int | None = None,
+        flag: str | None = None
     ):
         exe_path = self._compile_and_run_clang(source_files, out_dir, flag)
 
@@ -57,10 +55,7 @@ class TestPdSpeedBase(HvBaseTest):
         else:
             golden = {}
 
-        try:
-            out_dir = self._run_hvcc(pd_path)
-        except Exception as e:
-            self.fail(str(e))
+        out_dir = self._run_hvcc(pd_path)
 
         assert out_dir
         c_src_dir = Path(out_dir, "c")

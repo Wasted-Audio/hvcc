@@ -14,20 +14,19 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from typing import Optional
+
+from hvcc.types.Heavy import Heavy, HvPos
 
 from .NotificationEnum import NotificationEnum
 from .PdObject import PdObject
-from .PdRaw import parse_pd_raw_args, PdRawException
-
-from hvcc.types.Heavy import Heavy, HvPos
+from .PdRaw import PdRawException, parse_pd_raw_args
 
 
 class PdSendObject(PdObject):
     def __init__(
         self,
         obj_type: str,
-        obj_args: Optional[list] = None,
+        obj_args: list | None = None,
         pos_x: int = 0,
         pos_y: int = 0
     ) -> None:
@@ -48,7 +47,7 @@ class PdSendObject(PdObject):
                     self.__extern_type = "param"
                 elif self.obj_args[1] == "@hv_event":
                     self.__extern_type = "event"
-        except Exception:
+        except IndexError:
             pass
 
         if self.__extern_type == "param":
@@ -66,7 +65,7 @@ class PdSendObject(PdObject):
             except ValueError:
                 self.add_warning(
                     f"Minimum, maximum, and default values for Parameter {self.__send_name}  must be numbers.")
-            except Exception:
+            except IndexError:
                 pass
 
             if not (self.__attributes["min"] <= self.__attributes["default"]):

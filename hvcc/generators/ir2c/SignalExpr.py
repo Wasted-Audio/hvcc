@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from typing import Dict, List
+from typing import ClassVar
 
 from hvcc.types.IR import IRSignalList
 
@@ -27,7 +27,7 @@ class SignalExpr(HeavyObject):
     """
 
     preamble = "cExprSig"
-    obj_eval_functions: Dict = {}
+    obj_eval_functions: ClassVar[dict[str, str]] = {}
 
     @classmethod
     def handles_type(cls, obj_type: str) -> bool:
@@ -40,7 +40,7 @@ class SignalExpr(HeavyObject):
         return {"HvMath.h"}
 
     @classmethod
-    def get_C_class_header_code(cls, obj_type: str, args: Dict) -> List[str]:
+    def get_C_class_header_code(cls, obj_type: str, args: dict) -> list[str]:
         eval_funcs = ",\n\t\t".join(cls.obj_eval_functions.values())
         fptr_type = f"{cls.preamble}_evaluator"
         lines = [
@@ -50,7 +50,7 @@ class SignalExpr(HeavyObject):
         return lines
 
     @classmethod
-    def get_C_obj_header_code(cls, obj_type: str, obj_id: str, args: Dict) -> List[str]:
+    def get_C_obj_header_code(cls, obj_type: str, obj_id: str, args: dict) -> list[str]:
         lines = []
         func_name = f"{cls.preamble}_{obj_id}_evaluate"
         cls.obj_eval_functions[obj_id] = func_name
@@ -60,7 +60,7 @@ class SignalExpr(HeavyObject):
         return lines
 
     @classmethod
-    def get_C_obj_impl_code(cls, obj_type: str, obj_id: str, args: Dict) -> List[str]:
+    def get_C_obj_impl_code(cls, obj_type: str, obj_id: str, args: dict) -> list[str]:
         """ (Per object) this creates the _sendMessage function that other objects use to
             send messages to this object.
         """
@@ -75,7 +75,7 @@ class SignalExpr(HeavyObject):
         num_buffers = expr_parser.num_simd_buffers()
         buffer_declaration = "\t// no extra buffers needed"
         if num_buffers > 0:
-            buffers = ", ".join([f"Bf{i}" for i in range(0, num_buffers)])
+            buffers = ", ".join([f"Bf{i}" for i in range(num_buffers)])
             buffer_declaration = f"\thv_bufferf_t {buffers};"
 
         func_name = f"Heavy_{{{{name}}}}::{cls.preamble}_{obj_id}_evaluate"
@@ -91,7 +91,7 @@ class SignalExpr(HeavyObject):
         return lines
 
     @classmethod
-    def get_C_process(cls, process_dict: IRSignalList, obj_type: str, obj_id: str, args: Dict) -> List[str]:
+    def get_C_process(cls, process_dict: IRSignalList, obj_type: str, obj_id: str, args: dict) -> list[str]:
         input_args = []
         for b in process_dict.inputBuffers:
             buf = HeavyObject._c_buffer(b)
@@ -103,8 +103,8 @@ class SignalExpr(HeavyObject):
             "",
             "\t// !!! declare this buffer once outside the loop",
             f"\thv_bInf_t input_args_{obj_id}[{args['num_inlets']}] = {{{', '.join(input_args)}}};",
-            f"\t{cls.preamble}_evaluators[{len(cls.obj_eval_functions)}](input_args_{obj_id}, {out_buf});"
-            "",
+            (f"\t{cls.preamble}_evaluators[{len(cls.obj_eval_functions)}](input_args_{obj_id}, {out_buf});"
+            ""),
         ]
 
         return call

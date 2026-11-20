@@ -15,7 +15,6 @@
 
 import argparse
 import unittest
-
 from pathlib import Path
 
 from tests.framework.base_control import TestPdControlBase
@@ -74,6 +73,17 @@ class TestPdSignalCyclonePatches(TestPdControlBase):
 
     def test_poltocar_cartopol(self):
         self._test_control_patch("test-poltocar-cartopol.pd")
+
+    # signal comparisons: 1.0 or 0.0 also with SIMD (where the IR objects return a bit mask)
+
+    def test_sig_lt_gt(self):
+        self._test_control_patch("test-sig-lt-gt.pd")
+
+    def test_sig_lte_gte(self):
+        self._test_control_patch("test-sig-lte-gte.pd")
+
+    def test_sig_eq_neq(self):
+        self._test_control_patch("test-sig-eq-neq.pd")
 
 
 def main():

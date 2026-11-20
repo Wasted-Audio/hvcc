@@ -1,10 +1,11 @@
 import re
-
 from pathlib import Path
 
 
 def python_indent(content):
     # Pattern: classic markdown indent (2 spaces) to Python-Markdown indent (4 spaces)
+    # both for double and single indented lists
+    content = re.sub(r'^(\ \ \ \ -\ .*)', r'    \1', content, flags=re.MULTILINE)
     return re.sub(r'^(\ \ -\ .*)', r'  \1', content, flags=re.MULTILINE)
 
 
@@ -14,22 +15,22 @@ def on_page_markdown(markdown, page, config, files):
         try:
             with open(readme_path, 'r', encoding='utf-8') as f:
                 content = f.read()
-
-            # Rewrite links: [label](docs/...) -> [label](...)
-            # This handles both markdown links [text](url) and images ![text](url)
-            # We match (docs/ and replace with (
-
-            # Pattern: parenthesis, docs/, everything else
-            content = content.replace('](docs/', '](')
-            content = content.replace('CONTRIBUTING.md', 'contributing.md')
-            content = content.replace('CODE_OF_CONDUCT.md', 'code_of_conduct.md')
-
-            content = python_indent(content)
-
-            return content
-        except Exception as e:
+        except (OSError, UnicodeDecodeError) as e:
             print(f"Error including README.md: {e}")
             return markdown
+
+        # Rewrite links: [label](docs/...) -> [label](...)
+        # This handles both markdown links [text](url) and images ![text](url)
+        # We match (docs/ and replace with (
+
+        # Pattern: parenthesis, docs/, everything else
+        content = content.replace('](docs/', '](')
+        content = content.replace('CONTRIBUTING.md', 'contributing.md')
+        content = content.replace('CODE_OF_CONDUCT.md', 'code_of_conduct.md')
+
+        content = python_indent(content)
+
+        return content
 
     # # This is not functional yet:
     # if page.file.src_path == 'contributing.md':

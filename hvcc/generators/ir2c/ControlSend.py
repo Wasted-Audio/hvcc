@@ -14,11 +14,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from typing import Callable, Dict, List
-
-from .HeavyObject import HeavyObject
+from collections.abc import Callable
 
 from hvcc.types.IR import IRObjectdict, IROnMessage
+
+from .HeavyObject import HeavyObject
 
 
 class ControlSend(HeavyObject):
@@ -27,7 +27,7 @@ class ControlSend(HeavyObject):
     preamble = "cSend"
 
     @classmethod
-    def get_C_onMessage(cls, obj_type: str, obj_id: str, inlet_index: int, args: Dict) -> List[str]:
+    def get_C_onMessage(cls, obj_type: str, obj_id: str, inlet_index: int, args: dict) -> list[str]:
         return [f"cSend_{obj_id}_sendMessage(_c, 0, m);"]
 
     @classmethod
@@ -35,11 +35,11 @@ class ControlSend(HeavyObject):
         cls,
         obj_type: str,
         obj_id: str,
-        on_message_list: List[List[IROnMessage]],
+        on_message_list: list[list[IROnMessage]],
         get_obj_class: Callable,
-        objects: Dict[str, IRObjectdict],
-        args: Dict
-    ) -> List[str]:
+        objects: dict[str, IRObjectdict],
+        args: dict
+    ) -> list[str]:
         # Note(joe): if no corresponding receivers exist and there's no extern indicator
         # then there is not much need to generate code stub
         send_message_list = [

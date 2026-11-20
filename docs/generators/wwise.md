@@ -32,7 +32,10 @@ Exposing an input parameter will automatically generate a Slider UI in the plugi
 
 ### Output Parameters
 
-Sending a `single float value` to an output parameters will in turn cause the corresponding RTPC of the same name to be set. It will be set on the same game object. **Note**: it's important that the naming of the output parameter and the global RTPC set up in Wwise are exactly the same.
+Sending a `single float value` to an output parameters will in turn cause the corresponding RTPC of the same name to be set. It will be set on the same game object.
+
+> [!IMPORTANT]
+> The naming of the output parameter and the global RTPC set up in Wwise must match exactly.
 
 The example patch below describes a simple envelope follower that can be used to modulate other parameters of the same voice:
 
@@ -73,8 +76,7 @@ To build Authoring and Engine plugins on Windows you’ll need:
     - Different version can be specified in a generated PremakePlugin.lua file
 - Wwise 2022 or later
   - Version 2021 should work, too, but it wasn't tested
-  - SDKs with required deployment platforms must be installed through
-    Wwise Launcher
+  - SDKs with required deployment platforms must be installed through Wwise Launcher
 
 ### Converting a Pure Data Patch to C++ Code
 
@@ -87,7 +89,10 @@ hvcc HvccTestFX71.pd -o Hvcc_Out_Dir -g wwise -n HvccTestFX71
 
 ### Building C++ Code
 
-Heavy generates a project compatible with Audiokinetic's [Development Tools](https://www.audiokinetic.com/en/library/edge/?source=SDK&id=effectplugin_tools.html), which can build the plugins for all supported platforms, see the documentation for more details. **Important:** Please close any running Wwise Authoring instance as it'll prevent the plugin from being built.
+Heavy generates a project compatible with Audiokinetic's [Development Tools](https://www.audiokinetic.com/en/library/edge/?source=SDK&id=effectplugin_tools.html), which can build the plugins for all supported platforms, see the documentation for more details.
+
+> [!IMPORTANT]
+> Please close any running Wwise Authoring instance as it'll prevent the plugin from being built.
 
 Change into the generated directory:
 
@@ -129,7 +134,9 @@ The *Bundle* directory now contains a packaged plugin you can install through Ww
 ## Example: Building Your Plugin on Linux
 
 Building Linux plugin binaries is relatively easy. It requires python3 to be installed.
-Also make sure the Linux SDK is in a path without spaces or special characters.
+
+> [!WARNING]
+> Make sure the Linux SDK is installed in a path without spaces or special characters.
 
 Then make sure the `premake5` binary in the SDK has the executable flag set:
 

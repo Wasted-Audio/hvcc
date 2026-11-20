@@ -15,9 +15,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from collections import defaultdict
-from typing import Dict, List, Optional, Tuple
 
-from .HeavyException import HeavyException
+from .HeavyIrException import HeavyIrException
 
 
 class BufferPool:
@@ -26,12 +25,12 @@ class BufferPool:
         # the idea is that the same buffer is reused as quickly as possible so that it doesn't need
         # to be moved around in the cache. It does not give substantially different results
         # from a Counter-based implementation, but it is more consistent and predictable.
-        self.pool: Dict = {
+        self.pool: dict = {
             "~f>": defaultdict(list),
             "~i>": defaultdict(list)
         }
 
-    def num_buffers(self, connection_type: Optional[str] = None) -> int:
+    def num_buffers(self, connection_type: str | None = None) -> int:
         """ Returns the number of buffers with the given retain count. By default returns
             the size of the entire pool. Number of buffers per connection type can also be retrieved.
         """
@@ -40,9 +39,9 @@ class BufferPool:
         elif connection_type in self.pool:
             return sum(len(v) for v in self.pool[connection_type].values())
         else:
-            raise HeavyException(f"Unknown connection type: \"{connection_type}\"")
+            raise HeavyIrException(f"Unknown connection type: \"{connection_type}\"")
 
-    def get_buffer(self, connection_type: str, count: int = 1, excludeSet: Optional[set] = None) -> Tuple[str, int]:
+    def get_buffer(self, connection_type: str, count: int = 1, excludeSet: set | None = None) -> tuple[str, int]:
         """ Returns a currently unused buffer. The buffer can be assigned a retain count. An optional
             exclude set can also be supplied, ensuring that the returned buffer is not one of them.
         """
@@ -60,7 +59,7 @@ class BufferPool:
         pool[count].append(b)
         return b
 
-    def retain_buffer(self, b: List, count: int = 1) -> int:
+    def retain_buffer(self, b: list, count: int = 1) -> int:
         """ Increases the retain count of the buffer. Returns the new count.
         """
         # adc~ and ZERO_BUFFER are special. They cannot be retained.
@@ -73,7 +72,7 @@ class BufferPool:
                     v.remove(b)
                     pool[k + count].append(b)
                     return k + count  # return the new retain count
-            raise HeavyException(f"{b} not found in BufferPool!")
+            raise HeavyIrException(f"{b} not found in BufferPool!")
 
     def release_buffer(self, b: tuple[str, int], count: int = 1) -> int:
         """ Reduces the retain count of the buffer. Returns the new count.
@@ -90,7 +89,7 @@ class BufferPool:
                     v.remove(b)
                     pool[k - count].append(b)
                     return k - count  # return the new retain count
-            raise HeavyException(f"{b} not found in BufferPool!")
+            raise HeavyIrException(f"{b} not found in BufferPool!")
 
     def __repr__(self) -> str:
         return self.pool["~f>"].__repr__() + self.pool["~i>"].__repr__()

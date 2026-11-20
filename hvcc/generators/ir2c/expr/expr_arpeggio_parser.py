@@ -13,13 +13,15 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from typing import Literal, Union
+from typing import Literal, TypeAlias
 
-from arpeggio import ParsingExpression as ParseTreeNode, Terminal  # type: ignore
+from arpeggio import ParsingExpression as ParseTreeNode  # type: ignore
+from arpeggio import Terminal
+
 from .expr_arpeggio_grammar import expr_grammar
 
-ParseExpr = Union[ParseTreeNode, Terminal]
-NodeType = Literal["binary", "bound_var", "num_i", "num_f", "var", "func", "unary"]
+ParseExpr: TypeAlias = ParseTreeNode | Terminal
+NodeType: TypeAlias = Literal["binary", "bound_var", "num_i", "num_f", "var", "func", "unary"]
 
 
 class ExprNode:
@@ -27,11 +29,11 @@ class ExprNode:
         self,
         node_type: NodeType,
         value: str,
-        nodes: list = []
+        nodes: list | None = None
     ) -> None:
         self.type = node_type
         self.value = value
-        self.nodes: list[ExprNode] = nodes
+        self.nodes: list[ExprNode] = nodes or []
 
     def __str__(self, depth: int = 0) -> str:
         this = f"{'  '*depth}{self.type}:{self.value}\n"
@@ -40,7 +42,7 @@ class ExprNode:
         return this
 
 
-class ExprArpeggioParser():
+class ExprArpeggioParser:
     """
     These two methods are the "public" API
     """

@@ -16,9 +16,7 @@
 
 import argparse
 import json
-
 from collections import Counter, defaultdict
-from typing import Dict
 from pathlib import Path
 
 from hvcc.types.IR import HeavyIRType, IRGraph
@@ -33,19 +31,19 @@ class ir2c_perf:
         blocksize: int = 512,
         mhz: int = 1000,
         verbose: bool = False
-    ) -> Dict[str, Dict[str, float]]:
+    ) -> dict[str, dict[str, float]]:
         # read the hv.ir.json file
         with open(Path(Path(__file__).parent, "../../core/json/heavy.ir.json"), "r") as f:
             HEAVY_IR_JSON = HeavyIRType(**json.load(f)).root
 
         objects: Counter = Counter()
-        perf: Dict[str, float] = defaultdict(float)
-        per_object_perf: Dict[str, Dict[str, float]] = defaultdict(lambda: defaultdict(float))
+        perf: dict[str, float] = defaultdict(float)
+        per_object_perf: dict[str, dict[str, float]] = defaultdict(lambda: defaultdict(float))
 
         for o in ir.signal.processOrder:
             obj_id = o.id
             obj_type = ir.objects[obj_id].type
-            if obj_type in HEAVY_IR_JSON.keys():
+            if obj_type in HEAVY_IR_JSON:
                 objects[obj_type] += 1
                 obj_perf = HEAVY_IR_JSON[obj_type].perf
                 assert obj_perf is not None

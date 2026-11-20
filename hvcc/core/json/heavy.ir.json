@@ -1329,7 +1329,7 @@
   },
   "__inlet": {
     "inlets": [
-
+      "-->"
     ],
     "ir": {
       "control": false,
@@ -1337,6 +1337,7 @@
       "init": false
     },
     "outlets": [
+      "-~>",
       "-->"
     ]
   },

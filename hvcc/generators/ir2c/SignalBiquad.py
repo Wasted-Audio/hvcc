@@ -14,11 +14,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from typing import Dict, List
-
-from .HeavyObject import HeavyObject
 
 from hvcc.types.IR import IRSignalList
+
+from ..HeavyGenException import HeavyGenException
+from .HeavyObject import HeavyObject
 
 
 class SignalBiquad(HeavyObject):
@@ -37,16 +37,16 @@ class SignalBiquad(HeavyObject):
         return {"HvSignalBiquad.h", "HvSignalBiquad.c"}
 
     @classmethod
-    def get_C_def(cls, obj_type: str, obj_id: str) -> List[str]:
+    def get_C_def(cls, obj_type: str, obj_id: str) -> list[str]:
         if obj_type == "__biquad_k~f":
             return [f"SignalBiquad_k sBiquad_k_{obj_id};"]
         elif obj_type == "__biquad~f":
             return [f"SignalBiquad sBiquad_s_{obj_id};"]
         else:
-            raise Exception()
+            raise HeavyGenException(f"Incorrect obj_type {obj_type} for SignalBiquad")
 
     @classmethod
-    def get_C_init(cls, obj_type: str, obj_id: str, args: Dict) -> List[str]:
+    def get_C_init(cls, obj_type: str, obj_id: str, args: dict) -> list[str]:
         if obj_type == "__biquad_k~f":
             return ["sBiquad_k_init(&sBiquad_k_{0}, {1}f, {2}f, {3}f, {4}f, {5}f);".format(
                 obj_id,
@@ -58,18 +58,18 @@ class SignalBiquad(HeavyObject):
         elif obj_type == "__biquad~f":
             return [f"sBiquad_init(&sBiquad_s_{obj_id});"]
         else:
-            raise Exception()
+            raise HeavyGenException(f"Incorrect obj_type {obj_type} for SignalBiquad")
 
     @classmethod
-    def get_C_free(cls, obj_type: str, obj_id: str, args: Dict) -> List[str]:
+    def get_C_free(cls, obj_type: str, obj_id: str, args: dict) -> list[str]:
         return []
 
     @classmethod
-    def get_C_onMessage(cls, obj_type: str, obj_id: str, inlet_index: int, args: Dict) -> List[str]:
+    def get_C_onMessage(cls, obj_type: str, obj_id: str, inlet_index: int, args: dict) -> list[str]:
         return [f"sBiquad_k_onMessage(&Context(_c)->sBiquad_k_{obj_id}, {inlet_index}, m);"]
 
     @classmethod
-    def get_C_process(cls, process_dict: IRSignalList, obj_type: str, obj_id: str, args: Dict) -> List[str]:
+    def get_C_process(cls, process_dict: IRSignalList, obj_type: str, obj_id: str, args: dict) -> list[str]:
         if obj_type == "__biquad_k~f":
             return [
                 "__hv_biquad_k_f(&sBiquad_k_{0}, VIf({1}), VOf({2}));".format(
@@ -85,4 +85,4 @@ class SignalBiquad(HeavyObject):
                     ", ".join([f"VOf({cls._c_buffer(b)})" for b in process_dict.outputBuffers])
                 )]
         else:
-            raise Exception(f"Incorrect obj_type {obj_type} for SignalBiquad")
+            raise HeavyGenException(f"Incorrect obj_type {obj_type} for SignalBiquad")

@@ -15,12 +15,11 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import re
-from typing import Dict, List, Optional
-
-from .HeavyIrObject import HeavyIrObject
-from .HeavyGraph import HeavyGraph
 
 from hvcc.types.IR import IRSendMessage
+
+from .HeavyGraph import HeavyGraph
+from .HeavyIrObject import HeavyIrObject
 
 
 class HIrSend(HeavyIrObject):
@@ -30,19 +29,18 @@ class HIrSend(HeavyIrObject):
     def __init__(
         self,
         obj_type: str,
-        args: Optional[Dict] = None,
-        graph: Optional[HeavyGraph] = None,
-        annotations: Optional[Dict] = None
+        args: dict | None = None,
+        graph: HeavyGraph | None = None,
+        annotations: dict | None = None
     ) -> None:
         super().__init__("__send", args=args, graph=graph, annotations=annotations)
-        if args is not None and args["extern"]:
-            # output parameters must contain only alphanumeric characters or underscores,
-            # so that the names can be easily and transparently turned into code
-            if re.search(r"\W", args["name"]):
-                self.add_error(f"Parameter and Event names may only contain \
-                                alphanumeric characters or underscore: '{args['name']}'")
+        # output parameters must contain only alphanumeric characters or underscores,
+        # so that the names can be easily and transparently turned into code
+        if args is not None and args["extern"] and re.search(r"\W", args["name"]):
+            self.add_error(f"Parameter and Event names may only contain \
+                            alphanumeric characters or underscore: '{args['name']}'")
 
-    def get_ir_control_list(self) -> List[IRSendMessage]:
+    def get_ir_control_list(self) -> list[IRSendMessage]:
         if self.graph is not None and self.name is not None:
             receive_objs = self.graph.resolve_objects_for_name(self.name, "__receive")
             on_message_list = [x for o in receive_objs for x in o.get_ir_on_message(inlet_index=0)]

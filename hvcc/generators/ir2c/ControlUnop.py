@@ -14,14 +14,16 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from typing import Dict, List
+from collections.abc import Mapping
+from types import MappingProxyType
+from typing import Final
 
 from .HeavyObject import HeavyObject
 
 
 class ControlUnop(HeavyObject):
     # a dictionary translating from the operation argument to the C case
-    __OPERATION_DICT = {
+    __OPERATION_DICT: Final[Mapping[str, str]] = MappingProxyType({
         "__cos": "HV_UNOP_COS",
         "__acos": "HV_UNOP_ACOS",
         "__cosh": "HV_UNOP_COSH",
@@ -43,7 +45,7 @@ class ControlUnop(HeavyObject):
         "__ceil": "HV_UNOP_CEIL",
         "__floor": "HV_UNOP_FLOOR",
         "__round": "HV_UNOP_ROUND"
-    }
+    })
 
     c_struct = "ControlUnop"
     preamble = "cUnop"
@@ -63,15 +65,15 @@ class ControlUnop(HeavyObject):
         return {"HvControlUnop.h", "HvControlUnop.c"}
 
     @classmethod
-    def get_C_init(cls, obj_type: str, obj_id: str, args: Dict) -> List[str]:
+    def get_C_init(cls, obj_type: str, obj_id: str, args: dict) -> list[str]:
         return []
 
     @classmethod
-    def get_C_free(cls, obj_type: str, obj_id: str, args: Dict) -> List[str]:
+    def get_C_free(cls, obj_type: str, obj_id: str, args: dict) -> list[str]:
         return []
 
     @classmethod
-    def get_C_onMessage(cls, obj_type: str, obj_id: str, inlet_index: int, args: Dict) -> List[str]:
+    def get_C_onMessage(cls, obj_type: str, obj_id: str, inlet_index: int, args: dict) -> list[str]:
         return [
             "cUnop_onMessage(_c, {1}, m, &cUnop_{0}_sendMessage);".format(
                 obj_id,

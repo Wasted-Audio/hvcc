@@ -7,7 +7,7 @@
     {{object.id}}->setColors(nvgRGB{{object.bg_color.as_rgb_tuple()}});
             {%- if object.label != None %}
     {{object.id}}->setLabel("{{object.label.text}}",
-                {%- if meta.ui_theme is not none and meta.ui_themes[meta.ui_theme].cnv_text_color is not none %}
+                {%- if meta.ui_theme_set is sameas true and meta.ui_theme is not none and meta.ui_themes[meta.ui_theme].cnv_text_color is not none %}
         Colors::cnvTextColor,
                 {%- else %}
         nvgRGB{{object.label.color.as_rgb_tuple()}},
@@ -33,7 +33,7 @@
     {{object.parameter}}->setSize({{object.size.x}} * scaleFactor, {{object.size.y}} * scaleFactor);
     {{object.parameter}}->setAbsolutePos({{object.position.x}} * scaleFactor, {{object.position.y}} * scaleFactor);
     {{object.parameter}}->setColors(
-            {%- if meta.ui_theme is not none and meta.ui_themes[meta.ui_theme].bg_color is not none and meta.ui_themes[meta.ui_theme].cnvTextColor is not none %}
+            {%- if meta.ui_theme_set is sameas true and meta.ui_theme is not none and meta.ui_themes[meta.ui_theme].bg_color is not none and meta.ui_themes[meta.ui_theme].cnvTextColor is not none %}
         Colors::bgColor,
         Colors::cnvTextColor
             {%- else %}
@@ -42,7 +42,8 @@
             {%- endif %}
     );
     {{object.parameter}}->setInterval({{object.flash_time}});
-{% include 'gui_label.cpp' %}
+    {{object.parameter}}->setReadOnly({{object.send|lower}});
+{%- include 'gui_label.cpp' %}
     {{parent}}->addManagedChild({{object.parameter}});
         {%- elif object.type == 'toggle' %}
     // toggle
@@ -51,7 +52,7 @@
     {{object.parameter}}->setSize({{object.size.x}} * scaleFactor, {{object.size.y}} * scaleFactor);
     {{object.parameter}}->setAbsolutePos({{object.position.x}} * scaleFactor, {{object.position.y}} * scaleFactor);
     {{object.parameter}}->setColors(
-            {%- if meta.ui_theme is not none and meta.ui_themes[meta.ui_theme].bg_color is not none and meta.ui_themes[meta.ui_theme].cnvTextColor is not none %}
+            {%- if meta.ui_theme_set is sameas true and meta.ui_theme is not none and meta.ui_themes[meta.ui_theme].bg_color is not none and meta.ui_themes[meta.ui_theme].cnvTextColor is not none %}
         Colors::bgColor,
         Colors::cnvTextColor
             {%- else %}
@@ -59,6 +60,8 @@
         nvgRGB{{object.fg_color.as_rgb_tuple()}}
             {%- endif %}
     );
+    {{object.parameter}}->setReadOnly({{object.send|lower}});
+{%- include 'gui_label.cpp' %}
     {{parent}}->addManagedChild({{object.parameter}});
         {%- elif object.type in ['vradio', 'hradio'] %}
     // {{object.type}}
@@ -71,7 +74,7 @@
     {{object.parameter}}->setHorizontal();
             {%- endif %}
     {{object.parameter}}->setColors(
-            {%- if meta.ui_theme is not none and meta.ui_themes[meta.ui_theme].bg_color is not none and meta.ui_themes[meta.ui_theme].cnvTextColor is not none %}
+            {%- if meta.ui_theme_set is sameas true and meta.ui_theme is not none and meta.ui_themes[meta.ui_theme].bg_color is not none and meta.ui_themes[meta.ui_theme].cnvTextColor is not none %}
         Colors::bgColor,
         Colors::cnvTextColor
             {%- else %}
@@ -79,7 +82,8 @@
         nvgRGB{{object.fg_color.as_rgb_tuple()}}
             {%- endif %}
     );
-{% include 'gui_label.cpp' %}
+    {{object.parameter}}->setReadOnly({{object.send|lower}});
+{%- include 'gui_label.cpp' %}
     {{parent}}->addManagedChild({{object.parameter}});
         {%- elif object.type in ['vslider', 'hslider'] %}
     // {{object.type}}
@@ -101,12 +105,15 @@
         {%- for k, v in receivers + senders %}
             {%- if v.display == object.parameter %}
     {{object.parameter}}->setDefault({{v.attributes.default}}f);
+                {%- if v.attributes.type == "int" %}
+    {{object.parameter}}->setInteger(true);
+                {%- endif %}
             {%- endif %}
         {%- endfor %}
     {{object.parameter}}->setUsingLogScale({{object.logarithmic|lower}});
     {{object.parameter}}->setSteadyOnClick({{object.steady|lower}});
     {{object.parameter}}->setColors(
-            {%- if meta.ui_theme is not none and meta.ui_themes[meta.ui_theme].bg_color is not none and meta.ui_themes[meta.ui_theme].cnvTextColor is not none %}
+            {%- if meta.ui_theme_set is sameas true and meta.ui_theme is not none and meta.ui_themes[meta.ui_theme].bg_color is not none and meta.ui_themes[meta.ui_theme].cnvTextColor is not none %}
         Colors::bgColor,
         Colors::cnvTextColor
             {%- else %}
@@ -114,7 +121,8 @@
         nvgRGB{{object.fg_color.as_rgb_tuple()}}
             {%- endif %}
     );
-{% include 'gui_label.cpp' %}
+    {{object.parameter}}->setReadOnly({{object.send|lower}});
+{%- include 'gui_label.cpp' %}
     {{parent}}->addManagedChild({{object.parameter}});
         {%- elif object.type == 'knob' %}
     // knob
@@ -139,7 +147,7 @@
     {{object.parameter}}->setDiscrete({{object.discrete|lower}});
     {{object.parameter}}->setUsingLogScale(PDKnobEventHandler::LogMode::{{object.log_mode|upper}});
     {{object.parameter}}->setColors(
-        {%- if meta.ui_theme is not none and meta.ui_themes[meta.ui_theme].bg_color is not none and meta.ui_themes[meta.ui_theme].cnvTextColor is not none and meta.ui_themes[meta.ui_theme].io_color is not none %}
+        {%- if meta.ui_theme_set is sameas true and meta.ui_theme is not none and meta.ui_themes[meta.ui_theme].bg_color is not none and meta.ui_themes[meta.ui_theme].cnvTextColor is not none and meta.ui_themes[meta.ui_theme].io_color is not none %}
         Colors::bgColor,
         Colors::cnvTextColor,
         Colors::ioColor
@@ -149,8 +157,8 @@
         nvgRGB{{object.arc_color.as_rgb_tuple()}}
             {%- endif %}
     );
-    {{object.parameter}}->setLabelStyle({{object.label_pos.x}} * scaleFactor, {{object.label_pos.y}} * scaleFactor, {{object.label_size}} * scaleFactor);
-    {{object.parameter}}->setShowLabel(LabelShow::{{object.label_show.name|upper}});
+    {{object.parameter}}->setReadOnly({{object.send|lower}});
+    {{object.parameter}}->setLabelStyle({{object.label_pos.x}} * scaleFactor, {{object.label_pos.y}} * scaleFactor, {{object.label_size}} * scaleFactor, LabelShow::{{object.label_show.name|upper}});
     {{parent}}->addManagedChild({{object.parameter}});
         {%- elif object.type == 'number' %}
     // number
@@ -159,13 +167,15 @@
     {{object.parameter}}->setSize({{object.size.x}} * scaleFactor, {{object.size.y}} * scaleFactor);
     {{object.parameter}}->setAbsolutePos({{object.position.x}} * scaleFactor, {{object.position.y}} * scaleFactor);
     {{object.parameter}}->setRange({{object.min}}f, {{object.max}}f);
+    {{object.parameter}}->setUsingLogScale({{object.log_mode|lower}});
+    {{object.parameter}}->setLogarithmicHeight({{object.log_height}});
         {%- for k, v in receivers + senders %}
             {%- if v.display == object.parameter %}
     {{object.parameter}}->setDefault({{v.attributes.default}}f);
             {%- endif %}
         {%- endfor %}
     {{object.parameter}}->setColors(
-            {%- if meta.ui_theme is not none and meta.ui_themes[meta.ui_theme].bg_color is not none and meta.ui_themes[meta.ui_theme].cnvTextColor is not none %}
+            {%- if meta.ui_theme_set is sameas true and meta.ui_theme is not none and meta.ui_themes[meta.ui_theme].bg_color is not none and meta.ui_themes[meta.ui_theme].cnvTextColor is not none %}
         Colors::bgColor,
         Colors::cnvTextColor
             {%- else %}
@@ -173,7 +183,8 @@
         nvgRGB{{object.fg_color.as_rgb_tuple()}}
             {%- endif %}
     );
-{% include 'gui_label.cpp' %}
+    {{object.parameter}}->setReadOnly({{object.send|lower}});
+{%- include 'gui_label.cpp' %}
     {{parent}}->addManagedChild({{object.parameter}});
         {%- elif object.type == 'float' %}
     // float
@@ -188,6 +199,7 @@
             {%- endif %}
         {%- endfor %}
     {{object.parameter}}->setLabel("{{object.label_text}}", ({{object.font_height}} + 2) * scaleFactor, LabelPos::{{object.label_pos.name|capitalize}});
+    {{object.parameter}}->setReadOnly({{object.send|lower}});
     {{parent}}->addManagedChild({{object.parameter}});
         {%- endif %}
     {%- endfor %}

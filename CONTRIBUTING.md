@@ -23,7 +23,7 @@ Please use English for all communications to include as many people as possible.
 ### While contributing
 
 - Make sure that existing static code analysis and tests keep working.
-  - run `TOXENV=flake8 tox` for style checking
+  - run `TOXENV=ruff tox` for style checking
   - run `TOXENV=mypy tox` for type checking
   - run `tox` for the full suite of tests or `poetry run pytest tests/` for just the test suite.
 - Write unit, integration or end-to-end tests as appropriate to your feature or bug-fix.

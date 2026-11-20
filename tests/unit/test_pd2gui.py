@@ -3,8 +3,10 @@
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
+import pytest
+
 from hvcc.interpreters.pd2gui.PdGUIParser import PdGUIParser
-from hvcc.types.GUI import Graph, Coords, Size, GUIObjects
+from hvcc.types.GUI import Coords, Graph, GUIObjects, Size
 
 
 def test_filter_graph(cnv_vis1):
@@ -139,8 +141,12 @@ def test_filter_object_radio(
 def test_filter_params():
     p = PdGUIParser()
 
-    param1 = "vol @hv_param"
-    param2 = "volume"
+    param1_recv = "vol @hv_param"
+    param2_recv = "volume"
+    param2_send = "vol @hv_param"
 
-    assert p.filter_params(param1) == "vol"
-    assert p.filter_params(param2) is None
+    assert p.filter_params(param1_recv, "") == ("vol", False)
+    assert p.filter_params(param2_recv, param2_send) == ("vol", True)
+
+    with pytest.raises(ValueError):
+        p.filter_params(param1_recv, param2_send)

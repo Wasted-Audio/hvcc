@@ -18,15 +18,16 @@ import decimal
 import json
 from importlib import resources
 from pathlib import Path
-from typing import Optional, Any, Union, cast
+from typing import Any, cast
 
+from hvcc.types.Heavy import Heavy, HvPos
+from hvcc.types.IR import HeavyIRType, IRArg, IRNode
+from hvcc.types.Lang import HeavyLangType, LangArg, LangNode
+
+from ..HeavyPdException import HeavyPdException
 from .Connection import Connection
 from .NotificationEnum import NotificationEnum
 from .PdObject import PdObject
-
-from hvcc.types.IR import HeavyIRType, IRNode, IRArg
-from hvcc.types.Lang import HeavyLangType, LangNode, LangArg
-from hvcc.types.Heavy import Heavy, HvPos
 
 
 class HeavyObject(PdObject):
@@ -42,13 +43,13 @@ class HeavyObject(PdObject):
     def __init__(
         self,
         obj_type: str,
-        obj_args: Optional[list] = None,
+        obj_args: list | None = None,
         pos_x: int = 0,
         pos_y: int = 0
     ) -> None:
         super().__init__(obj_type, obj_args, pos_x, pos_y)
 
-        self.__obj_dict: Union[IRNode, LangNode]
+        self.__obj_dict: IRNode | LangNode
 
         # get the object dictionary (note that it is NOT a copy)
         if self.is_hvlang:
@@ -78,7 +79,7 @@ class HeavyObject(PdObject):
                     obj_args[i] = a.split(" ")[0] if "@hv_table" in a else a
 
         for i, a in enumerate(self.__obj_dict.args):
-            arg = cast(Union[IRArg, LangArg], a)
+            arg = cast(IRArg | LangArg, a)
             # if the argument exists (and has been correctly resolved)
             if i < len(obj_args) and obj_args[i] is not None:
                 # force the Heavy argument type
@@ -87,7 +88,7 @@ class HeavyObject(PdObject):
                     self.obj_dict[arg.name] = self.force_arg_type(
                         obj_args[i],
                         arg.value_type)
-                except Exception as e:
+                except (HeavyPdException, TypeError, ValueError, OverflowError, decimal.InvalidOperation) as e:
                     self.add_error(
                         f"Heavy {obj_type} cannot convert argument \"{arg.name}\""
                         f" with value \"{obj_args[i]}\" to type {arg.value_type}: {e}")
@@ -114,13 +115,13 @@ class HeavyObject(PdObject):
     def force_arg_type(
         cls,
         value: str,
-        value_type: Optional[str] = None
+        value_type: str | None = None
     ) -> Any:
         # TODO(mhroth): add support for mixedarray?
         if value_type == "auto":
             try:
                 return float(value)
-            except Exception:
+            except ValueError:
                 return str(value)
         elif value_type == "float":
             return float(value)
@@ -139,21 +140,21 @@ class HeavyObject(PdObject):
             if isinstance(value, str):
                 return [float(v) for v in value.split()]
             else:
-                raise Exception(f"Cannot convert value to type floatarray: {value}")
+                raise HeavyPdException(f"Cannot convert value to type floatarray: {value}")
         elif value_type == "intarray":
             if isinstance(value, list):
                 return [int(v) for v in value]
             if isinstance(value, str):
                 return [int(v) for v in value.split()]
             else:
-                raise Exception(f"Cannot convert value to type intarray: {value}")
+                raise HeavyPdException(f"Cannot convert value to type intarray: {value}")
         elif value_type == "stringarray":
             if isinstance(value, list):
                 return [str(v) for v in value]
             if isinstance(value, str):
                 return [str(v) for v in value.split()]
             else:
-                raise Exception(f"Cannot convert value to type stringarray: {value}")
+                raise HeavyPdException(f"Cannot convert value to type stringarray: {value}")
         else:
             # NOTE(mhroth): if value_type is not a known type or None, that is
             # not necessarily an error. It may simply be that the value should
@@ -163,13 +164,13 @@ class HeavyObject(PdObject):
 
     @property
     def is_hvlang(self) -> bool:
-        return self.obj_type in self.__HEAVY_LANG_OBJS.keys()
+        return self.obj_type in self.__HEAVY_LANG_OBJS
 
     @property
     def is_hvir(self) -> bool:
-        return self.obj_type in self.__HEAVY_IR_OBJS.keys()
+        return self.obj_type in self.__HEAVY_IR_OBJS
 
-    def get_inlet_connection_type(self, inlet_index: int) -> Optional[str]:
+    def get_inlet_connection_type(self, inlet_index: int) -> str | None:
         """ Returns the inlet connection type, None if the inlet does not exist.
         """
         # TODO(mhroth): it's stupid that hvlang and hvir json have different data formats here
@@ -186,7 +187,7 @@ class HeavyObject(PdObject):
         else:
             return None
 
-    def get_outlet_connection_type(self, outlet_index: int) -> Optional[str]:
+    def get_outlet_connection_type(self, outlet_index: int) -> str | None:
         """ Returns the outlet connection type, None if the inlet does not exist.
         """
         # TODO(mhroth): it's stupid that hvlang and hvir json have different data formats here
@@ -221,7 +222,7 @@ class HeavyObject(PdObject):
                     f"Connection made to non-existent inlet at [{self.obj_type} {self.obj_dict}]:{c.inlet_index}.",
                     enum=NotificationEnum.ERROR_UNABLE_TO_CONNECT_OBJECTS)
         else:
-            raise Exception("Adding a connection to the wrong object!")
+            raise HeavyPdException("Adding a connection to the wrong object!")
 
     def to_hv(self) -> Heavy:
         return Heavy(

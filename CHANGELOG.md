@@ -6,12 +6,88 @@ Next Release
 
 Features:
 
-* Support `list` object. Does not support tosymbol/fromsymbol.
-* Support `[route float]` for routing floats.
-* Support `trunc()` in `expr/expr~`.
-* Support `threshold~`.
-* Allow `else/popmenu` (converted to `[f ]`).
-* DPF: Allow theme overrides in NanoVG UI.
+* New MetaModule generator
+* Allow full type names in `[trigger]` object
+
+Updates:
+
+* Python typing syntax
+* Custom Exceptions
+
+Bugfixes:
+
+* Drop empty expressions (#441)
+* Correctly initialize default $arg2 of `delread~` to `0`
+* c2js: Fix for newer emsdk requiring `-sDEFAULT_TO_CXX=1`
+* NEON: correct sign of `__hv_fms_f` on ARMv8 (`[*~ k]` -> `[-~ k]` chains)
+* SIMD: signal comparisons (`<~`, `>~`, `==~`, ...) output `1.0` instead of a bit mask
+
+0.17.3
+-----
+
+Features:
+
+* pd2gui: support external send params on GUI objects
+* Daisy: add new devkits to json2daisy, integration tests and docs
+* DPF: support NanoVG `[nbx]` `log_mode` and `log_height`
+* DPF: update NanoVG `[knob]` `setLabelStyle()`
+* DPF: support port groups for parameters (#300)
+
+Bugfixes:
+
+* pd2gui: use correct value for `[nbx]` `log_height`
+* Daisy: Seed1.1 codec initialization test (#422)
+* Daisy: add delay_ticks option to CD4021 config (#404)
+* DPF: use correct default port groups
+
+Updates:
+
+* Deprecate python 3.9
+* Support python 3.15
+* DPF: match port group indices with PD i/o (start at 1)
+* DPF: improve parameter order: receive/event/send/out_event
+
+0.17.2
+-----
+
+Features:
+
+* Support `[inlet~]` object's control inlet and outlet
+* DPF: support Event type using a button for ImGui
+* DPF: support NanoVG slider integer quantization
+* Daisy: align Switch3 behavior and docs with libDaisy implementation
+
+Bugs:
+
+* pd2gui: properly return on subpatch restore without GoP
+* DPF: Better override for theme colors
+* DPF: NanoVG gui_objects - missing label for toggle
+
+Docs:
+
+* Daisy: add included boards I/O
+* DPF: document GUI generation
+* General improvements
+
+0.17.1
+-----
+
+Bugfixes:
+
+* Correctly parse `cyclone/` prefix as optional for PdBinopObject
+
+0.17.0
+-----
+
+Features:
+
+* Support `list` object. Does not support tosymbol/fromsymbol
+* Support `[route float]` for routing floats
+* Support `trunc()` in `expr/expr~`
+* Support `threshold~` object
+* Allow `else/popmenu` (converted to `[f ]`)
+* DPF: Allow theme overrides in NanoVG UI
+* External Generator: Add current directory to search path
 
 Bugfixes:
 
@@ -21,7 +97,9 @@ Bugfixes:
 
 Tests:
 
-* Adding basic midi-out tests.
+* Adding basic midi-out tests
+* Move to using `ruff`
+* Add tests and build for `arm`
 
 0.16.2
 -----

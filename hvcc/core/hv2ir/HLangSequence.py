@@ -14,13 +14,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from typing import Optional, Dict, List
 
 from .Connection import Connection
-from .HeavyException import HeavyException
+from .HeavyGraph import HeavyGraph
+from .HeavyIrException import HeavyIrException
 from .HeavyIrObject import HeavyIrObject
 from .HeavyLangObject import HeavyLangObject
-from .HeavyGraph import HeavyGraph
 
 
 class HLangSequence(HeavyLangObject):
@@ -28,9 +27,9 @@ class HLangSequence(HeavyLangObject):
     def __init__(
         self,
         obj_type: str,
-        args: Dict,
+        args: dict,
         graph: 'HeavyGraph',
-        annotations: Optional[Dict] = None
+        annotations: dict | None = None
     ) -> None:
         # get the number of outlets that this object has
         num_outlets = len(args[self._HEAVY_LANG_DICT[obj_type].args[0].name])
@@ -40,7 +39,7 @@ class HLangSequence(HeavyLangObject):
                          annotations=annotations)
 
     def reduce(self) -> tuple:
-        cast_objs: List = []
+        cast_objs: list = []
         for a in self.args[self.name_for_arg()]:
             if a in {"a", "anything", "l", "list"}:
                 cast_objs.append(None)  # pass through
@@ -51,7 +50,7 @@ class HLangSequence(HeavyLangObject):
             elif a in {"s", "symbol"}:
                 cast_objs.append(HeavyIrObject("__cast_s", {}))
             else:
-                raise HeavyException(f"Unsupported cast type '{a}'.")
+                raise HeavyIrException(f"Unsupported cast type '{a}'.")
 
         connections = []
 

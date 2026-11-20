@@ -14,11 +14,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from typing import Dict, List
-
-from .HeavyObject import HeavyObject
 
 from hvcc.types.IR import IRSignalList
+
+from ..HeavyGenException import HeavyGenException
+from .HeavyObject import HeavyObject
 
 
 class SignalSamphold(HeavyObject):
@@ -35,19 +35,19 @@ class SignalSamphold(HeavyObject):
         return {"HvSignalSamphold.h", "HvSignalSamphold.c"}
 
     @classmethod
-    def get_C_init(cls, obj_type: str, obj_id: str, args: Dict) -> List[str]:
+    def get_C_init(cls, obj_type: str, obj_id: str, args: dict) -> list[str]:
         return [f"sSamphold_init(&sSamphold_{obj_id});"]
 
     @classmethod
-    def get_C_free(cls, obj_type: str, obj_id: str, args: Dict) -> List[str]:
+    def get_C_free(cls, obj_type: str, obj_id: str, args: dict) -> list[str]:
         return []
 
     @classmethod
-    def get_C_onMessage(cls, obj_type: str, obj_id: str, inlet_index: int, args: Dict) -> List[str]:
-        raise Exception()
+    def get_C_onMessage(cls, obj_type: str, obj_id: str, inlet_index: int, args: dict) -> list[str]:
+        raise HeavyGenException(f"Incorrect obj_type {obj_type} for SignalSamphold")
 
     @classmethod
-    def get_C_process(cls, process_dict: IRSignalList, obj_type: str, obj_id: str, args: Dict) -> List[str]:
+    def get_C_process(cls, process_dict: IRSignalList, obj_type: str, obj_id: str, args: dict) -> list[str]:
         return [
             "__hv_samphold_f(&sSamphold_{0}, VIf({1}), VIf({2}), VOf({3}));".format(
                 process_dict.id,

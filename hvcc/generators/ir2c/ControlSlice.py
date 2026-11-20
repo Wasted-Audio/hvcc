@@ -14,7 +14,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from typing import Dict, List
 
 from .HeavyObject import HeavyObject
 
@@ -33,7 +32,7 @@ class ControlSlice(HeavyObject):
         return {"HvControlSlice.h", "HvControlSlice.c"}
 
     @classmethod
-    def get_C_init(cls, obj_type: str, obj_id: str, args: Dict) -> List[str]:
+    def get_C_init(cls, obj_type: str, obj_id: str, args: dict) -> list[str]:
         return [
             "cSlice_init(&cSlice_{0}, {1}, {2});".format(
                 obj_id,
@@ -41,11 +40,11 @@ class ControlSlice(HeavyObject):
                 int(args["length"]))]
 
     @classmethod
-    def get_C_free(cls, obj_type: str, obj_id: str, args: Dict) -> List[str]:
+    def get_C_free(cls, obj_type: str, obj_id: str, args: dict) -> list[str]:
         return []  # nothing to free
 
     @classmethod
-    def get_C_onMessage(cls, obj_type: str, obj_id: str, inlet_index: int, args: Dict) -> List[str]:
+    def get_C_onMessage(cls, obj_type: str, obj_id: str, inlet_index: int, args: dict) -> list[str]:
         return [
             f"cSlice_onMessage(_c, &Context(_c)->cSlice_{obj_id}, {inlet_index}, m, &cSlice_{obj_id}_sendMessage);"
         ]
