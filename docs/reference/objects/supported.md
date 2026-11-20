@@ -120,7 +120,7 @@ Here is a list of [unsupported Pd objects](unsupported.md).
 | wrap | |
 
 1. Does not support banging the left inlet. Use a `[f ]` to store the left value and bang that instead.
-2. Midi i/o objects are currently only supported for [dpf](../../generators/dpf.md), [daisy](../../generators/daisy.md) and [owl](../../generators/owl.md)
+2. Midi i/o objects are currently only supported for [daisy](../../generators/daisy.md), [dpf](../../generators/dpf.md), [javascript](../../generators/javascript.md), and [owl](../../generators/owl.md)
 3. Supports setting send/receive configuration, see [Getting Started](../../getting-started/patching.md#gui-objects)
 4. Does not support: `size()`, `sum()`, `Sum()`, `avg()`, `Avg()`, `mtof()`, `ftom()`, `dbtorms()`, `rmstodb()`, `powtodb()`, `dbtopow()`, `symbol()`, `sym()`, `tolower()`, `toupper()`, `strcat()`, `strncat()`, `strlen()`, `strcspn()`, `strbrk()`, `strcmp()`, `strcasecmp()`, `strncmp()`,`strncasecmp()`, `var()`
 5. Does not support tosymbol/fromsymbol.
