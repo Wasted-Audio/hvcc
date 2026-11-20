@@ -1,0 +1,14 @@
+#N canvas 0 22 420 240 10;
+#X text 10 10 [*~ k] -> [-~ k] is fused into __fms~f (a*b - c);
+#X obj 10 40 phasor~ 1464.84375;
+#X obj 10 70 *~ 3;
+#X obj 10 95 -~ 1;
+#X obj 150 70 *~ -2;
+#X obj 150 95 -~ 0.5;
+#X obj 10 130 dac~ 1 2;
+#X connect 1 0 2 0;
+#X connect 1 0 4 0;
+#X connect 2 0 3 0;
+#X connect 4 0 5 0;
+#X connect 3 0 6 0;
+#X connect 5 0 6 1;
