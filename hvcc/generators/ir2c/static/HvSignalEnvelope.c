@@ -29,14 +29,14 @@ hv_size_t sEnv_init(SignalEnvelope *o, int windowSize, int period) {
   o->windowSize = (windowSize <= HV_N_SIMD) ? HV_N_SIMD : (windowSize + (HV_N_SIMD - 1)) & ~(HV_N_SIMD - 1);
   o->period = (period <= HV_N_SIMD) ? HV_N_SIMD : (period > o->windowSize) ? o->windowSize : (period + (HV_N_SIMD - 1)) & ~(HV_N_SIMD - 1);
 
-  o->numAccumulators = o->windowSize / o->period;
+  o->numAccumulators = (o->windowSize + o->period - 1) / o->period;
   o->samplesSinceLastPeriod = 0;
   hv_size_t numBytes = 0;
 
   // Allocate Hanning weights
-  o->hanningWeights = (float *) hv_malloc(o->windowSize*sizeof(float));
+  o->hanningWeights = (float *) hv_malloc(o->windowSize * sizeof(float));
   hv_assert(o->hanningWeights != NULL);
-  numBytes += o->windowSize*sizeof(float);
+  numBytes += o->windowSize * sizeof(float);
 
   // Calculate Hanning weights
   float hanningSum = 0.0f;
@@ -52,8 +52,11 @@ hv_size_t sEnv_init(SignalEnvelope *o, int windowSize, int period) {
   }
 
   // Allocate Accumulators
-  o->accumulators = (float *) hv_malloc(o->numAccumulators * sizeof(float));
-  o->accOffsets = (int *) hv_malloc(o->numAccumulators * sizeof(int));
+  // hv_malloc is aligned (16 for SSE, 32 for AVX, 32 on Windows/NEON) and C11
+  // aligned_alloc requires the size to be a multiple of the alignment.
+  const hv_size_t alignedAccs = (o->numAccumulators + HV_N_SIMD - 1) & ~(hv_size_t)(HV_N_SIMD - 1);
+  o->accumulators = (float *) hv_malloc(alignedAccs * sizeof(float));
+  o->accOffsets = (int *) hv_malloc(alignedAccs * sizeof(int));
   numBytes += o->numAccumulators * (sizeof(float) + sizeof(int));
 
   for (int i = 0; i < o->numAccumulators; i++) {
@@ -90,7 +93,7 @@ void sEnv_process(HeavyContextInterface *_c, SignalEnvelope *o, hv_bInf_t bIn,
   __m256 bIn2 = _mm256_mul_ps(bIn, bIn);
 
   for (int a = 0; a < o->numAccumulators; a++) {
-    if (o->accOffsets[a] >= 0) {
+    if (o->accOffsets[a] >= 0 && o->accOffsets[a] + 8 <= o->windowSize) {
       // Load 8 Hanning weights (aligned)
       __m256 w = _mm256_load_ps(o->hanningWeights + o->accOffsets[a]);
       // Multiply weights by squared input
@@ -116,7 +119,7 @@ void sEnv_process(HeavyContextInterface *_c, SignalEnvelope *o, hv_bInf_t bIn,
   __m128 bIn2 = _mm_mul_ps(bIn, bIn);
 
   for (int a = 0; a < o->numAccumulators; a++) {
-    if (o->accOffsets[a] >= 0) {
+    if (o->accOffsets[a] >= 0 && o->accOffsets[a] + 4 <= o->windowSize) {
       // Load 4 Hanning weights (aligned)
       __m128 w = _mm_load_ps(o->hanningWeights + o->accOffsets[a]);
       __m128 prod = _mm_mul_ps(bIn2, w);
@@ -136,7 +139,7 @@ void sEnv_process(HeavyContextInterface *_c, SignalEnvelope *o, hv_bInf_t bIn,
   hv_bInf_t bIn2 = vmulq_f32(bIn, bIn);
 
   for (int a = 0; a < o->numAccumulators; a++) {
-    if (o->accOffsets[a] >= 0) {
+    if (o->accOffsets[a] >= 0 && o->accOffsets[a] + 4 <= o->windowSize) {
       // Load 4 Hanning weights (aligned)
       hv_bInf_t w = vld1q_f32(o->hanningWeights + o->accOffsets[a]);
       float32x4_t prod = vmulq_f32(bIn2, w);
@@ -159,7 +162,7 @@ void sEnv_process(HeavyContextInterface *_c, SignalEnvelope *o, hv_bInf_t bIn,
   const float bIn2 = bIn * bIn;
 
   for (int a = 0; a < o->numAccumulators; a++) {
-    if (o->accOffsets[a] >= 0) {
+    if (o->accOffsets[a] >= 0 && o->accOffsets[a] < o->windowSize) {
       o->accumulators[a] += bIn2 * o->hanningWeights[o->accOffsets[a]];
     }
     o->accOffsets[a] += 1;
@@ -169,14 +172,14 @@ void sEnv_process(HeavyContextInterface *_c, SignalEnvelope *o, hv_bInf_t bIn,
 #endif
 
   // Boundary check and message emission (Shared logic)
-  if (o->samplesSinceLastPeriod >= o->period) {
-    for (int a = 0; a < o->numAccumulators; a++) {
-      if (o->accOffsets[a] >= o->windowSize) {
-        sEnv_sendMessage(_c, o->accumulators[a], sendMessage);
-        o->accumulators[a] = 0.0f;
-        o->accOffsets[a] = 0;
-      }
+  for (int a = 0; a < o->numAccumulators; a++) {
+    if (o->accOffsets[a] >= o->windowSize) {
+      sEnv_sendMessage(_c, o->accumulators[a], sendMessage);
+      o->accumulators[a] = 0.0f;
+      // Re-stagger: the next window for this accumulator starts one full
+      // cycle (numAccumulators * period) after the previous start.
+      o->accOffsets[a] = -(o->numAccumulators * o->period - o->windowSize);
     }
-    o->samplesSinceLastPeriod = 0;
   }
+  if (o->samplesSinceLastPeriod >= o->period) o->samplesSinceLastPeriod = 0;
 }
