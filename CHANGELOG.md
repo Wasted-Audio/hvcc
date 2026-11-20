@@ -21,6 +21,11 @@ Bugfixes:
 * c2js: Fix for newer emsdk requiring `-sDEFAULT_TO_CXX=1`
 * NEON: correct sign of `__hv_fms_f` on ARMv8 (`[*~ k]` -> `[-~ k]` chains)
 * SIMD: signal comparisons (`<~`, `>~`, `==~`, ...) output `1.0` instead of a bit mask
+* Spread `env~` computations across callbacks
+
+Tests:
+
+* Introduce `Unity` for testing internal C functions directly, across SIMD variants.
 
 0.17.3
 -----
