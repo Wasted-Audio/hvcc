@@ -14,6 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import platform
 import shutil
 import subprocess
 import unittest
@@ -27,10 +28,16 @@ from hvcc.interpreters.pd2hv.NotificationEnum import NotificationEnum
 simd_flags = {
     "HV_SIMD_NONE": ["-DHV_SIMD_NONE"],
     "HV_SIMD_SSE": ["-msse", "-msse2", "-msse3", "-mssse3", "-msse4.1", "-msse4.2"],
-    "HV_SIMD_SSE_FMA": ["-msse", "-msse2", "-msse3", "-mssse3", "-msse4.1", "-msse4.2", "-mfma"],
+    # -mfma implies AVX, which heavy would otherwise select: force the SSE code path
+    "HV_SIMD_SSE_FMA": ["-msse", "-msse2", "-msse3", "-mssse3", "-msse4.1", "-msse4.2", "-mfma", "-DHV_SIMD_SSE=1"],
     "HV_SIMD_AVX": ["-msse", "-msse2", "-msse3", "-mssse3", "-msse4.1", "-msse4.2", "-mavx", "-mfma"],
-    "HV_SIMD_NEON": ["-mcpu=cortex-a7", "-mfloat-abi=hard"]
+    # 64-bit ARM always has NEON; -mcpu=cortex-a7 is a 32-bit target that clang rejects there
+    "HV_SIMD_NEON": (["-DHV_SIMD_NEON"] if platform.machine() in ("arm64", "aarch64")
+                     else ["-mcpu=cortex-a7", "-mfloat-abi=hard"])
 }
+
+# machines on which the NEON variant is tested
+ARM_MACHINES = ("arm", "aarch64")
 
 
 class HvBaseTest(unittest.TestCase):
@@ -106,6 +113,10 @@ class HvBaseTest(unittest.TestCase):
                 simd_flags=simd_flags[flag or "HV_SIMD_NONE"],
                 source_files=[str(f) for f in source_files],
                 out_path=exe_path))
+
+        # remove objects of a previous build: the Makefile does not depend on the
+        # SIMD flags, so make would otherwise only re-link the old objects
+        subprocess.check_output(["make", "-C", Path(makefile_path).parent, "clean"])
 
         # run the compile command
         subprocess.check_output(["make", "-C", Path(makefile_path).parent, "-j"])

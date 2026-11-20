@@ -21,6 +21,11 @@ Bugfixes:
 * c2js: Fix for newer emsdk requiring `-sDEFAULT_TO_CXX=1`
 * NEON: correct sign of `__hv_fms_f` on ARMv8 (`[*~ k]` -> `[-~ k]` chains)
 
+Tests:
+
+* Rebuild for every SIMD variant (SSE/AVX/NEON previously re-ran the plain C build), real NEON builds on arm64, `HV_SIMD_SSE_FMA` now tests SSE
+* Allow vector-granular timestamps for messages from signal objects in SIMD control tests
+
 0.17.3
 -----
 
