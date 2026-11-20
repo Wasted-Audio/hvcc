@@ -12,7 +12,7 @@ class CTestRunner:
         self.static_dir = self.root_dir / "hvcc" / "generators" / "ir2c" / "static"
         self.c_dir = Path(__file__).parent
 
-    def run(self, test_file, dependencies=None, simd="NONE"):
+    def run(self, test_file, dependencies=None, simd="NONE") -> 'CTestResult':
         dependencies = dependencies or []
         output_bin = self.tmp_path / f"test_{simd}.bin"
 
@@ -43,12 +43,12 @@ class CTestRunner:
 
         cmd.extend(["-o", str(output_bin), "-lm"])
 
-        comp_result = subprocess.run(cmd, capture_output=True, text=True)
+        comp_result = subprocess.run(cmd, check=False, capture_output=True, text=True)
         if comp_result.returncode != 0:
             return CTestResult(False, comp_result.returncode, "", comp_result.stderr, "COMPILATION_FAILED")
 
         # 2. Execution Stage
-        exec_result = subprocess.run([str(output_bin)], capture_output=True, text=True)
+        exec_result = subprocess.run([str(output_bin)], check=False, capture_output=True, text=True)
 
         status = "PASSED" if exec_result.returncode == 0 else "EXECUTION_FAILED"
         return CTestResult(
@@ -63,7 +63,7 @@ class CTestResult:
         self.stderr = stderr
         self.status = status
 
-    def __str__(self):
+    def __str__(self) -> str:
         msg = f"Status: {self.status} (Exit Code: {self.exit_code})\n"
         if self.stdout:
             msg += f"--- STDOUT ---\n{self.stdout}\n"
@@ -72,7 +72,7 @@ class CTestResult:
         return msg
 
 
-def get_available_simd():
+def get_available_simd() -> list[str]:
     machine = platform.machine().lower()
     if "arm" in machine or "aarch64" in machine:
         return ["NONE", "NEON"]
@@ -81,5 +81,5 @@ def get_available_simd():
 
 
 @pytest.fixture
-def c_test(tmp_path, request):
+def c_test(tmp_path: Path, request) -> CTestRunner:
     return CTestRunner(tmp_path, request)

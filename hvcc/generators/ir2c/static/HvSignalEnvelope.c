@@ -34,17 +34,22 @@ hv_size_t sEnv_init(SignalEnvelope *o, int windowSize, int period) {
   hv_size_t numBytes = 0;
 
   // Allocate Hanning weights
-  o->hanningWeights = (float *) hv_malloc(o->windowSize * sizeof(float));
-  numBytes += o->windowSize * sizeof(float);
+  o->hanningWeights = (float *) hv_malloc(o->windowSize*sizeof(float));
+  hv_assert(o->hanningWeights != NULL);
+  numBytes += o->windowSize*sizeof(float);
 
-  // Calculate Normalised Hanning weights
+  // Calculate Hanning weights
   float hanningSum = 0.0f;
   for (int i = 0; i < o->windowSize; i++) {
     const float w = 0.5f * (1.0f - cosf(((float)(2.0 * M_PI * i)) / ((float)(o->windowSize - 1))));
     o->hanningWeights[i] = w;
     hanningSum += w;
   }
-  for (int i = 0; i < o->windowSize; i++) o->hanningWeights[i] /= hanningSum;
+
+  for (int i = 0; i < o->windowSize; i++) {
+    // Normalise the Hanning coefficients such that they represent a normalised weighted averaging
+    o->hanningWeights[i] /= hanningSum;
+  }
 
   // Allocate Accumulators
   o->accumulators = (float *) hv_malloc(o->numAccumulators * sizeof(float));

@@ -62,7 +62,10 @@ plugins = [
 
 [tool.ruff]
 line-length = 120
-exclude = [".tox", ".venv", "venv", "build", "examples", "hvcc/generators/ir2c/static/MicroNam/*"]
+exclude = [".tox", ".venv", "venv", "build", "examples",
+    "hvcc/generators/ir2c/static/MicroNam/*",
+    "tests/c/unity/*"
+]
 
 [tool.ruff.lint]
 ignore = [
