@@ -60,9 +60,12 @@ Python 3.10 up to 3.15
 For tests:
 
 - `tox` (python install)
+- `ruff` (dev dependencies)
+- `mypy` (dev dependencies)
 - `numpy/scipy` (dev dependencies)
 - `midifile` (git submodule)
 - `tinywav` (git submodule)
+- `unity` (git submodule)
 - `clang/clang++` (system install)
 
 ## Installation
