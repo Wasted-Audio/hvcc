@@ -143,6 +143,7 @@ class c2js(Generator):
             "-s", "ALLOW_TABLE_GROWTH=1",
             "-s", f"BINARYEN_ASYNC_COMPILATION={binaryen_async}",  # Set this to 0 for the worklet so we don't
                                                                    # wait for promises when instantiating
+            "-s", "DEFAULT_TO_CXX=1",
             "--post-js", post_js_path
         ]
 
