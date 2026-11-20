@@ -12,7 +12,6 @@ from pathlib import Path
 
 import pytest
 
-
 SIMD_FLAGS = {
     "NONE": ["-DHV_SIMD_NONE=1"],
     "SSE": ["-DHV_SIMD_SSE=1", "-msse", "-msse2", "-msse3", "-msse4.1"],
@@ -21,7 +20,7 @@ SIMD_FLAGS = {
 }
 
 
-def get_available_simd():
+def get_available_simd() -> list[str]:
     """SIMD flavours this machine can actually build and run."""
     machine = platform.machine().lower()
     if machine in ("arm64", "aarch64") or machine.startswith("arm"):
@@ -29,7 +28,7 @@ def get_available_simd():
     return ["NONE", "SSE", "AVX"]
 
 
-def pytest_generate_tests(metafunc):
+def pytest_generate_tests(metafunc: pytest.Metafunc) -> None:
     """Parameterise any test that asks for a `simd` argument."""
     if "simd" in metafunc.fixturenames:
         metafunc.parametrize("simd", get_available_simd())
@@ -62,7 +61,7 @@ class CTestRunner:
         self.c_dir = Path(__file__).parent
 
     @property
-    def unity_src(self):
+    def unity_src(self) -> Path:
         return self.c_dir / "unity" / "src"
 
     def run(
@@ -98,19 +97,19 @@ class CTestRunner:
         cmd.extend(str(self.static_dir / dep) for dep in dependencies)
         cmd.extend(["-o", str(output_bin), "-lm"])
 
-        compiled = subprocess.run(cmd, capture_output=True, text=True)
+        compiled = subprocess.run(cmd, check=False, capture_output=True, text=True)
         if compiled.returncode != 0:
             return CTestResult(False, "COMPILATION_FAILED", compiled.returncode,
                                compiled.stdout, compiled.stderr, cmd)
 
-        executed = subprocess.run([str(output_bin)], capture_output=True, text=True)
+        executed = subprocess.run([str(output_bin)], check=False, capture_output=True, text=True)
         ok = executed.returncode == 0
         return CTestResult(ok, "PASSED" if ok else "EXECUTION_FAILED",
                            executed.returncode, executed.stdout, executed.stderr, cmd)
 
 
 @pytest.fixture(scope="session")
-def sanitizers_available(tmp_path_factory: pytest.TempPathFactory):
+def sanitizers_available(tmp_path_factory: pytest.TempPathFactory) -> bool:
     """True if the compiler can link ASan/UBSan on this machine."""
     cc = shutil.which("clang") or shutil.which("cc")
     if cc is None:
@@ -121,6 +120,7 @@ def sanitizers_available(tmp_path_factory: pytest.TempPathFactory):
     try:
         probe = subprocess.run(
             [cc, "-fsanitize=address,undefined", str(src), "-o", str(probe_dir / "probe")],
+            check=False,
             capture_output=True,
             text=True,
         )
