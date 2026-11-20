@@ -335,6 +335,17 @@ class TestPdControlPatches(TestPdControlBase):
     def test_inlet(self):
         self._test_control_patch("test-inlet.pd")
 
+    # signal comparisons: 1.0 or 0.0 also with SIMD (where the IR objects return a bit mask)
+
+    def test_sig_lt_gt(self):
+        self._test_control_patch("test-sig-lt-gt.pd")
+
+    def test_sig_lte_gte(self):
+        self._test_control_patch("test-sig-lte-gte.pd")
+
+    def test_sig_eq_neq(self):
+        self._test_control_patch("test-sig-eq-neq.pd")
+
     # list operations
 
     def test_list_append(self):
