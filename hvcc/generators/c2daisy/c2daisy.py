@@ -53,6 +53,7 @@ class c2daisy(Generator):
     @classmethod
     def compile(
         cls,
+        in_path: Path,
         c_src_dir: Path,
         out_dir: Path,
         externs: ExternInfo,
@@ -97,7 +98,7 @@ class c2daisy(Generator):
 
             # inject display process code
             try:
-                display_process = display_processor(daisy_meta.board_file)
+                display_process = display_processor(in_path, daisy_meta.board_file)
             except (FileNotFoundError, KeyError, ValueError):
                 display_process = board_info['displayprocess']
                 if display_process is not None:

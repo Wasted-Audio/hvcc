@@ -78,6 +78,7 @@ class Generator(ABC):
     @abstractmethod
     def compile(
         cls,
+        in_path: Path,
         c_src_dir: Path,
         out_dir: Path,
         externs: ExternInfo,

@@ -8,6 +8,8 @@ Features:
 
 * New MetaModule generator
 * Allow full type names in `[trigger]` object
+* Generators: add `in_path` to signature
+* Daisy: improve `display_process` discovery and fallback
 
 Updates:
 

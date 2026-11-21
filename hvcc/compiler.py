@@ -336,6 +336,7 @@ def compile_dataflow(
     num_output_channels = hvir.signal.numOutputBuffers
 
     gen_args: dict[str, Any] = {
+        'in_path': in_path,
         'c_src_dir': c_src_dir,
         'out_dir': out_dir,
         'patch_name': patch_name,
