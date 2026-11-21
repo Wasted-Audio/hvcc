@@ -8,6 +8,7 @@ Features:
 
 * New MetaModule generator
 * Allow full type names in `[trigger]` object
+* Daisy: improve `display_process` discovery and fallback
 
 Updates:
 
@@ -21,6 +22,7 @@ Bugfixes:
 * c2js: Fix for newer emsdk requiring `-sDEFAULT_TO_CXX=1`
 * NEON: correct sign of `__hv_fms_f` on ARMv8 (`[*~ k]` -> `[-~ k]` chains)
 * SIMD: signal comparisons (`<~`, `>~`, `==~`, ...) output `1.0` instead of a bit mask
+* Generators: add `in_path` to signature
 
 0.17.3
 -----
