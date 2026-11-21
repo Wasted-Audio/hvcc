@@ -7,3 +7,6 @@
 [submodule "hvcc/generators/ir2c/static/MicroNam"]
 	path = hvcc/generators/ir2c/static/MicroNam
 	url = https://github.com/jaffco/MicroNAM.git
+[submodule "tests/c/unity"]
+	path = tests/c/unity
+	url = https://github.com/ThrowTheSwitch/Unity.git

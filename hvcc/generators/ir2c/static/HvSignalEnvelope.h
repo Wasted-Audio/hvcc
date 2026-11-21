@@ -26,9 +26,13 @@ extern "C" {
 typedef struct SignalEnvelope {
 	int windowSize;
 	int period;
-	int numSamplesInBuffer;
 	float *hanningWeights;
-	float *buffer;
+
+	// Incremental Accumulation State
+	float *accumulators;     // Partial sums for overlapping windows
+	int *accOffsets;         // Current index into hanningWeights for each acc
+	int numAccumulators;     // windowSize / period
+	int samplesSinceLastPeriod;
 } SignalEnvelope;
 
 hv_size_t sEnv_init(SignalEnvelope *o, int windowSize, int period);
