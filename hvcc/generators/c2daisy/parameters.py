@@ -286,9 +286,8 @@ def display_processor(in_path: Path, description_file: str | None = None) -> str
         daisy_description = json.load(file)
         process_file = daisy_description['display']['process_file']
 
-        process_file = Path(process_file)
-        if not process_file.is_absolute():
-            process_file = Path(in_path).parent / process_file
+        if not Path(process_file).is_absolute():
+            process_file = in_path.parent / process_file
 
         with open(process_file, 'rb') as f:
             return f.read().decode('utf-8')
