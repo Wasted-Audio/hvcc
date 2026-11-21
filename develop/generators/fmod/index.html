@@ -1142,6 +1142,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#fmod-sdk" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FMOD SDK
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#cmake" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2208,6 +2219,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#fmod-sdk" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FMOD SDK
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#cmake" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2288,10 +2310,17 @@
 <h2 id="building-your-plugin">Building Your Plugin</h2>
 <p>The plugin folder contains a <code>CMakeLists.txt</code> file which will generate a <strong>dynamic</strong> and a <strong>static</strong> library version of the plugin prefixed with <code>lib</code>.</p>
 <p>The static library can be used on platforms that don't support dynamic library loading such as the Nintendo Switch (see <a href="https://fmod.com/docs/2.03/unity/plugins.html#static-plugins">Static Plugins</a>).</p>
+<h3 id="fmod-sdk">FMOD SDK</h3>
+<p>The <a href="https://www.fmod.com/download">FMOD SDK</a>, which is part of the FMOD Engine download, needs to be present in <code>fmod/include/fmod/</code>. Inside of the SDK you can find this as the <code>api/</code> folder.</p>
+<p>The directory structure should look like this.</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>include/fmod/core
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>include/fmod/fsbank
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>include/fmod/studio
+</span></code></pre></div>
 <h3 id="cmake">CMake</h3>
 <p>From within the directory containing the <code>CMakeLists.txt</code> use.</p>
-<div class="language-shell highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>cmake<span class="w"> </span>-S<span class="w"> </span>.<span class="w"> </span>-B<span class="w"> </span>cmake-build-debug<span class="w"> </span>-DCMAKE_BUILD_TYPE<span class="o">=</span>Debug
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>cmake<span class="w"> </span>--build<span class="w"> </span>cmake-build-debug
+<div class="language-shell highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>cmake<span class="w"> </span>-S<span class="w"> </span>.<span class="w"> </span>-B<span class="w"> </span>cmake-build-debug<span class="w"> </span>-DCMAKE_BUILD_TYPE<span class="o">=</span>Debug
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>cmake<span class="w"> </span>--build<span class="w"> </span>cmake-build-debug
 </span></code></pre></div>
 <h3 id="vscode">VSCode</h3>
 <p>Install <a href="https://marketplace.visualstudio.com/items?itemName=ms-vscode.cmake-tools">CMake Tools</a> and open the <code>fmod</code> folder containing the <code>CMakeLists.txt</code> in VSCode.</p>
