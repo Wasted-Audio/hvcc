@@ -18,7 +18,7 @@ import hashlib
 import os
 
 
-def filter_max(i: int, j: int) -> int:
+def filter_max(i: int | str, j: int | str) -> int:
     """Calculate the maximum of two integers.
     """
     return max(int(i), int(j))

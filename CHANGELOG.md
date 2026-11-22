@@ -22,6 +22,10 @@ Bugfixes:
 * NEON: correct sign of `__hv_fms_f` on ARMv8 (`[*~ k]` -> `[-~ k]` chains)
 * SIMD: signal comparisons (`<~`, `>~`, `==~`, ...) output `1.0` instead of a bit mask
 
+Tests:
+
+* Add jinja2 filter coverage
+
 0.17.3
 -----
 
