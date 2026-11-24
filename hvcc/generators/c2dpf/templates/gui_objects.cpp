@@ -146,6 +146,7 @@
     {{object.parameter}}->setJumpOnClick({{object.jump|lower}});
     {{object.parameter}}->setDiscrete({{object.discrete|lower}});
     {{object.parameter}}->setUsingLogScale(PDKnobEventHandler::LogMode::{{object.log_mode|upper}});
+    {{object.parameter}}->setTransparent({{object.transparent|lower}});
     {{object.parameter}}->setColors(
         {%- if meta.ui_theme_set is sameas true and meta.ui_theme is not none and meta.ui_themes[meta.ui_theme].bg_color is not none and meta.ui_themes[meta.ui_theme].cnvTextColor is not none and meta.ui_themes[meta.ui_theme].io_color is not none %}
         Colors::bgColor,

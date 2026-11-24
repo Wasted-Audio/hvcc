@@ -10,6 +10,7 @@ Features:
 * Allow full type names in `[trigger]` object
 * Generators: add `in_path` to signature
 * Daisy: improve `display_process` discovery and fallback
+* pd2gui: transparent knobs
 
 Updates:
 
@@ -24,6 +25,7 @@ Bugfixes:
 * NEON: correct sign of `__hv_fms_f` on ARMv8 (`[*~ k]` -> `[-~ k]` chains)
 * SIMD: signal comparisons (`<~`, `>~`, `==~`, ...) output `1.0` instead of a bit mask
 * pd2gui: improve float size and add width parameter
+* pd2gui: correctly parse the order of objects and subpatches (breaking!)
 
 Tests:
 

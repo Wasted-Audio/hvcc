@@ -91,7 +91,6 @@ class PdGUIParser(PdParser):
     ) -> tuple[Graph | GraphRoot | None, bool]:
 
         objects: list[GUIObjects] = []
-        graphs: list[Graph] = []
         x: GUIObjects | None = None
 
         # graph on parent settings
@@ -114,7 +113,7 @@ class PdGUIParser(PdParser):
                     )
                     if gop:
                         assert isinstance(g, Graph)
-                        graphs.append(g)
+                        objects.append(g)
 
             elif line[0] == "#X":
                 if line[1] == "coords":
@@ -130,7 +129,6 @@ class PdGUIParser(PdParser):
                 elif line[1] == "restore":
                     if gop:
                         objects = self.filter_invisible_objects(objects, gop_start, gop_size)
-                        graphs = self.filter_invisible_graphs(graphs, gop_start, gop_size)
                         self.object_counter["graph"] += 1
 
                         return Graph(
@@ -140,9 +138,8 @@ class PdGUIParser(PdParser):
                                 y=int(line[3])
                             ),
                             gop_start=gop_start,
-                            gop_size=gop_size,
-                            objects=objects,
-                            graphs=graphs
+                            size=gop_size,
+                            objects=objects
                         ), gop
                     else:
                         return None, False
@@ -190,7 +187,7 @@ class PdGUIParser(PdParser):
                                 x=int(line[2]),
                                 y=int(line[3])
                             )
-                            graphs.append(g)
+                            objects.append(g)
 
                     if obj_type == "cnv":
                         x = self.add_canvas(line)
@@ -223,16 +220,13 @@ class PdGUIParser(PdParser):
             )
 
             objects = self.filter_invisible_objects(objects, gop_start, gop_size)
-            graphs = self.filter_invisible_graphs(graphs, gop_start, gop_size)
 
             return GraphRoot(
                 size=gop_size,
                 objects=objects,
-                graphs=graphs
             ), gop
         else:
             objects = self.filter_invisible_objects(objects, gop_start, gop_size)
-            graphs = self.filter_invisible_graphs(graphs, gop_start, gop_size)
             self.object_counter["graph"] += 1
 
             return Graph(
@@ -242,9 +236,8 @@ class PdGUIParser(PdParser):
                     y=int(line[3])
                 ),
                 gop_start=gop_start,
-                gop_size=gop_size,
-                objects=objects,
-                graphs=graphs
+                size=gop_size,
+                objects=objects
             ), gop
 
     @classmethod
@@ -259,6 +252,10 @@ class PdGUIParser(PdParser):
         gop_max_x = gop_start.x + gop_size.x
 
         for obj in objects:
+            if isinstance(obj, Graph):
+                if cls.graph_is_empty(obj):
+                    continue
+
             obj_min_y = obj.position.y
             obj_max_y = obj.position.y + obj.size.y
             obj_min_x = obj.position.x
@@ -273,46 +270,18 @@ class PdGUIParser(PdParser):
         return filtered_objects
 
     @classmethod
-    def filter_invisible_graphs(
-        cls,
-        graphs: list[Graph],
-        gop_start: Coords,
-        gop_size: Size
-    ) -> list[Graph]:
-        filtered_graphs: list[Graph] = []
-        gop_max_y = gop_start.y + gop_size.y
-        gop_max_x = gop_start.x + gop_size.x
-
-        for g in graphs:
-            # skip empty graphs
-            if cls.graph_is_empty(g):
-                continue
-
-            g_min_y = g.position.y
-            g_max_y = g.position.y + g.gop_size.y
-            g_min_x = g.position.x
-            g_max_x = g.position.x + g.gop_size.x
-
-            # check if graph is overlapping with gop
-            if ((g_min_y < gop_max_y) or (g_min_x < gop_max_x)) and \
-                    ((g_max_y > gop_start.y) and (g_max_x > gop_start.x)) and \
-                    ((g_min_y < gop_max_y) and (g_min_x < gop_max_x)):
-                filtered_graphs.append(g)
-
-        return filtered_graphs
-
-    @classmethod
     def graph_is_empty(cls, graph: Graph) -> bool:
         """ A graph is considered empty when it doesn't have any objects
             and all of it's child graphs are also empty.
         """
         g_empty: list[bool] = []
 
-        for g in graph.graphs:
-            g_empty.append(cls.graph_is_empty(g))
+        for o in graph.objects:
+            if isinstance(o, Graph):
+                g_empty.append(cls.graph_is_empty(o))
 
         return len(graph.objects) == 0 and (
-            (len(g_empty) and all(g_empty)) or len(graph.graphs) == 0
+            (len(g_empty) and all(g_empty)) or not any(isinstance(o, Graph) for o in graph.objects)
         )
 
     @classmethod
