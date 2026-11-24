@@ -81,6 +81,7 @@ nav:
     - PDNAM External: adr/ADR-005-PDNAM-External.md
     - gui2dpf Templates: adr/ADR-006-gui2dpf-Templates.md
     - MetaModule: adr/ADR-007-MetaModule-Generator.md
+    - Unified GUI Object Order: adr/ADR-008-Unified-GUI-Object-Order.md
 
   - Community & Development:
     - Changelog: changelog.md
