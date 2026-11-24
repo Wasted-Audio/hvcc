@@ -270,18 +270,11 @@ class PdGUIParser(PdParser):
 
     @classmethod
     def graph_is_empty(cls, graph: Graph) -> bool:
-        """ A graph is considered empty when it doesn't have any objects
-            and all of it's child graphs are also empty.
+        """ A graph is considered empty when it doesn't have any UI objects
+            or of it's child graphs are empty.
         """
-        g_empty: list[bool] = []
-
-        for o in graph.objects:
-            if isinstance(o, Graph):
-                g_empty.append(cls.graph_is_empty(o))
-
-        return len(graph.objects) == 0 and (
-            (len(g_empty) and all(g_empty)) or not any(isinstance(o, Graph) for o in graph.objects)
-        )
+        return len(graph.objects) == 0 or \
+            all(isinstance(o, Graph) and cls.graph_is_empty(o) for o in graph.objects)
 
     @classmethod
     def filter_params(cls, param_recv: str, param_send: str) -> tuple[str | None, bool]:
@@ -576,7 +569,7 @@ class PdGUIParser(PdParser):
             arc_color=Color(line[13]),
             arc_start=float(line[23]),
             arc_show=bool(int(line[19])),
-            transparent=bool(int(line[35]))
+            transparent=bool(int(line[35])) if len(line) > 35 else False
         )
 
     @classmethod

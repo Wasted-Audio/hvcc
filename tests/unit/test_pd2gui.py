@@ -139,3 +139,29 @@ def test_filter_params():
 
     with pytest.raises(ValueError):
         p.filter_params(param1_recv, param2_send)
+
+
+def test_graph_is_empty(cnv_vis1):
+    p = PdGUIParser()
+
+    def make_graph(objects: list[GUIObjects]) -> Graph:
+        return Graph(
+            position=Coords(x=0, y=0),
+            gop_start=Coords(x=0, y=0),
+            size=Size(x=100, y=100),
+            objects=objects
+        )
+
+    g_empty = make_graph([])
+    g_with_obj = make_graph([cnv_vis1])
+    g_nested_empty = make_graph([g_empty, make_graph([g_empty])])
+    g_nested_mixed = make_graph([g_empty, g_with_obj])
+    g_nested_obj_and_empty_graph = make_graph([g_empty, cnv_vis1])
+    g_deep_non_empty = make_graph([make_graph([g_with_obj])])
+
+    assert p.graph_is_empty(g_empty) is True
+    assert p.graph_is_empty(g_with_obj) is False
+    assert p.graph_is_empty(g_nested_empty) is True
+    assert p.graph_is_empty(g_nested_mixed) is False
+    assert p.graph_is_empty(g_nested_obj_and_empty_graph) is False
+    assert p.graph_is_empty(g_deep_non_empty) is False
