@@ -2777,6 +2777,7 @@
 <li>Allow full type names in <code>[trigger]</code> object</li>
 <li>Generators: add <code>in_path</code> to signature</li>
 <li>Daisy: improve <code>display_process</code> discovery and fallback</li>
+<li>pd2gui: transparent knobs</li>
 </ul>
 <p>Updates:</p>
 <ul>
@@ -2791,6 +2792,7 @@
 <li>NEON: correct sign of <code>__hv_fms_f</code> on ARMv8 (<code>[*~ k]</code> -&gt; <code>[-~ k]</code> chains)</li>
 <li>SIMD: signal comparisons (<code>&lt;~</code>, <code>&gt;~</code>, <code>==~</code>, ...) output <code>1.0</code> instead of a bit mask</li>
 <li>pd2gui: improve float size and add width parameter</li>
+<li>pd2gui: correctly parse the order of objects and subpatches (breaking! - <a href="docs/adr/ADR-008-Unified-GUI-Object-Order.md">ADR-008</a>)</li>
 </ul>
 <p>Tests:</p>
 <ul>
