@@ -252,9 +252,8 @@ class PdGUIParser(PdParser):
         gop_max_x = gop_start.x + gop_size.x
 
         for obj in objects:
-            if isinstance(obj, Graph):
-                if cls.graph_is_empty(obj):
-                    continue
+            if isinstance(obj, Graph) and cls.graph_is_empty(obj):
+                continue
 
             obj_min_y = obj.position.y
             obj_max_y = obj.position.y + obj.size.y
