@@ -11,8 +11,8 @@ def open_gui_json(
     patch_name: str,
     c_src_dir: Path,
 ) -> GraphRoot:
-
-    # load GUI from json file
+    """ load GUI from json file
+    """
     gui_json_path = Path(c_src_dir, "../ir/", f"{patch_name}.heavy.gui.json")
     with open(gui_json_path, "r") as f:
         gui_json = GraphRoot(**json.load(f))

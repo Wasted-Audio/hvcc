@@ -25,7 +25,7 @@ Bugfixes:
 * NEON: correct sign of `__hv_fms_f` on ARMv8 (`[*~ k]` -> `[-~ k]` chains)
 * SIMD: signal comparisons (`<~`, `>~`, `==~`, ...) output `1.0` instead of a bit mask
 * pd2gui: improve float size and add width parameter
-* pd2gui: correctly parse the order of objects and subpatches (breaking!)
+* pd2gui: correctly parse the order of objects and subpatches (breaking! - [ADR-008](docs/adr/ADR-008-Unified-GUI-Object-Order.md))
 
 Tests:
 
