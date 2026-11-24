@@ -21,6 +21,7 @@ Bugfixes:
 * c2js: Fix for newer emsdk requiring `-sDEFAULT_TO_CXX=1`
 * NEON: correct sign of `__hv_fms_f` on ARMv8 (`[*~ k]` -> `[-~ k]` chains)
 * SIMD: signal comparisons (`<~`, `>~`, `==~`, ...) output `1.0` instead of a bit mask
+* pd2gui: improve float size and add width parameter
 
 Tests:
 
