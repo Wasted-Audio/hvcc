@@ -32,12 +32,13 @@
             "y": 81
           },
           "size": {
-            "x": 20,
-            "y": 8
+            "x": 38,
+            "y": 19
           },
           "parameter": "float_vol",
           "send": false,
-          "font_height": 8,
+          "width": 5,
+          "font_height": 12,
           "label_text": "",
           "label_pos": 0,
           "min": 0.0,

@@ -146,7 +146,7 @@ An empty `"display": {}` section triggers inclusion via the default configuratio
 - `config` - Additional [OLED configuration](https://github.com/electro-smith/libDaisy/blob/master/src/dev/oled_ssd130x.h#L30-L35) options as a dictionary.
 - `dim` - Specific OLED dimensions (defaults to `[128, 64]`)
 - `process` - Inline C++ code for the `Display()` function.
-- `process_file` - External C++ file with `Display()` function. This overrides the inline code.
+- `process_file` - External C++ file with `Display()` function. This overrides the inline code and can be either an absolute path on the filesystem or a relative path to your input patch.
 - `params` - List of `@hv_param` sends meant for display. These can be float values and available in the code prepended with `f`, like `fcustom1` for instance.
 
 Example:

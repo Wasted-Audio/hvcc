@@ -60,6 +60,18 @@ The plugin folder contains a `CMakeLists.txt` file which will generate a **dynam
 
 The static library can be used on platforms that don't support dynamic library loading such as the Nintendo Switch (see [Static Plugins](https://fmod.com/docs/2.03/unity/plugins.html#static-plugins)).
 
+### FMOD SDK
+
+The [FMOD SDK](https://www.fmod.com/download), which is part of the FMOD Engine download, needs to be present in `fmod/include/fmod/`. Inside of the SDK you can find this as the `api/` folder.
+
+The directory structure should look like this.
+
+```
+include/fmod/core
+include/fmod/fsbank
+include/fmod/studio
+```
+
 ### CMake
 
 From within the directory containing the `CMakeLists.txt` use.
@@ -74,4 +86,3 @@ cmake --build cmake-build-debug
 Install [CMake Tools](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cmake-tools) and open the `fmod` folder containing the `CMakeLists.txt` in VSCode.
 
 Check that the `[all]` target is selected and run `> cmake build`. The resulting binaries will be placed in `build\<CONFIG>`.
-

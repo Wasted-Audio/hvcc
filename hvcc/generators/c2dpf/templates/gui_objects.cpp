@@ -169,6 +169,7 @@
     {{object.parameter}}->setRange({{object.min}}f, {{object.max}}f);
     {{object.parameter}}->setUsingLogScale({{object.log_mode|lower}});
     {{object.parameter}}->setLogarithmicHeight({{object.log_height}});
+    {{object.parameter}}->setNumChars({{object.width}});
         {%- for k, v in receivers + senders %}
             {%- if v.display == object.parameter %}
     {{object.parameter}}->setDefault({{v.attributes.default}}f);
@@ -190,9 +191,10 @@
     // float
     {{object.parameter}} = new PDFloat({{parent}}, this);
     {{object.parameter}}->setId(k{{object.parameter|capitalize}});
-    {{object.parameter}}->setSize({{object.size.x}} * scaleFactor, ({{object.size.y}} * 1.5f) * scaleFactor);
+    {{object.parameter}}->setSize({{object.size.x}} * scaleFactor, {{object.size.y}} * scaleFactor);
     {{object.parameter}}->setAbsolutePos({{object.position.x}} * scaleFactor, {{object.position.y}} * scaleFactor);
     {{object.parameter}}->setRange({{object.min}}f, {{object.max}}f);
+    {{object.parameter}}->setNumChars({{object.width}});
         {%- for k, v in receivers + senders %}
             {%- if v.display == object.parameter %}
     {{object.parameter}}->setDefault({{v.attributes.default}}f);

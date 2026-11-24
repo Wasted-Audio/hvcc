@@ -25,6 +25,9 @@ from .HeavyObject import HeavyObject
 
 class SignalMath(HeavyObject):
     """Handles the math objects.
+
+       Float comparisons return a SIMD bit mask, not 1.0/0.0
+       Pd's [<~] family is normalised in HLangBinop._mask_comparison_result.
     """
 
     # translation from operation to function preamble

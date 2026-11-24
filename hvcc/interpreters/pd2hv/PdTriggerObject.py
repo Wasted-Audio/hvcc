@@ -14,6 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from typing import Any
 
 from hvcc.types.Heavy import Heavy, HvPos
 
@@ -30,11 +31,12 @@ class PdTriggerObject(PdObject):
         pos_y: int = 0
     ) -> None:
         assert obj_type in {"trigger", "t"}
+        obj_args = self.__convert_args(obj_args) if obj_args is not None else []
         super().__init__("trigger", obj_args, pos_x, pos_y)
 
         # convert all numeric casts to "f"
         for i, a in enumerate(self.obj_args):
-            self.obj_args[i] = "f" if PdTriggerObject.__is_float(a) else a
+            self.obj_args[i] = "f" if self.__is_float(a) else a
 
         if len(self.obj_args) == 0:
             self.obj_args = ["b", "b"]
@@ -54,7 +56,7 @@ class PdTriggerObject(PdObject):
         )
 
     @classmethod
-    def __is_float(cls, x: int) -> bool:
+    def __is_float(cls, x: Any) -> bool:
         """ Returns True if the input can be converted to a float. False otherwise.
         """
         try:
@@ -62,3 +64,15 @@ class PdTriggerObject(PdObject):
             return True
         except ValueError:
             return False
+
+    @classmethod
+    def __convert_args(cls, args: list) -> list:
+        """ Converts full argument types to their corresponding shorthand notation.
+        """
+        shorthand_map = {
+            "any": "a",
+            "float": "f",
+            "symbol": "s",
+            "bang": "b"
+        }
+        return [shorthand_map.get(arg, arg) for arg in args]

@@ -144,6 +144,18 @@ def flatten_index_dicts(comp: dict) -> dict:
     return newcomp
 
 
+def default_process(name: str) -> str:
+    process = f"""
+    hardware.display.Fill(0);
+    char tmp[64];
+    hardware.display.SetCursor(0, 24);
+    sprintf(tmp, "{name}");
+    hardware.display.WriteString(tmp, Font_6x8, true);
+    hardware.display.Update();
+"""
+    return process
+
+
 def generate_header(board_description_dict: dict) -> 'tuple[str, dict]':
     """
     Generate a C++ Daisy board header from a dictionary board description.
@@ -198,7 +210,7 @@ def generate_header(board_description_dict: dict) -> 'tuple[str, dict]':
         target['display']['driver'] = target['display'].get('driver', "daisy::SSD130x4WireSpi128x64Driver")
         target['display']['config'] = target['display'].get('config', [])
         target['display']['dim'] = target['display'].get('dim', [128, 64])
-        target['displayprocess'] = target['display'].get('process', '')
+        target['displayprocess'] = target['display'].get('process', default_process(target['name']))
 
     replacements = {}
     replacements['name'] = target['name']

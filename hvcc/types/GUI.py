@@ -155,6 +155,7 @@ class Knob(BaseParam):
 class Number(BaseParam):
     type: Literal["number"] = "number"
     label: Label | None = None
+    width: int
     fg_color: Color
     bg_color: Color
     log_mode: bool
@@ -165,6 +166,7 @@ class Number(BaseParam):
 
 class Float(BaseParam):
     type: Literal["float"] = "float"
+    width: int
     font_height: int
     label_text: str
     label_pos: LabelPos

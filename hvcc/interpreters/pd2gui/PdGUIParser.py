@@ -36,6 +36,9 @@ from hvcc.types.GUI import (
 
 from ..HeavyPdException import HeavyPdException
 
+PD_FONT_METRICS = {8: 5, 10: 6, 12: 7, 16: 10, 24: 14, 36: 22}
+PD_DEFAULT_FONT_SIZE = 12
+
 
 class PdGUIParser(PdParser):
     # retain width by overriding this regex with a pattern that never matches
@@ -370,6 +373,12 @@ class PdGUIParser(PdParser):
             resolved_obj_args[i] = a
         return resolved_obj_args
 
+    @staticmethod
+    def _pd_font_width(font_height: int) -> int:
+        """Interpolate Pd's char width for a non-standard font size."""
+        size = min(PD_FONT_METRICS, key=lambda s: abs(s - font_height))
+        return max(1, round(PD_FONT_METRICS[size] * font_height / size))
+
     def add_canvas(self, line: list[str]) -> Canvas:
         self.object_counter["canvas"] += 1
 
@@ -608,6 +617,10 @@ class PdGUIParser(PdParser):
         if param is None:
             return None
 
+        num_chars = int(line[5])
+        if num_chars <= 0 or num_chars > 500:
+            num_chars = 4
+
         label = Label(
             text=line[13],
             color=Color(line[20]),
@@ -628,6 +641,7 @@ class PdGUIParser(PdParser):
                 x=int(line[5])*int(line[17])+8,
                 y=int(line[6])
             ),
+            width=num_chars,
             parameter=param,
             send=send,
             label=label,
@@ -674,7 +688,11 @@ class PdGUIParser(PdParser):
         if param is None:
             return None
 
-        font_height = int(line[11]) if line[11] != "0" else 8
+        font_height = int(line[11]) or PD_DEFAULT_FONT_SIZE
+
+        num_chars = int(line[4])
+        if num_chars <= 0 or num_chars > 500:
+            num_chars = 4
 
         return Float(
             position=Coords(
@@ -682,9 +700,10 @@ class PdGUIParser(PdParser):
                 y=int(line[3])
             ),
             size=Size(
-                x=int(line[4]) * (font_height - 4),
-                y=font_height
+                x=num_chars * cls._pd_font_width(font_height) + 3,
+                y=font_height + 7
             ),
+            width=num_chars,
             parameter=param,
             send=send,
             label_text=line[8] if line[8] != "-" else "",

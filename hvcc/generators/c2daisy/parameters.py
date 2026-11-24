@@ -1,5 +1,6 @@
 import json
 from copy import deepcopy
+from pathlib import Path
 from typing import Any
 
 from hvcc.core.hv2ir.HeavyLangObject import HeavyLangObject
@@ -123,7 +124,7 @@ def de_alias(
                 for mapping in target_component['mapping']:
                     if mapping['name'].format_map({'name': alias}) == low:
                         return mapping['name'].format_map({'name': aliases[alias]})
-        except IndexError:
+        except (IndexError, StopIteration):
             # No matching alias from filter
             pass
     # otherwise, it's a direct parameter or unkown one
@@ -272,9 +273,10 @@ def display_parameters(description_file: str) -> dict[str, str]:
         return params
 
 
-def display_processor(description_file: str | None = None) -> str:
+def display_processor(in_path: Path, description_file: str | None = None) -> str:
     """
     Try to load display processing code from file.
+    If not absolute, the process file path will be resolved relative to in_path.
     """
 
     if description_file is None:
@@ -282,7 +284,10 @@ def display_processor(description_file: str | None = None) -> str:
 
     with open(description_file, 'rb') as file:
         daisy_description = json.load(file)
-
         process_file = daisy_description['display']['process_file']
+
+        if not Path(process_file).is_absolute():
+            process_file = in_path.parent / process_file
+
         with open(process_file, 'rb') as f:
             return f.read().decode('utf-8')

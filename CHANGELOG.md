@@ -4,6 +4,13 @@ CHANGELOG
 Next Release
 -----
 
+Features:
+
+* New MetaModule generator
+* Allow full type names in `[trigger]` object
+* Generators: add `in_path` to signature
+* Daisy: improve `display_process` discovery and fallback
+
 Updates:
 
 * Python typing syntax
@@ -12,6 +19,15 @@ Updates:
 Bugfixes:
 
 * Drop empty expressions (#441)
+* Correctly initialize default $arg2 of `delread~` to `0`
+* c2js: Fix for newer emsdk requiring `-sDEFAULT_TO_CXX=1`
+* NEON: correct sign of `__hv_fms_f` on ARMv8 (`[*~ k]` -> `[-~ k]` chains)
+* SIMD: signal comparisons (`<~`, `>~`, `==~`, ...) output `1.0` instead of a bit mask
+* pd2gui: improve float size and add width parameter
+
+Tests:
+
+* Add jinja2 filter coverage
 
 0.17.3
 -----
