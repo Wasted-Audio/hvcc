@@ -1,9 +1,36 @@
 {
   "id": "mainPatch",
-  "objects": [],
-  "graphs": [
+  "size": {
+    "x": 734,
+    "y": 565
+  },
+  "theme": {
+    "obj_corner_radius": null,
+    "cnv_color": null,
+    "cnv_txt_color": null,
+    "io_color": null,
+    "bg_color": null,
+    "sel_color": null,
+    "com_txt_color": null,
+    "out_color": null
+  },
+  "version": "0.14.0",
+    "objects": [
     {
       "id": "graph1",
+      "type": "graph",
+      "position": {
+        "x": 115,
+        "y": 107
+      },
+      "gop_start": {
+        "x": 0,
+        "y": 0
+      },
+      "size": {
+        "x": 188,
+        "y": 177
+      },
       "objects": [
         {
           "type": "vslider",
@@ -44,35 +71,7 @@
           "min": 0.0,
           "max": 0.0
         }
-      ],
-      "graphs": [],
-      "position": {
-        "x": 115,
-        "y": 107
-      },
-      "gop_start": {
-        "x": 0,
-        "y": 0
-      },
-      "gop_size": {
-        "x": 188,
-        "y": 177
-      }
+      ]
     }
-  ],
-  "size": {
-    "x": 734,
-    "y": 565
-  },
-  "theme": {
-    "obj_corner_radius": null,
-    "cnv_color": null,
-    "cnv_txt_color": null,
-    "io_color": null,
-    "bg_color": null,
-    "sel_color": null,
-    "com_txt_color": null,
-    "out_color": null
-  },
-  "version": "0.14.0"
+  ]
 }

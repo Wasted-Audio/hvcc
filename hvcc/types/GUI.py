@@ -149,6 +149,7 @@ class Knob(BaseParam):
     arc_color: Color
     arc_start: float
     arc_show: bool
+    transparent: bool
 
 
 class Number(BaseParam):
@@ -182,8 +183,17 @@ class Popmenu(BaseParam):
     options: list[str]
 
 
-GUIObjects = Bang | Toggle | Radio | Slider | Knob | Number | Float | Comment | Canvas | Popmenu
+class Graph(BaseUI):
+    type: Literal["graph"] = "graph"
+    position: Coords
+    gop_start: Coords
+    size: Size
+    objects: list['GUIObjects']
 
+
+GUIObjects = Bang | Toggle | Radio | Slider | Knob | Number | Float | Comment | Canvas | Popmenu | Graph
+
+Graph.model_rebuild()
 
 class Theme(BaseModel):
     obj_corner_radius: float | None = None
@@ -196,19 +206,9 @@ class Theme(BaseModel):
     out_color: Color | None = None
 
 
-class GraphBase(BaseModel):
+class GraphRoot(BaseModel):
     id: str = "mainPatch"
-    objects: list[GUIObjects]
-    graphs: list["Graph"]
-
-
-class Graph(GraphBase):
-    position: Coords
-    gop_start: Coords
-    gop_size: Size
-
-
-class GraphRoot(GraphBase):
     size: Size
     theme: Theme | None = Theme()
     version: str = VERSION
+    objects: list[GUIObjects]
