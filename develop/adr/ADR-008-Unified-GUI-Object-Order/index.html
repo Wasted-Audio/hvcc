@@ -11,6 +11,10 @@
         <link rel="canonical" href="https://wasted-audio.github.io/hvcc/develop/adr/ADR-008-Unified-GUI-Object-Order/">
       
       
+        <link rel="prev" href="../ADR-007-MetaModule-Generator/">
+      
+      
+        <link rel="next" href="../../changelog/">
       
       
         
@@ -21,7 +25,7 @@
     
     
       
-        <title>ADR-008: Unified GUI Object Order - Heavy Compiler Collection</title>
+        <title>Unified GUI Object Order - Heavy Compiler Collection</title>
       
     
     
@@ -107,7 +111,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              ADR-008: Unified GUI Object Order
+              Unified GUI Object Order
             
           </span>
         </div>
@@ -271,10 +275,12 @@
   
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
+      <li class="md-tabs__item md-tabs__item--active">
         <a href="../" class="md-tabs__link">
           
   
@@ -1495,26 +1501,31 @@
       
   
   
+    
   
   
+  
     
     
     
     
+      
+        
+        
       
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
         
           
-          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
             
   
   
@@ -1532,7 +1543,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_5">
             <span class="md-nav__icon md-icon"></span>
             
@@ -1767,6 +1778,164 @@
 
               
             
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Unified GUI Object Order
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Unified GUI Object Order
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#context" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Context
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#decision" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Decision
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Decision">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#graph-is-a-guiobject" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Graph is a GUIObject
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sequential-canvas-parsing-in-pdguiparser" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sequential Canvas Parsing in PdGUIParser
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tree-ordered-rendering-in-generators" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tree-Ordered Rendering in Generators
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#breaking-changes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Breaking Changes
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#mvp-definition" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MVP Definition
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1967,6 +2136,39 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#graph-is-a-guiobject" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Graph is a GUIObject
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sequential-canvas-parsing-in-pdguiparser" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sequential Canvas Parsing in PdGUIParser
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tree-ordered-rendering-in-generators" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tree-Ordered Rendering in Generators
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#breaking-changes" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2030,28 +2232,24 @@
 </ol>
 <h2 id="decision">Decision</h2>
 <p>We unify subpatches/graphs and standard GUI objects into a single recursive tree hierarchy:</p>
-<ol>
-<li><strong><code>Graph</code> is a <code>GUIObject</code></strong>:</li>
+<h3 id="graph-is-a-guiobject"><code>Graph</code> is a <code>GUIObject</code></h3>
+<ul>
 <li><code>Graph</code> inherits from <code>BaseUI</code> with <code>type: Literal["graph"] = "graph"</code>.</li>
 <li><code>gop_size</code> is unified to <code>size: Size</code> across all objects.</li>
 <li><code>Graph.objects</code> holds an ordered list of <code>GUIObjects</code> (which recursively includes <code>Graph</code>).</li>
-<li>
-<p><code>GraphBase</code> is removed; <code>GraphRoot</code> retains root-level document metadata (<code>id</code>, <code>size</code>, <code>theme</code>, <code>version</code>) and the top-level <code>objects: list[GUIObjects]</code>.</p>
-</li>
-<li>
-<p><strong>Sequential Canvas Parsing in <code>PdGUIParser</code></strong>:</p>
-</li>
+<li><code>GraphBase</code> is removed; <code>GraphRoot</code> retains root-level document metadata (<code>id</code>, <code>size</code>, <code>theme</code>, <code>version</code>) and the top-level <code>objects: list[GUIObjects]</code>.</li>
+</ul>
+<h3 id="sequential-canvas-parsing-in-pdguiparser">Sequential Canvas Parsing in <code>PdGUIParser</code></h3>
+<ul>
 <li><code>PdGUIParser.gui_from_canvas</code> maintains a single <code>objects: list[GUIObjects]</code> list.</li>
 <li>Subpatches (<code>#N canvas ... #X restore</code>) and abstractions (<code>#X obj</code>) are appended directly into <code>objects</code> at the point they are encountered.</li>
-<li>
-<p><code>filter_invisible_graphs</code> is merged into <code>filter_invisible_objects</code>, which recursively validates bounding box intersections with the local GoP area and discards empty graphs.</p>
-</li>
-<li>
-<p><strong>Tree-Ordered Rendering in Generators</strong>:</p>
-</li>
+<li><code>filter_invisible_graphs</code> is merged into <code>filter_invisible_objects</code>, which recursively validates bounding box intersections with the local GoP area and discards empty graphs.</li>
+</ul>
+<h3 id="tree-ordered-rendering-in-generators">Tree-Ordered Rendering in Generators</h3>
+<ul>
 <li>Generators like <code>nanovg_render.py</code> traverse <code>objects</code> in sequence.</li>
 <li>Standard objects and <code>PDSubpatch</code> instances are instantiated and added to the parent widget in the exact order parsed, correctly preserving z-order while keeping child objects clipped inside their respective subpatches.</li>
-</ol>
+</ul>
 <h3 id="breaking-changes">Breaking Changes</h3>
 <ul>
 <li><strong>Breaking IR Change</strong>: The top-level <code>"graphs"</code> key and nested <code>"graphs"</code> keys in the GUI IR JSON are removed. Subpatches now appear inside <code>"objects"</code> with <code>"type": "graph"</code>.</li>
