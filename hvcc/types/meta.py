@@ -150,7 +150,9 @@ class MetaModule(BaseModel):
     version:     str = "1.0.0"
     license:     str = "GPL-3.0-only"
     brand:       str = "Heavy"
-    author:      str = "Heavy"
+    author:      str = "Heavy User"
+    email:       str = "developer@wasted.audio"
+    url:         str = "https://wasted.audio"
     description: str = "Description of the plugin"
     modules:     list[metaPlugin] = [metaPlugin()]
 
