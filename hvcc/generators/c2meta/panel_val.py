@@ -3,13 +3,12 @@
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
-from pydantic_extra_types.color import Color
 
 from hvcc.types.compiler import ExternInfo
 from hvcc.types.meta import MetaModule
 from hvcc.types.metamodule import Assets, Input, Knob, Led, Output, UIElement
 
-from .panel_gen import DEFAULT_PANEL_COLOR, PANEL_HEIGHT, PANEL_MIN_WIDTH, Panel, image_size, layout_panel_assets
+from .panel_gen import image_size, layout_panel_assets
 
 
 def _reconcile_components(
@@ -123,16 +122,15 @@ def ensure_panel_assets(
 
     # Auto-layout if any component is missing coordinates
     all_elements: list[UIElement] = [*knobs, *leds, *inputs, *outputs]
-    needs_layout = any(el.x is None or el.y is None for el in all_elements)
+    needs_layout = (
+        any(el.x is None or el.y is None for el in all_elements)
+        or assets.panel is None
+        or assets.panel.x is None
+        or assets.panel.y is None
+    )
 
     if needs_layout:
         assets = layout_panel_assets(assets)
-
-    # Ensure panel model exists with dimensions and color (image remains None if auto-generated)
-    if assets.panel is None:
-        assets.panel = Panel(x=PANEL_MIN_WIDTH, y=PANEL_HEIGHT, color=Color(DEFAULT_PANEL_COLOR))
-    elif assets.panel.color is None:
-        assets.panel.color = Color(DEFAULT_PANEL_COLOR)
 
     module.assets = assets
     return module.assets

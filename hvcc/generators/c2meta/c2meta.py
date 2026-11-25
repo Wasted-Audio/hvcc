@@ -203,9 +203,9 @@ class c2meta(Generator):
 
             mm_json_path = Path(out_dir, "plugin-mm.json")
             mm_json = mmJson(
-                MetaModulePluginMaintainer="Wasted Audio",
-                MetaModulePluginMaintainerEmail="developer@wasted.audio",
-                MetaModulePluginMaintainerUrl="https://wasted.audio",
+                MetaModulePluginMaintainer=mm_meta.brand,
+                MetaModulePluginMaintainerEmail=mm_meta.email,
+                MetaModulePluginMaintainerUrl=mm_meta.url,
                 MetaModuleDescription=mm_meta.description
             )
 

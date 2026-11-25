@@ -35,6 +35,8 @@ In order to set custom information you should supply a `metadata.json` using `-m
         "license": "GPL-3.0-only",
         "brand": "Heavy",
         "author": "Heavy User",
+        "email": "user@brand.tld",
+        "url": "https://brand.tld",
         "description": "Description of the plugin",
         "modules": [
             {
