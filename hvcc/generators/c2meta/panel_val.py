@@ -3,13 +3,12 @@
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
-from pydantic_extra_types.color import Color
 
 from hvcc.types.compiler import ExternInfo
 from hvcc.types.meta import MetaModule
 from hvcc.types.metamodule import Assets, Input, Knob, Led, Output, UIElement
 
-from .panel_gen import DEFAULT_PANEL_COLOR, PANEL_HEIGHT, PANEL_MIN_WIDTH, Panel, image_size, layout_panel_assets
+from .panel_gen import image_size, layout_panel_assets
 
 
 def _reconcile_components(
