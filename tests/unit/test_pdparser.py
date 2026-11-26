@@ -109,3 +109,18 @@ def test_trigger_convert_args():
     assert convert_args(["symbol"]) == ["s"]
     assert convert_args(["bang"]) == ["b"]
     assert convert_args(["unknown"]) == ["unknown"]
+
+
+def test_faustgen_patch(tmp_path: Path):
+    pd_path = tmp_path / "faust_path.pd"
+    pd_path.write_text(
+        """#N canvas 827 239 734 565 12;
+#X obj 86 129 faustgen2~ gain;
+""")
+
+    graph = PdParser().graph_from_file(pd_path)
+    assert not graph.get_notices().has_error
+
+    faustgen_object = graph.to_hv()
+    object = next(iter(faustgen_object.objects.items()))
+    assert object[1].args["faustpatch"] == "gain"
