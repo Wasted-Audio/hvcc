@@ -22,12 +22,12 @@ class XY(BaseModel):
         return self
 
 
-class Knob(XY, BaseModel):
+class Knob(XY):
     param: str
     image: Path = Field(default=Path(__file__).parent / '../generators/c2meta/assets/knob.png')
 
 
-class Jack(XY, BaseModel):
+class Jack(XY):
     id: int
     name: str | None = None
     image: Path = Field(default=Path(__file__).parent / '../generators/c2meta/assets/jack.png')
@@ -41,12 +41,12 @@ class Output(Jack):
     pass
 
 
-class Led(XY, BaseModel):
+class Led(XY):
     led: str
     image: Path = Field(default=Path(__file__).parent / '../generators/c2meta/assets/led.png')
 
 
-class Panel(XY, BaseModel):
+class Panel(XY):
     image: Path | None = None
     color: Color | None = None
 

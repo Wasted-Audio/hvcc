@@ -1,7 +1,7 @@
 import pytest
 
 from hvcc.generators.c2dpf.c2dpf import _normalize_port_groups
-from hvcc.types.meta import DPFPortGroupConfig, DPFPortGroups, slugify
+from hvcc.types.dpf import DPFPortGroupConfig, DPFPortGroups, slugify
 
 
 def test_type():
