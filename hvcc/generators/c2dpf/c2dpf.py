@@ -27,15 +27,8 @@ from hvcc.types.compiler import (
     ExternInfo,
     Generator,
 )
-from hvcc.types.meta import (
-    DPF,
-    DPFPortGroupConfig,
-    DPFPortGroups,
-    DPFUISize,
-    DPFUIType,
-    Meta,
-    slugify,
-)
+from hvcc.types.dpf import DPFPortGroupConfig, DPFPortGroups, DPFUISize, DPFUIType, slugify
+from hvcc.types.meta import DPF, Meta
 
 from ..copyright import copyright_manager
 from ..filters import filter_uniqueid
