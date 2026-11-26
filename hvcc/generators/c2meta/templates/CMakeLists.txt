@@ -25,6 +25,6 @@ add_custom_command(
     TARGET plugin
     POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy
-        ${CMAKE_CURRENT_LIST_DIR}/../metamodule-plugins/dattorro.mmplugin
-        ${CMAKE_CURRENT_LIST_DIR}/../metamodule-plugins/dattorro-v${PROJECT_VERSION}.mmplugin
+        ${CMAKE_CURRENT_LIST_DIR}/../metamodule-plugins/{{ name }}.mmplugin
+        ${CMAKE_CURRENT_LIST_DIR}/../metamodule-plugins/{{ name }}-v${PROJECT_VERSION}.mmplugin
 )
