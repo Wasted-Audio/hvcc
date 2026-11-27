@@ -23,7 +23,7 @@ from .PdObject import PdObject
 class PdFaustObject(PdObject):
     """
     Limitations (compared to faustgen2~):
-    - requires patch.dsp as argument
+    - requires patch name as argument
     """
 
     def __init__(
@@ -62,7 +62,9 @@ class PdFaustObject(PdObject):
         return Heavy(
             type=f"__{self.obj_type}",
             args={
-                "faustpatch": self.faustpatch
+                "faustpatch": self.faustpatch,
+                "num_inlets": len(set(self._inlet_connections)),
+                "num_outlets": len(set(self._outlet_connections))
             },
             properties=HvPos(x=self.pos_x, y=self.pos_y)
         )

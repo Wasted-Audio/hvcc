@@ -180,9 +180,13 @@ def test_faustgen_iolets(tmp_path: Path):
     assert not notices.errors
 
     hv_graph = graph.to_hv()
-    faustgen_id = next(
-        obj_id for obj_id, obj in hv_graph.objects.items() if obj.type == "__faustgen2~"
+    faustgen_id, faustgen_obj = next(
+        (obj_id, obj) for obj_id, obj in hv_graph.objects.items() if obj.type == "__faustgen2~"
     )
+
+    import devtools
+
+    devtools.pprint(hv_graph)
 
     inlet_types = {
         conn.conn_to.inlet: conn.type
@@ -195,6 +199,8 @@ def test_faustgen_iolets(tmp_path: Path):
         if conn.conn_from.id == faustgen_id
     }
 
+    assert faustgen_obj.args['num_inlets'] == 3
+    assert faustgen_obj.args['num_outlets'] == 3
     assert inlet_types == {0: "-->", 1: "~f>", 2: "~f>"}
     assert outlet_types == {0: "-->", 1: "~f>", 2: "~f>"}
 
@@ -220,9 +226,12 @@ def test_faustgen_mixed_inlets(tmp_path: Path):
     assert not notices.errors
 
     hv_graph = graph.to_hv()
-    faustgen_id = next(
-        obj_id for obj_id, obj in hv_graph.objects.items() if obj.type == "__faustgen2~"
+    faustgen_id, faustgen_obj = next(
+        (obj_id, obj) for obj_id, obj in hv_graph.objects.items() if obj.type == "__faustgen2~"
     )
+
+    assert faustgen_obj.args['num_inlets'] == 2
+    assert faustgen_obj.args['num_outlets'] == 0
 
     inlet_types = {
         conn.conn_to.inlet: conn.type

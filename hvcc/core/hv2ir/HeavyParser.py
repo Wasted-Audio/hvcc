@@ -30,6 +30,7 @@ from .HeavyIrObject import HeavyIrObject
 from .HeavyLangObject import HeavyLangObject
 from .HIrConvolution import HIrConvolution
 from .HIrExpr import HIrExpr
+from .HIrFaust import HIrFaust
 from .HIrInlet import HIrInlet
 from .HIrLorenz import HIrLorenz
 from .HIrNam import HIrNam
@@ -322,4 +323,5 @@ LANG_CLASS_DICT = {
     "__pack": HIrPack,
     "__expr": HIrExpr,
     "__expr~": HIrExpr,
+    "__faustgen2~": HIrFaust
 }
