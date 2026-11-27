@@ -44,8 +44,17 @@ class PdFaustObject(PdObject):
 
         self.faustpatch = self.obj_args[0]
 
-        # this is overridden by PdParser
-        self.num_inlets = 1
+    def get_inlet_connection_type(self, inlet_index: int) -> str | None:
+        """ In faustgen2~ the first inlet is always for control messages.
+            The rest are signal.
+        """
+        return "-->" if inlet_index == 0 else "~f>"
+
+    def get_outlet_connection_type(self, outlet_index: int) -> str | None:
+        """ In faustgen2~ the first outlet is always for control messages.
+            The rest are signal.
+        """
+        return "-->" if outlet_index == 0 else "~f>"
 
     def validate_configuration(self) -> None:
         pass
@@ -54,8 +63,7 @@ class PdFaustObject(PdObject):
         return Heavy(
             type=f"__{self.obj_type}",
             args={
-                "faustpatch": self.faustpatch,
-                "num_inlets": self.num_inlets
+                "faustpatch": self.faustpatch
             },
             properties=HvPos(x=self.pos_x, y=self.pos_y)
         )

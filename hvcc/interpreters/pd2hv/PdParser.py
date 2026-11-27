@@ -29,7 +29,7 @@ from .NotificationEnum import NotificationEnum
 from .PdAudioIoObject import PdAudioIoObject  # adc~/dac~
 from .PdBinopObject import PdBinopObject  # binary arithmatic operators
 from .PdExprObject import PdExprObject  # expr/expr~
-from .PdFaustObject import PdFaustObject # faustgen2~
+from .PdFaustObject import PdFaustObject  # faustgen2~
 from .PdGraph import PdGraph  # canvas
 from .PdLetObject import PdLetObject  # inlet/inlet~/outlet/outlet~
 from .PdLibSignalGraph import PdLibSignalGraph  # pd/lib abstraction connection checks

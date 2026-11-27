@@ -2,6 +2,7 @@ from pathlib import Path
 
 from hvcc.interpreters.pd2hv.PdParser import PdParser
 from hvcc.interpreters.pd2hv.PdTriggerObject import PdTriggerObject
+from hvcc.types.Heavy import HvConn
 
 
 def test_single_array_in_subpatch(tmp_path: Path):
@@ -112,7 +113,7 @@ def test_trigger_convert_args():
 
 
 def test_faustgen_patch(tmp_path: Path):
-    pd_path = tmp_path / "faust_path.pd"
+    pd_path = tmp_path / "faust_patch.pd"
     pd_path.write_text(
         """#N canvas 827 239 734 565 12;
 #X obj 86 129 faustgen2~ gain;
@@ -124,3 +125,39 @@ def test_faustgen_patch(tmp_path: Path):
     faustgen_object = graph.to_hv()
     object = next(iter(faustgen_object.objects.items()))
     assert object[1].args["faustpatch"] == "gain"
+
+
+def test_faustgen_iolets(tmp_path: Path):
+    pd_path = tmp_path / "faust_patch.pd"
+    pd_path.write_text(
+        """#N canvas 827 239 734 565 12;
+#X obj 144 126 faustgen2~ gain;
+#X obj 144 67 loadbang;
+#X obj 144 158 print;
+#X obj 287 67 osc~ 220;
+#X obj 287 158 dac~ 1;
+#X msg 144 93 gain 1;
+#X connect 0 0 2 0;
+#X connect 0 1 4 0;
+#X connect 1 0 5 0;
+#X connect 3 0 0 1;
+#X connect 5 0 0 0;
+""")
+
+    graph = PdParser().graph_from_file(pd_path)
+    assert not graph.get_notices().has_error
+    graph.validate_configuration()
+
+    hv_graph = graph.to_hv()
+    faustgen_object = next(iter(hv_graph.objects))
+
+    connections: list[HvConn] = hv_graph.connections
+
+    for conn in connections:
+        if (conn.conn_from.id == faustgen_object and conn.conn_from.outlet == 0) or \
+           (conn.conn_to.id == faustgen_object and conn.conn_to.inlet == 0):
+            assert conn.type == '-->'
+
+        if (conn.conn_from.id == faustgen_object and conn.conn_from.outlet >= 1) or \
+           (conn.conn_to.id == faustgen_object and conn.conn_to.inlet >= 1):
+            assert conn.type == '~f>'
