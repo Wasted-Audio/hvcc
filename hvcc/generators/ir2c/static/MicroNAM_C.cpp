@@ -99,6 +99,50 @@ void MicroNAM_StandardNet_Process(MicroNAM_StandardNet* net, float* input, float
     reinterpret_cast<StandardNet<NAM_BLOCK_SIZE>*>(net)->forward(input, output);
 }
 
+// --- A2LiteNet ---
+
+MicroNAM_A2LiteNet* MicroNAM_A2LiteNet_Create(void) {
+    return reinterpret_cast<MicroNAM_A2LiteNet*>(new (std::nothrow) A2LiteNet<NAM_BLOCK_SIZE>());
+}
+
+void MicroNAM_A2LiteNet_Destroy(MicroNAM_A2LiteNet* net) {
+    delete reinterpret_cast<A2LiteNet<NAM_BLOCK_SIZE>*>(net);
+}
+
+void MicroNAM_A2LiteNet_Reset(MicroNAM_A2LiteNet* net) {
+    reinterpret_cast<A2LiteNet<NAM_BLOCK_SIZE>*>(net)->reset();
+}
+
+void MicroNAM_A2LiteNet_LoadWeights(MicroNAM_A2LiteNet* net, const float* weights) {
+    reinterpret_cast<A2LiteNet<NAM_BLOCK_SIZE>*>(net)->load_weights(weights);
+}
+
+void MicroNAM_A2LiteNet_Process(MicroNAM_A2LiteNet* net, float* input, float* output) {
+    reinterpret_cast<A2LiteNet<NAM_BLOCK_SIZE>*>(net)->forward(input, output);
+}
+
+// --- A2FullNet ---
+
+MicroNAM_A2FullNet* MicroNAM_A2FullNet_Create(void) {
+    return reinterpret_cast<MicroNAM_A2FullNet*>(new (std::nothrow) A2FullNet<NAM_BLOCK_SIZE>());
+}
+
+void MicroNAM_A2FullNet_Destroy(MicroNAM_A2FullNet* net) {
+    delete reinterpret_cast<A2FullNet<NAM_BLOCK_SIZE>*>(net);
+}
+
+void MicroNAM_A2FullNet_Reset(MicroNAM_A2FullNet* net) {
+    reinterpret_cast<A2FullNet<NAM_BLOCK_SIZE>*>(net)->reset();
+}
+
+void MicroNAM_A2FullNet_LoadWeights(MicroNAM_A2FullNet* net, const float* weights) {
+    reinterpret_cast<A2FullNet<NAM_BLOCK_SIZE>*>(net)->load_weights(weights);
+}
+
+void MicroNAM_A2FullNet_Process(MicroNAM_A2FullNet* net, float* input, float* output) {
+    reinterpret_cast<A2FullNet<NAM_BLOCK_SIZE>*>(net)->forward(input, output);
+}
+
 #ifdef __cplusplus
 } // extern "C"
 #endif

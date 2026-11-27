@@ -458,7 +458,7 @@ class PdParser:
                                 path = Path(obj_args[0])
                                 if not path.is_absolute():
                                     path = pd_path.parent / path
-                                obj_args = [str(path)]
+                                obj_args = [str(path), *obj_args[1:]]
 
                             x = self.graph_from_file(
                                 file_path=hvlib_path,
