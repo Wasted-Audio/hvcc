@@ -36,13 +36,12 @@ class PdFaustObject(PdObject):
         assert obj_type == "faustgen2~"
         super().__init__(obj_type, obj_args, pos_x, pos_y)
 
-        # turn the arguments into a list of expressions, but only one for now
         if len(self.obj_args) == 0:
             self.add_error("No patch arguments")
         elif len(self.obj_args) > 1:
             self.add_error("Only a single patch argument is allowed")
 
-        self.faustpatch = self.obj_args[0]
+        self.faustpatch = self.obj_args[0] if len(self.obj_args) > 0 else ""
 
     def get_inlet_connection_type(self, inlet_index: int) -> str | None:
         """ In faustgen2~ the first inlet is always for control messages.

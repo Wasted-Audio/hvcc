@@ -2,7 +2,6 @@ from pathlib import Path
 
 from hvcc.interpreters.pd2hv.PdParser import PdParser
 from hvcc.interpreters.pd2hv.PdTriggerObject import PdTriggerObject
-from hvcc.types.Heavy import HvConn
 
 
 def test_single_array_in_subpatch(tmp_path: Path):
@@ -96,7 +95,9 @@ def test_nam_path(tmp_path: Path):
 """)
 
     graph = PdParser().graph_from_file(pd_path)
-    assert not graph.get_notices().has_error
+    notices = graph.get_notices()
+    assert not notices.has_error
+    assert not notices.errors
 
     nam_object = graph.get_objects()[0].get_objects()[1]
     assert Path(nam_object.obj_dict["nam"]) == tmp_path / "test.nam"
@@ -120,44 +121,112 @@ def test_faustgen_patch(tmp_path: Path):
 """)
 
     graph = PdParser().graph_from_file(pd_path)
-    assert not graph.get_notices().has_error
+    notices = graph.get_notices()
+    assert not notices.has_error
+    assert not notices.errors
 
-    faustgen_object = graph.to_hv()
-    object = next(iter(faustgen_object.objects.items()))
-    assert object[1].args["faustpatch"] == "gain"
+    hv_graph = graph.to_hv()
+    _, obj = next(iter(hv_graph.objects.items()))
+    assert obj.type == "__faustgen2~"
+    assert obj.args["faustpatch"] == "gain"
+
+
+def test_faustgen_args_errors(tmp_path: Path):
+    no_arg_path = tmp_path / "faust_no_arg.pd"
+    no_arg_path.write_text(
+        """#N canvas 827 239 734 565 12;
+#X obj 86 129 faustgen2~;
+""")
+
+    graph = PdParser().graph_from_file(no_arg_path)
+    notices = graph.get_notices()
+    assert len(notices.errors) == 1
+    assert "No patch arguments" in notices.errors[0].message
+
+    multi_arg_path = tmp_path / "faust_multi_arg.pd"
+    multi_arg_path.write_text(
+        """#N canvas 827 239 734 565 12;
+#X obj 86 129 faustgen2~ gain extra;
+""")
+
+    graph = PdParser().graph_from_file(multi_arg_path)
+    notices = graph.get_notices()
+    assert len(notices.errors) == 1
+    assert "Only a single patch argument is allowed" in notices.errors[0].message
 
 
 def test_faustgen_iolets(tmp_path: Path):
-    pd_path = tmp_path / "faust_patch.pd"
+    pd_path = tmp_path / "faust_iolets.pd"
     pd_path.write_text(
         """#N canvas 827 239 734 565 12;
-#X obj 144 126 faustgen2~ gain;
+#X obj 144 126 faustgen2~ stereogain;
 #X obj 144 67 loadbang;
 #X obj 144 158 print;
 #X obj 287 67 osc~ 220;
-#X obj 287 158 dac~ 1;
+#X obj 287 158 dac~ 1 2;
 #X msg 144 93 gain 1;
 #X connect 0 0 2 0;
 #X connect 0 1 4 0;
+#X connect 0 2 4 1;
 #X connect 1 0 5 0;
 #X connect 3 0 0 1;
+#X connect 3 0 0 2;
 #X connect 5 0 0 0;
 """)
 
     graph = PdParser().graph_from_file(pd_path)
-    assert not graph.get_notices().has_error
-    graph.validate_configuration()
+    notices = graph.get_notices()
+    assert not notices.has_error
+    assert not notices.errors
 
     hv_graph = graph.to_hv()
-    faustgen_object = next(iter(hv_graph.objects))
+    faustgen_id = next(
+        obj_id for obj_id, obj in hv_graph.objects.items() if obj.type == "__faustgen2~"
+    )
 
-    connections: list[HvConn] = hv_graph.connections
+    inlet_types = {
+        conn.conn_to.inlet: conn.type
+        for conn in hv_graph.connections
+        if conn.conn_to.id == faustgen_id
+    }
+    outlet_types = {
+        conn.conn_from.outlet: conn.type
+        for conn in hv_graph.connections
+        if conn.conn_from.id == faustgen_id
+    }
 
-    for conn in connections:
-        if (conn.conn_from.id == faustgen_object and conn.conn_from.outlet == 0) or \
-           (conn.conn_to.id == faustgen_object and conn.conn_to.inlet == 0):
-            assert conn.type == '-->'
+    assert inlet_types == {0: "-->", 1: "~f>", 2: "~f>"}
+    assert outlet_types == {0: "-->", 1: "~f>", 2: "~f>"}
 
-        if (conn.conn_from.id == faustgen_object and conn.conn_from.outlet >= 1) or \
-           (conn.conn_to.id == faustgen_object and conn.conn_to.inlet >= 1):
-            assert conn.type == '~f>'
+
+def test_faustgen_mixed_inlets(tmp_path: Path):
+    pd_path = tmp_path / "faust_mixed_inlets.pd"
+    pd_path.write_text(
+        """#N canvas 827 239 734 565 12;
+#N canvas 0 0 200 200 mixed0 0;
+#X obj 10 10 outlet -~>;
+#X restore 50 50 pd mixed0;
+#N canvas 0 0 200 200 mixed1 0;
+#X obj 10 10 outlet -~>;
+#X restore 150 50 pd mixed1;
+#X obj 100 120 faustgen2~ gain;
+#X connect 0 0 2 0;
+#X connect 1 0 2 1;
+""")
+
+    graph = PdParser().graph_from_file(pd_path)
+    notices = graph.get_notices()
+    assert not notices.has_error
+    assert not notices.errors
+
+    hv_graph = graph.to_hv()
+    faustgen_id = next(
+        obj_id for obj_id, obj in hv_graph.objects.items() if obj.type == "__faustgen2~"
+    )
+
+    inlet_types = {
+        conn.conn_to.inlet: conn.type
+        for conn in hv_graph.connections
+        if conn.conn_to.id == faustgen_id
+    }
+    assert inlet_types == {0: "-->", 1: "~f>"}
