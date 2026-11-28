@@ -1,5 +1,3 @@
-"""TDD tests for lowering __faustgen2~ from HeavyLang into HeavyIR (hv2ir)."""
-
 import json
 from pathlib import Path
 
