@@ -38,7 +38,7 @@ class HLangDac(HeavyLangObject):
                          annotations=annotations)
 
     def reduce(self) -> tuple:
-        objects = set()
+        objects = []
         connections = []
 
         # reduce a HeavyLang dac to a number of individual HeavyIR __add~f objects
@@ -47,7 +47,7 @@ class HLangDac(HeavyLangObject):
                 x = HeavyIrObject("__add~f")
                 x.inlet_buffers[1] = ("output", channel_index - 1)  # channel indicies are one-indexed
                 x.outlet_buffers[0] = ("output", channel_index - 1)
-                objects.add(x)
+                objects.append(x)
 
                 for c in self.inlet_connections[i]:
                     connections.append((c, [c.copy(to_object=x, inlet_index=0)]))

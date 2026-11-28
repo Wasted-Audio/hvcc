@@ -43,7 +43,7 @@ class HLangAdc(HeavyLangObject):
         return "~f>"
 
     def reduce(self) -> tuple:
-        objects = set()
+        objects = []
         connections = []
 
         # reduce a HeavyLang adc to a number of individual HeavyIR __inlet objects
@@ -53,7 +53,7 @@ class HLangAdc(HeavyLangObject):
                     "index": 127 + channel_index
                 })
                 x.outlet_buffers[0] = ("input", channel_index - 1)  # channel indicies are one-indexed
-                objects.add(x)
+                objects.append(x)
 
                 for c in self.outlet_connections[i]:
                     connections.append((c, [c.copy(from_object=x, outlet_index=0)]))
