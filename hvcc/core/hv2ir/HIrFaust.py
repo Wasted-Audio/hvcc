@@ -13,6 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from hvcc.types.Lang import LangLetType
 
 from .HeavyGraph import HeavyGraph
 from .HeavyIrObject import HeavyIrObject
@@ -43,3 +44,9 @@ class HIrFaust(HeavyIrObject):
     def outlet_requires_signal(self, outlet_index: int = 0) -> bool:
         # Outlets above 0 require a signal
         return outlet_index > 0
+
+    def _resolved_outlet_type(self, outlet_index: int = 0) -> LangLetType:
+        # The faustgen2~ object has a dynamic number of outlets, which cannot be
+        # described statically in heavy.ir.json. The first outlet always carries
+        # control messages, the rest carry signals.
+        return "-->" if outlet_index == 0 else "~f>"

@@ -43,6 +43,14 @@ class PdFaustObject(PdObject):
 
         self.faustpatch = self.obj_args[0] if len(self.obj_args) > 0 else ""
 
+    @staticmethod
+    def _num_iolets(connections: dict) -> int:
+        """ Returns the number of inlets/outlets needed to hold all connections.
+        """
+        if len(connections) == 0:
+            return 0
+        return max(int(index) for index in connections) + 1
+
     def get_inlet_connection_type(self, inlet_index: int) -> str | None:
         """ In faustgen2~ the first inlet is always for control messages.
             The rest are signal.
@@ -63,8 +71,8 @@ class PdFaustObject(PdObject):
             type=f"__{self.obj_type}",
             args={
                 "faustpatch": self.faustpatch,
-                "num_inlets": len(set(self._inlet_connections)),
-                "num_outlets": len(set(self._outlet_connections))
+                "num_inlets": self._num_iolets(self._inlet_connections),
+                "num_outlets": self._num_iolets(self._outlet_connections)
             },
             properties=HvPos(x=self.pos_x, y=self.pos_y)
         )

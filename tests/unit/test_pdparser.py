@@ -184,10 +184,6 @@ def test_faustgen_iolets(tmp_path: Path):
         (obj_id, obj) for obj_id, obj in hv_graph.objects.items() if obj.type == "__faustgen2~"
     )
 
-    import devtools
-
-    devtools.pprint(hv_graph)
-
     inlet_types = {
         conn.conn_to.inlet: conn.type
         for conn in hv_graph.connections
