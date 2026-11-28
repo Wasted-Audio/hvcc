@@ -113,10 +113,10 @@ class PdObject:
             ]
         )
 
-    def get_inlet_connections(self) -> dict[str, Connection]:
+    def get_inlet_connections(self) -> dict[str, list[Connection]]:
         return self._inlet_connections
 
-    def get_outlet_connections(self) -> dict[str, Connection]:
+    def get_outlet_connections(self) -> dict[str, list[Connection]]:
         return self._outlet_connections
 
     def get_inlet_connection_type(self, inlet_index: int) -> str | None:

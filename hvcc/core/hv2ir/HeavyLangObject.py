@@ -114,7 +114,7 @@ class HeavyLangObject:
         """
         return self._HEAVY_LANG_DICT[self.type]
 
-    def reduce(self) -> tuple:
+    def reduce(self) -> tuple | None:
         raise NotImplementedError("reduce method not implemented")
 
     def inlet_connection_type(self, index: int) -> LangLet:
