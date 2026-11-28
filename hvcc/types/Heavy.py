@@ -3,6 +3,7 @@
 #
 # SPDX-License-Identifier: GPL-3.0-only
 
+from typing import Annotated
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -26,8 +27,8 @@ class HvConn(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
     type: str
-    conn_from: HvConnFrom = Field(..., alias='from')
-    conn_to: HvConnTo = Field(..., alias='to')
+    conn_from: Annotated[HvConnFrom, Field(..., alias='from')]
+    conn_to: Annotated[HvConnTo, Field(..., alias='to')]
 
 
 class Heavy(BaseModel):

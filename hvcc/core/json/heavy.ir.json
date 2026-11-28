@@ -1103,6 +1103,36 @@
       "required": true
     }]
   },
+  "__faustgen2~": {
+    "inlets": [],
+    "ir": {
+      "control": true,
+      "signal": true,
+      "init": true
+    },
+    "outlets": [],
+    "args": [{
+        "name": "faustpatch",
+        "value_type": "string",
+        "description": "The faust patch to integrate",
+        "default": "",
+        "required": true
+    },
+    {
+      "name": "num_inlets",
+      "value_type": "int",
+      "description": "Number of inlets for this instance",
+      "default": "",
+      "required": true
+    },
+    {
+      "name": "num_outlets",
+      "value_type": "int",
+      "description": "Number of outlets for this instance",
+      "default": "",
+      "required": true
+    }]
+  },
   "__floor": {
     "inlets": [
       "-->"

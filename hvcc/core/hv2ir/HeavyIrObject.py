@@ -124,10 +124,10 @@ class HeavyIrObject(HeavyLangObject):
         """
         return self.__obj_desc.inlets[inlet_index] in {"~i>", "~f>"}
 
-    def outlet_requires_signal(self, inlet_index: int = 0) -> bool:
+    def outlet_requires_signal(self, outlet_index: int = 0) -> bool:
         """ Returns True if the indexed outlet requires a signal connection. False otherwise.
         """
-        return self.__obj_desc.outlets[inlet_index] in {"~i>", "~f>"}
+        return self.__obj_desc.outlets[outlet_index] in {"~i>", "~f>"}
 
     def reduce(self) -> tuple | None:
         # A Heavy IR object is already reduced. Returns itself and no connection changes.
